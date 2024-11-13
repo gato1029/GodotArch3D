@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "GodotEcsArch": {
+      "commandName": "Project"
+    },
+    "Perfil 1": {
+      "commandName": "Executable",
+      "executablePath": "D:\\godot\\Godot_v4.4-dev3_mono_win64\\Godot_v4.4-dev3_mono_win64\\Godot_v4.4-dev3_mono_win64.exe",
+      "commandLineArgs": "--path. --verbose",
+      "workingDirectory": "."
+    }
+  }
+}

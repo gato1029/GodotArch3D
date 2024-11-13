@@ -1,0 +1,184 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\GitKraken\\ArchEcsGodot\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\managers\\unitmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\unitmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\mainnode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:mainnode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\godot\\cameracontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\godot\\cameracontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\managers\\ecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\ecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\systems\\searchmovementtargetsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\searchmovementtargetsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\systems\\movementsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\movementsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\components\\unitscomponents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\components\\unitscomponents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\managers\\collisionmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\collisionmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\archecsgodot\\sources\\components\\basiccomponents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\components\\basiccomponents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CameraController.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\godot\\CameraController.cs",
+              "RelativeDocumentMoniker": "sources\\godot\\CameraController.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\godot\\CameraController.cs",
+              "RelativeToolTip": "sources\\godot\\CameraController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAxwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T03:14:05.851Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Main.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\Main.cs",
+              "RelativeDocumentMoniker": "sources\\Main.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\Main.cs",
+              "RelativeToolTip": "sources\\Main.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAkwBMAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-27T00:29:51.946Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "BasicComponents.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\components\\BasicComponents.cs",
+              "RelativeDocumentMoniker": "sources\\components\\BasicComponents.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\components\\BasicComponents.cs",
+              "RelativeToolTip": "sources\\components\\BasicComponents.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-26T23:49:29.614Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "UnitsComponents.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\components\\UnitsComponents.cs",
+              "RelativeDocumentMoniker": "sources\\components\\UnitsComponents.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\components\\UnitsComponents.cs",
+              "RelativeToolTip": "sources\\components\\UnitsComponents.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-26T23:49:01.908Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "CollisionManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\managers\\CollisionManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\CollisionManager.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\managers\\CollisionManager.cs",
+              "RelativeToolTip": "sources\\managers\\CollisionManager.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABUAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-26T23:39:46.977Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EcsManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\managers\\EcsManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\EcsManager.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\managers\\EcsManager.cs",
+              "RelativeToolTip": "sources\\managers\\EcsManager.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAkwDcAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-26T23:32:10.841Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MovementSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\systems\\MovementSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\MovementSystem.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\systems\\MovementSystem.cs",
+              "RelativeToolTip": "sources\\systems\\MovementSystem.cs",
+              "ViewState": "AgIAAHwAAAAAAAAAAAAUwJoAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-25T19:58:15.528Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "SearchMovementTargetSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\systems\\SearchMovementTargetSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\SearchMovementTargetSystem.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\systems\\SearchMovementTargetSystem.cs",
+              "RelativeToolTip": "sources\\systems\\SearchMovementTargetSystem.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAAAtwFQAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-25T19:55:31.579Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UnitManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\sources\\managers\\UnitManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\UnitManager.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\sources\\managers\\UnitManager.cs",
+              "RelativeToolTip": "sources\\managers\\UnitManager.cs",
+              "ViewState": "AgIAAE8AAAAAAAAAAAAkwF8AAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-25T19:57:06.174Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainNode.cs",
+              "DocumentMoniker": "D:\\GitKraken\\ArchEcsGodot\\MainNode.cs",
+              "RelativeDocumentMoniker": "MainNode.cs",
+              "ToolTip": "D:\\GitKraken\\ArchEcsGodot\\MainNode.cs",
+              "RelativeToolTip": "MainNode.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAgwDQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-25T19:29:21.445Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
