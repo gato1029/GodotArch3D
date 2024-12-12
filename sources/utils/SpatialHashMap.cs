@@ -1,4 +1,4 @@
-﻿using Arch.Core;
+using Arch.Core;
 using Arch.LowLevel;
 using Arch.LowLevel.Jagged;
 using Godot;
@@ -16,6 +16,7 @@ internal class SpatialHashMap<TItem> where TItem : struct
     private readonly float cellSize;   
     public readonly Dictionary<int, Dictionary<int, TItem>> cellMap;
     private readonly Dictionary<int, int> mapItems;
+    private readonly Dictionary<Vector2, Transform3D> gridPositions;
 
     private readonly Func<TItem, int> getPositionItem;
 
@@ -27,6 +28,7 @@ internal class SpatialHashMap<TItem> where TItem : struct
         this.getPositionItem = getPositionItem;
         this.cellMap = new Dictionary<int, Dictionary<int, TItem>>();
         this.mapItems = new Dictionary<int, int>();
+        gridPositions =  new Dictionary<Vector2, Transform3D>();
     }
 
     public int CantorPairing(int X, int Y)
@@ -40,18 +42,25 @@ internal class SpatialHashMap<TItem> where TItem : struct
 
     private int GetCellIndex(Vector2 position)
     {
-        int cellX = (int)(position.X / cellSize);
-        int cellY = (int)(position.Y / cellSize);
+        int cellX = (int)Math.Floor(position.X / cellSize);
+        int cellY = (int)Math.Floor(position.Y / cellSize);
         return CantorPairing(cellX,cellY); 
     }
+    private Vector2 GetCellIndexNormalized(Vector2 position)
+    {
+        int cellX = (int)Math.Floor(position.X / cellSize);
+        int cellY = (int)Math.Floor(position.Y / cellSize);
+        return new Vector2(cellX,cellY);
+    }
 
-   
     public void AddItem(Vector2 positionCell,TItem item)
     {        
         int cellIndex = GetCellIndex(positionCell);
 
         if (!cellMap.ContainsKey(cellIndex))
         {
+         
+
             cellMap[cellIndex] = new Dictionary<int, TItem>();
         }
        
@@ -60,10 +69,39 @@ internal class SpatialHashMap<TItem> where TItem : struct
 
         mapItems.Add(itemId, cellIndex);
     }
+
+    public void DrawGrid(Color color)
+    {
+        foreach (var item in gridPositions)
+        {
+            DebugDraw.Quad(item.Value, cellSize, color, 100); //debug    
+        }
+        
+    }
+    void addGridPosition(Vector2 positionCell)
+    {
+        Vector2 vector2 = GetCellIndexNormalized(positionCell);
+        Vector2 plot = (vector2 * cellSize) + new Vector2(cellSize / 2, cellSize / 2);
+        Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
+        xform.Origin = new Vector3(plot.X, plot.Y, 1);
+        gridPositions.Add(vector2, xform);
+
+    }
+    void drawQuad(Vector2 positionCell)
+    {
+        //Vector2 vector2 = GetCellIndexNormalized(positionCell);
+        //Vector2 plot = (vector2 * cellSize) + new Vector2(cellSize / 2, cellSize / 2);
+        //Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
+        //xform.Origin = new Vector3(plot.X, plot.Y, 1);
+        //DebugDraw.Quad(xform, cellSize, Colors.Purple, 200); //debug
+    }
     public void AddUpdateItem(Vector2 positionCell, in TItem item)
     {
         int itemId = getPositionItem(item);
         int cellIndex = GetCellIndex(positionCell);
+
+
+     
         if (mapItems.ContainsKey(itemId))
         {
             int cellIndexPast = mapItems[itemId];
@@ -72,6 +110,8 @@ internal class SpatialHashMap<TItem> where TItem : struct
                 cellMap[cellIndexPast].Remove(itemId);
                 if (!cellMap.ContainsKey(cellIndex))
                 {
+
+                    addGridPosition(positionCell); 
                     cellMap[cellIndex] = new Dictionary<int, TItem>();
                 }
                 cellMap[cellIndex][itemId] = item;
@@ -82,6 +122,7 @@ internal class SpatialHashMap<TItem> where TItem : struct
         {         
             if (!cellMap.ContainsKey(cellIndex))
             {
+                addGridPosition(positionCell);
                 cellMap[cellIndex] = new Dictionary<int, TItem>();
             }
             cellMap[cellIndex][itemId] = item;

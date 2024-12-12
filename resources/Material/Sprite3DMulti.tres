@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cgago0s2wxmtw"]
+
+[ext_resource type="Shader" uid="uid://buliw3nrkgdub" path="res://resources/shaders/Sprite.gdshader" id="1_y8xm6"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_y8xm6")
+shader_parameter/transparency = 0.0
+shader_parameter/pos = null
+shader_parameter/ancho = null
+shader_parameter/alto = null

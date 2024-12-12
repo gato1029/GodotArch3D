@@ -1,13 +1,15 @@
-[gd_scene load_steps=9 format=3 uid="uid://fe0png73wkqq"]
+[gd_scene load_steps=11 format=3 uid="uid://fe0png73wkqq"]
 
-[ext_resource type="Script" path="res://MainNode.cs" id="1_uvhk3"]
-[ext_resource type="Script" path="res://sources/MainWindowGodot.cs" id="2_fup1n"]
-[ext_resource type="Script" path="res://sources/godot/InputHandler.cs" id="3_lm82g"]
-[ext_resource type="Script" path="res://sources/Main.cs" id="4_uq52a"]
-[ext_resource type="Script" path="res://sources/godot/InfiniteGrid.cs" id="5_jlp7f"]
-[ext_resource type="Script" path="res://sources/godot/CameraController.cs" id="6_bmacd"]
+[ext_resource type="Script" uid="uid://gjjn48iuspr7" path="res://sources/components/MainNode.cs" id="1_uvhk3"]
+[ext_resource type="Script" uid="uid://bvpb54gqawbxx" path="res://sources/MainWindowGodot.cs" id="2_fup1n"]
+[ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_lm82g"]
+[ext_resource type="Script" uid="uid://dxhnixejjcon2" path="res://sources/Main.cs" id="4_uq52a"]
+[ext_resource type="Script" uid="uid://cvk1pu0owlm32" path="res://sources/godot/InfiniteGrid.cs" id="5_jlp7f"]
+[ext_resource type="Script" uid="uid://ced4l02uhxxe3" path="res://sources/godot/CameraController.cs" id="6_bmacd"]
 [ext_resource type="Texture2D" uid="uid://djjaf8wikv4mu" path="res://resources/cat.png" id="7_sr7oq"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="8_wkbut"]
+[ext_resource type="Texture2D" uid="uid://ce6rr1s7aq4yy" path="res://resources/Minotauro.png" id="9_dkd5b"]
+[ext_resource type="Texture2D" uid="uid://d17auewvoxilh" path="res://resources/demo.jpg" id="9_urofc"]
 
 [node name="MainNode" type="Node"]
 script = ExtResource("1_uvhk3")
@@ -30,14 +32,22 @@ camera = NodePath("../Camera2D")
 script = ExtResource("6_bmacd")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
 texture = ExtResource("7_sr7oq")
 
 [node name="Sprite2D2" type="Sprite2D" parent="."]
-visible = false
 texture = ExtResource("8_wkbut")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.971428, 0.133159, 0)
 billboard = 1
-texture = ExtResource("8_wkbut")
+texture_filter = 2
+texture = ExtResource("9_urofc")
+
+[node name="Sprite3D2" type="Sprite3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 3.74422, 0, 0)
+billboard = 1
+texture_filter = 0
+texture = ExtResource("9_dkd5b")
+hframes = 13
+vframes = 46
+frame = 29

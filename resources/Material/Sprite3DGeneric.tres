@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://erobuq6rjmke"]
+
+[ext_resource type="Shader" uid="uid://duif5h20s0mm7" path="res://resources/shaders/SpriteGeneric.gdshader" id="1_73vf1"]
+[ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="2_pkrgl"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_73vf1")
+shader_parameter/mtexture = ExtResource("2_pkrgl")
+shader_parameter/transparency = 0.0
+shader_parameter/invert_horizontal = 1
+shader_parameter/invert_vertical = 0

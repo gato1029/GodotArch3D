@@ -2,6 +2,7 @@ using Arch.Core;
 using Arch.LowLevel;
 using Arch.System;
 using Godot;
+using GodotEcsArch.sources.systems;
 using Schedulers;
 using System;
 using System.Collections.Generic;
@@ -21,17 +22,23 @@ public struct ManagedStruct {
 public class EcsManager : SingletonBase<EcsManager>
 {
     private Rid canvasItem;
+    private Rid ridWorld3D;
+
     private Node2D main2D;
+    private Node3D main3D;
     private World world;
     private JobScheduler jobScheduler;
     public World World { get => world; set => world = value; }
     public JobScheduler JobScheduler { get => jobScheduler; set => jobScheduler = value; }
     public Rid CanvasItem { get => canvasItem; set => canvasItem = value; }
     public Node2D Main2D { get => main2D; set => main2D = value; }
+    public Node3D Main3D { get => main3D; set => main3D = value; }
+    public Rid RidWorld3D { get => ridWorld3D; set => ridWorld3D = value; }
 
     private Group<float> groupCollider;
     private Group<float> groupMovement;
     private Group<float> groupRender;
+    private Group<float> groupMainCharacter;
     private Group<float> groupUnits;
     private Group<float> groupRemove;
     private Group<float> groupDebugerArch;
@@ -52,18 +59,22 @@ public class EcsManager : SingletonBase<EcsManager>
 
     private void InitSystems()
     {
-        groupCollider = new Group<float>("Collider", new CollisionManager(world));
+        groupCollider = new Group<float>("Collider", new CollisionSystem(world));
         groupMovement = new Group<float>("Movement", new SearchMovementTargetSystem(world), new MovementSystem(world));
-        groupRender = new Group<float>("Render", new RenderManager(world));
 
-        groupUnits = new Group<float>("Units" ,new AtackUnitSystem(world));
-        groupRemove = new Group<float>("Remove", new RemoveManager(world));
+        groupRender = new Group<float>("Render", new StateSystem(world), new RefreshAnimationSystem(world),  new AnimationSystem(world), new RenderSystem(world));
+
+        groupMainCharacter = new Group<float>("MainCharacter", new MainCharacterSystem(world));
+
+        groupUnits = new Group<float>("Units" ,new BehaviorCharacterSystem(world));
+        groupRemove = new Group<float>("Remove", new RemoveSystem(world));
 
         groupDebugerArch = new Group<float>("DebugerArch", new DebugerManager(world));
-        groupDebuger = new Group<float>("DebugerSystem", new DebugerColliderSystem(world));
+        groupDebuger = new Group<float>("DebugerSystem", new DebugerSystem(world));
 
         groupTransform = new Group<float>("Transforms", new TransformSystem(world));
         groupCollider.Initialize(); // Inits all registered systems
+        groupMainCharacter.Initialize();
         groupRemove.Initialize();
         groupMovement.Initialize();
         groupRender.Initialize();
@@ -99,7 +110,8 @@ public class EcsManager : SingletonBase<EcsManager>
         groupRemove.Dispose();
         groupDebugerArch.Dispose();
         groupDebuger.Dispose();
-        groupTransform.Dispose();   
+        groupTransform.Dispose();
+        groupMainCharacter.Dispose();
     }
 
     public void SetCanvasItemRid(Rid id, Node2D node2D)
@@ -107,25 +119,30 @@ public class EcsManager : SingletonBase<EcsManager>
         this.CanvasItem = id;
         this.main2D = node2D;
     }
+    public void SetNode3DMain( Node3D node3D)
+    {        
+        this.main3D = node3D;
+        this.ridWorld3D = node3D.GetWorld3D().Scenario;
+    }
     public void UpdateSystems(float deltaTime, int tick)
     {
         //groupDebugerArch.Update(in deltaTime);
-        
 
 
+  
+
+        groupMainCharacter.Update(in deltaTime);
 
         groupUnits.BeforeUpdate(in deltaTime);
         groupUnits.Update(in deltaTime);
         groupUnits.AfterUpdate(in deltaTime);
 
-        groupMovement.BeforeUpdate(in deltaTime);
-        groupMovement.Update(in deltaTime);
-
+        //groupMovement.BeforeUpdate(in deltaTime);
+        //groupMovement.Update(in deltaTime);
+      
+        groupTransform.Update(in deltaTime);
         groupRender.BeforeUpdate(in deltaTime);
         groupRender.Update(in deltaTime);
-
-        groupTransform.Update(in deltaTime);
-        
     }
 
     public void UpdateSystemsPhysics(float deltaTime, int tick)

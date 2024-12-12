@@ -16,9 +16,10 @@ public struct Unit
     public string name;
     public TypeUnit unitType;
     public uint team;
-    public uint health;
-    public uint barrier;
+    public int health;
+    public int barrier;
     public uint shield;
+    public int damage;
     public uint resistenceFire;
     public uint resistenceWater;
     public uint resistenceEarth;

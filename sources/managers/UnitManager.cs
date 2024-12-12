@@ -17,6 +17,13 @@ using static System.Net.Mime.MediaTypeNames;
 
 internal class UnitManager
 {
+
+    public static void CreateUnitSprite()
+    {
+        ArrayMesh quadMesh = MeshCreator.CreateSquareMesh(32, 32, new Vector2(32,32), new Vector3(0, 0, 0));
+
+        ResourceSaver.Save(quadMesh, "res://Quad_32_32.tres");
+    }
     public static void CreateUnit(Vector2 position, Vector2? targetMoved = null, bool debugBorder = false)
     {
         Vector2 target = targetMoved ?? Vector2.Zero;
@@ -78,7 +85,7 @@ internal class UnitManager
             entity.Add<Health>(new Health { value = 100 });
             entity.Add<OrderAtack>();
             entity.Add<IAController>();
-            entity.Add<AreaMovement>(new AreaMovement { type = MovementType.CIRCLE_STATIC, origin = position, value = 250});
+            entity.Add<AreaMovement>(new AreaMovement { type = MovementType.CIRCLE_STATIC, origin = position, widthRadius = 250});
             entity.Add<Unit>(new Unit { team = 2 });
         }
         
@@ -89,7 +96,7 @@ internal class UnitManager
         RenderingServer.CanvasItemSetSortChildrenByY(canvasItem, true);
         RenderingServer.CanvasItemSetTransform(canvasItem, transform2D);
 
-        CollisionManager.dynamicCollidersEntities.AddUpdateItem(position, entity.Reference());
+        CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(position, entity.Reference());
 
         if (!(target == Vector2.Zero))
         {

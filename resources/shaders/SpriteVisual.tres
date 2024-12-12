@@ -1,0 +1,49 @@
+[gd_resource type="VisualShader" load_steps=5 format=3 uid="uid://c5arsr7d5vimn"]
+
+[sub_resource type="VisualShaderNodeUVFunc" id="VisualShaderNodeUVFunc_2xsc0"]
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_xo5a2"]
+parameter_name = "Texture2DParameter"
+texture_filter = 1
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_vbfr4"]
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_0gkeu"]
+source = 2
+texture = SubResource("CanvasTexture_vbfr4")
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+uniform sampler2D Texture2DParameter : filter_nearest;
+
+
+
+void fragment() {
+// UVFunc:2
+	vec2 n_in2p1 = vec2(1.00000, 1.00000);
+	vec2 n_in2p2 = vec2(0.00000, 0.00000);
+	vec2 n_out2p0 = n_in2p2 * n_in2p1 + UV;
+
+
+	vec4 n_out4p0;
+// Texture2D:4
+	n_out4p0 = vec4(0.0);
+
+
+// Output:0
+	ALBEDO = vec3(n_out4p0.xyz);
+
+
+}
+"
+preview_params/Texture2DParameter = "Resource(\"res://resources/cat.png\")"
+nodes/fragment/0/position = Vector2(560, 400)
+nodes/fragment/2/node = SubResource("VisualShaderNodeUVFunc_2xsc0")
+nodes/fragment/2/position = Vector2(-100, 640)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture2DParameter_xo5a2")
+nodes/fragment/3/position = Vector2(-100, 220)
+nodes/fragment/4/node = SubResource("VisualShaderNodeTexture_0gkeu")
+nodes/fragment/4/position = Vector2(300, 360)
+nodes/fragment/connections = PackedInt32Array(3, 0, 4, 2, 4, 0, 0, 0, 2, 0, 4, 0)

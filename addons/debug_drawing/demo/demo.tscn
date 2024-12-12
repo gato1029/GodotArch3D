@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://dvf1po0ih8680"]
 
-[ext_resource type="Script" path="res://addons/debug_drawing/demo/DrawDemo.cs" id="1_0khh5"]
-[ext_resource type="Script" path="res://addons/debug_drawing/demo/DemoDrawTarget.cs" id="3_p2kym"]
+[ext_resource type="Script" uid="uid://bdulqqwcm2q71" path="res://addons/debug_drawing/demo/DrawDemo.cs" id="1_0khh5"]
+[ext_resource type="Script" uid="uid://dukbhkyi2ok1o" path="res://addons/debug_drawing/demo/DemoDrawTarget.cs" id="3_p2kym"]
 
 [sub_resource type="Environment" id="Environment_u4wlx"]
 background_mode = 1

@@ -16,32 +16,33 @@ public partial class Main : Node2D
     public   override void _Ready()
     {
 
-        EcsManager.Instance.SetCanvasItemRid(GetCanvasItem(),this);
-        for (int i = 0; i < 15000; i++)
-        {
-            Vector2 randomVector = GetRandomVector2(new Vector2(-50000, -50000), new Vector2(50000, 50000));
-            Vector2 randomVectordes = GetRandomVector2(new Vector2(-10000, -10000), new Vector2(10000, 10000));
+        //UnitManager.CreateUnitSprite();
+        //EcsManager.Instance.SetCanvasItemRid(GetCanvasItem(),this);
+        //for (int i = 0; i < 15000; i++)
+        //{
+        //    Vector2 randomVector = GetRandomVector2(new Vector2(-50000, -50000), new Vector2(50000, 50000));
+        //    Vector2 randomVectordes = GetRandomVector2(new Vector2(-10000, -10000), new Vector2(10000, 10000));
 
-            //if (i == 0)
-            //{
-            //    randomVector = new Vector2(0, 0);
-            //    randomVectordes = new Vector2(500, 500);
-            //    UnitManager.CreateUnit(randomVector, randomVectordes, false);
-            //}
-            if (i == 1)
-            {
+        //    //if (i == 0)
+        //    //{
+        //    //    randomVector = new Vector2(0, 0);
+        //    //    randomVectordes = new Vector2(500, 500);
+        //    //    UnitManager.CreateUnit(randomVector, randomVectordes, false);
+        //    //}
+        //    if (i == 1)
+        //    {
 
-                randomVector = new Vector2(500, 100);
-                randomVectordes = new Vector2(0, 0);
-                UnitManager.CreateUnit(randomVector, Vector2.Zero, false);
-            }
-            else
-            {
-                UnitManager.CreateUnit(randomVector, randomVectordes, true);
-            }
+        //        randomVector = new Vector2(500, 100);
+        //        randomVectordes = new Vector2(0, 0);
+        //        UnitManager.CreateUnit(randomVector, Vector2.Zero, false);
+        //    }
+        //    else
+        //    {
+        //        UnitManager.CreateUnit(randomVector, randomVectordes, true);
+        //    }
 
 
-        }
+        //}
 
         
      

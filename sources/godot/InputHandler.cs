@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,7 @@ internal partial class InputHandler : Node
         inputStates["move_right"] = false;
         inputStates["attack"] = false;
         inputStates["debugColliders"] = false;
+        inputStates["debugGridCollider"] = false;
         ServiceLocator.Instance.RegisterService(this);
     }
 
@@ -31,6 +32,7 @@ internal partial class InputHandler : Node
             inputStates["move_right"] = Input.IsActionPressed("move_right");
             inputStates["attack"] = Input.IsActionPressed("attack");
             inputStates["debugColliders"] = Input.IsActionJustPressed("debugColliders");
+            inputStates["debugGridCollider"] = Input.IsActionJustPressed("debugGridCollider");
         }
     }
     

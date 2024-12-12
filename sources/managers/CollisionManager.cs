@@ -1,10 +1,14 @@
-﻿using Arch.AOT.SourceGenerator;
+using Arch.AOT.SourceGenerator;
 using Arch.Buffer;
 using Arch.Core;
 using Arch.Core.Extensions;
 using Arch.System;
-
+using FarseerPhysics.Dynamics;
+using FarseerPhysics.Factories;
 using Godot;
+
+//using Microsoft.Xna.Framework;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,82 +25,40 @@ public struct ColliderSprite
 [Component]
 public struct Collider
 {
-    public Rect2 rect;
-    public Rect2 rectTransform; 
+    public Godot.Rect2 rect;
+    public Godot.Rect2 rectTransform; 
     public bool aplyRotation;
 }
-internal class CollisionManager : BaseSystem<World, float>
+internal class CollisionManager : SingletonBase<CollisionManager>
 {
-   public static SpatialHashMap<Entity> dynamicCollidersEntities;
-    public static SpatialHashMap<Entity> MoveCollidersEntities;
-
-    private CommandBuffer commandBuffer;
-    private QueryDescription queryDynamicSprite = new QueryDescription().WithAll<Position, Direction, Collider>();
-    public CollisionManager(World world) : base(world)
+    public  SpatialHashMap<Entity> dynamicCollidersEntities;
+    public  SpatialHashMap<Entity> MoveCollidersEntities;
+    FarseerPhysics.Dynamics.World worldPhysic;
+    protected override void Initialize()
     {
-        commandBuffer = new CommandBuffer();
-        dynamicCollidersEntities = new SpatialHashMap<Entity>(256, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
-        MoveCollidersEntities = new SpatialHashMap<Entity>(256, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
+        dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
+        MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
+        worldPhysic = new FarseerPhysics.Dynamics.World(new Microsoft.Xna.Framework.Vector2(0,0));
+
+        Body demo= BodyFactory.CreateBody(worldPhysic);
+        demo.BodyType = BodyType.Kinematic;
+        demo.Position = new Microsoft.Xna.Framework.Vector2(1, 1);
+        demo.Rotation = 10;
+
+        Microsoft.Xna.Framework.Vector2 de1 = new Microsoft.Xna.Framework.Vector2(1, 2);
+        Microsoft.Xna.Framework.Vector2 de2 = new Microsoft.Xna.Framework.Vector2(1, 2);
+        de1 = de1 / 2 * de2;
+        
+        //worldPhysic.QueryAABB()
+        
     }
 
-    private struct ChunkJobUpdateCollider : IChunkJob
+    protected override void Destroy()
     {
-        private readonly float _deltaTime;
-        private readonly CommandBuffer _commandBuffer;
-
-        public ChunkJobUpdateCollider(CommandBuffer commandBuffer, float deltaTime) : this()
-        {
-            _commandBuffer = commandBuffer;
-            _deltaTime = deltaTime;
-        }
-
-        public void Execute(ref Chunk chunk)
-        {
-            ref var pointerEntity = ref chunk.Entity(0);
-            ref var pointerPosition = ref chunk.GetFirst<Position>();
-
-            foreach (var entityIndex in chunk)
-            {
-                ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
-                ref Position p = ref Unsafe.Add(ref pointerPosition, entityIndex);
-                dynamicCollidersEntities.AddUpdateItem(p.value,in entity);
-            }
-        }
-    }
-    private readonly struct JobUpdateCollider : IForEachWithEntity<Position, Direction>
-    {
-        private readonly float _deltaTime;
-        private readonly CommandBuffer _commandBuffer;
-
-        public JobUpdateCollider(float deltaTime, CommandBuffer commandBuffer)
-        {
-            _deltaTime = deltaTime;
-            _commandBuffer = commandBuffer;
-
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Update(Entity entity, ref Position p, ref Direction dir)
-        {
-            dynamicCollidersEntities.AddUpdateItem(p.value, entity);
-        }
+      
     }
 
-
-
-    public override void Update(in float t)
-    {
-
-
-
-        var job = new JobUpdateCollider((float)t, commandBuffer);
-        World.InlineEntityQuery<JobUpdateCollider, Position, Direction>(in queryDynamicSprite, ref job);
-
-        //World.InlineParallelChunkQuery(in queryDynamicSprite, new ChunkJobUpdateCollider(commandBuffer, t));
-        //commandBuffer.Playback(World);
-
-    }
-
-    public static bool CheckAABBCollision(Vector2 positionA, Vector2 sizeA, Vector2 directionA, Vector2 positionB, Vector2 sizeB, Vector2 directionB)
+    public  bool CheckAABBCollision(Vector2 positionA, Vector2 sizeA, Vector2 directionA, Vector2 positionB, Vector2 sizeB, Vector2 directionB)
     {
         //Inicializo values sin rotacion
         Vector2 topLeftA = positionA - sizeA / 2; ;
@@ -119,13 +81,77 @@ internal class CollisionManager : BaseSystem<World, float>
                 topLeftA.Y <= topLeftB.Y + sizeB.Y);
     }
 
-    public static bool CheckAABBCollision(Vector2 positionA, Rect2 rectA,  Vector2 positionB, Rect2 rectB)
+    public  bool CheckAABBCollision2(Vector2 positionA, Collider colliderA, Vector2 positionB, Collider colliderB)
+    {
+        //Inicializo values sin rotacion
+        Vector2 OriginA = positionA - colliderA.rectTransform.Size / 2 + colliderA.rectTransform.Position;
+        Vector2 OriginB = positionB - colliderB.rectTransform.Size / 2 + colliderB.rectTransform.Position;
+
+        //Transform3D transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
+        //transform3D = transform3D.Scaled(new Vector3(colliderA.rectTransform.Size.X, colliderA.rectTransform.Size.Y, 1));
+        //transform3D.Origin = new Vector3(positionA.X, positionA.Y, 2);
+
+        ////DebugDraw.Circle(transform3D, 4, Colors.Coral, 0.1f,1<<2);
+        //DebugDraw.Quad(transform3D, 1, Colors.Cornsilk, 4.0f); //debug   
+
+
+        //Transform3D transform3D2 = new Transform3D(Basis.Identity, Vector3.Zero);
+        //transform3D2 = transform3D2.Scaled(new Vector3(colliderB.rectTransform.Size.X, colliderB.rectTransform.Size.Y, 1));
+        //transform3D2.Origin = new Vector3(positionB.X, positionB.Y, 2);
+        //DebugDraw.Quad(transform3D2, 1, Colors.Yellow, 5.0f); //debug   
+
+        // Verifica si hay intersección
+        return (OriginA.X + colliderA.rectTransform.Size.X >= OriginB.X &&
+                OriginA.X <= OriginB.X + colliderB.rectTransform.Size.X &&
+                OriginA.Y + colliderA.rectTransform.Size.Y >= OriginB.Y &&
+                OriginA.Y <= OriginB.Y + colliderB.rectTransform.Size.Y);
+    }
+
+    public  bool CheckAABBCollision(Vector2 positionA, Collider colliderA, Vector2 positionB, Collider colliderB)
+    {
+        //Inicializo values sin rotacion
+        Vector2 topLeftA = positionA - colliderA.rectTransform.Size / 2 + colliderA.rectTransform.Position; 
+        Vector2 topLeftB = positionB - colliderB.rectTransform.Size / 2 + colliderB.rectTransform.Position;
+
+        //Transform3D transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
+        //transform3D = transform3D.Scaled(new Vector3(colliderA.rectTransform.Size.X, colliderA.rectTransform.Size.Y, 1));
+        //transform3D.Origin = new Vector3(topLeftA.X, topLeftA.Y, 2);
+
+        ////DebugDraw.Circle(transform3D, 4, Colors.Coral, 0.1f,1<<2);
+        //DebugDraw.Quad(transform3D, 1, Colors.Green, 0.0f); //debug   
+
+
+        //Transform3D transform3D2 = new Transform3D(Basis.Identity, Vector3.Zero);
+        //transform3D2 = transform3D2.Scaled(new Vector3(colliderB.rectTransform.Size.X, colliderB.rectTransform.Size.Y, 1));
+        //transform3D2.Origin = new Vector3(topLeftB.X, topLeftB.Y, 2);
+        //DebugDraw.Quad(transform3D2, 1, Colors.Blue, 0.0f); //debug   
+
+        // Verifica si hay intersección
+        return (topLeftA.X + colliderA.rectTransform.Size.X >= topLeftB.X &&
+                topLeftA.X <= topLeftB.X + colliderB.rectTransform.Size.X &&
+                topLeftA.Y + colliderA.rectTransform.Size.Y >= topLeftB.Y &&
+                topLeftA.Y <= topLeftB.Y + colliderB.rectTransform.Size.Y);
+    }
+    public  bool CheckAABBCollision(Vector2 positionA, Rect2 rectA,  Vector2 positionB, Rect2 rectB)
     {
         
-        Rect2 adjustedRectA = new Rect2(positionA + rectA.Position, rectA.Size);
-        Rect2 adjustedRectB = new Rect2(positionB + rectB.Position, rectB.Size);
+        Rect2 adjustedRectA = new Rect2(positionA - rectA.Position, rectA.Size);
+        Rect2 adjustedRectB = new Rect2(positionB - rectB.Position, rectB.Size);
 
-       
+        Transform3D transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
+        transform3D = transform3D.Scaled(new Vector3(adjustedRectA.Size.X, adjustedRectA.Size.Y, 1));
+        transform3D.Origin = new Vector3(adjustedRectA.Position.X, adjustedRectA.Position.Y, 2);
+        
+        //DebugDraw.Circle(transform3D, 4, Colors.Coral, 0.1f,1<<2);
+        DebugDraw.Quad(transform3D, 1, Colors.Green, 0.0f); //debug   
+        
+
+        Transform3D transform3D2 = new Transform3D(Basis.Identity, Vector3.Zero);
+        transform3D2 = transform3D2.Scaled(new Vector3(adjustedRectB.Size.X, adjustedRectB.Size.Y, 1));
+        transform3D2.Origin = new Vector3(adjustedRectB.Position.X, adjustedRectB.Position.Y, 2);
+        DebugDraw.Quad(transform3D2, 1, Colors.Blue, 0.0f); //debug   
+        //DebugDraw.Circle(transform3D2, 2, Colors.Coral, 1);
+
         return (adjustedRectA.Position.X + adjustedRectA.Size.X >= adjustedRectB.Position.X &&  
                 adjustedRectA.Position.X <= adjustedRectB.Position.X + adjustedRectB.Size.X &&  
                 adjustedRectA.Position.Y + adjustedRectA.Size.Y >= adjustedRectB.Position.Y  &&  
@@ -133,17 +159,17 @@ internal class CollisionManager : BaseSystem<World, float>
 
     }
 
-    public static Vector2 CalculateSizeBasedOnDirection(Vector2 originalSize, Vector2 direction)
+    public  Vector2 CalculateSizeBasedOnDirection(Vector2 originalSize, Vector2 direction)
     {
         ////Vector2 normalizedDirection = direction.Normalized();
 
         float width = originalSize.X;
         float height = originalSize.Y;
 
-        // Se establece un umbral para determinar si la dirección es principalmente horizontal o vertical
+        // Se establece un umbral para determinar si la direccion es principalmente horizontal o vertical
         float threshold = 0.707f; // Aproximadamente 45 grados en términos de vector
 
-        // Determinar el ancho y el alto basado en la dirección
+        // Determinar el ancho y el alto basado en la direccion
         if (Math.Abs(direction.X) > threshold) // Direcciones horizontales
         {
             width = originalSize.X;  // Mantiene el ancho original
@@ -163,5 +189,7 @@ internal class CollisionManager : BaseSystem<World, float>
 
         return new Vector2(width, height);
     }
+
+
 }
 

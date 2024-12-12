@@ -1,4 +1,4 @@
-﻿using Arch.AOT.SourceGenerator;
+using Arch.AOT.SourceGenerator;
 using Arch.Buffer;
 using Arch.Core;
 using Arch.Core.Extensions;
@@ -44,24 +44,30 @@ public struct Weapon
 {
     
 }
+[Component]
+public struct MelleCollider
+{
+   public Collider collider;
+}
 
-internal class AtackUnitSystem : BaseSystem<World, float>
+internal class AtackSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
     
-    private QueryDescription queryMelleAtack = new QueryDescription().WithAll<Unit, MelleWeapon, Position, Direction, OrderAtack>();
+    private QueryDescription query = new QueryDescription().WithAll<Unit, MelleWeapon, Position, Direction, OrderAtack>();
     private QueryDescription queryPending = new QueryDescription().WithAll<Unit, MelleWeapon, PendingAttack>();
-    public AtackUnitSystem(World world) : base(world)
+    private QueryDescription queryMelleAtack = new QueryDescription().WithAll<UnitController, Position, Velocity, Direction, Collider, Rotation, MelleCollider>();
+    public AtackSystem(World world) : base(world)
     {
         commandBuffer = new CommandBuffer();    
     }
 
-    private struct ChunkJobProcessAtackMelle : IChunkJob
+    private struct ChunkJobProcessMelleAttack : IChunkJob
     {
         private readonly CommandBuffer _commandBuffer;
         private readonly float _deltaTime;
 
-        public ChunkJobProcessAtackMelle(CommandBuffer commandBuffer, float deltaTime)
+        public ChunkJobProcessMelleAttack(CommandBuffer commandBuffer, float deltaTime)
         {
             _commandBuffer = commandBuffer;
             _deltaTime = deltaTime;
@@ -70,57 +76,132 @@ internal class AtackUnitSystem : BaseSystem<World, float>
         public void Execute(ref Chunk chunk)
         {
             ref var pointerEntity = ref chunk.Entity(0);
+
             ref var pointerPosition = ref chunk.GetFirst<Position>();
-            ref var pointerMelleWeapon = ref chunk.GetFirst<MelleWeapon>();
+            ref var pointerVelocity = ref chunk.GetFirst<Velocity>();
+
             ref var pointerDirection = ref chunk.GetFirst<Direction>();
-            ref var pointerDamage = ref chunk.GetFirst<Damage>();
-            ref var pointerUnit = ref chunk.GetFirst<Unit>();
-            ref var pointerFrecuencyAttack = ref chunk.GetFirst<FrecuencyAttack>();            
+            ref var pointerRotation = ref chunk.GetFirst<Rotation>();
+            ref var pointerCollider = ref chunk.GetFirst<Collider>();
+            ref var pointerAnimation = ref chunk.GetFirst<Animation>();
+            ref var pointerSprite3D = ref chunk.GetFirst<Sprite3D>();
+            ref var pointerUnitController = ref chunk.GetFirst<UnitController>();
+
             foreach (var entityIndex in chunk)
             {
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
-                ref Position pos = ref Unsafe.Add(ref pointerPosition, entityIndex);
-                ref MelleWeapon mw = ref Unsafe.Add(ref pointerMelleWeapon, entityIndex);
+                ref Position p = ref Unsafe.Add(ref pointerPosition, entityIndex);
+                ref Velocity v = ref Unsafe.Add(ref pointerVelocity, entityIndex);
+
                 ref Direction d = ref Unsafe.Add(ref pointerDirection, entityIndex);
-                ref Damage da = ref Unsafe.Add(ref pointerDamage, entityIndex);
-                ref Unit u = ref Unsafe.Add(ref pointerUnit, entityIndex);
-                ref FrecuencyAttack fa = ref Unsafe.Add(ref pointerFrecuencyAttack, entityIndex);
+                ref Rotation r = ref Unsafe.Add(ref pointerRotation, entityIndex);
+                ref Collider c = ref Unsafe.Add(ref pointerCollider, entityIndex);
+                ref Animation a = ref Unsafe.Add(ref pointerAnimation, entityIndex);
+                ref Sprite3D s = ref Unsafe.Add(ref pointerSprite3D, entityIndex);
+                ref UnitController unitController = ref Unsafe.Add(ref pointerUnitController, entityIndex);
 
-                fa.timeAccumulator += _deltaTime;
-                if (fa.timeAccumulator >= fa.value)
+                switch (unitController.controllerMode)
                 {
-                    fa.timeAccumulator = 0;
-                    Vector2 pp = mw.rect2Transform.Size / 2 * d.value;
-                    Vector2 posAtack = pos.value + pp;
-                    var result = CollisionManager.dynamicCollidersEntities.GetPossibleQuadrants(posAtack, 128);
-                    if (result != null)
-                    {
-                        foreach (var itemDic in result)
+                    case ControllerMode.HUMAN:
+                        break;
+                    case ControllerMode.IA:
+                        bool attackPosible = true;
+
+                        if (a.updateAction == AnimationAction.STUN)
                         {
-                            foreach (var item in itemDic.Value)
+                            attackPosible = false;
+                        //    GD.Print("Strun");
+                        }
+                        if ((a.updateAction == AnimationAction.STUN || a.updateAction == AnimationAction.HIT || a.updateAction == AnimationAction.ATACK) && !a.complete)
+                        {
+                            attackPosible = false;
+                        }
+                        else
+                        {
+
+
+                           // GD.Print(a.updateAction);
+                            if (a.updateAction == AnimationAction.ATACK && a.complete)
                             {
-                                Entity entB = item.Value;
-                                if (item.Key != entity.Id && u.team != entB.Get<Unit>().team)
-                                {                                    
-                                    if (!entity.Has<PendingAttack>())
-                                    {
+                                CallAttack(entity, ref p, ref d, ref a);
+                                //a.updateAction = AnimationAction.IDLE;
+                            }
 
-                                        var entityExternal = entB.Get<Collider>().rectTransform;
-                                        var entityExternalPos = entB.Get<Position>().value;
-
-                                        if (CollisionManager.CheckAABBCollision(pos.value, mw.rect2Transform, entityExternalPos, entityExternal))
-                                        {
-                                            _commandBuffer.Add<PendingAttack>(in entity,new PendingAttack { entityTarget = entB, damage = da.value });
-                                        }
-                                    }
-
+                            if (attackPosible)
+                            {
+                                bool flag = EntryRangeAttack(entity, ref p, ref d, ref a);
+                                if (flag)
+                                {
+                                    a.updateAction = AnimationAction.ATACK;
                                 }
                             }
                         }
-                    }
-                    if (entity.Has<HumanController>())
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private bool EntryRangeAttack(Entity entity, ref Position p, ref Direction d, ref Animation a)
+        {
+            Unit unit = entity.Get<Unit>();
+            MelleCollider melleAtack = entity.Get<MelleCollider>();
+            Vector2 pp = melleAtack.collider.rectTransform.Size / 2 * d.value;
+            Vector2 posAtack = p.value + pp;
+            var result = CollisionManager.Instance.dynamicCollidersEntities.GetPossibleQuadrants(posAtack, 4);
+            if (result != null)
+            {
+                foreach (var itemDic in result)
+                {
+                    foreach (var item in itemDic.Value)
                     {
-                        _commandBuffer.Remove<OrderAtack>(in entity);
+                        Entity entB = item.Value;
+                        if (item.Key != entity.Id && unit.team != entB.Get<Unit>().team)
+                        {
+
+                            var colliderB = entB.Get<Collider>();
+                            var positionB = entB.Get<Position>().value;
+
+                            if (CollisionManager.Instance.CheckAABBCollision2(posAtack, melleAtack.collider, positionB, colliderB))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+    
+        private void CallAttack(Entity entity, ref Position p, ref Direction d, ref Animation a)
+        {
+
+            Unit unit = entity.Get<Unit>();
+            MelleCollider melleAtack = entity.Get<MelleCollider>();
+            Vector2 pp = melleAtack.collider.rectTransform.Size / 2 * d.value;
+            Vector2 posAtack = p.value + pp;
+            var result = CollisionManager.Instance.dynamicCollidersEntities.GetPossibleQuadrants(posAtack, 4);
+            if (result != null)
+            {               
+                foreach (var itemDic in result)
+                {
+                    foreach (var item in itemDic.Value)
+                    {
+                        Entity entB = item.Value;
+                        if (item.Key != entity.Id && unit.team != entB.Get<Unit>().team)
+                        {
+                            
+                            var colliderB = entB.Get<Collider>();
+                            var positionB = entB.Get<Position>().value;
+
+                            if (CollisionManager.Instance.CheckAABBCollision2(posAtack, melleAtack.collider, positionB, colliderB))
+                            {                           
+                                ref Animation animationB = ref entB.TryGetRef<Animation>(out bool exist);
+                                animationB.updateAction = AnimationAction.HIT;
+                                GD.Print("danio enenmi");                                
+                            }                                                        
+                        }
                     }
                 }
             }
@@ -162,15 +243,16 @@ internal class AtackUnitSystem : BaseSystem<World, float>
         }
     }
 
-    public override void Update(in float tick)
+
+
+    public override void Update(in float delta)
     {
-        float delta = TimeGodot.Delta;
 
 
-        World.InlineParallelChunkQuery(in queryMelleAtack, new ChunkJobProcessAtackMelle(commandBuffer,delta));
-        commandBuffer.Playback(World);
-        World.InlineParallelChunkQuery(in queryPending, new ChunkJobPendingAtack(commandBuffer,delta));
 
+        //World.InlineParallelChunkQuery(in queryMelleAtack, new ChunkJobProcessAtackMelle(commandBuffer,delta));
+        //commandBuffer.Playback(World);
+        World.InlineParallelChunkQuery(in queryMelleAtack, new ChunkJobProcessMelleAttack(commandBuffer, delta));
         commandBuffer.Playback(World);
     }
 
