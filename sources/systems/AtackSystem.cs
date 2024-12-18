@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static Godot.TextServer;
-
+using XNA = FarseerPhysics.Dynamics;
 [Component]
 public struct OrderAtack
 {
@@ -48,6 +48,7 @@ public struct Weapon
 public struct MelleCollider
 {
    public Collider collider;
+   XNA.Body body;
 }
 
 internal class AtackSystem : BaseSystem<World, float>

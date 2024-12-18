@@ -42,12 +42,17 @@ namespace GodotEcsArch.sources.systems
             {
                 ref var pointerEntity = ref chunk.Entity(0);
                 ref var pointerPosition = ref chunk.GetFirst<Position>();
+                ref var pointerCollider = ref chunk.GetFirst<Collider>();
 
                 foreach (var entityIndex in chunk)
                 {
                     ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                     ref Position p = ref Unsafe.Add(ref pointerPosition, entityIndex);
-                    CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(p.value, in entity);
+                    ref Collider collider = ref Unsafe.Add(ref pointerCollider, entityIndex);
+
+                    collider.body.Position = new Microsoft.Xna.Framework.Vector2(p.value.X,p.value.Y);
+
+                    //CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(p.value, in entity);
                 }
             }
         }
@@ -73,8 +78,11 @@ namespace GodotEcsArch.sources.systems
 
         public override void Update(in float t)
         {
-            var job = new JobUpdateCollider((float)t, commandBuffer);
-            World.InlineEntityQuery<JobUpdateCollider, Position, Direction>(in queryDynamicSprite, ref job);
+            World.InlineParallelChunkQuery(in queryDynamicSprite, new ChunkJobUpdateCollider(commandBuffer, t));
+            CollisionManager.Instance.worldPhysic.Step(t);
+            
+            //var job = new JobUpdateCollider((float)t, commandBuffer);
+            //World.InlineEntityQuery<JobUpdateCollider, Position, Direction>(in queryDynamicSprite, ref job);
 
             bool debug = Input.IsActionJustPressed("debugGridCollider");
             if (debug)

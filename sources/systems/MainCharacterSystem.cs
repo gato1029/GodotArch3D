@@ -3,7 +3,7 @@ using Arch.Buffer;
 using Arch.Core;
 using Arch.Core.Extensions;
 using Arch.System;
-
+using FarseerPhysics.Dynamics.Contacts;
 using Godot;
 using GodotEcsArch.sources.managers.Behaviors;
 using System;
@@ -134,28 +134,22 @@ namespace GodotEcsArch.sources.systems
                 
                 Vector2 movement = d.value * v.value * _deltaTime;
                 Vector2 movementNext = p.value + movement;
-                var resultList = CollisionManager.Instance.dynamicCollidersEntities.GetPossibleQuadrants(movementNext, 4);
+
+                FarseerPhysics.Dynamics.Contacts.ContactEdge contactEdge = c.body.ContactList;             
                 bool existCollision = false;
-                foreach (var itemMap in resultList)
+
+                while (contactEdge != null) // Recorrer los contactos
                 {
-                    foreach (var item in itemMap.Value)
+                    Contact contact = contactEdge.Contact;
+
+                    if (contact.IsTouching()) // Si hay contacto
                     {
-                        if (item.Key != entity.Id)
-                        {
-                            Entity entB = item.Value;
-                            var colliderB = entB.Get<Collider>();
-                            var entityExternal = entB.Get<Collider>().rectTransform;
-                            var entityExternalPos = entB.Get<Position>().value;
-
-                            if (CollisionManager.Instance.CheckAABBCollision(movementNext, c, entityExternalPos, colliderB))
-                            {
-                                existCollision = true;
-                                break;
-                            }
-                        }
+                        existCollision = true;                     
+                        break; // No necesitamos seguir revisando más contactos
                     }
-
+                    contactEdge = contactEdge.Next; // Ir al siguiente contacto
                 }
+
                 if (!existCollision)
                 {
                     stateComponent.currentType = StateType.MOVING;                    

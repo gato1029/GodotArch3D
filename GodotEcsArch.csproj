@@ -17,6 +17,10 @@
     <PackageReference Include="Arch.System.SourceGenerator" Version="1.2.1" />
     <PackageReference Include="FarseerPhysics" Version="3.5.0" />
     <PackageReference Include="ImGui.NET" Version="1.91.0.1" />
+    <PackageReference Include="StructureOfArraysGenerator" Version="1.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="resources\" />

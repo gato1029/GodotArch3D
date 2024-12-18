@@ -1,5 +1,8 @@
 using Arch.Core;
 using Arch.Core.Extensions;
+using FarseerPhysics.Collision.Shapes;
+using FarseerPhysics.Dynamics;
+using FarseerPhysics.Factories;
 using Godot;
 using GodotEcsArch.sources.managers.Behaviors.Attack;
 using GodotEcsArch.sources.managers.Behaviors.Move;
@@ -108,11 +111,17 @@ internal class CharacterManager : SingletonBase<CharacterManager>
 
         AreaMovement areaMovementInternal = new AreaMovement { type = MovementType.CIRCLE_STATIC, widthRadius = 5, origin = position.value };
         IAController iaControllerInternal = new IAController { areaMovement = areaMovementInternal, targetMovement = new TargetMovement { arrive = true }  };
-        
+
+
+        //PolygonShape p = new PolygonShape();
+        //p.ve
+        Body body = BodyFactory.CreateRectangle(CollisionManager.Instance.worldPhysic, 1, 1, 0);
+        body.BodyType = BodyType.Dynamic;
+        body.Position = new Microsoft.Xna.Framework.Vector2(positionValue.X,positionValue.Y);
 
         //entity.Add<MushroomCharacter>();
         entity.Add<Transform>(new Transform { transformInternal = xform });
-        entity.Add<Collider>(new Collider { rect = new Rect2(new Vector2(0f, 0.0f), new Vector2(1, 1)), rectTransform = new Rect2(new Vector2(0,0f), new Vector2(1, 1)), aplyRotation = false });
+        entity.Add<Collider>(new Collider { body=body, rect = new Rect2(new Vector2(0f, 0.0f), new Vector2(1, 1)), rectTransform = new Rect2(new Vector2(0,0f), new Vector2(1, 1)), aplyRotation = false });
         entity.Add<Rotation>();
         entity.Add(position);
         entity.Add<Direction>();
@@ -125,7 +134,7 @@ internal class CharacterManager : SingletonBase<CharacterManager>
         entity.Add<StateComponent>(new StateComponent { currentType = StateType.IDLE});
         entity.Add<BehaviorCharacter>(new BehaviorCharacter { moveBehavior = new DefaultMove(), attackBehavior = new MelleAttackBehavior() });
 
-        CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(position.value, entity.Reference());
+        //CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(position.value, entity.Reference());
 
         return entity;
     }

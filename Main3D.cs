@@ -4,6 +4,8 @@ using Arch.Core;
 using Arch.Core.Extensions;
 using Arch.Relationships;
 using Arch.System;
+using FarseerPhysics.Dynamics;
+using FarseerPhysics.Factories;
 using Godot;
 using GodotEcsArch.sources.systems;
 using System;
@@ -92,7 +94,13 @@ public partial class Main3D : Node3D
         entity.Add<RefreshPositionAlways>();
         entity.Add<MainCharacter>();
         entity.Add<Transform>(new Transform { transformInternal = xform });
-        entity.Add<Collider>(new Collider { rect = new Rect2(new Vector2(0, 0), new Vector2(1, 1)), rectTransform = new Rect2(new Vector2(0, 0), new Vector2(1, 1)), aplyRotation=false});
+
+
+        Body body = BodyFactory.CreateRectangle(CollisionManager.Instance.worldPhysic,1,1,0); 
+        body.BodyType = BodyType.Dynamic;
+        body.Position = new Microsoft.Xna.Framework.Vector2(1,1);
+
+        entity.Add<Collider>(new Collider { body= body, rect = new Rect2(new Vector2(0, 0), new Vector2(1, 1)), rectTransform = new Rect2(new Vector2(0, 0), new Vector2(1, 1)), aplyRotation=false});
         entity.Add<Rotation>();
         entity.Add(position);
 
@@ -102,7 +110,7 @@ public partial class Main3D : Node3D
         entity.Add<Unit>(new Unit { team= 1, health= 10000, damage =30});
         entity.Add<StateComponent>();
         entity.Add<MelleCollider>(new MelleCollider { collider = new Collider { rect = new Rect2(new Vector2(1f, 0.5f), new Vector2(2, 1)), rectTransform = new Rect2(new Vector2(1f, 0.5f), new Vector2(2, 1)), aplyRotation = false } });
-        CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(position.value, entity.Reference());
+        //CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(position.value, entity.Reference());
     }
     void createTile(Position position)
     {

@@ -15,7 +15,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static Godot.TextServer;
+
+using XNA = FarseerPhysics.Dynamics;
 
 [Component]
 public struct ColliderSprite
@@ -28,27 +31,21 @@ public struct Collider
     public Godot.Rect2 rect;
     public Godot.Rect2 rectTransform; 
     public bool aplyRotation;
+    public XNA.Body body;
 }
 internal class CollisionManager : SingletonBase<CollisionManager>
 {
     public  SpatialHashMap<Entity> dynamicCollidersEntities;
     public  SpatialHashMap<Entity> MoveCollidersEntities;
-    FarseerPhysics.Dynamics.World worldPhysic;
+    public FarseerPhysics.Dynamics.World worldPhysic;
     protected override void Initialize()
     {
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         worldPhysic = new FarseerPhysics.Dynamics.World(new Microsoft.Xna.Framework.Vector2(0,0));
 
-        Body demo= BodyFactory.CreateBody(worldPhysic);
-        demo.BodyType = BodyType.Kinematic;
-        demo.Position = new Microsoft.Xna.Framework.Vector2(1, 1);
-        demo.Rotation = 10;
-
-        Microsoft.Xna.Framework.Vector2 de1 = new Microsoft.Xna.Framework.Vector2(1, 2);
-        Microsoft.Xna.Framework.Vector2 de2 = new Microsoft.Xna.Framework.Vector2(1, 2);
-        de1 = de1 / 2 * de2;
-        
+   
+       
         //worldPhysic.QueryAABB()
         
     }
