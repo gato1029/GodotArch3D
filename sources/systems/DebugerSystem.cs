@@ -6,6 +6,7 @@ using Arch.Relationships;
 using Arch.System;
 
 using Godot;
+using GodotEcsArch.sources.managers.Collision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,13 +30,13 @@ public struct DebugEntity
 internal class DebugerSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
-    private QueryDescription query = new QueryDescription().WithAll<Collider>().WithNone<ColliderDebug>();
-    private QueryDescription queryDebugSprite = new QueryDescription().WithAll<Sprite3D, Transform,Collider>();
+    private QueryDescription query = new QueryDescription().WithAll<ColliderSprite>().WithNone<ColliderDebug>();
+    private QueryDescription queryDebugSprite = new QueryDescription().WithAll<Sprite3D, Transform,ColliderSprite>();
     private QueryDescription queryDebugDirectionSprite = new QueryDescription().WithAll<Transform,Direction>();
 
     private QueryDescription queryDebugMelleCollider = new QueryDescription().WithAll<Position, Direction, MelleCollider>();
 
-    private QueryDescription queryDesactive = new QueryDescription().WithAll<Collider, ColliderDebug>();
+    private QueryDescription queryDesactive = new QueryDescription().WithAll<ColliderSprite, ColliderDebug>();
 
     public DebugerSystem(World world) : base(world)
     {
@@ -57,18 +58,48 @@ internal class DebugerSystem : BaseSystem<World, float>
         {
             ref var pointerEntity = ref chunk.Entity(0);  
             ref var pointerTransform = ref chunk.GetFirst<Transform>();
-            ref var pointerCollider = ref chunk.GetFirst<Collider>();
+            ref var pointerCollider = ref chunk.GetFirst<ColliderSprite>();
+            ref var pointerPosition = ref chunk.GetFirst<Position>();
             foreach (var entityIndex in chunk)
             {
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                 ref Transform t = ref Unsafe.Add(ref pointerTransform, entityIndex);
-                ref Collider c = ref Unsafe.Add(ref pointerCollider, entityIndex);
-                
-                Transform3D transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
-                transform3D = transform3D.Scaled(new Vector3(c.rect.Size.X, c.rect.Size.Y, 1));
-                transform3D.Origin = new Vector3(t.transformInternal.Origin.X + c.rectTransform.Position.X, t.transformInternal.Origin.Y + c.rectTransform.Position.Y, t.transformInternal.Origin.Z);
-                DebugDraw.Quad(transform3D, 1, Colors.Red, 0.0f); //debug
-                DebugDraw.Quad(t.transformInternal, .1f, Colors.Green, 0.0f); //debug          
+                ref ColliderSprite c = ref Unsafe.Add(ref pointerCollider, entityIndex);
+                ref Position position = ref Unsafe.Add(ref pointerPosition, entityIndex);
+
+                if (c.shapeBody is Rectangle)
+                {
+                    Rectangle shape = (Rectangle)c.shapeBody;
+                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width, shape.Height, 1));
+                    transform3DShape.Origin = new Vector3(position.value.X + shape.OriginCurrent.X, position.value.Y + shape.OriginCurrent.Y, 1);
+                    DebugDraw.Quad(transform3DShape, 1, Colors.Red, 0.0f); //debug
+                }
+
+
+                //transform3D.Origin = new Vector3(t.transformInternal.Origin.X + c.rectTransform.Position.X, t.transformInternal.Origin.Y + c.rectTransform.Position.Y, t.transformInternal.Origin.Z);
+                if (c.shapeMove is Rectangle)
+                {
+                    Rectangle shape2 = (Rectangle)c.shapeMove;
+                    Transform3D transform3DShape2 = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape2 = transform3DShape2.Scaled(new Vector3(shape2.Width, shape2.Height, 1));
+                    transform3DShape2.Origin = new Vector3(position.value.X + shape2.OriginCurrent.X, position.value.Y + shape2.OriginCurrent.Y, 1);
+                    DebugDraw.Quad(transform3DShape2, 1, Colors.Green, 0.0f); //debug
+                }
+                if (c.shapeMove is Circle)
+                {
+                    Circle shape2 = (Circle)c.shapeMove;
+                    Transform3D transform3DShape2 = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape2 = transform3DShape2.Scaled(new Vector3(1,1, 1));
+                    transform3DShape2.Origin = new Vector3(position.value.X + shape2.OriginCurrent.X, position.value.Y + shape2.OriginCurrent.Y, 1);
+                    DebugDraw.Sphere(transform3DShape2, shape2.Radius, Colors.Green, 0.0f); //debug
+                }
+                DebugDraw.Quad(t.transformInternal, .1f, Colors.BlueViolet, 0.0f); //center          
+
+                //Transform3D transform3DAABB = new Transform3D(Basis.Identity, Vector3.Zero);
+                //transform3DAABB = transform3DAABB.Scaled(new Vector3(c.aabbMove.Size.X, c.aabbMove.Size.Y, 1));
+                //transform3DAABB.Origin = new Vector3(c.aabbMove.Position.X, c.aabbMove.Position.Y, t.transformInternal.Origin.Z);
+                //DebugDraw.Quad(transform3DAABB, 1, Colors.WebGreen, 0.0f); //debug
 
             }
 
@@ -126,15 +157,25 @@ internal class DebugerSystem : BaseSystem<World, float>
                 ref Direction direction = ref Unsafe.Add(ref pointerDirection, entityIndex);
                 ref MelleCollider melleCollider = ref Unsafe.Add(ref pointerMelleCollider, entityIndex);
 
-                ////Vector2 pp = (( melleCollider.collider.rectTransform.Position));
-                Vector2 posAtack = position.value + NuevaPosicion( melleCollider.collider.rectTransform.Position, direction.value) ;
 
-                Transform3D transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
-                transform3D = transform3D.Scaled(new Vector3(melleCollider.collider.rectTransform.Size.X, melleCollider.collider.rectTransform.Size.Y, 1));
-                transform3D.Origin = new Vector3(posAtack.X, posAtack.Y,5);
+                if (melleCollider.shapeCollider is Rectangle)
+                {
+                    Rectangle shape = (Rectangle)melleCollider.shapeCollider;
+                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width, shape.Height, 1));
+                    transform3DShape.Origin = new Vector3(position.value.X + shape.OriginCurrent.X, position.value.Y + shape.OriginCurrent.Y, 1);
+                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkBlue, 0.0f); //debug
+                }
 
-                DebugDraw.Quad(transform3D, 1, Colors.DarkBlue, 0.0f); //debug       
-                
+                //////Vector2 pp = (( melleCollider.collider.rectTransform.Position));
+                //Vector2 posAtack = position.value + NuevaPosicion( melleCollider.collider.rectTransform.Position, direction.value) ;
+
+                //Transform3D transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
+                //transform3D = transform3D.Scaled(new Vector3(melleCollider.collider.rectTransform.Size.X, melleCollider.collider.rectTransform.Size.Y, 1));
+                //transform3D.Origin = new Vector3(posAtack.X, posAtack.Y,5);
+
+                //DebugDraw.Quad(transform3D, 1, Colors.DarkBlue, 0.0f); //debug       
+
             }
         }
 
@@ -197,7 +238,7 @@ internal class DebugerSystem : BaseSystem<World, float>
     bool DebugActive = false;
     public override void Update(in float t)
     {
-        bool debug = ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("debugColliders");
+        bool debug = Input.IsActionJustPressed("debugColliders");
         if (debug)
         {
             DebugActive = !DebugActive;

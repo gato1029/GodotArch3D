@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://fe0png73wkqq"]
+[gd_scene load_steps=12 format=3 uid="uid://fe0png73wkqq"]
 
 [ext_resource type="Script" uid="uid://gjjn48iuspr7" path="res://sources/components/MainNode.cs" id="1_uvhk3"]
 [ext_resource type="Script" uid="uid://bvpb54gqawbxx" path="res://sources/MainWindowGodot.cs" id="2_fup1n"]
@@ -10,6 +10,9 @@
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="8_wkbut"]
 [ext_resource type="Texture2D" uid="uid://ce6rr1s7aq4yy" path="res://resources/Minotauro.png" id="9_dkd5b"]
 [ext_resource type="Texture2D" uid="uid://d17auewvoxilh" path="res://resources/demo.jpg" id="9_urofc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_iw4ti"]
+size = Vector2(100, 100)
 
 [node name="MainNode" type="Node"]
 script = ExtResource("1_uvhk3")
@@ -35,7 +38,13 @@ script = ExtResource("6_bmacd")
 texture = ExtResource("7_sr7oq")
 
 [node name="Sprite2D2" type="Sprite2D" parent="."]
+position = Vector2(32, 0)
 texture = ExtResource("8_wkbut")
+
+[node name="Area2D" type="Area2D" parent="Sprite2D2"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D2/Area2D"]
+shape = SubResource("RectangleShape2D_iw4ti")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.971428, 0.133159, 0)

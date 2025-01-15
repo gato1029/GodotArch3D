@@ -1,0 +1,167 @@
+[gd_scene load_steps=3 format=3 uid="uid://k3k4c3lnny0m"]
+
+[ext_resource type="Script" uid="uid://d3brwq4l7ofjo" path="res://addons/control_node_window/window_scenes/template/control_node_window_template.gd" id="1_6f5jd"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t1pqk"]
+resource_local_to_scene = true
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[node name="ControlNodeWindowTemplate" type="Control"]
+clip_contents = true
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 3
+anchors_preset = 0
+offset_left = 32.0
+offset_top = 30.0
+offset_right = 332.0
+offset_bottom = 330.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_6f5jd")
+window_name = "Window"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopBar" type="ColorRect" parent="VBoxContainer"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+color = Color(0, 0.258242, 0.327687, 1)
+
+[node name="WinowName" type="Label" parent="VBoxContainer/TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Window"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TopBar"]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopPanel" type="Panel" parent="VBoxContainer/TopBar/HBoxContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 6
+theme_override_styles/panel = SubResource("StyleBoxEmpty_t1pqk")
+
+[node name="X" type="Button" parent="VBoxContainer/TopBar/HBoxContainer"]
+layout_mode = 2
+text = "X"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="BorderLeft" type="ColorRect" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(5, 5)
+layout_mode = 2
+mouse_default_cursor_shape = 10
+color = Color(0.237539, 0.237539, 0.237539, 1)
+
+[node name="CenterPanel" type="ColorRect" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.00267884, 0, 0.18191, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer2/CenterPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="ContentPlaceholder" type="ColorRect" parent="VBoxContainer/HBoxContainer2/CenterPanel/MarginContainer"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.00392157, 0, 0.180392, 1)
+
+[node name="BorderRight" type="ColorRect" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(5, 5)
+layout_mode = 2
+mouse_default_cursor_shape = 10
+color = Color(0.239216, 0.239216, 0.239216, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="CornerBotLeft" type="ColorRect" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(5, 5)
+layout_mode = 2
+mouse_default_cursor_shape = 11
+color = Color(0.239216, 0.239216, 0.239216, 1)
+
+[node name="BorderBot" type="ColorRect" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(5, 5)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 9
+color = Color(0.239216, 0.239216, 0.239216, 1)
+
+[node name="CornerBotRight" type="ColorRect" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(5, 5)
+layout_mode = 2
+mouse_default_cursor_shape = 12
+color = Color(0.239216, 0.239216, 0.239216, 1)
+
+[node name="Content_dummy" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 10.0
+offset_top = 25.0
+offset_right = 290.0
+offset_bottom = 290.0
+mouse_filter = 1
+color = Color(1, 0, 1, 1)
+
+[connection signal="child_entered_tree" from="." to="." method="_on_child_entered_tree"]
+[connection signal="child_order_changed" from="." to="." method="_on_child_order_changed"]
+[connection signal="focus_exited" from="." to="." method="_on_focus_exited"]
+[connection signal="item_rect_changed" from="." to="." method="_on_item_rect_changed"]
+[connection signal="gui_input" from="VBoxContainer/TopBar/HBoxContainer/TopPanel" to="." method="_on_top_panel_gui_input"]
+[connection signal="pressed" from="VBoxContainer/TopBar/HBoxContainer/X" to="." method="_on_x_pressed"]
+[connection signal="gui_input" from="VBoxContainer/HBoxContainer2/BorderLeft" to="." method="_on_border_left_gui_input"]
+[connection signal="gui_input" from="VBoxContainer/HBoxContainer2/BorderRight" to="." method="_on_border_right_gui_input"]
+[connection signal="gui_input" from="VBoxContainer/HBoxContainer/CornerBotLeft" to="." method="_on_corner_bot_left_gui_input"]
+[connection signal="gui_input" from="VBoxContainer/HBoxContainer/BorderBot" to="." method="_on_border_bot_gui_input"]
+[connection signal="gui_input" from="VBoxContainer/HBoxContainer/CornerBotRight" to="." method="_on_corner_bot_right_gui_input"]

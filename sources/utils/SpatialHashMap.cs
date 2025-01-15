@@ -1,6 +1,7 @@
 using Arch.Core;
 using Arch.LowLevel;
 using Arch.LowLevel.Jagged;
+
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ internal class SpatialHashMap<TItem> where TItem : struct
     private readonly float cellSize;   
     public readonly Dictionary<int, Dictionary<int, TItem>> cellMap;
     private readonly Dictionary<int, int> mapItems;
-    private readonly Dictionary<Vector2, Transform3D> gridPositions;
+    private readonly Dictionary<Vector2, Transform3D> gridPositions; // draw grid
 
     private readonly Func<TItem, int> getPositionItem;
 
@@ -110,12 +111,12 @@ internal class SpatialHashMap<TItem> where TItem : struct
                 cellMap[cellIndexPast].Remove(itemId);
                 if (!cellMap.ContainsKey(cellIndex))
                 {
-
                     addGridPosition(positionCell); 
                     cellMap[cellIndex] = new Dictionary<int, TItem>();
-                }
+                }                
+
                 cellMap[cellIndex][itemId] = item;
-                mapItems[itemId] = cellIndex;
+                mapItems[itemId] = cellIndex;                                
             }            
         }
         else
@@ -178,6 +179,43 @@ internal class SpatialHashMap<TItem> where TItem : struct
         return null;
     }
 
+    private Vector2[] GetRectVertices(Rect2 rect)
+    {
+        // Calculamos la mitad del tamaño del rectángulo
+        Vector2 halfSize = rect.Size / 2;
+
+        // Calculamos los vértices en función del centro
+        Vector2[] vertices = new Vector2[4]
+        {
+        rect.Position - halfSize, // Superior izquierdo
+        rect.Position + new Vector2(halfSize.X, -halfSize.Y), // Superior derecho
+        rect.Position + new Vector2(-halfSize.X, halfSize.Y), // Inferior izquierdo
+        rect.Position + halfSize, // Inferior derecho
+        };
+
+        return vertices;
+    }
+
+    public Dictionary<int, Dictionary<int, TItem>> QueryAABB(Rect2 aabb)
+    {                
+        Dictionary<int, Dictionary<int, TItem>> quadrants = new Dictionary<int, Dictionary<int, TItem>>();
+
+        
+        Vector2[] vertexs = GetRectVertices(aabb);
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2 point = vertexs[i];
+            int cellIndex = GetCellIndex(point);
+            if (cellMap.ContainsKey(cellIndex))
+            {
+                if (!quadrants.ContainsKey(cellIndex) && cellMap.ContainsKey(cellIndex))
+                {
+                    quadrants.Add(cellIndex, cellMap[cellIndex]);
+                }
+            }
+        }
+        return quadrants;
+    }
     public Dictionary<int,Dictionary<int, TItem>> GetPossibleQuadrants(Vector2 position,  float distance)
     {
         Dictionary<int,Dictionary<int, TItem>> quadrants = new Dictionary<int,Dictionary<int, TItem>>();      

@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://086yrvyrobjq"]
+
+[ext_resource type="PackedScene" uid="uid://k3k4c3lnny0m" path="res://addons/control_node_window/window_scenes/template/control_node_window_template.tscn" id="1_vw1h7"]
+[ext_resource type="Script" uid="uid://dbxg2g6p0g5rr" path="res://addons/control_node_window/window_scenes/control_node_window.gd" id="2_xx231"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_feco7"]
+resource_local_to_scene = true
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[node name="ControlNodeWindow" instance=ExtResource("1_vw1h7")]
+script = ExtResource("2_xx231")
+
+[node name="WinowName" parent="VBoxContainer/TopBar" index="0"]
+text = ""
+
+[node name="TopPanel" parent="VBoxContainer/TopBar/HBoxContainer" index="0"]
+theme_override_styles/panel = SubResource("StyleBoxEmpty_feco7")

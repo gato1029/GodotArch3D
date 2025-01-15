@@ -2,17 +2,22 @@ using Arch.AOT.SourceGenerator;
 using Arch.Buffer;
 using Arch.Core;
 using Arch.Core.Extensions;
+using Arch.Relationships;
 using Arch.System;
-using FarseerPhysics.Dynamics.Contacts;
+
 using Godot;
+using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Behaviors;
+using GodotEcsArch.sources.managers.Collision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Godot.TextServer;
+
+
+
 
 
 namespace GodotEcsArch.sources.systems
@@ -33,7 +38,7 @@ namespace GodotEcsArch.sources.systems
     internal class MainCharacterSystem : BaseSystem<World, float>
     {
         private CommandBuffer commandBuffer;
-        private QueryDescription query = new QueryDescription().WithAll<MainCharacter, StateComponent, Position, Sprite3D, RefreshPositionAlways, Animation, Direction, Rotation, Velocity, Collider>();
+        private QueryDescription query = new QueryDescription().WithAll<MainCharacter, StateComponent, Position, Sprite3D, RefreshPositionAlways, Animation, Direction, Rotation, Velocity, ColliderSprite>();
 
 
         public MainCharacterSystem(World world) : base(world)
@@ -62,7 +67,7 @@ namespace GodotEcsArch.sources.systems
                 ref var pointerDirection = ref chunk.GetFirst<Direction>();
                 ref var pointerRotation = ref chunk.GetFirst<Rotation>();
                 ref var pointerVelocity = ref chunk.GetFirst<Velocity>();
-                ref var pointerCollider = ref chunk.GetFirst<Collider>();
+                ref var pointerCollider = ref chunk.GetFirst<ColliderSprite>();
                 ref var pointerStateComponent = ref chunk.GetFirst<StateComponent>();
                 foreach (var entityIndex in chunk)
                 {
@@ -73,20 +78,20 @@ namespace GodotEcsArch.sources.systems
                     ref Direction d = ref Unsafe.Add(ref pointerDirection, entityIndex);
                     ref Rotation r = ref Unsafe.Add(ref pointerRotation, entityIndex);
                     ref Velocity v = ref Unsafe.Add(ref pointerVelocity, entityIndex);
-                    ref Collider c = ref Unsafe.Add(ref pointerCollider, entityIndex);
+                    ref ColliderSprite c = ref Unsafe.Add(ref pointerCollider, entityIndex);
                     ref StateComponent stateComponent = ref Unsafe.Add(ref pointerStateComponent, entityIndex);
 
                     Vector2 moveDirection = Vector2.Zero;
                     bool attack = false;
-                    if (Input.IsActionPressed("move_up"))
+                    if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("move_up"))
                     { moveDirection.Y += 1; }
-                    if (Input.IsActionPressed("move_down"))
+                    if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("move_down"))
                     { moveDirection.Y -= 1; }
-                    if (Input.IsActionPressed("move_left"))
+                    if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("move_left"))
                     { moveDirection.X -= 1; }
-                    if (Input.IsActionPressed("move_right"))
+                    if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("move_right"))
                     { moveDirection.X += 1; }
-                    if (Input.IsActionPressed("attack"))
+                    if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("attack"))
                     { attack = true; }
 
                     if (stateComponent.currentType == StateType.EXECUTE_ATTACK)
@@ -113,108 +118,133 @@ namespace GodotEcsArch.sources.systems
 
             }
 
-            private void CallMove(Entity entity, Vector2 moveDirection, ref StateComponent stateComponent, ref Direction d,ref Rotation r, ref Animation a, ref Velocity v, ref Position p, ref Collider c)
+            private void CallMove(Entity entity, Vector2 moveDirection, ref StateComponent stateComponent, ref Direction d,ref Rotation r, ref Animation a, ref Velocity v, ref Position p, ref ColliderSprite c)
             {
-               
-                d.value = moveDirection;
-                d.directionAnimation = CommonOperations.GetDirectionAnimation(d.value);
-
-                if ( r.value != Mathf.RadToDeg(d.value.Angle()))
+                Entity entityCharacter = default;
+                ref Relationship<CharacterWeapon> parentOfRelation = ref entity.GetRelationships<CharacterWeapon>();
+                
+                foreach (var child in parentOfRelation)
                 {
-                    
+                    entityCharacter = child.Key;
+                }
+                CharacterWeapon characterWeapon = parentOfRelation.Get(entityCharacter);
+                ref Position positionCharacter = ref entityCharacter.Get<Position>();
+
+                if ( d.value != moveDirection)
+                {
+                    d.directionAnimation = CommonOperations.GetDirectionAnimation(moveDirection);
+                    d.value = moveDirection;
                     r.value = Mathf.RadToDeg(d.value.Angle());
-                    float angle = Mathf.Atan2(moveDirection.Y, moveDirection.X);
+                    d.normalized = new Vector2(Math.Sign(moveDirection.X), Math.Sign(moveDirection.Y));
                     ref MelleCollider melleAtack = ref entity.TryGetRef<MelleCollider>(out bool exist);
-                    //melleAtack.collider.rectTransform= RotateRect2(melleAtack.collider.rect, moveDirection);
-                    //GD.Print(melleAtack.collider.rectTransform);
-                    //GD.Print(Mathf.RadToDeg(angle));
-                    //GD.Print(r.value);
-                    //GD.Print(Mathf.RadToDeg(dd));
+
+                    // luego ponerlo en una solo funcion
+
+                    melleAtack.shapeCollider = characterWeapon.shapeColliderLeftRight;
+
+                    if (d.directionAnimation == DirectionAnimation.UP || d.directionAnimation == DirectionAnimation.DOWN)
+                    {
+                        melleAtack.shapeCollider = characterWeapon.shapeColliderTopDown; 
+                    }
+                    
+                    Rectangle rectangle = (Rectangle)melleAtack.shapeCollider; 
+
+                    //rectangle.DirectionTo(moveDirection.X, moveDirection.Y);
+                    
+                    Vector2 vector2 = Collision2D.RotatePosition(rectangle.OriginRelative, d.normalized);
+                    rectangle.OriginCurrent = vector2;
+
+                    ref Direction directionCharacter = ref entityCharacter.Get<Direction>();
+
+                    directionCharacter.value = d.value;
+                    directionCharacter.normalized = d.normalized;
+                    directionCharacter.directionAnimation = d.directionAnimation;
                 }
                 
                 Vector2 movement = d.value * v.value * _deltaTime;
-                Vector2 movementNext = p.value + movement;
+                Vector2 movementNext = p.value + movement + c.shapeMove.OriginCurrent;
 
-                FarseerPhysics.Dynamics.Contacts.ContactEdge contactEdge = c.body.ContactList;             
+                
                 bool existCollision = false;
 
-                while (contactEdge != null) // Recorrer los contactos
+                Rect2 aabb = new Rect2(movementNext, c.shapeMove.GetSizeQuad()*2);
+                Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.dynamicCollidersEntities.QueryAABB(aabb);
+                if (data != null)
                 {
-                    Contact contact = contactEdge.Contact;
-
-                    if (contact.IsTouching()) // Si hay contacto
+                    foreach (var item in data.Values)
                     {
-                        existCollision = true;                     
-                        break; // No necesitamos seguir revisando más contactos
+                        foreach (var itemInternal in item)
+                        {
+                            if (itemInternal.Value.Id != entity.Id)
+                            {
+                                ColliderSprite colliderB = itemInternal.Value.Get<ColliderSprite>();
+                                var positionB = itemInternal.Value.Get<Position>().value + colliderB.shapeMove.OriginCurrent;                                
+                                if (Collision2D.Collides(c.shapeMove,colliderB.shapeMove,movementNext,positionB))
+                                {
+                                    existCollision = true;
+                                    break;
+                                }                                                            
+                            }                            
+                        }
+                        if (existCollision)
+                        {
+                            break;
+                        }
                     }
-                    contactEdge = contactEdge.Next; // Ir al siguiente contacto
                 }
-
+                      
                 if (!existCollision)
                 {
                     stateComponent.currentType = StateType.MOVING;                    
                     p.value += movement;
+                    positionCharacter.value = p.value;
                 }
                 else
                 {
-                    stateComponent.currentType = StateType.IDLE;
+                    stateComponent.currentType = StateType.IDLE;                   
                 }
             }
-
-
-            public static Rect2 RotateRect2(Rect2 originalRect, Vector2 direction)
-            {
-
-
-                float angle = Mathf.Atan2(direction.Y, direction.X );
-
-
-                Vector2 center = originalRect.Position + originalRect.Size / 2;
-                float cosAngle = Mathf.Cos(angle);
-                float sinAngle = Mathf.Sin(angle);
-
-                float newX = center.X * cosAngle - center.Y * sinAngle;
-                float newY = center.X * sinAngle + center.Y * cosAngle;
-
-                Vector2 newPosition = new Vector2(newX, newY) - originalRect.Size / 2;
-               
-                Rect2 nuevoRect = new Rect2(newPosition, originalRect.Size);
-
-                return nuevoRect;
-            }
-
+       
             private void CallAttack(Entity entity, ref Position p, ref Direction d)
             {
                 if (entity.Has<MelleCollider>())
                 {
                     Unit unit = entity.Get<Unit>();
                     MelleCollider melleAtack = entity.Get<MelleCollider>();
-                    Vector2 pp = melleAtack.collider.rectTransform.Position;
-                    Vector2 posAtack = (p.value + pp) ;
-                    var result = CollisionManager.Instance.dynamicCollidersEntities.GetPossibleQuadrants(posAtack, 4);
-                    if (result != null)
-                    {
-                        foreach (var itemDic in result)
-                        {
-                            foreach (var item in itemDic.Value)
-                            {
-                                Entity entB = item.Value;
-                                if (item.Key != entity.Id && unit.team != entB.Get<Unit>().team)
-                                {
-                                    var colliderB = entB.Get<Collider>();
-                                    var positionB = entB.Get<Position>().value;
 
-                                    if (CollisionManager.Instance.CheckAABBCollision2(posAtack, melleAtack.collider, positionB, colliderB))
+                    Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
+
+                    Vector2 pp = melleAtack.shapeCollider.OriginCurrent;
+                    Vector2 posAtack = (p.value + pp) ;
+
+                   
+
+                    Rect2 aabb = new Rect2(posAtack, rectangle.Width,rectangle.Height);
+                    Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.dynamicCollidersEntities.QueryAABB(aabb);
+                    if (data != null)
+                    {
+                        foreach (var item in data.Values)
+                        {
+                            foreach (var itemInternal in item)
+                            {
+                                Entity entB = itemInternal.Value;
+                                if (itemInternal.Value.Id != entity.Id && unit.team != entB.Get<Unit>().team)
+                                {
+                                    var colliderB = itemInternal.Value.Get<ColliderSprite>();
+                                    var positionB = itemInternal.Value.Get<Position>().value;
+                                    if (Collision2D.Collides(rectangle, colliderB.shapeBody, posAtack, positionB))
                                     {
                                         ref StateComponent stateComponentB = ref entB.TryGetRef<StateComponent>(out bool exist);
 
-                                        stateComponentB.currentType = StateType.TAKE_STUN;
+                                        stateComponentB.currentType = StateType.TAKE_HIT;
                                         BehaviorManager.Instance.AplyDamage(entity, entB);
+                                       
                                     }
+
                                 }
-                            }
+                            }                         
                         }
-                    }
+                    }                  
                 }
               
             }
@@ -222,7 +252,7 @@ namespace GodotEcsArch.sources.systems
 
         public override void Update(in float t)
         {
-            if (RenderWindowGui.Instance.IsActive)
+            //if (RenderWindowGui.Instance.IsActive)
             {
                 World.InlineParallelChunkQuery(in query, new JobCharacter(commandBuffer, t));
                 commandBuffer.Playback(World);

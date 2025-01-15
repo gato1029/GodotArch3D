@@ -21,6 +21,7 @@ public struct Sprite3D
 
     public byte spriteAnimation; // 0 - Sprite 1- Animation
     public Byte layer;
+    
 }
 
 [Component]
@@ -29,8 +30,10 @@ public struct Animation
     public AnimationAction currentAction;
     public AnimationAction updateAction;
 
-    public FrameAnimation frameAnimation;
+    public AnimationFrameBase frameAnimation;
+
     public int CurrentFrame;
+    public int indexFrame;
     public float TimeSinceLastFrame;
     public float TimePerFrame;
     public bool loop;
@@ -39,13 +42,31 @@ public struct Animation
 }
 
 
-public struct FrameAnimation
+public abstract class AnimationFrameBase
+{
+
+}
+public class CustomFrameAnimation : AnimationFrameBase
+{
+    public int startPosition;
+    public int endPosition;
+    public int[] arrayFrames;
+    public float timePerFrame;
+
+    public CustomFrameAnimation(float timePerFrame, int[] arrayFramesAll)
+    {
+        this.timePerFrame = timePerFrame;
+        arrayFrames = arrayFramesAll;
+    }
+
+}
+public class FrameAnimation: AnimationFrameBase
 {
     public int startFrame;
     public int totalFrames;
     public float timePerFrame;
 
-    public FrameAnimation(int startFrame, int totalFrames, float timePerFrame) : this()
+    public FrameAnimation(int startFrame, int totalFrames, float timePerFrame) 
     {
         this.totalFrames = totalFrames - 1;
         this.startFrame = startFrame;
@@ -55,7 +76,7 @@ public struct FrameAnimation
 internal class TypeAnimation
 {
 
-    public FrameAnimation[] Frames { get; set; }  // Array de fotogramas
+    public AnimationFrameBase[] Frames { get; set; }  // Array de fotogramas
     public float FrameDuration { get; set; } // Duración de cada fotograma
     public bool Looping { get; set; }  // Si la animación se repite
     public string NameTypeAnimation { get; set; }
@@ -63,15 +84,15 @@ internal class TypeAnimation
     public TypeAnimation(int frameCount, string nameTypeAnimation, bool loop = true)
     {
         NameTypeAnimation = nameTypeAnimation; 
-        Frames = new FrameAnimation[frameCount];
+        Frames = new AnimationFrameBase[frameCount];
         Looping = loop;
     }
 
-    public void AddFrame(int index, FrameAnimation frame)
+    public void AddFrame(int index, AnimationFrameBase frame)
     {
         Frames[index] = frame;
     }
-    public FrameAnimation GetFrame(int index)
+    public AnimationFrameBase GetFrame(int index)
     {
         return Frames[index];
     }
@@ -102,11 +123,11 @@ internal class AnimationIndividual
     {
         return typeAnimations[(int)idAnimationAction];
     }
-    public FrameAnimation GetFrame(int idTypeAnimation, int idMovement)
+    public AnimationFrameBase GetFrame(int idTypeAnimation, int idMovement)
     {
         return typeAnimations[idTypeAnimation].GetFrame(idMovement);
     }
-    public FrameAnimation GetFrame(AnimationAction idAnimationAction, int idMovement)
+    public AnimationFrameBase GetFrame(AnimationAction idAnimationAction, int idMovement)
     {
         return typeAnimations[(int)idAnimationAction].GetFrame(idMovement);
     }
@@ -218,11 +239,11 @@ internal class SpriteAnimation
         }
         return -1;
     }
-    public int LoadTexture(string pathTexture, Vector3 tileSize, Vector3 offset, Vector2 unitPixel)
+    public int LoadTexture(int idAtlas,string pathTexture, Vector3 tileSize, Vector3 offset, Vector2 unitPixel)
     {
         Texture2D texture2D = GD.Load<Texture2D>(pathTexture);
 
-        int idAtlas = StoreAtlas.Count + 1;
+        //int idAtlas = StoreAtlas.Count + 1;
         ushort instanceMax = 65500;
 
         float widht = texture2D.GetWidth() / tileSize.X;
@@ -629,9 +650,9 @@ internal class SpriteManager:SingletonBase<SpriteManager>
     {
         SpritesStore.LoadTexture(pathTexture, tileSize, offset, unitPixel ,atlas);
     }
-    public int LoadTextureAnimation(string pathTexture, Vector3 tileSize, Vector3 offset, Vector2 unitPixel)
+    public int LoadTextureAnimation(int idAtlasTexture,string pathTexture, Vector3 tileSize, Vector3 offset, Vector2 unitPixel)
     {
-        return  SpriteAnimation.LoadTexture(pathTexture, tileSize,offset,unitPixel);
+        return  SpriteAnimation.LoadTexture(idAtlasTexture, pathTexture, tileSize,offset,unitPixel);
     }
     public int CreateAnimation(int idAtlasAnimation, string nameAnimation, int countTypesAnimation)
     {

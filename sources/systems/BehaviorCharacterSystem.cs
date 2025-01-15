@@ -5,6 +5,7 @@ using Arch.Core.Extensions;
 using Arch.System;
 
 using Godot;
+using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.systems;
 using System;
 using System.Collections;
@@ -34,7 +35,8 @@ public enum ControllerMode
 public struct BehaviorCharacter
 {
     public IAttackBehavior attackBehavior;
-    public IMoveBehavior moveBehavior;      
+    public IMoveBehavior moveBehavior;
+    public IStateBehavior stateBehavior;
 }
 
 [Component]
@@ -60,8 +62,8 @@ public struct UnitController
 internal class BehaviorCharacterSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
-    private QueryDescription queryBehaviorIA = new QueryDescription().WithAll<BehaviorCharacter, Position, Sprite3D, UnitController, Direction, Rotation,Velocity,Collider>();
-    private QueryDescription queryBehaviorHuman = new QueryDescription().WithAll<BehaviorCharacter, Position, Sprite3D, RefreshPositionAlways, HumanController, Animation, Direction, Rotation, Velocity, Collider>();
+    private QueryDescription queryBehaviorIA = new QueryDescription().WithAll<BehaviorCharacter, Position, Sprite3D, UnitController, Direction, Rotation,Velocity,ColliderSprite>();
+    private QueryDescription queryBehaviorHuman = new QueryDescription().WithAll<BehaviorCharacter, Position, Sprite3D, RefreshPositionAlways, HumanController, Animation, Direction, Rotation, Velocity, ColliderSprite>();
 
     public BehaviorCharacterSystem(World world) : base(world)
     {
@@ -92,7 +94,7 @@ internal class BehaviorCharacterSystem : BaseSystem<World, float>
             ref var pointerDirection = ref chunk.GetFirst<Direction>();
             ref var pointerRotation = ref chunk.GetFirst<Rotation>();
             ref var pointerVelocity = ref chunk.GetFirst<Velocity>();
-            ref var pointerCollider = ref chunk.GetFirst<Collider>();
+            ref var pointerCollider = ref chunk.GetFirst<ColliderSprite>();
             ref var pointerStateComponent = ref chunk.GetFirst<StateComponent>();
             foreach (var entityIndex in chunk)
             {
@@ -105,7 +107,7 @@ internal class BehaviorCharacterSystem : BaseSystem<World, float>
                 ref Direction d = ref Unsafe.Add(ref pointerDirection, entityIndex);
                 ref Rotation r = ref Unsafe.Add(ref pointerRotation, entityIndex);
                 ref Velocity v = ref Unsafe.Add(ref pointerVelocity, entityIndex);
-                ref Collider c = ref Unsafe.Add(ref pointerCollider, entityIndex);
+                ref ColliderSprite c = ref Unsafe.Add(ref pointerCollider, entityIndex);
                 ref StateComponent stateComponent = ref Unsafe.Add(ref pointerStateComponent, entityIndex);
 
                 if (stateComponent.currentType == StateType.EXECUTE_ATTACK)
@@ -121,9 +123,9 @@ internal class BehaviorCharacterSystem : BaseSystem<World, float>
                     }
                     else
                     {
-                        bc.moveBehavior.Move(entity, ref stateComponent, ref ia.iaController, ref p, ref d, ref r, ref v, ref c, rng, _deltaTime);
+                        bc.moveBehavior.Move(entity,bc.attackBehavior, ref stateComponent, ref ia.iaController, ref p, ref d, ref r, ref v, ref c, rng, _deltaTime);
                     }
-                    
+
                 }             
             }
 

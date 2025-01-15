@@ -51,13 +51,36 @@ namespace GodotEcsArch.sources.systems
 
                     if (a.updateAction!= a.currentAction )
                     {
-                        a.currentAction = a.updateAction;
-                        AnimationIndividual animationIndividual = SpriteManager.Instance.GetAnimation(s.idSpriteOrAnimation);
-                        a.frameAnimation = animationIndividual.GetFrame(a.updateAction, (int)d.directionAnimation);
-                        a.CurrentFrame   = a.frameAnimation.startFrame;
-                        a.currentAction  = a.updateAction;
-                        a.loop           = animationIndividual.GetTypeAnimation(a.updateAction).Looping;
-                        a.complete = false;
+                        a.currentAction = a.updateAction;                        
+                        if (a.updateAction != AnimationAction.NONE)
+                        {
+                            AnimationIndividual animationIndividual = SpriteManager.Instance.GetAnimation(s.idSpriteOrAnimation);
+                            AnimationFrameBase animationFrameBase = animationIndividual.GetFrame(a.updateAction, (int)d.directionAnimation);
+                            switch (animationFrameBase)
+                            {
+                                case FrameAnimation frameAnimation:
+                                    a.frameAnimation = animationIndividual.GetFrame(a.updateAction, (int)d.directionAnimation);
+                                    a.CurrentFrame = frameAnimation.startFrame;
+                                    a.currentAction = a.updateAction;
+                                    a.TimePerFrame = frameAnimation.timePerFrame;
+                                    a.loop = animationIndividual.GetTypeAnimation(a.updateAction).Looping;
+                                    a.complete = false;
+                                    break;
+
+                                case CustomFrameAnimation customFrameAnimation:
+                                    a.frameAnimation = animationIndividual.GetFrame(a.updateAction, (int)d.directionAnimation);
+                                    a.CurrentFrame = customFrameAnimation.arrayFrames[0];
+                                    a.currentAction = a.updateAction;
+                                    a.TimePerFrame = customFrameAnimation.timePerFrame;
+                                    a.loop = animationIndividual.GetTypeAnimation(a.updateAction).Looping;
+                                    a.complete = false;
+                                    break;
+
+                            }
+                        }
+                     
+                        
+                        
                     }
                     else
                     {

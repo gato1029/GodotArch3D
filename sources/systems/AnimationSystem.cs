@@ -52,39 +52,75 @@ internal class AnimationSystem : BaseSystem<World, float>
                 ref Sprite3D s = ref Unsafe.Add(ref pointerSprite, entityIndex);
                 ref Animation animation = ref Unsafe.Add(ref pointerAnimation, entityIndex);
                 ref Direction d = ref Unsafe.Add(ref pointerDirection, entityIndex);
-
-                animation.TimeSinceLastFrame += _deltaTime;
-                if (animation.TimeSinceLastFrame >= animation.TimePerFrame  )
+                if (animation.currentAction == AnimationAction.NONE)
                 {
-                    
-
-                    //animation.StartFrame + animation.TotalFrames
-                    if (animation.CurrentFrame >= (animation.frameAnimation.startFrame + animation.frameAnimation.totalFrames))
-                    {
-                        if (animation.loop)
-                        {
-                            animation.CurrentFrame = animation.frameAnimation.startFrame; // Reinicia al frame inicial
-                            animation.complete = true;
-                        }
-                        else
-                        {
-                            animation.complete = true;
-                        }
-                    }
-                    else
-                    {
-                        animation.CurrentFrame++;
-                    }
-                
-                   
-                    int flipX = 0;
-                    if (animation.horizontalOrientation!= 0 && Math.Sign(d.value.X)!= animation.horizontalOrientation)
-                    {
-                        flipX = 1;
-                    }
-                    RenderingServer.MultimeshInstanceSetCustomData(s.idRid, s.idInstance, new Color(animation.CurrentFrame, flipX, 0, 0));
-                    animation.TimeSinceLastFrame -= animation.TimePerFrame;
+                    RenderingServer.MultimeshInstanceSetCustomData(s.idRid, s.idInstance, new Color(0, 0, 0, -1));
                 }
+                else
+                {
+                    animation.TimeSinceLastFrame += _deltaTime;
+                    if (animation.TimeSinceLastFrame >= animation.TimePerFrame)
+                    {
+
+                        switch (animation.frameAnimation)
+                        {
+                            case FrameAnimation frameAnimation:
+                                //animation.StartFrame + animation.TotalFrames
+                                if (animation.CurrentFrame >= (frameAnimation.startFrame + frameAnimation.totalFrames))
+                                {
+                                    if (animation.loop)
+                                    {
+                                        animation.CurrentFrame = frameAnimation.startFrame; // Reinicia al frame inicial
+                                        animation.complete = true;
+                                    }
+                                    else
+                                    {
+                                        animation.complete = true;
+                                    }
+                                }
+                                else
+                                {
+                                    animation.CurrentFrame++;
+                                }
+                                break;
+
+                            case CustomFrameAnimation customFrameAnimation:
+                                //animation.StartFrame + animation.TotalFrames
+                                if (animation.indexFrame >= (customFrameAnimation.arrayFrames.Length))
+                                {
+                                    if (animation.loop)
+                                    {
+                                        animation.CurrentFrame = customFrameAnimation.arrayFrames[0]; // Reinicia al frame inicial
+                                        animation.complete = true;
+                                        animation.indexFrame = 0;
+                                    }
+                                    else
+                                    {
+                                        animation.complete = true;
+                                    }
+                                }
+                                else
+                                {
+                                    animation.CurrentFrame = customFrameAnimation.arrayFrames[animation.indexFrame];
+                                    animation.indexFrame++;
+                                }
+                                break;
+                        }
+
+
+
+                        int flipX = 0;
+                        if (animation.horizontalOrientation != 0 && Math.Sign(d.value.X) != animation.horizontalOrientation)
+                        {
+                            flipX = 1;
+                        }
+
+                        RenderingServer.MultimeshInstanceSetCustomData(s.idRid, s.idInstance, new Color(animation.CurrentFrame, flipX, 0, 0));
+                        animation.TimeSinceLastFrame -= animation.TimePerFrame;
+                    }
+                }
+            
+               
 
             }
         }

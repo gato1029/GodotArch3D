@@ -9,7 +9,24 @@ using System.Threading.Tasks;
 internal partial class InputHandler : Node
 {
     private Dictionary<string, bool> inputStates = new Dictionary<string, bool>();
-
+    public override void _Input(InputEvent @event)
+    {
+        foreach (var action in inputStates.Keys)
+        {
+            if (@event.IsActionPressed(action))
+                inputStates[action] = true;
+            else if (@event.IsActionReleased(action))
+                inputStates[action] = false;
+        }
+        if (@event.IsActionPressed("move_up"))
+        {
+            inputStates["move_up"] = true;
+        }
+        if (@event.IsActionReleased("move_up"))
+        {
+            inputStates["move_up"] = false;            
+        }
+    }   
     public override void _Ready()
     { 
         inputStates["move_up"] = false;

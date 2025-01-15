@@ -103,65 +103,10 @@ internal class RenderSystem : BaseSystem<World, float>
         }
     }
 
-    private readonly struct RenderColliderDebugJob : IForEachWithEntity<ColliderDebug, Position, Transform, Rotation, Collider>
-    {
-        private readonly float _deltaTime;
-        private readonly CommandBuffer _commandBuffer;
-
-        public RenderColliderDebugJob(float deltaTime, CommandBuffer commandBuffer)
-        {
-            _deltaTime = deltaTime;
-            _commandBuffer = commandBuffer;
-
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Update(Entity entity, ref ColliderDebug c, ref Position pos, ref Transform t, ref Rotation r, ref Collider col)
-        {
-            float gradRad = Mathf.DegToRad(r.value);
-            Transform2D transform = new Transform2D(gradRad, pos.value);
-            RenderingServer.CanvasItemSetTransform(c.canvasItemColliderMelle, transform);
-            if (col.aplyRotation)
-            {
-                RenderingServer.CanvasItemSetTransform(c.canvasItemCollider, transform);
-            }
-            else
-            {
-                RenderingServer.CanvasItemSetTransform(c.canvasItemCollider, t.value);
-            }
-            
-        }
-
-    }
+   
 
 
-    private readonly struct RenderJobDebug : IForEachWithEntity<Debug, Position, Direction>
-    {
-        private readonly float _deltaTime;
-        private readonly CommandBuffer _commandBuffer;
-
-        public RenderJobDebug(float deltaTime, CommandBuffer commandBuffer)
-        {
-            _deltaTime = deltaTime;
-            _commandBuffer = commandBuffer;
-
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Update(Entity entity, ref Debug sp, ref Position pos, ref Direction d)
-        {
-            Vector2 posNew = pos.value + GetRotatedPointByDirection(sp.offset, Vector2.Zero, d.value);
-            
-            Transform2D transform = 
-                new Transform2D(d.value.Angle(), posNew);
-            //transform = transform.RotatedLocal(Mathf.Pi / 2);
-            RenderingServer.CanvasItemSetTransform(sp.CanvasItem, transform);
-            //GD.Print("rect:"+sp.rect.Position);
-            //GD.Print("rect center:" + sp.rect.GetCenter());
-            //GD.Print("posicion transform:" + transform.Origin);
-            //GD.Print("posicion pos:" + pos.value);
-         
-        }
-
-    }
+  
 
     public static Vector2 GetRotatedPointByDirection(Vector2 point, Vector2 origin, Vector2 direction)
     {
@@ -185,13 +130,11 @@ internal class RenderSystem : BaseSystem<World, float>
         //var job = new RenderJob((float)t, commandBuffer);
         //World.InlineEntityQuery<RenderJob,Sprite, Position,Transform>(in queryRender, ref job);
 
-        World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
+        //World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
 
         //var jobDebug = new RenderJobDebug((float)t, commandBuffer);
         //World.InlineEntityQuery<RenderJobDebug, Debug, Position, Direction>(in queryDebug, ref jobDebug);
 
-        var jobDebugCollider = new RenderColliderDebugJob((float)t, commandBuffer);
-        World.InlineEntityQuery<RenderColliderDebugJob, ColliderDebug, Position, Transform, Rotation, Collider>(in queryDebugCollider, ref jobDebugCollider);
     }
 
     public override void AfterUpdate(in float t)

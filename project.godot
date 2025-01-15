@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="GodotEcsArch3d"
-run/main_scene="uid://lrurlw6ang80"
+run/main_scene="uid://cmwumcvxxgnjl"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -20,13 +20,17 @@ config/icon="res://icon.svg"
 ImGuiRoot="*res://addons/imgui-godot/data/ImGuiRoot.tscn"
 DebugDraw="*res://addons/debug_drawing/DebugDraw.cs"
 
+[display]
+
+window/subwindows/embed_subwindows=false
+
 [dotnet]
 
 project/assembly_name="GodotEcsArch"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg", "res://addons/imgui-godot/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg", "res://addons/dockable_container/plugin.cfg", "res://addons/godot_visualstudio_debugger/plugin.cfg", "res://addons/imgui-godot/plugin.cfg")
 
 [input]
 

@@ -9,6 +9,6 @@ using GodotEcsArch.sources.systems;
 
 public interface IMoveBehavior
 {
-    void Move(Entity entity, ref StateComponent stateComponent, ref IAController iaController, ref Position position, ref Direction direction, ref Rotation rotation, ref Velocity velocity, ref Collider collider, RandomNumberGenerator rng, float deltaTime);
+    void Move(Entity entity,IAttackBehavior attackBehavior,  ref StateComponent stateComponent, ref IAController iaController, ref Position position, ref Direction direction, ref Rotation rotation, ref Velocity velocity, ref ColliderSprite collider, RandomNumberGenerator rng, float deltaTime);
 }
 

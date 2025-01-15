@@ -14,14 +14,18 @@ public enum DirectionAnimation
 public enum AnimationAction
     {
         NONE=-1,
-        IDLE,
+        IDLE_WEAPON,
         WALK,
+        DEATH,                
         RUN,
+        STUN,        
+        HIT,        
+        CASTER,
         ATACK,
-        STUN,
-        DEATH,
-        HIT
-    }
-    internal class PublicEnums
-    {
-    }
+        ATACK2,
+        ATACK3,
+        ATACK4
+}
+internal class PublicEnums
+{
+}

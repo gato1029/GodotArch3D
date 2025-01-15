@@ -1,4 +1,7 @@
 using Godot;
+using GodotEcsArch.sources.imgui;
+using GodotEcsArch.sources.managers;
+using ImGuiNET;
 using System;
 
 public partial class Camera3dGodot : Camera3D
@@ -23,20 +26,64 @@ public partial class Camera3dGodot : Camera3D
         string nombre = _viewport.Name;
         _screenSize = GetViewport().GetVisibleRect().Size;
         _viewport.Connect("size_changed", new Callable(this, "ViewPortChanged"));
+       
         RenderManager.Instance.currentDisplay = RectRender();
     }
+
+ 
+
     private void ViewPortChanged()
     {
-        _screenSize = GetViewport().GetVisibleRect().Size;
+        _screenSize = _viewport.GetVisibleRect().Size;
         RenderManager.Instance.currentDisplay = RectRender();
+    }
+    private bool isInScreen()
+    {
+        Vector2 mousePos = GetViewport().GetMousePosition();
+        Vector2 windowSize = _screenSize;
+        if (mousePos.X < 0 || mousePos.Y < 0 || mousePos.X > windowSize.X || mousePos.Y > windowSize.Y)
+        {
+            return false;            
+        }
+        return true;
     }
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
-        if (RenderWindowGui.Instance.IsActive)
+        
+        if (isInScreen())
         {
             MoveCamera((float)delta);
+
+            var cameraPosition = camera.ProjectRayOrigin(GetViewport().GetMousePosition());
+            PositionsManager.Instance.positionMouseCamera = new Vector2(cameraPosition.X, cameraPosition.Y);
+            PositionsManager.Instance.positionMouseTileGlobal = new Vector2(MathF.Floor(cameraPosition.X), MathF.Floor(cameraPosition.Y));
+            PositionsManager.Instance.positionMouseChunk = new Vector2(
+                MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.X / PositionsManager.Instance.chunkDimencion.X), 
+                MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.Y / PositionsManager.Instance.chunkDimencion.Y));
+
+            var calc = PositionsManager.Instance.positionMouseChunk * PositionsManager.Instance.chunkDimencion;
+            PositionsManager.Instance.positionMouseTileChunk = PositionsManager.Instance.positionMouseTileGlobal - calc;
+
+
+            //#if DEBUG
+            //DockerImguiManager.Instance.AddContentToWindow(DockerIMGUI.RIGHT, "Camera", () =>
+            //{
+            //    ImguiWidgets.ToggleableGroup("Camera", "Camera Detail", () =>
+            //    {
+            //        var ss = camera.ProjectRayOrigin(GetViewport().GetMousePosition());
+            //        ImGui.Text($"Position Camera:{Position}");
+            //        ImGui.Text($"Position Mouse:{PositionsManager.Instance.positionMouseCamera}");
+            //        ImGui.Text($"Position Global Tile:{PositionsManager.Instance.positionMouseTileGlobal}");
+            //        ImGui.Text($"Position Chunk:{PositionsManager.Instance.positionMouseChunk}");
+            //        ImGui.Text($"Position Tile in Chunk:{PositionsManager.Instance.positionMouseTileChunk}");
+            //    });
+            //});
+
+           
+            //#endif
         }
+      
     }
 
     private void MoveCamera(float delta)

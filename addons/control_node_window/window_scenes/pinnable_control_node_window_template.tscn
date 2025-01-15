@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://48bpajupnvkg"]
+
+[ext_resource type="PackedScene" uid="uid://k3k4c3lnny0m" path="res://addons/control_node_window/window_scenes/template/control_node_window_template.tscn" id="1_yle4b"]
+[ext_resource type="Script" uid="uid://7p8jqgk2cqkq" path="res://addons/control_node_window/window_scenes/pinnable_control_node_window.gd" id="2_7jhkr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mgmmf"]
+resource_local_to_scene = true
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[node name="PinnableControlNodeWindow" instance=ExtResource("1_yle4b")]
+script = ExtResource("2_7jhkr")
+window_name = ""
+
+[node name="WinowName" parent="VBoxContainer/TopBar" index="0"]
+text = ""
+
+[node name="PinLabel" type="Label" parent="VBoxContainer/TopBar/HBoxContainer" index="0"]
+layout_mode = 2
+text = "Pin"
+
+[node name="IsPinnedWindow" type="CheckButton" parent="VBoxContainer/TopBar/HBoxContainer" index="1"]
+unique_name_in_owner = true
+layout_mode = 2
+flat = true
+
+[node name="TopPanel" parent="VBoxContainer/TopBar/HBoxContainer" index="2"]
+theme_override_styles/panel = SubResource("StyleBoxEmpty_mgmmf")

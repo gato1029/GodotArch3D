@@ -1,41 +1,56 @@
 using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.systems;
+using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.managers.Behaviors.Attack
 {
     internal class MelleAtackHorizontalBehavior : IAttackBehavior
     {
-        public bool AttackPosible(Entity entity, ref Position position, ref Direction direction)
+
+        public void AttackDirection(Entity entity, ref Position position, ref Direction direction)
         {
-            
-            Unit unit = entity.Get<Unit>();
-            MelleCollider melleAtack = entity.Get<MelleCollider>();
-            Vector2 pp = melleAtack.collider.rectTransform.Size / 2 * direction.value;
-            Vector2 posAtack = position.value + pp;
-            var result = CollisionManager.Instance.dynamicCollidersEntities.GetPossibleQuadrants(posAtack, 4);
-            if (result != null)
-            {
-                foreach (var itemDic in result)
+            Vector2 directionLeftRight = CommonOperations.QuantizeDirectionLeftRight(direction.value);
+            ref MelleCollider melleAtack = ref entity.TryGetRef<MelleCollider>(out bool exist);
+            Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
+            rectangle.DirectionTo(directionLeftRight.X, directionLeftRight.Y);
+            Vector2 vector2 = Collision2D.RotatePosition(rectangle.OriginRelative, direction.normalized);
+            rectangle.OriginCurrent = vector2;
+        }
+        public bool AttackPosible(Entity entity, ref Position position, ref Direction direction)
+        {                                       
+                Unit unit = entity.Get<Unit>();
+                MelleCollider melleAtack = entity.Get<MelleCollider>();
+                Vector2 pp = melleAtack.shapeCollider.OriginCurrent;
+                Vector2 posAtack = position.value + pp;
+                Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
+
+                Rect2 aabb = new Rect2(posAtack, rectangle.Width, rectangle.Height);
+                Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.dynamicCollidersEntities.QueryAABB(aabb);
+                if (data != null)
                 {
-                    foreach (var item in itemDic.Value)
+                    foreach (var item in data.Values)
                     {
-                        Entity entB = item.Value;
-                        if (item.Key != entity.Id && unit.team != entB.Get<Unit>().team)
+                        foreach (var itemInternal in item)
                         {
-
-                            var colliderB = entB.Get<Collider>();
-                            var positionB = entB.Get<Position>().value;
-
-                            if (CollisionManager.Instance.CheckAABBCollision2(posAtack, melleAtack.collider, positionB, colliderB))
+                            Entity entB = itemInternal.Value;
+                            if (itemInternal.Value.Id != entity.Id && unit.team != entB.Get<Unit>().team)
                             {
-                                return true;
+                                var colliderB = itemInternal.Value.Get<ColliderSprite>();
+                                var positionB = itemInternal.Value.Get<Position>().value + colliderB.shapeBody.OriginCurrent;
+                                if (Collision2D.Collides(rectangle, colliderB.shapeBody, posAtack, positionB))
+                                {
+
+                                    return true;
+                                }
+
                             }
                         }
                     }
-                }
-            }
+                
+                 }                  
             return false;
         }
 
@@ -43,31 +58,37 @@ namespace GodotEcsArch.sources.managers.Behaviors.Attack
         {
             Unit unit = entity.Get<Unit>();
             MelleCollider melleAtack = entity.Get<MelleCollider>();
-            Vector2 pp = melleAtack.collider.rectTransform.Size / 2 * direction.value;
+            Vector2 pp = melleAtack.shapeCollider.OriginCurrent;
             Vector2 posAtack = position.value + pp;
-            var result = CollisionManager.Instance.dynamicCollidersEntities.GetPossibleQuadrants(posAtack, 4);
-            if (result != null)
+            Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
+
+            Rect2 aabb = new Rect2(posAtack, rectangle.Width, rectangle.Height);
+            Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.dynamicCollidersEntities.QueryAABB(aabb);
+            if (data != null)
             {
-                foreach (var itemDic in result)
+                foreach (var item in data.Values)
                 {
-                    foreach (var item in itemDic.Value)
+                    foreach (var itemInternal in item)
                     {
-                        Entity entB = item.Value;
-                        if (item.Key != entity.Id && unit.team != entB.Get<Unit>().team)
+                        Entity entB = itemInternal.Value;
+                        if (itemInternal.Value.Id != entity.Id && unit.team != entB.Get<Unit>().team)
                         {
-
-                            var colliderB = entB.Get<Collider>();
-                            var positionB = entB.Get<Position>().value;
-
-                            if (CollisionManager.Instance.CheckAABBCollision2(posAtack, melleAtack.collider, positionB, colliderB))
+                            var colliderB = itemInternal.Value.Get<ColliderSprite>();
+                            var positionB = itemInternal.Value.Get<Position>().value + colliderB.shapeBody.OriginCurrent;
+                            if (Collision2D.Collides(rectangle, colliderB.shapeBody, posAtack, positionB))
                             {
                                 ref StateComponent stateComponentB = ref entB.TryGetRef<StateComponent>(out bool exist);
+
                                 stateComponentB.currentType = StateType.TAKE_HIT;
+                                BehaviorManager.Instance.AplyDamage(entity, entB);
+
                             }
+
                         }
                     }
                 }
             }
+
         }
     }
 }

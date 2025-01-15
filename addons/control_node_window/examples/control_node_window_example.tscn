@@ -1,0 +1,205 @@
+[gd_scene load_steps=4 format=3 uid="uid://dk4lv22vjcd4s"]
+
+[ext_resource type="PackedScene" uid="uid://48bpajupnvkg" path="res://addons/control_node_window/window_scenes/pinnable_control_node_window_template.tscn" id="1_dodod"]
+[ext_resource type="Script" uid="uid://ckjm48gvayt1s" path="res://addons/control_node_window/examples/control_node_window_example.gd" id="1_vun3q"]
+[ext_resource type="PackedScene" uid="uid://086yrvyrobjq" path="res://addons/control_node_window/window_scenes/control_node_window.tscn" id="3_vun3q"]
+
+[node name="SimpleWindowExample" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_vun3q")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 165.0
+offset_top = 51.0
+offset_right = 306.0
+offset_bottom = 152.0
+text = "Windows that are 
+closed stop 
+processing to 
+save resources.
+Pinned windows will
+not close."
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 0
+offset_right = 50.0
+offset_bottom = 50.0
+
+[node name="Popup" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Popup All Windows"
+
+[node name="Close All Windows" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Close All Windows"
+
+[node name="Swap Content" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Swap Content"
+
+[node name="PinnableControlNodeWindow" parent="." instance=ExtResource("1_dodod")]
+offset_left = 62.0
+offset_top = 237.0
+offset_right = 523.0
+offset_bottom = 596.0
+popup_rect = Rect2(62, 237, 461, 359)
+window_name = "PinnedWindow"
+
+[node name="TextEdit" type="TextEdit" parent="PinnableControlNodeWindow"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 25.0
+offset_right = 451.0
+offset_bottom = 349.0
+text = "THIS WINDOW CAN BE PINNED WHILE ITS PINNED IT WONT BE CLOSED.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat hast du zanpasta im ohr kommt dir alles leiser vor non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+wrap_mode = 1
+
+[node name="ControlNodeWindow" parent="." instance=ExtResource("3_vun3q")]
+offset_left = 550.0
+offset_top = 81.0
+offset_right = 850.0
+offset_bottom = 381.0
+popup_rect = Rect2(550, 81, 300, 300)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ControlNodeWindow"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 25.0
+offset_right = 290.0
+offset_bottom = 290.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlNodeWindow/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button2" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button3" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button4" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button5" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button6" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button7" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button8" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button9" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button10" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button11" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button12" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button13" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button14" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button15" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button16" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button17" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button18" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button19" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button20" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button21" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button22" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button23" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[node name="Button24" type="Button" parent="ControlNodeWindow/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This button doesen't do anything!"
+
+[connection signal="pressed" from="HBoxContainer/Popup" to="." method="_on_popup_pressed"]
+[connection signal="pressed" from="HBoxContainer/Close All Windows" to="." method="_on_close_all_windows_pressed"]
+[connection signal="pressed" from="HBoxContainer/Swap Content" to="." method="_on_swap_content_pressed"]

@@ -10,7 +10,7 @@ public partial class MainNode : Node
     public override void _Process(double delta)
     {
         DockSpace();
-
+        
     }
 
 
@@ -48,5 +48,6 @@ public partial class MainNode : Node
         ImGuiIOPtr io = ImGui.GetIO();
         io.ConfigFlags = configFlags;
         ServiceLocator.Instance.RegisterService(this);
+        
     }
 }

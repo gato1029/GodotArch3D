@@ -1,3 +1,4 @@
+
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,30 @@ using System.Threading.Tasks;
 
 internal class CommonOperations
 {
+
+    public static Vector2 QuantizeDirection(Vector2 direction)
+    {
+        float quantizedX = 0;
+        float quantizedY = 0;
+
+        if (direction.X > 0) quantizedX = 1;
+        else if (direction.X < 0) quantizedX = -1;
+
+        if (direction.Y > 0) quantizedY = 1;
+        else if (direction.Y < 0) quantizedY = -1;
+
+        return new Vector2(quantizedX, quantizedY);
+    }
+    public static Vector2 QuantizeDirectionLeftRight(Vector2 direction)
+    {
+        float quantizedX = 0;
+        float quantizedY = 0;
+
+        if (direction.X > 0) quantizedX = 1;
+        else if (direction.X < 0) quantizedX = -1;
+      
+        return new Vector2(quantizedX, quantizedY);
+    }
     public static DirectionAnimation GetDirectionAnimation(Vector2 value)
     {
         if (Math.Abs(value.X) > Math.Abs(value.Y)) // Predominio en 
@@ -15,7 +40,7 @@ internal class CommonOperations
         }
         else // Predominio en Y
         {
-            return value.Y > 0 ? DirectionAnimation.DOWN : DirectionAnimation.UP;
+            return value.Y > 0 ? DirectionAnimation.UP : DirectionAnimation.DOWN;
         }
     }
 
@@ -70,6 +95,8 @@ internal class CommonOperations
         }
         return pointDirection;
     }
+
+        
 
     public static Rect2 CalculateTransformedRect(Rect2 originalRect, float rotation)
     {

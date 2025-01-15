@@ -32,8 +32,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
 
             if (unitB.health<=0)
             {
-                stateComponentB.currentType = StateType.DIE;
-                GD.Print("Muerto");
+                stateComponentB.currentType = StateType.DIE;             
             }
         }
     }

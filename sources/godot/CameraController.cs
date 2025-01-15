@@ -1,5 +1,5 @@
 using Godot;
-
+using ImGuiNET;
 using System;
 
 public partial class CameraController : Camera2D
@@ -45,6 +45,8 @@ public partial class CameraController : Camera2D
         {
             MoveCamera((float)delta);
         }
+
+      
     }
 
     private void MoveCamera(float delta)
@@ -78,6 +80,7 @@ public partial class CameraController : Camera2D
         if (mousePosition.Y > _screenSize.Y - borderSize)
             Position += new Vector2(0, moveSpeed * delta);
 
+       
 
         Rect2 viewportRect = new Rect2(Position - _screenSize / 2, _screenSize);
       //  ClampCamera(viewportRect);

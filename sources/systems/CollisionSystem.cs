@@ -20,7 +20,7 @@ namespace GodotEcsArch.sources.systems
 
 
         private CommandBuffer commandBuffer;
-        private QueryDescription queryDynamicSprite = new QueryDescription().WithAll<Position, Direction, Collider>();
+        private QueryDescription queryDynamicSprite = new QueryDescription().WithAll<Position, Direction, ColliderSprite>();
         public CollisionSystem(World world) : base(world)
         {
             commandBuffer = new CommandBuffer();
@@ -42,21 +42,19 @@ namespace GodotEcsArch.sources.systems
             {
                 ref var pointerEntity = ref chunk.Entity(0);
                 ref var pointerPosition = ref chunk.GetFirst<Position>();
-                ref var pointerCollider = ref chunk.GetFirst<Collider>();
+                ref var pointerCollider = ref chunk.GetFirst<ColliderSprite>();
 
                 foreach (var entityIndex in chunk)
                 {
                     ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                     ref Position p = ref Unsafe.Add(ref pointerPosition, entityIndex);
-                    ref Collider collider = ref Unsafe.Add(ref pointerCollider, entityIndex);
-
-                    collider.body.Position = new Microsoft.Xna.Framework.Vector2(p.value.X,p.value.Y);
-
-                    //CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(p.value, in entity);
+                    ref ColliderSprite collider = ref Unsafe.Add(ref pointerCollider, entityIndex);
+                                                  
+                    CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(p.value, in entity);
                 }
             }
         }
-        private readonly struct JobUpdateCollider : IForEachWithEntity<Position, Direction>
+        private readonly struct JobUpdateCollider : IForEachWithEntity<Position, Direction, ColliderSprite>
         {
             private readonly float _deltaTime;
             private readonly CommandBuffer _commandBuffer;
@@ -68,9 +66,10 @@ namespace GodotEcsArch.sources.systems
 
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Update(Entity entity, ref Position p, ref Direction dir)
+            public void Update(Entity entity, ref Position p, ref Direction dir,ref ColliderSprite collider)
             {
                 CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(p.value, entity);
+      
             }
         }
 
@@ -78,12 +77,12 @@ namespace GodotEcsArch.sources.systems
 
         public override void Update(in float t)
         {
-            World.InlineParallelChunkQuery(in queryDynamicSprite, new ChunkJobUpdateCollider(commandBuffer, t));
-            CollisionManager.Instance.worldPhysic.Step(t);
-            
-            //var job = new JobUpdateCollider((float)t, commandBuffer);
-            //World.InlineEntityQuery<JobUpdateCollider, Position, Direction>(in queryDynamicSprite, ref job);
+            //World.InlineParallelChunkQuery(in queryDynamicSprite, new ChunkJobUpdateCollider(commandBuffer, t));
 
+
+            var job = new JobUpdateCollider((float)t, commandBuffer);
+            World.InlineEntityQuery<JobUpdateCollider, Position, Direction, ColliderSprite>(in queryDynamicSprite, ref job);
+            //CollisionManager.Instance.worldPhysic.Step(1/60);
             bool debug = Input.IsActionJustPressed("debugGridCollider");
             if (debug)
             {

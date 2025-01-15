@@ -2,15 +2,16 @@ using Arch.Buffer;
 using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.systems;
-using static Godot.TextServer;
-
+using System;
+using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.managers.Behaviors.Move
 {
     internal class DefaultMove : IMoveBehavior
     {       
-        public void Move(Entity entity, ref StateComponent stateComponent, ref IAController iaController, ref Position position, ref Direction direction, ref Rotation rotation, ref Velocity velocity, ref Collider collider,RandomNumberGenerator rng, float deltaTime)
+        public void Move(Entity entity, IAttackBehavior attackBehavior, ref StateComponent stateComponent, ref IAController iaController, ref Position position, ref Direction direction, ref Rotation rotation, ref Velocity velocity, ref ColliderSprite collider,RandomNumberGenerator rng, float deltaTime)
         {          
             if (iaController.targetMovement.arrive)
             {
@@ -21,6 +22,15 @@ namespace GodotEcsArch.sources.managers.Behaviors.Move
                 rotation.value = Mathf.RadToDeg(targetDirection.Angle());
                 iaController.targetMovement.value = newpoint;
                 iaController.targetMovement.arrive = false;
+                direction.normalized = new Vector2(Math.Sign(targetDirection.X), Math.Sign(targetDirection.Y));
+                attackBehavior.AttackDirection(entity, ref position, ref direction);
+                // CollisionUpdate
+                //direction.normalized = CommonOperations.QuantizeDirectionLeftRight(targetDirection);         
+                //ref MelleCollider melleAtack = ref entity.TryGetRef<MelleCollider>(out bool exist);
+                //Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
+                //rectangle.DirectionTo(direction.normalized.X, direction.normalized.Y);
+                //Vector2 vector2 = Collision2D.RotatePosition(rectangle.OriginRelative, Vector2.Zero, direction.normalized.Angle());
+                //rectangle.OriginCurrent = vector2;         
             }
             else
             {
@@ -28,34 +38,41 @@ namespace GodotEcsArch.sources.managers.Behaviors.Move
             }                                    
         }
        
-        private void MoveInternal(Entity entity, ref Direction direction, ref Velocity velocity, ref Position position, ref Collider collider, ref IAController iaController, ref StateComponent stateComponent, float deltaTime)
+        private void MoveInternal(Entity entity, ref Direction direction, ref Velocity velocity, ref Position position, ref ColliderSprite collider, ref IAController iaController, ref StateComponent stateComponent, float deltaTime)
         {
             Vector2 movement = direction.value * velocity.value * deltaTime;
-            Vector2 movementNext = position.value + movement;
+            Vector2 movementNext = position.value + movement + collider.shapeMove.OriginCurrent;
 
-            var entityInternal = collider.rect.Size;
-            var resultList = CollisionManager.Instance.dynamicCollidersEntities.GetPossibleQuadrants(movementNext, 4);
+
             bool existCollision = false;
-            foreach (var itemMap in resultList)
+
+
+           
+           
+
+            Rect2 aabb = new Rect2(movementNext, collider.shapeMove.GetSizeQuad()*2);
+            Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.dynamicCollidersEntities.QueryAABB(aabb);
+            if (data != null)
             {
-                foreach (var item in itemMap.Value)
+                foreach (var item in data.Values)
                 {
-                    if (item.Key != entity.Id)
+                    foreach (var itemInternal in item)
                     {
-                        Entity entB = item.Value;
-                        var colliderB = entB.Get<Collider>();
-                        var entityExternal = entB.Get<Collider>().rect;
-                        var entityExternalPos = entB.Get<Position>().value;
-                        if (CollisionManager.Instance.CheckAABBCollision(movementNext, collider, entityExternalPos, colliderB))
+                        if (itemInternal.Value.Id != entity.Id)
                         {
-                            existCollision = true;
-                            break;
+                            ColliderSprite colliderB = itemInternal.Value.Get<ColliderSprite>();
+                            var positionB = itemInternal.Value.Get<Position>().value + colliderB.shapeMove.OriginCurrent;
+                            if (Collision2D.Collides(collider.shapeMove, colliderB.shapeMove, movementNext, positionB))
+                            {
+                                existCollision = true;
+                                break;
+                            }                         
                         }
                     }
-                }
-                if (existCollision)
-                {
-                    break;
+                    if (existCollision)
+                    {
+                        break;
+                    }
                 }
             }
             // to do radio busqueda para atacar

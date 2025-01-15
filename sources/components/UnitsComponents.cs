@@ -8,6 +8,7 @@ using Godot;
 
 public enum TypeUnit
 {
+    CHARACTER,
     MELLE
 }
 [Component]

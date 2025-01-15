@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://lrurlw6ang80"]
+[gd_scene load_steps=15 format=3 uid="uid://lrurlw6ang80"]
 
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="1_fmkiq"]
 [ext_resource type="Script" uid="uid://gjjn48iuspr7" path="res://sources/components/MainNode.cs" id="1_tf3nt"]
@@ -6,13 +6,11 @@
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="3_ris41"]
 [ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="4_n776p"]
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="4_p0p6f"]
-[ext_resource type="Texture2D" uid="uid://d17auewvoxilh" path="res://resources/demo.jpg" id="5_enew4"]
-[ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="5_op6oi"]
-[ext_resource type="Texture2D" uid="uid://ce6rr1s7aq4yy" path="res://resources/Minotauro.png" id="6_fpgil"]
-[ext_resource type="Material" uid="uid://erobuq6rjmke" path="res://resources/Material/Sprite3DGeneric.tres" id="6_wk5cn"]
-[ext_resource type="Material" uid="uid://cgago0s2wxmtw" path="res://resources/Material/Sprite3DMulti.tres" id="8_7mkw4"]
-[ext_resource type="ArrayMesh" uid="uid://combjsrcsw4mw" path="res://resources/Mesh/Quad_32_32.tres" id="9_a8tbu"]
+[ext_resource type="Texture2D" uid="uid://djjaf8wikv4mu" path="res://resources/cat.png" id="8_n776p"]
+[ext_resource type="Script" uid="uid://bv4v3tnislwti" path="res://sources/WindowsDataBase/TileCreator/WindowTileCreator.cs" id="8_v88eg"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="9_v88eg"]
+[ext_resource type="Texture2D" uid="uid://cy4ksrqvjo3xt" path="res://resources/basic_ground_tiles.png" id="9_wk5cn"]
+[ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="10_wk5cn"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_p0p6f"]
 
@@ -21,35 +19,38 @@
 [sub_resource type="Environment" id="Environment_n2bax"]
 background_color = Color(1, 1, 1, 1)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_d86hs"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v6uag"]
-albedo_color = Color(0.322155, 0.638671, 0.49703, 1)
-
 [node name="Main3d" type="Node"]
 script = ExtResource("1_tf3nt")
+
+[node name="Game" type="Node" parent="."]
 
 [node name="Window" type="SubViewport" parent="."]
 render_target_update_mode = 4
 script = ExtResource("2_coqbo")
 
-[node name="center" type="MeshInstance3D" parent="Window"]
+[node name="Base" type="Node" parent="Window"]
+
+[node name="mainArch" type="Node3D" parent="Window/Base"]
+script = ExtResource("4_n776p")
+
+[node name="center" type="MeshInstance3D" parent="Window/Base"]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
 mesh = SubResource("SphereMesh_p0p6f")
-surface_material_override/0 = ExtResource("3_ris41")
-
-[node name="center2" type="MeshInstance3D" parent="Window"]
-transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 1, 1, 0)
-mesh = SubResource("SphereMesh_p0p6f")
-surface_material_override/0 = ExtResource("3_ris41")
-
-[node name="grid" type="MeshInstance3D" parent="Window"]
-transform = Transform3D(1024, 0, 0, 0, 1024, 0, 0, 0, 1, 0, 0, -50)
-mesh = SubResource("QuadMesh_ris41")
-skeleton = NodePath("../Camera3D")
+skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("4_p0p6f")
 
-[node name="Camera3D" type="Camera3D" parent="Window"]
+[node name="grid" type="MeshInstance3D" parent="Window/Base"]
+transform = Transform3D(1024, 0, 0, 0, 1024, 0, 0, 0, 1, 0, 0, -50)
+mesh = SubResource("QuadMesh_ris41")
+skeleton = NodePath("../../Components/Camera3D")
+surface_material_override/0 = ExtResource("4_p0p6f")
+
+[node name="Components" type="Node" parent="Window"]
+
+[node name="InputHandler" type="Node" parent="Window/Components"]
+script = ExtResource("1_fmkiq")
+
+[node name="Camera3D" type="Camera3D" parent="Window/Components"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
 projection = 1
 current = true
@@ -57,38 +58,14 @@ size = 10.0
 script = ExtResource("9_v88eg")
 MinZoomSize = 10.0
 
+[node name="center" type="MeshInstance3D" parent="Window/Components/Camera3D"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, -10)
+mesh = SubResource("SphereMesh_p0p6f")
+skeleton = NodePath("../../..")
+surface_material_override/0 = ExtResource("3_ris41")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Window"]
 environment = SubResource("Environment_n2bax")
-
-[node name="InputHandler" type="Node" parent="Window"]
-script = ExtResource("1_fmkiq")
-
-[node name="mainArch" type="Node3D" parent="Window"]
-script = ExtResource("4_n776p")
-
-[node name="Sprite3D2" type="Sprite3D" parent="Window"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.256495, 0.392559, 0)
-billboard = 1
-alpha_cut = 2
-alpha_scissor_threshold = 1.0
-texture_filter = 2
-texture = ExtResource("6_fpgil")
-hframes = 13
-vframes = 46
-frame = 29
-
-[node name="Sprite3D3" type="Sprite3D" parent="Window"]
-transform = Transform3D(9, 0, 0, 0, 9, 0, 0, 0, 9, 0, 0, -1.4)
-visible = false
-shaded = true
-texture_filter = 0
-texture = ExtResource("5_enew4")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Window"]
-transform = Transform3D(17.6801, 0, 0, 0, 3.15633, 0, 0, 0, 7.72298, 1.12131, -0.803154, 0)
-visible = false
-mesh = SubResource("PlaneMesh_d86hs")
-surface_material_override/0 = SubResource("StandardMaterial3D_v6uag")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="Window"]
 transform = Transform3D(0.866004, 0.00604595, 0.5, -0.00698126, 0.999976, 0, -0.499988, -0.00349063, 0.866025, 3, 0, 10)
@@ -110,27 +87,186 @@ shadow_enabled = true
 omni_range = 45.948
 omni_shadow_mode = 0
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Window"]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 1.56995, 0.995861, 3.854)
-visible = false
-mesh = ExtResource("9_a8tbu")
-surface_material_override/0 = ExtResource("8_7mkw4")
+[node name="Windows" type="Node" parent="Window"]
 
-[node name="Sprite3D" type="Sprite3D" parent="Window"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.925, 0, 0)
+[node name="WindowTileCreator" type="Window" parent="Window/Windows"]
+title = "Tile Creator"
+position = Vector2i(0, 36)
+size = Vector2i(1000, 500)
 visible = false
-billboard = 1
-alpha_cut = 2
-texture_filter = 2
-texture = ExtResource("5_op6oi")
+wrap_controls = true
+popup_window = true
+script = ExtResource("8_v88eg")
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="Window"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.63672, 0.951012, 0)
-visible = false
-mesh = ExtResource("9_a8tbu")
-surface_material_override/0 = ExtResource("6_wk5cn")
+[node name="Panel" type="Panel" parent="Window/Windows/WindowTileCreator"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="MeshInstance3D4" type="MeshInstance3D" parent="Window"]
-transform = Transform3D(1.98102, 0.137445, 0, -0.274889, 0.990509, 0, 0, 0, 1, 2.875, 2.01134, 0)
-material_override = ExtResource("6_wk5cn")
-mesh = ExtResource("9_a8tbu")
+[node name="MarginContainer" type="MarginContainer" parent="Window/Windows/WindowTileCreator/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_edit_use_anchors_ = true
+
+[node name="SplitContainer" type="HSplitContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Imagen:"
+
+[node name="LineEditPath" type="LineEdit" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="ButtonDisco" type="Button" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Disco"
+
+[node name="ButtonBD" type="Button" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "BD"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Division Tiles:"
+
+[node name="SpinBoxX" type="SpinBox" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+min_value = 16.0
+max_value = 512.0
+value = 16.0
+suffix = "px"
+
+[node name="Label2" type="Label" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "x"
+
+[node name="SpinBoxY" type="SpinBox" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+min_value = 16.0
+max_value = 512.0
+value = 16.0
+suffix = "px"
+
+[node name="ButtonDividir" type="Button" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Dividir"
+
+[node name="ButtonGuardarBD" type="Button" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Guardar BD"
+
+[node name="ItemList" type="ItemList" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+select_mode = 2
+item_count = 4
+max_columns = 10
+icon_mode = 0
+fixed_icon_size = Vector2i(128, 128)
+item_0/text = "ID:1"
+item_0/icon = ExtResource("8_n776p")
+item_1/text = "ID:2"
+item_1/icon = ExtResource("9_wk5cn")
+item_2/icon = ExtResource("10_wk5cn")
+item_3/icon = ExtResource("10_wk5cn")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer"]
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Tipo Tile:"
+
+[node name="OptionButton" type="OptionButton" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 3
+popup/item_0/text = "Simpe"
+popup/item_0/id = 0
+popup/item_1/text = "Animation"
+popup/item_1/id = 1
+popup/item_2/text = "Auto Tile"
+popup/item_2/id = 2
+
+[node name="Panel" type="Panel" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -99.0
+offset_right = 64.0
+offset_bottom = 99.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("10_wk5cn")
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "ID:"
+
+[node name="LineEdit" type="LineEdit" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+editable = false
+
+[node name="Button" type="Button" parent="Window/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Guardar BD"
+
+[node name="FileDialog" type="FileDialog" parent="Window/Windows"]

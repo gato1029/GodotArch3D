@@ -1,12 +1,14 @@
 using Arch.Core;
 using Arch.Core.Extensions;
-using FarseerPhysics.Collision.Shapes;
-using FarseerPhysics.Dynamics;
-using FarseerPhysics.Factories;
+
 using Godot;
+using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Behaviors.Attack;
 using GodotEcsArch.sources.managers.Behaviors.Move;
+using GodotEcsArch.sources.managers.Behaviors.States;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.systems;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +18,11 @@ using System.Threading.Tasks;
 
 internal class CharacterManager : SingletonBase<CharacterManager>
 {
-
-
-
     private Dictionary<int, Func<Vector2, Entity>> functionMap = new Dictionary<int, Func<Vector2,Entity>>();
     protected override void Initialize()
     {
         ConfigMushroom();
+
     }
 
     protected override void Destroy()
@@ -44,9 +44,22 @@ internal class CharacterManager : SingletonBase<CharacterManager>
     }
 
 
+ 
+
+    int positionInitial(int widht, int height, int sizeX, int sizeY, int row)
+    {
+        int x = widht / sizeX;
+        int y = height / sizeY;
+
+        int pos = row * x;
+        return pos;
+    }
+
+  
+  
     void ConfigMushroom () {
-        int idAnimation = 2;
-        int atlasAnimation = SpriteManager.Instance.LoadTextureAnimation("res://resources/Textures/Monster/Hongito.png", new Vector3(80, 64, 32), new Vector3(0, -0.5f, 0), new Vector2(40, 32));
+        int idAnimation = 10;
+        int atlasAnimation = SpriteManager.Instance.LoadTextureAnimation(10,"res://resources/Textures/Monster/Hongito.png", new Vector3(80, 64, 32), new Vector3(0, -0.5f, 0), new Vector2(40, 32));
 
         SpriteManager.Instance.CreateAnimation(atlasAnimation,idAnimation, "Mushroom", 8);
         AnimationIndividual animationIndividual = SpriteManager.Instance.GetAnimation(idAnimation);
@@ -56,7 +69,7 @@ internal class CharacterManager : SingletonBase<CharacterManager>
         typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(144, 7, timeFrame));
         typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(144, 7, timeFrame));
         typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(144, 7, timeFrame));
-        animationIndividual.AddTypeAnimation((int)AnimationAction.IDLE, typeAnimation);
+        animationIndividual.AddTypeAnimation((int)AnimationAction.IDLE_WEAPON, typeAnimation);
 
         typeAnimation = new TypeAnimation(4, "Walk");
         typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(72, 8, timeFrame));
@@ -65,14 +78,14 @@ internal class CharacterManager : SingletonBase<CharacterManager>
         typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(72, 8, timeFrame));             
         animationIndividual.AddTypeAnimation((int)AnimationAction.WALK, typeAnimation);
 
-        timeFrame = 0.05f;
+        timeFrame = 0.1f;
         typeAnimation = new TypeAnimation(4, "Atack");
         typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(0, 10, timeFrame));
         typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(0, 10, timeFrame));
         typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(0, 10, timeFrame));
         typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(0, 10, timeFrame));
         animationIndividual.AddTypeAnimation((int)AnimationAction.ATACK, typeAnimation);
-
+        timeFrame = 0.1f;
         typeAnimation = new TypeAnimation(4, "Death",false);
         typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(24, 15, timeFrame   ));
         typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(24,  15, timeFrame));
@@ -92,14 +105,14 @@ internal class CharacterManager : SingletonBase<CharacterManager>
         typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(96, 18, timeFrame));
         typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(96, 18, timeFrame));
         typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(96, 18, timeFrame));
-        animationIndividual.AddTypeAnimation((int)AnimationAction.STUN , typeAnimation);
+        animationIndividual.AddTypeAnimation((int)AnimationAction.STUN , typeAnimation);   
 
         functionMap[idAnimation] = CreateMushrrom;
     }
 
     Entity CreateMushrrom(Vector2 positionValue)
     {
-        Sprite3D sprite3d = SpriteManager.Instance.CreateAnimationInstance(2);
+        Sprite3D sprite3d = SpriteManager.Instance.CreateAnimationInstance(10);
         
         sprite3d.layer = 5;
         Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
@@ -112,29 +125,24 @@ internal class CharacterManager : SingletonBase<CharacterManager>
         AreaMovement areaMovementInternal = new AreaMovement { type = MovementType.CIRCLE_STATIC, widthRadius = 5, origin = position.value };
         IAController iaControllerInternal = new IAController { areaMovement = areaMovementInternal, targetMovement = new TargetMovement { arrive = true }  };
 
+     
 
-        //PolygonShape p = new PolygonShape();
-        //p.ve
-        Body body = BodyFactory.CreateRectangle(CollisionManager.Instance.worldPhysic, 1, 1, 0);
-        body.BodyType = BodyType.Dynamic;
-        body.Position = new Microsoft.Xna.Framework.Vector2(positionValue.X,positionValue.Y);
-
-        //entity.Add<MushroomCharacter>();
         entity.Add<Transform>(new Transform { transformInternal = xform });
-        entity.Add<Collider>(new Collider { body=body, rect = new Rect2(new Vector2(0f, 0.0f), new Vector2(1, 1)), rectTransform = new Rect2(new Vector2(0,0f), new Vector2(1, 1)), aplyRotation = false });
+        entity.Add<ColliderSprite>(new ColliderSprite { shapeMove = new Rectangle(1, 1), shapeBody = new Rectangle(1,1) });
         entity.Add<Rotation>();
         entity.Add(position);
-        entity.Add<Direction>();
+        entity.Add<Direction>(new Direction { value= new Vector2(1,0), directionAnimation = DirectionAnimation.LEFT });
         entity.Add<Animation>(new Animation { TimePerFrame = 0.1f, TimeSinceLastFrame = 0, currentAction = AnimationAction.NONE, horizontalOrientation = -1, complete=false });
         entity.Add(new Velocity { value = 2f });
         
         entity.Add<UnitController>(new UnitController { controllerMode= ControllerMode.IA, iaController = iaControllerInternal  });      
         entity.Add<Unit>(new Unit { team = 2, health=100, damage =1});
-        entity.Add<MelleCollider>(new MelleCollider { collider = new Collider { rect = new Rect2(new Vector2(0, 0f), new Vector2(1, 1)), rectTransform = new Rect2(new Vector2(0, 0f), new Vector2(1, 1)), aplyRotation = false } });
-        entity.Add<StateComponent>(new StateComponent { currentType = StateType.IDLE});
-        entity.Add<BehaviorCharacter>(new BehaviorCharacter { moveBehavior = new DefaultMove(), attackBehavior = new MelleAttackBehavior() });
+        entity.Add<MelleCollider>(new MelleCollider { shapeCollider = new Rectangle(.5f, .8f, new Vector2(.5f,0f)) });
 
-        //CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(position.value, entity.Reference());
+        entity.Add<StateComponent>(new StateComponent { currentType = StateType.IDLE});
+        entity.Add<BehaviorCharacter>(new BehaviorCharacter { moveBehavior = new DefaultMove(), attackBehavior = new MelleAtackHorizontalBehavior(), stateBehavior = new MushroomState()});
+
+        CollisionManager.Instance.dynamicCollidersEntities.AddUpdateItem(position.value, entity.Reference());
 
         return entity;
     }
