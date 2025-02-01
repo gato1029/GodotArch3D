@@ -1,0 +1,270 @@
+[gd_scene load_steps=6 format=3 uid="uid://7ep482axlki2"]
+
+[ext_resource type="Script" uid="uid://bv4v3tnislwti" path="res://sources/WindowsDataBase/TileCreator/WindowTileCreator.cs" id="1_21pv8"]
+[ext_resource type="Texture2D" uid="uid://djjaf8wikv4mu" path="res://resources/cat.png" id="2_j73ej"]
+[ext_resource type="Texture2D" uid="uid://cy4ksrqvjo3xt" path="res://resources/basic_ground_tiles.png" id="3_eqtx5"]
+[ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="4_kgrlk"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_21pv8"]
+
+[node name="WindowTileCreator" type="Window"]
+auto_translate_mode = 1
+title = "Tile Creator"
+initial_position = 2
+size = Vector2i(1000, 500)
+wrap_controls = true
+always_on_top = true
+script = ExtResource("1_21pv8")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_edit_use_anchors_ = true
+
+[node name="SplitContainer" type="HSplitContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/SplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/SplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Imagen:"
+
+[node name="LineEditPath" type="LineEdit" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="ButtonDisco" type="Button" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Disco"
+
+[node name="ButtonBD" type="Button" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "BD"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Division Tiles:"
+
+[node name="SpinBoxX" type="SpinBox" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+min_value = 16.0
+max_value = 512.0
+value = 16.0
+suffix = "px"
+
+[node name="Label2" type="Label" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "x"
+
+[node name="SpinBoxY" type="SpinBox" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+min_value = 16.0
+max_value = 512.0
+value = 16.0
+suffix = "px"
+
+[node name="ButtonDividir" type="Button" parent="Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Dividir"
+
+[node name="ItemList" type="ItemList" parent="Panel/MarginContainer/SplitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+item_count = 4
+max_columns = 10
+icon_mode = 0
+fixed_icon_size = Vector2i(128, 128)
+item_0/text = "ID:1"
+item_0/icon = ExtResource("2_j73ej")
+item_1/text = "ID:2"
+item_1/icon = ExtResource("3_eqtx5")
+item_2/icon = ExtResource("4_kgrlk")
+item_3/icon = ExtResource("4_kgrlk")
+
+[node name="LeftContainer" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VSeparator" type="VSeparator" parent="Panel/MarginContainer/SplitContainer/LeftContainer"]
+layout_mode = 2
+
+[node name="VBoxBD" type="VBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Materiales - Texturas en BD"
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_vertical = 2
+texture = ExtResource("2_j73ej")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Panel" type="VBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "ID:"
+
+[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+editable = false
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "Nombre:"
+
+[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+editable = false
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "Division Pixels:"
+
+[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer3"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+editable = false
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel"]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "Guardar BD"
+
+[node name="Button2" type="Button" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD/Panel/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 2
+text = "Guardar BD"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Tipo Tile:"
+
+[node name="OptionButton" type="OptionButton" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 3
+popup/item_0/text = "Simple Tile"
+popup/item_0/id = 0
+popup/item_1/text = "Animation Tile"
+popup/item_1/id = 1
+popup/item_2/text = "Auto Tile"
+popup/item_2/id = 2
+
+[node name="PanelSimpleTile" type="Panel" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -99.0
+offset_right = 64.0
+offset_bottom = 99.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile/VBoxContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+texture = SubResource("AtlasTexture_21pv8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "ID:"
+
+[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+editable = false
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Guardar BD"

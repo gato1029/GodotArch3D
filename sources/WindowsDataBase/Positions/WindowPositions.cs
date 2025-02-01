@@ -27,7 +27,7 @@ public partial class WindowPositions : Window
 
     private void WindowTileCreator_CloseRequested()
     {
-        QueueFree();
+        //QueueFree();
     }
 
     public override void _Process(double delta)

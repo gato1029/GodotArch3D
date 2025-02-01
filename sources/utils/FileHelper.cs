@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Godot.HttpRequest;
 
 
     internal class FileHelper
@@ -30,5 +31,54 @@ using System.Threading.Tasks;
 
             return fileList;
         }
+
+        public static string CopyFileToAssetExternals(string sourcePath,string carpet, string idName)
+        {
+        string gameDirectory = OS.GetExecutablePath().GetBaseDir();
+#if DEBUG
+        gameDirectory = "D:\\GitKraken";
+#endif
+        // Obtener la ruta del directorio actual del juego (directorio donde se encuentra el ejecutable)
+        string finalCarpet = "AssetExternals" + "/" + carpet;
+        // Crear la ruta completa para la carpeta AssetExternals
+        string destinationFolder = Path.Combine(gameDirectory, finalCarpet );
+
+            // Asegurarse de que la carpeta de destino exista, si no, crearla
+            
+            if (!Directory.Exists(destinationFolder))
+            {
+                Directory.CreateDirectory(destinationFolder);
+            }
+
+            // Crear la ruta de destino completa (copiar el archivo con su nombre original)
+            string fileName = idName +"." +sourcePath.GetExtension(); // Obtener solo el nombre del archivo
+            string destinationPath = Path.Combine(destinationFolder, fileName); // Ruta completa de destino
+
+        // Usar la clase File para copiar el archivo
+
+        try
+        {
+            File.Copy(sourcePath, destinationPath);
+            return finalCarpet+"/"+fileName;
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr("Error al copiar el archivo: " + ex.Message);
+            throw ;
+        }
+                        
+        }
+
+    public static string GetPathGameDB(string sourcePathDB)
+    {
+        string gameDirectory = OS.GetExecutablePath().GetBaseDir();
+        #if DEBUG
+                gameDirectory = "D:\\GitKraken";
+        #endif
+        string destinationFolder = Path.Combine(gameDirectory, sourcePathDB);
+
+
+        return destinationFolder;
     }
+}
 

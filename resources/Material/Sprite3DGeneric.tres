@@ -1,7 +1,7 @@
 [gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://erobuq6rjmke"]
 
 [ext_resource type="Shader" uid="uid://duif5h20s0mm7" path="res://resources/shaders/SpriteGeneric.gdshader" id="1_73vf1"]
-[ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="2_pkrgl"]
+[ext_resource type="Texture2D" uid="uid://cy4ksrqvjo3xt" path="res://resources/basic_ground_tiles.png" id="2_pkrgl"]
 
 [resource]
 render_priority = 0

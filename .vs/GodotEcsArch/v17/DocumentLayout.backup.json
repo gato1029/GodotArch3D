@@ -3,24 +3,24 @@
   "WorkspaceRootPath": "D:\\GitKraken\\GodotArch3D\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\positions\\windowpositions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\positions\\windowpositions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\windowtileanimate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\windowtileanimate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\camera3dgodot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:camera3dgodot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\database\\tiledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\database\\tiledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\windowtilecreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\windowtilecreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\systems\\maincharactersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\maincharactersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\windowtilesimple.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\windowtilesimple.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\godot\\inputhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\godot\\inputhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\generic\\windowdatageneric.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\generic\\windowdatageneric.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,66 +38,67 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "WindowPositions.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Positions\\WindowPositions.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Positions\\WindowPositions.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Positions\\WindowPositions.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\Positions\\WindowPositions.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAmwBgAAAAsAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "TileData.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAowDYAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-13T19:39:07.235Z",
+              "WhenOpened": "2025-01-28T23:07:34.737Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Camera3dGodot.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\Camera3dGodot.cs",
-              "RelativeDocumentMoniker": "Camera3dGodot.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\Camera3dGodot.cs",
-              "RelativeToolTip": "Camera3dGodot.cs",
-              "ViewState": "AgIAADIAAAAAAAAAAAAwwEkAAAAcAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "HerramientaMenuBar.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFAAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-13T01:54:57.178Z",
+              "WhenOpened": "2025-01-28T23:21:21.068Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "WindowTileSimple.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAQwBMAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-28T22:50:57.967Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WindowTileAnimate.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
+              "ViewState": "AgIAAK8AAAAAAAAAAAA0wLsAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-28T22:42:19.689Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "InputHandler.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\godot\\InputHandler.cs",
-              "RelativeDocumentMoniker": "sources\\godot\\InputHandler.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\godot\\InputHandler.cs",
-              "RelativeToolTip": "sources\\godot\\InputHandler.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAgwC0AAABGAAAAAAAAAA==",
+              "Title": "WindowDataGeneric.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Generic\\WindowDataGeneric.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Generic\\WindowDataGeneric.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Generic\\WindowDataGeneric.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\Generic\\WindowDataGeneric.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-13T01:50:00.596Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "MainCharacterSystem.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\MainCharacterSystem.cs",
-              "RelativeDocumentMoniker": "sources\\systems\\MainCharacterSystem.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\MainCharacterSystem.cs",
-              "RelativeToolTip": "sources\\systems\\MainCharacterSystem.cs",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAmwFMAAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-13T01:34:12.394Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "WindowTileCreator.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileCreator.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\WindowTileCreator.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileCreator.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\WindowTileCreator.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAACEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-13T00:45:14.366Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-27T02:13:12.044Z"
             }
           ]
         }

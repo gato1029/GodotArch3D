@@ -13,22 +13,40 @@ public partial class WindowTileCreator : Window
     ItemList itemListTiles;
     FileDialog fileDialog;
     LineEdit pathFile;
+    OptionButton optionButton;
+    TextureRect simpleTextureRect;
+    Button guardarBDButton;
+
+    VBoxContainer vBoxContainerTiles;
+    VBoxContainer vBoxContainerBD;
+    HBoxContainer leftContainer;
     public override void _Ready()
 	{
 
         CloseRequested += WindowTileCreator_CloseRequested;
         GetNode<Button>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer/ButtonDisco").Pressed += Disco_Pressed;
         GetNode<Button>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer/ButtonBD").Pressed += BD_Pressed;
+        GetNode<Button>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ButtonDividir").Pressed += Dividir_Pressed;
 
         pathFile = GetNode<LineEdit>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer/LineEditPath");
         pixel_X = GetNode<SpinBox>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2/SpinBoxX");
         pixel_Y= GetNode<SpinBox>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2/SpinBoxY");
 
-        GetNode<Button>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ButtonDividir").Pressed += Dividir_Pressed;
-        GetNode<Button>("Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ButtonGuardarBD").Pressed += GuardarBD_Pressed;
-
         itemListTiles = GetNode<ItemList>("Panel/MarginContainer/SplitContainer/VBoxContainer/ItemList");
 
+        // -- Left Panel
+        leftContainer = GetNode<HBoxContainer>("Panel/MarginContainer/SplitContainer/LeftContainer");
+
+        vBoxContainerTiles = GetNode<VBoxContainer>("Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer");
+        vBoxContainerBD = GetNode<VBoxContainer>("Panel/MarginContainer/SplitContainer/LeftContainer/VBoxBD");
+
+        optionButton = GetNode<OptionButton>("Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/HBoxContainer/OptionButton");
+        optionButton.ItemSelected += OptionButton_ItemSelected;
+
+        guardarBDButton = GetNode<Button>("Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile/VBoxContainer/Button");
+        guardarBDButton.Pressed += GuardarBD_Pressed;
+
+        //----fileDialog
         fileDialog = new FileDialog();
         fileDialog.Title = "Buscar Imagen";
 
@@ -37,24 +55,58 @@ public partial class WindowTileCreator : Window
         fileDialog.Access = FileDialog.AccessEnum.Filesystem; // Acceso al sistema de archivos
         fileDialog.Filters = new string[] { "*.png ; PNG Images" }; // Filtros de archivo
 
-
         // Conectar la señal "file_selected"
         fileDialog.FileSelected += OnFileSelected;
-
         // Agregar el nodo a la escena
         AddChild(fileDialog);
 
-        // Mostrar el FileDialog al iniciar (opcional)
+        //------ simpleTile
+        simpleTextureRect = GetNode<TextureRect>("Panel/MarginContainer/SplitContainer/LeftContainer/VBoxContainer/PanelSimpleTile/VBoxContainer/TextureRect");
+        SimpleTile();
 
-        //MaterialData materialData = new MaterialData();
-        //materialData.pathTexture = "demo5.png";
-        //DataBaseManager.Instance.Insert(materialData);
 
-        //var matdata= DataBaseManager.Instance.FindById<MaterialData>(1);
 
-        //matdata.divisionPixelX = 1;
+
+
+        
+
+
         
         
+    }
+
+    private void OptionButton_ItemSelected(long index)
+    {
+        string selected = optionButton.GetItemText((int)index);
+        switch (selected)
+        {
+            case "Simple Tile":
+                SimpleTile();
+                break;
+            case "Animation Tile":
+                break;
+            case "Auto Tile":
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void SimpleTile()
+    {      
+        if (!itemListTiles.IsConnected(ItemList.SignalName.ItemSelected, Callable.From<long>(ItemListTiles_ItemSelected)))
+        {
+            itemListTiles.SelectMode = ItemList.SelectModeEnum.Single;
+            itemListTiles.Connect(ItemList.SignalName.ItemSelected, Callable.From<long>(ItemListTiles_ItemSelected));
+        }
+    }
+
+
+    private void ItemListTiles_ItemSelected(long index)
+    {
+        var texture = itemListTiles.GetItemIcon((int)index);
+        simpleTextureRect.Texture = texture;
+      
     }
 
     private void WindowTileCreator_CloseRequested()
@@ -70,6 +122,14 @@ public partial class WindowTileCreator : Window
     private void GuardarBD_Pressed()
     {
        
+
+        MaterialData materialData = new MaterialData();
+        materialData.pathTexture = "demo5.png";
+        DataBaseManager.Instance.Insert(materialData);
+
+        var matdata = DataBaseManager.Instance.FindById<MaterialData>(1);
+
+        matdata.divisionPixelX = 1;
     }
 
     private Texture LoadTexture(string filePath)
@@ -172,7 +232,9 @@ public partial class WindowTileCreator : Window
 
     private void BD_Pressed()
     {
-        
+        leftContainer.Visible = true;
+        vBoxContainerBD.Visible = true;
+        vBoxContainerTiles.Visible = false;
     }
 
     private void Disco_Pressed()

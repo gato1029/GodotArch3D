@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug Main3dGodot": {
+	"Godot Debug WindowCharacterBase": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.4-dev7_mono_win64/Godot_v4.4-dev7_mono_win64/Godot_v4.4-dev7_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./Main3DGodot.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Character/windowCharacterBase.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

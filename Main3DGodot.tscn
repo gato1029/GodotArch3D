@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cmwumcvxxgnjl"]
+[gd_scene load_steps=12 format=3 uid="uid://cmwumcvxxgnjl"]
 
 [ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_a2usr"]
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="2_xh56v"]
@@ -6,10 +6,7 @@
 [ext_resource type="Script" uid="uid://xfxpirr8k7b" path="res://sources/WindowsDataBase/HerramientaMenuBar.cs" id="3_kc28b"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="4_tksb4"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
-[ext_resource type="Script" uid="uid://bv4v3tnislwti" path="res://sources/WindowsDataBase/TileCreator/WindowTileCreator.cs" id="6_yxrc8"]
-[ext_resource type="Script" uid="uid://clvs040u8vi6d" path="res://sources/WindowsDataBase/Positions/WindowPositions.cs" id="7_kc28b"]
-[ext_resource type="Texture2D" uid="uid://djjaf8wikv4mu" path="res://resources/cat.png" id="7_namcl"]
-[ext_resource type="Texture2D" uid="uid://cy4ksrqvjo3xt" path="res://resources/basic_ground_tiles.png" id="8_kc28b"]
+[ext_resource type="PackedScene" uid="uid://7ep482axlki2" path="res://sources/WindowsDataBase/TileCreator/window_tile_creator.tscn" id="8_ong74"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="9_hq8xv"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_yxrc8"]
@@ -84,31 +81,45 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
 
-[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu"]
+[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu" node_paths=PackedStringArray("viewportMainEditor")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3_kc28b")
+viewportMainEditor = NodePath("../../HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport")
 
-[node name="TilesEditor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
-title = "Menu Tiles"
+[node name="Atlas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+auto_translate_mode = 1
 item_count = 1
-item_0/text = "Tile Creator"
+item_0/text = "Materiales"
 item_0/id = 0
+
+[node name="Creador Tiles" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+title = "Menu Tiles"
+size = Vector2i(110, 100)
+item_count = 3
+item_0/text = "Tiles Simple"
+item_0/id = 0
+item_1/text = "Auto Tile"
+item_1/id = 1
+item_2/text = "Tile Animated"
+item_2/id = 2
 
 [node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1
-hide_on_item_selection = false
-hide_on_checkable_item_selection = false
 item_count = 2
 item_0/text = "Visualizar Posiciones"
 item_0/checkable = 1
-item_0/id = 1
+item_0/id = 0
 item_1/text = "rau"
 item_1/checkable = 1
-item_1/id = 2
+item_1/id = 1
 
-[node name="PopupMenu3" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Character" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1
+item_count = 1
+item_0/text = "Base Character"
+item_0/checkable = 1
+item_0/id = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -151,7 +162,6 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer"]
 handle_input_locally = false
-gui_embed_subwindows = true
 size = Vector2i(1012, 603)
 render_target_update_mode = 4
 
@@ -163,7 +173,7 @@ projection = 1
 current = true
 size = 10.0
 script = ExtResource("4_tksb4")
-MouseEdgeMargin = 10.0
+MouseEdgeMargin = 5.0
 MinZoomSize = 10.0
 
 [node name="center" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D"]
@@ -177,219 +187,5 @@ script = ExtResource("3_e6381")
 
 [node name="Windows" type="Node" parent="Editor"]
 
-[node name="WindowTileCreator" type="Window" parent="Editor/Windows"]
-auto_translate_mode = 1
-title = "Tile Creator"
-position = Vector2i(0, 36)
-size = Vector2i(1000, 500)
+[node name="WindowTileCreator" parent="Editor/Windows" instance=ExtResource("8_ong74")]
 visible = false
-wrap_controls = true
-always_on_top = true
-script = ExtResource("6_yxrc8")
-
-[node name="Panel" type="Panel" parent="Editor/Windows/WindowTileCreator"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="Editor/Windows/WindowTileCreator/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-metadata/_edit_use_anchors_ = true
-
-[node name="SplitContainer" type="HSplitContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer"]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Imagen:"
-
-[node name="LineEditPath" type="LineEdit" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-editable = false
-
-[node name="ButtonDisco" type="Button" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Disco"
-
-[node name="ButtonBD" type="Button" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "BD"
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label" type="Label" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-text = "Division Tiles:"
-
-[node name="SpinBoxX" type="SpinBox" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-min_value = 16.0
-max_value = 512.0
-value = 16.0
-suffix = "px"
-
-[node name="Label2" type="Label" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-text = "x"
-
-[node name="SpinBoxY" type="SpinBox" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-min_value = 16.0
-max_value = 512.0
-value = 16.0
-suffix = "px"
-
-[node name="ButtonDividir" type="Button" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-text = "Dividir"
-
-[node name="ButtonGuardarBD" type="Button" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-text = "Guardar BD"
-
-[node name="ItemList" type="ItemList" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-select_mode = 2
-item_count = 4
-max_columns = 10
-icon_mode = 0
-fixed_icon_size = Vector2i(128, 128)
-item_0/text = "ID:1"
-item_0/icon = ExtResource("7_namcl")
-item_1/text = "ID:2"
-item_1/icon = ExtResource("8_kc28b")
-item_2/icon = ExtResource("9_hq8xv")
-item_3/icon = ExtResource("9_hq8xv")
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer"]
-layout_mode = 2
-
-[node name="VSeparator" type="VSeparator" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2"]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 10
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Tipo Tile:"
-
-[node name="OptionButton" type="OptionButton" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-selected = 0
-item_count = 3
-popup/item_0/text = "Simpe"
-popup/item_0/id = 0
-popup/item_1/text = "Animation"
-popup/item_1/id = 1
-popup/item_2/text = "Auto Tile"
-popup/item_2/id = 2
-
-[node name="Panel" type="Panel" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -64.0
-offset_top = -99.0
-offset_right = 64.0
-offset_bottom = 99.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_vertical = 3
-
-[node name="TextureRect" type="TextureRect" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer"]
-layout_mode = 2
-texture = ExtResource("9_hq8xv")
-stretch_mode = 5
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="Label" type="Label" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "ID:"
-
-[node name="LineEdit" type="LineEdit" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-editable = false
-
-[node name="Button" type="Button" parent="Editor/Windows/WindowTileCreator/Panel/MarginContainer/SplitContainer/HBoxContainer2/VBoxContainer/Panel/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Guardar BD"
-
-[node name="FileDialog" type="FileDialog" parent="Editor/Windows"]
-auto_translate_mode = 1
-
-[node name="WindowPositions" type="Window" parent="Editor/Windows"]
-title = "Posiciones"
-initial_position = 2
-size = Vector2i(350, 140)
-visible = false
-wrap_controls = true
-unresizable = true
-always_on_top = true
-sharp_corners = true
-script = ExtResource("7_kc28b")
-
-[node name="Panel" type="Panel" parent="Editor/Windows/WindowPositions"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="Editor/Windows/WindowPositions/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Editor/Windows/WindowPositions/Panel/MarginContainer"]
-layout_mode = 2
