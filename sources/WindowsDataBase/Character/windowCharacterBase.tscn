@@ -1,20 +1,29 @@
-[gd_scene load_steps=3 format=3 uid="uid://dkdpfqsxie7jl"]
+[gd_scene load_steps=6 format=3 uid="uid://dkdpfqsxie7jl"]
 
-[ext_resource type="Script" uid="uid://cprmd1wowvju4" path="res://sources/WindowsDataBase/TileCreator/WindowTileAnimate.cs" id="1_wntqo"]
+[ext_resource type="Script" uid="uid://bnm55gg12wjlw" path="res://sources/WindowsDataBase/Character/WindowCharacterBase.cs" id="1_m6v26"]
+[ext_resource type="Texture2D" uid="uid://btk75fbvbbjyc" path="res://resources/Textures/Character/baseCharacter.png" id="1_ww0eh"]
 
-[sub_resource type="AnimatedTexture" id="AnimatedTexture_d17lp"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_0cu6d"]
+atlas = ExtResource("1_ww0eh")
+region = Rect2(64, 128, 64, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_03fyf"]
+size = Vector2(25.6, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ww0eh"]
+size = Vector2(16, 9.6)
 
 [node name="WindowCharacterBase" type="Window"]
 gui_embed_subwindows = true
-title = "Tile Animated"
+title = "Character Base"
 initial_position = 1
-size = Vector2i(800, 500)
+size = Vector2i(1200, 500)
 wrap_controls = true
 transient = true
 transient_to_focused = true
 exclusive = true
 always_on_top = true
-script = ExtResource("1_wntqo")
+script = ExtResource("1_m6v26")
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 15
@@ -45,7 +54,7 @@ size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/VBoxContainer"]
 layout_mode = 2
@@ -69,7 +78,7 @@ size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 
 [node name="VSeparator" type="VSeparator" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer"]
 layout_mode = 2
@@ -77,66 +86,219 @@ size_flags_horizontal = 0
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2"]
+[node name="VBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(128, 256)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 6
+size_flags_vertical = 0
 
-[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
-custom_minimum_size = Vector2(128, 128)
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2"]
 layout_mode = 2
-texture = SubResource("AnimatedTexture_d17lp")
-expand_mode = 3
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = SubResource("AtlasTexture_0cu6d")
+expand_mode = 2
 stretch_mode = 5
 
-[node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
+[node name="CenterContainer" type="CenterContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/TextureRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(4, 4)
+size_flags_horizontal = 4
+size_flags_vertical = 6
+metadata/_edit_use_anchors_ = true
+
+[node name="CollisionBody" type="CollisionShape2D" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/TextureRect/CenterContainer"]
+position = Vector2(0, 6.4)
+shape = SubResource("RectangleShape2D_03fyf")
+
+[node name="CollisionMove" type="CollisionShape2D" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/TextureRect/CenterContainer"]
+position = Vector2(0, 25.6)
+shape = SubResource("RectangleShape2D_ww0eh")
+debug_color = Color(0.203829, 0.633408, 0.283972, 0.42)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Collision Move"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Offset:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Collision Body"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Offset:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Guardar"
+
+[node name="VBoxContainer" type="TabContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Animations" type="MarginContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 0
+
+[node name="Animations" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Animations"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Animations/Animations"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Agregar Animation"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Animations/Animations"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Animations/Animations/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 6
-size_flags_vertical = 4
+columns = 5
+
+[node name="Colliders Atack" type="MarginContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 1
+
+[node name="Colliders Atack" type="VBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Colliders Atack"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Colliders Atack/Colliders Atack"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "New Atack"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Colliders Atack/Colliders Atack"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Colliders Atack/Colliders Atack/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
 columns = 2
-
-[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "Id Tile:"
-
-[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-editable = false
-
-[node name="Label3" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "Id Frames:"
-
-[node name="LineEdit3" type="LineEdit" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-expand_to_text_length = true
-
-[node name="Label4" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "Fps:"
-
-[node name="SpinBox" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer"]
-layout_mode = 2
-step = 0.01
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="Button" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Actualizar"
-
-[node name="Button2" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Guardar"

@@ -1,0 +1,243 @@
+[gd_scene load_steps=2 format=3 uid="uid://d10q20o1jd51a"]
+
+[ext_resource type="Script" path="res://sources/WindowsDataBase/Character/WindowsCharacterCollisionAtack.cs" id="1_ifhol"]
+
+[node name="ContainerPanel" type="PanelContainer"]
+script = ExtResource("1_ifhol")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Node" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/Node/HBoxContainer"]
+layout_mode = 2
+text = "ID Atack:"
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/HBoxContainer"]
+layout_mode = 2
+
+[node name="CheckButton" type="CheckButton" parent="MarginContainer/Node/HBoxContainer"]
+layout_mode = 2
+text = "Rect"
+
+[node name="Button2" type="Button" parent="MarginContainer/Node/HBoxContainer"]
+layout_mode = 2
+text = "Eliminar"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/Node"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Collision UP"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer3"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+min_value = -100.0
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Offset:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="MarginContainer/Node"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Collision DOWN"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer4"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Offset:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer5" type="VBoxContainer" parent="MarginContainer/Node"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer5"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Collision LEFT"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer5"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Offset:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer6" type="VBoxContainer" parent="MarginContainer/Node"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer6"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Collision RIGHT"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer6"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Offset:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="MarginContainer/Node"]
+layout_mode = 2
+text = "Refrescar"

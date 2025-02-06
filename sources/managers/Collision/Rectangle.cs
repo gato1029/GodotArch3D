@@ -76,6 +76,7 @@ namespace GodotEcsArch.sources.managers.Collision
             Height = maxY - minY;
         }
 
+
         public override string ToString()
         {
             return $"Rectangle: Width = {Width}, Height = {Height}, Direction = {Direction}";

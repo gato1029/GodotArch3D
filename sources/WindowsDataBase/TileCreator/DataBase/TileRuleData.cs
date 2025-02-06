@@ -1,4 +1,3 @@
-using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
 
 namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
@@ -97,10 +96,5 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
             // Compara si la máscara de vecinos coincide con la regla
             return this.neighborMask == neighborMask;
         }
-    }
-
-    public class AutoTileData : IdData
-    {
-        public TileRuleData[] arrayTiles { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 
 using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using LiteDB;
@@ -27,6 +28,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             collectionNameMap[typeof(MaterialData)] = "Materiales";
             collectionNameMap[typeof(TileData)] = "Tiles";
             collectionNameMap[typeof(AutoTileData)] = "AutoTiles";
+            collectionNameMap[typeof(CharacterBaseData)] = "CharacterBase";
 
             ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");            
             MaterialDataCollection.EnsureIndex(x => x.id, unique: true);
@@ -36,6 +38,9 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             ILiteCollection<AutoTileData> AutoTileDataCollection = db.GetCollection<AutoTileData>("AutoTiles");
             AutoTileDataCollection.EnsureIndex(x => x.id, unique: true);
+
+            ILiteCollection<AutoTileData> CharacterBaseDataCollection = db.GetCollection<AutoTileData>("CharacterBase");
+            CharacterBaseDataCollection.EnsureIndex(x => x.id, unique: true);
         }
 
         public int NextID<T>()

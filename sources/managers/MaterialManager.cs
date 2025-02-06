@@ -55,10 +55,11 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
 
         AtlasTexture atlasTexture = new AtlasTexture();
         atlasTexture.Atlas = (Texture2D)(materials[idMaterial].textureMaterial); 
-        int columns = (int)(materialData.widhtTexture / materialData.divisionPixelX);
-        int rows = (int)(materialData.heightTexture / materialData.divisionPixelY);
+        int columns = (int)(materialData.widhtTexture / materialData.divisionPixelX); //8
+        
+
         int row = internalPosition / columns; // Fila correspondiente al índice
-        int column = internalPosition % rows; // Columna correspondiente al índice
+        int column = internalPosition % columns; // Columna correspondiente al índice
 
         // Calcular las coordenadas de la subimagen a partir del índice
         int x = column * materialData.divisionPixelX;
