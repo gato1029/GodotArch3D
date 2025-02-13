@@ -1,3 +1,4 @@
+using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,13 @@ namespace GodotEcsArch.sources.managers.Collision
 {
     public class Rectangle : GeometricShape2D
     {
+        [BsonIgnore]
         public float OriginalWidth { get; private set; }
+        [BsonIgnore]
         public float OriginalHeight { get; private set; }
         public float Width { get; private set; }
         public float Height { get; private set; }
+        [BsonIgnore]
         public Vector2 Direction { get; private set; }
 
         public Rectangle(float width, float height, Godot.Vector2 originRelative)
@@ -23,10 +27,29 @@ namespace GodotEcsArch.sources.managers.Collision
             Width = width;
             Height = height;
             Direction = new Vector2(1, 0); 
-            OriginRelative = originRelative;
-            OriginCurrent = originRelative;
+            this.OriginRelative = originRelative;
+            this.OriginCurrent = originRelative;
+        
         }
-        public Rectangle(float width, float height)
+        [BsonCtor]
+        public Rectangle(float widthPixel, float heightPixel, float originPixelX, float originPixelY) : base()
+        {
+            OriginalWidth = MeshCreator.PixelsToUnits(widthPixel);
+            OriginalHeight = MeshCreator.PixelsToUnits(heightPixel);
+            Width = MeshCreator.PixelsToUnits(widthPixel);
+            Height = MeshCreator.PixelsToUnits(heightPixel);
+
+            this.widthPixel = widthPixel;
+            this.heightPixel = heightPixel;
+            Direction = new Vector2(1, 0);
+            OriginRelative = new Godot.Vector2(MeshCreator.PixelsToUnits(originPixelX), MeshCreator.PixelsToUnits(originPixelY));
+            OriginCurrent = new Godot.Vector2(MeshCreator.PixelsToUnits(originPixelX), MeshCreator.PixelsToUnits(originPixelY));
+            this.originPixelX = originPixelX;
+            this.originPixelY = originPixelY;
+        }
+
+
+        public Rectangle(float width, float height) 
         {
             OriginalWidth = width;
             OriginalHeight = height;

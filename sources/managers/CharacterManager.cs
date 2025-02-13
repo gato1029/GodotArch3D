@@ -59,7 +59,7 @@ internal class CharacterManager : SingletonBase<CharacterManager>
   
     void ConfigMushroom () {
         int idAnimation = 10;
-        int atlasAnimation = SpriteManager.Instance.LoadTextureAnimation(10,"res://resources/Textures/Monster/Hongito.png", new Vector3(80, 64, 32), new Vector3(0, -0.5f, 0), new Vector2(40, 32));
+        int atlasAnimation = SpriteManager.Instance.LoadTextureAnimation(10,"res://resources/Textures/Monster/Hongito.png", new Vector3(80, 64, 32), new Vector3(0, -0.5f, 0), new Vector2(32, 32));
 
         SpriteManager.Instance.CreateAnimation(atlasAnimation,idAnimation, "Mushroom", 8);
         AnimationIndividual animationIndividual = SpriteManager.Instance.GetAnimation(idAnimation);

@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-internal class SpatialHashMap<TItem> where TItem : struct
+internal class SpatialHashMap<TItem> 
 {
    
     private readonly float cellSize;   

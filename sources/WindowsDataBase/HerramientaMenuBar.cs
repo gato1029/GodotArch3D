@@ -4,6 +4,8 @@ using GodotEcsArch.sources.WindowsDataBase;
 using System;
 using System.Collections.Generic;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 
 public partial class HerramientaMenuBar : MenuBar
 {
@@ -18,7 +20,7 @@ public partial class HerramientaMenuBar : MenuBar
     PopupMenu tileCreator;
     PopupMenu atlasCreator;
 
-    PopupMenu menuCharacter;
+    PopupMenu menuComponentes;
     public override void _Ready()
 	{
         editor = GetNode<PopupMenu>("Editor");
@@ -31,12 +33,12 @@ public partial class HerramientaMenuBar : MenuBar
         atlasCreator = GetNode<PopupMenu>("Atlas");
         atlasCreator.IdPressed += AtlasCreator_IdPressed;
 
-        menuCharacter = GetNode<PopupMenu>("Character");
-        menuCharacter.IdPressed += MenuCharacter_IdPressed;
+        menuComponentes = GetNode<PopupMenu>("Componentes");
+        menuComponentes.IdPressed += MenuComponentes_IdPressed;
         
     }
 
-    private void MenuCharacter_IdPressed(long id)
+    private void MenuComponentes_IdPressed(long id)
     {
         WindowDataGeneric win;
         PackedScene ps;
@@ -46,11 +48,30 @@ public partial class HerramientaMenuBar : MenuBar
                 win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
                 AddChild(win);
                 win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD);
+                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/windowCharacterBase.tscn");
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Character");
                 win.SetLoaddBAction(() =>
                 {
-                    var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();
+                    var collection = DataBaseManager.Instance.FindAll<CharacterBaseData>();
+                    List<IdData> ids = new List<IdData>();
+                    foreach (var item in collection)
+                    {
+                        IdData iddata = item;
+                        ids.Add(iddata);
+                    }
+                    return ids;
+                }
+                );
+                break;
+            case 1:
+                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
+                AddChild(win);
+                win.Show();
+                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/Terrain/windowTerrain.tscn");
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Terrenos");
+                win.SetLoaddBAction(() =>
+                {
+                    var collection = DataBaseManager.Instance.FindAll<TerrainData>();
                     List<IdData> ids = new List<IdData>();
                     foreach (var item in collection)
                     {
@@ -89,7 +110,7 @@ public partial class HerramientaMenuBar : MenuBar
                 AddChild(win);
                 win.Show();
                  ps =  GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD);
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Tile Simple");
                 win.SetLoaddBAction(() => 
                 {
                     var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();
@@ -108,7 +129,7 @@ public partial class HerramientaMenuBar : MenuBar
                 AddChild(win);
                 win.Show();
                 ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD);
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Auto Tile");
                 win.SetLoaddBAction(() =>
                 {
                     var collection = DataBaseManager.Instance.FindAll<AutoTileData>();
@@ -127,10 +148,29 @@ public partial class HerramientaMenuBar : MenuBar
                 AddChild(win);
                 win.Show();
                 ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileAnimate.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD);
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Tile Animate");
                 win.SetLoaddBAction(() =>
                 {
                     var collection = DataBaseManager.Instance.FindAll<TileAnimateData>();
+                    List<IdData> ids = new List<IdData>();
+                    foreach (var item in collection)
+                    {
+                        IdData iddata = item;
+                        ids.Add(iddata);
+                    }
+                    return ids;
+                }
+                );
+                break;
+            case 3:
+                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
+                AddChild(win);
+                win.Show();
+                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileDinamic.tscn");
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Tile Dinamico");
+                win.SetLoaddBAction(() =>
+                {
+                    var collection = DataBaseManager.Instance.FindAll<TileDynamicData>();
                     List<IdData> ids = new List<IdData>();
                     foreach (var item in collection)
                     {

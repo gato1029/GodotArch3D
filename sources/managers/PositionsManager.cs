@@ -10,8 +10,9 @@ namespace GodotEcsArch.sources.managers
     internal class PositionsManager : SingletonBase<PositionsManager>
     {
         public Vector2I chunkDimencion { get; set; }
-
+        public Vector2 positionCamera { get; set; }
         public Vector2 positionMouseCamera { get; set; }
+        public Vector2 positionMouseCameraPixel { get; set; }
         public Vector2 positionMouseTileGlobal { get; set; }
         public Vector2 positionMouseChunk { get; set; }
         public Vector2 positionMouseTileChunk { get; set; }

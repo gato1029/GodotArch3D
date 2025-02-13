@@ -2,6 +2,7 @@
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using LiteDB;
 using System;
@@ -24,11 +25,15 @@ namespace GodotEcsArch.sources.WindowsDataBase
             db = new LiteDatabase(dataBasePath);
             var mapper = BsonMapper.Global;
 
+        
+      
+
 
             collectionNameMap[typeof(MaterialData)] = "Materiales";
             collectionNameMap[typeof(TileData)] = "Tiles";
             collectionNameMap[typeof(AutoTileData)] = "AutoTiles";
             collectionNameMap[typeof(CharacterBaseData)] = "CharacterBase";
+            collectionNameMap[typeof(TerrainData)] = "Terrain";
 
             ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");            
             MaterialDataCollection.EnsureIndex(x => x.id, unique: true);
@@ -41,6 +46,9 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             ILiteCollection<AutoTileData> CharacterBaseDataCollection = db.GetCollection<AutoTileData>("CharacterBase");
             CharacterBaseDataCollection.EnsureIndex(x => x.id, unique: true);
+
+            ILiteCollection<TerrainData> TerrainDataCollection = db.GetCollection<TerrainData>("Terrain");
+            TerrainDataCollection.EnsureIndex(x => x.id, unique: true);
         }
 
         public int NextID<T>()

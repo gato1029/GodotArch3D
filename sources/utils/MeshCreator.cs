@@ -8,11 +8,15 @@ using System.Threading.Tasks;
 
 internal class MeshCreator
 {
+    public static float PixelsToUnits(float pixels)
+    {
+        return pixels / 32f; // Se usa 32f para asegurar que la división sea en punto flotante
+    }
     public static ArrayMesh CreateSquareMesh(float widthPixels, float heightPixels,  Vector2 unitGodotPerPixel , Vector3 offset)
     {
         ArrayMesh arrayMesh = new ArrayMesh();
-        float halfWidth = 0.5f * (widthPixels / unitGodotPerPixel.X);
-        float halfHeight = 0.5f * (heightPixels / unitGodotPerPixel.Y);
+        float halfWidth = 0.5f * PixelsToUnits(widthPixels );
+        float halfHeight = 0.5f * PixelsToUnits(heightPixels );
 
      
 

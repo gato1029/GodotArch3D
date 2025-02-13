@@ -28,5 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="resources\" />
+    <Folder Include="sources\managers\Sprite3D\" />
   </ItemGroup>
 </Project>

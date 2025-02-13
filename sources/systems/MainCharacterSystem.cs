@@ -9,6 +9,8 @@ using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Behaviors;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.Tilemap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -192,7 +194,34 @@ namespace GodotEcsArch.sources.systems
                         }
                     }
                 }
-                      
+
+                if (!existCollision)
+                {
+                    Dictionary<int, Dictionary<int, TileDataGame>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+                    if (dataTile != null)
+                    {
+                        foreach (var item in dataTile.Values)
+                        {
+                            foreach (var itemInternal in item)
+                            {
+
+                                GeometricShape2D colliderB = itemInternal.Value.collisionBody;
+                                var positionB = itemInternal.Value.positionReal + itemInternal.Value.collisionBody.OriginCurrent;
+                                if (Collision2D.Collides(c.shapeMove, colliderB, movementNext, positionB))
+                                {
+                                    existCollision = true;
+                                    break;
+                                }
+
+                            }
+                            if (existCollision)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 if (!existCollision)
                 {
                     stateComponent.currentType = StateType.MOVING;                    

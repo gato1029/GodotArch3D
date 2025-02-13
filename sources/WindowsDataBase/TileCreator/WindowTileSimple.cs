@@ -1,8 +1,10 @@
 using Godot;
-
+using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
 using System.Collections.Generic;
@@ -18,8 +20,16 @@ public partial class WindowTileSimple : Window, IDetailWindow
 
     LineEdit lineId;
     LineEdit linePositionTile;
-    TextureRect textureSelection;
 
+
+    Sprite2D spriteSelection;
+    SpinBox bodyWidthSpin;
+    SpinBox bodyHeightSpin;
+    SpinBox bodyOffsetXSpin;
+    SpinBox bodyOffsetYSpin;
+    CheckBox collisionCheckBox;
+
+    CollisionShape2D collisionBody;
     //----
 
     MaterialData currentMaterialData;
@@ -30,7 +40,24 @@ public partial class WindowTileSimple : Window, IDetailWindow
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
+
+        spriteSelection = GetNode<Sprite2D>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/Sprite2D");
+        collisionBody = GetNode<CollisionShape2D>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/Sprite2D/CollisionBody");
+        bodyWidthSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox");
+        bodyHeightSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox2");
+        bodyOffsetXSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer/SpinBox");
+        bodyOffsetYSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer/SpinBox2");
+        collisionCheckBox = GetNode<CheckBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer/CheckBox");
+
+        bodyWidthSpin.ValueChanged += bodyValueChanged;
+        bodyHeightSpin.ValueChanged += bodyValueChanged;
+        bodyOffsetXSpin.ValueChanged += bodyValueChanged;
+        bodyOffsetYSpin.ValueChanged += bodyValueChanged;
+
+        collisionCheckBox.Pressed += CollisionCheckBox_Pressed;
+
         CloseRequested += WindowTileCreator_CloseRequested;
+
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Button").Pressed += Save_Click;
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/HBoxContainer/Button2").Pressed += GenerateAll_Click;
         
@@ -38,7 +65,7 @@ public partial class WindowTileSimple : Window, IDetailWindow
 
         
         optionMaterial = GetNode<OptionButton>("Panel/MarginContainer/HSplitContainer/VBoxContainer/HBoxContainer/OptionButton");
-        textureSelection = GetNode<TextureRect>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/TextureRect");
+
 
         lineId = GetNode<LineEdit>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer/LineEdit");
         linePositionTile = GetNode<LineEdit>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer/LineEdit3");
@@ -48,6 +75,19 @@ public partial class WindowTileSimple : Window, IDetailWindow
         LoadMaterials();
         windowState = WindowState.NEW;
         currentSimpleData = new TileSimpleData();
+    }
+
+    private void CollisionCheckBox_Pressed()
+    {
+        collisionBody.Visible = collisionCheckBox.ButtonPressed;
+        GetNode<HBoxContainer>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3").Visible = collisionCheckBox.ButtonPressed;
+    }
+
+    private void bodyValueChanged(double value)
+    {
+        collisionBody.Position = new Vector2((float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value * (-1));
+        var shape = (RectangleShape2D)collisionBody.Shape;
+        shape.Size = new Vector2((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value);
     }
 
     private void ComboMaterial_Selected(long index)
@@ -83,6 +123,12 @@ public partial class WindowTileSimple : Window, IDetailWindow
                 TileSimpleData tile = new TileSimpleData();
                 tile.idMaterial = currentMaterialData.id;
                 tile.idInternalPosition = postile;
+                tile.haveCollider = collisionCheckBox.ButtonPressed;
+                if (tile.haveCollider)
+                {
+                    tile.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value); 
+                }
+                
                 DataBaseManager.Instance.InsertUpdate(tile);
             }
             
@@ -93,8 +139,16 @@ public partial class WindowTileSimple : Window, IDetailWindow
 
     private void Save_Click()
     {
-        if (!DataBaseManager.Instance.ExistTile(currentSimpleData.idMaterial, currentSimpleData.idInternalPosition))
+        //if (!DataBaseManager.Instance.ExistTile(currentSimpleData.idMaterial, currentSimpleData.idInternalPosition))
         {
+            currentSimpleData.id = int.Parse( lineId.Text);
+            currentSimpleData.haveCollider = collisionCheckBox.ButtonPressed;
+            currentSimpleData.idMaterial = currentMaterialData.id;
+            if (currentSimpleData.haveCollider)
+            {
+                currentSimpleData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value);
+            }
+            
             DataBaseManager.Instance.InsertUpdate(currentSimpleData);
             OnRequestUpdate?.Invoke();
             QueueFree();
@@ -106,7 +160,7 @@ public partial class WindowTileSimple : Window, IDetailWindow
       
             int postile = (int)itemListTiles.GetItemMetadata((int)index);
             linePositionTile.Text = postile.ToString();
-            textureSelection.Texture = itemListTiles.GetItemIcon((int)index);
+            spriteSelection.Texture = itemListTiles.GetItemIcon((int)index);
             
             currentSimpleData.idMaterial = currentMaterialData.id;
             currentSimpleData.idInternalPosition = postile;           
@@ -137,6 +191,8 @@ public partial class WindowTileSimple : Window, IDetailWindow
     {
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/HBoxContainer/Button2").Visible = false;
         currentSimpleData = DataBaseManager.Instance.FindById<TileSimpleData>(id);
+        collisionCheckBox.ButtonPressed = currentSimpleData.haveCollider;
+        CollisionCheckBox_Pressed();
         linePositionTile.Text = currentSimpleData.idInternalPosition.ToString();
         lineId.Text = currentSimpleData.id.ToString();
 
@@ -144,7 +200,16 @@ public partial class WindowTileSimple : Window, IDetailWindow
         
         ComboMaterial_Selected(currentMaterialData.id);
         optionMaterial.Selected = currentMaterialData.id;
-        textureSelection.Texture = currentSimpleData.textureVisual;
-        windowState = WindowState.UPDATE;        
+        spriteSelection.Texture = currentSimpleData.textureVisual;
+        windowState = WindowState.UPDATE;
+        if (currentSimpleData.haveCollider)
+        {
+            Rectangle rect = (Rectangle)currentSimpleData.collisionBody;
+            bodyWidthSpin.Value = rect.widthPixel;
+            bodyHeightSpin.Value = rect.heightPixel;
+            bodyOffsetXSpin.Value = rect.originPixelX;
+            bodyOffsetYSpin.Value = rect.originPixelY;
+        }
+        
     }
 }

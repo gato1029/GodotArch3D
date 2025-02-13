@@ -62,7 +62,7 @@ public class EcsManager : SingletonBase<EcsManager>
         groupCollider = new Group<float>("Collider", new CollisionSystem(world));
         groupMovement = new Group<float>("Movement", new SearchMovementTargetSystem(world));
 
-        groupRender = new Group<float>("Render", new StateSystem(world), new RefreshAnimationSystem(world),  new AnimationSystem(world), new RenderSystem(world));
+        groupRender = new Group<float>("Render", new StateSystem(world), new RefreshAnimationSystem(world),  new AnimationSystem(world), new AnimationTileSystem(world), new RenderSystem(world));
 
         groupMainCharacter = new Group<float>("MainCharacter", new MainCharacterSystem(world));
 

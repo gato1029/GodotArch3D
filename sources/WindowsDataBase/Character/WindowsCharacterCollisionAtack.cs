@@ -17,9 +17,31 @@ public partial class WindowsCharacterCollisionAtack : PanelContainer
     Button buttonRefresh;
     SpinBox spinBoxId;
 
-    public delegate void RequestDeleteHandler(WindowsCharacterCollisionAtack id);
+    public delegate void RequestDeleteHandler(WindowsCharacterCollisionAtack item);
     public event RequestDeleteHandler OnRequestDelete;
-    // Called when the node enters the scene tree for the first time.
+
+    public delegate void RequestNotifyHandler(CharacterColliderAtackData itemData);
+    public event RequestNotifyHandler OnNotifyChangue;
+
+    public void SetData(CharacterColliderAtackData In_data)
+    {
+        data = In_data;
+
+        spinBoxId.Value = data.id;
+        for (int i = 0; i < In_data.colliders.Length; i++)
+        {
+            Rectangle item = (Rectangle) In_data.colliders[i];
+            spinBoxesWidht[i].Value = item.Width;
+            spinBoxesHeight[i].Value = item.Height;
+            spinBoxesOffsetX[i].Value = item.OriginCurrent.X;
+            spinBoxesOffsetY[i].Value = item.OriginCurrent.Y;
+        }
+    }
+    public void SetID(int id)
+    { 
+        spinBoxId.Value = id;
+    }  
+        // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
         data = new CharacterColliderAtackData();
@@ -66,10 +88,28 @@ public partial class WindowsCharacterCollisionAtack : PanelContainer
         GetNode<Button>("MarginContainer/Node/HBoxContainer/Button2").Pressed += Delete_Press;
 
         buttonRefresh = GetNode<Button>("MarginContainer/Node/Button");
+
+        buttonRefresh.Pressed += ButtonRefresh_Pressed;
         spinBoxId = GetNode<SpinBox>("MarginContainer/Node/HBoxContainer/SpinBox");
 
         spinBoxId.ValueChanged += SpinBoxId_ValueChanged;
+        data.colliders = new GeometricShape2D[4];
+        data.colliders[0] = new Rectangle(20,20);
+        data.colliders[1] = new Rectangle(20, 20);
+        data.colliders[2] = new Rectangle(20, 20);
+        data.colliders[3] = new Rectangle(20, 20);
+    }
 
+    private void ButtonRefresh_Pressed()
+    {
+        
+        data.id = (int)spinBoxId.Value;
+        data.colliders[0] = new Rectangle((float)spinBoxesWidht[0].Value, (float)spinBoxesHeight[0].Value, new Vector2((float)spinBoxesOffsetX[0].Value, (float)spinBoxesOffsetY[0].Value));
+        data.colliders[1] = new Rectangle((float)spinBoxesWidht[1].Value, (float)spinBoxesHeight[1].Value, new Vector2((float)spinBoxesOffsetX[1].Value, (float)spinBoxesOffsetY[1].Value));
+        data.colliders[2] = new Rectangle((float)spinBoxesWidht[2].Value, (float)spinBoxesHeight[2].Value, new Vector2((float)spinBoxesOffsetX[2].Value, (float)spinBoxesOffsetY[2].Value));
+        data.colliders[3] = new Rectangle((float)spinBoxesWidht[3].Value, (float)spinBoxesHeight[3].Value, new Vector2((float)spinBoxesOffsetX[3].Value, (float)spinBoxesOffsetY[3].Value));
+        
+        OnNotifyChangue?.Invoke(data);
     }
 
     private void Delete_Press()
@@ -85,21 +125,26 @@ public partial class WindowsCharacterCollisionAtack : PanelContainer
     private void ValueChanguedRIGHT(double value)
     {
         data.colliders[3] = new Rectangle((float)spinBoxesWidht[3].Value, (float)spinBoxesHeight[3].Value, new Vector2((float)spinBoxesOffsetX[3].Value, (float)spinBoxesOffsetY[3].Value));
+        OnNotifyChangue?.Invoke(data);
     }
 
     private void ValueChanguedLEFT(double value)
     {
         data.colliders[2] = new Rectangle((float)spinBoxesWidht[2].Value, (float)spinBoxesHeight[2].Value, new Vector2((float)spinBoxesOffsetX[2].Value, (float)spinBoxesOffsetY[2].Value));
+        OnNotifyChangue?.Invoke(data);
     }
+
 
     private void ValueChanguedDOWN(double value)
     {
         data.colliders[1] = new Rectangle((float)spinBoxesWidht[1].Value, (float)spinBoxesHeight[1].Value, new Vector2((float)spinBoxesOffsetX[1].Value, (float)spinBoxesOffsetY[1].Value));
+        OnNotifyChangue?.Invoke(data);
     }
 
     private void ValueChanguedUP(double value)
     {
-        data.colliders[0] = new Rectangle((float)spinBoxesWidht[0].Value, (float)spinBoxesHeight[0].Value, new Vector2((float)spinBoxesOffsetX[0].Value, (float)spinBoxesOffsetY[0].Value));                     
+        data.colliders[0] = new Rectangle((float)spinBoxesWidht[0].Value, (float)spinBoxesHeight[0].Value, new Vector2((float)spinBoxesOffsetX[0].Value, (float)spinBoxesOffsetY[0].Value));
+        OnNotifyChangue?.Invoke(data);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

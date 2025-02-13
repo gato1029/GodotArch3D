@@ -7,12 +7,23 @@ using Arch.System;
 using Godot;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.systems;
+using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase;
 using System;
+using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileData;
+using System.Reflection.Emit;
 
+using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.utils;
 public partial class Main3D : Node3D
 {
+    MultimeshMaterial multimeshMaterial;
+    TerrainMap terrainMap;
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
     public override void _Ready()
 	{
@@ -20,7 +31,7 @@ public partial class Main3D : Node3D
 
     
         EcsManager.Instance.SetNode3DMain(this);
-
+        ChunkManager.Initialize(CommonAtributes.VIEW_DISTANCE_CHUNK);
         
         SpriteManager.Instance.LoadTexture("res://resources/cdemo.png", new Vector3(32,32,32), new Vector3(0, 0, 0),new Vector2(32,32));
         SpriteManager.Instance.LoadTextureMultimesh("res://resources/Textures/Monster/Hongito.png", new Vector3(80, 64, 32),new Vector3(0,0,0),new Vector2(40,32));
@@ -36,21 +47,56 @@ public partial class Main3D : Node3D
 
 
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 1000; i++)
         {
-            Position position = new Position { value = GetRandomVector2(new Vector2(-15, -15), new Vector2(15, 15)) };
+            Position position = new Position { value = GetRandomVector2(new Vector2(-150, -150), new Vector2(150, 150)) };
             //Position position = new Position { value = new Vector2(2,-0.5f) };
             CharacterManager.Instance.CreateCharacter(10, position.value);
         }
         MainCharacterManager.Instance.CreateCharacter(new Vector2(0,0));
 
+        terrainMap = new TerrainMap();
+
+
+
+
+
+        for (int i = 0; i < 1024; i++)
+        {
+            for (int j = 0; j < 1024; j++)
+            {
+                terrainMap.AddUpdateTile(new Vector2I(i, j), 3);
+            }
+
+        }
+
+        ChunkManager.Instance.ForcedUpdateChunks(new Vector2(0,0));
+        //terrainMap.RefreshChunk();
         //for (int i = 0; i < 13; i++)
         //{
         //    Position position = new Position { value = GetRandomVector2(new Vector2(-550, -550), new Vector2(550, 550)) };
         //    CreateUnitIA(position);
         //}        
+
+
+        
+
+        
+        multimeshMaterial = new MultimeshMaterial(DataBaseManager.Instance.FindById<MaterialData>(8));
+        for (int i = 0; i < 20000; i++)
+        {
+            Position position = new Position { value = GetRandomVector2(new Vector2(-150, -150), new Vector2(150, 150)) };
+            Transform3D xform2 = new Transform3D(Basis.Identity, Vector3.Zero);
+            xform2.Origin = (new Vector3(position.value.X, position.value.Y, 0));
+            xform2 = xform2.ScaledLocal(new Vector3(0.5f, 0.5f, 1));
+            
+            (Rid, int) instance = multimeshMaterial.CreateInstance();
+            RenderingServer.MultimeshInstanceSetTransform(instance.Item1, instance.Item2, xform2);
+            RenderingServer.MultimeshInstanceSetCustomData(instance.Item1, instance.Item2, new Godot.Color(160, 16, 96, 144));
+        }
+    
+       
     }
-   
 
 
     
@@ -90,18 +136,15 @@ public partial class Main3D : Node3D
     }
     public override void _Process(double delta)
     {
-     
+        ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
+        //terrainMap.UpdatePositionChunk(PositionsManager.Instance.positionCamera);
         EcsManager.Instance.UpdateSystems((float)delta, 0);   
         
     }
 
     public override void _PhysicsProcess(double delta)
     {
-
         TimeGodot.UpdateDelta((float)delta);
-
-        EcsManager.Instance.UpdateSystemsPhysics((float)delta, 0);
-   
-
+        EcsManager.Instance.UpdateSystemsPhysics((float)delta, 0);   
     }
 }

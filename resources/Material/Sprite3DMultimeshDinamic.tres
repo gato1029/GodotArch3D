@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cgago0s2wxmtw"]
+
+[ext_resource type="Shader" uid="uid://bwbqswk8sqk45" path="res://resources/shaders/SpriteMultimeshDinamic.gdshader" id="1_x64hp"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_x64hp")
+shader_parameter/transparency = 0.0

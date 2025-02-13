@@ -59,7 +59,7 @@ public partial class WindowAutoTileItem : HBoxContainer
             AddChild(win);
             win.Show();
             PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-            win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR);
+            win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR,"Tile Simple");
             win.SetLoaddBAction(() =>
             {
                 var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();
@@ -106,7 +106,7 @@ public partial class WindowAutoTileItem : HBoxContainer
                 AddChild(win);
                 win.Show();
                 PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR);
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR, "Tile Simple");
                 win.SetLoaddBAction(() =>
                 {
                     var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();

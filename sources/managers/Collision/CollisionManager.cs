@@ -7,6 +7,8 @@ using Auios.QuadTree;
 
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.Tilemap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,14 +35,17 @@ internal class CollisionManager : SingletonBase<CollisionManager>
 {
     public  SpatialHashMap<Entity> dynamicCollidersEntities;
     public  SpatialHashMap<Entity> MoveCollidersEntities;
-            
+    public SpatialHashMap<TileDataGame> tileColliders;
+
     public QuadTree<ColliderSprite> quadTreeColliders;
 
 
     protected override void Initialize()
     {                       
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
-        MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128      
+        MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
+        tileColliders = new SpatialHashMap<TileDataGame>(8, delegate (TileDataGame er) { return er.idCollider; });
+
     }
 
     protected override void Destroy()

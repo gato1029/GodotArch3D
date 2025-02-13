@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 DebugDraw="*res://addons/debug_drawing/DebugDraw.cs"
+DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
 [dotnet]
 
@@ -25,7 +26,7 @@ project/assembly_name="GodotEcsArch"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg", "res://addons/dockable_container/plugin.cfg", "res://addons/godot_visualstudio_debugger/plugin.cfg", "res://addons/tnowe_extra_controls/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/dockable_container/plugin.cfg", "res://addons/godot_visualstudio_debugger/plugin.cfg", "res://addons/grid_display/plugin.cfg", "res://addons/spanning_table/plugin.cfg", "res://addons/tnowe_extra_controls/plugin.cfg")
 
 [input]
 

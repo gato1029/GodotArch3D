@@ -4,11 +4,16 @@ using System;
 
 public partial class WindowCharacterAnimation : PanelContainer
 {
-	public CharacterAnimationStateData data;
+	public AnimationStateData data;
 
     public delegate void RequestDeleteHandler(WindowCharacterAnimation item);
     public event RequestDeleteHandler OnRequestDelete;
 
+    public delegate void RequestNotifyHandler(AnimationStateData itemData, int state);
+    public event RequestNotifyHandler OnNotifyChangue;
+
+
+    SpinBox idSpin;
     SpinBox idSpinBox;
     LineEdit framesLine;
     SpinBox frameDuration;
@@ -18,6 +23,29 @@ public partial class WindowCharacterAnimation : PanelContainer
     // Called when the node enters the scene tree for the first time.
 
     int currentIdState = 0;
+
+    public void SetData(AnimationStateData In_data)
+    {
+        data = In_data;
+        if (In_data.animationData[0] != null)
+        {
+            string strFrame = "";
+            foreach (var frame in In_data.animationData[0].idFrames)
+            {
+                strFrame = strFrame + "," + frame.ToString();
+            }
+            strFrame = strFrame.Substr(1, strFrame.Length);
+            framesLine.Text = strFrame;
+        }
+
+        frameDuration.Value = data.frameDuration;
+        idSpin.Value = data.id;
+        idSpinBox.Value = 0;
+    }
+    public void SetID(int id)
+    {
+        idSpin.Value = id;
+    }
     public void SetMaterial(int idMat)
     {
         idMaterial = idMat;
@@ -28,6 +56,7 @@ public partial class WindowCharacterAnimation : PanelContainer
         GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/Button").Pressed += Refresh_Press;
         textureSelection = GetNode<TextureRect>("MarginContainer/VBoxContainer/TextureRect");
 
+        idSpin = GetNode<SpinBox>("MarginContainer/VBoxContainer/HBoxContainer2/SpinBox");
         idSpinBox = GetNode<SpinBox>("MarginContainer/VBoxContainer/GridContainer/SpinBox2");
         framesLine = GetNode<LineEdit>("MarginContainer/VBoxContainer/GridContainer/LineEdit3");
         frameDuration = GetNode<SpinBox>("MarginContainer/VBoxContainer/GridContainer/SpinBox");
@@ -35,7 +64,7 @@ public partial class WindowCharacterAnimation : PanelContainer
 
         tipoCheckButton.Pressed += Tipo_Pressed;
         idSpinBox.ValueChanged += IdSpinBox_ValueChanged;
-        data = new CharacterAnimationStateData();
+        data = new AnimationStateData();
     }
 
     private void Tipo_Pressed()
@@ -45,14 +74,14 @@ public partial class WindowCharacterAnimation : PanelContainer
             tipoCheckButton.Text = "8 Direcciones";
             data.eightDirection = true;
             idSpinBox.MaxValue = 7;
-            data= new CharacterAnimationStateData(true);
+            data= new AnimationStateData(true);
         }
         else
         {
             tipoCheckButton.Text = "4 Direcciones";
             data.eightDirection = false;
             idSpinBox.MaxValue = 3;
-            data = new CharacterAnimationStateData(false);
+            data = new AnimationStateData(false);
         }
         
     }
@@ -88,7 +117,12 @@ public partial class WindowCharacterAnimation : PanelContainer
             strFrame = strFrame.Substr(1, strFrame.Length);
             framesLine.Text = strFrame;
         }
-        
+        else
+        {
+            framesLine.Text = "";
+        }
+        frameDuration.Value = data.frameDuration;
+        OnNotifyChangue?.Invoke(data, currentIdState);
     }
 
     private void Refresh_Press()
@@ -112,8 +146,9 @@ public partial class WindowCharacterAnimation : PanelContainer
                     arrayFrame[index] = i;            
                     index++;
                 }
-                data.animationData[currentIdState].id = currentIdState;
 
+                data.id = (int)idSpin.Value;
+                data.animationData[currentIdState].id = currentIdState;
                 data.animationData[currentIdState].idFrames = arrayFrame;
                 data.frameDuration = (float)frameDuration.Value;
             }
@@ -128,11 +163,13 @@ public partial class WindowCharacterAnimation : PanelContainer
                     arrayFrame[index] = frame;              
                     index++;
                 }
+                data.id = (int) idSpin.Value;
                 data.animationData[currentIdState].id = currentIdState;
                 data.animationData[currentIdState].idFrames = arrayFrame;
                 data.frameDuration = (float)frameDuration.Value;
             }
         }
+        OnNotifyChangue?.Invoke(data, currentIdState);
     }
 
     private void Delete_Press()

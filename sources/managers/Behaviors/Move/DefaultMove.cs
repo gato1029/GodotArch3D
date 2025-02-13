@@ -3,6 +3,8 @@ using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.systems;
 using System;
 using System.Collections.Generic;
@@ -75,6 +77,37 @@ namespace GodotEcsArch.sources.managers.Behaviors.Move
                     }
                 }
             }
+
+            //
+            if (!existCollision)
+            {
+                Dictionary<int, Dictionary<int, TileDataGame>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+                if (dataTile != null)
+                {
+                    foreach (var item in dataTile.Values)
+                    {
+                        foreach (var itemInternal in item)
+                        {
+
+                            GeometricShape2D colliderB = itemInternal.Value.collisionBody;
+                            var positionB = itemInternal.Value.positionReal + itemInternal.Value.collisionBody.OriginCurrent;
+                            if (Collision2D.Collides(collider.shapeMove, colliderB, movementNext, positionB))
+                            {
+                                existCollision = true;
+                                break;
+                            }
+
+                        }
+                        if (existCollision)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+         
+
+
             // to do radio busqueda para atacar
             // 1. si esta en radio la posicion de objetivo se actualiza
             // 2. verifica el radio de ataque del arma, si esta dentro del ataque cambia comportamiento a ataque

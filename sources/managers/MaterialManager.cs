@@ -41,18 +41,24 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
 
     public MaterialData GetMaterial(int id)
     {
-        return materials[id];
+        if (materials.ContainsKey(id))
+        {
+            return materials[id];
+        }
+        return null;
     }
 
     public AtlasTexture GetAtlasTexture(int idMaterial, int internalPosition)
     {
-        MaterialData materialData = DataBaseManager.Instance.FindById<MaterialData>(idMaterial);
 
+        MaterialData materialData;
         if (!materials.ContainsKey(idMaterial))
         {
+            materialData = DataBaseManager.Instance.FindById<MaterialData>(idMaterial);
             RegisterMaterial(idMaterial, materialData);
         }
 
+        materialData = materials[idMaterial];
         AtlasTexture atlasTexture = new AtlasTexture();
         atlasTexture.Atlas = (Texture2D)(materials[idMaterial].textureMaterial); 
         int columns = (int)(materialData.widhtTexture / materialData.divisionPixelX); //8
@@ -70,9 +76,17 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         return atlasTexture;
     }
 
-    public AtlasTexture GetAtlasTexture(int id, int x, int y, float width, float height)
+    public AtlasTexture GetAtlasTexture(int idMaterial, int x, int y, float width, float height)
     {
-        AtlasTexture atlasTexture = (AtlasTexture)(materials[id].textureMaterial);
+        MaterialData materialData;
+        if (!materials.ContainsKey(idMaterial))
+        {
+            materialData = DataBaseManager.Instance.FindById<MaterialData>(idMaterial);
+            RegisterMaterial(idMaterial, materialData);
+        }
+        materialData = materials[idMaterial];
+        AtlasTexture atlasTexture = new AtlasTexture();
+        atlasTexture.Atlas = (Texture2D)(materialData.textureMaterial);
         atlasTexture.Region = new Rect2(x, y, width, height);           
         return atlasTexture;
     }

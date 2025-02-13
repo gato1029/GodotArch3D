@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
@@ -13,9 +14,12 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
 {
     public class TileData:IdData
-    {        
+    {
+        public bool haveCollider { get; set; }
+        public GeometricShape2D collisionBody { get; set; }
         public int idMaterial { get; set; }   
         public string type { get; set; }    
+        public float scale { get; set; }
     }
     public class TileSimpleData : TileData
     {
@@ -40,11 +44,17 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         public TileDynamicData()
         {
             type = nameof(TileDynamicData);
+        
+        }
+        [BsonCtor]
+        public TileDynamicData(int idMaterial, float x, float y, float widht, float height):base()
+        {
+            textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, (int)x, (int)y, widht, height);
         }
     }
     public class TileAnimateData : TileData
     {
-        public int[] idFrames { get; set; } // Cantidad de frames en la animación
+        public int[] idFrames { get; set; } // Cantidad de frames en la animacion
         public float frameDuration { get; set; } // Duración de cada frame
         public TileAnimateData()
         {
@@ -52,9 +62,9 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         }
 
         [BsonCtor]
-        public TileAnimateData(int idMaterial, int idInternalPosition) : base()
+        public TileAnimateData(int idMaterial, int[] idFrames) : base()
         {
-            textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idInternalPosition);
+            textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idFrames[0]);
         }
     }
 

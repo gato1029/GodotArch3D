@@ -64,28 +64,17 @@ public partial class Camera3dGodot : Camera3D
 
             var calc = PositionsManager.Instance.positionMouseChunk * PositionsManager.Instance.chunkDimencion;
             PositionsManager.Instance.positionMouseTileChunk = PositionsManager.Instance.positionMouseTileGlobal - calc;
-
-
-            //#if DEBUG
-            //DockerImguiManager.Instance.AddContentToWindow(DockerIMGUI.RIGHT, "Camera", () =>
-            //{
-            //    ImguiWidgets.ToggleableGroup("Camera", "Camera Detail", () =>
-            //    {
-            //        var ss = camera.ProjectRayOrigin(GetViewport().GetMousePosition());
-            //        ImGui.Text($"Position Camera:{Position}");
-            //        ImGui.Text($"Position Mouse:{PositionsManager.Instance.positionMouseCamera}");
-            //        ImGui.Text($"Position Global Tile:{PositionsManager.Instance.positionMouseTileGlobal}");
-            //        ImGui.Text($"Position Chunk:{PositionsManager.Instance.positionMouseChunk}");
-            //        ImGui.Text($"Position Tile in Chunk:{PositionsManager.Instance.positionMouseTileChunk}");
-            //    });
-            //});
-
-           
-            //#endif
+            PositionsManager.Instance.positionCamera = new Vector2(this.Position.X, this.Position.Y);
+            PositionsManager.Instance.positionMouseCameraPixel = ConvertMouseToPixel(PositionsManager.Instance.positionMouseCamera);
         }
       
     }
-
+    public Vector2 ConvertMouseToPixel(Vector2 mousePositionUnits)
+    {
+        float pixelsPerUnit = 32.0f; // 1 unidad = 32 píxeles
+        return new Vector2(Mathf.Round(mousePositionUnits.X * pixelsPerUnit),
+                        Mathf.Round(mousePositionUnits.Y * pixelsPerUnit));
+    }
     private void MoveCamera(float delta)
     {
         Vector2 mousePosition = GetViewport().GetMousePosition();

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://d10q20o1jd51a"]
 
-[ext_resource type="Script" path="res://sources/WindowsDataBase/Character/WindowsCharacterCollisionAtack.cs" id="1_ifhol"]
+[ext_resource type="Script" uid="uid://cf2lyoxoo8pnl" path="res://sources/WindowsDataBase/Character/WindowsCharacterCollisionAtack.cs" id="1_ifhol"]
 
 [node name="ContainerPanel" type="PanelContainer"]
 script = ExtResource("1_ifhol")
@@ -28,9 +28,11 @@ text = "ID Atack:"
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/HBoxContainer"]
 layout_mode = 2
+editable = false
 
 [node name="CheckButton" type="CheckButton" parent="MarginContainer/Node/HBoxContainer"]
 layout_mode = 2
+disabled = true
 text = "Rect"
 
 [node name="Button2" type="Button" parent="MarginContainer/Node/HBoxContainer"]
@@ -64,10 +66,13 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-min_value = -100.0
+max_value = 1000.0
+value = 20.0
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+max_value = 1000.0
+value = 20.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3"]
 layout_mode = 2
@@ -84,9 +89,16 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+step = 0.1
+prefix = "X:"
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer3/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+max_value = 1000.0
+step = 0.1
+prefix = "Y:"
 
 [node name="VBoxContainer4" type="VBoxContainer" parent="MarginContainer/Node"]
 layout_mode = 2
@@ -115,9 +127,13 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+max_value = 1000.0
+value = 20.0
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+max_value = 1000.0
+value = 20.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3"]
 layout_mode = 2
@@ -134,9 +150,16 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+step = 0.1
+prefix = "X:"
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer4/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+max_value = 1000.0
+step = 0.1
+prefix = "Y:"
 
 [node name="VBoxContainer5" type="VBoxContainer" parent="MarginContainer/Node"]
 layout_mode = 2
@@ -165,9 +188,13 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+max_value = 1000.0
+value = 20.0
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+max_value = 1000.0
+value = 20.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3"]
 layout_mode = 2
@@ -184,9 +211,16 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+step = 0.1
+prefix = "X:"
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer5/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+max_value = 1000.0
+step = 0.1
+prefix = "Y:"
 
 [node name="VBoxContainer6" type="VBoxContainer" parent="MarginContainer/Node"]
 layout_mode = 2
@@ -215,9 +249,13 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+max_value = 1000.0
+value = 20.0
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+max_value = 1000.0
+value = 20.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3"]
 layout_mode = 2
@@ -234,9 +272,16 @@ layout_mode = 2
 
 [node name="SpinBox" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+step = 0.1
+prefix = "X:"
 
 [node name="SpinBox2" type="SpinBox" parent="MarginContainer/Node/VBoxContainer6/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+min_value = -100.0
+max_value = 1000.0
+step = 0.1
+prefix = "Y:"
 
 [node name="Button" type="Button" parent="MarginContainer/Node"]
 layout_mode = 2

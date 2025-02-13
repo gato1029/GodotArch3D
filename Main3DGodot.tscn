@@ -1,13 +1,14 @@
-[gd_scene load_steps=12 format=3 uid="uid://cmwumcvxxgnjl"]
+[gd_scene load_steps=14 format=3 uid="uid://cmwumcvxxgnjl"]
 
 [ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_a2usr"]
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="2_xh56v"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_e6381"]
 [ext_resource type="Script" uid="uid://xfxpirr8k7b" path="res://sources/WindowsDataBase/HerramientaMenuBar.cs" id="3_kc28b"]
+[ext_resource type="Texture2D" uid="uid://btk75fbvbbjyc" path="res://resources/Textures/Character/baseCharacter.png" id="4_ong74"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="4_tksb4"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
+[ext_resource type="Texture2D" uid="uid://c5ccx8t7g4yrh" path="res://resources/Textures/TX Plant.png" id="5_yxrc8"]
 [ext_resource type="PackedScene" uid="uid://7ep482axlki2" path="res://sources/WindowsDataBase/TileCreator/window_tile_creator.tscn" id="8_ong74"]
-[ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="9_hq8xv"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_yxrc8"]
 
@@ -15,6 +16,10 @@
 
 [sub_resource type="Environment" id="Environment_xh56v"]
 background_color = Color(1, 1, 1, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxrc8"]
+atlas = ExtResource("4_ong74")
+region = Rect2(0, 1344, 64, 64)
 
 [node name="Main3dGodot" type="Node"]
 
@@ -96,13 +101,15 @@ item_0/id = 0
 [node name="Creador Tiles" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 title = "Menu Tiles"
 size = Vector2i(110, 100)
-item_count = 3
+item_count = 4
 item_0/text = "Tiles Simple"
 item_0/id = 0
 item_1/text = "Auto Tile"
 item_1/id = 1
 item_2/text = "Tile Animated"
 item_2/id = 2
+item_3/text = "Tile Dynamic"
+item_3/id = 3
 
 [node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1
@@ -114,12 +121,13 @@ item_1/text = "rau"
 item_1/checkable = 1
 item_1/id = 1
 
-[node name="Character" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Componentes" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1
-item_count = 1
+item_count = 2
 item_0/text = "Base Character"
-item_0/checkable = 1
 item_0/id = 0
+item_1/text = "Terrain"
+item_1/id = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -136,7 +144,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("9_hq8xv")
+texture = SubResource("AtlasTexture_yxrc8")
 
 [node name="VBoxContainerRidht" type="VBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer"]
 layout_mode = 2
@@ -162,10 +170,17 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(1012, 603)
+size = Vector2i(1076, 603)
 render_target_update_mode = 4
 
 [node name="Render" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport"]
+
+[node name="Sprite3D" type="Sprite3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
+visible = false
+texture = ExtResource("5_yxrc8")
+region_enabled = true
+region_rect = Rect2(16, 16, 128, 144)
 
 [node name="Camera3D" type="Camera3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
@@ -175,6 +190,7 @@ size = 10.0
 script = ExtResource("4_tksb4")
 MouseEdgeMargin = 5.0
 MinZoomSize = 10.0
+MaxZoomSize = 20.0
 
 [node name="center" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D"]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, -10)

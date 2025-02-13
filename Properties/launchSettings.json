@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug WindowCharacterBase": {
+	"Godot Debug WindowTileSimple": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.4-dev7_mono_win64/Godot_v4.4-dev7_mono_win64/Godot_v4.4-dev7_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Character/windowCharacterBase.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/TileCreator/windowTileDinamic.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

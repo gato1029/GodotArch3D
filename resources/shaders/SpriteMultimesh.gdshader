@@ -16,12 +16,16 @@ void vertex() {
 	oclusion = INSTANCE_CUSTOM.a;
 }
 void fragment() {
-	if (oclusion == -1.0)
+	if (pos == -1.0 )
+	{
+		discard;
+	}
+	if (oclusion == -1.0 )
 	{
 		discard;
 	}
 	vec2 camera_position = SCREEN_UV;
-    if (camera_position.x >= 0.0 && camera_position.x <= 1.0 && camera_position.y >= 0.0 && camera_position.y <= 1.0) {
+    //if (camera_position.x >= 0.0 && camera_position.x <= 1.0 && camera_position.y >= 0.0 && camera_position.y <= 1.0) {
 	    // Calcular el tamaño de un segmento de la textura
 	    vec2 segmentSize = vec2(1.0 / ancho, 1.0 / alto);
 
@@ -52,9 +56,9 @@ void fragment() {
 
 	    ALBEDO = texColor.rgb * texColor.rgb;
 	    ALPHA = texColor.a;
-	}
+	/*}
 	else
 	{
 	discard;
-	}
+	}*/
 }

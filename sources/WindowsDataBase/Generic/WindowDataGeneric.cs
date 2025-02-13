@@ -35,8 +35,9 @@ public partial class WindowDataGeneric : Window
         loadDataDB = function;
         LoadDB();
     }
-    public void SetWindowDetail(PackedScene InpackedSceneWindowDetail, WindowState windowState)
+    public void SetWindowDetail(PackedScene InpackedSceneWindowDetail, WindowState windowState, string nameWindow)
     {
+        this.Title = nameWindow;
         this.windowState = windowState; 
         packedSceneWindowDetail = InpackedSceneWindowDetail;
         if (windowState == WindowState.SELECTOR)
