@@ -29,18 +29,28 @@ internal class TilesManager : SingletonBase<TilesManager>
         TileData tileData = null;
         if (!tilesDictionary.ContainsKey(idTileData))
         {
-             tileData = DataBaseManager.Instance.FindById<TileData>(idTileData);
+            
+            tileData = DataBaseManager.Instance.FindById<TileData>(idTileData);
+            var mat = MaterialManager.Instance.GetMaterial(tileData.idMaterial);
             if (tileData.type == "TileSimpleData")
             {
                 tileData = DataBaseManager.Instance.FindById<TileSimpleData>(idTileData);
             }
+            if (tileData.type == "TileDynamicData")
+            {
+                tileData = DataBaseManager.Instance.FindById<TileDynamicData>(idTileData);
+       
+            }
             if (tileData.type == "TileAnimateData")
             {
                 tileData = DataBaseManager.Instance.FindById<TileAnimateData>(idTileData);
+                //tileData.offsetInternal = tileData.offsetInternal+new Vector2(0.25f, 0.25f);
             }
+            
+         
             tilesDictionary.Add(tileData.id, tileData);
         }
-
+       
         tileData = tilesDictionary[idTileData];
         return tileData;
     }

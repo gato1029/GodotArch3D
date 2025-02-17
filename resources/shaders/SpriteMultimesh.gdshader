@@ -10,10 +10,19 @@ uniform float alto;  // Número total de segmentos en el alto de la textura
 varying float pos;
 varying float invert;
 varying float oclusion;
+
+vec2 get_aspect_ratio(vec2 texture_size) {
+    float base_size = 32.0; // Tamanio base de referencia
+    return texture_size / base_size;
+}
+
 void vertex() {
  	pos= INSTANCE_CUSTOM.r;
 	invert = INSTANCE_CUSTOM.g;
 	oclusion = INSTANCE_CUSTOM.a;
+
+	vec2 scale = get_aspect_ratio(vec2(64.0,64.0));
+   // VERTEX.xy *= scale;
 }
 void fragment() {
 	if (pos == -1.0 )

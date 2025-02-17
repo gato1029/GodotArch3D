@@ -5,6 +5,7 @@ using Arch.Core.Extensions;
 using Arch.Relationships;
 using Arch.System;
 using Godot;
+using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,7 +116,7 @@ internal class TransformSystem : BaseSystem<World, float>
                 ref Position p = ref Unsafe.Add(ref pointerPosition, entityIndex);
                 ref Sprite3D s = ref Unsafe.Add(ref pointerSprite3D, entityIndex);
                 
-                t.transformInternal.Origin = new Vector3(p.value.X , p.value.Y , (p.value.Y * -0.05f) + s.layer);                      
+                t.transformInternal.Origin = new Vector3(p.value.X , p.value.Y , (p.value.Y * CommonAtributes.LAYER_MULTIPLICATOR) + s.layer);                      
 
                 if (s.idInstance==-1)
                 {

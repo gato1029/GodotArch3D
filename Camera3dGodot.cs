@@ -57,17 +57,27 @@ public partial class Camera3dGodot : Camera3D
 
             var cameraPosition = camera.ProjectRayOrigin(GetViewport().GetMousePosition());
             PositionsManager.Instance.positionMouseCamera = new Vector2(cameraPosition.X, cameraPosition.Y);
-            PositionsManager.Instance.positionMouseTileGlobal = new Vector2(MathF.Floor(cameraPosition.X), MathF.Floor(cameraPosition.Y));
+            PositionsManager.Instance.positionMouseCameraPixel = ConvertMouseToPixel(PositionsManager.Instance.positionMouseCamera);
+
+            PositionsManager.Instance.positionMouseTileGlobal = positionTile(PositionsManager.Instance.positionMouseCameraPixel);// new Vector2(MathF.Floor(cameraPosition.X), MathF.Floor(cameraPosition.Y));
             PositionsManager.Instance.positionMouseChunk = new Vector2(
-                MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.X / PositionsManager.Instance.chunkDimencion.X), 
+                MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.X / PositionsManager.Instance.chunkDimencion.X),  
                 MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.Y / PositionsManager.Instance.chunkDimencion.Y));
 
             var calc = PositionsManager.Instance.positionMouseChunk * PositionsManager.Instance.chunkDimencion;
             PositionsManager.Instance.positionMouseTileChunk = PositionsManager.Instance.positionMouseTileGlobal - calc;
             PositionsManager.Instance.positionCamera = new Vector2(this.Position.X, this.Position.Y);
-            PositionsManager.Instance.positionMouseCameraPixel = ConvertMouseToPixel(PositionsManager.Instance.positionMouseCamera);
+           
         }
       
+    }
+
+    public Vector2 positionTile(Vector2 positionMouse)
+    {
+        Vector2I tileSize = new Vector2I(32, 32);
+        int tileX = (int)MathF.Floor(positionMouse.X / tileSize.X);
+        int tileY = (int)MathF.Floor(positionMouse.Y / tileSize.Y);
+        return new Vector2(tileX,tileY);
     }
     public Vector2 ConvertMouseToPixel(Vector2 mousePositionUnits)
     {

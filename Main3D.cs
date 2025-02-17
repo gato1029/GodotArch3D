@@ -31,7 +31,7 @@ public partial class Main3D : Node3D
 
     
         EcsManager.Instance.SetNode3DMain(this);
-        ChunkManager.Initialize(CommonAtributes.VIEW_DISTANCE_CHUNK);
+        ChunkManager.Initialize();
         
         SpriteManager.Instance.LoadTexture("res://resources/cdemo.png", new Vector3(32,32,32), new Vector3(0, 0, 0),new Vector2(32,32));
         SpriteManager.Instance.LoadTextureMultimesh("res://resources/Textures/Monster/Hongito.png", new Vector3(80, 64, 32),new Vector3(0,0,0),new Vector2(40,32));
@@ -47,7 +47,7 @@ public partial class Main3D : Node3D
 
 
 
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 100; i++)
         {
             Position position = new Position { value = GetRandomVector2(new Vector2(-150, -150), new Vector2(150, 150)) };
             //Position position = new Position { value = new Vector2(2,-0.5f) };
@@ -61,16 +61,20 @@ public partial class Main3D : Node3D
 
 
 
-        for (int i = 0; i < 1024; i++)
+        for (int i = 0; i < 8; i++)
         {
-            for (int j = 0; j < 1024; j++)
+            for (int j = 0; j < 8; j++)
             {
-                terrainMap.AddUpdateTile(new Vector2I(i, j), 3);
+                terrainMap.AddUpdateTile(new Vector2I(i, j), 7);
             }
 
         }
 
-        ChunkManager.Instance.ForcedUpdateChunks(new Vector2(0,0));
+        //terrainMap.AddUpdateTile(new Vector2I(0, 0), 6);
+        //terrainMap.AddUpdateTile(new Vector2I(2, 2), 5);
+        
+        ChunkManager.Instance.ForcedUpdate();
+
         //terrainMap.RefreshChunk();
         //for (int i = 0; i < 13; i++)
         //{
@@ -79,21 +83,23 @@ public partial class Main3D : Node3D
         //}        
 
 
-        
 
-        
-        multimeshMaterial = new MultimeshMaterial(DataBaseManager.Instance.FindById<MaterialData>(8));
-        for (int i = 0; i < 20000; i++)
-        {
-            Position position = new Position { value = GetRandomVector2(new Vector2(-150, -150), new Vector2(150, 150)) };
-            Transform3D xform2 = new Transform3D(Basis.Identity, Vector3.Zero);
-            xform2.Origin = (new Vector3(position.value.X, position.value.Y, 0));
-            xform2 = xform2.ScaledLocal(new Vector3(0.5f, 0.5f, 1));
+
+
+        //TileDynamicData tileDynamicData = DataBaseManager.Instance.FindById<TileDynamicData>(129);
+        //multimeshMaterial = new MultimeshMaterial(DataBaseManager.Instance.FindById<MaterialData>(tileDynamicData.idMaterial));
+        //for (int i = 0; i < 10; i++)
+        //{
+         
+        //    Transform3D xform2 = new Transform3D(Basis.Identity, Vector3.Zero);
+        //    float profundidad = ((0 + tileDynamicData.offsetInternal.Y) * CommonAtributes.LAYER_MULTIPLICATOR) + 5;
+        //    xform2.Origin = (new Vector3(i+tileDynamicData.offsetInternal.X,0+ tileDynamicData.offsetInternal.Y, profundidad));
+        //    xform2 = xform2.ScaledLocal(new Vector3(tileDynamicData.scale, tileDynamicData.scale, 1));
             
-            (Rid, int) instance = multimeshMaterial.CreateInstance();
-            RenderingServer.MultimeshInstanceSetTransform(instance.Item1, instance.Item2, xform2);
-            RenderingServer.MultimeshInstanceSetCustomData(instance.Item1, instance.Item2, new Godot.Color(160, 16, 96, 144));
-        }
+        //    (Rid, int) instance = multimeshMaterial.CreateInstance();
+        //    RenderingServer.MultimeshInstanceSetTransform(instance.Item1, instance.Item2, xform2);
+        //    RenderingServer.MultimeshInstanceSetCustomData(instance.Item1, instance.Item2, new Godot.Color(tileDynamicData.x, tileDynamicData.y, tileDynamicData.widht, tileDynamicData.height));
+        //}
     
        
     }

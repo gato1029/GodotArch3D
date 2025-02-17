@@ -133,6 +133,11 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Tile"
 
+[node name="Button4" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Buscar Tile Dynamic"
+
 [node name="Button3" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4

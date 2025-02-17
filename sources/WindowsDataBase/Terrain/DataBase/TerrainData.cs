@@ -21,7 +21,7 @@ public class TerrainData :IdData
     public TileData tileData { get; set; }
 
     [BsonIgnore]
-    public TileRuleData tileDatarule { get; set; }
+    public AutoTileData autoTileData { get; set; }
 
     public TerrainData()
     {
@@ -32,7 +32,7 @@ public class TerrainData :IdData
     {
         if (isRule)
         {
-            tileDatarule = DataBaseManager.Instance.FindById<TileRuleData>(idRule);
+            autoTileData = DataBaseManager.Instance.FindById<AutoTileData>(idRule);      
         }
         else
         {

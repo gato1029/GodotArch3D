@@ -68,7 +68,7 @@ public partial class HerramientaMenuBar : MenuBar
                 AddChild(win);
                 win.Show();
                 ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/Terrain/windowTerrain.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Terrenos");
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Terrenos",true);
                 win.SetLoaddBAction(() =>
                 {
                     var collection = DataBaseManager.Instance.FindAll<TerrainData>();

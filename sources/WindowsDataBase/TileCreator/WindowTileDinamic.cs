@@ -26,6 +26,9 @@ public partial class WindowTileDinamic : Window, IDetailWindow
     SpinBox bodyOffsetYSpin;
     CheckBox collisionCheckBox;
 
+    SpinBox textureOffsetXSpin;
+    SpinBox textureOffsetYSpin;
+
     CollisionShape2D collisionBody;
     //----
 
@@ -41,7 +44,7 @@ public partial class WindowTileDinamic : Window, IDetailWindow
     {
 
         spriteSelection = GetNode<Sprite2D>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/Sprite2D");
-        collisionBody = GetNode<CollisionShape2D>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/Sprite2D/CollisionBody");
+        collisionBody = GetNode<CollisionShape2D>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/CollisionBody");
         bodyWidthSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox");
         bodyHeightSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox2");
         bodyOffsetXSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer/SpinBox");
@@ -49,6 +52,12 @@ public partial class WindowTileDinamic : Window, IDetailWindow
         collisionCheckBox = GetNode<CheckBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer/CheckBox");
 
         imageSelectionControl = GetNode<ImageSelectionControl>("Panel/MarginContainer/HSplitContainer/VBoxContainer/MarginContainer/ScrollContainer/CenterContainer");
+        textureOffsetXSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer/HBoxContainer/SpinBox");
+        textureOffsetYSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/GridContainer/HBoxContainer/SpinBox2");
+
+
+        textureOffsetXSpin.ValueChanged += textureValueChanged;
+        textureOffsetYSpin.ValueChanged += textureValueChanged;
 
         bodyWidthSpin.ValueChanged += bodyValueChanged;
         bodyHeightSpin.ValueChanged += bodyValueChanged;
@@ -76,6 +85,13 @@ public partial class WindowTileDinamic : Window, IDetailWindow
         LoadMaterials();
         windowState = WindowState.NEW;
         currentData = new TileDynamicData();
+
+        optionMaterial.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
+    }
+
+    private void textureValueChanged(double value)
+    {
+        spriteSelection.Position = new Vector2((float)textureOffsetXSpin.Value, (float)textureOffsetYSpin.Value * (-1));
     }
 
     private void ScaleSpinbox_ValueChanged(double value)
@@ -122,6 +138,8 @@ public partial class WindowTileDinamic : Window, IDetailWindow
             currentData.widht = atlasTexture.Region.Size.X;
             currentData.height = atlasTexture.Region.Size.Y;
             currentData.scale = (float)scaleSpinbox.Value;
+            currentData.offsetX = (float)textureOffsetXSpin.Value;
+            currentData.offsetY = (float)textureOffsetYSpin.Value;
             if (currentData.haveCollider)
             {
                 currentData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value);
@@ -173,7 +191,11 @@ public partial class WindowTileDinamic : Window, IDetailWindow
         ComboMaterial_Selected(currentMaterialData.id);
         optionMaterial.Selected = currentMaterialData.id;
         spriteSelection.Texture = currentData.textureVisual;
+        spriteSelection.Scale = new Vector2(currentData.scale,currentData.scale);
         windowState = WindowState.UPDATE;
+
+        textureOffsetXSpin.Value = currentData.offsetX;
+        textureOffsetYSpin.Value = currentData.offsetY;
         if (currentData.haveCollider)
         {
             Rectangle rect = (Rectangle)currentData.collisionBody;

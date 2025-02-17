@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3 uid="uid://2atlmr14w1rs"]
+
+[ext_resource type="Script" uid="uid://bak68a0eanw4q" path="res://sources/WindowsDataBase/Generic/WindowFilterRules.cs" id="1_rqedf"]
+
+[node name="windowFilterRules" type="Window"]
+title = "Materiales"
+initial_position = 3
+size = Vector2i(500, 500)
+current_screen = 0
+transient = true
+exclusive = true
+always_on_top = true
+script = ExtResource("1_rqedf")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="OptionButton" type="OptionButton" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+item_count = 1
+popup/item_0/text = "Seleecione"
+popup/item_0/id = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Nuevo"
+
+[node name="Button2" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Modificar"
+
+[node name="ItemList" type="ItemList" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+max_columns = 30
+same_column_width = true
+icon_mode = 0
+fixed_icon_size = Vector2i(64, 64)

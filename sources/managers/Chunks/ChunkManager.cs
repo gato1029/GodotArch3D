@@ -1,6 +1,6 @@
 using Godot;
+using GodotEcsArch.sources.utils;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,124 +10,36 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.managers.Chunks;
 public class ChunkManager
 {
+    public ChunkManagerBase tiles16X16 { get; private set; }
+    public ChunkManagerBase tiles32X32 { get; private set; }
+
     public static ChunkManager Instance { get; private set; }
-
-    public event Action<Vector2> OnChunkLoad;
-    public event Action<Vector2> OnChunkUnload;
-
-    private ConcurrentQueue<(Vector2, bool)> chunkQueue = new ConcurrentQueue<(Vector2, bool)>();
-    private Thread workerThread;
-    private bool isRunning = true;
-
-    public Vector2I ViewDistance { get; private set; }
-    private Vector2 playerChunkPosCurrent;
-    private Vector2 chunkDimencion;
-    private HashSet<Vector2> activeChunks = new HashSet<Vector2>();
-
-    public static void Initialize(Vector2I viewDistance)
+    public static void Initialize()
     {
         if (Instance == null)
         {
-            Instance = new ChunkManager(viewDistance);
+            Instance = new ChunkManager();
         }
     }
-
-    private ChunkManager(Vector2I viewDistance)
+    private ChunkManager()
     {
-        chunkDimencion = PositionsManager.Instance.chunkDimencion;
-        ViewDistance = viewDistance;
-        workerThread = new Thread(ProcessChunkQueue);
-        workerThread.Start();
+        tiles16X16 = new ChunkManagerBase(CommonAtributes.VIEW_DISTANCE_CHUNK_16, new Vector2I(8,8), new Vector2I(16,16));
+        tiles32X32 = new ChunkManagerBase(CommonAtributes.VIEW_DISTANCE_CHUNK_32, new Vector2I(8, 8), new Vector2I(32,32));
+        //chunkDimencion = PositionsManager.Instance.chunkDimencion;
+        //ViewDistance = viewDistance;
+        //workerThread = new Thread(ProcessChunkQueue);
+        //workerThread.Start();
     }
 
-    public void UpdatePlayerPosition(Vector2 playerPosition)
+    public void ForcedUpdate()
     {
-        Vector2 currentChunkPos = WorldToChunkCoords(playerPosition);
-
-        if (currentChunkPos != playerChunkPosCurrent)
-        {
-            playerChunkPosCurrent = currentChunkPos;
-            UpdateChunks();
-        }
+        tiles16X16.ForcedUpdateChunks(new Vector2(0, 0));
+        tiles32X32.ForcedUpdateChunks(new Vector2(0, 0));
     }
 
-    public void ForcedUpdateChunks(Vector2 Position)
+    internal void UpdatePlayerPosition(Vector2 positionCamera)
     {
-        playerChunkPosCurrent = Position;
-        UpdateChunks();
-    }
-
-    private void UpdateChunks()
-    {
-        HashSet<Vector2> requiredChunks = new HashSet<Vector2>();
-
-        for (int x = -ViewDistance.X; x <= ViewDistance.X; x++)
-        {
-            for (int y = -ViewDistance.Y; y <= ViewDistance.Y; y++)
-            {
-                Vector2 chunkPos = playerChunkPosCurrent + new Vector2(x, y);
-                requiredChunks.Add(chunkPos);
-
-                if (!activeChunks.Contains(chunkPos))
-                {
-                    RequestLoadChunk(chunkPos);
-                    activeChunks.Add(chunkPos);
-                }
-            }
-        }
-
-        foreach (var chunkPos in new List<Vector2>(activeChunks))
-        {
-            if (!requiredChunks.Contains(chunkPos))
-            {
-                RequestUnloadChunk(chunkPos);
-                activeChunks.Remove(chunkPos);
-            }
-        }
-    }
-
-    public void RequestLoadChunk(Vector2 chunkPos)
-    {
-        chunkQueue.Enqueue((chunkPos, true));
-    }
-
-    public void RequestUnloadChunk(Vector2 chunkPos)
-    {
-        chunkQueue.Enqueue((chunkPos, false));
-    }
-
-    private void ProcessChunkQueue()
-    {
-        while (isRunning)
-        {
-            if (chunkQueue.TryDequeue(out var chunkTask))
-            {
-                Vector2 chunkPos = chunkTask.Item1;
-                bool isLoad = chunkTask.Item2;
-
-                if (isLoad)
-                    OnChunkLoad?.Invoke(chunkPos);
-                else
-                    OnChunkUnload?.Invoke(chunkPos);
-            }
-            else
-            {
-                Thread.Sleep(10); // Pequenia pausa para evitar consumo alto de CPU
-            }
-        }
-    }
-
-    private Vector2 WorldToChunkCoords(Vector2 worldPos)
-    {
-        return new Vector2(
-            (int)Math.Floor(worldPos.X / chunkDimencion.X), // Suponiendo que cada chunk tiene 8 tiles de ancho
-            (int)Math.Floor(worldPos.Y / chunkDimencion.Y)
-        );
-    }
-
-    public void Stop()
-    {
-        isRunning = false;
-        workerThread.Join();
+        tiles16X16.UpdatePlayerPosition(positionCamera);
+        //tiles32X32.UpdatePlayerPosition(positionCamera);
     }
 }

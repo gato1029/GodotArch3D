@@ -76,7 +76,7 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         return atlasTexture;
     }
 
-    public AtlasTexture GetAtlasTexture(int idMaterial, int x, int y, float width, float height)
+    public AtlasTexture GetAtlasTexture(int idMaterial, float x, float y, float width, float height)
     {
         MaterialData materialData;
         if (!materials.ContainsKey(idMaterial))

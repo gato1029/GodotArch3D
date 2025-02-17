@@ -15,17 +15,38 @@ public partial class WindowAutoTileItem : HBoxContainer
 	Label labelName;
 	int position;
 	bool tiledDataCheck;
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+    OptionButton optionButton;
+    CheckBox checkIsnullcheckBox;
+
+    Button up;
+    Button down;
+    public delegate void RequestOrderItemHandler(int id, int position, WindowAutoTileItem windowAutoTileItem);
+    public event RequestOrderItemHandler OnRequestOrderItem;
+
+    public delegate void RequestOrderDeleteHandler( int position, WindowAutoTileItem windowAutoTileItem);
+    public event RequestOrderDeleteHandler OnDeleteItem;
+
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
 	{
 		tileRuleData = new TileRuleData();
 		arrayButton = new Button[8];
 		position = 0;
-		tiledDataCheck = true;
-		labelName	   = GetNode<Label>("VBoxContainer2/Label");
+		tiledDataCheck = false;
+		labelName	   = GetNode<Label>("VBoxContainer2/HBoxContainer/Label");
+        optionButton   = GetNode<OptionButton>("VBoxContainer2/HBoxContainer/OptionButton");
+        checkIsnullcheckBox = GetNode<CheckBox>("VBoxContainer2/CheckBox");
 
+        checkIsnullcheckBox.Pressed += CheckIsnullcheckBox_Pressed;
+        optionButton.ItemSelected += OptionButton_ItemSelected; 
         GetNode<Button>("VBoxContainer2/Button3").Pressed += Delete_Button; ;
 
+
+        up = GetNode<Button>("VBoxContainer/Button2");
+        down = GetNode<Button>("VBoxContainer/Button");
+
+        up.Pressed += UP_Button;
+        down.Pressed += Down_Pressed;
 
         centralButton  = GetNode<Button>("VBoxContainer2/GridContainer/ButtonCentral");
         arrayButton[0] = GetNode<Button>("VBoxContainer2/GridContainer/Button0");
@@ -45,7 +66,69 @@ public partial class WindowAutoTileItem : HBoxContainer
 			button.SetMeta("id",i);
 			button.SetMeta("check",false);
             button.Pressed += () => WindowAutoTileItem_Pressed(button);
-		}	
+		}
+
+        optionButton.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
+    }
+
+    private void CheckIsnullcheckBox_Pressed()
+    {
+        Texture2D texture2DNull = GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
+        Texture2D texture2DSome = GD.Load<Texture2D>("res://resources/Textures/internal/check-64.png");
+        Texture2D texture2DNullCheck = GD.Load<Texture2D>("res://resources/Textures/internal/exclamation.PNG");
+
+        tileRuleData.checkIsNull = checkIsnullcheckBox.ButtonPressed;
+    
+            for (int i = 0; i <= 7; i++)
+            {
+                if (tileRuleData.tileDataMask[i] == null)
+                {           
+                    if (tileRuleData.IsDirectionConnected(i))
+                    {
+                        if (tileRuleData.checkIsNull)
+                        {
+
+                            arrayButton[i].Icon = texture2DNullCheck;
+                        }
+                        else
+                        {
+                            arrayButton[i].Icon = texture2DSome;
+                        }
+
+                    }
+                    else
+                    {
+                        arrayButton[i].Icon = texture2DNull;
+                    }
+
+                }
+            }
+        
+    }
+
+    private void Down_Pressed()
+    {
+        OnRequestOrderItem?.Invoke(1,position,this);
+    }
+
+    private void UP_Button()
+    {
+        OnRequestOrderItem?.Invoke(0,position, this);
+    }
+
+    int currentIndex;
+    private void OptionButton_ItemSelected(long index)
+    {
+        if (index==0)
+        {
+            tiledDataCheck = false;
+        }
+        else
+        {
+            tiledDataCheck = true;
+            currentIndex = (int)index;
+        }
+        
     }
 
     private void CentralButton_Pressed()
@@ -55,40 +138,62 @@ public partial class WindowAutoTileItem : HBoxContainer
 
         if (check)
         {
-            WindowDataGeneric win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-            AddChild(win);
-            win.Show();
-            PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-            win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR,"Tile Simple");
-            win.SetLoaddBAction(() =>
+            if (currentIndex ==1)
             {
-                var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();
-                List<IdData> ids = new List<IdData>();
-                foreach (var item in collection)
+                WindowFilterRules win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowFilterRules.tscn").Instantiate<WindowFilterRules>();
+                AddChild(win);
+                win.Show();
+                win.SetType(1);
+                win.OnRequestSelectedItem += (int id) =>
                 {
-                    IdData iddata = item;
-                    ids.Add(iddata);
-                }
-                return ids;
+                    var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileSimpleData>(id);
+                    centralButton.Icon = data.textureVisual;
+                    tileRuleData.tileDataCentral = data;
+                    tileRuleData.idTileDataCentral = id;
+                };
             }
-            );
-            win.OnRequestSelectedItem += (int id) =>
+            if (currentIndex == 2)
             {
-                var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileSimpleData>(id);
-                centralButton.Icon = data.textureVisual;           
-                tileRuleData.tileDataCentral = data;
-            };
+                WindowFilterRules win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowFilterRules.tscn").Instantiate<WindowFilterRules>();
+                AddChild(win);
+                win.Show();
+                win.SetType(2);
+                win.OnRequestSelectedItem += (int id) =>
+                {
+                    var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileDynamicData>(id);
+                    centralButton.Icon = data.textureVisual;
+                    tileRuleData.tileDataCentral = data;
+                    tileRuleData.idTileDataCentral = id;
+                };
+            }
+            if (currentIndex == 3)
+            {
+                WindowFilterRules win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowFilterRules.tscn").Instantiate<WindowFilterRules>();
+                AddChild(win);
+                win.Show();
+                win.SetType(3);
+                win.OnRequestSelectedItem += (int id) =>
+                {
+                    var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileAnimateData>(id);
+                    centralButton.Icon = data.textureVisual;
+                    tileRuleData.tileDataCentral = data;
+                    tileRuleData.idTileDataCentral = id;
+                };
+            }
+
         }
         else
         {
             Texture2D texture2D = GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
             centralButton.Icon = texture2D;
             tileRuleData.tileDataCentral = null;
+            tileRuleData.idTileDataCentral = 0;
         }
     }
 
     private void Delete_Button()
     {
+        OnDeleteItem?.Invoke(position, this);
         QueueFree();
     }
 
@@ -102,30 +207,50 @@ public partial class WindowAutoTileItem : HBoxContainer
 		{
 			if (check)
 			{
-                WindowDataGeneric win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR, "Tile Simple");
-                win.SetLoaddBAction(() =>
+                
+                if (currentIndex == 1)
                 {
-                    var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
+                    WindowFilterRules win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowFilterRules.tscn").Instantiate<WindowFilterRules>();
+                    AddChild(win);
+                    win.Show();
+                    win.SetType(1);
+                    win.OnRequestSelectedItem += (int idTile) =>
                     {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
+                        var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileSimpleData>(idTile);
+                        button.Icon = data.textureVisual;
+                        var indexNeighbord = tileRuleData.GetDirectionFromIndex(id);
+                        tileRuleData.UpdateNeighborMask(indexNeighbord, check, data);
+                    };
                 }
-                );
-                win.OnRequestSelectedItem += (int idTile) => {
-                    var data =   DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileSimpleData>(idTile);
-                    button.Icon = data.textureVisual;
-                    var indexNeighbord = tileRuleData.GetDirectionFromIndex(id);
-                    tileRuleData.UpdateNeighborMask(indexNeighbord, check,data);
-                };
-			}
+                if (currentIndex == 2)
+                {
+                    WindowFilterRules win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowFilterRules.tscn").Instantiate<WindowFilterRules>();
+                    AddChild(win);
+                    win.Show();
+                    win.SetType(2);
+                    win.OnRequestSelectedItem += (int idTile) =>
+                    {
+                        var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileDynamicData>(idTile);
+                        button.Icon = data.textureVisual;
+                        var indexNeighbord = tileRuleData.GetDirectionFromIndex(id);
+                        tileRuleData.UpdateNeighborMask(indexNeighbord, check, data);
+                    };
+                }
+                if (currentIndex == 3)
+                {
+                    WindowFilterRules win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowFilterRules.tscn").Instantiate<WindowFilterRules>();
+                    AddChild(win);
+                    win.Show();
+                    win.SetType(3);
+                    win.OnRequestSelectedItem += (int idTile) =>
+                    {
+                        var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileAnimateData>(idTile);
+                        button.Icon = data.textureVisual;
+                        var indexNeighbord = tileRuleData.GetDirectionFromIndex(id);
+                        tileRuleData.UpdateNeighborMask(indexNeighbord, check, data);
+                    };
+                }
+            }
 			else
 			{
                 Texture2D texture2D = GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
@@ -139,8 +264,17 @@ public partial class WindowAutoTileItem : HBoxContainer
 		{						
 			if (check)
 			{
-				Texture2D texture2D = GD.Load<Texture2D>("res://resources/Textures/internal/check-64.png");
-				button.Icon = texture2D;
+                if (checkIsnullcheckBox.ButtonPressed)
+                {
+                    Texture2D texture2D = GD.Load<Texture2D>("res://resources/Textures/internal/exclamation.PNG");
+                    button.Icon = texture2D;
+                }
+                else
+                {
+                    Texture2D texture2D = GD.Load<Texture2D>("res://resources/Textures/internal/check-64.png");
+                    button.Icon = texture2D;
+                }
+				
             }
 			else
 			{
@@ -157,25 +291,48 @@ public partial class WindowAutoTileItem : HBoxContainer
     public void SetPosition(int position)
 	{
 		this.position = position;
-		labelName.Text = "Regla:"+position.ToString();
-
-   
+		labelName.Text = "Regla:"+position.ToString();   
     }
 
     public void LoadData(TileRuleData tileRuleData)
 	{
         Texture2D texture2DNull = GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
-        this.tileRuleData = tileRuleData;        
+        Texture2D texture2DSome = GD.Load<Texture2D>("res://resources/Textures/internal/check-64.png");
+        Texture2D texture2DNullCheck = GD.Load<Texture2D>("res://resources/Textures/internal/exclamation.PNG");
+        this.tileRuleData = tileRuleData;
+        checkIsnullcheckBox.ButtonPressed = tileRuleData.checkIsNull;
+        for (int i = 0; i <= 7; i++)
+        {
+            if (tileRuleData.tileDataMask[i] != null)
+            {
+                arrayButton[i].Icon = tileRuleData.tileDataMask[i].textureVisual;
+            }
+            else
+            {
+                if (tileRuleData.IsDirectionConnected(i))
+                {
+                    if (tileRuleData.checkIsNull)
+                    {
+
+                        arrayButton[i].Icon = texture2DNullCheck;
+                    }
+                    else
+                    {
+                        arrayButton[i].Icon = texture2DSome;
+                    }
+                    
+                }
+                else
+                {
+                    arrayButton[i].Icon = texture2DNull;
+                }
+               
+            }                      
+        }
+        
         centralButton.Icon = tileRuleData.tileDataCentral?.textureVisual ?? texture2DNull;                      
         
-        arrayButton[0].Icon = tileRuleData.tileDataMask[0]?.textureVisual ?? texture2DNull; 
-        arrayButton[1].Icon = tileRuleData.tileDataMask[1]?.textureVisual ?? texture2DNull;
-        arrayButton[2].Icon = tileRuleData.tileDataMask[2]?.textureVisual ?? texture2DNull;
-        arrayButton[3].Icon = tileRuleData.tileDataMask[3]?.textureVisual ?? texture2DNull;
-        arrayButton[4].Icon = tileRuleData.tileDataMask[4]?.textureVisual ?? texture2DNull;
-        arrayButton[5].Icon = tileRuleData.tileDataMask[5]?.textureVisual ?? texture2DNull;
-        arrayButton[6].Icon = tileRuleData.tileDataMask[6]?.textureVisual ?? texture2DNull;
-        arrayButton[7].Icon = tileRuleData.tileDataMask[7]?.textureVisual ?? texture2DNull;
+      
 
    
     }

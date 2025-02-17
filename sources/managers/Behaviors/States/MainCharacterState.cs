@@ -15,6 +15,8 @@ namespace GodotEcsArch.sources.managers.Behaviors.States
 {
     internal class MainCharacterState : IStateBehavior
     {
+        public string Name => "MainCharacter";
+
         public void StateController(Entity entity, ref Animation animation, ref StateComponent stateComponent, ref CommandBuffer commandBuffer)
         {
             Entity entityCharacter = default;

@@ -15,6 +15,7 @@ public partial class WindowAutoTile : Window, IDetailWindow
     AutoTileData autoTileData;
     public event IDetailWindow.RequestUpdateHandler OnRequestUpdate;
 
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
@@ -40,29 +41,77 @@ public partial class WindowAutoTile : Window, IDetailWindow
     {
         WindowAutoTileItem item = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTileItem.tscn").Instantiate<WindowAutoTileItem>();
         vBoxContainerItems.AddChild(item);
+        item.SetPosition(items.Count);
         items.Add(item);
+
+        item.OnRequestOrderItem += Item_OnRequestOrderItem;
+        item.OnDeleteItem += Item_OnDeleteItem;
+        
     }
+
+    private void Item_OnDeleteItem(int position, WindowAutoTileItem windowAutoTileItem)
+    {
+        
+        for (int i = position+1; i < vBoxContainerItems.GetChildCount(); i++)
+        {
+            var node = vBoxContainerItems.GetChild<WindowAutoTileItem>(i);
+            node.SetPosition(i-1);
+        }
+        items.Remove(windowAutoTileItem);
+    }
+
+    private void Item_OnRequestOrderItem(int id,int position, WindowAutoTileItem windowAutoTileItem)
+    {
+
+        if (id == 1) //up
+        {
+            if (position < vBoxContainerItems.GetChildCount())
+            {
+                var node = vBoxContainerItems.GetChild<WindowAutoTileItem>(position+1);
+                node.SetPosition(position);
+                vBoxContainerItems.MoveChild(windowAutoTileItem, position + 1);
+                windowAutoTileItem.SetPosition(position + 1);
+                
+            }
+            
+        }
+        if (id==0) // down
+        {
+            if (position>0)
+            {
+                var node = vBoxContainerItems.GetChild<WindowAutoTileItem>(position - 1);
+                node.SetPosition(position);
+                vBoxContainerItems.MoveChild(windowAutoTileItem, position - 1);
+                windowAutoTileItem.SetPosition(position - 1);
+            }
+            
+        }
+        
+        
+    }
+
+ 
 
     private void Save_Pressed()
     {
         List<TileRuleData> tileRuleDatas = new List<TileRuleData>();
-        foreach (var item in items)
+        foreach (var item in vBoxContainerItems.GetChildren())
         {
-            tileRuleDatas.Add(item.tileRuleData);
+            WindowAutoTileItem windowAutoTileItem = (WindowAutoTileItem)item;
+            tileRuleDatas.Add(windowAutoTileItem.tileRuleData);
         }
         if (state == WindowState.UPDATE)
-        {            
+        {
+            AutoTileData autoTileData = new AutoTileData(tileRuleDatas.ToArray(), true);
             autoTileData.id = int.Parse(lineid.Text);
-            autoTileData.name = lineName.Text;
-            autoTileData.arrayTiles = tileRuleDatas.ToArray();
+            autoTileData.name = lineName.Text;            
             DataBaseManager.Instance.InsertUpdate(autoTileData, autoTileData.id);
         }
         else
         {
-            AutoTileData autoTileData = new AutoTileData();
+            AutoTileData autoTileData = new AutoTileData(tileRuleDatas.ToArray(),true);
             autoTileData.id = int.Parse(lineid.Text);
-            autoTileData.name = lineName.Text;
-            autoTileData.arrayTiles = tileRuleDatas.ToArray();
+            autoTileData.name = lineName.Text;          
             DataBaseManager.Instance.InsertUpdate(autoTileData);
         }
 
@@ -88,7 +137,11 @@ public partial class WindowAutoTile : Window, IDetailWindow
             WindowAutoTileItem itemWin = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTileItem.tscn").Instantiate<WindowAutoTileItem>();
             vBoxContainerItems.AddChild(itemWin);
             itemWin.LoadData(item);
-            items.Add(itemWin);
+            itemWin.SetPosition(items.Count);
+            items.Add(itemWin);                          
+            itemWin.OnRequestOrderItem += Item_OnRequestOrderItem;
+            itemWin.OnDeleteItem += Item_OnDeleteItem;
+
         }
     }
 }

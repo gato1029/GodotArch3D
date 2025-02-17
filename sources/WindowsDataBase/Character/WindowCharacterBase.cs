@@ -8,6 +8,7 @@ using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 public partial class WindowCharacterBase : Window, IDetailWindow
@@ -91,6 +92,8 @@ public partial class WindowCharacterBase : Window, IDetailWindow
 
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Animations/Animations/Button").Pressed += button_AddAnimation;
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Colliders Atack/Colliders Atack/Button").Pressed += button_AddCollider;
+       
+
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/HBoxContainer/Button").Pressed += button_Save;
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer2/HBoxContainer/Button2").Pressed += button_Copy;
 
@@ -109,6 +112,8 @@ public partial class WindowCharacterBase : Window, IDetailWindow
         spriteSelection.Hframes = 1;
         spriteSelection.Vframes = 1;
     }
+
+
 
     private void button_Copy()
     {
@@ -129,12 +134,25 @@ public partial class WindowCharacterBase : Window, IDetailWindow
 
         idBaseSpin.Value = characterBaseData.idCharacterBase;
         nameLine.Text = characterBaseData.name;
+
+        bodyWidthSpin.Value = characterBaseData.collisionBody.widthPixel;
+        bodyHeightSpin.Value = characterBaseData.collisionBody.heightPixel;
+        bodyOffsetXSpin.Value = characterBaseData.collisionBody.originPixelX;
+        bodyOffsetYSpin.Value = characterBaseData.collisionBody.originPixelY;
+
+        moveWidthSpin.Value = characterBaseData.collisionMove.widthPixel;
+        moveHeightSpin.Value = characterBaseData.collisionMove.heightPixel;
+        moveOffsetXSpin.Value = characterBaseData.collisionMove.originPixelX;
+        moveOffsetYSpin.Value = characterBaseData.collisionMove.originPixelY;
+
         foreach (var item in characterBaseData.animationDataArray)
         {
             PackedScene packedScene = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/windowCharacterAnimation.tscn");
             var node = packedScene.Instantiate<WindowCharacterAnimation>();
             node.OnRequestDelete += Node_OnRequestDeleteAnimation;
             node.OnNotifyChangue += Node_OnNotifyChangueAnimation;
+            node.OnRequestOrderItem += Node_OnRequestOrderItem;
+
             node.SetMaterial(currentMaterialData.id);      
             panelAnimation.Add(node);
             gridContainerAnimations.AddChild(node);
@@ -161,7 +179,7 @@ public partial class WindowCharacterBase : Window, IDetailWindow
         collisionBody.Position = new Vector2((float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value * (-1));
         var shape = (RectangleShape2D)collisionBody.Shape;
         shape.Size = new Vector2((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value);
-        button_Save();
+       
     }
 
     private void moveValueChanged(double value)
@@ -169,7 +187,7 @@ public partial class WindowCharacterBase : Window, IDetailWindow
         collisionMove.Position = new Vector2((float)moveOffsetXSpin.Value, (float)moveOffsetYSpin.Value * (-1));
         var shape = (RectangleShape2D) collisionMove.Shape;
         shape.Size = new Vector2((float)moveWidthSpin.Value, (float)moveHeightSpin.Value);
-        button_Save();
+        
     }
 
     private void ItemListTiles_ItemSelected(long index)
@@ -230,17 +248,18 @@ public partial class WindowCharacterBase : Window, IDetailWindow
         }
 
         List<AnimationStateData> dataAnimations = new List<AnimationStateData>();
-        foreach (var item in panelAnimation)
+        foreach (var item in gridContainerAnimations.GetChildren())
         {
-            dataAnimations.Add(item.data);
+            WindowCharacterAnimation windowAutoTileItem = (WindowCharacterAnimation)item;
+            dataAnimations.Add(windowAutoTileItem.data);
         }
 
         characterBaseData.idMaterial = currentMaterialData.id;
         characterBaseData.atackDataCollidersArray = dataCollider.ToArray();
         characterBaseData.animationDataArray = dataAnimations.ToArray();
 
-        characterBaseData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, new Vector2((float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value));
-        characterBaseData.collisionMove = new Rectangle((float)moveWidthSpin.Value, (float)moveHeightSpin.Value, new Vector2((float)moveOffsetXSpin.Value, (float)moveOffsetYSpin.Value));
+        characterBaseData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value);
+        characterBaseData.collisionMove = new Rectangle((float)moveWidthSpin.Value, (float)moveHeightSpin.Value, (float)moveOffsetXSpin.Value, (float)moveOffsetYSpin.Value);
 
         characterBaseData.idCharacterBase = (int) idBaseSpin.Value;
         characterBaseData.name = nameLine.Text; 
@@ -258,13 +277,42 @@ public partial class WindowCharacterBase : Window, IDetailWindow
             var node = packedScene.Instantiate<WindowCharacterAnimation>();
             node.OnRequestDelete += Node_OnRequestDeleteAnimation;
             node.OnNotifyChangue += Node_OnNotifyChangueAnimation;
+            node.OnRequestOrderItem += Node_OnRequestOrderItem;
             node.SetMaterial(currentMaterialData.id);
+            
             int i = panelAnimation.Count;
             panelAnimation.Add(node);
             gridContainerAnimations.AddChild(node);
             node.SetID(i);
         }
      
+    }
+
+    private void Node_OnRequestOrderItem(int id, int position, WindowCharacterAnimation windowAutoTileItem)
+    {
+        if (id == 1) //down
+        {
+            if ((position +1) < gridContainerAnimations.GetChildCount())
+            {
+                var node = gridContainerAnimations.GetChild<WindowCharacterAnimation>(position + 1);
+                node.SetID(position);
+                gridContainerAnimations.MoveChild(windowAutoTileItem, position + 1);
+                windowAutoTileItem.SetID(position + 1);
+
+            }
+
+        }
+        if (id == 0) // up
+        {
+            if ((position -1) >= 0)
+            {
+                var node = gridContainerAnimations.GetChild<WindowCharacterAnimation>(position - 1);
+                node.SetID(position);
+                gridContainerAnimations.MoveChild(windowAutoTileItem, position - 1);
+                windowAutoTileItem.SetID(position - 1);
+            }
+
+        }
     }
 
     private void Node_OnNotifyChangueAnimation(AnimationStateData itemData, int state)

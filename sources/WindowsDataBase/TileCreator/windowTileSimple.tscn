@@ -1,10 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://cye7227ba86pn"]
+[gd_scene load_steps=7 format=3 uid="uid://cye7227ba86pn"]
 
 [ext_resource type="Script" uid="uid://clpres1b45noe" path="res://sources/WindowsDataBase/TileCreator/WindowTileSimple.cs" id="1_l0ftt"]
 [ext_resource type="Texture2D" uid="uid://bfy5aob4otta4" path="res://resources/Textures/internal/image.png" id="2_l0ftt"]
+[ext_resource type="Shader" uid="uid://dg2vkenhkieyp" path="res://resources/shaders/gridUI.gdshader" id="2_sjx3w"]
+[ext_resource type="Texture2D" uid="uid://dk644aa76crq1" path="res://resources/Textures/internal/point.png" id="4_76024"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l0ftt"]
 size = Vector2(32, 32)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_76024"]
+shader = ExtResource("2_sjx3w")
+shader_parameter/size = Vector2(150, 150)
+shader_parameter/line_width = 0.08
+shader_parameter/offset = Vector2(0, 4)
+shader_parameter/grid_size = 8.0
+shader_parameter/grid_color = Color(1, 1, 1, 0.2)
 
 [node name="WindowTileSimple" type="Window"]
 gui_embed_subwindows = true
@@ -68,6 +78,10 @@ popup/item_0/id = 0
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+max_columns = 20
+same_column_width = true
+fixed_column_width = 64
+icon_mode = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HSplitContainer"]
 layout_mode = 2
@@ -101,10 +115,11 @@ size_flags_vertical = 6
 
 [node name="CenterContainer" type="CenterContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control"]
 layout_mode = 1
-anchors_preset = 13
+anchors_preset = 8
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
+anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
@@ -116,6 +131,42 @@ texture = ExtResource("2_l0ftt")
 [node name="CollisionBody" type="CollisionShape2D" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/Sprite2D"]
 visible = false
 shape = SubResource("RectangleShape2D_l0ftt")
+
+[node name="Control" type="Control" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer"]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/Control"]
+material = SubResource("ShaderMaterial_76024")
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -75.0
+offset_top = -75.0
+offset_right = 75.0
+offset_bottom = 75.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Control/CenterContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_76024")
+expand_mode = 3
+stretch_mode = 5
 
 [node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
 layout_mode = 2

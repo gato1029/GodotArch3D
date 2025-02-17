@@ -160,6 +160,7 @@ public partial class WindowTileAnimate : Window, IDetailWindow
 
     private void Save_Click()
     {
+        currentTileAnimateSimpleData.scale = 1;
         if (currentTileAnimateSimpleData.haveCollider)
         {
             currentTileAnimateSimpleData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value);

@@ -9,10 +9,11 @@ public partial class ImageSelectionControl : CenterContainer
     private bool _isSelecting = false;
     private ColorRect _selectionRect;
     private TextureRect _image;
-    private const int GRID_SIZE = 16; // Tamaño de la cuadrícula
+    private  int GRID_SIZE = 16; // Tamaño de la cuadrícula
     [Export] Sprite2D _selectionSprite;
     [Export] GridDrawUI _gridUI;
     MaterialData materialData;
+    private int scale = 3;
     
     public override void _Ready()
     {
@@ -24,9 +25,11 @@ public partial class ImageSelectionControl : CenterContainer
     }
     public void SetMaterial(int idMaterial)
     {
+        GRID_SIZE = GRID_SIZE * scale;
         materialData = MaterialManager.Instance.GetMaterial(idMaterial);
         _image.Texture = (Texture2D) materialData.textureMaterial;
-        _gridUI.Redraw(new Vector2(materialData.widhtTexture, materialData.heightTexture));
+        _image.CustomMinimumSize = new Vector2(materialData.widhtTexture* scale, materialData.heightTexture* scale);
+        _gridUI.Redraw(new Vector2(materialData.widhtTexture * scale, materialData.heightTexture * scale));
     }
     public override void _Input(InputEvent @event)
     {      
@@ -79,7 +82,7 @@ public partial class ImageSelectionControl : CenterContainer
     {
         if (materialData!=null && _selectionRect.Size.X>0 && _selectionRect.Size.Y > 0)
         {
-            _selectionSprite.Texture = MaterialManager.Instance.GetAtlasTexture(materialData.id, (int)_selectionRect.Position.X, (int)_selectionRect.Position.Y, _selectionRect.Size.X, _selectionRect.Size.Y);
+            _selectionSprite.Texture = MaterialManager.Instance.GetAtlasTexture(materialData.id, (int)_selectionRect.Position.X / scale, (int)_selectionRect.Position.Y / scale, _selectionRect.Size.X/scale, _selectionRect.Size.Y / scale);
         }
     
     }

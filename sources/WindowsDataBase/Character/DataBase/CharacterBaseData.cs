@@ -14,6 +14,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         public int id {  get; set; }
         public bool eightDirection { get; set; }
         public float frameDuration { get; set; }
+        public bool loop {  get; set; }
+        public bool mirrorHorizontal { get; set; }
         public AnimationData[] animationData { get; set; }
 
         public AnimationStateData( bool EightDirection = false)
@@ -54,9 +56,12 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
     {
         public int idMaterial { get; set; }
         public int idCharacterBase {  get; set; }
-        public float healthBase { get; set; }
-        public float damageBase { get; set; }
+        public int healthBase { get; set; }
+        public int damageBase { get; set; }
         public string colorBase { set; get; }
+        public int moveIDBehavior { set; get; }
+        public int attackIDBehavior { set; get; }
+        public int statesIDBehavior { set; get; }
 
         public GeometricShape2D collisionMove { get; set; }
         public GeometricShape2D collisionBody { get; set; }
@@ -67,11 +72,15 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         [BsonCtor]
         public CharacterBaseData(AnimationStateData[] animationDataArray, int idMaterial) : base()
         {
-            if (animationDataArray != null && animationDataArray[0]!=null && animationDataArray[0].animationData[0] !=null)
+            if (animationDataArray != null&& animationDataArray.Length>0)
             {
-                int idInternalPosition = animationDataArray[0].animationData[0].idFrames[0];
-                textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idInternalPosition);
+                if (animationDataArray[0] != null && animationDataArray[0].animationData[0] != null && animationDataArray[0].animationData[0].idFrames!=null)
+                {
+                    int idInternalPosition = animationDataArray[0].animationData[0].idFrames[0];
+                    textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idInternalPosition);
+                }
             }
+          
             
         }
         public CharacterBaseData() 

@@ -206,7 +206,7 @@ namespace GodotEcsArch.sources.systems
                             {
 
                                 GeometricShape2D colliderB = itemInternal.Value.collisionBody;
-                                var positionB = itemInternal.Value.positionReal + itemInternal.Value.collisionBody.OriginCurrent;
+                                var positionB = itemInternal.Value.positionCollider + itemInternal.Value.collisionBody.OriginCurrent;
                                 if (Collision2D.Collides(c.shapeMove, colliderB, movementNext, positionB))
                                 {
                                     existCollision = true;

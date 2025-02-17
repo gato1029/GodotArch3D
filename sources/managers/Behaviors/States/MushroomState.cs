@@ -13,6 +13,8 @@ namespace GodotEcsArch.sources.managers.Behaviors.States
 {
     public class MushroomState : IStateBehavior
     {
+        public string Name { get => "Hongo"; }
+
         public void StateController(Entity entity, ref Animation animation, ref StateComponent stateComponent, ref CommandBuffer commandBuffer)
         {
             switch (stateComponent.currentType)

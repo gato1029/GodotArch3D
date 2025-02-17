@@ -207,7 +207,42 @@ namespace GodotEcsArch.sources.WindowsDataBase
             return result; // Devuelve el documento o null si no se encuentra
 
         }
+        public List<T> FindAllByMaterial<T>(int idMaterial) where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = typeof(T).BaseType;
+            string collectionName;
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+                }
+                else
+                {
+                    // Obtén la colección correspondiente
+                    var collectionBson = db.GetCollection<BsonDocument>(collectionName);
+                    var filteredDocuments = collectionBson.Query().Where(x => x["type"] == currentType.Name && x["idMaterial"] == idMaterial).ToList();
 
+                    var result2 = filteredDocuments.Select(BsonMapper.Global.ToObject<T>);
+                    // Busca el documento por ID
+                    return result2.ToList(); // Devuelve el documento o null si no se encuentra
+                }
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+                }
+            }
+
+            var collection = db.GetCollection<BsonDocument>(collectionName);
+            var filteredDocuments2 = collection.Query().Where(x => x["idMaterial"] == idMaterial).ToList();
+            var result = filteredDocuments2.Select(BsonMapper.Global.ToObject<T>);
+            // Busca el documento por ID
+            return result.ToList(); // Devuelve el documento o null si no se encuentra
+        }
         public List<T> FindAll<T>() where T : class
         {
             var currentType = typeof(T);

@@ -132,13 +132,13 @@ namespace GodotEcsArch.sources.managers.Tilemap
             }
 
             
-            dataGame.positionReal =positionReal;
+            dataGame.positionCollider =positionReal;
             dataGame.tilePositionChunk =tilePositionChunk;
             dataGame.idMaterial =idMaterial;
             dataGame.transform3d = xform;
             dataGame.idTile =tileData.id;
             dataGame.collisionBody = tileData.collisionBody;
-            dataGame.idInternal = idInternalPosition;
+   
             tileMapChunkData.CreateUpdateTile(tilePositionChunk, dataGame);
 
             CollisionManager.Instance.tileColliders.AddUpdateItem(new Vector2(positionReal.X, positionReal.Y), dataGame);
@@ -221,7 +221,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
                         if (dataGame!=null)
                         {
                             (Rid, int) instance = multimeshMaterialDict[dataGame.idMaterial].CreateInstance();
-                            chunk.CreateUpdate(i, j, dataGame.idMaterial, instance.Item1, instance.Item2, dataGame.idInternal, dataGame.transform3d,dataGame.idTile);
+                            chunk.CreateUpdate(i, j, dataGame.idMaterial, instance.Item1, instance.Item2,  dataGame.transform3d,dataGame.idTile);
                         }                        
                     }
                 }

@@ -124,6 +124,7 @@ public partial class WindowTileSimple : Window, IDetailWindow
                 tile.idMaterial = currentMaterialData.id;
                 tile.idInternalPosition = postile;
                 tile.haveCollider = collisionCheckBox.ButtonPressed;
+                tile.scale = 1;
                 if (tile.haveCollider)
                 {
                     tile.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value); 
@@ -144,6 +145,7 @@ public partial class WindowTileSimple : Window, IDetailWindow
             currentSimpleData.id = int.Parse( lineId.Text);
             currentSimpleData.haveCollider = collisionCheckBox.ButtonPressed;
             currentSimpleData.idMaterial = currentMaterialData.id;
+            currentSimpleData.scale = 1;
             if (currentSimpleData.haveCollider)
             {
                 currentSimpleData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value);

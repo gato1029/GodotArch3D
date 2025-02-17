@@ -1,4 +1,6 @@
+using LiteDB;
 using System;
+using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
 {
@@ -18,18 +20,28 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
     public class TileRuleData
     {
         public byte neighborMask { get;  set; } // Byte que representa las conexiones
+
+        public bool checkIsNull { get; set; }
+
+        public int idTileDataCentral {  get; set; }
+        public int[] idsTileDataMask { get; set; }
+
+        [BsonIgnore]
         public TileData tileDataCentral { get; set; }     // Índice del tile correspondiente
+        [BsonIgnore]
         public TileData[] tileDataMask { get; set; }
         public TileRuleData(byte neighborMask, TileData tileData)
         {
             this.neighborMask = neighborMask;
             this.tileDataCentral = tileData;
             tileDataMask = new TileData[8];
+            idsTileDataMask = new int[8];
         }
 
         public TileRuleData()
         {            
             tileDataMask = new TileData[8];
+            idsTileDataMask = new int[8];
             neighborMask = 0;
         }
         // Método para actualizar NeighborMask usando el enum NeighborDirection
@@ -40,12 +52,23 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
                 // Enciende el bit correspondiente a la dirección
                 neighborMask |= (byte)direction;
                 tileDataMask[GetDirectionIndex(direction)] = tileData;
+                if (tileData!=null)
+                {
+                    idsTileDataMask[GetDirectionIndex(direction)] = tileData.id;
+                }
+                else
+                {
+                    idsTileDataMask[GetDirectionIndex(direction)] = 0;
+                }
+                
             }
             else
             {
                 // Apaga el bit correspondiente a la dirección
                 neighborMask &= (byte)~direction;
-                tileDataMask[GetDirectionIndex(direction)] = tileData;
+                tileDataMask[GetDirectionIndex(direction)] = null;           
+                idsTileDataMask[GetDirectionIndex(direction)] = 0;
+                
             }
         }
         // Método auxiliar para convertir NeighborDirection a un índice (0-7)
@@ -91,10 +114,45 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
             NeighborDirection direction = GetDirectionFromIndex(directionIndex);
             return (neighborMask & (byte)direction) != 0;
         }
-        public bool Matches(byte neighborMask)
+        public bool Matches(byte neighborMaskIn)
         {
+            if (checkIsNull)
+            {
+                return CompareNeighborMasks(this.neighborMask, neighborMaskIn);
+            }
             // Compara si la máscara de vecinos coincide con la regla
-            return this.neighborMask == neighborMask;
+            return this.neighborMask == neighborMaskIn;
+        }
+        public bool CompareNeighborMasks(byte mask1, byte mask2)
+        {            
+            for (int i = 0; i < 8; i++) // Itera sobre cada bit (posición de dirección)
+            {
+                bool bit1 = (mask1 & (1 << i)) != 0;
+                bool bit2 = (mask2 & (1 << i)) != 0;
+
+                if (bit1 ==false && (bit1!=bit2))
+                {
+                    return false;
+                }
+                //if (bit1==true && (bit2== true || bit2 ==false))
+                //{
+                    
+                //}
+                //else
+                //{
+                //    if (bit1 != bit2)
+                //    {
+                //        return false;
+                //    }
+                //}
+                
+            }
+
+            return true;
+        }
+        public byte GetOppositeMask(byte mask)
+        {
+            return (byte)(~mask & 0xFF); // Invierte los bits y mantiene solo los primeros 8 bits
         }
     }
 }

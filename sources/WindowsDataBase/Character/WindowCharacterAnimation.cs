@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
+using System.Runtime.CompilerServices;
 
 public partial class WindowCharacterAnimation : PanelContainer
 {
@@ -12,6 +13,12 @@ public partial class WindowCharacterAnimation : PanelContainer
     public delegate void RequestNotifyHandler(AnimationStateData itemData, int state);
     public event RequestNotifyHandler OnNotifyChangue;
 
+    
+    public delegate void RequestOrderItemHandler(int id, int position, WindowCharacterAnimation windowAutoTileItem);
+    public event RequestOrderItemHandler OnRequestOrderItem;
+
+    Button up;
+    Button down;
 
     SpinBox idSpin;
     SpinBox idSpinBox;
@@ -19,32 +26,43 @@ public partial class WindowCharacterAnimation : PanelContainer
     SpinBox frameDuration;
     TextureRect textureSelection;
     CheckButton tipoCheckButton;
+    CheckBox isloop;
+    CheckBox mirrorHorizontal;
     int idMaterial;
+    public int idPosition;
     // Called when the node enters the scene tree for the first time.
 
-    int currentIdState = 0;
+    public int currentIdState = 0;
 
     public void SetData(AnimationStateData In_data)
     {
-        data = In_data;
-        if (In_data.animationData[0] != null)
+        if (In_data.animationData[0].idFrames!=null)
         {
-            string strFrame = "";
-            foreach (var frame in In_data.animationData[0].idFrames)
+            data = In_data;
+            if (In_data.animationData[0] != null)
             {
-                strFrame = strFrame + "," + frame.ToString();
+                string strFrame = "";
+                foreach (var frame in In_data.animationData[0].idFrames)
+                {
+                    strFrame = strFrame + "," + frame.ToString();
+                }
+                strFrame = strFrame.Substr(1, strFrame.Length);
+                framesLine.Text = strFrame;
             }
-            strFrame = strFrame.Substr(1, strFrame.Length);
-            framesLine.Text = strFrame;
-        }
 
-        frameDuration.Value = data.frameDuration;
-        idSpin.Value = data.id;
-        idSpinBox.Value = 0;
+            frameDuration.Value = data.frameDuration;
+            isloop.ButtonPressed = data.loop;
+            mirrorHorizontal.ButtonPressed = data.mirrorHorizontal;
+            idSpin.Value = data.id;
+            idSpinBox.Value = 0;
+        }
+     
     }
     public void SetID(int id)
     {
         idSpin.Value = id;
+        idPosition = id;
+        data.id = id;
     }
     public void SetMaterial(int idMat)
     {
@@ -56,15 +74,46 @@ public partial class WindowCharacterAnimation : PanelContainer
         GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/Button").Pressed += Refresh_Press;
         textureSelection = GetNode<TextureRect>("MarginContainer/VBoxContainer/TextureRect");
 
+        up = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer2/Button2");
+        down = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer2/Button");
+
+        up.Pressed += up_Pressed;
+        down.Pressed += down_Pressed;
+
         idSpin = GetNode<SpinBox>("MarginContainer/VBoxContainer/HBoxContainer2/SpinBox");
         idSpinBox = GetNode<SpinBox>("MarginContainer/VBoxContainer/GridContainer/SpinBox2");
         framesLine = GetNode<LineEdit>("MarginContainer/VBoxContainer/GridContainer/LineEdit3");
         frameDuration = GetNode<SpinBox>("MarginContainer/VBoxContainer/GridContainer/SpinBox");
         tipoCheckButton = GetNode<CheckButton>("MarginContainer/VBoxContainer/GridContainer/CheckButton");
-
+        isloop = GetNode<CheckBox>("MarginContainer/VBoxContainer/GridContainer/CheckBox");
+        mirrorHorizontal = GetNode<CheckBox>("MarginContainer/VBoxContainer/GridContainer/CheckBox2");
+        mirrorHorizontal.Pressed += MirrorHorizontal_Pressed;
+        isloop.Pressed += isloop_Press;
         tipoCheckButton.Pressed += Tipo_Pressed;
         idSpinBox.ValueChanged += IdSpinBox_ValueChanged;
         data = new AnimationStateData();
+    }
+
+    private void down_Pressed()
+    {
+        OnRequestOrderItem?.Invoke(1, idPosition, this);
+    }
+
+    private void up_Pressed()
+    {
+        OnRequestOrderItem?.Invoke(0, idPosition, this);
+    }
+
+    private void MirrorHorizontal_Pressed()
+    {
+        data.mirrorHorizontal = mirrorHorizontal.ButtonPressed;
+        OnNotifyChangue?.Invoke(data, currentIdState);
+    }
+
+    private void isloop_Press()
+    {
+        data.loop = isloop.ButtonPressed;
+        OnNotifyChangue?.Invoke(data, currentIdState);
     }
 
     private void Tipo_Pressed()

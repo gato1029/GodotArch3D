@@ -1,5 +1,6 @@
 using Arch.Core;
 using Godot;
+using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.managers.Tilemap;
@@ -24,13 +25,12 @@ public class TileDataGame
     public int idCollider { get; set; }
     public int idMaterial { get; set; }
     public int idTile { get; set; }
-    public int idInternal { get; set; }
     public Transform3D transform3d { get; set; }
     public GeometricShape2D collisionBody { get; set; }
 
     //Si se debe Guardar
     public Vector2I tilePositionChunk;
-    public Vector2 positionReal;
+    public Vector2 positionCollider;
 }
 public class TerrainDataGame: TileDataGame
 {
@@ -50,7 +50,7 @@ public class TerrainMap
         terrainDictionary = new Dictionary<int, TerrainData>();
         layer = 0;        
         chunkDimencion = PositionsManager.Instance.chunkDimencion;
-        tilemapTerrain = new TileMapChunkRender<TerrainDataGame>(0);
+        tilemapTerrain = new TileMapChunkRender<TerrainDataGame>( layer,ChunkManager.Instance.tiles16X16);
     }
 
     public void AddUpdateTile(Vector2I tilePositionGlobal, int idTerrain)
@@ -62,29 +62,20 @@ public class TerrainMap
             terrainDictionary.Add(idTerrain, terrainData);  
         }
         terrainData = terrainDictionary[idTerrain];
-
+        TerrainDataGame terrainDataGame = new TerrainDataGame();
+        terrainDataGame.idTerrain = idTerrain;
         if (terrainData.isRule)
         {
-            //cuando use rule
+            tilemapTerrain.AddUpdatedTileRule(tilePositionGlobal, terrainData.autoTileData, terrainDataGame);
         }
         else
         {
-            TerrainDataGame terrainDataGame = new TerrainDataGame();
-            terrainDataGame.idTerrain = idTerrain;
-            Vector2 positionReal = tilePositionGlobal; 
-            tilemapTerrain.AddUpdatedTile(tilePositionGlobal, positionReal, terrainData.tileData, terrainDataGame);
+         
+        
+            tilemapTerrain.AddUpdatedTile(tilePositionGlobal,  terrainData.tileData, terrainDataGame);
         }
-
     }
 
-    //public void RefreshChunk()
-    //{
-    //    tilemapTerrain.UnloadAll();
-    //    tilemapTerrain.UpdateChunks();
-    //}
+  
 
-    //public void UpdatePositionChunk(Vector2 position)
-    //{
-    //    tilemapTerrain.UpdatePlayerPosition(position);
-    //}
 }

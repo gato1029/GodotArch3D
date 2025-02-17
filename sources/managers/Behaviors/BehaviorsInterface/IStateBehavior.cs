@@ -11,6 +11,7 @@ namespace GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface
 {
     public interface IStateBehavior
     {
+        public string Name { get; }    
         void StateController(Entity entity, ref Animation animation, ref StateComponent stateComponent, ref CommandBuffer commandBuffer);
     }
 }

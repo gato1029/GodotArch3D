@@ -40,7 +40,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
         {            
 
         }
-        public void UpdateTile(int idMaterial,Rid rid, int instance, int idInternal, Transform3D xform, int idTile)
+        public void UpdateTile(int idMaterial,Rid rid, int instance, Transform3D xform, int idTile)
         {
             this.idMaterial = idMaterial;
             this.rid = rid;
@@ -50,16 +50,22 @@ namespace GodotEcsArch.sources.managers.Tilemap
             TileData tileData = TilesManager.Instance.GetTileData(idTile);
             if (tileData.type == "TileSimpleData")
             {
+                TileSimpleData simpleData = (TileSimpleData)tileData;
                 RenderingServer.MultimeshInstanceSetTransform(rid, instance, xform);
-                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(idInternal, 0, 0, 0));                
+                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(simpleData.idInternalPosition, 0, 0, 0));                
+            }
+            if (tileData.type == "TileDynamicData")
+            {
+                TileDynamicData tileDynamicData = (TileDynamicData)tileData;
+                RenderingServer.MultimeshInstanceSetTransform(rid, instance, xform);
+                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileDynamicData.x, tileDynamicData.y, tileDynamicData.widht, tileDynamicData.height));
             }
             if (tileData.type == "TileAnimateData")
             {
-                RenderingServer.MultimeshInstanceSetTransform(rid, instance, xform);
-                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(idInternal, 0, 0, 0));
-
                 TileAnimateData tileAnimateData = (TileAnimateData)tileData;
-            
+                RenderingServer.MultimeshInstanceSetTransform(rid, instance, xform);
+                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileAnimateData.idFrames[0], 0, 0, 0));
+                            
                 Entity entity = EcsManager.Instance.World.Create();
                 TileAnimation tileAnimation = new TileAnimation();
                 tileAnimation.TileAnimateData = tileAnimateData;

@@ -162,9 +162,10 @@ debug_color = Color(0.517856, 0.308616, 0.597025, 0.42)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-current_tab = 0
+current_tab = 1
 
 [node name="Collider Basic" type="ScrollContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 metadata/_tab_index = 0
@@ -323,7 +324,6 @@ step = 0.1
 prefix = "Y:"
 
 [node name="Animations" type="MarginContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
-visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -339,6 +339,12 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Agregar Animation"
+
+[node name="Button2" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Animations/Animations"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Refrescar Orden"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer/Animations/Animations"]
 layout_mode = 2

@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode unshaded;
 
-uniform sampler2D main_texture;
+uniform sampler2D main_texture: filter_nearest;
 uniform float atlas_width;
 uniform float atlas_height;
 
@@ -12,15 +12,15 @@ varying float anchoSubTexture;
 varying float altoSubTexture;
 
 vec2 get_aspect_ratio(vec2 texture_size) {
-    float base_size = 32.0; // Tamanio base de referencia
-    return texture_size / base_size;
+	float base_size = 16.0; // Tamanio base de referencia
+    return (texture_size / base_size);
 }
 
 void vertex() {
  	x= INSTANCE_CUSTOM.r;
 	y= INSTANCE_CUSTOM.g;
 	anchoSubTexture = INSTANCE_CUSTOM.b;
-	altoSubTexture = INSTANCE_CUSTOM.a;	
+	altoSubTexture = INSTANCE_CUSTOM.a;
 	vec2 scale = get_aspect_ratio(vec2(anchoSubTexture,altoSubTexture));
     VERTEX.xy *= scale;
 }
@@ -35,13 +35,14 @@ void fragment() {
  	vec2 frameOffset = vec2(x / atlas_width, y / atlas_height);
     vec2 frameSize = vec2(anchoSubTexture / atlas_width, altoSubTexture / atlas_height);
 
-    vec2 texCoord = UV * frameSize + frameOffset;
+	vec2 texCoord = UV * (frameSize * 0.98) + (frameOffset + frameSize * 0.01);
+    //vec2 texCoord = UV * frameSize + frameOffset;
     vec4 texColor = texture(main_texture, texCoord);
     // Aplica el color del segmento al resultado final
 	texColor.a *= 1.0 - transparency;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
 
-    ALBEDO = texColor.rgb * texColor.rgb;
+    ALBEDO = texColor.rgb * texColor.rgb * texColor.rgb;
     ALPHA = texColor.a ;
 	}
 	else

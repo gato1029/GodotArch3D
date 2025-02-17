@@ -5,6 +5,9 @@ using Arch.Core.Extensions;
 using Arch.System;
 
 using Godot;
+using GodotEcsArch.sources.managers.Generic;
+using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,10 +45,9 @@ public struct Sprite
 internal class RenderSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
-    private QueryDescription queryDebug = new QueryDescription().WithAll<Debug, Position>();
-    private QueryDescription queryRender = new QueryDescription().WithAll<Sprite,Position, Transform>();
-    private QueryDescription queryDebugCollider = new QueryDescription().WithAll<ColliderDebug, Position, Transform>();
-    
+   
+    private QueryDescription queryRender = new QueryDescription().WithAll<PositionComponent,RenderGPUComponent>();
+        
     public RenderSystem(World world) : base(world)
     {
         commandBuffer = new CommandBuffer();        
@@ -66,75 +68,26 @@ internal class RenderSystem : BaseSystem<World, float>
         {
             ref var pointerEntity = ref chunk.Entity(0);
 
-            ref var pointerSprite = ref chunk.GetFirst<Sprite>();
-            ref var pointerPosition = ref chunk.GetFirst<Position>();
-            ref var pointerTransform = ref chunk.GetFirst<Transform>();
-            
+            ref var pointerPositionComponent = ref chunk.GetFirst<PositionComponent>();
+            ref var pointerRenderComponent = ref chunk.GetFirst<RenderGPUComponent>();
 
             foreach (var entityIndex in chunk)
             {
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
-                ref Sprite s = ref Unsafe.Add(ref pointerSprite, entityIndex);
-                ref Position p = ref Unsafe.Add(ref pointerPosition, entityIndex);
-                ref Transform t = ref Unsafe.Add(ref pointerTransform, entityIndex);
-                t.value.Origin = p.value;
-                RenderingServer.CanvasItemSetTransform(s.CanvasItem, t.value);
+                ref PositionComponent   positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
+                ref RenderGPUComponent  renderComponent = ref Unsafe.Add(ref pointerRenderComponent, entityIndex);
 
+                renderComponent.transform.Origin = new Vector3(positionComponent.x, positionComponent.y, (positionComponent.y * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender);                
+                RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);                
             }
-        }
-    }
-    private readonly struct RenderJob : IForEachWithEntity< Sprite, Position, Transform>
-    {
-        private readonly float _deltaTime;
-        private readonly CommandBuffer _commandBuffer;
 
-        public RenderJob(float deltaTime, CommandBuffer commandBuffer)
-        {
-            _deltaTime = deltaTime;
-            _commandBuffer = commandBuffer;
-
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Update(Entity entity, ref Sprite sp, ref Position pos, ref Transform t)
-        {
-            t.value.Origin = pos.value;                     
-            RenderingServer.CanvasItemSetTransform(sp.CanvasItem, t.value);
-            
         }
     }
 
-   
-
-
-  
-
-    public static Vector2 GetRotatedPointByDirection(Vector2 point, Vector2 origin, Vector2 direction)
-    {
-        // Normalizar la dirección para obtener un vector unitario
-        direction = direction.Normalized();
-
-        // Calcular el vector perpendicular para el eje de la rotación
-        Vector2 perpDirection = new Vector2(-direction.Y, direction.X);
-
-        // Mover el punto al origen (trasladar)
-        Vector2 relativePoint = point - origin;
-
-        // Aplicar la rotación usando la dirección y su perpendicular
-        Vector2 rotatedPoint = origin + (relativePoint.X * direction + relativePoint.Y * perpDirection);
-
-        return rotatedPoint;
-    }
 
     public override void Update(in float t)
     {
-        //var job = new RenderJob((float)t, commandBuffer);
-        //World.InlineEntityQuery<RenderJob,Sprite, Position,Transform>(in queryRender, ref job);
-
-        //World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
-
-        //var jobDebug = new RenderJobDebug((float)t, commandBuffer);
-        //World.InlineEntityQuery<RenderJobDebug, Debug, Position, Direction>(in queryDebug, ref jobDebug);
-
+        World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
     }
 
     public override void AfterUpdate(in float t)

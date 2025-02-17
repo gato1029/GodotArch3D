@@ -3,60 +3,64 @@
   "WorkspaceRootPath": "D:\\GitKraken\\GodotArch3D\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\windowtiledinamic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\windowtiledinamic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\systems\\behaviorcharactersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\behaviorcharactersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\database\\tiledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\database\\tiledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\behaviors\\states\\maincharacterstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\behaviors\\states\\maincharacterstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\terrain\\database\\terraindata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\terrain\\database\\terraindata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\behaviors\\behaviorsinterface\\istatebehavior.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\behaviors\\behaviorsinterface\\istatebehavior.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\systems\\statesystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\statesystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\systems\\maincharactersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\maincharactersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\imageselectioncontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\imageselectioncontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\behaviors\\states\\mushroomstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\behaviors\\states\\mushroomstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\griddrawui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\griddrawui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\behaviors\\behaviormanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\behaviors\\behaviormanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\camera3dgodot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:camera3dgodot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\charactermanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\charactermanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\materials\\materialdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\materials\\materialdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\character\\database\\characterbasedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\character\\database\\characterbasedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\windowautotileitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\windowautotileitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\characters\\charactercreatormanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\characters\\charactercreatormanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\terrain\\windowterrain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\terrain\\windowterrain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\generic\\genericcomponents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\generic\\genericcomponents.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\windowtileanimate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\windowtileanimate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\systems\\rendersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\rendersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\windowtilesimple.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\windowtilesimple.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\systems\\transformsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\transformsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\tilemap\\tilemapchunkrender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\tilemap\\tilemapchunkrender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\systems\\animationtilesystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\animationtilesystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -65,193 +69,206 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "DockedWidth": 205,
+          "SelectedChildIndex": 2,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainCharacterState.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\States\\MainCharacterState.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Behaviors\\States\\MainCharacterState.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\States\\MainCharacterState.cs",
+              "RelativeToolTip": "sources\\managers\\Behaviors\\States\\MainCharacterState.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAAAowBEAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T01:56:02.526Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "StateSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\StateSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\StateSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\StateSystem.cs",
+              "RelativeToolTip": "sources\\systems\\StateSystem.cs",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAIwEcAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T01:54:47.594Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BehaviorCharacterSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\BehaviorCharacterSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\BehaviorCharacterSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\BehaviorCharacterSystem.cs",
+              "RelativeToolTip": "sources\\systems\\BehaviorCharacterSystem.cs",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAswGkAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T01:53:54.042Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainCharacterSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\MainCharacterSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\MainCharacterSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\MainCharacterSystem.cs",
+              "RelativeToolTip": "sources\\systems\\MainCharacterSystem.cs",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAmwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T01:53:33.04Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IStateBehavior.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\BehaviorsInterface\\IStateBehavior.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Behaviors\\BehaviorsInterface\\IStateBehavior.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\BehaviorsInterface\\IStateBehavior.cs",
+              "RelativeToolTip": "sources\\managers\\Behaviors\\BehaviorsInterface\\IStateBehavior.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwA4AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T01:47:26.463Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MushroomState.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\States\\MushroomState.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Behaviors\\States\\MushroomState.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\States\\MushroomState.cs",
+              "RelativeToolTip": "sources\\managers\\Behaviors\\States\\MushroomState.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAADEAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T01:48:29.095Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "CharacterBaseData.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Character\\DataBase\\CharacterBaseData.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Character\\DataBase\\CharacterBaseData.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Character\\DataBase\\CharacterBaseData.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\Character\\DataBase\\CharacterBaseData.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAgwEAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T01:45:51.549Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "TerrainData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T05:08:29.322Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "MaterialData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Materials\\MaterialData.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Materials\\MaterialData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Materials\\MaterialData.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\Materials\\MaterialData.cs",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAAwDIAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T02:29:36.44Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "Camera3dGodot.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\Camera3dGodot.cs",
-              "RelativeDocumentMoniker": "Camera3dGodot.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\Camera3dGodot.cs",
-              "RelativeToolTip": "Camera3dGodot.cs",
-              "ViewState": "AgIAACwAAAAAAAAAAAAwwEsAAAAjAAAAAAAAAA==",
+              "Title": "CharacterManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\CharacterManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\CharacterManager.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\CharacterManager.cs",
+              "RelativeToolTip": "sources\\managers\\CharacterManager.cs",
+              "ViewState": "AgIAAHAAAAAAAAAAAAAcwI4AAACTAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T01:26:29.215Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ImageSelectionControl.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\ImageSelectionControl.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\ImageSelectionControl.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\ImageSelectionControl.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\ImageSelectionControl.cs",
-              "ViewState": "AgIAADsAAAAAAAAAAAAIwFIAAAADAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T00:32:49.624Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "WindowAutoTileItem.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowAutoTileItem.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\WindowAutoTileItem.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowAutoTileItem.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\WindowAutoTileItem.cs",
-              "ViewState": "AgIAAFsAAAAAAAAAAAAowGwAAABmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T00:27:53.138Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "WindowTerrain.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\WindowTerrain.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Terrain\\WindowTerrain.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\WindowTerrain.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\Terrain\\WindowTerrain.cs",
-              "ViewState": "AgIAAFYAAAAAAAAAAAAuwGIAAABcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T00:27:29.026Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "HerramientaMenuBar.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "ViewState": "AgIAAJ4AAAAAAAAAAAAAAKwAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T00:23:16.514Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "WindowTileDinamic.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileDinamic.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\WindowTileDinamic.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileDinamic.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\WindowTileDinamic.cs",
-              "ViewState": "AgIAAC4AAAAAAAAAAAAgwFIAAABIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T00:20:36.151Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "WindowTileSimple.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\WindowTileSimple.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA9AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-12T23:53:07.852Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "WindowTileAnimate.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\WindowTileAnimate.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAPAAAAA1AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T00:13:38.842Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "TileMapChunkRender.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Tilemap\\TileMapChunkRender.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\Tilemap\\TileMapChunkRender.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Tilemap\\TileMapChunkRender.cs",
-              "RelativeToolTip": "sources\\managers\\Tilemap\\TileMapChunkRender.cs",
-              "ViewState": "AgIAADQAAAAAAAAAAAAcwEgAAAA3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T00:10:49.651Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "TileData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\DataBase\\TileData.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAABUAAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-12T23:56:12.345Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "MaterialManager.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\MaterialManager.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\MaterialManager.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\MaterialManager.cs",
-              "RelativeToolTip": "sources\\managers\\MaterialManager.cs",
-              "ViewState": "AgIAADYAAAAAAAAAAAAqwFgAAAA1AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T02:33:58.976Z",
+              "WhenOpened": "2025-02-17T01:41:17.161Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "GridDrawUI.cs",
-              "DocumentMoniker": "D:\\GITKRAKEN\\GODOTARCH3D\\sources\\WindowsDataBase\\TileCreator\\GridDrawUI.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\GridDrawUI.cs",
-              "ToolTip": "D:\\GITKRAKEN\\GODOTARCH3D\\sources\\WindowsDataBase\\TileCreator\\GridDrawUI.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\GridDrawUI.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAwBgAAAAIAAAAAAAAAA==",
+              "Title": "BehaviorManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\BehaviorManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Behaviors\\BehaviorManager.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Behaviors\\BehaviorManager.cs",
+              "RelativeToolTip": "sources\\managers\\Behaviors\\BehaviorManager.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAkwBIAAABdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-13T02:51:04.016Z",
+              "WhenOpened": "2025-02-17T01:33:55.907Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "RenderSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\RenderSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\RenderSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\RenderSystem.cs",
+              "RelativeToolTip": "sources\\systems\\RenderSystem.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAA6wFkAAABdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-16T18:26:34.43Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "GenericComponents.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Generic\\GenericComponents.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Generic\\GenericComponents.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Generic\\GenericComponents.cs",
+              "RelativeToolTip": "sources\\managers\\Generic\\GenericComponents.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwBAAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-16T18:25:33.769Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "TransformSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\TransformSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\TransformSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\TransformSystem.cs",
+              "RelativeToolTip": "sources\\systems\\TransformSystem.cs",
+              "ViewState": "AgIAAJwAAAAAAAAAAAAgwAkBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-16T18:22:17.903Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "AnimationTileSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\AnimationTileSystem.cs",
+              "RelativeDocumentMoniker": "sources\\systems\\AnimationTileSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\systems\\AnimationTileSystem.cs",
+              "RelativeToolTip": "sources\\systems\\AnimationTileSystem.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAwwEEAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-16T18:18:17.37Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CharacterCreatorManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Characters\\CharacterCreatorManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Characters\\CharacterCreatorManager.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Characters\\CharacterCreatorManager.cs",
+              "RelativeToolTip": "sources\\managers\\Characters\\CharacterCreatorManager.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAowCwAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-16T17:39:17.874Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Main3D.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\Main3D.cs",
+              "RelativeDocumentMoniker": "Main3D.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\Main3D.cs",
+              "RelativeToolTip": "Main3D.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-16T17:30:23.118Z",
               "EditorCaption": ""
             }
           ]

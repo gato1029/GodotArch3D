@@ -10,7 +10,7 @@ internal class MeshCreator
 {
     public static float PixelsToUnits(float pixels)
     {
-        return pixels / 32f; // Se usa 32f para asegurar que la división sea en punto flotante
+        return pixels / 32; // Se usa 32f para asegurar que la división sea en punto flotante
     }
     public static ArrayMesh CreateSquareMesh(float widthPixels, float heightPixels,  Vector2 unitGodotPerPixel , Vector3 offset)
     {

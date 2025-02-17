@@ -56,6 +56,7 @@ text = "Id Autotile:"
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 0
+text = "0"
 editable = false
 
 [node name="Label3" type="Label" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]

@@ -37,6 +37,15 @@ metadata/_edit_use_anchors_ = true
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
 
+[node name="MenuBar" type="MenuBar" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Materiales" type="PopupMenu" parent="Panel/MarginContainer/VBoxContainer/MenuBar"]
+
+[node name="OptionButton" type="OptionButton" parent="Panel/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
@@ -52,5 +61,7 @@ text = "Modificar"
 [node name="ItemList" type="ItemList" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+max_columns = 30
 same_column_width = true
+icon_mode = 0
 fixed_icon_size = Vector2i(64, 64)

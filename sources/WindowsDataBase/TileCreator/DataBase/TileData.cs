@@ -20,6 +20,11 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         public int idMaterial { get; set; }   
         public string type { get; set; }    
         public float scale { get; set; }
+        public float offsetX { get; set; }
+        public float offsetY { get; set; }
+
+        [BsonIgnore]
+        public Vector2 offsetInternal{ get;  set; }
     }
     public class TileSimpleData : TileData
     {
@@ -30,9 +35,11 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
             type = nameof(TileSimpleData);         
         }
         [BsonCtor]
-        public TileSimpleData(int idMaterial, int idInternalPosition):base()
+        public TileSimpleData(int idMaterial, int idInternalPosition, float offsetX, float offsetY) :base()
         {
-           textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idInternalPosition);
+            offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
+            textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idInternalPosition);
+          
         }        
     }
     public class TileDynamicData : TileData
@@ -47,9 +54,12 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         
         }
         [BsonCtor]
-        public TileDynamicData(int idMaterial, float x, float y, float widht, float height):base()
+        public TileDynamicData(int idMaterial, float x, float y, float widht, float height, float offsetX, float offsetY) :base()
         {
+            offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
             textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, (int)x, (int)y, widht, height);
+         
+         
         }
     }
     public class TileAnimateData : TileData
@@ -62,9 +72,12 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         }
 
         [BsonCtor]
-        public TileAnimateData(int idMaterial, int[] idFrames) : base()
+        public TileAnimateData(int idMaterial, int[] idFrames, float offsetX, float offsetY) : base()
         {
+            offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
             textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idFrames[0]);
+
+        
         }
     }
 
