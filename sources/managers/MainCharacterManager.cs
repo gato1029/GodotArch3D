@@ -7,6 +7,7 @@ using GodotEcsArch.sources.managers.Behaviors.Attack;
 using GodotEcsArch.sources.managers.Behaviors.Move;
 using GodotEcsArch.sources.managers.Behaviors.States;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Generic;
 using GodotEcsArch.sources.systems;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace GodotEcsArch.sources.managers
             entity.Add<ColliderSprite>(new ColliderSprite { shapeMove = new Rectangle(.5f, .3f, new Vector2(0, -0.8f)), shapeBody = new Rectangle(.8f, 1.5f, new Vector2(0f, -0.2f)) });
             entity.Add<Rotation>();
             entity.Add(position);
-            entity.Add<Direction>(new Direction { value = new Vector2(1, 0), directionAnimation = DirectionAnimation.RIGHT });
+            entity.Add<Direction>(new Direction { value = new Vector2(1, 0), directionAnimation = AnimationDirection.RIGHT });
             entity.Add<Animation>(new Animation { TimePerFrame = 0.1f, TimeSinceLastFrame = 0, currentAction = AnimationAction.NONE, horizontalOrientation = 0, complete = true });
             entity.Add(new Velocity { value = 5f });
 
@@ -58,7 +59,7 @@ namespace GodotEcsArch.sources.managers
             entityWeapon.Add<RefreshPositionAlways>();
             entityWeapon.Add(new Animation { TimePerFrame = 0.1f, TimeSinceLastFrame = 0, currentAction = AnimationAction.IDLE_WEAPON, horizontalOrientation = 0, complete = true });
             entityWeapon.Add<Transform>(new Transform { transformInternal = new Transform3D(Basis.Identity, Vector3.Zero) });
-            entityWeapon.Add<Direction>(new Direction { value = new Vector2(1, 0), directionAnimation = DirectionAnimation.RIGHT });
+            entityWeapon.Add<Direction>(new Direction { value = new Vector2(1, 0), directionAnimation = AnimationDirection.RIGHT });
             CharacterWeapon characterWeapon = new CharacterWeapon();
             characterWeapon.id = 1;
             characterWeapon.shapeColliderLeftRight = new Rectangle(2f, 2f, new Vector2(1.5f, 0f));
@@ -77,10 +78,10 @@ namespace GodotEcsArch.sources.managers
 
             float timeFrame = 0.05f;
             TypeAnimation typeAnimation = new TypeAnimation(4, "IDLE_WEAPON");
-            typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(0, 6, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(6, 6, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(12, 6, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(18, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(0, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(6, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(12, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(18, 6, timeFrame));
             animationIndividual.AddTypeAnimation((int)AnimationAction.IDLE_WEAPON, typeAnimation);
         }
         void ConfigCharacter()
@@ -93,26 +94,26 @@ namespace GodotEcsArch.sources.managers
             
             float timeFrame = 0.1f;
             TypeAnimation typeAnimation = new TypeAnimation(4, "WALK");
-            typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(105, 8, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(118, 8, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(131, 8, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(144, 8, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(105, 8, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(118, 8, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(131, 8, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(144, 8, timeFrame));
             animationIndividual.AddTypeAnimation((int)AnimationAction.WALK, typeAnimation);
 
             timeFrame = 0.2f;
             typeAnimation = new TypeAnimation(4, "IDLE");
-            typeAnimation.AddFrame((int)DirectionAnimation.UP, new CustomFrameAnimation(timeFrame, [286, 286, 287]));
-            typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new CustomFrameAnimation(timeFrame, [299, 299, 300]));
-            typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new CustomFrameAnimation(timeFrame, [312, 312, 313]));
-            typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new CustomFrameAnimation(timeFrame, [325, 325, 326]));
+            typeAnimation.AddFrame((int)AnimationDirection.UP, new CustomFrameAnimation(timeFrame, [286, 286, 287]));
+            typeAnimation.AddFrame((int)AnimationDirection.LEFT, new CustomFrameAnimation(timeFrame, [299, 299, 300]));
+            typeAnimation.AddFrame((int)AnimationDirection.DOWN, new CustomFrameAnimation(timeFrame, [312, 312, 313]));
+            typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new CustomFrameAnimation(timeFrame, [325, 325, 326]));
             animationIndividual.AddTypeAnimation((int)AnimationAction.IDLE_WEAPON, typeAnimation);
 
             timeFrame = 0.05f;
             typeAnimation = new TypeAnimation(4, "ATACK");
-            typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(156, 6, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(169, 6, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(182, 6, timeFrame));
-            typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(195, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(156, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(169, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(182, 6, timeFrame));
+            typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(195, 6, timeFrame));
             animationIndividual.AddTypeAnimation((int)AnimationAction.ATACK, typeAnimation);        
         }
         protected override void Initialize()

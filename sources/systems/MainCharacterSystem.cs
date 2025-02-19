@@ -9,6 +9,7 @@ using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Behaviors;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Generic;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.Tilemap;
 using System;
@@ -144,7 +145,7 @@ namespace GodotEcsArch.sources.systems
 
                     melleAtack.shapeCollider = characterWeapon.shapeColliderLeftRight;
 
-                    if (d.directionAnimation == DirectionAnimation.UP || d.directionAnimation == DirectionAnimation.DOWN)
+                    if (d.directionAnimation == AnimationDirection.UP || d.directionAnimation == AnimationDirection.DOWN)
                     {
                         melleAtack.shapeCollider = characterWeapon.shapeColliderTopDown; 
                     }

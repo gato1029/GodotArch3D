@@ -7,6 +7,7 @@ using GodotEcsArch.sources.managers.Behaviors.Attack;
 using GodotEcsArch.sources.managers.Behaviors.Move;
 using GodotEcsArch.sources.managers.Behaviors.States;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Generic;
 using GodotEcsArch.sources.systems;
 using Newtonsoft.Json;
 using System;
@@ -65,46 +66,46 @@ internal class CharacterManager : SingletonBase<CharacterManager>
         AnimationIndividual animationIndividual = SpriteManager.Instance.GetAnimation(idAnimation);
         float timeFrame = 0.1f;
         TypeAnimation typeAnimation = new TypeAnimation(4, "Idle");
-        typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(144, 7, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(144, 7, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(144, 7, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(144, 7, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(144, 7, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(144, 7, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(144, 7, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(144, 7, timeFrame));
         animationIndividual.AddTypeAnimation((int)AnimationAction.IDLE_WEAPON, typeAnimation);
 
         typeAnimation = new TypeAnimation(4, "Walk");
-        typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(72, 8, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(72, 8, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(72, 8, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(72, 8, timeFrame));             
+        typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(72, 8, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(72, 8, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(72, 8, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(72, 8, timeFrame));             
         animationIndividual.AddTypeAnimation((int)AnimationAction.WALK, typeAnimation);
 
         timeFrame = 0.1f;
         typeAnimation = new TypeAnimation(4, "Atack");
-        typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(0, 10, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(0, 10, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(0, 10, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(0, 10, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(0, 10, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(0, 10, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(0, 10, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(0, 10, timeFrame));
         animationIndividual.AddTypeAnimation((int)AnimationAction.ATACK, typeAnimation);
         timeFrame = 0.1f;
         typeAnimation = new TypeAnimation(4, "Death",false);
-        typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(24, 15, timeFrame   ));
-        typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(24,  15, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(24, 15, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(24, 15, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(24, 15, timeFrame   ));
+        typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(24,  15, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(24, 15, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(24, 15, timeFrame));
         animationIndividual.AddTypeAnimation((int)AnimationAction.DEATH, typeAnimation);
 
         typeAnimation = new TypeAnimation(4, "Hit");
-        typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(48, 5, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(48, 5, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(48, 5, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(48, 5, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(48, 5, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(48, 5, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(48, 5, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(48, 5, timeFrame));
         animationIndividual.AddTypeAnimation((int)AnimationAction.HIT, typeAnimation);
 
         typeAnimation = new TypeAnimation(4, "Stun");
-        typeAnimation.AddFrame((int)DirectionAnimation.DOWN, new FrameAnimation(96, 18, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.LEFT, new FrameAnimation(96, 18, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.UP, new FrameAnimation(96, 18, timeFrame));
-        typeAnimation.AddFrame((int)DirectionAnimation.RIGHT, new FrameAnimation(96, 18, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.DOWN, new FrameAnimation(96, 18, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.LEFT, new FrameAnimation(96, 18, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.UP, new FrameAnimation(96, 18, timeFrame));
+        typeAnimation.AddFrame((int)AnimationDirection.RIGHT, new FrameAnimation(96, 18, timeFrame));
         animationIndividual.AddTypeAnimation((int)AnimationAction.STUN , typeAnimation);   
 
         functionMap[idAnimation] = CreateMushrrom;
@@ -131,7 +132,7 @@ internal class CharacterManager : SingletonBase<CharacterManager>
         entity.Add<ColliderSprite>(new ColliderSprite { shapeMove = new Rectangle(1, 1), shapeBody = new Rectangle(1,1) });
         entity.Add<Rotation>();
         entity.Add(position);
-        entity.Add<Direction>(new Direction { value= new Vector2(1,0), directionAnimation = DirectionAnimation.LEFT });
+        entity.Add<Direction>(new Direction { value= new Vector2(1,0), directionAnimation = AnimationDirection.LEFT });
         entity.Add<Animation>(new Animation { TimePerFrame = 0.1f, TimeSinceLastFrame = 0, currentAction = AnimationAction.NONE, horizontalOrientation = -1, complete=false });
         entity.Add(new Velocity { value = 2f });
         

@@ -1,5 +1,6 @@
 
 using Godot;
+using GodotEcsArch.sources.managers.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,15 +33,15 @@ internal class CommonOperations
       
         return new Vector2(quantizedX, quantizedY);
     }
-    public static DirectionAnimation GetDirectionAnimation(Vector2 value)
+    public static AnimationDirection GetDirectionAnimation(Vector2 value)
     {
         if (Math.Abs(value.X) > Math.Abs(value.Y)) // Predominio en 
         {
-            return value.X > 0 ? DirectionAnimation.RIGHT : DirectionAnimation.LEFT;
+            return value.X > 0 ? AnimationDirection.RIGHT : AnimationDirection.LEFT;
         }
         else // Predominio en Y
         {
-            return value.Y > 0 ? DirectionAnimation.UP : DirectionAnimation.DOWN;
+            return value.Y > 0 ? AnimationDirection.UP : AnimationDirection.DOWN;
         }
     }
 

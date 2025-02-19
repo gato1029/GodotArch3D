@@ -5,6 +5,7 @@ using GodotEcsArch.sources.managers.Behaviors.Attack;
 using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Behaviors.Move;
 using GodotEcsArch.sources.managers.Behaviors.States;
+using GodotEcsArch.sources.managers.Behaviors.States.Character;
 using GodotEcsArch.sources.systems;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
 {
     internal class BehaviorManager : SingletonBase<BehaviorManager>
     {
-        Dictionary<int, IStateBehavior> dictionaryStates = new Dictionary<int, IStateBehavior>();
+        Dictionary<int, IStateCharacterBehavior> dictionaryStates = new Dictionary<int, IStateCharacterBehavior>();
         Dictionary<int, IMoveBehavior>  dictionaryMoves = new Dictionary<int, IMoveBehavior>();
         Dictionary<int, IAttackBehavior> dictionaryAttack = new Dictionary<int, IAttackBehavior>();
 
@@ -36,8 +37,8 @@ namespace GodotEcsArch.sources.managers.Behaviors
 
         void RegisterAllStates()
         {
-            RegisterStateBehavior(1, new MainCharacterState());
-            RegisterStateBehavior(2, new MushroomState());
+            RegisterStateBehavior(1, new HumanCharacterState());
+         
         }
         void RegisterAllMoves()
         {
@@ -48,7 +49,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
             RegisterAttackBehavior(1, new MelleAtackHorizontalBehavior());
             RegisterAttackBehavior(2, new MelleAttackBehavior());
         }
-        public IStateBehavior GetStateBehavior(int id)
+        public IStateCharacterBehavior GetStateBehavior(int id)
         {
             if (dictionaryStates.ContainsKey(id))
             {
@@ -73,7 +74,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
             return null;
         }
 
-        public void RegisterStateBehavior(int id, IStateBehavior behavior)
+        public void RegisterStateBehavior(int id, IStateCharacterBehavior behavior)
         {
             if (!dictionaryStates.ContainsKey(id))
             {

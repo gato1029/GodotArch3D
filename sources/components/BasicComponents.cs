@@ -5,6 +5,7 @@ using Arch.Core.Extensions;
 using Arch.Relationships;
 using Arch.System;
 using Godot;
+using GodotEcsArch.sources.managers.Generic;
 
 internal class BasicComponents
 {
@@ -33,7 +34,7 @@ public struct Direction
 {
     public Vector2 value;
     public Vector2 normalized;
-    public DirectionAnimation directionAnimation;
+    public AnimationDirection directionAnimation;
 }
 [Component]
 public struct Velocity

@@ -2,7 +2,10 @@ using Arch.AOT.SourceGenerator;
 using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
+using GodotEcsArch.sources.managers.Behaviors;
+using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Generic;
+using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
@@ -20,6 +23,12 @@ public struct CharacterComponent
 public struct CharacterColliderComponent { }
 
 [Component]
+public struct CharacterStateComponent
+{
+    public IStateCharacterBehavior stateBehavior;
+    public int currentState;  // varia por cada logica de personaje
+}
+[Component]
 public struct CharacterAnimationComponent
 {    
     public int stateAnimation;
@@ -30,6 +39,15 @@ public struct CharacterAnimationComponent
     
     public bool animationComplete;
     public int  horizontalMirror;
+
+    public bool active;
+}
+
+[Component]
+public struct CharacterBehaviorComponent
+{
+    public IAttackBehavior attackBehavior;
+    public IMoveBehavior moveBehavior;
 }
 
 internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
@@ -47,6 +65,7 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         AddBase(entity, characterBaseData);
         AddMove(entity, positionInitial);        
         AddAnimations(entity, characterBaseData);
+        AddAnimationState(entity, characterBaseData);
         AddSoulCharacter(entity, characterBaseData.idCharacterBase);
 
         if (characterBaseData.collisionBody !=null || characterBaseData.collisionMove !=null)
@@ -55,14 +74,27 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         }
     }
 
+    private void AddAnimationState(Entity entity, CharacterBaseData characterBaseData)
+    {
+        entity.Add(new CharacterStateComponent { currentState = 0, stateBehavior = BehaviorManager.Instance.GetStateBehavior(1) }); // siempre inicia con el estado 0 que debe ser idle 
+    }
+
     private void AddMove(Entity entity, Vector2 positionInitial)
     {
         entity.Add(new PositionComponent { x = positionInitial.X, y = positionInitial.Y });
+        entity.Add(new DirectionComponent { animationDirection = AnimationDirection.LEFT });
     }
 
     private void AddSoulCharacter(Entity entity , int RootBase)
     {
         // aqui agregar el componente de comportamiento, Luego seria genial extenderlo a lua :)
+
+        CharacterBehaviorComponent behaviorCharacterComponent;
+        behaviorCharacterComponent.moveBehavior = BehaviorManager.Instance.GetMoveBehavior(1);
+        behaviorCharacterComponent.attackBehavior = BehaviorManager.Instance.GetAttackBehavior(1);
+        
+
+        entity.Add(behaviorCharacterComponent);
 
     }
     private void AddAnimations(Entity entity, CharacterBaseData characterBaseData)

@@ -10,11 +10,31 @@ using Arch.Core.Extensions;
 
 namespace GodotEcsArch.sources.managers.Generic;
 
+public enum AnimationDirection
+{
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+}
+public enum CardinalDirection
+{
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+}
+
 [Component]
 public struct PositionComponent
 {    
     public float x;
     public float y;
+}
+[Component]
+public struct DirectionComponent
+{
+    public AnimationDirection animationDirection;
 }
 
 [Component]
