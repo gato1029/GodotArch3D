@@ -15,28 +15,23 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
     protected override void Initialize()
     {
         materials = new Dictionary<int, MaterialData>();
-    
-
-        //var collection = FileHelper.GetAllFiles("res://resources/Material/");
-
-        //foreach (var item in collection)
-        //{
-        //    var pathGodot = ProjectSettings.LocalizePath(item);
-        //    Material resource = (Material)ResourceLoader.Load(pathGodot);
-        //    if (resource != null)
-        //    {
-        //        string fileName = Path.GetFileNameWithoutExtension(pathGodot);
-        //        materials.Add(fileName, resource);
-        //    }
-        //}
     }
-
+    
     public void RegisterMaterial(int id, MaterialData materialData)
     {
+        
         if (!materials.ContainsKey(id) )
         {
-            materials.Add(id, materialData);       
-        }                
+            materials.Add(id, materialData);
+        }
+        else
+        {
+            if (id == -1)
+            {
+                materials[id] = materialData;
+            }
+        }
+        
     }
 
     public MaterialData GetMaterial(int id)

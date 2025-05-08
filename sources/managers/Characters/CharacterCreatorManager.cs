@@ -5,11 +5,25 @@ using Godot;
 using GodotEcsArch.sources.managers.Behaviors;
 using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Generic;
+using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.systems;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
+using System.Collections.Generic;
 namespace GodotEcsArch.sources.managers.Characters;
+
+public enum CharacterStateType
+{
+    IDLE,
+    MOVING,
+    EXECUTE_ATTACK,
+    ATTACK,
+    TAKE_HIT,
+    TAKE_STUN,
+    DIE
+}
 
 
 [Component]
@@ -20,14 +34,16 @@ public struct CharacterComponent
     public int damageBase;
 }
 [Component]
-public struct CharacterColliderComponent { }
+public struct CharacterAccesoriesComponent
+{    
+    public int idWeapon;
+    public int idArmor;
+}
 
 [Component]
-public struct CharacterStateComponent
-{
-    public IStateCharacterBehavior stateBehavior;
-    public int currentState;  // varia por cada logica de personaje
-}
+public struct CharacterColliderComponent { }
+
+
 [Component]
 public struct CharacterAnimationComponent
 {    
@@ -45,57 +61,94 @@ public struct CharacterAnimationComponent
 
 [Component]
 public struct CharacterBehaviorComponent
-{
+{    
+    public CharacterStateType characterStateType;  // varia por cada logica de personaje
+    public ICharacterBehavior characterBehavior;        
+}
+
+[Component]
+public struct CharacterCustomBehaviorComponent
+{    
+    public CharacterStateType characterStateType;  // varia por cada logica de personaje
+    public ICharacterBehavior characterBehavior;
     public IAttackBehavior attackBehavior;
     public IMoveBehavior moveBehavior;
 }
 
 internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
 {
-    
+    Dictionary<int, MultimeshMaterial> multimeshMaterialDict;
     protected override void Initialize()
     {
-        throw new NotImplementedException();
+        multimeshMaterialDict = new Dictionary<int, MultimeshMaterial>();
     }
 
     public void CreateNewCharacter(int idCharacterBase, Vector2 positionInitial)
     {
+
         CharacterBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(idCharacterBase);
+       
+        if (!multimeshMaterialDict.ContainsKey(characterBaseData.idMaterial))
+        {
+            MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(characterBaseData.idMaterial));
+            multimeshMaterialDict.Add(characterBaseData.idMaterial, multimeshMaterial);
+        }
+        
+
         Entity entity = EcsManager.Instance.World.Create();        
         AddBase(entity, characterBaseData);
+        AddRender(entity, characterBaseData, multimeshMaterialDict[characterBaseData.idMaterial], positionInitial);
         AddMove(entity, positionInitial);        
-        AddAnimations(entity, characterBaseData);
-        AddAnimationState(entity, characterBaseData);
-        AddSoulCharacter(entity, characterBaseData.idCharacterBase);
+        AddAnimations(entity, characterBaseData);        
+        AddSoulCharacter(entity, characterBaseData);
 
         if (characterBaseData.collisionBody !=null || characterBaseData.collisionMove !=null)
         {
-            AddColliderBody(entity, characterBaseData);
+            AddColliderBody(entity, characterBaseData, positionInitial);
         }
     }
 
-    private void AddAnimationState(Entity entity, CharacterBaseData characterBaseData)
+    private void AddRender(Entity entity, CharacterBaseData characterBaseData, MultimeshMaterial multimeshMaterial, Vector2 positionInitial)
     {
-        entity.Add(new CharacterStateComponent { currentState = 0, stateBehavior = BehaviorManager.Instance.GetStateBehavior(1) }); // siempre inicia con el estado 0 que debe ser idle 
+        var inst = multimeshMaterial.CreateInstance();
+        
+        Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
+        transform.Origin = new Vector3(positionInitial.X, positionInitial.Y, (positionInitial.Y * CommonAtributes.LAYER_MULTIPLICATOR) + 0);
+        entity.Add(new RenderGPUComponent { rid = inst.Item1, instance = inst.Item2, layerRender =0, transform = transform, zOrdering = characterBaseData.collisionMove.OriginCurrent.Y } );
     }
 
+    private void AddBase(Entity entity, CharacterBaseData baseData)
+    {
+        entity.Add(new CharacterComponent { CharacterBaseData = baseData, damageBase = 10, healthBase = 10 });
+       
+    }
     private void AddMove(Entity entity, Vector2 positionInitial)
     {
-        entity.Add(new PositionComponent { x = positionInitial.X, y = positionInitial.Y });
+        entity.Add(new PositionComponent { position = positionInitial });
         entity.Add(new DirectionComponent { animationDirection = AnimationDirection.LEFT });
+        entity.Add(new VelocityComponent { velocity = 5 });
+        
     }
 
-    private void AddSoulCharacter(Entity entity , int RootBase)
+    private void AddSoulCharacter(Entity entity , CharacterBaseData characterBaseData)
     {
         // aqui agregar el componente de comportamiento, Luego seria genial extenderlo a lua :)
+        //if (characterBaseData.attackIDBehavior!=0|| characterBaseData.moveIDBehavior != 0)
+        //{
+        //    CharacterCustomBehaviorComponent characterCustomBehaviorComponent;
 
-        CharacterBehaviorComponent behaviorCharacterComponent;
-        behaviorCharacterComponent.moveBehavior = BehaviorManager.Instance.GetMoveBehavior(1);
-        behaviorCharacterComponent.attackBehavior = BehaviorManager.Instance.GetAttackBehavior(1);
-        
+        //    characterCustomBehaviorComponent.characterStateType = CharacterStateType.IDLE;
+        //    characterCustomBehaviorComponent.characterBehavior = BehaviorManager.Instance.GetBehavior(1);
 
-        entity.Add(behaviorCharacterComponent);
-
+        //    // me falta completar este
+        //}
+        //else
+        {
+            CharacterBehaviorComponent behaviorCharacterComponent;
+            behaviorCharacterComponent.characterStateType = CharacterStateType.IDLE;
+            behaviorCharacterComponent.characterBehavior = BehaviorManager.Instance.GetBehavior(1);
+            entity.Add(behaviorCharacterComponent);
+        }        
     }
     private void AddAnimations(Entity entity, CharacterBaseData characterBaseData)
     {
@@ -103,18 +156,22 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         characterAnimationComponent.stateAnimation = 0;
         characterAnimationComponent.currentFrame = 0;
         characterAnimationComponent.currentFrameIndex = 0;
-        entity.Add<CharacterAnimationComponent>();
+        characterAnimationComponent.active = true;
+        characterAnimationComponent.frameDuration = 0;
+        characterAnimationComponent.horizontalMirror = 0;
+        characterAnimationComponent.animationComplete = false;
+        characterAnimationComponent.TimeSinceLastFrame = 0;
+
+        entity.Add<CharacterAnimationComponent>(characterAnimationComponent);
     }
 
-    private void AddColliderBody(Entity entity, CharacterBaseData characterBaseData)
+    private void AddColliderBody(Entity entity, CharacterBaseData characterBaseData, Vector2 positionInitial)
     {
         entity.Add<CharacterColliderComponent>();
+        CollisionManager.Instance.characterCollidersEntities.AddUpdateItem(positionInitial, entity);
     }
 
-    private void AddBase(Entity entity, CharacterBaseData baseData)
-    {
-        entity.Add(new CharacterComponent { CharacterBaseData = baseData, damageBase =baseData.damageBase, healthBase = baseData.healthBase });
-    }
+ 
  
 
     protected override void Destroy()

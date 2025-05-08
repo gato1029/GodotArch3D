@@ -1,0 +1,234 @@
+[gd_scene load_steps=18 format=3 uid="uid://oxktsgqni13i"]
+
+[ext_resource type="Script" uid="uid://cf7t7xax0xu83" path="res://sources/WindowsDataBase/Weapons/WindowWeapons.cs" id="1_rnr75"]
+[ext_resource type="Script" uid="uid://v1j8xeix4eag" path="res://addons/dockable_container/dockable_container.gd" id="2_3xim7"]
+[ext_resource type="PackedScene" uid="uid://7qitk1hya1sf" path="res://sources/WindowsDataBase/Character/Colliders/windowColliders.tscn" id="2_rnr75"]
+[ext_resource type="Script" uid="uid://dqgvsidevc60" path="res://addons/dockable_container/layout_panel.gd" id="3_2acj8"]
+[ext_resource type="Script" uid="uid://ckq0vvm6ro0r4" path="res://addons/dockable_container/layout_split.gd" id="4_2acj8"]
+[ext_resource type="Script" uid="uid://deei2bkhtqhp2" path="res://addons/dockable_container/layout.gd" id="4_s5tc3"]
+[ext_resource type="PackedScene" uid="uid://ffcrdynu3lki" path="res://sources/WindowsDataBase/Character/Colliders/AnimationScene.tscn" id="6_vsfvy"]
+[ext_resource type="PackedScene" uid="uid://cn2baqsyiht17" path="res://sources/WindowsDataBase/Character/Colliders/AnimationPanel.tscn" id="7_s5tc3"]
+[ext_resource type="Texture2D" uid="uid://dk644aa76crq1" path="res://resources/Textures/internal/point.png" id="10_1layi"]
+[ext_resource type="Script" uid="uid://c8kvdr1wgotq1" path="res://sources/WindowsDataBase/Generic/AnimationPreview.cs" id="10_2lfhk"]
+
+[sub_resource type="Resource" id="Resource_vsfvy"]
+resource_name = "Tabs"
+script = ExtResource("3_2acj8")
+names = PackedStringArray("Texture")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_s5tc3"]
+resource_name = "Tabs"
+script = ExtResource("3_2acj8")
+names = PackedStringArray("Panel")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_1layi"]
+resource_name = "Tabs"
+script = ExtResource("3_2acj8")
+names = PackedStringArray("TabContainer")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_gsxsq"]
+resource_name = "Split"
+script = ExtResource("4_2acj8")
+direction = 0
+percent = 0.5
+first = SubResource("Resource_s5tc3")
+second = SubResource("Resource_1layi")
+
+[sub_resource type="Resource" id="Resource_467py"]
+resource_name = "Split"
+script = ExtResource("4_2acj8")
+direction = 0
+percent = 0.161232
+first = SubResource("Resource_vsfvy")
+second = SubResource("Resource_gsxsq")
+
+[sub_resource type="Resource" id="Resource_2lfhk"]
+resource_name = "Layout"
+script = ExtResource("4_s5tc3")
+root = SubResource("Resource_467py")
+hidden_tabs = {}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vsfvy"]
+
+[node name="WindowWeapons" type="Window" node_paths=PackedStringArray("fileDialog", "buttonDialog", "buttonSplit", "itemListTiles", "spinPixel_X", "spinPixel_Y", "optionButtonCharacterBase", "optionButtonCharacterAnimationID", "animationSceneCharacter", "animationPreviewCharacter", "animationPreviewWeapon", "animationPanel", "colliderPanel", "collisionShape2DCollider")]
+initial_position = 2
+size = Vector2i(1000, 500)
+exclusive = true
+always_on_top = true
+script = ExtResource("1_rnr75")
+fileDialog = NodePath("FileDialog")
+buttonDialog = NodePath("Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer/Button2")
+buttonSplit = NodePath("Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer/Button")
+itemListTiles = NodePath("Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/ItemList")
+spinPixel_X = NodePath("Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer/SpinBox")
+spinPixel_Y = NodePath("Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer/SpinBox2")
+optionButtonCharacterBase = NodePath("Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer/GridContainer/OptionButton")
+optionButtonCharacterAnimationID = NodePath("Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer/GridContainer/OptionButton2")
+animationSceneCharacter = NodePath("Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer/AnimationScene")
+animationPreviewCharacter = NodePath("Panel/HBoxContainer/VFlowContainer/Panel/CenterContainer/Sprite2D")
+animationPreviewWeapon = NodePath("Panel/HBoxContainer/VFlowContainer/Panel/CenterContainer/Weapon")
+animationPanel = NodePath("Panel/HBoxContainer/VFlowContainer/TabContainer/ControlAnimations")
+colliderPanel = NodePath("Panel/HBoxContainer/VFlowContainer/TabContainer/Colliders Atack")
+collisionShape2DCollider = NodePath("Panel/HBoxContainer/VFlowContainer/Panel/CenterContainer/CollisionShape2D")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="VFlowContainer" type="Container" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_3xim7")
+tabs_visible = false
+hide_single_tab = true
+layout = SubResource("Resource_2lfhk")
+metadata/_custom_type_script = "uid://v1j8xeix4eag"
+
+[node name="Texture" type="PanelContainer" parent="Panel/HBoxContainer/VFlowContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/HBoxContainer/VFlowContainer/Texture"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Button2" type="Button" parent="Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Load Texture"
+
+[node name="SpinBox" type="SpinBox" parent="Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 500.0
+value = 64.0
+
+[node name="SpinBox2" type="SpinBox" parent="Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 500.0
+value = 64.0
+
+[node name="Button" type="Button" parent="Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Dividir"
+
+[node name="ItemList" type="ItemList" parent="Panel/HBoxContainer/VFlowContainer/Texture/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+max_columns = 20
+same_column_width = true
+fixed_column_width = 128
+icon_mode = 0
+
+[node name="TabContainer" type="TabContainer" parent="Panel/HBoxContainer/VFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+current_tab = 0
+
+[node name="CharacterBase" type="PanelContainer" parent="Panel/HBoxContainer/VFlowContainer/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="GridContainer" type="GridContainer" parent="Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 2
+
+[node name="Label" type="Label" parent="Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Character:"
+
+[node name="OptionButton" type="OptionButton" parent="Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "ID Animation:"
+
+[node name="OptionButton2" type="OptionButton" parent="Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="AnimationScene" parent="Panel/HBoxContainer/VFlowContainer/TabContainer/CharacterBase/VBoxContainer" instance=ExtResource("6_vsfvy")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Colliders Atack" parent="Panel/HBoxContainer/VFlowContainer/TabContainer" instance=ExtResource("2_rnr75")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ControlAnimations" parent="Panel/HBoxContainer/VFlowContainer/TabContainer" instance=ExtResource("7_s5tc3")]
+visible = false
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="Panel/HBoxContainer/VFlowContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel/HBoxContainer/VFlowContainer/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Panel/HBoxContainer/VFlowContainer/Panel/CenterContainer"]
+auto_translate_mode = 1
+shape = SubResource("RectangleShape2D_vsfvy")
+
+[node name="Sprite2D" type="Sprite2D" parent="Panel/HBoxContainer/VFlowContainer/Panel/CenterContainer"]
+script = ExtResource("10_2lfhk")
+
+[node name="Weapon" type="Sprite2D" parent="Panel/HBoxContainer/VFlowContainer/Panel/CenterContainer"]
+script = ExtResource("10_2lfhk")
+
+[node name="Center" type="Sprite2D" parent="Panel/HBoxContainer/VFlowContainer/Panel/CenterContainer"]
+auto_translate_mode = 1
+scale = Vector2(0.005, 0.005)
+texture = ExtResource("10_1layi")
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+use_native_dialog = true

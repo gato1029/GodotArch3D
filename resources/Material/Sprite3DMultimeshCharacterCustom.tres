@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://chxv2yy7drnad"]
+
+[ext_resource type="Shader" path="res://resources/shaders/SpriteMultimeshCharacter.gdshader" id="1_7dmja"]
+[ext_resource type="Texture2D" uid="uid://cy4ksrqvjo3xt" path="res://resources/basic_ground_tiles.png" id="2_8jbni"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_7dmja")
+shader_parameter/mtexture = ExtResource("2_8jbni")
+shader_parameter/transparency = 0.0
+shader_parameter/ancho = 13.0
+shader_parameter/alto = 46.0

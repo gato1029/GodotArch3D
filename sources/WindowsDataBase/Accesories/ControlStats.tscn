@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://dag6ud1ctfxtj"]
+
+[ext_resource type="Script" uid="uid://jfm8nhgpcekn" path="res://sources/WindowsDataBase/Accesories/ControlStats.cs" id="1_rqhjk"]
+
+[node name="HBoxContainer" type="HBoxContainer" node_paths=PackedStringArray("optionButtonCombo", "spinBoxValue", "buttonDelete")]
+script = ExtResource("1_rqhjk")
+optionButtonCombo = NodePath("OptionButton")
+spinBoxValue = NodePath("SpinBox")
+buttonDelete = NodePath("Button")
+
+[node name="OptionButton" type="OptionButton" parent="."]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="."]
+layout_mode = 2
+min_value = -1000.0
+max_value = 1000.0
+step = 0.1
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+text = "Eliminar
+"

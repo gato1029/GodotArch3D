@@ -58,7 +58,7 @@ using static Godot.HttpRequest;
 
         try
         {
-            File.Copy(sourcePath, destinationPath);
+            File.Copy(sourcePath, destinationPath,true);
             return finalCarpet+"/"+fileName;
         }
         catch (Exception ex)

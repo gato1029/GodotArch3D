@@ -1,0 +1,99 @@
+[gd_scene load_steps=2 format=3 uid="uid://eouyrgdv2i88"]
+
+[ext_resource type="Script" uid="uid://ug7eoe7pq4gn" path="res://sources/WindowsDataBase/Character/Colliders/ColliderScene.cs" id="1_dajyo"]
+
+[node name="Panel" type="VBoxContainer" node_paths=PackedStringArray("buttonRemove", "buttonPreview", "spinBoxWidth", "spinBoxHeight", "spinBoxOffsetX", "spinBoxOffsetY", "optionButtonType")]
+offset_right = 431.0
+offset_bottom = 93.0
+size_flags_horizontal = 6
+size_flags_vertical = 4
+script = ExtResource("1_dajyo")
+buttonRemove = NodePath("HBoxContainer3/Button")
+buttonPreview = NodePath("HBoxContainer3/Button2")
+spinBoxWidth = NodePath("HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox")
+spinBoxHeight = NodePath("HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox2")
+spinBoxOffsetX = NodePath("HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer/SpinBox")
+spinBoxOffsetY = NodePath("HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer/SpinBox2")
+optionButtonType = NodePath("HBoxContainer/OptionButton")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "Forma:"
+
+[node name="OptionButton" type="OptionButton" parent="HBoxContainer"]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Rectangle"
+popup/item_0/id = 0
+popup/item_1/text = "Circle"
+popup/item_1/id = 1
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 1000.0
+value = 20.0
+prefix = "W:"
+
+[node name="SpinBox2" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 1000.0
+value = 20.0
+prefix = "H:"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer3"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Offset:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+min_value = -100.0
+step = 0.1
+prefix = "X:"
+
+[node name="SpinBox2" type="SpinBox" parent="HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+min_value = -100.0
+max_value = 1000.0
+step = 0.1
+prefix = "Y:"
+
+[node name="Button" type="Button" parent="HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "Remove"
+
+[node name="Button2" type="Button" parent="HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "Previsualizar"

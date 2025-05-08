@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.4.0-dev.7">
+<Project Sdk="Godot.NET.Sdk/4.4.0">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
@@ -28,6 +28,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="resources\" />
+    <Folder Include="sources\managers\Characters\MainCharacter\" />
     <Folder Include="sources\managers\Sprite3D\" />
+    <Folder Include="sources\WindowsDataBase\Accesories\UIGenerate\" />
   </ItemGroup>
 </Project>

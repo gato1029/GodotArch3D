@@ -20,16 +20,20 @@ using System.Reflection.Emit;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.managers.Characters;
 public partial class Main3D : Node3D
 {
     MultimeshMaterial multimeshMaterial;
     TerrainMap terrainMap;
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
+
+   
     public override void _Ready()
 	{
         
 
-    
+
+
         EcsManager.Instance.SetNode3DMain(this);
         ChunkManager.Initialize();
         
@@ -72,6 +76,8 @@ public partial class Main3D : Node3D
 
         //terrainMap.AddUpdateTile(new Vector2I(0, 0), 6);
         //terrainMap.AddUpdateTile(new Vector2I(2, 2), 5);
+
+        //CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(5, 3));
         
         ChunkManager.Instance.ForcedUpdate();
 

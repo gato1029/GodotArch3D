@@ -111,6 +111,7 @@ public partial class WindowCharacterBase : Window, IDetailWindow
 
         spriteSelection.Hframes = 1;
         spriteSelection.Vframes = 1;
+        optionMaterial.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
     }
 
 
@@ -132,7 +133,7 @@ public partial class WindowCharacterBase : Window, IDetailWindow
         ComboMaterial_Selected(currentMaterialData.id);
         optionMaterial.Selected = currentMaterialData.id;
 
-        idBaseSpin.Value = characterBaseData.idCharacterBase;
+        idBaseSpin.Value = characterBaseData.idGroup;
         nameLine.Text = characterBaseData.name;
 
         bodyWidthSpin.Value = characterBaseData.collisionBody.widthPixel;
@@ -159,17 +160,16 @@ public partial class WindowCharacterBase : Window, IDetailWindow
             node.SetData(item);
         }
 
-        foreach (var item in characterBaseData.atackDataCollidersArray)
-        {
-            PackedScene packedScene = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/windosCharacterCollisionAtack.tscn");
-            var node = packedScene.Instantiate<WindowsCharacterCollisionAtack>();
-            node.OnRequestDelete += Node_OnRequestDelete;
-            node.OnNotifyChangue += Node_OnNotifyChangue;
+       
+            PackedScene packedScene2 = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/windosCharacterCollisionAtack.tscn");
+            var node2 = packedScene2.Instantiate<WindowsCharacterCollisionAtack>();
+            node2.OnRequestDelete += Node_OnRequestDelete;
+            node2.OnNotifyChangue += Node_OnNotifyChangue;
             int i = panelColliders.Count;
-            panelColliders.Add(node);
-            gridContainerColliders.AddChild(node);
-            node.SetData(item);
-        }
+            panelColliders.Add(node2);
+            gridContainerColliders.AddChild(node2);
+            node2.SetData(characterBaseData.atackDataColliders);
+       
         
 
 
@@ -255,13 +255,13 @@ public partial class WindowCharacterBase : Window, IDetailWindow
         }
 
         characterBaseData.idMaterial = currentMaterialData.id;
-        characterBaseData.atackDataCollidersArray = dataCollider.ToArray();
+        characterBaseData.atackDataColliders = dataCollider[0];
         characterBaseData.animationDataArray = dataAnimations.ToArray();
 
         characterBaseData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value);
         characterBaseData.collisionMove = new Rectangle((float)moveWidthSpin.Value, (float)moveHeightSpin.Value, (float)moveOffsetXSpin.Value, (float)moveOffsetYSpin.Value);
 
-        characterBaseData.idCharacterBase = (int) idBaseSpin.Value;
+        characterBaseData.idGroup = (int) idBaseSpin.Value;
         characterBaseData.name = nameLine.Text; 
 
         DataBaseManager.Instance.InsertUpdate(characterBaseData);
@@ -337,15 +337,19 @@ public partial class WindowCharacterBase : Window, IDetailWindow
     }
 
     private void button_AddCollider()
-    {        
-        PackedScene packedScene = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/windosCharacterCollisionAtack.tscn");
-        var node = packedScene.Instantiate<WindowsCharacterCollisionAtack>();     
-        node.OnRequestDelete += Node_OnRequestDelete;
-        node.OnNotifyChangue += Node_OnNotifyChangue;
-        int i = panelColliders.Count;
-        panelColliders.Add(node);
-        gridContainerColliders.AddChild(node);
-        node.SetID(i);
+    {
+        if (panelColliders.Count<1)
+        {
+            PackedScene packedScene = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/windosCharacterCollisionAtack.tscn");
+            var node = packedScene.Instantiate<WindowsCharacterCollisionAtack>();
+            node.OnRequestDelete += Node_OnRequestDelete;
+            node.OnNotifyChangue += Node_OnNotifyChangue;
+            int i = panelColliders.Count;
+            panelColliders.Add(node);
+            gridContainerColliders.AddChild(node);
+            node.SetID(i);
+        }
+   
     }
 
     private void Node_OnNotifyChangue(CharacterColliderAtackData itemData)

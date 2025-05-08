@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkh861ecemyee"]
+
+[ext_resource type="Script" uid="uid://lt1kajpr1okx" path="res://sources/WindowsDataBase/Accesories/ControlMiniature.cs" id="1_3a8sj"]
+
+[node name="PanelContainer" type="PanelContainer"]
+custom_minimum_size = Vector2(200, 200)
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_right = 100.0
+offset_bottom = 200.0
+grow_horizontal = 2
+size_flags_horizontal = 6
+size_flags_vertical = 2
+script = ExtResource("1_3a8sj")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Miniatura"
+
+[node name="TextureRectImage" type="TextureRect" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+expand_mode = 3
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="ButtonNew" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Nuevo"
+
+[node name="ButtonSelect" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Buscar"

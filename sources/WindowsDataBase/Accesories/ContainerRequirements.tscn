@@ -1,0 +1,45 @@
+[gd_scene load_steps=3 format=3 uid="uid://cl5oe3w81hqsh"]
+
+[ext_resource type="Script" uid="uid://csb2jruku7pyw" path="res://sources/WindowsDataBase/Accesories/ContainerRequirements.cs" id="1_1u7p8"]
+[ext_resource type="PackedScene" uid="uid://kma1fph6dbb6" path="res://sources/WindowsDataBase/Accesories/ContainerStats.tscn" id="2_i65ug"]
+
+[node name="PanelContainer" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1u7p8")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Requisitos Necesarios"
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Nivel Necesario:"
+
+[node name="SpinBoxLevel" type="SpinBox" parent="MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+max_value = 1000.0
+
+[node name="ContainerStats" parent="MarginContainer/VBoxContainer" instance=ExtResource("2_i65ug")]
+layout_mode = 2
+size_flags_vertical = 3

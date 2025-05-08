@@ -8,13 +8,7 @@ public partial class GridDrawUI : ColorRect
     [Export] TextureRect _image;
     private ShaderMaterial _shaderMaterial;
     public override void _Ready()
-    {
-        //_shaderMaterial = new ShaderMaterial();
-        //_shaderMaterial.Shader = (Shader)GD.Load("res://resources/shaders/gridUI.gdshader"); // Ruta al shader
-
-        //// Asignar el material al GridDrawer
-        //Material = _shaderMaterial;
-      
+    {      
         _shaderMaterial = (ShaderMaterial)Material;
         Redraw(_image.Size);
     }

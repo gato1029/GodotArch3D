@@ -6,7 +6,9 @@ using Arch.Relationships;
 using Arch.System;
 
 using Godot;
+using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,11 +38,65 @@ internal class DebugerSystem : BaseSystem<World, float>
 
     private QueryDescription queryDebugMelleCollider = new QueryDescription().WithAll<Position, Direction, MelleCollider>();
 
-    private QueryDescription queryDesactive = new QueryDescription().WithAll<ColliderSprite, ColliderDebug>();
+
+    private QueryDescription queryDirection = new QueryDescription().WithAll<DirectionComponent, PositionComponent>();
+    private QueryDescription queryColliderCharacter = new QueryDescription().WithAll<CharacterComponent,CharacterColliderComponent>();
 
     public DebugerSystem(World world) : base(world)
     {
         commandBuffer = new CommandBuffer();
+    }
+
+    private struct ChunkJobDebugColliderCharacter : IChunkJob
+    {
+        private readonly float _deltaTime;
+        private readonly CommandBuffer _commandBuffer;
+
+        public ChunkJobDebugColliderCharacter(CommandBuffer commandBuffer, float deltaTime) : this()
+        {
+            _commandBuffer = commandBuffer;
+            _deltaTime = deltaTime;
+        }
+
+        public void Execute(ref Chunk chunk)
+        {
+            ref var pointerEntity = ref chunk.Entity(0);
+            ref var pointerCharacterComponent = ref chunk.GetFirst<CharacterComponent>();
+            ref var pointerPositionComponent = ref chunk.GetFirst<PositionComponent>();
+            
+            //ref var pointerPosition = ref chunk.GetFirst<Position>();
+            foreach (var entityIndex in chunk)
+            {
+                ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
+                ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
+                ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
+
+                if (characterComponent.CharacterBaseData.collisionBody is Rectangle)
+                {
+                    Rectangle shape = (Rectangle)characterComponent.CharacterBaseData.collisionBody;
+                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width, shape.Height, 1));
+                    transform3DShape.Origin = new Vector3(positionComponent.position.X + shape.OriginCurrent.X, positionComponent.position.Y + shape.OriginCurrent.Y, 1);
+                    DebugDraw.Quad(transform3DShape, 1, Colors.Red, 0.0f); 
+                }
+
+             
+                if (characterComponent.CharacterBaseData.collisionMove is Rectangle)
+                {
+                    Rectangle shape2 = (Rectangle)characterComponent.CharacterBaseData.collisionMove;
+                    Transform3D transform3DShape2 = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape2 = transform3DShape2.Scaled(new Vector3(shape2.Width, shape2.Height, 1));
+                    transform3DShape2.Origin = new Vector3(positionComponent.position.X + shape2.OriginCurrent.X, positionComponent.position.Y + shape2.OriginCurrent.Y, 1);
+                    DebugDraw.Quad(transform3DShape2, 1, Colors.Green, 0.0f); //debug
+                }
+           
+                DebugDraw.Quad(new Vector3(positionComponent.position.X, positionComponent.position.Y, 1), .2f, Colors.DarkOrange, 0.0f); //center          
+
+
+
+            }
+
+        }
     }
 
     private struct ChunkJobDebugColliderSprite : IChunkJob
@@ -105,6 +161,33 @@ internal class DebugerSystem : BaseSystem<World, float>
 
         }
     }
+    private struct ChunkJobDebugDirectionComponent : IChunkJob
+    {
+        private readonly float _deltaTime;
+        private readonly CommandBuffer _commandBuffer;
+
+        public ChunkJobDebugDirectionComponent(CommandBuffer commandBuffer, float deltaTime) : this()
+        {
+            _commandBuffer = commandBuffer;
+            _deltaTime = deltaTime;
+        }
+
+        public void Execute(ref Chunk chunk)
+        {
+            ref var pointerEntity = ref chunk.Entity(0);
+            ref var pointerPositionComponent = ref chunk.GetFirst<PositionComponent>();
+            ref var pointerDirectionComponent = ref chunk.GetFirst<DirectionComponent>();
+
+            foreach (var entityIndex in chunk)
+            {
+                ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
+                ref PositionComponent t = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
+                ref DirectionComponent d = ref Unsafe.Add(ref pointerDirectionComponent, entityIndex);
+                DebugDraw.Arrow(new Vector3(t.position.X, t.position.Y,1), new Vector3(d.value.X, d.value.Y, 1), 1, Colors.Aqua, 0);
+            }
+        }
+    }
+
     private struct ChunkJobDebugDirection : IChunkJob
     {
         private readonly float _deltaTime;
@@ -249,6 +332,10 @@ internal class DebugerSystem : BaseSystem<World, float>
             World.InlineParallelChunkQuery(in queryDebugSprite, new ChunkJobDebugColliderSprite(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryDebugDirectionSprite, new ChunkJobDebugDirection(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryDebugMelleCollider, new ChunkJobDebugMelleCollider(commandBuffer, t));
+
+            World.InlineParallelChunkQuery(in queryColliderCharacter, new ChunkJobDebugColliderCharacter(commandBuffer, t));
+            World.InlineParallelChunkQuery(in queryDirection, new ChunkJobDebugDirectionComponent(commandBuffer, t));
+
         }
 
     }

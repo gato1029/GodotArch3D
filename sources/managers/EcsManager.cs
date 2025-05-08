@@ -3,6 +3,7 @@ using Arch.LowLevel;
 using Arch.System;
 using Godot;
 using GodotEcsArch.sources.systems;
+using GodotEcsArch.sources.systems.Character;
 using Schedulers;
 using System;
 using System.Collections.Generic;
@@ -62,11 +63,11 @@ public class EcsManager : SingletonBase<EcsManager>
         groupCollider = new Group<float>("Collider", new CollisionSystem(world));
         groupMovement = new Group<float>("Movement", new SearchMovementTargetSystem(world));
 
-        groupRender = new Group<float>("Render", new StateSystem(world), new RefreshAnimationSystem(world),  new AnimationSystem(world), new AnimationTileSystem(world), new RenderSystem(world));
+        groupRender = new Group<float>("Render", new StateSystem(world), new RefreshAnimationSystem(world), new CharacterAnimationSystem(world),  new AnimationSystem(world), new AnimationTileSystem(world), new RenderSystem(world));
 
         groupMainCharacter = new Group<float>("MainCharacter", new MainCharacterSystem(world));
 
-        groupUnits = new Group<float>("Units" ,new BehaviorCharacterSystem(world));
+        groupUnits = new Group<float>("Units" ,new BehaviorCharacterSystem(world), new CharacterBehaviorSystem(world));
         groupRemove = new Group<float>("Remove", new RemoveSystem(world));
 
         groupDebugerArch = new Group<float>("DebugerArch", new DebugerManager(world));

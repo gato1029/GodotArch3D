@@ -1,3 +1,4 @@
+using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
@@ -39,6 +40,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
     {
         public int id { get; set; }
         public int[] idFrames { get; set; } // Cantidad de frames en la animación
+        public bool hasCollider { get; set; }
+        public GeometricShape2D collider { get; set; }
 
     }
     public class CharacterColliderAtackData
@@ -52,21 +55,25 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         }
      
     }
+
+
     public class CharacterBaseData : IdData
     {
-        public int idMaterial { get; set; }
-        public int idCharacterBase {  get; set; }
-        public int healthBase { get; set; }
-        public int damageBase { get; set; }
-        public string colorBase { set; get; }
-        public int moveIDBehavior { set; get; }
-        public int attackIDBehavior { set; get; }
-        public int statesIDBehavior { set; get; }
+        public int idMaterial { get; set; }        
+        public int idGroup {  get; set; }
+
+        public float zOrderingOrigin { get; set; }
+        //public int healthBase { get; set; }
+        //public int damageBase { get; set; }
+        //public string colorBase { set; get; }
+        //public int moveIDBehavior { set; get; }
+        //public int attackIDBehavior { set; get; }
+        //public int statesIDBehavior { set; get; }
 
         public GeometricShape2D collisionMove { get; set; }
         public GeometricShape2D collisionBody { get; set; }
 
-        public  CharacterColliderAtackData[] atackDataCollidersArray { get; set; }
+        public  CharacterColliderAtackData atackDataColliders { get; set; } // solo Si esta dentro
         public AnimationStateData[] animationDataArray { get; set; }
 
         [BsonCtor]
@@ -87,14 +94,23 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         {
          
         }
-        public  CharacterColliderAtackData GetColliderAtack(int id)
-        {
-            return  atackDataCollidersArray[id];
-        }
 
         public AnimationStateData GetAnimationData(int id)
         {
             return  animationDataArray[id];
         }
+    }
+
+    public class CharacterCustomData : CharacterBaseData
+    {
+        public int idWeaponTextureAnimation;
+        public int idShieldAnimation;
+        //public int idWeaponAnimation;
+        //public int idWeaponAnimation;
+        //public int idWeaponAnimation;
+    }
+    public class CharacterSimpleData : CharacterBaseData
+    {
+        
     }
 }

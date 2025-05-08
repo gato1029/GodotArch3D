@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5l0xhw6ebiwl"]
+
+[ext_resource type="Script" uid="uid://hnykhsfkyio1" path="res://sources/WindowsDataBase/Accesories/ElementsContainer.cs" id="1_n8e2f"]
+
+[node name="PanelContainer" type="PanelContainer" node_paths=PackedStringArray("buttonNew", "boxContainer")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_n8e2f")
+buttonNew = NodePath("MarginContainer/VBoxContainer/Button")
+boxContainer = NodePath("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainerDanio")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Elementos Basicos"
+
+[node name="Button" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Nuevo"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainerDanio" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3

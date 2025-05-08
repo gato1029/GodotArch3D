@@ -17,7 +17,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
 {
     internal class BehaviorManager : SingletonBase<BehaviorManager>
     {
-        Dictionary<int, IStateCharacterBehavior> dictionaryStates = new Dictionary<int, IStateCharacterBehavior>();
+        Dictionary<int, ICharacterBehavior> dictionaryBehaviorsCharacter = new Dictionary<int, ICharacterBehavior>();
         Dictionary<int, IMoveBehavior>  dictionaryMoves = new Dictionary<int, IMoveBehavior>();
         Dictionary<int, IAttackBehavior> dictionaryAttack = new Dictionary<int, IAttackBehavior>();
 
@@ -37,7 +37,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
 
         void RegisterAllStates()
         {
-            RegisterStateBehavior(1, new HumanCharacterState());
+            RegisterBehavior(1, new HumanCharacterBehavior());
          
         }
         void RegisterAllMoves()
@@ -49,11 +49,11 @@ namespace GodotEcsArch.sources.managers.Behaviors
             RegisterAttackBehavior(1, new MelleAtackHorizontalBehavior());
             RegisterAttackBehavior(2, new MelleAttackBehavior());
         }
-        public IStateCharacterBehavior GetStateBehavior(int id)
+        public ICharacterBehavior GetBehavior(int id)
         {
-            if (dictionaryStates.ContainsKey(id))
+            if (dictionaryBehaviorsCharacter.ContainsKey(id))
             {
-                return dictionaryStates[id];
+                return dictionaryBehaviorsCharacter[id];
             }
             return null;
         }
@@ -74,11 +74,11 @@ namespace GodotEcsArch.sources.managers.Behaviors
             return null;
         }
 
-        public void RegisterStateBehavior(int id, IStateCharacterBehavior behavior)
+        public void RegisterBehavior(int id, ICharacterBehavior behavior)
         {
-            if (!dictionaryStates.ContainsKey(id))
+            if (!dictionaryBehaviorsCharacter.ContainsKey(id))
             {
-                dictionaryStates[id] = behavior;
+                dictionaryBehaviorsCharacter[id] = behavior;
             }
    
         }

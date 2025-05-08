@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Weapons;
 
 public partial class HerramientaMenuBar : MenuBar
 {
@@ -81,6 +82,31 @@ public partial class HerramientaMenuBar : MenuBar
                     return ids;
                 }
                 );
+                break;
+            case 2:
+                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
+                AddChild(win);
+                win.Show();
+                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/Weapons/windowWeapons.tscn");
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD, "Armas", true);
+                win.SetLoaddBAction(() =>
+                {
+                    var collection = DataBaseManager.Instance.FindAll<AnimationBaseData>();
+                    List<IdData> ids = new List<IdData>();
+                    foreach (var item in collection)
+                    {
+                        IdData iddata = item;
+                        ids.Add(iddata);
+                    }
+                    return ids;
+                }
+                );
+                break;
+            case 3:
+                var winInternal = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/WindowAccessory.tscn").Instantiate<WindowAccessory>();
+                AddChild(winInternal);
+                winInternal.PopupCentered();
+               
                 break;
         }
     }

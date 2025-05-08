@@ -1,0 +1,180 @@
+[gd_scene load_steps=6 format=3 uid="uid://dp2ttehohacx3"]
+
+[ext_resource type="Script" uid="uid://bk6crwlxmt8q7" path="res://sources/WindowsDataBase/Accesories/AccessoryControl.cs" id="1_33k0g"]
+[ext_resource type="PackedScene" uid="uid://dbvmmc5uyo82x" path="res://sources/WindowsDataBase/Accesories/ContainerBonus.tscn" id="1_d3m74"]
+[ext_resource type="PackedScene" uid="uid://bkh861ecemyee" path="res://sources/WindowsDataBase/Accesories/ControlMiniature.tscn" id="2_f1rau"]
+[ext_resource type="PackedScene" uid="uid://kma1fph6dbb6" path="res://sources/WindowsDataBase/Accesories/ContainerStats.tscn" id="2_pi4ds"]
+[ext_resource type="PackedScene" uid="uid://c5l0xhw6ebiwl" path="res://sources/WindowsDataBase/Accesories/ContainerElements.tscn" id="3_d3m74"]
+
+[node name="AccesoryControl" type="Window"]
+title = "Accesorios"
+initial_position = 3
+size = Vector2i(1000, 800)
+current_screen = 0
+exclusive = true
+popup_window = true
+script = ExtResource("1_33k0g")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="ControlMiniatura" parent="MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("2_f1rau")]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 0
+columns = 2
+
+[node name="Label7" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Animacion Cuerpo:"
+
+[node name="CheckBoxAnimationBody" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Disponible"
+
+[node name="Label8" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Animacion Tiles:"
+
+[node name="CheckBoxAnimationTiles" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Disponible"
+
+[node name="Label9" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Requisitos:"
+
+[node name="CheckBoxRequeriment" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Disponible"
+
+[node name="Label6" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Clase de Accesorio:"
+
+[node name="OptionButtonClassAccesory" type="OptionButton" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="Label10" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Tipo de Accesorio:"
+
+[node name="OptionButtonTypeAccesory" type="OptionButton" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="Label11" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Ubicacion Accesorio:"
+
+[node name="OptionButtonBodyAccesory" type="OptionButton" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="Label5" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="Descripcion" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Descripcion:"
+
+[node name="TextEditDescription" type="TextEdit" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 2
+wrap_mode = 1
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Color Base:"
+
+[node name="ColorPickerButtonColorBase" type="ColorPickerButton" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonSave" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Guardar"
+
+[node name="ButtonDelete" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Eliminar
+"
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="TabContainerControl" type="TabContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+current_tab = 0
+
+[node name="Bonificaciones" type="PanelContainer" parent="MarginContainer/HBoxContainer/TabContainerControl"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones"]
+layout_mode = 2
+columns = 2
+
+[node name="ControlBonusBase" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer" instance=ExtResource("1_d3m74")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ControlStats" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer" instance=ExtResource("2_pi4ds")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Ataque"
+
+[node name="ControlAtaque" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer/VBoxContainer" instance=ExtResource("3_d3m74")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer2f" type="VBoxContainer" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer/VBoxContainer2f"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Defensa"
+
+[node name="ControlDefensa" parent="MarginContainer/HBoxContainer/TabContainerControl/Bonificaciones/GridContainer/VBoxContainer2f" instance=ExtResource("3_d3m74")]
+layout_mode = 2
+size_flags_vertical = 3

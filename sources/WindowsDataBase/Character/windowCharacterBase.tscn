@@ -20,7 +20,6 @@ size = Vector2(20, 45.3333)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ejj3j"]
 
 [node name="WindowCharacterBase" type="Window"]
-gui_embed_subwindows = true
 title = "Character Base"
 initial_position = 2
 size = Vector2i(1500, 600)
@@ -162,7 +161,7 @@ debug_color = Color(0.517856, 0.308616, 0.597025, 0.42)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-current_tab = 1
+current_tab = 2
 
 [node name="Collider Basic" type="ScrollContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
 visible = false
@@ -324,6 +323,7 @@ step = 0.1
 prefix = "Y:"
 
 [node name="Animations" type="MarginContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -355,7 +355,6 @@ layout_mode = 2
 size_flags_horizontal = 6
 
 [node name="Colliders Atack" type="MarginContainer" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 10

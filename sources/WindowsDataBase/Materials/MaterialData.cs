@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Materials
 {
-    public class IdData
+    public class IdData 
     {
         [BsonId]
         public int id { get; set; }
@@ -36,7 +36,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         public Mesh mesh { get; set; }
         public MaterialData()
         {
-            
+            MaterialManager.Instance.RegisterMaterial(-1, this);            
         }
 
         [BsonCtor]
@@ -86,6 +86,24 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
                     shaderMaterial.SetShaderParameter("atlas_width", widht);
                     shaderMaterial.SetShaderParameter("atlas_height", height);
 
+                    mesh = MeshCreator.CreateSquareMesh(divisionPixelX, divisionPixelY, new Vector2(divisionPixelX, divisionPixelY), new Vector3(0, 0, 0));
+                    mesh.SurfaceSetMaterial(0, shaderMaterial);
+                    break;
+             
+                case 2:
+                    materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshCharacterCustom.tres");
+                    texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
+                    textureMaterial = texture2D;
+                    widht = texture2D.GetWidth() / divisionPixelX;
+                    height = texture2D.GetHeight() / divisionPixelY;
+
+                    shaderMaterial = (ShaderMaterial)materialGeneric.Duplicate();
+                    shaderMaterial.SetShaderParameter("body_texture", textureMaterial);
+                    shaderMaterial.SetShaderParameter("ancho", widht);
+                    shaderMaterial.SetShaderParameter("alto", height);
+
+                    shaderMaterial.SetShaderParameter("layers", 0);
+       
                     mesh = MeshCreator.CreateSquareMesh(divisionPixelX, divisionPixelY, new Vector2(divisionPixelX, divisionPixelY), new Vector3(0, 0, 0));
                     mesh.SurfaceSetMaterial(0, shaderMaterial);
                     break;

@@ -1,0 +1,150 @@
+[gd_scene load_steps=6 format=3 uid="uid://ffcrdynu3lki"]
+
+[ext_resource type="Script" uid="uid://cv7ejoq3x8004" path="res://sources/WindowsDataBase/Character/Colliders/AnimationScene.cs" id="1_b5r4x"]
+[ext_resource type="Texture2D" uid="uid://dpe6okmjy8jkj" path="res://resources/Textures/internal/arrow_up_icon.png" id="1_vjg6e"]
+[ext_resource type="Texture2D" uid="uid://dtmyjyeiduhhe" path="res://resources/Textures/internal/arrow_down_icon.png" id="2_b5r4x"]
+[ext_resource type="PackedScene" uid="uid://eouyrgdv2i88" path="res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn" id="4_flc7d"]
+
+[sub_resource type="AnimatedTexture" id="AnimatedTexture_1ru15"]
+
+[node name="AnimationScene" type="VBoxContainer" node_paths=PackedStringArray("buttonUp", "buttonDown", "buttonRemove", "buttonPrevisualizar", "idSpin", "idDirectionSpinBox", "framesLine", "frameDuration", "textureSelection", "isloop", "mirrorHorizontal", "colliderScene", "hasCollision")]
+theme_override_constants/separation = 10
+script = ExtResource("1_b5r4x")
+buttonUp = NodePath("HBoxContainer/VBoxContainer2/Button2")
+buttonDown = NodePath("HBoxContainer/VBoxContainer2/Button")
+buttonRemove = NodePath("HBoxContainer2/Button2")
+buttonPrevisualizar = NodePath("HBoxContainer2/Button")
+idSpin = NodePath("HBoxContainer/GridContainer/SpinBox3")
+idDirectionSpinBox = NodePath("HBoxContainer/GridContainer/SpinBox2")
+framesLine = NodePath("HBoxContainer/GridContainer/LineEdit3")
+frameDuration = NodePath("HBoxContainer/GridContainer/SpinBox")
+textureSelection = NodePath("HBoxContainer/TextureRect")
+isloop = NodePath("HBoxContainer/GridContainer/CheckBox")
+mirrorHorizontal = NodePath("HBoxContainer/GridContainer/CheckBox2")
+colliderScene = NodePath("ControlCollider")
+hasCollision = NodePath("HBoxContainer/GridContainer/CheckBox3")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 10
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = SubResource("AnimatedTexture_1ru15")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="Label2" type="Label" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "ID:"
+
+[node name="SpinBox3" type="SpinBox" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="Label" type="Label" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "ID Direction:"
+
+[node name="SpinBox2" type="SpinBox" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 3.0
+suffix = "- IZQUIERDA"
+
+[node name="Label3" type="Label" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Id Frames:"
+
+[node name="LineEdit3" type="LineEdit" parent="HBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+expand_to_text_length = true
+
+[node name="Label4" type="Label" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Frame Duration"
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+step = 0.01
+
+[node name="Label5" type="Label" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "loop"
+
+[node name="CheckBox" type="CheckBox" parent="HBoxContainer/GridContainer"]
+self_modulate = Color(0, 0.486275, 0.121569, 1)
+layout_mode = 2
+text = "Bucle"
+
+[node name="Label6" type="Label" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "mirror Horizontal"
+
+[node name="CheckBox2" type="CheckBox" parent="HBoxContainer/GridContainer"]
+self_modulate = Color(0, 0.486275, 0.121569, 1)
+layout_mode = 2
+
+[node name="Label7" type="Label" parent="HBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Collision"
+
+[node name="CheckBox3" type="CheckBox" parent="HBoxContainer/GridContainer"]
+self_modulate = Color(0, 0.486275, 0.121569, 1)
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+
+[node name="Button2" type="Button" parent="HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+icon = ExtResource("1_vjg6e")
+expand_icon = true
+
+[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+icon = ExtResource("2_b5r4x")
+expand_icon = true
+
+[node name="ControlCollider" parent="." instance=ExtResource("4_flc7d")]
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Button" type="Button" parent="HBoxContainer2"]
+layout_mode = 2
+text = "Previsualizar"
+
+[node name="Button2" type="Button" parent="HBoxContainer2"]
+layout_mode = 2
+text = "Eliminar"

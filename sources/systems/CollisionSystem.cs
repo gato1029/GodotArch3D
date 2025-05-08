@@ -5,6 +5,8 @@ using Arch.Core.Extensions;
 using Arch.System;
 
 using Godot;
+using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +23,7 @@ namespace GodotEcsArch.sources.systems
 
         private CommandBuffer commandBuffer;
         private QueryDescription queryDynamicSprite = new QueryDescription().WithAll<Position, Direction, ColliderSprite>();
+        private QueryDescription queryCharacter = new QueryDescription().WithAll<PositionComponent, CharacterColliderComponent>();
         public CollisionSystem(World world) : base(world)
         {
             commandBuffer = new CommandBuffer();
@@ -73,7 +76,23 @@ namespace GodotEcsArch.sources.systems
             }
         }
 
+        private readonly struct UpdateColliderCharacter : IForEachWithEntity<PositionComponent>
+        {
+            private readonly float _deltaTime;
+            private readonly CommandBuffer _commandBuffer;
 
+            public UpdateColliderCharacter(float deltaTime, CommandBuffer commandBuffer)
+            {
+                _deltaTime = deltaTime;
+                _commandBuffer = commandBuffer;
+
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Update(Entity entity, ref PositionComponent p)
+            {
+                CollisionManager.Instance.characterCollidersEntities.AddUpdateItem(p.position, entity);
+            }
+        }
 
         public override void Update(in float t)
         {
@@ -82,6 +101,10 @@ namespace GodotEcsArch.sources.systems
 
             var job = new JobUpdateCollider((float)t, commandBuffer);
             World.InlineEntityQuery<JobUpdateCollider, Position, Direction, ColliderSprite>(in queryDynamicSprite, ref job);
+            
+            var job2 = new UpdateColliderCharacter((float)t, commandBuffer);
+            World.InlineEntityQuery<UpdateColliderCharacter, PositionComponent>(in queryCharacter, ref job2);
+
             //CollisionManager.Instance.worldPhysic.Step(1/60);
             bool debug = Input.IsActionJustPressed("debugGridCollider");
             if (debug)

@@ -63,7 +63,7 @@ void fragment() {
 	    texColor.a *= 1.0 - transparency;
 	    ALPHA_SCISSOR_THRESHOLD = 0.5;
 
-	    ALBEDO = texColor.rgb * texColor.rgb;
+	    ALBEDO = texColor.rgb * texColor.rgb * texColor.rgb;
 	    ALPHA = texColor.a;
 	/*}
 	else

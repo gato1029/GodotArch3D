@@ -10,6 +10,7 @@ public partial class ImageSelectionControl : CenterContainer
     private ColorRect _selectionRect;
     private TextureRect _image;
     private  int GRID_SIZE = 16; // Tamaño de la cuadrícula
+    private int GRID_SIZE_BASE = 16; // Tamaño de la cuadrícula
     [Export] Sprite2D _selectionSprite;
     [Export] GridDrawUI _gridUI;
     MaterialData materialData;
@@ -25,11 +26,12 @@ public partial class ImageSelectionControl : CenterContainer
     }
     public void SetMaterial(int idMaterial)
     {
-        GRID_SIZE = GRID_SIZE * scale;
+        GRID_SIZE = GRID_SIZE_BASE * scale;
         materialData = MaterialManager.Instance.GetMaterial(idMaterial);
         _image.Texture = (Texture2D) materialData.textureMaterial;
         _image.CustomMinimumSize = new Vector2(materialData.widhtTexture* scale, materialData.heightTexture* scale);
         _gridUI.Redraw(new Vector2(materialData.widhtTexture * scale, materialData.heightTexture * scale));
+        _isSelecting = false;
     }
     public override void _Input(InputEvent @event)
     {      
@@ -106,21 +108,34 @@ public partial class ImageSelectionControl : CenterContainer
 
     private Vector2 ClampToTextureRect(Vector2 position)
     {
-        Vector2 textureSize = _image.Size;
-
-        float clampedX = Mathf.Clamp(position.X, 0, textureSize.X - GRID_SIZE);
-        float clampedY = Mathf.Clamp(position.Y, 0, textureSize.Y - GRID_SIZE);
-
-        // Si la imagen es múltiplo de GRID_SIZE, permitir la última celda
-        if (textureSize.Y % GRID_SIZE == 0 && position.Y > textureSize.Y - GRID_SIZE)
+        if (position.X < 0)
         {
-            clampedY = textureSize.Y;
+            position.X = 1;
         }
-        if (textureSize.X % GRID_SIZE == 0 && position.X > textureSize.X - GRID_SIZE)
+        if (position.Y < 0)
         {
-            clampedX = textureSize.X;
+            position.Y = 1;
         }
-        return new Vector2(clampedX, clampedY);
+      
+            Vector2 textureSize = _image.Size;
+      
+
+            float clampedX = Mathf.Clamp(position.X, 0, textureSize.X - GRID_SIZE);
+            float clampedY = Mathf.Clamp(position.Y, 0, textureSize.Y - GRID_SIZE);
+
+            // Si la imagen es múltiplo de GRID_SIZE, permitir la última celda
+            if (textureSize.Y % GRID_SIZE == 0 && position.Y > textureSize.Y - GRID_SIZE)
+            {
+                clampedY = textureSize.Y;
+            }
+            if (textureSize.X % GRID_SIZE == 0 && position.X > textureSize.X - GRID_SIZE)
+            {
+                clampedX = textureSize.X;
+            }
+            return new Vector2(clampedX, clampedY);
+    
+      
+       
     }
 }
 

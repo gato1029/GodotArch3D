@@ -26,14 +26,21 @@ public enum CardinalDirection
 }
 
 [Component]
+public struct VelocityComponent
+{
+    public float velocity;    
+}
+
+[Component]
 public struct PositionComponent
 {    
-    public float x;
-    public float y;
+    public Vector2 position;
 }
 [Component]
 public struct DirectionComponent
 {
+    public Vector2 value;
+    public Vector2 normalized;
     public AnimationDirection animationDirection;
 }
 
@@ -43,6 +50,7 @@ public struct RenderGPUComponent
     public Rid rid;
     public int instance;
     public int layerRender;
+    public float zOrdering;
     public Transform3D transform;
 }
 

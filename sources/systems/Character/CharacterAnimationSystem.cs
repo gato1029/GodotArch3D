@@ -55,7 +55,7 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                 int stateAnimation = characterAnimationComponent.stateAnimation;
                 AnimationStateData animationStateData = characterComponent.CharacterBaseData.animationDataArray[stateAnimation];
                 AnimationData animationData = animationStateData.animationData[(int)directionComponent.animationDirection];
-
+                
                 characterAnimationComponent.TimeSinceLastFrame += _deltaTime;
                 if (characterAnimationComponent.TimeSinceLastFrame >= characterAnimationComponent.frameDuration && characterAnimationComponent.active)
                 {
