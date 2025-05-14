@@ -5,8 +5,8 @@ using Arch.Core.Extensions;
 using Arch.System;
 
 using Godot;
+using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
-using GodotEcsArch.sources.managers.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -5,7 +5,7 @@ using Arch.Core.Extensions;
 using Arch.Relationships;
 using Arch.System;
 using Godot;
-using GodotEcsArch.sources.managers.Generic;
+using GodotEcsArch.sources.components;
 
 internal class BasicComponents
 {

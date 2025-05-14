@@ -2,8 +2,8 @@ using Arch.Buffer;
 using Arch.Core;
 using Arch.System;
 using Godot;
+using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
-using GodotEcsArch.sources.managers.Generic;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
@@ -86,6 +86,7 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                         activeMirror = -1;
                     }
                     RenderingServer.MultimeshInstanceSetCustomData(renderGPUComponent.rid, renderGPUComponent.instance, new Color(characterAnimationComponent.currentFrame, activeMirror, 0, 0));
+
                     characterAnimationComponent.TimeSinceLastFrame -= characterAnimationComponent.frameDuration;
                 }
 

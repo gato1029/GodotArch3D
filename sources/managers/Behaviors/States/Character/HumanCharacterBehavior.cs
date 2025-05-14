@@ -6,7 +6,6 @@ using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
-using GodotEcsArch.sources.managers.Generic;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;

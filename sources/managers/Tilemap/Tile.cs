@@ -93,19 +93,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
         }
     }
 
-    public class TileBase
-    {
-        public Rid idRid;
-        public int idSpriteOrAnimation;
-        public int idInstance;
-        public byte spriteAnimation; // 0 - Sprite 1- Animation
-        public Byte layer;
-    }
 
-    public class TileSimple : TileBase
-    {
-        
-    }
 
     public class TileAnimation 
     {

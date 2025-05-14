@@ -42,6 +42,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         public int[] idFrames { get; set; } // Cantidad de frames en la animación
         public bool hasCollider { get; set; }
         public GeometricShape2D collider { get; set; }
+        public bool hasColliderMultiple { get; set; }
+        public GeometricShape2D[] colliderMultiple { get; set; }
 
     }
     public class CharacterColliderAtackData
@@ -59,22 +61,18 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
 
     public class CharacterBaseData : IdData
     {
-        public int idMaterial { get; set; }        
+        public int idMaterial { get; set; }
+        public int idExtraMaterial { get; set; }
         public int idGroup {  get; set; }
-
         public float zOrderingOrigin { get; set; }
-        //public int healthBase { get; set; }
-        //public int damageBase { get; set; }
-        //public string colorBase { set; get; }
-        //public int moveIDBehavior { set; get; }
-        //public int attackIDBehavior { set; get; }
-        //public int statesIDBehavior { set; get; }
+        public bool hasCompositeAnimation { get; set; }
 
         public GeometricShape2D collisionMove { get; set; }
         public GeometricShape2D collisionBody { get; set; }
 
         public  CharacterColliderAtackData atackDataColliders { get; set; } // solo Si esta dentro
         public AnimationStateData[] animationDataArray { get; set; }
+        public AnimationStateData[] animationExtraDataArray { get; set; }
 
         [BsonCtor]
         public CharacterBaseData(AnimationStateData[] animationDataArray, int idMaterial) : base()

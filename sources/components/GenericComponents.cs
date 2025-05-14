@@ -8,7 +8,7 @@ using Arch.AOT.SourceGenerator;
 using Arch.Core;
 using Arch.Core.Extensions;
 
-namespace GodotEcsArch.sources.managers.Generic;
+namespace GodotEcsArch.sources.components;
 
 public enum AnimationDirection
 {
@@ -28,12 +28,12 @@ public enum CardinalDirection
 [Component]
 public struct VelocityComponent
 {
-    public float velocity;    
+    public float velocity;
 }
 
 [Component]
 public struct PositionComponent
-{    
+{
     public Vector2 position;
 }
 [Component]
@@ -51,7 +51,19 @@ public struct RenderGPUComponent
     public int instance;
     public int layerRender;
     public float zOrdering;
-    public Transform3D transform;
+    public Transform3D transform;    
+}
+
+[Component]
+public struct RenderGPULinkedComponent
+{
+    public GpuInstance[] instancedLinked;
+}
+
+public struct GpuInstance
+{
+    public Rid rid;
+    public int instance;
 }
 
 internal class GenericComponents

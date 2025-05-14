@@ -28,7 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="resources\" />
-    <Folder Include="sources\managers\Characters\MainCharacter\" />
+    <Folder Include="sources\managers\Generic\" />
     <Folder Include="sources\managers\Sprite3D\" />
     <Folder Include="sources\WindowsDataBase\Accesories\UIGenerate\" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 
 using Godot;
-using GodotEcsArch.sources.managers.Generic;
+using GodotEcsArch.sources.components;
 using System;
 using System.Collections.Generic;
 using System.Linq;

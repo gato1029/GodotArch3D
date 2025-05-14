@@ -2,14 +2,12 @@ using Arch.AOT.SourceGenerator;
 using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
+using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Behaviors;
 using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
-using GodotEcsArch.sources.managers.Generic;
 using GodotEcsArch.sources.managers.Multimesh;
-using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
 using System.Collections.Generic;
 namespace GodotEcsArch.sources.managers.Characters;
@@ -24,6 +22,8 @@ public enum CharacterStateType
     TAKE_STUN,
     DIE
 }
+
+
 
 
 [Component]
@@ -43,6 +43,11 @@ public struct CharacterAccesoriesComponent
 [Component]
 public struct CharacterColliderComponent { }
 
+[Component]
+public struct CharacterAnimationCompositeComponent
+{
+
+}
 
 [Component]
 public struct CharacterAnimationComponent

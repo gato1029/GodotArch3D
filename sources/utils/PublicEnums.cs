@@ -4,6 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+public enum CharacterType
+{
+    MAIN,
+    NPC,
+    ENEMY
+}
+
+
 public enum ColliderType 
 {
     RECTANGLE,

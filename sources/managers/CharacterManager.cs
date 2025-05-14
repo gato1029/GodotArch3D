@@ -7,7 +7,6 @@ using GodotEcsArch.sources.managers.Behaviors.Attack;
 using GodotEcsArch.sources.managers.Behaviors.Move;
 using GodotEcsArch.sources.managers.Behaviors.States;
 using GodotEcsArch.sources.managers.Collision;
-using GodotEcsArch.sources.managers.Generic;
 using GodotEcsArch.sources.systems;
 using Newtonsoft.Json;
 using System;

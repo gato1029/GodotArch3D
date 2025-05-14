@@ -51,9 +51,9 @@ public partial class Main3D : Node3D
 
 
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 5000; i++)
         {
-            Position position = new Position { value = GetRandomVector2(new Vector2(-150, -150), new Vector2(150, 150)) };
+            Position position = new Position { value = GetRandomVector2(new Vector2(-100, -100), new Vector2(100, 100)) };
             //Position position = new Position { value = new Vector2(2,-0.5f) };
             CharacterManager.Instance.CreateCharacter(10, position.value);
         }
@@ -77,7 +77,7 @@ public partial class Main3D : Node3D
         //terrainMap.AddUpdateTile(new Vector2I(0, 0), 6);
         //terrainMap.AddUpdateTile(new Vector2I(2, 2), 5);
 
-        //CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(5, 3));
+     //   CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(5, 3));
         
         ChunkManager.Instance.ForcedUpdate();
 
