@@ -1,0 +1,70 @@
+[gd_scene load_steps=3 format=3 uid="uid://bnly1c27b0vfp"]
+
+[ext_resource type="Script" uid="uid://bfcwf1rg5lrfd" path="res://sources/WindowsDataBase/Animation/ControlAnimation.cs" id="1_3tcg0"]
+[ext_resource type="PackedScene" uid="uid://bjrgekdhtioub" path="res://sources/WindowsDataBase/Animation/ControlFramesArray.tscn" id="2_ajj8p"]
+
+[node name="ControlAnimation" type="PanelContainer"]
+offset_right = 424.0
+offset_bottom = 564.0
+script = ExtResource("1_3tcg0")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainerAnimacion" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion"]
+layout_mode = 2
+
+[node name="ControlFramesData" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion/VBoxContainer" instance=ExtResource("2_ajj8p")]
+layout_mode = 2
+
+[node name="GridContainerAnimacion" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion/VBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="LabelCollision" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Collision Simple"
+
+[node name="CheckBoxHasCollision" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Collision"
+
+[node name="LabelColiisionMultiple" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Collision Multiple:"
+
+[node name="CheckBoxHasCollisionMultiple" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Collision"
+
+[node name="VBoxContainerCollision" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonRemove" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Remover"
+
+[node name="ButtonPreview" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Previsualizar"

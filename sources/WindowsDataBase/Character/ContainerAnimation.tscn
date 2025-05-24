@@ -1,0 +1,218 @@
+[gd_scene load_steps=5 format=3 uid="uid://nl3w2xabpse7"]
+
+[ext_resource type="Script" uid="uid://fn2abwthg4li" path="res://sources/WindowsDataBase/Character/ContainerAnimation.cs" id="1_0wgb5"]
+[ext_resource type="PackedScene" uid="uid://br8idq6tnjgxt" path="res://sources/WindowsDataBase/Animation/ControlAnimationStateArray.tscn" id="2_layo5"]
+[ext_resource type="PackedScene" uid="uid://bjrgekdhtioub" path="res://sources/WindowsDataBase/Animation/ControlFramesArray.tscn" id="3_xfudb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_75pw8"]
+
+[node name="ContainerAnimation" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0wgb5")
+metadata/_tab_index = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonBuscar" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Buscar Material"
+
+[node name="ButtonNuevo" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Nuevo Material"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Ancho Pixel:"
+
+[node name="SpinBoxWidthPixel" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 500.0
+value = 16.0
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Alto Pixel:"
+
+[node name="SpinBox2HeightPixel" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 500.0
+value = 16.0
+
+[node name="ButtonSplit" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Dividir"
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Zoom:"
+
+[node name="SpinBoxZoom" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 20.0
+value = 1.0
+
+[node name="ViewItems" type="ItemList" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+select_mode = 2
+allow_reselect = true
+max_columns = 30
+same_column_width = true
+icon_mode = 0
+icon_scale = 2.0
+
+[node name="FramesArray" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer" instance=ExtResource("3_xfudb")]
+layout_mode = 2
+
+[node name="ContainerMain" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="CenterContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+
+[node name="PanelImage" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/CenterContainer/PanelImage"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(3, 3)
+size_flags_horizontal = 8
+size_flags_vertical = 4
+
+[node name="Sprite2DView" type="Sprite2D" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/CenterContainer/PanelImage/Control"]
+
+[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/CenterContainer/PanelImage/Control"]
+visible = false
+shape = SubResource("RectangleShape2D_75pw8")
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="GridContainerAnimacion" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="Label8" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Seleccion Ordenada:"
+
+[node name="CheckBoxModeSelection" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Ordenada"
+
+[node name="LabelFrameDuplicate" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Frames Duplicados:"
+
+[node name="CheckBoxFrameDuplicate" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="Label9" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Frame Duration"
+
+[node name="SpinBoxDuration" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+step = 0.01
+
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "loop"
+
+[node name="CheckBoxLoop" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Bucle"
+
+[node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "mirror Horizontal"
+
+[node name="CheckBoxMirror" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="Label7" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Espejo Vertical:"
+
+[node name="CheckBoxMirrorV" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="ButtonLinked" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Enlazar Animacion"
+
+[node name="ControlAnimationItems" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer" instance=ExtResource("2_layo5")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1

@@ -1,0 +1,68 @@
+[gd_scene load_steps=2 format=3 uid="uid://k15qa5h70q8j"]
+
+[ext_resource type="Script" uid="uid://cuy7dtmenhpig" path="res://sources/WindowsDataBase/Animation/ControlFrames.cs" id="1_pip1t"]
+
+[node name="ControlFrames" type="PanelContainer"]
+script = ExtResource("1_pip1t")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainerMain" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainerMain"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainerMain/HBoxContainer"]
+layout_mode = 2
+text = "X:"
+
+[node name="SpinBoxX" type="SpinBox" parent="MarginContainer/HBoxContainerMain/HBoxContainer"]
+layout_mode = 2
+max_value = 5000.0
+step = 0.001
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainerMain"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainerMain/HBoxContainer2"]
+layout_mode = 2
+text = "Y:"
+
+[node name="SpinBoxY" type="SpinBox" parent="MarginContainer/HBoxContainerMain/HBoxContainer2"]
+layout_mode = 2
+max_value = 5000.0
+step = 0.001
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/HBoxContainerMain"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainerMain/HBoxContainer3"]
+layout_mode = 2
+text = "Ancho:"
+
+[node name="SpinBoxWidht" type="SpinBox" parent="MarginContainer/HBoxContainerMain/HBoxContainer3"]
+layout_mode = 2
+max_value = 5000.0
+step = 0.001
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="MarginContainer/HBoxContainerMain"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainerMain/HBoxContainer4"]
+layout_mode = 2
+text = "Alto"
+
+[node name="SpinBoxHeight" type="SpinBox" parent="MarginContainer/HBoxContainerMain/HBoxContainer4"]
+layout_mode = 2
+max_value = 5000.0
+step = 0.001
+
+[node name="ButtonDelete" type="Button" parent="MarginContainer/HBoxContainerMain"]
+layout_mode = 2
+text = "Remover"

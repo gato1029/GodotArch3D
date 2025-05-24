@@ -20,9 +20,45 @@ public partial class ContainerAnimationCharacter : PanelContainer
     AnimationTilesData objectData;
 
     List<int> tiles = new List<int>();
+    List<int> tilesAnimation = new List<int>();
+    List<int> tilesAnimationExtras = new List<int>();
     public AnimationTilesData ObjectData { get => objectData; set => objectData = value; }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
+    public override void _Ready()
+    {
+        InitializeUI();
+
+        ButtonBuscar.Pressed += ButtonBuscar_Pressed;
+        objectData = new AnimationTilesData();
+
+        ViewItems.MultiSelected += ViewItems_MultiSelected;
+        CheckBoxModeSelection.Pressed += CheckBoxModeSelection_Pressed;
+        SpinBoxDuration.ValueChanged += SpinBoxDuration_ValueChanged;
+        CheckBoxLoop.Pressed += CheckBoxLoop_Pressed;
+        CheckBoxMirror.Pressed += CheckBoxMirror_Pressed;
+        CheckBoxHasCollision.Pressed += CheckBoxHasCollision_Pressed;
+        CheckBoxFrameDuplicate.Pressed += CheckBoxFrameDuplicate_Pressed;
+        ButtonForcedFrames.Pressed += ButtonForcedFrames_Pressed;
+        OptionButtonAnimation.ItemSelected += OptionButtonAnimation_ItemSelected;
+    }
+
+    private void OptionButtonAnimation_ItemSelected(long index)
+    {
+        tiles.Clear();
+        ViewItems.DeselectAll();
+        TextEditFrames.Clear();
+        if (index == 0) //animacion basica
+        {
+            TextEditFrames.Text = string.Join(",", tilesAnimation);
+           // tilesAnimation.Clear();
+        }
+        else
+        {
+            TextEditFrames.Text = string.Join(",", tilesAnimationExtras);
+            //tilesAnimationExtras.Clear();
+        }
+    }
 
     public void SetData(AnimationTilesData pObjectData)
     {
@@ -39,7 +75,7 @@ public partial class ContainerAnimationCharacter : PanelContainer
         {
 
             control = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn").Instantiate<ColliderScene>();
-            ContainerMain.AddChild(control);
+            VBoxContainerCollision.AddChild(control);
             control.SetOcluccionButton();
             control.OnNotifyPreview += Control_OnNotifyPreview;
             CollisionShapeView.Visible = true;
@@ -69,22 +105,7 @@ public partial class ContainerAnimationCharacter : PanelContainer
         }
     }
 
-    public override void _Ready()
-    {
-        InitializeUI();
-
-        ButtonBuscar.Pressed += ButtonBuscar_Pressed;
-        objectData = new AnimationTilesData();
-
-        ViewItems.MultiSelected += ViewItems_MultiSelected;
-        CheckBoxModeSelection.Pressed += CheckBoxModeSelection_Pressed;
-        SpinBoxDuration.ValueChanged += SpinBoxDuration_ValueChanged;
-        CheckBoxLoop.Pressed += CheckBoxLoop_Pressed;
-        CheckBoxMirror.Pressed += CheckBoxMirror_Pressed;
-        CheckBoxHasCollision.Pressed += CheckBoxHasCollision_Pressed;
-        CheckBoxFrameDuplicate.Pressed += CheckBoxFrameDuplicate_Pressed;
-        ButtonForcedFrames.Pressed += ButtonForcedFrames_Pressed;
-    }
+  
 
     private void ButtonBuscar_Pressed()
     {
@@ -124,14 +145,14 @@ public partial class ContainerAnimationCharacter : PanelContainer
         {
 
             control = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn").Instantiate<ColliderScene>();
-            ContainerMain.AddChild(control);
+            VBoxContainerCollision.AddChild(control);
             control.SetOcluccionButton();
             control.OnNotifyPreview += Control_OnNotifyPreview;
             CollisionShapeView.Visible = true;
         }
         else
         {
-            ContainerMain.RemoveChild(control);
+            VBoxContainerCollision.RemoveChild(control);
             objectData.collider = null;
             CollisionShapeView.Visible = false;
         }
@@ -243,6 +264,14 @@ public partial class ContainerAnimationCharacter : PanelContainer
             objectData.idFrames = tiles.ToArray();
         }
 
+        if (OptionButtonAnimation.GetSelectedId() == 0)
+        {
+            tilesAnimation = tiles;
+        }
+        else 
+        {
+            tilesAnimationExtras = tiles;
+        }
     }
 
 

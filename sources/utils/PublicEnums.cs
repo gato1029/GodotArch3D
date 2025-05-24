@@ -4,6 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+public enum DirectionArrowArray 
+{
+    REMOVE,UP, DOWN
+}
+public enum DirectionAnimationType
+{
+    DOS,
+    CUATRO,
+    OCHO
+}
+public enum PositionAnimationType
+{
+    IZQUIERDA,
+    DERECHA,
+    ARRIBA,
+    ABAJO,
+    IZQUIERDA_ARRIBA,
+    DERECHA_ARRIBA,
+    IZQUIERDA_ABAJO,
+    DERECHA_ABAJO
+}
+
 public enum CharacterType
 {
     MAIN,

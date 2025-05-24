@@ -27,6 +27,14 @@ public partial class PanelColliders : PanelContainer
         return list;
     }
 
+    public void SetData(List<GeometricShape2D> arrayData)
+    {
+        foreach (var item in arrayData)
+        {
+            addCollider(item);
+        }
+    }
+
     public void addCollider(GeometricShape2D item)
     {
         var node = ColliderScene.Instantiate<ColliderScene>();
@@ -50,7 +58,8 @@ public partial class PanelColliders : PanelContainer
     {
         var node = ColliderScene.Instantiate<ColliderScene>();
         container.AddChild(node);
-        node.OnNotifyPreview += Node_OnNotifyPreview;        
+        node.OnNotifyPreview += Node_OnNotifyPreview;
+        OnNotifyPreview?.Invoke(node.data);
     }
 
     private void Node_OnNotifyPreview(GeometricShape2D itemData)

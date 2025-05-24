@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug ContainerAnimationCharacter": {
+	"Godot Debug ContainerAnimation": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.4-stable_mono_win64/Godot_v4.4-stable_mono_win64/Godot_v4.4-stable_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Character/ContainerAnimationCharacter.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Character/ContainerAnimation.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

@@ -1,0 +1,123 @@
+[gd_scene load_steps=5 format=3 uid="uid://dxfavynmpdy8g"]
+
+[ext_resource type="PackedScene" uid="uid://bnly1c27b0vfp" path="res://sources/WindowsDataBase/Animation/ControlAnimation.tscn" id="1_3ub7f"]
+[ext_resource type="Script" uid="uid://dflv3yikgblim" path="res://sources/WindowsDataBase/Animation/ControlAnimationState.cs" id="1_hv3v3"]
+[ext_resource type="Texture2D" uid="uid://dtmyjyeiduhhe" path="res://resources/Textures/internal/arrow_down_icon.png" id="2_y0jiy"]
+[ext_resource type="Texture2D" uid="uid://dpe6okmjy8jkj" path="res://resources/Textures/internal/arrow_up_icon.png" id="3_3pyf0"]
+
+[node name="ControlAnimationState" type="PanelContainer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -193.0
+offset_top = -223.5
+offset_right = 193.0
+offset_bottom = 223.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hv3v3")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Posicion:"
+
+[node name="SpinBoxPosition" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+editable = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="ButtonDelete" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Remover"
+expand_icon = true
+
+[node name="ButtonDown" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_horizontal = 8
+icon = ExtResource("2_y0jiy")
+expand_icon = true
+
+[node name="ButtonUp" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_horizontal = 10
+icon = ExtResource("3_3pyf0")
+expand_icon = true
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+columns = 2
+
+[node name="Label11" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Direcciones:"
+
+[node name="OptionButtonDirection" type="OptionButton" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="Label10" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Posicion:"
+
+[node name="OptionButtonPosition" type="OptionButton" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="Label9" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Frame Duration"
+
+[node name="SpinBoxDuration" type="SpinBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+step = 0.01
+
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "loop"
+
+[node name="CheckBoxLoop" type="CheckBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Bucle"
+
+[node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "mirror Horizontal"
+
+[node name="CheckBoxMirror" type="CheckBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="ControlAnimationFrames" parent="MarginContainer/VBoxContainer/VBoxContainer2" instance=ExtResource("1_3ub7f")]
+layout_mode = 2

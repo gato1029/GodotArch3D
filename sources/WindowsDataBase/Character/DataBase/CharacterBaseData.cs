@@ -13,6 +13,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
     public class AnimationStateData
     {
         public int id {  get; set; }
+        public DirectionAnimationType directionAnimationType { get; set; }
         public bool eightDirection { get; set; }
         public float frameDuration { get; set; }
         public bool loop {  get; set; }
@@ -39,11 +40,21 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
     public class AnimationData
     {
         public int id { get; set; }
-        public int[] idFrames { get; set; } // Cantidad de frames en la animación
+        public int[] idFrames { get; set; } // Cantidad de frames en la animación        
+        public FrameData[] frameDataArray { get; set; }
         public bool hasCollider { get; set; }
         public GeometricShape2D collider { get; set; }
         public bool hasColliderMultiple { get; set; }
         public GeometricShape2D[] colliderMultiple { get; set; }
+
+    }
+
+    public class FrameData
+    {
+        public float x { get; set; }
+        public float y { get; set; }
+        public float widht { get; set; }
+        public float height { get; set; }
 
     }
     public class CharacterColliderAtackData
