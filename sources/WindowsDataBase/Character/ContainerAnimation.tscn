@@ -10,6 +10,7 @@
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 808.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0wgb5")
@@ -37,6 +38,11 @@ text = "Buscar Material"
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Nuevo Material"
+
+[node name="ButtonSave" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Guardar Todo"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -138,7 +144,6 @@ size_flags_vertical = 4
 [node name="Sprite2DView" type="Sprite2D" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/CenterContainer/PanelImage/Control"]
 
 [node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer/CenterContainer/PanelImage/Control"]
-visible = false
 shape = SubResource("RectangleShape2D_75pw8")
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/HBoxContainer/VBoxContainer"]

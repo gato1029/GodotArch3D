@@ -16,7 +16,6 @@ public partial class ControlAnimation : PanelContainer
     private CheckBox CheckBoxHasCollisionMultiple;
     private VBoxContainer VBoxContainerCollision;
     private Button ButtonRemove;
-    private Button ButtonPreview;
 
     public void InitializeUI()
     {
@@ -33,7 +32,6 @@ public partial class ControlAnimation : PanelContainer
         CheckBoxHasCollisionMultiple_PressedUI();
         VBoxContainerCollision = GetNode<VBoxContainer>("MarginContainer/VBoxContainer/HBoxContainerAnimacion/VBoxContainerCollision");
         ButtonRemove = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/ButtonRemove");
-        ButtonPreview = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/ButtonPreview");
     }
 
     private void CheckBoxHasCollision_PressedUI()

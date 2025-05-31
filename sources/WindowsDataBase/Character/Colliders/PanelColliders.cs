@@ -27,8 +27,16 @@ public partial class PanelColliders : PanelContainer
         return list;
     }
 
+    public void ClearAll()
+    {
+        foreach (var item in container.GetChildren())
+        {
+          item.QueueFree();
+        }
+    }
     public void SetData(List<GeometricShape2D> arrayData)
     {
+        ClearAll();
         foreach (var item in arrayData)
         {
             addCollider(item);

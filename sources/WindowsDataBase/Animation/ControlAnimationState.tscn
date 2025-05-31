@@ -119,5 +119,14 @@ text = "mirror Horizontal"
 layout_mode = 2
 text = "Habilitado"
 
+[node name="Label7" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "mirror Vertical"
+
+[node name="CheckBoxMirrorV" type="CheckBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Habilitado"
+
 [node name="ControlAnimationFrames" parent="MarginContainer/VBoxContainer/VBoxContainer2" instance=ExtResource("1_3ub7f")]
 layout_mode = 2

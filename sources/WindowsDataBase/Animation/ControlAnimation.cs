@@ -9,7 +9,8 @@ using System.Reflection.Emit;
 
 public partial class ControlAnimation : PanelContainer
 {
-
+    public delegate void EventNotifyCollisionSelect(ControlAnimation objectControl, GeometricShape2D geometricShape2D);
+    public event EventNotifyCollisionSelect OnNotifyCollisionCurrent;
 
     PanelColliders panelColliders;
     ColliderScene controlCollider;
@@ -26,13 +27,23 @@ public partial class ControlAnimation : PanelContainer
         ControlFramesData.SetData(data.frameDataArray);
         if (objectData.hasCollider)
         {
+           
+            if (controlCollider!=null)
+            {
+                VBoxContainerCollision.RemoveChild(controlCollider);
+            }
             CheckBoxHasCollision.ButtonPressed = true;
             CheckBoxHasCollision_Pressed();
             controlCollider.SetData(objectData.collider);
         }
         if (objectData.hasColliderMultiple)
         {
+            if (panelColliders!=null)
+            {
+                VBoxContainerCollision.RemoveChild(panelColliders);
+            }
             CheckBoxHasCollisionMultiple.ButtonPressed = true;
+          
             CheckBoxHasCollisionMultiple_Pressed();
             panelColliders.SetData(objectData.colliderMultiple.ToList());            
         }
@@ -70,7 +81,7 @@ public partial class ControlAnimation : PanelContainer
             LabelCollision.Visible = true;
             VBoxContainerCollision.RemoveChild(panelColliders);
             objectData.colliderMultiple = null;
-            
+            panelColliders = null;
         }
     }
 
@@ -78,6 +89,7 @@ public partial class ControlAnimation : PanelContainer
     {
         objectData.colliderMultiple = panelColliders.GetAllCollidersData().ToArray();
         OnNotifyChangued?.Invoke(this);
+        OnNotifyCollisionCurrent?.Invoke(this, itemData);
     }
 
     private void CheckBoxHasCollision_Pressed()
@@ -89,7 +101,7 @@ public partial class ControlAnimation : PanelContainer
             LabelColiisionMultiple.Visible = false;
             controlCollider = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn").Instantiate<ColliderScene>();
             VBoxContainerCollision.AddChild(controlCollider);
-            controlCollider.SetOcluccionButton();
+            //controlCollider.SetOcluccionButton();
             controlCollider.OnNotifyPreview += ControlCollider_OnNotifyPreview;
            // CollisionShapeView.Visible = true;
         }
@@ -99,6 +111,7 @@ public partial class ControlAnimation : PanelContainer
             CheckBoxHasCollisionMultiple.Visible = true;
             VBoxContainerCollision.RemoveChild(controlCollider);
             objectData.collider = null;
+            controlCollider = null;
            // CollisionShapeView.Visible = false;
         }
     }
@@ -107,6 +120,7 @@ public partial class ControlAnimation : PanelContainer
     {
         objectData.collider = itemData;
         OnNotifyChangued?.Invoke(this);
+        OnNotifyCollisionCurrent?.Invoke(this,itemData);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

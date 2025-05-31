@@ -7,6 +7,7 @@ using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
+using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
 
 public partial class HerramientaMenuBar : MenuBar
 {
@@ -105,8 +106,10 @@ public partial class HerramientaMenuBar : MenuBar
             case 3:
                 var winInternal = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/WindowAccessory.tscn").Instantiate<WindowAccessory>();
                 AddChild(winInternal);
-                winInternal.PopupCentered();
-               
+                winInternal.PopupCentered();               
+                break;
+            case 4:
+                FacadeWindowDataSearch<CharacterBaseData> windowQuery = new FacadeWindowDataSearch<CharacterBaseData>("res://sources/WindowsDataBase/Character/WindowAnimationCharacterRefact.tscn", this);
                 break;
         }
     }

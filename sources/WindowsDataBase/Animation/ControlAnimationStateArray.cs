@@ -7,6 +7,12 @@ using System.Reflection;
 
 public partial class ControlAnimationStateArray : PanelContainer
 {
+    public delegate void EventNotifyCollision(GodotEcsArch.sources.managers.Collision.GeometricShape2D geometricShape2D);
+    public event EventNotifyCollision OnNotifyCollisionSelected;
+
+    public delegate void EventNotifyAnimation(ControlAnimationState objectControl, int animationDataPosition);
+    public event EventNotifyAnimation OnNotifyAnimationSelected;
+
     ControlAnimationState objectControlSelect;
     int animationDataPositionSelect;
 
@@ -20,7 +26,35 @@ public partial class ControlAnimationStateArray : PanelContainer
         InitializeUI(); // Insertado por el generador de UI
         ButtonAdd.Pressed += ButtonAdd_Pressed;
 	}
+    internal List<AnimationStateData> GetAllData()
+    {
+        var list = new List<AnimationStateData>();
+        foreach (var item in VBoxContainerItems.GetChildren())
+        {
+            var data = (ControlAnimationState)item;
+            list.Add(data.ObjectData);
+        }
+        return list;
+    }
+    internal void SetData(AnimationStateData[] animationDataArray)
+    {
+        foreach (var data in animationDataArray)
+        {
 
+            var node = GD.Load<PackedScene>("res://sources/WindowsDataBase/Animation/ControlAnimationState.tscn").Instantiate<ControlAnimationState>();
+            VBoxContainerItems.AddChild(node);
+            node.SetData(data);
+
+            int childCount = VBoxContainerItems.GetChildCount();
+            node.SetPosition(childCount - 1);
+            objectControlSelect = node;
+            animationDataPositionSelect = 0;
+
+            node.OnNotifyChanguedOrder += Node_OnNotifyChanguedOrder;
+            node.OnNotifyPointerSelect += Node_OnNotifyPointerSelect;
+            node.OnNotifyCollisionSelected += Node_OnNotifyCollisionSelected;
+        }
+    }
     private void ButtonAdd_Pressed()
     {
         var node = GD.Load<PackedScene>("res://sources/WindowsDataBase/Animation/ControlAnimationState.tscn").Instantiate<ControlAnimationState>();       
@@ -32,12 +66,22 @@ public partial class ControlAnimationStateArray : PanelContainer
 
         node.OnNotifyChanguedOrder += Node_OnNotifyChanguedOrder;
         node.OnNotifyPointerSelect += Node_OnNotifyPointerSelect;
+        node.OnNotifyCollisionSelected += Node_OnNotifyCollisionSelected;
+
+        OnNotifyChangued?.Invoke(this);
+    }
+
+    private void Node_OnNotifyCollisionSelected(GodotEcsArch.sources.managers.Collision.GeometricShape2D geometricShape2D)
+    {
+        OnNotifyCollisionSelected?.Invoke(geometricShape2D);
     }
 
     private void Node_OnNotifyPointerSelect(ControlAnimationState objectControl, int animationDataPosition)
     {
         objectControlSelect = objectControl;
         animationDataPositionSelect = animationDataPosition;
+
+        OnNotifyAnimationSelected?.Invoke(objectControlSelect,animationDataPosition);
     }
 
     private void Node_OnNotifyChanguedOrder(ControlAnimationState objectControl, DirectionArrowArray directionArrowArray)
@@ -83,10 +127,13 @@ public partial class ControlAnimationStateArray : PanelContainer
                 position++;
             }
         }
+        OnNotifyChangued?.Invoke(this);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
 	{
 	}
+
+  
 }

@@ -1,0 +1,143 @@
+[gd_scene load_steps=5 format=3 uid="uid://cboqtlx1evylg"]
+
+[ext_resource type="Script" uid="uid://do50j55kqdye5" path="res://sources/WindowsDataBase/Character/ContainerAnimationCharacter.cs" id="1_r0j85"]
+[ext_resource type="PackedScene" uid="uid://nl3w2xabpse7" path="res://sources/WindowsDataBase/Character/ContainerAnimation.tscn" id="2_1go7i"]
+[ext_resource type="PackedScene" uid="uid://eouyrgdv2i88" path="res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn" id="3_650ey"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mlu17"]
+
+[node name="ContainerAnimationCharacter" type="Window"]
+size = Vector2i(1500, 800)
+exclusive = true
+always_on_top = true
+popup_window = true
+script = ExtResource("1_r0j85")
+metadata/_tab_index = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="ButtonSaveAll" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Guardar TODO"
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+current_tab = 1
+
+[node name="Animacion Base" parent="MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("2_1go7i")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Datos Basicos" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos"]
+layout_mode = 2
+
+[node name="CenterContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="PanelImage" type="Panel" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/PanelImage"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(3, 3)
+size_flags_horizontal = 8
+size_flags_vertical = 4
+
+[node name="Sprite2DView" type="Sprite2D" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/PanelImage/Control"]
+
+[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/PanelImage/Control"]
+shape = SubResource("RectangleShape2D_mlu17")
+
+[node name="VBoxContainerBasico" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
+layout_mode = 2
+columns = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/GridContainer"]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/GridContainer"]
+layout_mode = 2
+text = "Z ordering:"
+
+[node name="SpinBoxZordering" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/GridContainer"]
+layout_mode = 2
+text = "Animacion Compuesta:"
+
+[node name="CheckBoxAnimationComposite" type="CheckBox" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/GridContainer"]
+layout_mode = 2
+text = "Habilitada"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer"]
+layout_mode = 2
+text = "Colision de Movimiento"
+
+[node name="PanelMovimiento" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer" instance=ExtResource("3_650ey")]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer2"]
+layout_mode = 2
+text = "Colision del Cuerpo"
+
+[node name="PanelCuerpo" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer2" instance=ExtResource("3_650ey")]
+layout_mode = 2
+
+[node name="ButtonSave" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
+layout_mode = 2
+text = "Guardar"
+
+[node name="Animacion Extra" parent="MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("2_1go7i")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2

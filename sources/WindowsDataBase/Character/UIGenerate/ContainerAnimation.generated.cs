@@ -10,6 +10,7 @@ public partial class ContainerAnimation : PanelContainer
     private HBoxContainer HBoxContainer2;
     private Button ButtonBuscar;
     private Button ButtonNuevo;
+    private Button ButtonSave;
     private SpinBox SpinBoxWidthPixel;
     private Label Label2;
     private SpinBox SpinBox2HeightPixel;
@@ -44,6 +45,7 @@ public partial class ContainerAnimation : PanelContainer
         HBoxContainer2 = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/HBoxContainer2");
         ButtonBuscar = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer2/ButtonBuscar");
         ButtonNuevo = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer2/ButtonNuevo");
+        ButtonSave = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer2/ButtonSave");
         SpinBoxWidthPixel = GetNode<SpinBox>("MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer/SpinBoxWidthPixel");
         Label2 = GetNode<Label>("MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer/Label2");
         SpinBox2HeightPixel = GetNode<SpinBox>("MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer/SpinBox2HeightPixel");

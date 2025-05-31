@@ -4,7 +4,12 @@ using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using System;
 using System.Linq;
 
-public partial class AccessoryControl : Window
+public interface IFacadeWindow<T> {
+    public void SetData(T data);
+    public delegate void EventNotifyChanguedSimple();
+    public event EventNotifyChanguedSimple OnNotifyChanguedSimple;
+}
+public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
 {
         
 
@@ -15,6 +20,9 @@ public partial class AccessoryControl : Window
     ContainerAnimationTiles controlAnimationTiles;
 
     ContainerRequirements controlRequirements;
+
+    public event IFacadeWindow<AccessoryData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
+    
 
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -50,7 +58,7 @@ public partial class AccessoryControl : Window
 
         objectData = new AccessoryData();
     }
-    internal void SetData(AccessoryData p_ObjectData)
+    public void SetData(AccessoryData p_ObjectData)
     {
         objectData = p_ObjectData;
         var components = p_ObjectData.colorBase.Trim('(', ')')

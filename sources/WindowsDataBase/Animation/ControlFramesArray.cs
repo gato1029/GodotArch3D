@@ -61,7 +61,7 @@ public partial class ControlFramesArray : PanelContainer
     }
     public void SetData(FrameData[] frameDataArray)
     {
-        
+       
         if (frameDataArray!=null)
         {
             RemoveAll();
@@ -71,6 +71,10 @@ public partial class ControlFramesArray : PanelContainer
                 ContainerItems.AddChild(node);
                 node.SetData(frame);
             }
+        }
+        else
+        {
+            RemoveAll();
         }
       
     }

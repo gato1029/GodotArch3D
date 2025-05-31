@@ -22,6 +22,8 @@ public partial class ControlAnimationState : PanelContainer
     private CheckBox CheckBoxLoop;
     private Label Label6;
     private CheckBox CheckBoxMirror;
+    private Label Label7;
+    private CheckBox CheckBoxMirrorV;
     private ControlAnimation ControlAnimationFrames;
 
     public void InitializeUI()
@@ -47,6 +49,10 @@ public partial class ControlAnimationState : PanelContainer
         CheckBoxMirror = GetNode<CheckBox>("MarginContainer/VBoxContainer/VBoxContainer2/GridContainer/CheckBoxMirror");
         CheckBoxMirror.Pressed += CheckBoxMirror_PressedUI;
         CheckBoxMirror_PressedUI();
+        Label7 = GetNode<Label>("MarginContainer/VBoxContainer/VBoxContainer2/GridContainer/Label7");
+        CheckBoxMirrorV = GetNode<CheckBox>("MarginContainer/VBoxContainer/VBoxContainer2/GridContainer/CheckBoxMirrorV");
+        CheckBoxMirrorV.Pressed += CheckBoxMirrorV_PressedUI;
+        CheckBoxMirrorV_PressedUI();
         ControlAnimationFrames = GetNode<ControlAnimation>("MarginContainer/VBoxContainer/VBoxContainer2/ControlAnimationFrames");
     }
 
@@ -64,5 +70,13 @@ public partial class ControlAnimationState : PanelContainer
             CheckBoxMirror.Text = "Habilitado";
         else
             CheckBoxMirror.Text = "No Habilitado";
+    }
+
+    private void CheckBoxMirrorV_PressedUI()
+    {
+        if (CheckBoxMirrorV.ButtonPressed)
+            CheckBoxMirrorV.Text = "Habilitado";
+        else
+            CheckBoxMirrorV.Text = "No Habilitado";
     }
 }

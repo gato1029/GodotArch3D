@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2vv1gtw5355w"]
+
+[ext_resource type="Script" uid="uid://d3kbiqo5awqyj" path="res://sources/WindowsDataBase/Generic/WindowDataSearch.cs" id="1_u3s4t"]
+
+[node name="WindowDataSearch" type="Window"]
+title = "Elementos"
+position = Vector2i(0, 36)
+size = Vector2i(900, 600)
+script = ExtResource("1_u3s4t")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditSearch" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonNew" type="Button" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Nuevo"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemListView" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+icon_scale = 2.0
+fixed_icon_size = Vector2i(30, 30)

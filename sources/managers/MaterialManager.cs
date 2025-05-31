@@ -34,11 +34,17 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         
     }
 
-    public MaterialData GetMaterial(int id)
+    public MaterialData GetMaterial(int idMaterial)
     {
-        if (materials.ContainsKey(id))
+        if (!materials.ContainsKey(idMaterial))
         {
-            return materials[id];
+            MaterialData materialData = DataBaseManager.Instance.FindById<MaterialData>(idMaterial);
+            RegisterMaterial(idMaterial, materialData);
+            return materialData;
+        }
+        if (materials.ContainsKey(idMaterial))
+        {
+            return materials[idMaterial];
         }
         return null;
     }

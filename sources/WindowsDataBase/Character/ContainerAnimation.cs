@@ -34,7 +34,7 @@ public partial class ContainerAnimation : PanelContainer
 
     List<FrameData> tiles = new List<FrameData>();
 
-  //  public AnimationStateData ObjectData { get => objectData; set => objectData = value; }
+    //  public AnimationStateData ObjectData { get => objectData; set => objectData = value; }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Ready()
@@ -48,20 +48,89 @@ public partial class ContainerAnimation : PanelContainer
         CheckBoxModeSelection.Pressed += CheckBoxModeSelection_Pressed;
         SpinBoxDuration.ValueChanged += SpinBoxDuration_ValueChanged;
         CheckBoxLoop.Pressed += CheckBoxLoop_Pressed;
-        CheckBoxMirror.Pressed += CheckBoxMirror_Pressed;        
+        CheckBoxMirror.Pressed += CheckBoxMirror_Pressed;
         CheckBoxFrameDuplicate.Pressed += CheckBoxFrameDuplicate_Pressed;
-       
+
         ButtonSplit.Pressed += ButtonSplit_Pressed;
 
         SpinBoxZoom.ValueChanged += SpinBoxZoom_ValueChanged;
         CheckBoxMirrorV.Pressed += CheckBoxMirrorV_Pressed;
         ButtonLinked.Pressed += ButtonLinked_Pressed;
+        ControlAnimationItems.OnNotifyCollisionSelected += ControlAnimationItems_OnNotifyCollisionSelected;
+        ControlAnimationItems.OnNotifyAnimationSelected += ControlAnimationItems_OnNotifyAnimationSelected;
+        ControlAnimationItems.OnNotifyChangued += ControlAnimationItems_OnNotifyChangued;
+        ButtonSave.Pressed += ButtonSave_Pressed;
+    }
+
+    private void ControlAnimationItems_OnNotifyChangued(ControlAnimationStateArray objectControl)
+    {
+        OnNotifyChangued?.Invoke(this);
+    }
+
+    private void ControlAnimationItems_OnNotifyAnimationSelected(ControlAnimationState objectControl, int animationDataPosition)
+    {
+
+        FramesArray.SetData(objectControl.ObjectData.animationData[animationDataPosition].frameDataArray);
+        if (objectControl.ObjectData.animationData[animationDataPosition] != null && objectControl.ObjectData.animationData[animationDataPosition].frameDataArray!=null)
+        {
+            if (objectControl.ObjectData.idMaterial!=0)
+            {                
+                if (materialData == null || materialData.id!= objectControl.ObjectData.idMaterial)
+                {
+                    materialData = MaterialManager.Instance.GetMaterial(objectControl.ObjectData.idMaterial);
+                    WindowViewDb_OnRequestSelectedItem(materialData.id);                    
+                }
+                
+                CheckBoxMirror.ButtonPressed = objectControl.ObjectData.mirrorHorizontal;
+                CheckBoxMirrorV.ButtonPressed = objectControl.ObjectData.mirrorVertical;
+                Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;
+                Sprite2DView.FlipV = CheckBoxMirrorV.ButtonPressed;
+                SpinBoxDuration.Value = objectControl.ObjectData.frameDuration;
+                CheckBoxLoop.ButtonPressed = objectControl.ObjectData.loop;
+            }
+           
+        }
+        
+    }
+
+    private void ButtonSave_Pressed()
+    {
+        OnNotifyChangued?.Invoke(this);
+    }
+
+    public List<AnimationStateData> GetData()
+    {
+        return ControlAnimationItems.GetAllData();
+    }
+
+    private void ControlAnimationItems_OnNotifyCollisionSelected(GeometricShape2D geometricShape2D)
+    {
+        CollisionShapeView.Position = new Vector2((float)geometricShape2D.originPixelX, (float)geometricShape2D.originPixelY * (-1));
+        switch (geometricShape2D)
+        {
+            case Rectangle:
+                var shape = new RectangleShape2D();
+                CollisionShapeView.Shape = shape;
+                shape.Size = new Vector2((float)geometricShape2D.widthPixel, (float)geometricShape2D.heightPixel);
+                break;
+            case Circle:
+                var shapeC = new CircleShape2D();
+                CollisionShapeView.Shape = shapeC;
+                shapeC.Radius = geometricShape2D.widthPixel;
+                break;
+            default:
+                break;
+        }
     }
 
     private void ButtonLinked_Pressed()
     {
-        int i = ControlAnimationItems.AnimationDataPositionSelect;
-        ControlAnimationItems.ObjectControlSelect.SetData((float)SpinBoxDuration.Value, CheckBoxMirror.ButtonPressed, CheckBoxLoop.ButtonPressed,i,animationData.frameDataArray);        
+        if (ControlAnimationItems.ObjectControlSelect!= null)
+        {
+            int i = ControlAnimationItems.AnimationDataPositionSelect;
+            ControlAnimationItems.ObjectControlSelect.SetData((float)SpinBoxDuration.Value, CheckBoxMirror.ButtonPressed, CheckBoxMirrorV.ButtonPressed , CheckBoxLoop.ButtonPressed, i, animationData.frameDataArray,materialData.id);
+        }
+        
     }
 
     private void CheckBoxMirrorV_Pressed()
@@ -107,7 +176,33 @@ public partial class ContainerAnimation : PanelContainer
 
     }
 
-   
+    internal void SetData(AnimationStateData[] animationDataArray)
+    {
+        if (animationDataArray != null && animationDataArray.Length>0)
+        {
+            if (animationDataArray[0].idMaterial!=0)
+            {
+                materialData = MaterialManager.Instance.GetMaterial(animationDataArray[0].idMaterial);               
+                WindowViewDb_OnRequestSelectedItem(materialData.id);           
+            }
+
+            ControlAnimationItems.SetData(animationDataArray);
+            if (animationDataArray[0].animationData != null)
+            {
+                FramesArray.SetData(animationDataArray[0].animationData[0].frameDataArray);
+                CheckBoxMirror.ButtonPressed = animationDataArray[0].mirrorHorizontal;
+                CheckBoxMirrorV.ButtonPressed = animationDataArray[0].mirrorVertical;
+                Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;
+                Sprite2DView.FlipV = CheckBoxMirrorV.ButtonPressed;
+                SpinBoxDuration.Value = animationDataArray[0].frameDuration;
+                CheckBoxLoop.ButtonPressed = animationDataArray[0].loop;
+            }
+
+
+        }
+        
+    }
+
     public void SetData(AnimationTilesData pObjectData)
     {
         //objectData = pObjectData;
@@ -341,4 +436,6 @@ public partial class ContainerAnimation : PanelContainer
             }
         }
     }
+
+
 }

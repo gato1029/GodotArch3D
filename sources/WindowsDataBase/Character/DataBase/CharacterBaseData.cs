@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
 using System;
@@ -13,11 +14,14 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
     public class AnimationStateData
     {
         public int id {  get; set; }
+
+        public int idMaterial { get; set; }
         public DirectionAnimationType directionAnimationType { get; set; }
         public bool eightDirection { get; set; }
         public float frameDuration { get; set; }
         public bool loop {  get; set; }
         public bool mirrorHorizontal { get; set; }
+        public bool mirrorVertical { get; set; }
         public AnimationData[] animationData { get; set; }
 
         public AnimationStateData( bool EightDirection = false)
@@ -110,7 +114,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         }
     }
 
-    public class CharacterCustomData : CharacterBaseData
+    public class CharacterCustomData 
     {
         public int idWeaponTextureAnimation;
         public int idShieldAnimation;
@@ -118,8 +122,14 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         //public int idWeaponAnimation;
         //public int idWeaponAnimation;
     }
-    public class CharacterSimpleData : CharacterBaseData
+    public class CharacterModelBaseData :IdData
     {
-        
+        public int idCharacterBaseData { get; set; }
+        public string colorBase { set; get; }
+        public float scale {  set; get; }
+        public BonusData[] bonusDataArray { get; set; }
+        public ElementsData[] damageDataArray { get; set; }
+        public ElementsData[] defenseDataArray { get; set; }
+        public StatsData[] statsDataArray { get; set; }
     }
 }

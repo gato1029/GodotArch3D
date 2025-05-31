@@ -64,7 +64,3 @@ size_flags_horizontal = 4
 visible = false
 layout_mode = 2
 text = "Remover"
-
-[node name="ButtonPreview" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Previsualizar"
