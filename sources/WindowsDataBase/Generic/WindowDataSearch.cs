@@ -12,9 +12,7 @@ public partial class WindowDataSearch : Window
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
-        InitializeUI(); // Insertado por el generador de UI
-      
-      
+        InitializeUI(); // Insertado por el generador de UI            
     }
 
 

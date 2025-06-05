@@ -24,6 +24,10 @@ namespace GodotEcsArch.sources.managers.Collision
             OriginCurrent = originRelative;
 
         }
+        public override Circle Multiplicity(float value)
+        {
+            return new Circle(Radius * value, OriginCurrent *value);
+        }
         public Circle(float widthPixel, float originPixelX, float originPixelY) : base()
         {
             this.originPixelX = originPixelX;

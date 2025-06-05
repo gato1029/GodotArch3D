@@ -8,9 +8,10 @@ public class MultimeshMaterial
 {
     public MaterialData materialData;
     public Dictionary<Rid, MultimeshData> multimeshDataDict;
-
-    public MultimeshMaterial(MaterialData MaterialData)
+    int sizeMax = 1;
+    public MultimeshMaterial(MaterialData MaterialData, int pMaxInstances = 65500)
     {
+        sizeMax = pMaxInstances;
         this.materialData = MaterialData;
         multimeshDataDict = new Dictionary<Rid, MultimeshData>();
                
@@ -35,14 +36,14 @@ public class MultimeshMaterial
 
         if (multimeshData==null)
         {
-            multimeshData = new MultimeshData(materialData.mesh);
+            multimeshData = new MultimeshData(materialData.mesh, sizeMax);
             multimeshDataDict.Add(multimeshData.rid,multimeshData);
         }
         else
         {
             if (!multimeshData.AvailbleSpace())
             {
-                multimeshData = new MultimeshData(materialData.mesh);
+                multimeshData = new MultimeshData(materialData.mesh, sizeMax);
                 multimeshDataDict.Add(multimeshData.rid, multimeshData);
             }
             

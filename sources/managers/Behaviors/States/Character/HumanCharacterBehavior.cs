@@ -10,6 +10,7 @@ using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,20 +26,34 @@ public class HumanCharacterBehavior : ICharacterBehavior
     {
         switch (characterBehaviorComponent.characterStateType)
         {
-            default:
-                break;
+            
             case CharacterStateType.IDLE:
-                    animation.stateAnimation = 0;
-                    animation.frameDuration = characterComponent.CharacterBaseData.animationDataArray[0].frameDuration;
+                 animation.stateAnimation = 0;              
                 break;
             case CharacterStateType.MOVING:
-                animation.stateAnimation = 1;
-                animation.frameDuration = characterComponent.CharacterBaseData.animationDataArray[1].frameDuration;
-                break;
-            case CharacterStateType.EXECUTE_ATTACK:
+                 animation.stateAnimation = 1;                     
                 break;
             case CharacterStateType.ATTACK:
+                if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("attack"))
+                {
+                    characterComponent.speedAtackBase = -0.05f;
+                    animation.stateAnimation = 2;
+                    
+                    if (animation.animationComplete)
+                    {
+                        characterBehaviorComponent.characterStateType = CharacterStateType.EXECUTE_ATTACK;
+                    }
+                }
+                else
+                {
+                    animation.TimeSinceLastFrame = 0;
+                    characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;
+                }                                                                     
                 break;
+            case CharacterStateType.EXECUTE_ATTACK:
+                characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;                
+                break;
+            
             case CharacterStateType.TAKE_HIT:
                 break;
             case CharacterStateType.TAKE_STUN:
@@ -69,45 +84,43 @@ public class HumanCharacterBehavior : ICharacterBehavior
         { moveDirection.X += 1; }
         if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("attack"))
         { attack = true; }
-
-
-     
-
-       
-
-     
+                 
 
         if (stateCharacter == CharacterStateType.EXECUTE_ATTACK)
         {
-            Atack();
+            Atack(ref characterBehaviorComponent);
         }
 
         if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && attack)
         {
-            characterBehaviorComponent.characterStateType = CharacterStateType.ATTACK;
+            characterBehaviorComponent.characterStateType = CharacterStateType.ATTACK;           
+            stateCharacter = CharacterStateType.ATTACK;
+           
         }
 
         if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection == Vector2.Zero)
         {
             characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;
+          
         }
 
         if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection != Vector2.Zero)
-        {
+        {            
             moveDirection = moveDirection.Normalized();
            Move(entity, moveDirection,characterComponent, ref characterBehaviorComponent, ref positionComponent,ref directionComponent, velocityComponent, delta);         
         }
     }
 
-    private void Atack()
+    private void Atack(ref CharacterBehaviorComponent characterBehaviorComponent)
     {
-      //  throw new NotImplementedException();
+        GD.Print("Ejecutar ataque");
+        characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;
     }
 
     private void Move(Entity entity, Vector2 moveDirection, CharacterComponent characterComponent, ref CharacterBehaviorComponent characterBehaviorComponent, ref PositionComponent positionComponent,ref DirectionComponent directionComponent, VelocityComponent velocityComponent, float delta)
     {
-        CharacterBaseData characterData = characterComponent.CharacterBaseData;
-        GeometricShape2D collisionMove = characterData.collisionMove;
+        AnimationCharacterBaseData characterData = characterComponent.CharacterBaseData.animationCharacterBaseData;
+        GeometricShape2D collisionMove = characterData.collisionMove.Multiplicity(characterComponent.CharacterBaseData.scale);
 
 
         if (directionComponent.value != moveDirection)
@@ -159,8 +172,8 @@ public class HumanCharacterBehavior : ICharacterBehavior
                     if (itemInternal.Value.Id != entity.Id)
                     {
                         CharacterComponent characterComponentB = itemInternal.Value.Get<CharacterComponent>();
-                        CharacterBaseData characterB = characterComponentB.CharacterBaseData;
-                        GeometricShape2D colliderB =  characterB.collisionMove;
+                        AnimationCharacterBaseData characterB = characterComponentB.CharacterBaseData.animationCharacterBaseData;
+                        GeometricShape2D colliderB =  characterB.collisionMove.Multiplicity(characterComponentB.CharacterBaseData.scale);
                         var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
 
                         if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))

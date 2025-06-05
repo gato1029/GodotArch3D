@@ -46,8 +46,8 @@ internal class CharacterBehaviorSystem : BaseSystem<World, float>
                 ref CharacterBehaviorComponent characterBehaviorComponent = ref Unsafe.Add(ref pointerCharacterBehaviorComponent, entityIndex);
                 ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
 
-                characterBehaviorComponent.characterBehavior.ControllerState(entity, ref characterComponent, ref characterAnimationComponent,ref characterBehaviorComponent, ref _commandBuffer);
-                characterBehaviorComponent.characterBehavior.ControllerBehavior(entity,ref characterComponent, ref characterBehaviorComponent, ref _commandBuffer, _deltaTime);
+                characterBehaviorComponent.characterBehavior.ControllerBehavior(entity, ref characterComponent, ref characterBehaviorComponent, ref _commandBuffer, _deltaTime);
+                characterBehaviorComponent.characterBehavior.ControllerState(entity, ref characterComponent, ref characterAnimationComponent,ref characterBehaviorComponent, ref _commandBuffer);                
 
             }
 

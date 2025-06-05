@@ -4,20 +4,29 @@ using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+
+
 
 namespace GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
 internal class FacadeWindowDataSearch<T> where T : class
 {
+    public delegate void EventNotifySelected(T objectSelected);
+    public event EventNotifySelected OnNotifySelected;
+
     PackedScene packedSceneNew;
     PackedScene packedSceneWindowData = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/WindowDataSearch.tscn");
     WindowDataSearch windowDataSearch;
 
-    public FacadeWindowDataSearch(string pathWindowNew, Node node)
+    WindowType windowType = WindowType.CREATOR;
+    
+    public FacadeWindowDataSearch(string pathWindowNew, Node node, WindowType pWindowType= WindowType.CREATOR)
     {
-        packedSceneNew = GD.Load<PackedScene>(pathWindowNew);
+        windowType = pWindowType;
 
+        packedSceneNew = GD.Load<PackedScene>(pathWindowNew);
         windowDataSearch = packedSceneWindowData.Instantiate<WindowDataSearch>();
         node.AddChild(windowDataSearch);
         windowDataSearch.PopupCentered();
@@ -27,7 +36,17 @@ internal class FacadeWindowDataSearch<T> where T : class
         LoadAll();
     }
 
-    
+    public FacadeWindowDataSearch(Node node, WindowType pWindowType = WindowType.SELECTED)
+    {
+        windowType = pWindowType;        
+        windowDataSearch = packedSceneWindowData.Instantiate<WindowDataSearch>();
+        node.AddChild(windowDataSearch);
+        windowDataSearch.PopupCentered();
+        windowDataSearch.LineEditSearch.TextChanged += LineEditSearch_TextChanged;
+        windowDataSearch.ItemListView.GuiInput += ItemListView_GuiInput;
+        windowDataSearch.ButtonNew.Pressed += ButtonNew_Pressed;
+        LoadAll();
+    }
 
     private void LoadAll()
     {
@@ -88,13 +107,26 @@ internal class FacadeWindowDataSearch<T> where T : class
                 {
                     int idInternal = (int)windowDataSearch.ItemListView.GetItemMetadata(itemIndex);
                     var objectData = DataBaseManager.Instance.FindById<T>(idInternal);
-                    var control = packedSceneNew.Instantiate<Window>();
-                    control.PopupExclusiveCentered(windowDataSearch);
+                    
+                    switch (windowType)
+                    {
+                        case WindowType.SELECTED:
+                            OnNotifySelected?.Invoke(objectData);
+                            windowDataSearch.QueueFree();
+                            break;
+                        case WindowType.CREATOR:                            
+                            var control = packedSceneNew.Instantiate<Window>();
+                            control.PopupExclusiveCentered(windowDataSearch);
 
-                    var controlInternal = control as IFacadeWindow<T>;
+                            var controlInternal = control as IFacadeWindow<T>;
+                            controlInternal.SetData(objectData);
+                            controlInternal.OnNotifyChanguedSimple += ControlInternal_OnNotifyChanguedSimple;
+                            break;
+                        default:
+                            break;
+                    }
 
-                    controlInternal.SetData(objectData);
-                    controlInternal.OnNotifyChanguedSimple += ControlInternal_OnNotifyChanguedSimple;
+                 
                 }
             }
         }

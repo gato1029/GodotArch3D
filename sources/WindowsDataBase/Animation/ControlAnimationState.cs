@@ -35,10 +35,7 @@ public partial class ControlAnimationState : PanelContainer
         OptionButtonDirection_ItemSelected(0);
 
         OptionButtonPosition.ItemSelected += OptionButtonPosition_ItemSelected;
-        CheckBoxLoop.Pressed += CheckBoxLoop_Pressed;
-        CheckBoxMirror.Pressed += CheckBoxMirror_Pressed;
-        CheckBoxMirrorV.Pressed += CheckBoxMirrorV_Pressed;
-        SpinBoxDuration.ValueChanged += SpinBoxDuration_ValueChanged;
+      
 
         ButtonDelete.Pressed += ButtonDelete_Pressed;
         ButtonUp.Pressed += ButtonUp_Pressed;
@@ -47,14 +44,24 @@ public partial class ControlAnimationState : PanelContainer
 
         OnNotifyPointerSelect?.Invoke(this, 0);
         ControlAnimationFrames.OnNotifyCollisionCurrent += ControlAnimationFrames_OnNotifyCollisionCurrent;
-
-        
+        LineEditName.TextChanged += LineEditName_TextChanged;
+        ButtonSelection.Pressed += ButtonSelection_Pressed;
     }
 
-    private void CheckBoxMirrorV_Pressed()
+    private void LineEditName_TextChanged(string newText)
     {
-        objectData.mirrorVertical = CheckBoxMirrorV.ButtonPressed;
+        objectData.name = LineEditName.Text;
+        OnNotifyChangued?.Invoke(this);
+      
     }
+
+    private void ButtonSelection_Pressed()
+    {
+        OnNotifyChangued?.Invoke(this);
+        OptionButtonPosition_ItemSelected(0);
+    }
+
+
 
     private void ControlAnimationFrames_OnNotifyCollisionCurrent(ControlAnimation objectControl, GodotEcsArch.sources.managers.Collision.GeometricShape2D geometricShape2D)
     {
@@ -63,33 +70,26 @@ public partial class ControlAnimationState : PanelContainer
     internal void SetData(AnimationStateData data)
     {
         objectData = data;
+        LineEditName.Text = data.name;
         OptionButtonDirection.Selected = (int)data.directionAnimationType;
         nivelarPosiciones((int)data.directionAnimationType);
-        SpinBoxDuration.Value = objectData.frameDuration;
-        CheckBoxMirror.ButtonPressed = objectData.mirrorHorizontal;
-        CheckBoxMirrorV.ButtonPressed = objectData.mirrorVertical;
 
-        CheckBoxLoop.ButtonPressed = objectData.loop;
         ControlAnimationFrames.SetData(objectData.animationData[0]);
         ControlAnimationFrames.OnNotifyCollisionCurrent += ControlAnimationFrames_OnNotifyCollisionCurrent;
 
-        CheckBoxLoop_PressedUI();
-        CheckBoxMirror_PressedUI();
-        CheckBoxMirrorV_PressedUI();
     }
     public void SetData(float frameDuration, bool mirrorX, bool mirrorY, bool loop, int positionAnimation, FrameData[] frameArray, int idMaterial )
     {
-        SpinBoxDuration.Value = frameDuration;
-        CheckBoxMirror.ButtonPressed = mirrorX;
-        CheckBoxMirrorV.ButtonPressed = mirrorY;
-        CheckBoxLoop.ButtonPressed = loop;
+
 
         objectData.idMaterial = idMaterial;
-        objectData.mirrorHorizontal = CheckBoxMirror.ButtonPressed;
-        objectData.mirrorVertical = CheckBoxMirrorV.ButtonPressed;
-        objectData.loop = CheckBoxLoop.ButtonPressed;
-        objectData.frameDuration = (float)SpinBoxDuration.Value;
+
         objectData.animationData[positionAnimation].frameDataArray =  frameArray;
+        objectData.animationData[positionAnimation].frameDuration = frameDuration;
+        objectData.animationData[positionAnimation].mirrorHorizontal = mirrorX;
+        objectData.animationData[positionAnimation].mirrorVertical = mirrorY;
+        objectData.animationData[positionAnimation].loop = loop;
+
         ControlAnimationFrames.SetData(objectData.animationData[positionAnimation]);
         ControlAnimationFrames.OnNotifyCollisionCurrent += ControlAnimationFrames_OnNotifyCollisionCurrent;
     }
@@ -113,20 +113,7 @@ public partial class ControlAnimationState : PanelContainer
         QueueFree();
     }
 
-    private void SpinBoxDuration_ValueChanged(double value)
-    {
-        objectData.frameDuration = (float)SpinBoxDuration.Value;
-    }
 
-    private void CheckBoxMirror_Pressed()
-    {
-        objectData.mirrorHorizontal = CheckBoxMirror.ButtonPressed;
-    }
-
-    private void CheckBoxLoop_Pressed()
-    {
-        objectData.loop = CheckBoxLoop.ButtonPressed;        
-    }
 
     private void OptionButtonPosition_ItemSelected(long index)
     {

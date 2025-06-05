@@ -50,10 +50,10 @@ public partial class WindowCharacterAnimation : PanelContainer
                 framesLine.Text = strFrame;
             }
 
-            frameDuration.Value = data.frameDuration;
-            isloop.ButtonPressed = data.loop;
-            mirrorHorizontal.ButtonPressed = data.mirrorHorizontal;
-            idSpin.Value = data.id;
+            //frameDuration.Value = data.frameDuration;
+            //isloop.ButtonPressed = data.loop;
+            //mirrorHorizontal.ButtonPressed = data.mirrorHorizontal;
+       //     idSpin.Value = data.id;
             idSpinBox.Value = 0;
         }
      
@@ -62,7 +62,7 @@ public partial class WindowCharacterAnimation : PanelContainer
     {
         idSpin.Value = id;
         idPosition = id;
-        data.id = id;
+   //     data.id = id;
     }
     public void SetMaterial(int idMat)
     {
@@ -106,13 +106,13 @@ public partial class WindowCharacterAnimation : PanelContainer
 
     private void MirrorHorizontal_Pressed()
     {
-        data.mirrorHorizontal = mirrorHorizontal.ButtonPressed;
+        //data.mirrorHorizontal = mirrorHorizontal.ButtonPressed;
         OnNotifyChangue?.Invoke(data, currentIdState);
     }
 
     private void isloop_Press()
     {
-        data.loop = isloop.ButtonPressed;
+        //data.loop = isloop.ButtonPressed;
         OnNotifyChangue?.Invoke(data, currentIdState);
     }
 
@@ -121,16 +121,16 @@ public partial class WindowCharacterAnimation : PanelContainer
         if (tipoCheckButton.ButtonPressed)
         {
             tipoCheckButton.Text = "8 Direcciones";
-            data.eightDirection = true;
+            //data.eightDirection = true;
             idSpinBox.MaxValue = 7;
-            data= new AnimationStateData(true);
+          //  data= new AnimationStateData(true);
         }
         else
         {
             tipoCheckButton.Text = "4 Direcciones";
-            data.eightDirection = false;
+            //data.eightDirection = false;
             idSpinBox.MaxValue = 3;
-            data = new AnimationStateData(false);
+          //  data = new AnimationStateData(false);
         }
         
     }
@@ -170,7 +170,7 @@ public partial class WindowCharacterAnimation : PanelContainer
         {
             framesLine.Text = "";
         }
-        frameDuration.Value = data.frameDuration;
+        //frameDuration.Value = data.frameDuration;
         OnNotifyChangue?.Invoke(data, currentIdState);
     }
 
@@ -196,10 +196,10 @@ public partial class WindowCharacterAnimation : PanelContainer
                     index++;
                 }
 
-                data.id = (int)idSpin.Value;
+            //    data.id = (int)idSpin.Value;
                 data.animationData[currentIdState].id = currentIdState;
                 data.animationData[currentIdState].idFrames = arrayFrame;
-                data.frameDuration = (float)frameDuration.Value;
+                //data.frameDuration = (float)frameDuration.Value;
             }
             else
             {
@@ -212,10 +212,10 @@ public partial class WindowCharacterAnimation : PanelContainer
                     arrayFrame[index] = frame;              
                     index++;
                 }
-                data.id = (int) idSpin.Value;
+              //  data.id = (int) idSpin.Value;
                 data.animationData[currentIdState].id = currentIdState;
                 data.animationData[currentIdState].idFrames = arrayFrame;
-                data.frameDuration = (float)frameDuration.Value;
+                //data.frameDuration = (float)frameDuration.Value;
             }
         }
         OnNotifyChangue?.Invoke(data, currentIdState);
@@ -232,22 +232,22 @@ public partial class WindowCharacterAnimation : PanelContainer
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
-        if (data.animationData[currentIdState]!= null && data.animationData[currentIdState].idFrames != null)
-        {
-            currentfps += delta;
-            if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
-            {
-                var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
-                indexFrame++;
-                currentfps = 0;
-                var dataTexture = MaterialManager.Instance.GetAtlasTexture(idMaterial, iFrame);
-                textureSelection.Texture = dataTexture;
-            }
-            if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
-            {
-                indexFrame = 0;
-            }
-        }
+        //if (data.animationData[currentIdState]!= null && data.animationData[currentIdState].idFrames != null)
+        //{
+        //    currentfps += delta;
+        //    if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
+        //    {
+        //        var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
+        //        indexFrame++;
+        //        currentfps = 0;
+        //        var dataTexture = MaterialManager.Instance.GetAtlasTexture(idMaterial, iFrame);
+        //        textureSelection.Texture = dataTexture;
+        //    }
+        //    if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
+        //    {
+        //        indexFrame = 0;
+        //    }
+        //}
 
     }
 }

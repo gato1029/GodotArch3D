@@ -20,25 +20,25 @@ public partial class AnimationPreview : Sprite2D
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
 	{
-        if (data !=null)
-        {
-            if (data.animationData[currentIdState] != null && data.animationData[currentIdState].idFrames != null)
-            {
-                currentfps += delta;
-                if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
-                {
-                    var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
-                    indexFrame++;
-                    currentfps = 0;
-                    var dataTexture = MaterialManager.Instance.GetAtlasTexture(idMaterial, iFrame);
-                    Texture = dataTexture;
-                }
-                if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
-                {
-                    indexFrame = 0;
-                }
-            }
-        }
+        //if (data !=null)
+        //{
+        //    if (data.animationData[currentIdState] != null && data.animationData[currentIdState].idFrames != null)
+        //    {
+        //        currentfps += delta;
+        //        if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
+        //        {
+        //            var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
+        //            indexFrame++;
+        //            currentfps = 0;
+        //            var dataTexture = MaterialManager.Instance.GetAtlasTexture(idMaterial, iFrame);
+        //            Texture = dataTexture;
+        //        }
+        //        if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
+        //        {
+        //            indexFrame = 0;
+        //        }
+        //    }
+        //}
        
     }
 }

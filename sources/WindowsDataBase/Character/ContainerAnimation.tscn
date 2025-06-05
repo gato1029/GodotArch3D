@@ -40,6 +40,7 @@ size_flags_horizontal = 0
 text = "Nuevo Material"
 
 [node name="ButtonSave" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Guardar Todo"

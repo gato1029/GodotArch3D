@@ -6,17 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://dpe6okmjy8jkj" path="res://resources/Textures/internal/arrow_up_icon.png" id="3_3pyf0"]
 
 [node name="ControlAnimationState" type="PanelContainer"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -193.0
-offset_top = -223.5
-offset_right = 193.0
-offset_bottom = 223.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_vertical = 3
 script = ExtResource("1_hv3v3")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -31,7 +26,11 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
+
+[node name="ButtonSelection" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Seleccionar"
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -71,6 +70,7 @@ layout_mode = 2
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
@@ -79,10 +79,21 @@ columns = 2
 [node name="Label11" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
+text = "Nombre Animacion:"
+
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label12" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
 text = "Direcciones:"
 
 [node name="OptionButtonDirection" type="OptionButton" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
 layout_mode = 2
+size_flags_horizontal = 0
 
 [node name="Label10" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
 layout_mode = 2
@@ -91,42 +102,8 @@ text = "Posicion:"
 
 [node name="OptionButtonPosition" type="OptionButton" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
 layout_mode = 2
-
-[node name="Label9" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "Frame Duration"
-
-[node name="SpinBoxDuration" type="SpinBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-step = 0.01
-
-[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "loop"
-
-[node name="CheckBoxLoop" type="CheckBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Bucle"
-
-[node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "mirror Horizontal"
-
-[node name="CheckBoxMirror" type="CheckBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Habilitado"
-
-[node name="Label7" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 8
-text = "mirror Vertical"
-
-[node name="CheckBoxMirrorV" type="CheckBox" parent="MarginContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Habilitado"
+size_flags_horizontal = 0
 
 [node name="ControlAnimationFrames" parent="MarginContainer/VBoxContainer/VBoxContainer2" instance=ExtResource("1_3ub7f")]
 layout_mode = 2
+size_flags_vertical = 3

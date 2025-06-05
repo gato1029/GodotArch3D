@@ -15,7 +15,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
 
     AccessoryData objectData;
 
-    ContainerAnimationBody controlAnimationBody;
+    ControlAccesoryAnimationBodyView controlAnimationBody;
 
     ContainerAnimationTiles controlAnimationTiles;
 
@@ -97,7 +97,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
 
         if (p_ObjectData.hasBodyAnimation && p_ObjectData.idBodyAnimationBaseData > 0)
         {
-            controlAnimationBody = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ContainerAnimationBody.tscn").Instantiate<ContainerAnimationBody>();
+            controlAnimationBody = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAccesoryAnimationBodyView.tscn").Instantiate<ControlAccesoryAnimationBodyView>();
             controlAnimationBody.Name = "Control Animacion Body";
             TabContainerControl.AddChild(controlAnimationBody);
 
@@ -227,7 +227,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
         if (CheckBoxAnimationBody.ButtonPressed)
         {
 
-            controlAnimationBody = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ContainerAnimationBody.tscn").Instantiate<ContainerAnimationBody>();
+            controlAnimationBody = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAccesoryAnimationBodyView.tscn").Instantiate<ControlAccesoryAnimationBodyView>();
             controlAnimationBody.Name = "Control Animacion Body";
             TabContainerControl.AddChild(controlAnimationBody);
         }

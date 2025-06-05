@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
 using System;
@@ -20,7 +21,7 @@ public partial class ControlAnimation : PanelContainer
     public AnimationData ObjectData { get => objectData; set => objectData = value; }
 
     // Called when the node enters the scene tree for the first time.
-    
+
     public void SetData(AnimationData data)
     {
         this.objectData = data;
@@ -47,6 +48,14 @@ public partial class ControlAnimation : PanelContainer
             CheckBoxHasCollisionMultiple_Pressed();
             panelColliders.SetData(objectData.colliderMultiple.ToList());            
         }
+
+        SpinBoxDuration.Value = data.frameDuration;
+        CheckBoxLoop.ButtonPressed = data.loop;
+        CheckBoxMirror.ButtonPressed = data.mirrorHorizontal;
+        CheckBoxMirrorV.ButtonPressed = data.mirrorVertical;
+
+        CheckBoxMirrorV_PressedUI();
+        CheckBoxMirror_PressedUI();
     }
   
 	public override void _Ready()
@@ -127,4 +136,6 @@ public partial class ControlAnimation : PanelContainer
     public override void _Process(double delta)
 	{
 	}
+
+
 }

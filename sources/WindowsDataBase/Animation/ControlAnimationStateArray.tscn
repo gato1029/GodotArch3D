@@ -27,7 +27,7 @@ layout_mode = 2
 
 [node name="ButtonAdd" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-text = "Agregar"
+text = "Agregar Nueva Animacion"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2

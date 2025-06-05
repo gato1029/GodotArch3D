@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://djwgi7aj2f76j"]
+
+[ext_resource type="Shader" uid="uid://dfmomngig0nhb" path="res://resources/shaders/SpriteMultimeshGeneric.gdshader" id="1_wmjxe"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_wmjxe")
+shader_parameter/atlas_width = 0.0
+shader_parameter/atlas_height = 0.0
+shader_parameter/transparency = 0.0

@@ -19,5 +19,10 @@ namespace GodotEcsArch.sources.managers.Collision
         {
            return new Godot.Vector2(Vertices.Count, Vertices.Count);
         }
+
+        public override GeometricShape2D Multiplicity(float value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -71,22 +71,24 @@ internal class DebugerSystem : BaseSystem<World, float>
                 ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
                 ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
 
-                if (characterComponent.CharacterBaseData.collisionBody is Rectangle)
+                float scale = characterComponent.CharacterBaseData.scale;
+                if (characterComponent.CharacterBaseData.animationCharacterBaseData.collisionBody is Rectangle)
                 {
-                    Rectangle shape = (Rectangle)characterComponent.CharacterBaseData.collisionBody;
+                    Rectangle shape = (Rectangle)characterComponent.CharacterBaseData.animationCharacterBaseData.collisionBody;
                     Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
-                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width, shape.Height, 1));
-                    transform3DShape.Origin = new Vector3(positionComponent.position.X + shape.OriginCurrent.X, positionComponent.position.Y + shape.OriginCurrent.Y, 1);
+                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
+                    transform3DShape.Origin = new Vector3(positionComponent.position.X + shape.OriginCurrent.X * scale, positionComponent.position.Y + shape.OriginCurrent.Y * scale, 1);
+                    
                     DebugDraw.Quad(transform3DShape, 1, Colors.Red, 0.0f); 
                 }
 
              
-                if (characterComponent.CharacterBaseData.collisionMove is Rectangle)
+                if (characterComponent.CharacterBaseData.animationCharacterBaseData.collisionMove is Rectangle)
                 {
-                    Rectangle shape2 = (Rectangle)characterComponent.CharacterBaseData.collisionMove;
+                    Rectangle shape2 = (Rectangle)characterComponent.CharacterBaseData.animationCharacterBaseData.collisionMove;
                     Transform3D transform3DShape2 = new Transform3D(Basis.Identity, Vector3.Zero);
-                    transform3DShape2 = transform3DShape2.Scaled(new Vector3(shape2.Width, shape2.Height, 1));
-                    transform3DShape2.Origin = new Vector3(positionComponent.position.X + shape2.OriginCurrent.X, positionComponent.position.Y + shape2.OriginCurrent.Y, 1);
+                    transform3DShape2 = transform3DShape2.Scaled(new Vector3(shape2.Width*scale, shape2.Height * scale, 1));
+                    transform3DShape2.Origin = new Vector3(positionComponent.position.X + shape2.OriginCurrent.X * scale, positionComponent.position.Y + shape2.OriginCurrent.Y * scale, 1);
                     DebugDraw.Quad(transform3DShape2, 1, Colors.Green, 0.0f); //debug
                 }
            
@@ -325,6 +327,7 @@ internal class DebugerSystem : BaseSystem<World, float>
         if (debug)
         {
             DebugActive = !DebugActive;
+            DebugTiles();
         }
 
         if (DebugActive)
@@ -335,12 +338,32 @@ internal class DebugerSystem : BaseSystem<World, float>
 
             World.InlineParallelChunkQuery(in queryColliderCharacter, new ChunkJobDebugColliderCharacter(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryDirection, new ChunkJobDebugDirectionComponent(commandBuffer, t));
-
+            
         }
 
     }
 
-  
+    private void DebugTiles()
+    {
+        foreach (var item in CollisionManager.Instance.tileColliders.cellMap)
+        {
+            foreach (var item2 in item.Value)
+            {
+                GeometricShape2D collision =item2.Value.collisionBody;
+                
+                if (collision is Rectangle)
+                {
+                    int scale = 1;
+                    Rectangle shape = (Rectangle)collision;
+                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
+                    transform3DShape.Origin = new Vector3(item2.Value.positionCollider.X + shape.OriginCurrent.X * scale, item2.Value.positionCollider.Y + shape.OriginCurrent.Y * scale, 1);
 
+                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 10.0f);
+                }
+            }
+            
+        } 
+    }
 }
 

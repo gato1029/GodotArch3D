@@ -7,6 +7,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mlu17"]
 
 [node name="ContainerAnimationCharacter" type="Window"]
+oversampling_override = 1.0
 size = Vector2i(1500, 800)
 exclusive = true
 always_on_top = true
@@ -113,16 +114,6 @@ text = "Animacion Compuesta:"
 layout_mode = 2
 text = "Habilitada"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer"]
-layout_mode = 2
-text = "Colision de Movimiento"
-
-[node name="PanelMovimiento" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer" instance=ExtResource("3_650ey")]
-layout_mode = 2
-
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
 layout_mode = 2
 
@@ -131,6 +122,16 @@ layout_mode = 2
 text = "Colision del Cuerpo"
 
 [node name="PanelCuerpo" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer2" instance=ExtResource("3_650ey")]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer"]
+layout_mode = 2
+text = "Colision de Movimiento"
+
+[node name="PanelMovimiento" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer" instance=ExtResource("3_650ey")]
 layout_mode = 2
 
 [node name="ButtonSave" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]

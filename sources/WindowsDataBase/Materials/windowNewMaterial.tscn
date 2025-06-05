@@ -4,6 +4,7 @@
 
 [node name="WindowNewMaterial" type="Window"]
 gui_embed_subwindows = true
+oversampling_override = 1.0
 title = "Nuevo Material"
 initial_position = 3
 size = Vector2i(500, 500)
@@ -108,11 +109,15 @@ text = "Tipo:"
 layout_mode = 2
 size_flags_horizontal = 3
 selected = 0
-item_count = 2
+item_count = 4
 popup/item_0/text = "TILES"
 popup/item_0/id = 0
 popup/item_1/text = "TILES_DINAMIC"
 popup/item_1/id = 1
+popup/item_2/text = "CUSTOM"
+popup/item_2/id = 2
+popup/item_3/text = "GENERIC"
+popup/item_3/id = 3
 
 [node name="Label3" type="Label" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2

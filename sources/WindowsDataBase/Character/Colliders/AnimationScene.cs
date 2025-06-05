@@ -62,10 +62,10 @@ public partial class AnimationScene : VBoxContainer
                 framesLine.Text = strFrame;
             }
 
-            frameDuration.Value = data.frameDuration;
-            isloop.ButtonPressed = data.loop;
-            mirrorHorizontal.ButtonPressed = data.mirrorHorizontal;
-            idSpin.Value = data.id;
+            //frameDuration.Value = data.frameDuration;
+            //isloop.ButtonPressed = data.loop;
+            //mirrorHorizontal.ButtonPressed = data.mirrorHorizontal;
+           // idSpin.Value = data.id;
             idDirectionSpinBox.Value = 0;         
             
         }
@@ -158,12 +158,12 @@ public partial class AnimationScene : VBoxContainer
 
     private void FrameDuration_ValueChanged(double value)
     {
-        data.frameDuration = (float)frameDuration.Value;
+   //     data.frameDuration = (float)frameDuration.Value;
     }
 
     private void MirrorHorizontal_Pressed()
     {
-        data.mirrorHorizontal = mirrorHorizontal.ButtonPressed;
+     //   data.mirrorHorizontal = mirrorHorizontal.ButtonPressed;
      
     }
     private void Refresh_Press()
@@ -188,10 +188,10 @@ public partial class AnimationScene : VBoxContainer
                     index++;
                 }
 
-                data.id = (int)idSpin.Value;
+              //  data.id = (int)idSpin.Value;
                 data.animationData[currentIdState].id = currentIdState;
                 data.animationData[currentIdState].idFrames = arrayFrame;
-                data.frameDuration = (float)frameDuration.Value;
+           //     data.frameDuration = (float)frameDuration.Value;
             }
             else
             {
@@ -204,17 +204,17 @@ public partial class AnimationScene : VBoxContainer
                     arrayFrame[index] = frame;
                     index++;
                 }
-                data.id = (int)idSpin.Value;
+                //data.id = (int)idSpin.Value;
                 data.animationData[currentIdState].id = currentIdState;
                 data.animationData[currentIdState].idFrames = arrayFrame;
-                data.frameDuration = (float)frameDuration.Value;
+               // data.frameDuration = (float)frameDuration.Value;
             }
         }
        
     }
     private void isloop_Press()
     {
-        data.loop = isloop.ButtonPressed;
+     //   data.loop = isloop.ButtonPressed;
     }
 
     private void idDirectionSpinBox_ValueChanged(double value)
@@ -252,7 +252,7 @@ public partial class AnimationScene : VBoxContainer
         {
             framesLine.Text = "";
         }
-        frameDuration.Value = data.frameDuration;
+      //  frameDuration.Value = data.frameDuration;
 
         ChangueCollider(currentIdState);
     }
@@ -293,21 +293,21 @@ public partial class AnimationScene : VBoxContainer
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
 	{
-        if (data.animationData[currentIdState] != null && data.animationData[currentIdState].idFrames != null)
-        {
-            currentfps += delta;
-            if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
-            {
-                var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
-                indexFrame++;
-                currentfps = 0;
-                var dataTexture = MaterialManager.Instance.GetAtlasTexture(idMaterial, iFrame);
-                textureSelection.Texture = dataTexture;
-            }
-            if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
-            {
-                indexFrame = 0;
-            }
-        }
+        //if (data.animationData[currentIdState] != null && data.animationData[currentIdState].idFrames != null)
+        //{
+        //    currentfps += delta;
+        //    if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
+        //    {
+        //        var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
+        //        indexFrame++;
+        //        currentfps = 0;
+        //        var dataTexture = MaterialManager.Instance.GetAtlasTexture(idMaterial, iFrame);
+        //        textureSelection.Texture = dataTexture;
+        //    }
+        //    if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
+        //    {
+        //        indexFrame = 0;
+        //    }
+        //}
     }
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cmwumcvxxgnjl"]
+[gd_scene load_steps=13 format=3 uid="uid://cmwumcvxxgnjl"]
 
 [ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_a2usr"]
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="2_xh56v"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="4_tksb4"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
 [ext_resource type="Texture2D" uid="uid://c5ccx8t7g4yrh" path="res://resources/Textures/TX Plant.png" id="5_yxrc8"]
-[ext_resource type="PackedScene" uid="uid://7ep482axlki2" path="res://sources/WindowsDataBase/TileCreator/window_tile_creator.tscn" id="8_ong74"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_yxrc8"]
 
@@ -123,7 +122,7 @@ item_1/id = 1
 
 [node name="Componentes" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1
-item_count = 5
+item_count = 6
 item_0/text = "Base Character"
 item_0/id = 0
 item_1/text = "Terrain"
@@ -132,8 +131,18 @@ item_2/text = "Armas"
 item_2/id = 2
 item_3/text = "Accesorios"
 item_3/id = 3
-item_4/text = "Personajes"
+item_4/text = "Animacion Personajes"
 item_4/id = 4
+item_5/text = "Creacion Personajes"
+item_5/id = 5
+
+[node name="Armamento" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+auto_translate_mode = 1
+item_count = 2
+item_0/text = "Animacion Accesorios"
+item_0/id = 0
+item_1/text = "Creacion Accesorios"
+item_1/id = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -206,8 +215,3 @@ surface_material_override/0 = ExtResource("5_ong74")
 
 [node name="InputHandlerGame" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
 script = ExtResource("3_e6381")
-
-[node name="Windows" type="Node" parent="Editor"]
-
-[node name="WindowTileCreator" parent="Editor/Windows" instance=ExtResource("8_ong74")]
-visible = false

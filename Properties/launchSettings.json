@@ -3,15 +3,15 @@
   "profiles": {
 	"Godot Debug": {
 	  "commandName": "Executable",
-	  "executablePath": "D:/godot/Godot_v4.4-stable_mono_win64/Godot_v4.4-stable_mono_win64/Godot_v4.4-stable_mono_win64.exe",
+	  "executablePath": "D:/godot/Godot_v4.5-dev4_mono_win64/Godot_v4.5-dev4_mono_win64/Godot_v4.5-dev4_mono_win64.exe",
 	  "commandLineArgs": "--path . --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug ContainerAnimation": {
+	"Godot Debug Main3dGodot": {
 	  "commandName": "Executable",
-	  "executablePath": "D:/godot/Godot_v4.4-stable_mono_win64/Godot_v4.4-stable_mono_win64/Godot_v4.4-stable_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Character/ContainerAnimation.tscn --verbose",
+	  "executablePath": "D:/godot/Godot_v4.5-dev4_mono_win64/Godot_v4.5-dev4_mono_win64/Godot_v4.5-dev4_mono_win64.exe",
+	  "commandLineArgs": "--upwards ./Main3DGodot.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

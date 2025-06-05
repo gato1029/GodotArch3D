@@ -53,8 +53,33 @@ public partial class ControlAnimationStateArray : PanelContainer
             node.OnNotifyChanguedOrder += Node_OnNotifyChanguedOrder;
             node.OnNotifyPointerSelect += Node_OnNotifyPointerSelect;
             node.OnNotifyCollisionSelected += Node_OnNotifyCollisionSelected;
+            node.OnNotifyChangued += Node_OnNotifyChangued;
         }
     }
+
+    private void Node_OnNotifyChangued(ControlAnimationState objectControl)
+    {
+        int index = VBoxContainerItems.GetChildren().IndexOf(objectControl);
+        int childCount = VBoxContainerItems.GetChildCount();
+
+        var children = VBoxContainerItems.GetChildren();
+        
+        foreach (Node child in children)
+        {
+            ControlAnimationState controlChild = (ControlAnimationState)child;
+            if (child == objectControl)
+            {
+                Texture2D texture = GD.Load("res://resources/Textures/internal/check-64.png") as Texture2D;
+                controlChild.ButtonSelection.Icon = texture;
+            }
+            else
+            {
+                Texture2D texture = GD.Load("res://resources/Textures/internal/cancel.png") as Texture2D;
+                controlChild.ButtonSelection.Icon = texture;
+            }            
+        }
+    }
+
     private void ButtonAdd_Pressed()
     {
         var node = GD.Load<PackedScene>("res://sources/WindowsDataBase/Animation/ControlAnimationState.tscn").Instantiate<ControlAnimationState>();       
@@ -67,6 +92,7 @@ public partial class ControlAnimationStateArray : PanelContainer
         node.OnNotifyChanguedOrder += Node_OnNotifyChanguedOrder;
         node.OnNotifyPointerSelect += Node_OnNotifyPointerSelect;
         node.OnNotifyCollisionSelected += Node_OnNotifyCollisionSelected;
+        node.OnNotifyChangued += Node_OnNotifyChangued;
 
         OnNotifyChangued?.Invoke(this);
     }

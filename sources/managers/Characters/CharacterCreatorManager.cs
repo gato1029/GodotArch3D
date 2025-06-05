@@ -3,13 +3,19 @@ using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
 using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Behaviors;
 using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
 using System.Collections.Generic;
+
 namespace GodotEcsArch.sources.managers.Characters;
 
 public enum CharacterStateType
@@ -29,10 +35,14 @@ public enum CharacterStateType
 [Component]
 public struct CharacterComponent
 {
-    public CharacterBaseData CharacterBaseData;
+    public CharacterModelBaseData CharacterBaseData;
     public int healthBase;
     public int damageBase;
+    public float speedAtackBase;    
+    public AccessoryData[] accessoryArray;
 }
+
+
 [Component]
 public struct CharacterAccesoriesComponent
 {    
@@ -43,25 +53,22 @@ public struct CharacterAccesoriesComponent
 [Component]
 public struct CharacterColliderComponent { }
 
-[Component]
-public struct CharacterAnimationCompositeComponent
-{
 
-}
 
 [Component]
 public struct CharacterAnimationComponent
 {    
+    public Color currentframeData;
+
     public int stateAnimation;
-    public int currentFrame;
+    public int lastStateAnimation;
     public int currentFrameIndex;
     public float TimeSinceLastFrame;
-    public float frameDuration; // aqui si lo almacenamos por que con ello manejaremos la velocidad de ataque
-    
-    public bool animationComplete;
-    public int  horizontalMirror;
-
+    public float frameDuration; // aqui si lo almacenamos por que con ello manejaremos la velocidad de ataque    
+    public bool animationComplete;    
     public bool active;
+
+    public Color[] currentframeDataAccesorys;
 }
 
 [Component]
@@ -90,42 +97,66 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
 
     public void CreateNewCharacter(int idCharacterBase, Vector2 positionInitial)
     {
-
-        CharacterBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(idCharacterBase);
-       
-        if (!multimeshMaterialDict.ContainsKey(characterBaseData.idMaterial))
+        CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(idCharacterBase);
+        int idMaterial = 0;
+        if (!multimeshMaterialDict.ContainsKey(characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial))
         {
-            MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(characterBaseData.idMaterial));
-            multimeshMaterialDict.Add(characterBaseData.idMaterial, multimeshMaterial);
+            idMaterial = characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial;
+            MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(idMaterial));
+            multimeshMaterialDict.Add(idMaterial, multimeshMaterial);
         }
-        
 
-        Entity entity = EcsManager.Instance.World.Create();        
+
+        Entity entity = EcsManager.Instance.World.Create();
         AddBase(entity, characterBaseData);
-        AddRender(entity, characterBaseData, multimeshMaterialDict[characterBaseData.idMaterial], positionInitial);
-        AddMove(entity, positionInitial);        
-        AddAnimations(entity, characterBaseData);        
+        AddRender(entity, characterBaseData, multimeshMaterialDict[idMaterial], positionInitial);
+        AddMove(entity, positionInitial);
+        AddAnimations(entity, characterBaseData);
         AddSoulCharacter(entity, characterBaseData);
 
-        if (characterBaseData.collisionBody !=null || characterBaseData.collisionMove !=null)
+        if (characterBaseData.animationCharacterBaseData.collisionBody != null || characterBaseData.animationCharacterBaseData.collisionMove != null)
         {
-            AddColliderBody(entity, characterBaseData, positionInitial);
+            AddColliderBody(entity, characterBaseData.animationCharacterBaseData, positionInitial);
         }
+
+        
     }
 
-    private void AddRender(Entity entity, CharacterBaseData characterBaseData, MultimeshMaterial multimeshMaterial, Vector2 positionInitial)
+    private void AddRender(Entity entity, CharacterModelBaseData characterBaseData, MultimeshMaterial multimeshMaterial, Vector2 positionInitial)
     {
         var inst = multimeshMaterial.CreateInstance();
         
         Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
         transform.Origin = new Vector3(positionInitial.X, positionInitial.Y, (positionInitial.Y * CommonAtributes.LAYER_MULTIPLICATOR) + 0);
-        entity.Add(new RenderGPUComponent { rid = inst.Item1, instance = inst.Item2, layerRender =0, transform = transform, zOrdering = characterBaseData.collisionMove.OriginCurrent.Y } );
+        transform = transform.ScaledLocal(new Vector3(characterBaseData.scale, characterBaseData.scale, 1));
+        entity.Add(new RenderGPUComponent { rid = inst.Item1, instance = inst.Item2, layerRender = (int)characterBaseData.animationCharacterBaseData.zOrderingOrigin, transform = transform, zOrdering = positionInitial.Y  } );
+        if (characterBaseData.animationCharacterBaseData.hasCompositeAnimation)
+        {
+            GpuInstance[] instancedLinked = new GpuInstance[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+            instancedLinked[(int)AccesoryAvatarType.WEAPON] = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, 2);
+            for (int i = 1; i < instancedLinked.Length; i++)
+            {
+                instancedLinked[i] = default;
+            }
+
+            //crear cada rid
+            entity.Add(new RenderGPULinkedComponent { instancedLinked = instancedLinked });
+        }
+
     }
 
-    private void AddBase(Entity entity, CharacterBaseData baseData)
+    private void AddBase(Entity entity, CharacterModelBaseData baseData)
     {
-        entity.Add(new CharacterComponent { CharacterBaseData = baseData, damageBase = 10, healthBase = 10 });
-       
+        if (baseData.animationCharacterBaseData.hasCompositeAnimation)
+        {          
+            AccessoryData[] accessoryArray = new AccessoryData[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+            accessoryArray[(int)AccesoryAvatarType.WEAPON] = AccesoryManager.Instance.GetAccesory(2);
+            entity.Add(new CharacterComponent { CharacterBaseData = baseData, damageBase = 10, healthBase = 10, speedAtackBase = 0.1f, accessoryArray = accessoryArray  });
+        }
+        else
+        {
+            entity.Add(new CharacterComponent { CharacterBaseData = baseData, damageBase = 10, healthBase = 10, speedAtackBase = 0.1f, accessoryArray = null });
+        }                       
     }
     private void AddMove(Entity entity, Vector2 positionInitial)
     {
@@ -135,7 +166,7 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         
     }
 
-    private void AddSoulCharacter(Entity entity , CharacterBaseData characterBaseData)
+    private void AddSoulCharacter(Entity entity , CharacterModelBaseData characterBaseData)
     {
         // aqui agregar el componente de comportamiento, Luego seria genial extenderlo a lua :)
         //if (characterBaseData.attackIDBehavior!=0|| characterBaseData.moveIDBehavior != 0)
@@ -155,22 +186,32 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
             entity.Add(behaviorCharacterComponent);
         }        
     }
-    private void AddAnimations(Entity entity, CharacterBaseData characterBaseData)
+    private void AddAnimations(Entity entity, CharacterModelBaseData characterBaseData)
     {
-        CharacterAnimationComponent characterAnimationComponent;
+        CharacterAnimationComponent characterAnimationComponent = default;
+        if (characterBaseData.animationCharacterBaseData.hasCompositeAnimation)
+        {
+            characterAnimationComponent.currentframeData = new Color();
+            characterAnimationComponent.currentframeDataAccesorys = new Color[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+        }
+        else
+        {
+            characterAnimationComponent.currentframeData = new Color();
+        }
+    
         characterAnimationComponent.stateAnimation = 0;
-        characterAnimationComponent.currentFrame = 0;
+        characterAnimationComponent.lastStateAnimation = -1;
         characterAnimationComponent.currentFrameIndex = 0;
         characterAnimationComponent.active = true;
         characterAnimationComponent.frameDuration = 0;
-        characterAnimationComponent.horizontalMirror = 0;
+        
         characterAnimationComponent.animationComplete = false;
         characterAnimationComponent.TimeSinceLastFrame = 0;
 
         entity.Add<CharacterAnimationComponent>(characterAnimationComponent);
     }
 
-    private void AddColliderBody(Entity entity, CharacterBaseData characterBaseData, Vector2 positionInitial)
+    private void AddColliderBody(Entity entity, AnimationCharacterBaseData characterBaseData, Vector2 positionInitial)
     {
         entity.Add<CharacterColliderComponent>();
         CollisionManager.Instance.characterCollidersEntities.AddUpdateItem(positionInitial, entity);

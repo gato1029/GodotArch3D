@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.managers.Characters;
 public class CharacterLocalBase:SingletonBase<CharacterLocalBase>
 {
-    Dictionary<int,CharacterBaseData> dictionary = new Dictionary<int,CharacterBaseData>();
+    Dictionary<int, CharacterModelBaseData> dictionary = new Dictionary<int, CharacterModelBaseData>();
     protected override void Initialize()
     {
     }
@@ -20,11 +21,11 @@ public class CharacterLocalBase:SingletonBase<CharacterLocalBase>
     {
         if (!dictionary.ContainsKey(id))
         {
-            var data = DataBaseManager.Instance.FindById<CharacterBaseData>(id);
+            var data = DataBaseManager.Instance.FindById<CharacterModelBaseData>(id);
             dictionary.Add(id,data);
         }
     }
-    public void RegisterCharacterBase(int id, CharacterBaseData data)
+    public void RegisterCharacterBase(int id, CharacterModelBaseData data)
     {
         if (!dictionary.ContainsKey(id))
         {            
@@ -32,7 +33,7 @@ public class CharacterLocalBase:SingletonBase<CharacterLocalBase>
         }
     }
 
-    public CharacterBaseData GetCharacterBaseData(int id)
+    public CharacterModelBaseData GetCharacterBaseData(int id)
     {
         if (dictionary.ContainsKey(id))
         {

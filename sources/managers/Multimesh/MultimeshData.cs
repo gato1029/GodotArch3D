@@ -10,10 +10,10 @@ public class MultimeshData
     public Stack<int> freePositions;
     public int currentPosition;
     public int maxInstances;
-    public MultimeshData(Mesh meshBase)
+    public MultimeshData(Mesh meshBase, int pMaxInstances = 65500)
     {
         currentPosition = -1;
-        maxInstances = 65500;
+        maxInstances = pMaxInstances;
         freePositions = new Stack<int>();
         multiMesh = new MultiMesh();
         multiMesh.Mesh = meshBase;

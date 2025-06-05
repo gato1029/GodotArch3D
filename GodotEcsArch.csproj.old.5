@@ -1,0 +1,35 @@
+<Project Sdk="Godot.NET.Sdk/4.4.0">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);DEBUG_IMGUI</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ExportDebug|AnyCPU'" />
+  <ItemGroup>
+    <PackageReference Include="Arch" Version="1.2.8" />
+    <PackageReference Include="Arch.AOT.SourceGenerator" Version="1.0.1" />
+    <PackageReference Include="Arch.EventBus" Version="1.0.2" />
+    <PackageReference Include="Arch.LowLevel" Version="1.1.1" />
+    <PackageReference Include="Arch.Persistence" Version="1.0.4" />
+    <PackageReference Include="Arch.Relationships" Version="1.0.1" />
+    <PackageReference Include="Arch.System" Version="1.0.5" />
+    <PackageReference Include="Arch.System.SourceGenerator" Version="1.2.1" />
+    <PackageReference Include="Auios.QuadTree" Version="1.2.0" />
+    <PackageReference Include="ImGui.NET" Version="1.91.0.1" />
+    <PackageReference Include="LiteDB" Version="5.0.21" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="StructureOfArraysGenerator" Version="1.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="resources\" />
+    <Folder Include="sources\managers\Generic\" />
+    <Folder Include="sources\managers\Sprite3D\" />
+    <Folder Include="sources\WindowsDataBase\Accesories\UIGenerate\" />
+  </ItemGroup>
+</Project>

@@ -11,20 +11,20 @@ using System.Text;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 
 
-public partial class ContainerAnimationCharacter : Window, IFacadeWindow<CharacterBaseData>
+public partial class ContainerAnimationCharacter : Window, IFacadeWindow<AnimationCharacterBaseData>
 {
     // Called when the node enters the scene tree for the first time.
 
-    CharacterBaseData objectData;
+    AnimationCharacterBaseData objectData;
 
-    public event IFacadeWindow<CharacterBaseData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
+    public event IFacadeWindow<AnimationCharacterBaseData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
 
     public override void _Ready()
     {
         InitializeUI();
-        objectData = new CharacterBaseData();
+        objectData = new AnimationCharacterBaseData();
         PanelMovimiento.OnNotifyPreview += PanelMovimiento_OnNotifyPreview;
         PanelCuerpo.OnNotifyPreview += PanelCuerpo_OnNotifyPreview;
         SpinBoxZordering.ValueChanged += SpinBoxZordering_ValueChanged;
@@ -63,7 +63,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Charact
         OnNotifyChanguedSimple?.Invoke();
     }
 
-    public void SetData(CharacterBaseData data)
+    public void SetData(AnimationCharacterBaseData data)
     {
        objectData = data;
        LineEditName.Text = data.name;
@@ -72,11 +72,10 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Charact
        Animacion_Base.SetData(data.animationDataArray);
        Animacion_Extra.SetData(data.animationExtraDataArray);
        PanelMovimiento.SetData(data.collisionMove);
-       PanelCuerpo.SetData(data.collisionBody);
-
-        AnimationStateData dataAnim = data.animationDataArray[0];
-        if (data != null)
+       PanelCuerpo.SetData(data.collisionBody);        
+        if (data.animationDataArray != null)
         {
+            AnimationStateData dataAnim = data.animationDataArray[0];
             FrameData iFrame = dataAnim.animationData[0].frameDataArray[0];
             var dataTexture = MaterialManager.Instance.GetAtlasTexture(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
             Sprite2DView.Texture = dataTexture;
@@ -92,12 +91,17 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Charact
     private void Animacion_Base_OnNotifyChangued(ContainerAnimation objectControl)
     {         
         objectData.animationDataArray = objectControl.GetData().ToArray();
-        AnimationStateData data =objectControl.GetData()[0];
-        if (data != null)
+       
+        if (objectControl.GetData() != null)
         {
-            FrameData iFrame = data.animationData[0].frameDataArray[0];
-            var dataTexture = MaterialManager.Instance.GetAtlasTexture(data.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
-            Sprite2DView.Texture = dataTexture;
+            AnimationStateData data = objectControl.GetData()[0];
+            if (data.animationData[0].frameDataArray!=null)
+            {
+                FrameData iFrame = data.animationData[0].frameDataArray[0];
+                var dataTexture = MaterialManager.Instance.GetAtlasTexture(data.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+                Sprite2DView.Texture = dataTexture;
+            }
+           
         }
     }
 

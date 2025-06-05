@@ -31,6 +31,10 @@ namespace GodotEcsArch.sources.managers.Collision
             this.OriginCurrent = originRelative;
         
         }
+        public override Rectangle Multiplicity(float value)
+        {
+            return new Rectangle(Width * value, Height * value,OriginCurrent * value);
+        }
         [BsonCtor]
         public Rectangle(float widthPixel, float heightPixel, float originPixelX, float originPixelY) : base()
         {

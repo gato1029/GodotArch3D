@@ -15,7 +15,7 @@ public partial class WindowCharacterBase : Window, IDetailWindow
 {
 	Button buttonCollider;
 
-    CharacterBaseData characterBaseData;
+    AnimationCharacterBaseData characterBaseData;
 
     List<WindowsCharacterCollisionAtack> panelColliders;
     List<WindowCharacterAnimation> panelAnimation;
@@ -54,7 +54,7 @@ public partial class WindowCharacterBase : Window, IDetailWindow
     public override void _Ready()
 	{
         CloseRequested += Window_CloseRequested;
-        characterBaseData = new CharacterBaseData();
+        characterBaseData = new AnimationCharacterBaseData();
         panelColliders = new List<WindowsCharacterCollisionAtack>();
         panelAnimation = new List<WindowCharacterAnimation>();
 
@@ -128,12 +128,12 @@ public partial class WindowCharacterBase : Window, IDetailWindow
     public void LoadData(int id)
     {
         //GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer2/HBoxContainer/Button2").Visible = false;
-        characterBaseData = DataBaseManager.Instance.FindById<CharacterBaseData>(id);     
-        currentMaterialData = MaterialManager.Instance.GetMaterial(characterBaseData.idMaterial);
+        characterBaseData = DataBaseManager.Instance.FindById<AnimationCharacterBaseData>(id);     
+     //   currentMaterialData = MaterialManager.Instance.GetMaterial(characterBaseData.idMaterial);
         ComboMaterial_Selected(currentMaterialData.id);
         optionMaterial.Selected = currentMaterialData.id;
 
-        idBaseSpin.Value = characterBaseData.idGroup;
+       // idBaseSpin.Value = characterBaseData.idGroup;
         nameLine.Text = characterBaseData.name;
 
         bodyWidthSpin.Value = characterBaseData.collisionBody.widthPixel;
@@ -254,14 +254,14 @@ public partial class WindowCharacterBase : Window, IDetailWindow
             dataAnimations.Add(windowAutoTileItem.data);
         }
 
-        characterBaseData.idMaterial = currentMaterialData.id;
+      //  characterBaseData.idMaterial = currentMaterialData.id;
         characterBaseData.atackDataColliders = dataCollider[0];
         characterBaseData.animationDataArray = dataAnimations.ToArray();
 
         characterBaseData.collisionBody = new Rectangle((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value, (float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value);
         characterBaseData.collisionMove = new Rectangle((float)moveWidthSpin.Value, (float)moveHeightSpin.Value, (float)moveOffsetXSpin.Value, (float)moveOffsetYSpin.Value);
 
-        characterBaseData.idGroup = (int) idBaseSpin.Value;
+       // characterBaseData.idGroup = (int) idBaseSpin.Value;
         characterBaseData.name = nameLine.Text; 
 
         DataBaseManager.Instance.InsertUpdate(characterBaseData);
@@ -398,22 +398,22 @@ public partial class WindowCharacterBase : Window, IDetailWindow
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
-        if (data !=null && data.animationData[currentIdState] != null && data.animationData[currentIdState].idFrames != null)
-        {
-            currentfps += delta;
-            if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
-            {
-                var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
-                indexFrame++;
-                currentfps = 0;
-                var dataTexture = MaterialManager.Instance.GetAtlasTexture(currentMaterialData.id, iFrame);
-                spriteSelection.Texture = dataTexture;
-            }
-            if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
-            {
-                indexFrame = 0;
-            }
-        }
+        //if (data !=null && data.animationData[currentIdState] != null && data.animationData[currentIdState].idFrames != null)
+        //{
+        //    currentfps += delta;
+        //    if (currentfps >= data.frameDuration && data.animationData[currentIdState].idFrames.Length > 0)
+        //    {
+        //        var iFrame = data.animationData[currentIdState].idFrames[indexFrame];
+        //        indexFrame++;
+        //        currentfps = 0;
+        //        var dataTexture = MaterialManager.Instance.GetAtlasTexture(currentMaterialData.id, iFrame);
+        //        spriteSelection.Texture = dataTexture;
+        //    }
+        //    if (indexFrame >= data.animationData[currentIdState].idFrames.Length)
+        //    {
+        //        indexFrame = 0;
+        //    }
+        //}
 
     }
 }

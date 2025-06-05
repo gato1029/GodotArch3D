@@ -35,7 +35,7 @@ public partial class WindowWeapons : Window, IDetailWindow
     WindowState state;
 
     MaterialData materialData;
-    CharacterBaseData characterBaseData;
+    AnimationCharacterBaseData characterBaseData;
 
     AnimationBaseData weaponBaseData;
 
@@ -135,12 +135,12 @@ public partial class WindowWeapons : Window, IDetailWindow
     {
         int id = (int)index;    
         animationPreviewCharacter.data = characterBaseData.animationDataArray[id];
-        animationSceneCharacter.SetData(characterBaseData.animationDataArray[id], characterBaseData.idMaterial);
+      //  animationSceneCharacter.SetData(characterBaseData.animationDataArray[id], characterBaseData.idMaterial);
     }
 
     private void AnimationSceneCharacter_OnNotifyPreview(AnimationStateData itemData, int currentIdState)
     {    
-        animationPreviewCharacter.idMaterial = characterBaseData.idMaterial;
+    //    animationPreviewCharacter.idMaterial = characterBaseData.idMaterial;
         animationPreviewCharacter.currentIdState = currentIdState;
     }
 
@@ -153,7 +153,7 @@ public partial class WindowWeapons : Window, IDetailWindow
 
     private void LoadCharacters()
     {
-        var dataList = DataBaseManager.Instance.FindAll<CharacterBaseData>();
+        var dataList = DataBaseManager.Instance.FindAll<AnimationCharacterBaseData>();
 
         optionButtonCharacterBase.AddItem("Seleccione", 0);
 
@@ -171,14 +171,14 @@ public partial class WindowWeapons : Window, IDetailWindow
         if (index > 0)
         {
             int id = (int)optionButtonCharacterBase.GetItemMetadata((int)index);
-            characterBaseData = DataBaseManager.Instance.FindById<CharacterBaseData>(id);
-            animationSceneCharacter.SetData(characterBaseData.animationDataArray[0], characterBaseData.idMaterial);
-            animationPreviewCharacter.idMaterial = characterBaseData.idMaterial;
+            characterBaseData = DataBaseManager.Instance.FindById<AnimationCharacterBaseData>(id);
+        //    animationSceneCharacter.SetData(characterBaseData.animationDataArray[0], characterBaseData.idMaterial);
+       //     animationPreviewCharacter.idMaterial = characterBaseData.idMaterial;
             animationPreviewCharacter.data = characterBaseData.animationDataArray[0];
 
             foreach (var item in characterBaseData.animationDataArray)
             {
-                optionButtonCharacterAnimationID.AddItem(item.id.ToString());
+                //optionButtonCharacterAnimationID.AddItem(item.id.ToString());
             }
             
         }

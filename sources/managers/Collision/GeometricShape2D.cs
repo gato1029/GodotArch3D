@@ -21,5 +21,6 @@ namespace GodotEcsArch.sources.managers.Collision
         [BsonIgnore]
         public Vector2 OriginCurrent { get;  set; }
         public abstract Vector2 GetSizeQuad();
+        public abstract GeometricShape2D Multiplicity(float value);
     }
 }

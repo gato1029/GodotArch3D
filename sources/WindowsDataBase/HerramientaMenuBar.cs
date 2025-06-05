@@ -8,6 +8,8 @@ using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
+using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 
 public partial class HerramientaMenuBar : MenuBar
 {
@@ -21,8 +23,8 @@ public partial class HerramientaMenuBar : MenuBar
 
     PopupMenu tileCreator;
     PopupMenu atlasCreator;
-
     PopupMenu menuComponentes;
+    PopupMenu menuArmamento;
     public override void _Ready()
 	{
         editor = GetNode<PopupMenu>("Editor");
@@ -37,7 +39,26 @@ public partial class HerramientaMenuBar : MenuBar
 
         menuComponentes = GetNode<PopupMenu>("Componentes");
         menuComponentes.IdPressed += MenuComponentes_IdPressed;
-        
+
+        menuArmamento = GetNode<PopupMenu>("Armamento");
+        menuArmamento.IdPressed += MenuArmamento_IdPressed;
+    }
+
+    private void MenuArmamento_IdPressed(long id)
+    {
+        switch (id)
+        {
+            case 0:
+                FacadeWindowDataSearch<AccesoryAnimationBodyData> windowQueryModelData = new FacadeWindowDataSearch<AccesoryAnimationBodyData>("res://sources/WindowsDataBase/Accesories/WindowAccesoryAnimation.tscn", this);
+                break;
+            case 1:
+                var winInternal = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/WindowAccessory.tscn").Instantiate<WindowAccessory>();
+                AddChild(winInternal);
+                winInternal.PopupCentered();
+                break;
+            default:
+                break;
+        }
     }
 
     private void MenuComponentes_IdPressed(long id)
@@ -54,7 +75,7 @@ public partial class HerramientaMenuBar : MenuBar
                 win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Character");
                 win.SetLoaddBAction(() =>
                 {
-                    var collection = DataBaseManager.Instance.FindAll<CharacterBaseData>();
+                    var collection = DataBaseManager.Instance.FindAll<AnimationCharacterBaseData>();
                     List<IdData> ids = new List<IdData>();
                     foreach (var item in collection)
                     {
@@ -109,7 +130,10 @@ public partial class HerramientaMenuBar : MenuBar
                 winInternal.PopupCentered();               
                 break;
             case 4:
-                FacadeWindowDataSearch<CharacterBaseData> windowQuery = new FacadeWindowDataSearch<CharacterBaseData>("res://sources/WindowsDataBase/Character/WindowAnimationCharacterRefact.tscn", this);
+                FacadeWindowDataSearch<AnimationCharacterBaseData> windowQuery = new FacadeWindowDataSearch<AnimationCharacterBaseData>("res://sources/WindowsDataBase/Character/WindowAnimationCharacterRefact.tscn", this);
+                break;
+            case 5:
+                FacadeWindowDataSearch<CharacterModelBaseData> windowQueryModelData = new FacadeWindowDataSearch<CharacterModelBaseData>("res://sources/WindowsDataBase/CharacterCreator/WindowCharacterCreator.tscn", this);
                 break;
         }
     }

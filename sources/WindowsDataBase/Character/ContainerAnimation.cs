@@ -28,9 +28,7 @@ public partial class ContainerAnimation : PanelContainer
 
     AnimationData animationData;
 
-    public float frameDuration { get; set; }
-    public bool loop { get; set; }
-    public bool mirrorHorizontal { get; set; }
+
 
     List<FrameData> tiles = new List<FrameData>();
 
@@ -81,12 +79,15 @@ public partial class ContainerAnimation : PanelContainer
                     WindowViewDb_OnRequestSelectedItem(materialData.id);                    
                 }
                 
-                CheckBoxMirror.ButtonPressed = objectControl.ObjectData.mirrorHorizontal;
-                CheckBoxMirrorV.ButtonPressed = objectControl.ObjectData.mirrorVertical;
+                CheckBoxMirror.ButtonPressed = objectControl.ObjectData.animationData[animationDataPosition].mirrorHorizontal;
+                CheckBoxMirrorV.ButtonPressed = objectControl.ObjectData.animationData[animationDataPosition].mirrorVertical;
                 Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;
                 Sprite2DView.FlipV = CheckBoxMirrorV.ButtonPressed;
-                SpinBoxDuration.Value = objectControl.ObjectData.frameDuration;
-                CheckBoxLoop.ButtonPressed = objectControl.ObjectData.loop;
+                SpinBoxDuration.Value = objectControl.ObjectData.animationData[animationDataPosition].frameDuration;
+                CheckBoxLoop.ButtonPressed = objectControl.ObjectData.animationData[animationDataPosition].loop;
+
+                currentfps = 0;
+                indexFrame = 0;
             }
            
         }
@@ -190,12 +191,12 @@ public partial class ContainerAnimation : PanelContainer
             if (animationDataArray[0].animationData != null)
             {
                 FramesArray.SetData(animationDataArray[0].animationData[0].frameDataArray);
-                CheckBoxMirror.ButtonPressed = animationDataArray[0].mirrorHorizontal;
-                CheckBoxMirrorV.ButtonPressed = animationDataArray[0].mirrorVertical;
+                //CheckBoxMirror.ButtonPressed = animationDataArray[0].mirrorHorizontal;
+                //CheckBoxMirrorV.ButtonPressed = animationDataArray[0].mirrorVertical;
                 Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;
                 Sprite2DView.FlipV = CheckBoxMirrorV.ButtonPressed;
-                SpinBoxDuration.Value = animationDataArray[0].frameDuration;
-                CheckBoxLoop.ButtonPressed = animationDataArray[0].loop;
+                //SpinBoxDuration.Value = animationDataArray[0].frameDuration;
+                //CheckBoxLoop.ButtonPressed = animationDataArray[0].loop;
             }
 
 

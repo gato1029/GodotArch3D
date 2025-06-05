@@ -6,6 +6,7 @@ using Arch.System;
 
 using Godot;
 using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using System;
@@ -47,7 +48,7 @@ internal class RenderSystem : BaseSystem<World, float>
     private CommandBuffer commandBuffer;
    
     private QueryDescription queryRender = new QueryDescription().WithAll<PositionComponent,RenderGPUComponent>().WithNone<RenderGPULinkedComponent>();
-    private QueryDescription queryRenderLinked = new QueryDescription().WithAll<PositionComponent, RenderGPUComponent,RenderGPULinkedComponent>();
+    private QueryDescription queryRenderLinked = new QueryDescription().WithAll<CharacterComponent, PositionComponent, RenderGPUComponent,RenderGPULinkedComponent>();
 
     public RenderSystem(World world) : base(world)
     {
@@ -101,6 +102,7 @@ internal class RenderSystem : BaseSystem<World, float>
         {
             ref var pointerEntity = ref chunk.Entity(0);
 
+            ref var pointerCharacterComponent = ref chunk.GetFirst<CharacterComponent>();
             ref var pointerPositionComponent = ref chunk.GetFirst<PositionComponent>();
             ref var pointerRenderComponent = ref chunk.GetFirst<RenderGPUComponent>();
             ref var pointerRenderLinkedComponent = ref chunk.GetFirst<RenderGPULinkedComponent>();
@@ -110,13 +112,24 @@ internal class RenderSystem : BaseSystem<World, float>
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                 ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
                 ref RenderGPUComponent renderComponent = ref Unsafe.Add(ref pointerRenderComponent, entityIndex);
+                ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
 
                 renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, ((positionComponent.position.Y + renderComponent.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender);
                 RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);
 
-                foreach (var item in pointerRenderLinkedComponent.instancedLinked)
+                //if (characterComponent.activeTool)
+                //{
+                //    GpuInstance item = pointerRenderLinkedComponent.instancedLinked[0];
+                //    RenderingServer.MultimeshInstanceSetTransform(item.rid, item.instance, renderComponent.transform);
+                //}
+             
+                for (int i = 0; i < pointerRenderLinkedComponent.instancedLinked.Length; i++)
                 {
-                    RenderingServer.MultimeshInstanceSetTransform(item.rid, item.instance, renderComponent.transform);
+                    GpuInstance item = pointerRenderLinkedComponent.instancedLinked[i];
+                    if (item.rid.IsValid)
+                    {
+                        RenderingServer.MultimeshInstanceSetTransform(item.rid, item.instance, renderComponent.transform);
+                    }                    
                 }
 
             }
@@ -126,7 +139,7 @@ internal class RenderSystem : BaseSystem<World, float>
     public override void Update(in float t)
     {
         World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
-        World.InlineParallelChunkQuery(in queryRenderLinked, new ChunkJobRender(commandBuffer, t));
+        World.InlineParallelChunkQuery(in queryRenderLinked, new ChunkJobRenderLinked(commandBuffer, t));
     }
 
     public override void AfterUpdate(in float t)

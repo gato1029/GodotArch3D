@@ -26,23 +26,25 @@ public class AccessoryData : IdData
     public StatsData[] statsDataArray { get; set; }    
     public RequirementsData requirementsData { get; set; }
 
+    [BsonIgnore]
+    public AccesoryAnimationBodyData accesoryAnimationBodyData { set; get; }
+
     public AccessoryData() 
     {
     
     }
 
     [BsonCtor]
-    public AccessoryData(MiniatureData miniatureData) : base()
+    public AccessoryData(MiniatureData miniatureData, int idBodyAnimationBaseData) : base()
     {
         if (miniatureData.idMaterial>0 && miniatureData.idTile>0)
         {
             var tile =DataBaseManager.Instance.FindById<TileDynamicData>(miniatureData.idTile);
             textureVisual = tile.textureVisual;
         }
-        
+        accesoryAnimationBodyData = DataBaseManager.Instance.FindById<AccesoryAnimationBodyData>(idBodyAnimationBaseData);
     }
 }
-
 public struct MiniatureData {
     public int idMaterial { get; set; }
     public int idTile { get; set; } 
@@ -87,15 +89,3 @@ public struct BonusData
     public float value { get; set; }
 }
 
-public class WeaponCommonData : IdData
-{
-    public int idInstanceMiniature { set; get; }
-    public WeaponType weaponType { set; get; }
-    public int idAnimationBaseData { set; get; }
-    [BsonIgnore]
-    public AnimationBaseData weaponBaseData { set; get; }
-    public string colorBase { set; get; }
-    public float speedAtack { get; set; }
-    public float durability { get; set; }
-    public StatsData[] damageData { get; set; }
-}

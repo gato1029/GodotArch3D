@@ -5,6 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 
+public enum WindowType
+{
+    SELECTED, CREATOR
+}
+public enum AccesoryAvatarType
+{
+    WEAPON,
+    HEAD,  
+    FINGER,
+    LEGS,
+    FOOTS,
+    BODY,
+}
+
 public enum DirectionArrowArray 
 {
     REMOVE,UP, DOWN

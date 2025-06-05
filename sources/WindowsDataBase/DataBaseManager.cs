@@ -3,6 +3,7 @@ using Godot;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
@@ -30,20 +31,25 @@ namespace GodotEcsArch.sources.WindowsDataBase
             db = new LiteDatabase(dataBasePath);
             var mapper = BsonMapper.Global;
 
-        
-      
-
+            collectionNameMap[typeof(MaterialSimpleData)] = "Materiales";
 
             collectionNameMap[typeof(MaterialData)] = "Materiales";
             collectionNameMap[typeof(TileData)] = "Tiles";
             collectionNameMap[typeof(AutoTileData)] = "AutoTiles";
-            collectionNameMap[typeof(CharacterBaseData)] = "CharacterBase";
+            collectionNameMap[typeof(AnimationCharacterBaseData)] = "AnimationCharacterBaseData";
             collectionNameMap[typeof(TerrainData)] = "Terrain";
             collectionNameMap[typeof(AnimationBaseData)] = "AnimationBase";
             collectionNameMap[typeof(AccessoryData)] = "AccessoryData";
+            collectionNameMap[typeof(CharacterModelBaseData)] = "CharacterModelBaseData";
+            collectionNameMap[typeof(AccesoryAnimationBodyData)] = "AccesoryAnimationBodyData";
+
+            
+            
 
             ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");            
             MaterialDataCollection.EnsureIndex(x => x.id, unique: true);
+
+     
 
             ILiteCollection<TileData> TileDataCollection = db.GetCollection<TileData>("Tiles");
             TileDataCollection.EnsureIndex(x => x.id, unique: true);
@@ -51,8 +57,8 @@ namespace GodotEcsArch.sources.WindowsDataBase
             ILiteCollection<AutoTileData> AutoTileDataCollection = db.GetCollection<AutoTileData>("AutoTiles");
             AutoTileDataCollection.EnsureIndex(x => x.id, unique: true);
 
-            ILiteCollection<AutoTileData> CharacterBaseDataCollection = db.GetCollection<AutoTileData>("CharacterBase");
-            CharacterBaseDataCollection.EnsureIndex(x => x.id, unique: true);
+            ILiteCollection<AnimationCharacterBaseData> AnimationCharacterBaseDataCollection = db.GetCollection<AnimationCharacterBaseData>("AnimationCharacterBaseData");
+            AnimationCharacterBaseDataCollection.EnsureIndex(x => x.id, unique: true);
 
             ILiteCollection<TerrainData> TerrainDataCollection = db.GetCollection<TerrainData>("Terrain");
             TerrainDataCollection.EnsureIndex(x => x.id, unique: true);
@@ -62,6 +68,12 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             ILiteCollection<AccessoryData> AccessoryDataCollection = db.GetCollection<AccessoryData>("AccessoryData");
             AccessoryDataCollection.EnsureIndex(x => x.id, unique: true);
+
+            ILiteCollection<CharacterModelBaseData> CharacterModelBaseDataCollection = db.GetCollection<CharacterModelBaseData>("CharacterModelBaseData");
+            CharacterModelBaseDataCollection.EnsureIndex(x => x.id, unique: true);
+
+            ILiteCollection<AccesoryAnimationBodyData> AccesoryAnimationBodyDataCollection = db.GetCollection<AccesoryAnimationBodyData>("AccesoryAnimationBodyData");
+            AccesoryAnimationBodyDataCollection.EnsureIndex(x => x.id, unique: true);
         }
 
         public int NextID<T>()
