@@ -181,7 +181,7 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                         animComp.currentFrameIndex++;
                     }
 
-                    RenderMainAndAccessories(animComp, renderGPU, renderLinked, stateAnimation);
+                    RenderMainAndAccessories(animComp, renderGPU, renderLinked, charComp,stateAnimation);
                 }
             }
         }
@@ -205,12 +205,16 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
             }
         }
 
-        private static void RenderMainAndAccessories(CharacterAnimationComponent animComp, RenderGPUComponent renderGPU, RenderGPULinkedComponent renderLinked, int stateAnimation)
+        private static void RenderMainAndAccessories(CharacterAnimationComponent animComp, RenderGPUComponent renderGPU, RenderGPULinkedComponent renderLinked, CharacterComponent charComp, int stateAnimation)
         {
             RenderingServer.MultimeshInstanceSetCustomData(renderGPU.rid, renderGPU.instance, animComp.currentframeData);
 
             for (int i = 0; i < animComp.currentframeDataAccesorys.Length; i++)
             {
+                if (charComp.accessoryArray[i]==null)
+                {
+                    continue;
+                }
                 var color = stateAnimation == 2 ? animComp.currentframeDataAccesorys[i] : new Color(-1, -1, -1, -1);
                 var linked = renderLinked.instancedLinked[i];
                 RenderingServer.MultimeshInstanceSetCustomData(linked.rid, linked.instance, color);

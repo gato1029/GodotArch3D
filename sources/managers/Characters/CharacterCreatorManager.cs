@@ -41,8 +41,26 @@ public struct CharacterComponent
     public float speedAtackBase;    
     public AccessoryData[] accessoryArray;
 }
-
-
+[Component]
+public struct CharacterUnitSearchFixedComponent
+{
+    public float radiusSearch;
+    public float postionOrigin;
+}
+[Component]
+public struct CharacterUnitSearchMovementComponent
+{
+    public float radiusSearch;
+    public float radiusMovement;
+    public float postionOrigin;
+}
+[Component]
+public struct CharacterUnitSearchFollowComponent
+{
+    public float radiusSearch;
+    public bool follow;
+    public float postionOrigin;
+}
 [Component]
 public struct CharacterAccesoriesComponent
 {    
@@ -52,8 +70,6 @@ public struct CharacterAccesoriesComponent
 
 [Component]
 public struct CharacterColliderComponent { }
-
-
 
 [Component]
 public struct CharacterAnimationComponent
@@ -193,6 +209,7 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         {
             characterAnimationComponent.currentframeData = new Color();
             characterAnimationComponent.currentframeDataAccesorys = new Color[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+            
         }
         else
         {

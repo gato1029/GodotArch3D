@@ -51,7 +51,7 @@ public partial class Main3D : Node3D
 
 
 
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 5000; i++)
         {
             Position position = new Position { value = GetRandomVector2(new Vector2(-100, -100), new Vector2(100, 100)) };
             //Position position = new Position { value = new Vector2(2,-0.5f) };

@@ -6,6 +6,7 @@ using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Behaviors.Move;
 using GodotEcsArch.sources.managers.Behaviors.States;
 using GodotEcsArch.sources.managers.Behaviors.States.Character;
+using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.systems;
 using System;
 using System.Collections.Generic;
@@ -111,6 +112,19 @@ namespace GodotEcsArch.sources.managers.Behaviors
             if (unitB.health<=0)
             {
                 stateComponentB.currentType = StateType.DIE;             
+            }
+        }
+
+        public void AplyDamageCharacter(Entity origin, Entity destiny)
+        {
+            CharacterComponent unitA = origin.Get<CharacterComponent>();
+            ref CharacterComponent unitB = ref destiny.TryGetRef<CharacterComponent>(out bool exist);
+            ref CharacterBehaviorComponent characterBehaviorComponentB = ref destiny.TryGetRef<CharacterBehaviorComponent>(out bool exist2);
+            unitB.healthBase -= unitA.damageBase;
+
+            if (unitB.healthBase <= 0)
+            {
+                characterBehaviorComponentB.characterStateType = CharacterStateType.DIE;
             }
         }
     }

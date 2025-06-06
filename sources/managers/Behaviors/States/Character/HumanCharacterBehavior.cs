@@ -55,10 +55,12 @@ public class HumanCharacterBehavior : ICharacterBehavior
                 break;
             
             case CharacterStateType.TAKE_HIT:
+                //efecto tomar daño
                 break;
             case CharacterStateType.TAKE_STUN:
                 break;
             case CharacterStateType.DIE:
+                //aqui animacion morir 
                 break;
         }
     }
@@ -88,7 +90,7 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
         if (stateCharacter == CharacterStateType.EXECUTE_ATTACK)
         {
-            Atack(ref characterBehaviorComponent);
+            Atack(entity, characterComponent, positionComponent,directionComponent);
         }
 
         if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && attack)
@@ -111,10 +113,47 @@ public class HumanCharacterBehavior : ICharacterBehavior
         }
     }
 
-    private void Atack(ref CharacterBehaviorComponent characterBehaviorComponent)
+    private void Atack(Entity entity, CharacterComponent characterComponent, PositionComponent positionComponent, DirectionComponent directionComponent)
     {
         GD.Print("Ejecutar ataque");
-        characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;
+        var animacionData = characterComponent.accessoryArray[0].accesoryAnimationBodyData.animationStateData.animationData[(int)directionComponent.animationDirection];
+        if (animacionData.hasCollider)
+        {
+            GeometricShape2D collision = animacionData.collider.Multiplicity(characterComponent.CharacterBaseData.scale);
+            
+            Vector2 positionRelative = positionComponent.position + collision.OriginCurrent;
+
+            Rect2 aabb = new Rect2(positionRelative, collision.GetSizeQuad() * 2);
+            Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.characterCollidersEntities.QueryAABB(aabb);
+            if (data != null)
+            {
+                foreach (var item in data.Values)
+                {
+                    foreach (var itemInternal in item)
+                    {
+                        Entity entityObjetive = itemInternal.Value;
+                        if (entityObjetive.Id != entity.Id)
+                        {
+                            CharacterComponent characterComponentB = itemInternal.Value.Get<CharacterComponent>();
+                            AnimationCharacterBaseData characterB = characterComponentB.CharacterBaseData.animationCharacterBaseData;
+                            GeometricShape2D colliderB = characterB.collisionMove.Multiplicity(characterComponentB.CharacterBaseData.scale);
+                            var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
+
+                            if (Collision2D.Collides(collision, colliderB, positionRelative, positionB))
+                            {
+                                ref CharacterBehaviorComponent stateComponentB = ref entityObjetive.TryGetRef<CharacterBehaviorComponent>(out bool exist);
+
+                                stateComponentB.characterStateType = CharacterStateType.TAKE_HIT;
+                                BehaviorManager.Instance.AplyDamageCharacter(entity, entityObjetive);                                
+                            }
+                        }
+                    }
+                
+                }
+            }
+
+        }
+
     }
 
     private void Move(Entity entity, Vector2 moveDirection, CharacterComponent characterComponent, ref CharacterBehaviorComponent characterBehaviorComponent, ref PositionComponent positionComponent,ref DirectionComponent directionComponent, VelocityComponent velocityComponent, float delta)

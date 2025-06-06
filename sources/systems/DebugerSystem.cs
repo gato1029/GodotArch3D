@@ -9,10 +9,12 @@ using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static Godot.TextServer;
@@ -94,8 +96,28 @@ internal class DebugerSystem : BaseSystem<World, float>
            
                 DebugDraw.Quad(new Vector3(positionComponent.position.X, positionComponent.position.Y, 1), .2f, Colors.DarkOrange, 0.0f); //center          
 
-
-
+                if (characterComponent.accessoryArray[0]!=null)
+                {
+                    var accesoryCollision = characterComponent.accessoryArray[0];
+                    if (accesoryCollision.hasBodyAnimation)
+                    {
+                        for (int i=0; i<= Enum.GetNames(typeof(DirectionAnimationType)).Length; i++)
+                        {
+                            var animacionData =accesoryCollision.accesoryAnimationBodyData.animationStateData.animationData[i];
+                            if (animacionData.hasCollider)
+                            {
+                                
+                                Rectangle shapeWeapon = (Rectangle)animacionData.collider;
+                                Transform3D transform3DShape2 = new Transform3D(Basis.Identity, Vector3.Zero);
+                                transform3DShape2 = transform3DShape2.Scaled(new Vector3(shapeWeapon.Width * scale, shapeWeapon.Height * scale, 1));
+                                transform3DShape2.Origin = new Vector3(positionComponent.position.X + shapeWeapon.OriginCurrent.X * scale, positionComponent.position.Y + shapeWeapon.OriginCurrent.Y * scale, 1);
+                                DebugDraw.Quad(transform3DShape2, 1, Colors.Blue, 0.0f); //debug
+                            }
+                        }
+                        
+                    }
+                    
+                }
             }
 
         }

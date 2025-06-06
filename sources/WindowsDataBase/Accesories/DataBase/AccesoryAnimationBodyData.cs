@@ -5,8 +5,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 
 public class AccesoryAnimationBodyData : IdData
 {
-    public AnimationStateData animationStateData { get; set; }
-    public string pathTexture { get; set; }
+    public AnimationStateData animationStateData { get; set; }  
     public AccesoryAnimationBodyData()
     {
 
