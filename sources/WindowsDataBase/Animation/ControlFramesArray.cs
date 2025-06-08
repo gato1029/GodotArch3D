@@ -38,6 +38,22 @@ public partial class ControlFramesArray : PanelContainer
 		}
 		return list;
 	}
+    public void ReverseFramesVertical(bool reverse)
+    {        
+        foreach (var item in ContainerItems.GetChildren())
+        {
+            ControlFrames t = (ControlFrames)item;
+            t.ReverseFramesVertical(reverse);
+        }
+    }
+    public void ReverseFramesHorizontal(bool reverse)
+    {
+        foreach (var item in ContainerItems.GetChildren())
+        {
+            ControlFrames t = (ControlFrames)item;
+            t.ReverseFramesHorizontal(reverse);
+        }
+    }
     public List<FrameData> GetAllDataFrames()
     {
         var list = new List<FrameData>();

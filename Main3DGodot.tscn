@@ -98,8 +98,10 @@ item_0/text = "Materiales"
 item_0/id = 0
 
 [node name="Creador Tiles" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+auto_translate_mode = 2
 title = "Menu Tiles"
 size = Vector2i(110, 100)
+auto_translate = false
 item_count = 4
 item_0/text = "Tiles Simple"
 item_0/id = 0
@@ -198,7 +200,7 @@ region_enabled = true
 region_rect = Rect2(16, 16, 128, 144)
 
 [node name="Camera3D" type="Camera3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1000)
 projection = 1
 current = true
 size = 10.0

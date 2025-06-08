@@ -43,6 +43,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
         public float y { get; set; }
         public float widht { get; set; }
         public float height { get; set; }
+        public float widhtFormat { get; set; }
+        public float heightFormat { get; set; }
 
     }
     public class CharacterColliderAtackData

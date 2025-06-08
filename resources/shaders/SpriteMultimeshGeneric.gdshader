@@ -46,11 +46,11 @@ void fragment() {
 		discard;
 	}
 	vec2 uv = UV;
-	if (mirrorX<0.0)
+	if (mirrorX>0.0)
 	{
  		uv.x = 1.0 - uv.x;
 	}
-	if (mirrorY<0.0)
+	if (mirrorY>0.0)
 	{
  		 uv.y = 1.0 - uv.y;
 	}

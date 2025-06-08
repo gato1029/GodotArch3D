@@ -58,7 +58,7 @@ internal class SearchMovementTargetSystem : BaseSystem<World, float>
                 switch (am.type)
                 {
                     case MovementType.CIRCLE:
-                        pointDirection = CommonOperations.MovementCircle(rng, p.value, am.widthRadius);
+                        pointDirection = CommonOperations.NewPointInCircle(rng, p.value, am.widthRadius);
                         break;
                     case MovementType.SQUARE:
                         pointDirection = CommonOperations.MovementSquare(rng, p.value, am.widthRadius, am.height);
@@ -67,7 +67,7 @@ internal class SearchMovementTargetSystem : BaseSystem<World, float>
                         pointDirection = CommonOperations.MovementSquare(rng, am.origin, am.widthRadius, am.height);
                         break;
                     case MovementType.CIRCLE_STATIC:
-                        pointDirection = CommonOperations.MovementCircle(rng, am.origin, am.widthRadius);
+                        pointDirection = CommonOperations.NewPointInCircle(rng, am.origin, am.widthRadius);
                         break;
                     default:
                         break;

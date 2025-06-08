@@ -87,7 +87,7 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
 
     private void CreateTile(ChunkData<TData> chunkData, Vector2I tilePositionGlobal, Vector2I tilePositionChunk,  AutoTileData autoTileData, TData dataGame)
     {
-        byte neighborMask = CalculateNeighborMask(tilePositionGlobal);
+        byte neighborMask = CalculateNeighborMask(tilePositionGlobal); //
         TileRuleData bestRule = autoTileData.FindBestMatchingRule(neighborMask);
         
         if (bestRule == null)

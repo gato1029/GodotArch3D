@@ -19,8 +19,10 @@ namespace GodotEcsArch.sources.managers.Behaviors
     internal class BehaviorManager : SingletonBase<BehaviorManager>
     {
         Dictionary<int, ICharacterBehavior> dictionaryBehaviorsCharacter = new Dictionary<int, ICharacterBehavior>();
-        Dictionary<int, IMoveBehavior>  dictionaryMoves = new Dictionary<int, IMoveBehavior>();
-        Dictionary<int, IAttackBehavior> dictionaryAttack = new Dictionary<int, IAttackBehavior>();
+        Dictionary<Type, ICharacterMoveBehavior>  dictionaryMoves = new Dictionary<Type, ICharacterMoveBehavior>();
+        Dictionary<Type, ICharacterStateBehavior> dictionaryStates = new Dictionary<Type, ICharacterStateBehavior>();
+
+        Dictionary<Type, IAttackBehavior> dictionaryAttack = new Dictionary<Type, IAttackBehavior>();
 
         
         protected override void Initialize()
@@ -29,26 +31,32 @@ namespace GodotEcsArch.sources.managers.Behaviors
             RegisterAllAttack();
             RegisterAllMoves();
             RegisterAllStates();
+            RegisterParticularBehavior();
         }
 
+       
         protected override void Destroy()
         {
-           
-        }
 
-        void RegisterAllStates()
+        }
+        void RegisterParticularBehavior()
         {
             RegisterBehavior(1, new HumanCharacterBehavior());
-         
         }
+        private void RegisterAllStates()
+        {
+            RegisterStateBehavior<CommonState2D>(new CommonState2D());
+        }
+
+       
         void RegisterAllMoves()
         {
-            RegisterMoveBehavior(1, new DefaultMove());                        
+            RegisterMoveBehavior<MoveRadiusCharacter2D>(new MoveRadiusCharacter2D());                        
         }
         void RegisterAllAttack()
         {
-            RegisterAttackBehavior(1, new MelleAtackHorizontalBehavior());
-            RegisterAttackBehavior(2, new MelleAttackBehavior());
+            RegisterAttackBehavior<MelleAtackHorizontalBehavior>(new MelleAtackHorizontalBehavior());
+            RegisterAttackBehavior<MelleAttackBehavior>( new MelleAttackBehavior());
         }
         public ICharacterBehavior GetBehavior(int id)
         {
@@ -58,21 +66,32 @@ namespace GodotEcsArch.sources.managers.Behaviors
             }
             return null;
         }
-        public IMoveBehavior GetMoveBehavior(int id)
+        public ICharacterStateBehavior GetStateBehavior<T>()
         {
-            if (dictionaryMoves.ContainsKey(id))
+            var type = typeof(T);
+            if (dictionaryStates.TryGetValue(type, out var behavior))
             {
-                return dictionaryMoves[id];
+                return behavior;
             }
-            return null;
+            throw new KeyNotFoundException($"No se encontró un ICharacterStateBehavior para el tipo {type.FullName}.");
         }
-        public IAttackBehavior GetAttackBehavior(int id)
+        public ICharacterMoveBehavior GetMoveBehavior<T>()
         {
-            if (dictionaryAttack.ContainsKey(id))
+            var type = typeof(T);
+            if (dictionaryMoves.TryGetValue(type, out var moveBehavior))
             {
-                return dictionaryAttack[id];
+                return moveBehavior;
             }
-            return null;
+            throw new KeyNotFoundException($"No se encontró un IMoveBehavior para el tipo {type.FullName}.");
+        }
+        public IAttackBehavior GetAttackBehavior<T>()
+        {
+            var type = typeof(T);
+            if (dictionaryAttack.TryGetValue(type, out var attackBehavior))
+            {
+                return attackBehavior;
+            }
+            throw new KeyNotFoundException($"No se encontró un IMoveBehavior para el tipo {type.FullName}.");         
         }
 
         public void RegisterBehavior(int id, ICharacterBehavior behavior)
@@ -84,23 +103,31 @@ namespace GodotEcsArch.sources.managers.Behaviors
    
         }
 
-        public void RegisterMoveBehavior(int id, IMoveBehavior behavior)
+        public void RegisterMoveBehavior<T>(ICharacterMoveBehavior behavior)
         {
-            if (!dictionaryMoves.ContainsKey(id))
-            {
-                dictionaryMoves[id] = behavior;
-            }
-           
-        }
+            if (behavior == null)
+                throw new ArgumentNullException(nameof(behavior));
 
-        public void RegisterAttackBehavior(int id, IAttackBehavior behavior)
-        {
-            if (!dictionaryAttack.ContainsKey(id))
-            {
-                dictionaryAttack[id] = behavior;
-            }
-          
+            var type = typeof(T);
+            dictionaryMoves.TryAdd(type, behavior);
         }
+        public void RegisterStateBehavior<T>(ICharacterStateBehavior behavior)
+        {
+            if (behavior == null)
+                throw new ArgumentNullException(nameof(behavior));
+
+            var type = typeof(T);
+            dictionaryStates.TryAdd(type, behavior);
+        }
+        public void RegisterAttackBehavior<T>(IAttackBehavior behavior)
+        {
+            if (behavior == null)
+                throw new ArgumentNullException(nameof(behavior));
+
+            var type = typeof(T);
+            dictionaryAttack.TryAdd(type, behavior);
+        }
+ 
 
         public void AplyDamage(Entity origin, Entity destiny)
         {
@@ -118,13 +145,11 @@ namespace GodotEcsArch.sources.managers.Behaviors
         public void AplyDamageCharacter(Entity origin, Entity destiny)
         {
             CharacterComponent unitA = origin.Get<CharacterComponent>();
-            ref CharacterComponent unitB = ref destiny.TryGetRef<CharacterComponent>(out bool exist);
-            ref CharacterBehaviorComponent characterBehaviorComponentB = ref destiny.TryGetRef<CharacterBehaviorComponent>(out bool exist2);
+            ref CharacterComponent unitB = ref destiny.TryGetRef<CharacterComponent>(out bool exist);      
             unitB.healthBase -= unitA.damageBase;
-
             if (unitB.healthBase <= 0)
             {
-                characterBehaviorComponentB.characterStateType = CharacterStateType.DIE;
+                unitB.characterStateType = CharacterStateType.DIE;
             }
         }
     }

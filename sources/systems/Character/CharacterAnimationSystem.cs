@@ -1,5 +1,6 @@
 using Arch.Buffer;
 using Arch.Core;
+using Arch.Core.Extensions;
 using Arch.System;
 using Godot;
 using GodotEcsArch.sources.components;
@@ -8,6 +9,7 @@ using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
 using System.Collections.Generic;
+
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -17,7 +19,7 @@ namespace GodotEcsArch.sources.systems.Character;
 internal class CharacterAnimationSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
-    private QueryDescription query = new QueryDescription().WithAll<CharacterAnimationComponent, CharacterComponent,DirectionComponent, RenderGPUComponent>();
+    private QueryDescription query = new QueryDescription().WithAll<CharacterAnimationComponent, CharacterComponent,DirectionComponent, RenderGPUComponent>().WithNone<RenderGPULinkedComponent>();
     private QueryDescription queryLinkedGpu = new QueryDescription().WithAll<CharacterAnimationComponent, CharacterComponent, DirectionComponent, RenderGPUComponent, RenderGPULinkedComponent>();
 
     public CharacterAnimationSystem(World world) : base(world)
@@ -57,20 +59,29 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                 AnimationStateData animationStateData = characterComponent.CharacterBaseData.animationCharacterBaseData.animationDataArray[stateAnimation];
                 AnimationData animationData = animationStateData.animationData[(int)directionComponent.animationDirection];
 
-                float frameDuration = characterAnimationComponent.frameDuration + animationData.frameDuration;
-
+               
+                if (characterAnimationComponent.lastStateAnimation != stateAnimation)
+                {
+                    characterAnimationComponent.TimeSinceLastFrame = 0f;
+                    characterAnimationComponent.animationComplete = false;
+                    characterAnimationComponent.currentFrameIndex = 0;
+                    characterAnimationComponent.active = true;
+                    characterAnimationComponent.lastStateAnimation = stateAnimation;
+                    characterAnimationComponent.frameDuration = animationData.frameDuration + characterComponent.speedAtackBase;                     
+                }
 
                 characterAnimationComponent.TimeSinceLastFrame += _deltaTime;
-                if (characterAnimationComponent.TimeSinceLastFrame >= frameDuration && characterAnimationComponent.active)
+                if (characterAnimationComponent.TimeSinceLastFrame >= characterAnimationComponent.frameDuration && characterAnimationComponent.active)
                 {
+                    characterAnimationComponent.TimeSinceLastFrame = 0;
                     if (characterAnimationComponent.currentFrameIndex >= (animationData.frameDataArray.Length))
                     {
                         if (animationData.loop)
                         {
                             characterAnimationComponent.currentframeData.R = animationData.frameDataArray[0].x; // Reinicia al frame inicial
                             characterAnimationComponent.currentframeData.G = animationData.frameDataArray[0].y; // Reinicia al frame inicial
-                            characterAnimationComponent.currentframeData.B = animationData.frameDataArray[0].widht; // Reinicia al frame inicial
-                            characterAnimationComponent.currentframeData.A = animationData.frameDataArray[0].height; // Reinicia al frame inicial
+                            characterAnimationComponent.currentframeData.B = animationData.frameDataArray[0].widhtFormat; // Reinicia al frame inicial
+                            characterAnimationComponent.currentframeData.A = animationData.frameDataArray[0].heightFormat; // Reinicia al frame inicial
 
                             characterAnimationComponent.animationComplete = true;
                             characterAnimationComponent.currentFrameIndex = 0;
@@ -86,20 +97,14 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                     {
                         characterAnimationComponent.currentframeData.R = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].x; // Reinicia al frame inicial
                         characterAnimationComponent.currentframeData.G = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].y; // Reinicia al frame inicial
-                        characterAnimationComponent.currentframeData.B = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].widht; // Reinicia al frame inicial
-                        characterAnimationComponent.currentframeData.A = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].height; // Reinicia al frame inicial
+                        characterAnimationComponent.currentframeData.B = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].widhtFormat; // Reinicia al frame inicial
+                        characterAnimationComponent.currentframeData.A = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].heightFormat; // Reinicia al frame inicial
              
                         characterAnimationComponent.currentFrameIndex++;
                     }
-
-                    //int activeMirror = 0;
-                    //if (animationData.mirrorHorizontal && directionComponent.animationDirection == AnimationDirection.LEFT)
-                    //{
-                    //    activeMirror = -1;
-                    //}
                     RenderingServer.MultimeshInstanceSetCustomData(renderGPUComponent.rid, renderGPUComponent.instance, characterAnimationComponent.currentframeData);
 
-                    characterAnimationComponent.TimeSinceLastFrame -= frameDuration;
+                    
                 }
 
             }
@@ -139,7 +144,10 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                 int stateAnimation = animComp.stateAnimation;
                 AnimationStateData stateData = charComp.CharacterBaseData.animationCharacterBaseData.animationDataArray[stateAnimation];
                 AnimationData animData = stateData.animationData[(int)dirComp.animationDirection];
+                
+                ref CharacterAtackComponent characterAtackComponent = ref entity.Get<CharacterAtackComponent>();
 
+                
                 if (animComp.lastStateAnimation != stateAnimation)
                 {
                     animComp.TimeSinceLastFrame = 0f;
@@ -147,16 +155,17 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                     animComp.currentFrameIndex = 0;
                     animComp.active = true;
                     animComp.lastStateAnimation = stateAnimation;
-                    animComp.frameDuration = animData.frameDuration;
+                    animComp.frameDuration =  animData.frameDuration;
                     if (stateAnimation == 2)
-                        animComp.frameDuration += charComp.speedAtackBase;
+                        animComp.frameDuration = charComp.speedAtackBase +animData.frameDuration;
                 }
 
-                animComp.TimeSinceLastFrame += _deltaTime;
-
+                animComp.TimeSinceLastFrame = animComp.TimeSinceLastFrame +_deltaTime;
+                
                 if (animComp.TimeSinceLastFrame >= animComp.frameDuration && animComp.active)
                 {
-                    animComp.TimeSinceLastFrame -= animComp.frameDuration;
+                   
+                    animComp.TimeSinceLastFrame = 0;
 
                     if (animComp.currentFrameIndex >= animData.frameDataArray.Length)
                     {
@@ -175,14 +184,30 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
 
                     if (animComp.active)
                     {
-                        SetFrameData(ref animComp, animData, animComp.currentFrameIndex);
-                        if (stateAnimation == 2)
-                            SetAccessoryFrameData(ref animComp, charComp, dirComp, animComp.currentFrameIndex);
-                        animComp.currentFrameIndex++;
-                    }
 
-                    RenderMainAndAccessories(animComp, renderGPU, renderLinked, charComp,stateAnimation);
+                        SetFrameData(ref animComp, animData, animComp.currentFrameIndex);
+                        var linkedWeapon = renderLinked.instancedLinked[0];
+                        Color colorWeapon = new Color(-1, -1, -1, -1);
+                        if (characterAtackComponent.isAttack)
+                        {                 
+                            int frameWeapon = animComp.currentFrameIndex;                        
+                            var animDataWeapon = charComp.accessoryArray[0].accesoryAnimationBodyData.animationStateData.animationData[(int)dirComp.animationDirection];
+                            var frame = animDataWeapon.frameDataArray[frameWeapon];
+                            colorWeapon = new Color(frame.x, frame.y, frame.widht, frame.height);
+                                                    
+                        }                                               
+                        RenderingServer.MultimeshInstanceSetCustomData(linkedWeapon.rid, linkedWeapon.instance, colorWeapon);
+                        RenderMainAndAccessories(animComp, renderGPU, renderLinked, charComp, stateAnimation);
+                        animComp.currentFrameIndex++;
+                                    
+                    }             
                 }
+             
+           
+
+
+               
+              
             }
         }
 
@@ -194,31 +219,33 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
 
         private static void SetAccessoryFrameData(ref CharacterAnimationComponent animComp, CharacterComponent charComp, DirectionComponent dirComp, int frameIndex)
         {
-            for (int i = 0; i < charComp.accessoryArray.Length; i++)
+            for (int i = 1; i < charComp.accessoryArray.Length; i++)
             {
                 var item = charComp.accessoryArray[i];
                 if (item == null) continue;
 
                 var animData = item.accesoryAnimationBodyData.animationStateData.animationData[(int)dirComp.animationDirection];
                 var frame = animData.frameDataArray[frameIndex];
-                animComp.currentframeDataAccesorys[i] = new Color(frame.x, frame.y, frame.widht, frame.height);
+                animComp.currentframeDataAccesorys[i] = new Color(frame.x, frame.y, frame.widhtFormat, frame.heightFormat);
             }
         }
 
         private static void RenderMainAndAccessories(CharacterAnimationComponent animComp, RenderGPUComponent renderGPU, RenderGPULinkedComponent renderLinked, CharacterComponent charComp, int stateAnimation)
         {
             RenderingServer.MultimeshInstanceSetCustomData(renderGPU.rid, renderGPU.instance, animComp.currentframeData);
+                        
+            //for (int i = 1; i < animComp.currentframeDataAccesorys.Length; i++)
+            //{
+            //    if (charComp.accessoryArray[i]==null)
+            //    {
+            //        continue;
+            //    }
+            //    Color color1 = animComp.currentframeDataAccesorys[i];
+               
 
-            for (int i = 0; i < animComp.currentframeDataAccesorys.Length; i++)
-            {
-                if (charComp.accessoryArray[i]==null)
-                {
-                    continue;
-                }
-                var color = stateAnimation == 2 ? animComp.currentframeDataAccesorys[i] : new Color(-1, -1, -1, -1);
-                var linked = renderLinked.instancedLinked[i];
-                RenderingServer.MultimeshInstanceSetCustomData(linked.rid, linked.instance, color);
-            }
+            //    var linked = renderLinked.instancedLinked[i];
+            //    RenderingServer.MultimeshInstanceSetCustomData(linked.rid, linked.instance, color1);
+            //}
         }
     }
 
@@ -227,6 +254,6 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
     {
 
         World.InlineParallelChunkQuery(in query, new ChunkJobAnimationCharacter(commandBuffer, t));
-        World.InlineParallelChunkQuery(in query, new ChunkJobAnimationAvatarCharacter(commandBuffer, t));
+        World.InlineParallelChunkQuery(in queryLinkedGpu, new ChunkJobAnimationAvatarCharacter(commandBuffer, t));
     }
 }

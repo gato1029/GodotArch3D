@@ -6,9 +6,21 @@ using LiteDB;
 
 namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
 {
+    public struct UnitMoveData
+    {
+        public float radiusMove { get; set; }
+        public float radiusSearch { get; set; }
+    }
     public class CharacterModelBaseData : IdData
     {
         public int idAnimationCharacterBaseData { get; set; }
+        public CharacterBehaviorType characterBehaviorType { get; set; }
+        public CharacterType characterType { get; set; }
+        public UnitDirectionType unitDirectionType { get; set; }
+        public UnitType unitType { get; set; }
+        public UnitMoveType unitMoveType { get; set; }
+        public UnitMoveData unitMoveData { get; set; }
+
         public string colorBase { set; get; }
         public string description { set; get; }
         public float scale { set; get; }

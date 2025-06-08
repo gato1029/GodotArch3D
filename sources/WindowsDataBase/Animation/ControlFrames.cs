@@ -31,15 +31,20 @@ public partial class ControlFrames : PanelContainer
         SpinBoxY.Value = objectData.y;
         SpinBoxWidht.Value = objectData.widht;
         SpinBoxHeight.Value = objectData.height;
+        if (objectData.heightFormat == 0 || objectData.widhtFormat == 0)
+        {
+            objectData.heightFormat = objectData.height;
+            objectData.widhtFormat = objectData.widht;
+        }
     }
     private void SpinBoxHeight_ValueChanged(double value)
     {
-        objectData.height = (float)value;
+        objectData.height = (float)value;        
     }
 
     private void SpinBoxWidht_ValueChanged(double value)
     {
-        objectData.widht = (float)value;
+        objectData.widht = (float)value;        
     }
 
     private void SpinBoxY_ValueChanged(double value)
@@ -60,4 +65,27 @@ public partial class ControlFrames : PanelContainer
 	{
 	}
 
+    public void ReverseFramesHorizontal(bool reverse)
+    {
+        if (reverse)
+        {
+            objectData.widhtFormat = (-1) * objectData.widht;
+        }
+        else
+        {
+            objectData.widhtFormat = objectData.widht;
+        }
+    }
+
+    public void ReverseFramesVertical(bool reverse)
+    {
+        if (reverse)
+        {
+            objectData.heightFormat = (-1) * objectData.height;
+        }
+        else
+        {
+            objectData.heightFormat = objectData.height;
+        }
+    }
 }

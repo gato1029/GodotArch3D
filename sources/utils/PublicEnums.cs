@@ -9,6 +9,38 @@ public enum WindowType
 {
     SELECTED, CREATOR
 }
+public enum CharacterType
+{
+    MAIN,
+    NPC,
+    ENEMIGO
+}
+public enum CharacterBehaviorType   
+{
+    NINGUNO,
+    PERSONAJE_PRINCIPAL,
+    GENERICO
+}
+public enum UnitMoveType
+{
+   ALERTA,
+   MOVIMIENTO_RADIO_FIJO,
+   BUSQUEDA_RADIO_FIJO,
+   MOVIMIENTO_RADIO_VARIABLE,
+   BUSQUEDA_RADIO_VARIBLE,
+}
+public enum UnitType
+{
+    TERRESTRE,
+    AEREO,
+    ACUATICO
+}
+public enum UnitDirectionType
+{
+    DOS,
+    CUATRO,
+    OCHO
+}
 public enum AccesoryAvatarType
 {
     WEAPON,
@@ -41,12 +73,7 @@ public enum PositionAnimationType
     DERECHA_ABAJO
 }
 
-public enum CharacterType
-{
-    MAIN,
-    NPC,
-    ENEMY
-}
+
 
 
 public enum ColliderType 
@@ -88,6 +115,7 @@ public enum BonusType
     DURABILITY,
     VELOCITY_ATTACK,
     SPACE_BAG,
+    VELOCITY_MOVE,
 }
 public enum ElementType
 {

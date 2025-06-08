@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 internal class CommonOperations
 {
-
+    static RandomNumberGenerator rngInternal = new RandomNumberGenerator();
     public static Vector2 QuantizeDirection(Vector2 direction)
     {
         float quantizedX = 0;
@@ -33,6 +33,12 @@ internal class CommonOperations
       
         return new Vector2(quantizedX, quantizedY);
     }
+    public static AnimationDirection GetDirectionAnimationLeftRight(Vector2 value)
+    {
+        // Cuadrante I y IV: X positivo → Derecha
+        // Cuadrante II y III: X negativo → Izquierda
+        return value.X >= 0 ? AnimationDirection.RIGHT : AnimationDirection.LEFT;
+    }
     public static AnimationDirection GetDirectionAnimation(Vector2 value)
     {
         if (Math.Abs(value.X) > Math.Abs(value.Y)) // Predominio en 
@@ -44,8 +50,26 @@ internal class CommonOperations
             return value.Y > 0 ? AnimationDirection.UP : AnimationDirection.DOWN;
         }
     }
+    public static Vector2 NewPointInCircle(Vector2 origin, float radius)
+    {
+        Vector2 newPoint;
 
-    public  static Vector2 MovementCircle(RandomNumberGenerator rng, Vector2 origin, uint radius)
+        do
+        {
+            float angle = rngInternal.RandfRange(0, Mathf.Pi * 2);
+
+            float distance = Mathf.Sqrt(rngInternal.RandfRange(0, 1)) * radius;
+
+            float x = Mathf.Cos(angle) * distance;
+            float y = Mathf.Sin(angle) * distance;
+            newPoint = origin + new Vector2(x, y);
+
+        } while (newPoint.DistanceTo(origin) > radius);
+
+        return newPoint; //new Vector2(-159.97408f,1660.1527f);
+
+    }
+    public  static Vector2 NewPointInCircle(RandomNumberGenerator rng, Vector2 origin, uint radius)
     {
         Vector2 newPoint;
 
@@ -80,7 +104,7 @@ internal class CommonOperations
         switch (am.type)
         {
             case MovementType.CIRCLE:
-                pointDirection = MovementCircle(rng, position.value, am.widthRadius);
+                pointDirection = NewPointInCircle(rng, position.value, am.widthRadius);
                 break;
             case MovementType.SQUARE:
                 pointDirection = MovementSquare(rng, position.value, am.widthRadius, am.height);
@@ -89,7 +113,7 @@ internal class CommonOperations
                 pointDirection = MovementSquare(rng, am.origin, am.widthRadius, am.height);
                 break;
             case MovementType.CIRCLE_STATIC:
-                pointDirection = MovementCircle(rng, am.origin, am.widthRadius);
+                pointDirection = NewPointInCircle(rng, am.origin, am.widthRadius);
                 break;
             default:
                 break;

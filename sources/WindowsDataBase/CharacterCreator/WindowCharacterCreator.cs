@@ -20,6 +20,43 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         objectData = new CharacterModelBaseData();
         ButtonSave.Pressed += ButtonSave_Pressed;
         ButtonSearch.Pressed += ButtonSearch_Pressed;
+
+        foreach (CharacterBehaviorType type in Enum.GetValues(typeof(CharacterBehaviorType)))
+        {
+            OptionButtonBehavior.AddItem(type.ToString());
+        }
+        foreach (CharacterType type in Enum.GetValues(typeof(CharacterType)))
+        {
+            OptionButtonType.AddItem(type.ToString());
+        }
+        foreach (UnitType type in Enum.GetValues(typeof(UnitType)))
+        {
+            OptionButtonUnitType.AddItem(type.ToString());
+        }
+        foreach (UnitDirectionType type in Enum.GetValues(typeof(UnitDirectionType)))
+        {
+            OptionButtonUnitDirectionType.AddItem(type.ToString());
+        }
+        foreach (UnitMoveType type in Enum.GetValues(typeof(UnitMoveType)))
+        {
+            OptionButtonUnitMoveType.AddItem(type.ToString());
+        }
+
+        OptionButtonBehavior.ItemSelected += OptionButtonBehavior_ItemSelected;
+        OptionButtonBehavior_ItemSelected(0);
+    }
+
+    private void OptionButtonBehavior_ItemSelected(long index)
+    {
+        if (OptionButtonBehavior.GetSelectedId() == (int)CharacterBehaviorType.GENERICO)
+        {
+            VBoxContainerUnits.Visible = true;
+        }
+        else
+        {
+            VBoxContainerUnits.Visible = false;
+        }
+        
     }
 
     private void ButtonSearch_Pressed()
@@ -50,6 +87,14 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         objectData.damageDataArray = PanelAtaque.GetAllStats().ToArray();
         objectData.defenseDataArray = PanelDefensa.GetAllStats().ToArray();
 
+        objectData.characterBehaviorType = (CharacterBehaviorType)OptionButtonBehavior.GetSelectedId();
+        objectData.characterType = (CharacterType)OptionButtonType.GetSelectedId();
+        objectData.unitType = (UnitType)OptionButtonUnitType.GetSelectedId();
+        objectData.unitDirectionType = (UnitDirectionType)OptionButtonUnitDirectionType.GetSelectedId();
+        objectData.unitMoveType = (UnitMoveType)OptionButtonUnitMoveType.GetSelectedId();
+
+        objectData.unitMoveData = new UnitMoveData { radiusMove = (float)SpinBoxRadiusMove.Value, radiusSearch = (float)SpinBoxRadiusSearch.Value };
+        
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChangued?.Invoke(this);
         OnNotifyChanguedSimple?.Invoke();
@@ -79,7 +124,16 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         PanelEstadisticas.SetAllData(objectData.statsDataArray);
         PanelAtaque.SetAllData(objectData.damageDataArray);
         PanelDefensa.SetAllData(objectData.defenseDataArray);
+        OptionButtonType.Select((int)objectData.characterType);
+        OptionButtonBehavior.Select((int)objectData.characterBehaviorType);
+        OptionButtonUnitType.Select((int)objectData.unitType);
+        OptionButtonUnitDirectionType.Select((int)objectData.unitDirectionType);
+        OptionButtonUnitMoveType.Select((int)objectData.unitMoveType);
 
+        SpinBoxRadiusMove.Value = objectData.unitMoveData.radiusMove;
+        SpinBoxRadiusSearch.Value = objectData.unitMoveData.radiusSearch;
+
+        OptionButtonBehavior_ItemSelected(0);
         var dataInt = DataBaseManager.Instance.FindById<AnimationCharacterBaseData>(data.idAnimationCharacterBaseData);
         FrameData iFrame = dataInt.animationDataArray[0].animationData[0].frameDataArray[0];
         var dataTexture = MaterialManager.Instance.GetAtlasTexture(dataInt.animationDataArray[0].idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);

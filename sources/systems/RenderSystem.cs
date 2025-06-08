@@ -78,8 +78,8 @@ internal class RenderSystem : BaseSystem<World, float>
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                 ref PositionComponent   positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
                 ref RenderGPUComponent  renderComponent = ref Unsafe.Add(ref pointerRenderComponent, entityIndex);
-
-                renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, (( positionComponent.position.Y+ renderComponent.zOrdering  ) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender);                
+                float renderZ = ((positionComponent.position.Y + renderComponent.originOffset.Y + renderComponent.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender;
+                renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, renderZ );                
                 RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);       
                 
             }
@@ -113,8 +113,9 @@ internal class RenderSystem : BaseSystem<World, float>
                 ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
                 ref RenderGPUComponent renderComponent = ref Unsafe.Add(ref pointerRenderComponent, entityIndex);
                 ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
-
-                renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, ((positionComponent.position.Y + renderComponent.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender);
+                float renderZ = ((positionComponent.position.Y +renderComponent.originOffset.Y + renderComponent.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender ;
+                
+                renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, renderZ);
                 RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);
 
                 //if (characterComponent.activeTool)

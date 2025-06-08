@@ -67,7 +67,7 @@ public class EcsManager : SingletonBase<EcsManager>
 
         groupMainCharacter = new Group<float>("MainCharacter", new MainCharacterSystem(world));
 
-        groupUnits = new Group<float>("Units" ,new BehaviorCharacterSystem(world), new CharacterBehaviorSystem(world));
+        groupUnits = new Group<float>("Units" ,new BehaviorCharacterSystem(world), new CharacterBehaviorSystem(world), new CharacterCommonBehaviorSystem(world));
         groupRemove = new Group<float>("Remove", new RemoveSystem(world));
 
         groupDebugerArch = new Group<float>("DebugerArch", new DebugerManager(world));

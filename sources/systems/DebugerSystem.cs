@@ -96,7 +96,7 @@ internal class DebugerSystem : BaseSystem<World, float>
            
                 DebugDraw.Quad(new Vector3(positionComponent.position.X, positionComponent.position.Y, 1), .2f, Colors.DarkOrange, 0.0f); //center          
 
-                if (characterComponent.accessoryArray[0]!=null)
+                if (characterComponent.accessoryArray != null && characterComponent.accessoryArray[0]!=null)
                 {
                     var accesoryCollision = characterComponent.accessoryArray[0];
                     if (accesoryCollision.hasBodyAnimation)
@@ -201,13 +201,16 @@ internal class DebugerSystem : BaseSystem<World, float>
             ref var pointerEntity = ref chunk.Entity(0);
             ref var pointerPositionComponent = ref chunk.GetFirst<PositionComponent>();
             ref var pointerDirectionComponent = ref chunk.GetFirst<DirectionComponent>();
+            ref var pointerRenderGPUComponent = ref chunk.GetFirst<RenderGPUComponent>();
 
             foreach (var entityIndex in chunk)
             {
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                 ref PositionComponent t = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
                 ref DirectionComponent d = ref Unsafe.Add(ref pointerDirectionComponent, entityIndex);
-                DebugDraw.Arrow(new Vector3(t.position.X, t.position.Y,1), new Vector3(d.value.X, d.value.Y, 1), 1, Colors.Aqua, 0);
+                ref RenderGPUComponent r = ref Unsafe.Add(ref pointerRenderGPUComponent, entityIndex);
+
+                DebugDraw.Arrow(new Vector3(t.position.X + r.originOffset.X, t.position.Y+r.originOffset.Y,1), new Vector3(d.value.X, d.value.Y, 1), 1, Colors.Aqua, 0);
             }
         }
     }

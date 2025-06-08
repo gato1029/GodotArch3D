@@ -24,34 +24,28 @@ public class HumanCharacterBehavior : ICharacterBehavior
  
     public void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer)
     {
-        switch (characterBehaviorComponent.characterStateType)
+        ref CharacterAtackComponent characterAtackComponent = ref entity.Get<CharacterAtackComponent>();
+        switch (characterComponent.characterStateType)
         {
             
             case CharacterStateType.IDLE:
-                 animation.stateAnimation = 0;              
+                 animation.stateAnimation = 0;
                 break;
             case CharacterStateType.MOVING:
-                 animation.stateAnimation = 1;                     
+                 animation.stateAnimation = 1;            
                 break;
             case CharacterStateType.ATTACK:
-                if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("attack"))
+                characterComponent.speedAtackBase =-0.08f;
+                animation.stateAnimation = 2;                                
+                if (animation.animationComplete)
                 {
-                    characterComponent.speedAtackBase = -0.05f;
-                    animation.stateAnimation = 2;
+                    characterComponent.characterStateType = CharacterStateType.EXECUTE_ATTACK;          
                     
-                    if (animation.animationComplete)
-                    {
-                        characterBehaviorComponent.characterStateType = CharacterStateType.EXECUTE_ATTACK;
-                    }
                 }
-                else
-                {
-                    animation.TimeSinceLastFrame = 0;
-                    characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;
-                }                                                                     
+         
                 break;
             case CharacterStateType.EXECUTE_ATTACK:
-                characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;                
+                characterComponent.characterStateType = CharacterStateType.IDLE;                
                 break;
             
             case CharacterStateType.TAKE_HIT:
@@ -70,8 +64,9 @@ public class HumanCharacterBehavior : ICharacterBehavior
         ref PositionComponent positionComponent = ref entity.Get<PositionComponent>();
         ref DirectionComponent directionComponent = ref entity.Get<DirectionComponent>();
         ref VelocityComponent  velocityComponent = ref entity.Get<VelocityComponent>();
+        ref CharacterAtackComponent characterAtackComponent = ref entity.Get<CharacterAtackComponent>();
 
-        CharacterStateType stateCharacter = characterBehaviorComponent.characterStateType;
+        CharacterStateType stateCharacter = characterComponent.characterStateType;
 
 
         Vector2 moveDirection = Vector2.Zero;
@@ -84,38 +79,62 @@ public class HumanCharacterBehavior : ICharacterBehavior
         { moveDirection.X -= 1; }
         if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("move_right"))
         { moveDirection.X += 1; }
-        if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("attack"))
-        { attack = true; }
-                 
+        //if (ServiceLocator.Instance.GetService<InputHandler>().IsActionActive("attack"))
+        //{ attack = true; }
 
-        if (stateCharacter == CharacterStateType.EXECUTE_ATTACK)
+        if (Input.IsActionPressed("attack"))
         {
-            Atack(entity, characterComponent, positionComponent,directionComponent);
+            characterAtackComponent.isAttack = true;
+            characterComponent.characterStateType = CharacterStateType.ATTACK;
+            attack = true;
         }
-
-        if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && attack)
+        if (Input.IsActionJustReleased("attack"))
         {
-            characterBehaviorComponent.characterStateType = CharacterStateType.ATTACK;           
-            stateCharacter = CharacterStateType.ATTACK;
+            characterComponent.characterStateType = CharacterStateType.IDLE;
+        
+            characterAtackComponent.isAttack = false;
+            attack = false;
+        }
+        if (attack!=true)
+        {
            
-        }
 
-        if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection == Vector2.Zero)
+            //if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && attack)
+            //{
+            //    characterComponent.characterStateType = CharacterStateType.ATTACK;
+            //    stateCharacter = CharacterStateType.ATTACK;
+            //    //characterAtackComponent.isAttack = true;
+            //}
+
+            if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection == Vector2.Zero)
+            {
+                characterComponent.characterStateType = CharacterStateType.IDLE;
+
+            }
+
+            if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection != Vector2.Zero)
+            {
+                moveDirection = moveDirection.Normalized();
+                Move(entity, moveDirection, ref characterComponent, ref characterBehaviorComponent, ref positionComponent, ref directionComponent, velocityComponent, delta);
+            }
+        }
+        else
         {
-            characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;
+            if (stateCharacter == CharacterStateType.EXECUTE_ATTACK)
+            {
+                GD.Print("ataque");
+                Atack(entity, characterComponent, positionComponent, directionComponent);
+                characterComponent.characterStateType = CharacterStateType.IDLE;
+            }
+        }
           
-        }
-
-        if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection != Vector2.Zero)
-        {            
-            moveDirection = moveDirection.Normalized();
-           Move(entity, moveDirection,characterComponent, ref characterBehaviorComponent, ref positionComponent,ref directionComponent, velocityComponent, delta);         
-        }
+        
+     
     }
 
     private void Atack(Entity entity, CharacterComponent characterComponent, PositionComponent positionComponent, DirectionComponent directionComponent)
     {
-        GD.Print("Ejecutar ataque");
+       
         var animacionData = characterComponent.accessoryArray[0].accesoryAnimationBodyData.animationStateData.animationData[(int)directionComponent.animationDirection];
         if (animacionData.hasCollider)
         {
@@ -134,16 +153,15 @@ public class HumanCharacterBehavior : ICharacterBehavior
                         Entity entityObjetive = itemInternal.Value;
                         if (entityObjetive.Id != entity.Id)
                         {
-                            CharacterComponent characterComponentB = itemInternal.Value.Get<CharacterComponent>();
+                            
+                            ref CharacterComponent characterComponentB =ref itemInternal.Value.TryGetRef<CharacterComponent>(out bool exist);
                             AnimationCharacterBaseData characterB = characterComponentB.CharacterBaseData.animationCharacterBaseData;
-                            GeometricShape2D colliderB = characterB.collisionMove.Multiplicity(characterComponentB.CharacterBaseData.scale);
+                            GeometricShape2D colliderB = characterB.collisionBody.Multiplicity(characterComponentB.CharacterBaseData.scale);
                             var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
 
                             if (Collision2D.Collides(collision, colliderB, positionRelative, positionB))
-                            {
-                                ref CharacterBehaviorComponent stateComponentB = ref entityObjetive.TryGetRef<CharacterBehaviorComponent>(out bool exist);
-
-                                stateComponentB.characterStateType = CharacterStateType.TAKE_HIT;
+                            {                              
+                                characterComponentB.characterStateType = CharacterStateType.TAKE_HIT;
                                 BehaviorManager.Instance.AplyDamageCharacter(entity, entityObjetive);                                
                             }
                         }
@@ -156,7 +174,7 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
     }
 
-    private void Move(Entity entity, Vector2 moveDirection, CharacterComponent characterComponent, ref CharacterBehaviorComponent characterBehaviorComponent, ref PositionComponent positionComponent,ref DirectionComponent directionComponent, VelocityComponent velocityComponent, float delta)
+    private void Move(Entity entity, Vector2 moveDirection,ref CharacterComponent characterComponent, ref CharacterBehaviorComponent characterBehaviorComponent, ref PositionComponent positionComponent,ref DirectionComponent directionComponent, VelocityComponent velocityComponent, float delta)
     {
         AnimationCharacterBaseData characterData = characterComponent.CharacterBaseData.animationCharacterBaseData;
         GeometricShape2D collisionMove = characterData.collisionMove.Multiplicity(characterComponent.CharacterBaseData.scale);
@@ -260,12 +278,12 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
         if (!existCollision)
         {
-            characterBehaviorComponent.characterStateType = CharacterStateType.MOVING;
+            characterComponent.characterStateType = CharacterStateType.MOVING;
             positionComponent.position += movement;           
         }
         else
         {
-            characterBehaviorComponent.characterStateType = CharacterStateType.IDLE;
+            characterComponent.characterStateType = CharacterStateType.IDLE;
         }
 
     }

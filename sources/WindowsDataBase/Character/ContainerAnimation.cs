@@ -137,6 +137,15 @@ public partial class ContainerAnimation : PanelContainer
     private void CheckBoxMirrorV_Pressed()
     {
         Sprite2DView.FlipV = CheckBoxMirrorV.ButtonPressed;
+
+        if (CheckBoxMirrorV.ButtonPressed)
+        {
+            FramesArray.ReverseFramesVertical(true);
+        }
+        else
+        {
+            FramesArray.ReverseFramesVertical(false);
+        }
     }
 
     private void SpinBoxZoom_ValueChanged(double value)
@@ -285,7 +294,16 @@ public partial class ContainerAnimation : PanelContainer
 
     private void CheckBoxMirror_Pressed()
     {
-        Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;        
+        Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;
+        if (CheckBoxMirror.ButtonPressed)
+        {
+            FramesArray.ReverseFramesHorizontal(true);
+        }
+        else
+        {
+            FramesArray.ReverseFramesHorizontal(false);
+        }
+        
     }
 
     private void CheckBoxModeSelection_Pressed()

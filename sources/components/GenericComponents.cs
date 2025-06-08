@@ -34,7 +34,7 @@ public struct VelocityComponent
 [Component]
 public struct PositionComponent
 {
-    public Vector2 position;
+    public Vector2 position;    
 }
 [Component]
 public struct DirectionComponent
@@ -51,6 +51,7 @@ public struct RenderGPUComponent
     public int instance;
     public int layerRender;
     public float zOrdering;
+    public Vector2 originOffset;
     public Transform3D transform;    
 }
 
