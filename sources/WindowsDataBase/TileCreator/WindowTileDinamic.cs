@@ -92,11 +92,12 @@ public partial class WindowTileDinamic : Window, IDetailWindow
     private void textureValueChanged(double value)
     {
         spriteSelection.Position = new Vector2((float)textureOffsetXSpin.Value, (float)textureOffsetYSpin.Value * (-1));
+        collisionBody.Position = new Vector2((float)(bodyOffsetXSpin.Value + textureOffsetXSpin.Value), (float)(((float)(bodyOffsetYSpin.Value + textureOffsetYSpin.Value) * (-1))));
     }
 
     private void ScaleSpinbox_ValueChanged(double value)
     {
-        spriteSelection.Scale = new Vector2((float)value, (float)value);
+        //spriteSelection.Scale = new Vector2((float)value, (float)value);
     }
 
     private void CollisionCheckBox_Pressed()
@@ -107,7 +108,7 @@ public partial class WindowTileDinamic : Window, IDetailWindow
 
     private void bodyValueChanged(double value)
     {
-        collisionBody.Position = new Vector2((float)bodyOffsetXSpin.Value, (float)bodyOffsetYSpin.Value * (-1));
+        collisionBody.Position = new Vector2((float)(bodyOffsetXSpin.Value + textureOffsetXSpin.Value), (float)(((float)(bodyOffsetYSpin.Value + textureOffsetYSpin.Value) * (-1)) ));
         var shape = (RectangleShape2D)collisionBody.Shape;
         shape.Size = new Vector2((float)bodyWidthSpin.Value, (float)bodyHeightSpin.Value);
     }
@@ -191,7 +192,7 @@ public partial class WindowTileDinamic : Window, IDetailWindow
         ComboMaterial_Selected(currentMaterialData.id);
         optionMaterial.Selected = currentMaterialData.id;
         spriteSelection.Texture = currentData.textureVisual;
-        spriteSelection.Scale = new Vector2(currentData.scale,currentData.scale);
+        //spriteSelection.Scale = new Vector2(currentData.scale,currentData.scale);
         windowState = WindowState.UPDATE;
 
         textureOffsetXSpin.Value = currentData.offsetX;
@@ -204,6 +205,7 @@ public partial class WindowTileDinamic : Window, IDetailWindow
             bodyOffsetXSpin.Value = rect.originPixelX;
             bodyOffsetYSpin.Value = rect.originPixelY;
         }
+        bodyValueChanged(0);
 
     }
 }

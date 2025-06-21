@@ -90,11 +90,11 @@ internal class SpatialHashMap<TItem>
     }
     void drawQuad(Vector2 positionCell)
     {
-        //Vector2 vector2 = GetCellIndexNormalized(positionCell);
-        //Vector2 plot = (vector2 * cellSize) + new Vector2(cellSize / 2, cellSize / 2);
-        //Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
-        //xform.Origin = new Vector3(plot.X, plot.Y, 1);
-        //DebugDraw.Quad(xform, cellSize, Colors.Purple, 200); //debug
+        Vector2 vector2 = GetCellIndexNormalized(positionCell);
+        Vector2 plot = (vector2 * cellSize) + new Vector2(cellSize / 2, cellSize / 2);
+        Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
+        xform.Origin = new Vector3(plot.X, plot.Y, 1);
+        DebugDraw.Quad(xform, cellSize, Colors.Purple, 200); //debug
     }
     public void AddUpdateItem(Vector2 positionCell, in TItem item)
     {

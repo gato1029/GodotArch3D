@@ -9,9 +9,9 @@
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
 [ext_resource type="Texture2D" uid="uid://c5ccx8t7g4yrh" path="res://resources/Textures/TX Plant.png" id="5_yxrc8"]
 
-[sub_resource type="SphereMesh" id="SphereMesh_yxrc8"]
-
 [sub_resource type="QuadMesh" id="QuadMesh_namcl"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_yxrc8"]
 
 [sub_resource type="Environment" id="Environment_xh56v"]
 background_color = Color(1, 1, 1, 1)
@@ -33,17 +33,17 @@ script = ExtResource("1_a2usr")
 
 [node name="Grid" type="Node" parent="Game/Components"]
 
-[node name="center" type="MeshInstance3D" parent="Game/Components/Grid"]
-transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
-mesh = SubResource("SphereMesh_yxrc8")
-skeleton = NodePath("../../..")
-surface_material_override/0 = ExtResource("2_xh56v")
-
 [node name="grid" type="MeshInstance3D" parent="Game/Components/Grid"]
 transform = Transform3D(1024, 0, 0, 0, 1024, 0, 0, 0, 1, 0, 0, -50)
 mesh = SubResource("QuadMesh_namcl")
 skeleton = NodePath("../../../../Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D")
 surface_material_override/0 = ExtResource("2_xh56v")
+
+[node name="center" type="MeshInstance3D" parent="Game/Components/Grid"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("SphereMesh_yxrc8")
+skeleton = NodePath("../../..")
+surface_material_override/0 = ExtResource("5_ong74")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Game"]
 environment = SubResource("Environment_xh56v")
@@ -211,6 +211,7 @@ MaxZoomSize = 20.0
 
 [node name="center" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D"]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, -10)
+visible = false
 mesh = SubResource("SphereMesh_yxrc8")
 skeleton = NodePath("../../../../../../../../../../../../../../../Game")
 surface_material_override/0 = ExtResource("5_ong74")

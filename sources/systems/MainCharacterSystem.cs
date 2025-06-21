@@ -197,7 +197,7 @@ namespace GodotEcsArch.sources.systems
 
                 if (!existCollision)
                 {
-                    Dictionary<int, Dictionary<int, TileDataGame>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+                    Dictionary<int, Dictionary<int, IDataTile>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
                     if (dataTile != null)
                     {
                         foreach (var item in dataTile.Values)
@@ -205,13 +205,13 @@ namespace GodotEcsArch.sources.systems
                             foreach (var itemInternal in item)
                             {
 
-                                GeometricShape2D colliderB = itemInternal.Value.collisionBody;
-                                var positionB = itemInternal.Value.positionCollider + itemInternal.Value.collisionBody.OriginCurrent;
-                                if (Collision2D.Collides(c.shapeMove, colliderB, movementNext, positionB))
-                                {
-                                    existCollision = true;
-                                    break;
-                                }
+                                //GeometricShape2D colliderB = itemInternal.Value.collisionBody;
+                                //var positionB = itemInternal.Value.positionCollider + itemInternal.Value.collisionBody.OriginCurrent;
+                                //if (Collision2D.Collides(c.shapeMove, colliderB, movementNext, positionB))
+                                //{
+                                //    existCollision = true;
+                                //    break;
+                                //}
 
                             }
                             if (existCollision)

@@ -3,10 +3,12 @@ using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
 using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
@@ -49,12 +51,25 @@ public class HumanCharacterBehavior : ICharacterBehavior
                 break;
             
             case CharacterStateType.TAKE_HIT:
-                //efecto tomar daño
+                
+                animation.stateAnimation = 4;
+                if (animation.animationComplete)
+                {
+                    characterComponent.characterStateType = CharacterStateType.IDLE;
+
+                }
                 break;
             case CharacterStateType.TAKE_STUN:
                 break;
             case CharacterStateType.DIE:
-                //aqui animacion morir 
+                animation.stateAnimation = 3;
+                if (animation.animationComplete)
+                {
+                    if (!entity.Has<PendingRemove>())
+                    {
+                        commandBuffer.Add<PendingRemove>(in entity);
+                    }
+                }
                 break;
         }
     }
@@ -112,7 +127,7 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
             }
 
-            if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection != Vector2.Zero)
+            if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING ) && moveDirection != Vector2.Zero)
             {
                 moveDirection = moveDirection.Normalized();
                 Move(entity, moveDirection, ref characterComponent, ref characterBehaviorComponent, ref positionComponent, ref directionComponent, velocityComponent, delta);
@@ -134,11 +149,12 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
     private void Atack(Entity entity, CharacterComponent characterComponent, PositionComponent positionComponent, DirectionComponent directionComponent)
     {
-       
-        var animacionData = characterComponent.accessoryArray[0].accesoryAnimationBodyData.animationStateData.animationData[(int)directionComponent.animationDirection];
+        var dataAccesory = AccesoryManager.Instance.GetAccesory(characterComponent.accessoryArray[0]);
+        var animacionData = dataAccesory.accesoryAnimationBodyData.animationStateData.animationData[(int)directionComponent.animationDirection];
         if (animacionData.hasCollider)
         {
-            GeometricShape2D collision = animacionData.collider.Multiplicity(characterComponent.CharacterBaseData.scale);
+            var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
+            GeometricShape2D collision = animacionData.collider.Multiplicity(dataCharacterModel.scale);
             
             Vector2 positionRelative = positionComponent.position + collision.OriginCurrent;
 
@@ -155,8 +171,10 @@ public class HumanCharacterBehavior : ICharacterBehavior
                         {
                             
                             ref CharacterComponent characterComponentB =ref itemInternal.Value.TryGetRef<CharacterComponent>(out bool exist);
-                            AnimationCharacterBaseData characterB = characterComponentB.CharacterBaseData.animationCharacterBaseData;
-                            GeometricShape2D colliderB = characterB.collisionBody.Multiplicity(characterComponentB.CharacterBaseData.scale);
+                            var dataCharacterModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
+
+                            AnimationCharacterBaseData characterB = dataCharacterModelB.animationCharacterBaseData;
+                            GeometricShape2D colliderB = characterB.collisionBody.Multiplicity(dataCharacterModelB.scale);
                             var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
 
                             if (Collision2D.Collides(collision, colliderB, positionRelative, positionB))
@@ -176,8 +194,9 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
     private void Move(Entity entity, Vector2 moveDirection,ref CharacterComponent characterComponent, ref CharacterBehaviorComponent characterBehaviorComponent, ref PositionComponent positionComponent,ref DirectionComponent directionComponent, VelocityComponent velocityComponent, float delta)
     {
-        AnimationCharacterBaseData characterData = characterComponent.CharacterBaseData.animationCharacterBaseData;
-        GeometricShape2D collisionMove = characterData.collisionMove.Multiplicity(characterComponent.CharacterBaseData.scale);
+        var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
+        AnimationCharacterBaseData characterData = dataCharacterModel.animationCharacterBaseData;
+        GeometricShape2D collisionMove = characterData.collisionMove.Multiplicity(dataCharacterModel.scale);
 
 
         if (directionComponent.value != moveDirection)
@@ -229,8 +248,9 @@ public class HumanCharacterBehavior : ICharacterBehavior
                     if (itemInternal.Value.Id != entity.Id)
                     {
                         CharacterComponent characterComponentB = itemInternal.Value.Get<CharacterComponent>();
-                        AnimationCharacterBaseData characterB = characterComponentB.CharacterBaseData.animationCharacterBaseData;
-                        GeometricShape2D colliderB =  characterB.collisionMove.Multiplicity(characterComponentB.CharacterBaseData.scale);
+                        var dataCharacterModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
+                        AnimationCharacterBaseData characterB = dataCharacterModelB.animationCharacterBaseData;
+                        GeometricShape2D colliderB =  characterB.collisionMove.Multiplicity(dataCharacterModelB.scale);
                         var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
 
                         if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
@@ -249,17 +269,17 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
         if (!existCollision)
         {
-            Dictionary<int, Dictionary<int, TileDataGame>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+            Dictionary<int, Dictionary<int, IDataTile>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
             if (dataTile != null)
             {
                 foreach (var item in dataTile.Values)
                 {
                     foreach (var itemInternal in item)
                     {
-
-                        GeometricShape2D colliderB = itemInternal.Value.collisionBody;
-                        var positionB = itemInternal.Value.positionCollider + itemInternal.Value.collisionBody.OriginCurrent;
-                        if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
+                        var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);                        
+                        GeometricShape2D collisionB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);                                
+                        var positionB = itemInternal.Value.PositionCollider;// + collisionB.OriginCurrent;
+                        if (Collision2D.Collides(collisionMove, collisionB, movementNext, positionB))
                         {
                             existCollision = true;
                             break;

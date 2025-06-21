@@ -59,7 +59,7 @@ internal class TilesManager : SingletonBase<TilesManager>
     {
         if (!tilesDictionary.ContainsKey(idTile))
         {
-            return null;
+            return RegisterTileData(idTile);
         }
         return tilesDictionary[idTile];
     }

@@ -50,11 +50,19 @@ public class ChunkManagerBase
 
         return new Vector2I(x, y);
     }
+    private int FloorDiv(int a, int b)
+    {
+        return (a >= 0) ? (a / b) : ((a - b + 1) / b);
+    }
     public Vector2I ChunkPosition(Vector2I TilePositionGlobal)
     {
+        //return new Vector2I(
+        //    (int)Mathf.Floor(TilePositionGlobal.X / chunkDimencion.X),
+        //    (int)MathF.Floor(TilePositionGlobal.Y / chunkDimencion.Y));
         return new Vector2I(
-            (int)Mathf.Floor(TilePositionGlobal.X / chunkDimencion.X),
-            (int)MathF.Floor(TilePositionGlobal.Y / chunkDimencion.Y));
+        FloorDiv(TilePositionGlobal.X, chunkDimencion.X),
+        FloorDiv(TilePositionGlobal.Y, chunkDimencion.Y)
+);
     }
 
     public void UpdatePlayerPosition(Vector2 playerPosition)

@@ -1,8 +1,11 @@
 using Godot;
 using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.Multimesh;
+using GodotEcsArch.sources.managers.Serializer.Data;
 using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using Microsoft.CodeAnalysis;
@@ -15,21 +18,30 @@ using static Godot.TextServer;
 using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileData;
 
 namespace GodotEcsArch.sources.managers.Tilemap;
-public class TileMapChunkRender<TData> where TData : TileDataGame
+public class TileMapChunkRender<TData> where TData : IDataTile
 {
+    public event Action<Vector2, ChunkData<TData>> OnChunSerialize;
+    
+
     Dictionary<int, MultimeshMaterial> multimeshMaterialDict;
     public Vector2I ChunkSize { get; private set; }
     public Vector2I tileSize { get; set; }
     public int layer { get; set; }
     public int maxPool { get; set; }
+    public int IdMaterialLastUsed { get => idMaterialLastUsed; set => idMaterialLastUsed = value; }
 
-    private Dictionary<Vector2, ChunkData<TData>> dataChunks = new Dictionary<Vector2, ChunkData<TData>>();
+    private bool serializableUnload;
+    public Dictionary<Vector2, ChunkData<TData>> dataChunks = new Dictionary<Vector2, ChunkData<TData>>();
     private Dictionary<Vector2, ChunkRender> loadedChunks = new Dictionary<Vector2, ChunkRender>();
     private Queue<ChunkRender> chunkPool = new Queue<ChunkRender>();
 
+
+    private int idMaterialLastUsed = 0;
+
     ChunkManagerBase chunkManager;
-    public TileMapChunkRender(int layer, ChunkManagerBase ChunkManager)
+    public TileMapChunkRender(int layer, ChunkManagerBase ChunkManager, bool SerializableUnload=false)
     {
+        serializableUnload = SerializableUnload;
         this.chunkManager = ChunkManager;
         chunkManager.OnChunkLoad += Instance_OnChunkLoad;
         chunkManager.OnChunkUnload += Instance_OnChunkUnload;
@@ -43,16 +55,45 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
         
     }
 
-    (Vector2I chunk, Vector2I tile) GetTilePositionInChunk(Vector2 tilePositionGlobalPixel)
+    public void LoadMaterials(List<int> materialsUsed)
     {
-      
-        int tileX = (int)MathF.Floor(tilePositionGlobalPixel.X / tileSize.X);
-        int tileY = (int)MathF.Floor(tilePositionGlobalPixel.Y / tileSize.Y);
-        var tilePosition = new Vector2(tileX, tileY);
+        foreach (var item in materialsUsed)
+        {
+            if (!multimeshMaterialDict.ContainsKey(item))
+            {
+                MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(item));
+                multimeshMaterialDict.Add(item, multimeshMaterial);
+            }
+        }
+    }
+    public void CreateChunkData(ChunkDataSerializable<TData> serializable)
+    {
+       
+        ChunkData<TData> data = FromSerializable(serializable);
+        if (!dataChunks.ContainsKey(data.positionChunk))
+        {
+            dataChunks.Add(data.positionChunk, data);
 
-        Vector2I chunkPosition = new Vector2I((int)MathF.Floor(tilePositionGlobalPixel.X/ ChunkSize.X),
-                                            (int)MathF.Floor(tilePositionGlobalPixel.Y / ChunkSize.Y));        
-        return (chunkPosition,chunkPosition);
+            foreach (var item in data.tiles)
+            {
+                if (item !=null)
+                {
+                    var tileData = TilesManager.Instance.GetTileData(item.IdTile);             
+                    if (tileData.haveCollider)
+                    {
+                        CollisionManager.Instance.tileColliders.AddUpdateItem(item.PositionCollider, item);
+                    }
+
+                }
+             
+            }
+            
+        }
+        else
+        {
+            dataChunks[data.positionChunk] = data;
+        }
+        
     }
 
     public TData GetTileGlobalPosition(Vector2I tilePositionGlobal)
@@ -63,7 +104,7 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
         {
             return dataChunks[chunkPosition].GetTileAt(tilePositionChunk);
         }
-        return null;
+        return default;
     }
     public void AddUpdatedTileRule(Vector2I tilePositionGlobal, AutoTileData autoTileData, TData dataGame)
     {        
@@ -201,12 +242,14 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
         }
     }
 
+
+
     private void CreateTile(ChunkData<TData> tileMapChunkData, Vector2I tilePositionChunk, Vector2I tilePositionGlobal, TileData tileData, TData dataGame)
     {
         MultimeshMaterial multimeshMaterial = null;
 
         int idMaterial = tileData.idMaterial;
-
+        IdMaterialLastUsed = idMaterial;
         if (!multimeshMaterialDict.ContainsKey(tileData.idMaterial))
         {
             multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(tileData.idMaterial));
@@ -216,43 +259,39 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
 
         float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
         float y = MeshCreator.PixelsToUnits(tileSize.Y) / 2f;
-        //float x = 0;
-        //float y = 0;
-
-        Vector2 positionNormalize = tilePositionGlobal * new Vector2( MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
-        Vector2 posicionCollider = positionNormalize + new Vector2(x, y);
-
-        Vector2 positionReal = positionNormalize + new Vector2(x, y) +new Vector2(tileData.offsetInternal.X,tileData.offsetInternal.Y);
 
         
-        Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
-        xform.Origin = new Vector3(positionReal.X, positionReal.Y, (positionReal.Y * CommonAtributes.LAYER_MULTIPLICATOR) + layer);
-        xform = xform.ScaledLocal(new Vector3(tileData.scale, tileData.scale, 1));
-        
-
+        Vector2 positionNormalize = tilePositionGlobal * new Vector2( MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y) );        
+        Vector2 positionReal = positionNormalize + new Vector2(x , y ) + new Vector2(tileData.offsetInternal.X * tileData.scale, tileData.offsetInternal.Y * tileData.scale);        
         if (!tileMapChunkData.ExistTile(tilePositionChunk))
         {
-            dataGame.idCollider = TileNumeratorManager.Instance.getNumerator();
+            dataGame.IdCollider = TileNumeratorManager.Instance.getNumerator();
         }
         else 
         { 
             dataGame = tileMapChunkData.GetTileAt(tilePositionChunk);
         }
-        
-        
-        dataGame.positionCollider = posicionCollider;
-        dataGame.tilePositionChunk = tilePositionChunk;
-        dataGame.idMaterial = idMaterial;
-        dataGame.transform3d = xform;
-        dataGame.idTile = tileData.id;
-        dataGame.collisionBody = tileData.collisionBody;    
+
+
+        Vector2 posicionCollider = positionReal;
+        dataGame.PositionWorld = new Vector3(positionReal.X, positionReal.Y, (positionReal.Y * CommonAtributes.LAYER_MULTIPLICATOR) + layer);
+        dataGame.Scale = tileData.scale;      
+        dataGame.IdTile = tileData.id;
+        dataGame.PositionTileChunk = tilePositionChunk;
+        dataGame.PositionTileWorld = tilePositionGlobal;
+
+
         tileMapChunkData.CreateUpdateTile(tilePositionChunk, dataGame);
         if (tileData.haveCollider)
         {
+
+            posicionCollider = positionReal + tileData.collisionBody.Multiplicity(tileData.scale).OriginCurrent;//+ new Vector2(x, y);
+            dataGame.PositionCollider = posicionCollider;
             CollisionManager.Instance.tileColliders.AddUpdateItem(posicionCollider, dataGame);
         }
         else
         {
+            dataGame.PositionCollider = posicionCollider;
             CollisionManager.Instance.tileColliders.RemoveItem(posicionCollider, dataGame);
         }
         
@@ -269,9 +308,10 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
                 for (int j = 0; j < tileMapChunkRender.size.Y; j++)
                 {
                     var datatile = tileMapChunkRender.tiles[i, j];
-                    if (datatile != null && datatile.idMaterial != 0)
+                    if (datatile != null && datatile.instance!=-1) //&& datatile.idMaterial != 0)
                     {
-                        multimeshMaterialDict[datatile.idMaterial].FreeInstance(datatile.rid, datatile.instance);
+                        var dataTileInfo = TilesManager.Instance.GetTileData(datatile.idTile);
+                        multimeshMaterialDict[dataTileInfo.idMaterial].FreeInstance(datatile.rid, datatile.instance);
                         datatile.FreeTile();
                     }
                 }
@@ -281,9 +321,35 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
                 chunkPool.Enqueue(tileMapChunkRender);
             }
             loadedChunks.Remove(chunkPos);
+            if (serializableUnload && dataChunks[chunkPos].changue)
+            {
+                OnChunSerialize?.Invoke(chunkPos, dataChunks[chunkPos]);// SaveOnDisk(chunkPos);
+            }
+            
         }
+        
     }
 
+    private void SaveOnDisk(Godot.Vector2 chunkPos)
+    {
+        Serializer.Data.ChunkDataSerializable<TData> dataSer = dataChunks[chunkPos].ToSerializable();
+
+    }
+    public  ChunkData<TData> FromSerializable(ChunkDataSerializable<TData> serializable)
+    {
+        var chunk = new ChunkData<TData>(
+            serializable.PositionChunk,  // Se convierte implícitamente a Vector2
+            serializable.Size            // Se convierte implícitamente a Vector2I
+        );
+
+        foreach (var tile in serializable.Tiles)
+        {
+            var pos = tile.Position; // ProtoVector2I -> Vector2I (implícito)
+            chunk.tiles[pos.X, pos.Y] = tile.Value;
+        }
+
+        return chunk;
+    }
     private void Instance_OnChunkLoad(Godot.Vector2 chunkPos)
     {
         if (dataChunks.ContainsKey(chunkPos))
@@ -307,8 +373,9 @@ public class TileMapChunkRender<TData> where TData : TileDataGame
                     var dataGame = tileMapChunkData.tiles[i, j];
                     if (dataGame != null)
                     {
-                        (Rid, int) instance = multimeshMaterialDict[dataGame.idMaterial].CreateInstance();
-                        chunk.CreateUpdate(i, j, dataGame.idMaterial, instance.Item1, instance.Item2, dataGame.transform3d, dataGame.idTile);
+                        var tileData = TilesManager.Instance.GetTileData(dataGame.IdTile);
+                        (Rid, int) instance = multimeshMaterialDict[tileData.idMaterial].CreateInstance();
+                        chunk.CreateUpdate(i, j,  instance.Item1, instance.Item2, dataGame.PositionWorld,dataGame.Scale, dataGame.IdTile);
                     }
                 }
             }

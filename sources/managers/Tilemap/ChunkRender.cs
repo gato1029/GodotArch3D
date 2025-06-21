@@ -22,13 +22,13 @@ namespace GodotEcsArch.sources.managers.Tilemap
             tiles = new Tile[size.X, size.Y];
         }
 
-        public void CreateUpdate(int x, int y, int idMaterial, Rid rid, int instance, Transform3D xform, int idTile)
+        public void CreateUpdate(int x, int y,  Rid rid, int instance, Vector3 worldPosition, float scale, int idTile)
         {
             if (tiles[x, y] == null)
             {
                 tiles[x, y] = new Tile();
             }  
-            tiles[x, y].UpdateTile(idMaterial, rid, instance, xform,idTile);            
+            tiles[x, y].UpdateTile( rid, instance, worldPosition, scale, idTile);            
         }
       
         public void CreateTile(Vector2I position, Tile tile)

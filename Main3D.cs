@@ -40,27 +40,37 @@ public partial class Main3D : Node3D
 
 
 
-     
 
-        //corregir el tile map para que soporte negativos
-        terrainMap = new TerrainMap();
+        //terrainMap = TerrainMap.LoadMapfromFile("Mapa1");
 
-        for (int i = 0; i < 8; i++)
+
+        terrainMap = new TerrainMap("Mapa2", 1, false);
+
+        for (int i = 0; i < 250; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 250; j++)
             {
                 terrainMap.AddUpdateTile(new Vector2I(i, j), 7);
             }
 
         }
-        ChunkManager.Instance.ForcedUpdate();
- 
+        terrainMap.AddUpdateTile(new Vector2I(8, 8), 8);
 
-        CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(5, 3));
+
+        //terrainMap.LoadMapData();
+        //terrainMap.SaveAllMap();
+        ChunkManager.Instance.ForcedUpdate();
+
+
+        CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(5, 5));
+
+        Vector2 wdd = new Vector2(8, 8);
+        CharacterCreatorManager.Instance.CreateNewCharacter(2, wdd);
+
         for (int i = 0; i < 100; i++)
         {
 
-            Vector2 dd = GetRandomVector2(new Vector2(-10, -10), new Vector2(200, 200));
+            Vector2 dd = GetRandomVector2(new Vector2(-10, -10), new Vector2(50, 50));
             CharacterCreatorManager.Instance.CreateNewCharacter(2, dd);
         }
 

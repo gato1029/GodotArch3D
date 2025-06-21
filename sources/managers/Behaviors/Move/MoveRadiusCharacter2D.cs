@@ -7,6 +7,7 @@ using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
@@ -39,7 +40,7 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
         }
         else
         {
-            if (characterComponent.characterStateType != CharacterStateType.TAKE_HIT && characterComponent.characterStateType != CharacterStateType.EXECUTE_ATTACK && characterComponent.characterStateType != CharacterStateType.DIE && characterComponent.characterStateType != CharacterStateType.TAKE_STUN)
+            if (characterComponent.characterStateType != CharacterStateType.ATTACK &&characterComponent.characterStateType != CharacterStateType.TAKE_HIT && characterComponent.characterStateType != CharacterStateType.EXECUTE_ATTACK && characterComponent.characterStateType != CharacterStateType.DIE && characterComponent.characterStateType != CharacterStateType.TAKE_STUN)
             {
                 Move(entity, ref characterComponent, ref unitMovementComponent, ref positionComponent, ref directionComponent, ref characterBehaviorComponent, delta);
             }
@@ -50,7 +51,8 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
     private void Move(Entity entity, ref CharacterComponent characterComponent, ref CharacterUnitMovementFixedComponent unitMovementComponent, ref PositionComponent positionComponent, ref DirectionComponent directionComponent, ref CharacterCommonBehaviorComponent characterBehaviorComponent, float delta)
     {
         ref VelocityComponent velocityComponent = ref entity.Get<VelocityComponent>();
-        GeometricShape2D collisionMove = characterComponent.CharacterBaseData.animationCharacterBaseData.collisionMove.Multiplicity(characterComponent.CharacterBaseData.scale);
+        var dataModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
+        GeometricShape2D collisionMove = dataModel.animationCharacterBaseData.collisionMove.Multiplicity(dataModel.scale);
      
         Vector2 movement = directionComponent.value * velocityComponent.velocity * delta;
         Vector2 pointNextCollision = positionComponent.position + movement + collisionMove.OriginCurrent;
@@ -68,8 +70,9 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
                     if (itemInternal.Value.Id != entity.Id)
                     {
                         CharacterComponent characterComponentB = itemInternal.Value.Get<CharacterComponent>();
-                        AnimationCharacterBaseData characterB = characterComponentB.CharacterBaseData.animationCharacterBaseData;
-                        GeometricShape2D colliderB = characterB.collisionMove.Multiplicity(characterComponentB.CharacterBaseData.scale);
+                        var dataModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
+                        AnimationCharacterBaseData characterB = dataModelB.animationCharacterBaseData;
+                        GeometricShape2D colliderB = characterB.collisionMove.Multiplicity(dataModelB.scale);
                         var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
 
                         if (Collision2D.Collides(collisionMove, colliderB, pointNextCollision, positionB))
@@ -89,7 +92,7 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
         //
         if (!existCollision)
         {
-            Dictionary<int, Dictionary<int, TileDataGame>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+            Dictionary<int, Dictionary<int, IDataTile>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
             if (dataTile != null)
             {
                 foreach (var item in dataTile.Values)
@@ -97,9 +100,10 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
                     foreach (var itemInternal in item)
                     {
 
-                        GeometricShape2D colliderB = itemInternal.Value.collisionBody;
-                        var positionB = itemInternal.Value.positionCollider + itemInternal.Value.collisionBody.OriginCurrent;
-                        if (Collision2D.Collides(collisionMove, colliderB, pointNextCollision, positionB))
+                        var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);
+                        GeometricShape2D collisionB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);
+                        var positionB = itemInternal.Value.PositionCollider;// + collisionB.OriginCurrent;
+                        if (Collision2D.Collides(collisionMove, collisionB, pointNextCollision, positionB))
                         {
                             existCollision = true;
                             break;

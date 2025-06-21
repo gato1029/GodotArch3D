@@ -19,10 +19,10 @@ namespace GodotEcsArch.sources.managers.Behaviors
     internal class BehaviorManager : SingletonBase<BehaviorManager>
     {
         Dictionary<int, ICharacterBehavior> dictionaryBehaviorsCharacter = new Dictionary<int, ICharacterBehavior>();
-        Dictionary<Type, ICharacterMoveBehavior>  dictionaryMoves = new Dictionary<Type, ICharacterMoveBehavior>();
-        Dictionary<Type, ICharacterStateBehavior> dictionaryStates = new Dictionary<Type, ICharacterStateBehavior>();
+        Dictionary<int, ICharacterMoveBehavior>  dictionaryMoves = new Dictionary<int, ICharacterMoveBehavior>();
+        Dictionary<int, ICharacterStateBehavior> dictionaryStates = new Dictionary<int, ICharacterStateBehavior>();
 
-        Dictionary<Type, IAttackBehavior> dictionaryAttack = new Dictionary<Type, IAttackBehavior>();
+        Dictionary<int, ICharacterAttackBehavior> dictionaryAttack = new Dictionary<int, ICharacterAttackBehavior>();
 
         
         protected override void Initialize()
@@ -45,18 +45,18 @@ namespace GodotEcsArch.sources.managers.Behaviors
         }
         private void RegisterAllStates()
         {
-            RegisterStateBehavior<CommonState2D>(new CommonState2D());
+            RegisterStateBehavior(1,new CommonState2D());
         }
 
        
         void RegisterAllMoves()
         {
-            RegisterMoveBehavior<MoveRadiusCharacter2D>(new MoveRadiusCharacter2D());                        
+            RegisterMoveBehavior(1,new MoveRadiusCharacter2D());                        
         }
         void RegisterAllAttack()
         {
-            RegisterAttackBehavior<MelleAtackHorizontalBehavior>(new MelleAtackHorizontalBehavior());
-            RegisterAttackBehavior<MelleAttackBehavior>( new MelleAttackBehavior());
+            RegisterAttackBehavior(1,new MelleAtack2D());
+            //RegisterAttackBehavior<MelleAttackBehavior>( new MelleAttackBehavior());
         }
         public ICharacterBehavior GetBehavior(int id)
         {
@@ -66,32 +66,32 @@ namespace GodotEcsArch.sources.managers.Behaviors
             }
             return null;
         }
-        public ICharacterStateBehavior GetStateBehavior<T>()
+        public ICharacterStateBehavior GetStateBehavior(int id)
         {
-            var type = typeof(T);
-            if (dictionaryStates.TryGetValue(type, out var behavior))
+            
+            if (dictionaryStates.TryGetValue(id, out var behavior))
             {
                 return behavior;
             }
-            throw new KeyNotFoundException($"No se encontró un ICharacterStateBehavior para el tipo {type.FullName}.");
+            throw new KeyNotFoundException($"No se encontró un ICharacterStateBehavior para el tipo id."+ id);
         }
-        public ICharacterMoveBehavior GetMoveBehavior<T>()
-        {
-            var type = typeof(T);
-            if (dictionaryMoves.TryGetValue(type, out var moveBehavior))
+
+        public ICharacterMoveBehavior GetMoveBehavior(int id)
+        {            
+            if (dictionaryMoves.TryGetValue(id, out var moveBehavior))
             {
                 return moveBehavior;
             }
-            throw new KeyNotFoundException($"No se encontró un IMoveBehavior para el tipo {type.FullName}.");
+            throw new KeyNotFoundException($"No se encontró un IMoveBehavior para el id."+ id);
         }
-        public IAttackBehavior GetAttackBehavior<T>()
+        public ICharacterAttackBehavior GetAttackBehavior(int id)
         {
-            var type = typeof(T);
-            if (dictionaryAttack.TryGetValue(type, out var attackBehavior))
+          
+            if (dictionaryAttack.TryGetValue(id, out var attackBehavior))
             {
                 return attackBehavior;
             }
-            throw new KeyNotFoundException($"No se encontró un IMoveBehavior para el tipo {type.FullName}.");         
+            throw new KeyNotFoundException($"No se encontró un IMoveBehavior para el tipo."+id);         
         }
 
         public void RegisterBehavior(int id, ICharacterBehavior behavior)
@@ -103,29 +103,23 @@ namespace GodotEcsArch.sources.managers.Behaviors
    
         }
 
-        public void RegisterMoveBehavior<T>(ICharacterMoveBehavior behavior)
+        public void RegisterMoveBehavior(int id, ICharacterMoveBehavior behavior)
         {
             if (behavior == null)
-                throw new ArgumentNullException(nameof(behavior));
-
-            var type = typeof(T);
-            dictionaryMoves.TryAdd(type, behavior);
+                throw new ArgumentNullException(nameof(behavior));          
+            dictionaryMoves.TryAdd(id, behavior);
         }
-        public void RegisterStateBehavior<T>(ICharacterStateBehavior behavior)
+        public void RegisterStateBehavior(int id,ICharacterStateBehavior behavior)
         {
             if (behavior == null)
-                throw new ArgumentNullException(nameof(behavior));
-
-            var type = typeof(T);
-            dictionaryStates.TryAdd(type, behavior);
+                throw new ArgumentNullException(nameof(behavior));            
+            dictionaryStates.TryAdd(id, behavior);
         }
-        public void RegisterAttackBehavior<T>(IAttackBehavior behavior)
+        public void RegisterAttackBehavior(int id, ICharacterAttackBehavior behavior)
         {
             if (behavior == null)
-                throw new ArgumentNullException(nameof(behavior));
-
-            var type = typeof(T);
-            dictionaryAttack.TryAdd(type, behavior);
+                throw new ArgumentNullException(nameof(behavior));            
+            dictionaryAttack.TryAdd(id, behavior);
         }
  
 

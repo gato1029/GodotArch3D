@@ -17,32 +17,31 @@ namespace GodotEcsArch.sources.managers.Tilemap
 {
 
     public class Tile
-    {
-        //public int idUnique {  get; set; }
-
+    {        
         public int idTile { get; set; }
         public EntityReference entityReference { get; set; }
-        public bool isAnimate { get; set; }
-        public int idMaterial { get; set; }
+        public bool isAnimate { get; set; }       
         public Rid rid { get; set; }
         public int instance { get; set; }
+        public Transform3D transform3D { get; set; }
 
-        //public Vector2 position { get; set; }
-        //public GeometricShape2D collisionBody { get; set; }
-        public Vector2I tilePosition { get; set; }
-
+        public Vector2I tilePosition { get; set; }       
 
         public Tile(Vector2I tilePosition)
         {
             this.tilePosition = tilePosition;
+            transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
         }
         public Tile()
         {            
 
         }
-        public void UpdateTile(int idMaterial,Rid rid, int instance, Transform3D xform, int idTile)
+        public void UpdateTile(Rid rid, int instance, Vector3 worldPosition, float scale, int idTile)
         {
-            this.idMaterial = idMaterial;
+            transform3D = new Transform3D(Basis.Identity, worldPosition);
+            transform3D = transform3D.ScaledLocal(new Vector3(scale, scale, 1));
+
+            //this.idMaterial = idMaterial;
             this.rid = rid;
             this.instance = instance;
             this.idTile = idTile;
@@ -51,19 +50,19 @@ namespace GodotEcsArch.sources.managers.Tilemap
             if (tileData.type == "TileSimpleData")
             {
                 TileSimpleData simpleData = (TileSimpleData)tileData;
-                RenderingServer.MultimeshInstanceSetTransform(rid, instance, xform);
+                RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
                 RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(simpleData.idInternalPosition, 0, 0, 0));                
             }
             if (tileData.type == "TileDynamicData")
             {
                 TileDynamicData tileDynamicData = (TileDynamicData)tileData;
-                RenderingServer.MultimeshInstanceSetTransform(rid, instance, xform);
+                RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
                 RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileDynamicData.x, tileDynamicData.y, tileDynamicData.widht, tileDynamicData.height));
             }
             if (tileData.type == "TileAnimateData")
             {
                 TileAnimateData tileAnimateData = (TileAnimateData)tileData;
-                RenderingServer.MultimeshInstanceSetTransform(rid, instance, xform);
+                RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
                 RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileAnimateData.idFrames[0], 0, 0, 0));
                             
                 Entity entity = EcsManager.Instance.World.Create();
@@ -83,7 +82,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
         public void FreeTile()
         {
             RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(-1, 0, 0, 0));
-            idMaterial = 0;
+            //idMaterial = 0;
             rid = default;
             instance = -1;
             if (isAnimate)

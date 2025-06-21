@@ -1,6 +1,8 @@
 using Arch.Buffer;
 using Arch.Core;
 using Arch.System;
+using GodotEcsArch.sources.managers.Behaviors;
+using GodotEcsArch.sources.managers.Behaviors.States;
 using GodotEcsArch.sources.managers.Characters;
 using System.Runtime.CompilerServices;
 
@@ -41,9 +43,13 @@ internal class CharacterCommonBehaviorSystem : BaseSystem<World, float>
                 ref CharacterAnimationComponent characterAnimationComponent = ref Unsafe.Add(ref pointerCharacterAnimationComponent, entityIndex);
                 ref CharacterCommonBehaviorComponent characterCommonBehaviorComponent = ref Unsafe.Add(ref pointerCharacterCommonBehaviorComponent, entityIndex);
                 ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
+                managers.Behaviors.BehaviorsInterface.ICharacterMoveBehavior moveBehavior = BehaviorManager.Instance.GetMoveBehavior(characterCommonBehaviorComponent.idMoveBehavior);
+                managers.Behaviors.BehaviorsInterface.ICharacterStateBehavior stateBehavior =BehaviorManager.Instance.GetStateBehavior(characterCommonBehaviorComponent.idStateBehavior);
+                managers.Behaviors.BehaviorsInterface.ICharacterAttackBehavior attackBehavior = BehaviorManager.Instance.GetAttackBehavior(characterCommonBehaviorComponent.idAttackBehavior);
 
-                characterCommonBehaviorComponent.moveBehavior.ControllerBehavior(entity, ref characterComponent, ref characterCommonBehaviorComponent, ref _commandBuffer, _deltaTime);
-                characterCommonBehaviorComponent.stateBehavior.ControllerState(entity, ref characterComponent, ref characterAnimationComponent, ref characterCommonBehaviorComponent, ref _commandBuffer);
+                moveBehavior.ControllerBehavior(entity, ref characterComponent, ref characterCommonBehaviorComponent, ref _commandBuffer, _deltaTime);
+                attackBehavior.ControllerBehavior(entity, ref characterComponent, ref characterCommonBehaviorComponent, ref _commandBuffer, _deltaTime);
+                stateBehavior.ControllerState(entity, ref characterComponent, ref characterAnimationComponent, ref characterCommonBehaviorComponent, ref _commandBuffer);
              
 
             }

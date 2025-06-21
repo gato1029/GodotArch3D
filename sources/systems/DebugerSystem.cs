@@ -7,8 +7,10 @@ using Arch.System;
 
 using Godot;
 using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using System;
 using System.Collections.Generic;
@@ -72,11 +74,11 @@ internal class DebugerSystem : BaseSystem<World, float>
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                 ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
                 ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
-
-                float scale = characterComponent.CharacterBaseData.scale;
-                if (characterComponent.CharacterBaseData.animationCharacterBaseData.collisionBody is Rectangle)
+                var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
+                float scale = dataCharacterModel.scale;
+                if (dataCharacterModel.animationCharacterBaseData.collisionBody is Rectangle)
                 {
-                    Rectangle shape = (Rectangle)characterComponent.CharacterBaseData.animationCharacterBaseData.collisionBody;
+                    Rectangle shape = (Rectangle)dataCharacterModel.animationCharacterBaseData.collisionBody;
                     Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
                     transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
                     transform3DShape.Origin = new Vector3(positionComponent.position.X + shape.OriginCurrent.X * scale, positionComponent.position.Y + shape.OriginCurrent.Y * scale, 1);
@@ -85,9 +87,9 @@ internal class DebugerSystem : BaseSystem<World, float>
                 }
 
              
-                if (characterComponent.CharacterBaseData.animationCharacterBaseData.collisionMove is Rectangle)
+                if (dataCharacterModel.animationCharacterBaseData.collisionMove is Rectangle)
                 {
-                    Rectangle shape2 = (Rectangle)characterComponent.CharacterBaseData.animationCharacterBaseData.collisionMove;
+                    Rectangle shape2 = (Rectangle)dataCharacterModel.animationCharacterBaseData.collisionMove;
                     Transform3D transform3DShape2 = new Transform3D(Basis.Identity, Vector3.Zero);
                     transform3DShape2 = transform3DShape2.Scaled(new Vector3(shape2.Width*scale, shape2.Height * scale, 1));
                     transform3DShape2.Origin = new Vector3(positionComponent.position.X + shape2.OriginCurrent.X * scale, positionComponent.position.Y + shape2.OriginCurrent.Y * scale, 1);
@@ -96,9 +98,10 @@ internal class DebugerSystem : BaseSystem<World, float>
            
                 DebugDraw.Quad(new Vector3(positionComponent.position.X, positionComponent.position.Y, 1), .2f, Colors.DarkOrange, 0.0f); //center          
 
-                if (characterComponent.accessoryArray != null && characterComponent.accessoryArray[0]!=null)
+                if (characterComponent.accessoryArray != null && characterComponent.accessoryArray[0]!=0)
                 {
-                    var accesoryCollision = characterComponent.accessoryArray[0];
+                    var dataAccesory = AccesoryManager.Instance.GetAccesory(characterComponent.accessoryArray[0]);
+                    var accesoryCollision = dataAccesory;
                     if (accesoryCollision.hasBodyAnimation)
                     {
                         for (int i=0; i<= Enum.GetNames(typeof(DirectionAnimationType)).Length; i++)
@@ -363,7 +366,7 @@ internal class DebugerSystem : BaseSystem<World, float>
 
             World.InlineParallelChunkQuery(in queryColliderCharacter, new ChunkJobDebugColliderCharacter(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryDirection, new ChunkJobDebugDirectionComponent(commandBuffer, t));
-            
+            CollisionManager.Instance.tileColliders.DrawGrid(Colors.Bisque);
         }
 
     }
@@ -374,17 +377,19 @@ internal class DebugerSystem : BaseSystem<World, float>
         {
             foreach (var item2 in item.Value)
             {
-                GeometricShape2D collision =item2.Value.collisionBody;
-                
-                if (collision is Rectangle)
+                var tileInfo = TilesManager.Instance.GetTileData(item2.Value.IdTile);
+
+                GeometricShape2D collisionB = tileInfo.collisionBody;
+                //GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
+                if (collisionB is Rectangle)
                 {
-                    int scale = 1;
-                    Rectangle shape = (Rectangle)collision;
+                    float scale = tileInfo.scale;
+                    Rectangle shape = (Rectangle)collisionB;
                     Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
                     transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
-                    transform3DShape.Origin = new Vector3(item2.Value.positionCollider.X + shape.OriginCurrent.X * scale, item2.Value.positionCollider.Y + shape.OriginCurrent.Y * scale, 1);
+                    transform3DShape.Origin = new Vector3(item2.Value.PositionCollider.X, item2.Value.PositionCollider.Y , 1);
 
-                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 10.0f);
+                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
                 }
             }
             

@@ -4,6 +4,7 @@ using Arch.Core.Extensions;
 using Arch.System;
 using Godot;
 using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
@@ -56,7 +57,8 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                 ref RenderGPUComponent renderGPUComponent = ref Unsafe.Add(ref pointerRenderGPUComponent, entityIndex);
 
                 int stateAnimation = characterAnimationComponent.stateAnimation;
-                AnimationStateData animationStateData = characterComponent.CharacterBaseData.animationCharacterBaseData.animationDataArray[stateAnimation];
+                var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
+                AnimationStateData animationStateData = dataCharacterModel.animationCharacterBaseData.animationDataArray[stateAnimation];
                 AnimationData animationData = animationStateData.animationData[(int)directionComponent.animationDirection];
 
                
@@ -142,7 +144,8 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                 ref RenderGPULinkedComponent renderLinked = ref Unsafe.Add(ref pointerRenderGPULinkedComponent, entityIndex);
 
                 int stateAnimation = animComp.stateAnimation;
-                AnimationStateData stateData = charComp.CharacterBaseData.animationCharacterBaseData.animationDataArray[stateAnimation];
+                var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(charComp.idCharacterBaseData);
+                AnimationStateData stateData = dataCharacterModel.animationCharacterBaseData.animationDataArray[stateAnimation];
                 AnimationData animData = stateData.animationData[(int)dirComp.animationDirection];
                 
                 ref CharacterAtackComponent characterAtackComponent = ref entity.Get<CharacterAtackComponent>();
@@ -189,9 +192,10 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                         var linkedWeapon = renderLinked.instancedLinked[0];
                         Color colorWeapon = new Color(-1, -1, -1, -1);
                         if (characterAtackComponent.isAttack)
-                        {                 
+                        {
+                            var dataAccesory = AccesoryManager.Instance.GetAccesory(charComp.accessoryArray[0]);
                             int frameWeapon = animComp.currentFrameIndex;                        
-                            var animDataWeapon = charComp.accessoryArray[0].accesoryAnimationBodyData.animationStateData.animationData[(int)dirComp.animationDirection];
+                            var animDataWeapon = dataAccesory.accesoryAnimationBodyData.animationStateData.animationData[(int)dirComp.animationDirection];
                             var frame = animDataWeapon.frameDataArray[frameWeapon];
                             colorWeapon = new Color(frame.x, frame.y, frame.widht, frame.height);
                                                     
@@ -222,9 +226,13 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
             for (int i = 1; i < charComp.accessoryArray.Length; i++)
             {
                 var item = charComp.accessoryArray[i];
-                if (item == null) continue;
+                if (item == 0)
+                {
+                    continue;
+                }
 
-                var animData = item.accesoryAnimationBodyData.animationStateData.animationData[(int)dirComp.animationDirection];
+                var dataAccesory = AccesoryManager.Instance.GetAccesory(item);
+                var animData = dataAccesory.accesoryAnimationBodyData.animationStateData.animationData[(int)dirComp.animationDirection];
                 var frame = animData.frameDataArray[frameIndex];
                 animComp.currentframeDataAccesorys[i] = new Color(frame.x, frame.y, frame.widhtFormat, frame.heightFormat);
             }
