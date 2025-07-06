@@ -285,7 +285,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
         if (tileData.haveCollider)
         {
 
-            posicionCollider = positionReal + tileData.collisionBody.Multiplicity(tileData.scale).OriginCurrent;//+ new Vector2(x, y);
+            posicionCollider = positionNormalize + new Vector2(x, y) + tileData.collisionBody.Multiplicity(tileData.scale).OriginCurrent;//+ new Vector2(x, y);
             dataGame.PositionCollider = posicionCollider;
             CollisionManager.Instance.tileColliders.AddUpdateItem(posicionCollider, dataGame);
         }

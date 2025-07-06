@@ -6,6 +6,7 @@ using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Profiler;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
@@ -260,8 +261,10 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
   
     public override void Update(in float t)
     {
-
-        World.InlineParallelChunkQuery(in query, new ChunkJobAnimationCharacter(commandBuffer, t));
-        World.InlineParallelChunkQuery(in queryLinkedGpu, new ChunkJobAnimationAvatarCharacter(commandBuffer, t));
+        using (new ProfileScope("Animation System"))
+        {
+            World.InlineParallelChunkQuery(in query, new ChunkJobAnimationCharacter(commandBuffer, t));
+            World.InlineParallelChunkQuery(in queryLinkedGpu, new ChunkJobAnimationAvatarCharacter(commandBuffer, t));
+        }
     }
 }

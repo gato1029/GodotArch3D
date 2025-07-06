@@ -111,7 +111,10 @@ func _generate_script(root_node: Node, class_name_base: String) -> String:
 			var script_path = n.get_script().resource_path
 			node_type = script_path.get_file().get_basename()
 
-		if n.name == node_type and n.get_script() == null:
+		var name_match_regex = RegEx.new()
+		name_match_regex.compile("^%s(\\d*)$" % node_type)  # Coincide con "Button", "Button1", "Button2", etc.
+
+		if name_match_regex.search(n.name)  and n.get_script() == null:
 			continue
 		if _is_instance_of_scene(n):
 			continue
@@ -199,14 +202,23 @@ func _is_instance_of_scene(node: Node) -> bool:
 	return false
 func _traverse(node: Node, acc: Array,is_root := false) -> void:
 	acc.append(node)
-	# Si NO es el nodo raíz y tiene script, no recursar hijos
-	if not is_root and node.get_script() != null:
-		print("Nodo '%s' tiene script asociado, omitiendo hijos..." % node.name)
-		return
-	
+	# Si es una instancia de PackedScene, solo recorrer hijos que no pertenecen a esa escena
 	if _is_instance_of_scene(node):
-		print("Nodo '%s' es una instancia de 'PackedScene', omitiendo recorrido de hijos..." % node.name)
+		print("Nodo '%s' es una instancia de 'PackedScene', omitiendo hijos propios..." % node.name)
+		for child in node.get_children():
+			if child is Node and child.owner != node:
+				_traverse(child, acc)
 		return
+
+	# Si NO es el nodo raíz y tiene script, aún recorremos hijos si no son propios
+	if not is_root and node.get_script() != null:
+		print("Nodo '%s' tiene script asociado, omitiendo hijos propios..." % node.name)
+		for child in node.get_children():
+			if child is Node and child.owner != node:
+				_traverse(child, acc)
+		return
+
+	# Caso general
 	for child in node.get_children():
 		if child is Node:
 			_traverse(child, acc)

@@ -16,7 +16,9 @@ public partial class HerramientaMenuBar : MenuBar
     [Export]
     public SubViewport viewportMainEditor;
     PopupMenu editor;
+    Window positionWindow = null;
     Window editorWindow = null;
+    bool positionCheck;
     bool editorCheck;
     Vector2I editorPosition;
 
@@ -25,6 +27,7 @@ public partial class HerramientaMenuBar : MenuBar
     PopupMenu atlasCreator;
     PopupMenu menuComponentes;
     PopupMenu menuArmamento;
+    PopupMenu menuMapas;
     public override void _Ready()
 	{
         editor = GetNode<PopupMenu>("Editor");
@@ -42,6 +45,24 @@ public partial class HerramientaMenuBar : MenuBar
 
         menuArmamento = GetNode<PopupMenu>("Armamento");
         menuArmamento.IdPressed += MenuArmamento_IdPressed;
+
+        menuMapas = GetNode<PopupMenu>("Mapas");
+        menuMapas.IdPressed += MenuMapas_IdPressed;
+    }
+
+    private void MenuMapas_IdPressed(long id)
+    {
+        Window win;
+        switch (id)
+        {
+            case 0:
+                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Maps/MapsWindow.tscn").Instantiate<Window>();
+                AddChild(win);
+                win.Popup();
+                break;
+            default:
+                break;
+        }
     }
 
     private void MenuArmamento_IdPressed(long id)
@@ -143,9 +164,10 @@ public partial class HerramientaMenuBar : MenuBar
         switch (id)
         {
             case 0:
-                Window win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Materials/windowMaterial.tscn").Instantiate<Window>();               
-                AddChild(win);
-                win.Show();                
+                FacadeWindowDataSearch<MaterialData> windowQuery = new FacadeWindowDataSearch<MaterialData>("res://sources/WindowsDataBase/Materials/windowNewMaterial.tscn", this);
+                //Window win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Materials/windowMaterial.tscn").Instantiate<Window>();               
+                //AddChild(win);
+                //win.Show();                
                 break;
             default:
                 break;
@@ -159,71 +181,20 @@ public partial class HerramientaMenuBar : MenuBar
         switch (id)
         {
             case 0:
-                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                 ps =  GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Tile Simple");
-                win.SetLoaddBAction(() => 
-                {
-                    var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
-                    {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
-                }
-                );                               
+                FacadeWindowDataSearch<TileDynamicData> windowDinamic = new FacadeWindowDataSearch<TileDynamicData>("res://sources/WindowsDataBase/TileCreator/WindowTiles.tscn", this);
                 break;
             case 1:
-                 win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Auto Tile");
-                win.SetLoaddBAction(() =>
-                {
-                    var collection = DataBaseManager.Instance.FindAll<AutoTileData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
-                    {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
-                }
-                );
+                FacadeWindowDataSearch<TileAnimateData> windowQueryModelData = new FacadeWindowDataSearch<TileAnimateData>("res://sources/WindowsDataBase/TileCreator/WindowAnimatedTiles.tscn", this);
                 break;
             case 2:
                 win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
                 AddChild(win);
                 win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileAnimate.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Tile Animate");
+                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn");
+                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD, "Auto Tile");
                 win.SetLoaddBAction(() =>
                 {
-                    var collection = DataBaseManager.Instance.FindAll<TileAnimateData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
-                    {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
-                }
-                );
-                break;
-            case 3:
-                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileDinamic.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Tile Dinamico");
-                win.SetLoaddBAction(() =>
-                {
-                    var collection = DataBaseManager.Instance.FindAll<TileDynamicData>();
+                    var collection = DataBaseManager.Instance.FindAll<AutoTileData>();
                     List<IdData> ids = new List<IdData>();
                     foreach (var item in collection)
                     {
@@ -245,29 +216,44 @@ public partial class HerramientaMenuBar : MenuBar
         switch (index)
         {
             case 0:
-                editorCheck = !editorCheck;
-                editor.SetItemChecked(index, editorCheck);
+                positionCheck = !positionCheck;
+                editor.SetItemChecked(index, positionCheck);
                 
-                if (editorWindow==null)
+                if (positionWindow==null)
                 {
-                    editorWindow = GD.Load<PackedScene>("res://sources/WindowsDataBase/Positions/window_positions.tscn").Instantiate<Window>();
-                    editorWindow.Position = editorPosition;
-                    editorWindow.Show();                    
-                    viewportMainEditor.AddChild(editorWindow); 
+                    positionWindow = GD.Load<PackedScene>("res://sources/WindowsDataBase/Positions/window_positions.tscn").Instantiate<Window>();
+                    positionWindow.Position = editorPosition;
+                    positionWindow.Show();                    
+                    viewportMainEditor.AddChild(positionWindow); 
                 }
-                if (editorCheck)
+                if (positionCheck)
                 {
-                    editorWindow.Position = editorPosition;
+                    positionWindow.Position = editorPosition;
                 }
                 else
                 {
-                    editorPosition = editorWindow.Position;
+                    editorPosition = positionWindow.Position;
                 }
-                editorWindow.Visible = editorCheck;
+                positionWindow.Visible = positionCheck;
                 break;
-
+            case 1:
+                editorCheck = !editorCheck;
+                editor.SetItemChecked(index, editorCheck);
+                if (editorWindow == null)
+                {
+                    editorWindow = GD.Load<PackedScene>("res://sources/Editor/Scenes/EditorWindow.tscn").Instantiate<Window>();                   
+                    editorWindow.Show();
+                    AddChild(editorWindow);
+                }
+                if (editor.IsItemChecked(index))
+                {
+                    editorWindow.Visible = true;
+                }
+                else { editorWindow.Visible = false; }
+                break;
             default:
                 break;
+            
         }
         
         

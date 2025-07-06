@@ -28,6 +28,7 @@ shader_parameter/grid_size = 16.0
 shader_parameter/grid_color = Color(1, 1, 1, 0.2)
 
 [node name="WindowTileSimple" type="Window"]
+oversampling_override = 1.0
 title = "Tile Simple "
 initial_position = 1
 size = Vector2i(900, 500)

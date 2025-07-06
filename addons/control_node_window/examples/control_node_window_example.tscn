@@ -41,6 +41,7 @@ layout_mode = 2
 text = "Swap Content"
 
 [node name="PinnableControlNodeWindow" parent="." instance=ExtResource("1_dodod")]
+layout_mode = 0
 offset_left = 62.0
 offset_top = 237.0
 offset_right = 523.0
@@ -50,10 +51,10 @@ window_name = "PinnedWindow"
 
 [node name="TextEdit" type="TextEdit" parent="PinnableControlNodeWindow"]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 25.0
-offset_right = 451.0
-offset_bottom = 349.0
+offset_left = -88.0
+offset_top = 87.0
+offset_right = -80.0
+offset_bottom = 95.0
 text = "THIS WINDOW CAN BE PINNED WHILE ITS PINNED IT WONT BE CLOSED.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -62,7 +63,16 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor inci
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 wrap_mode = 1
 
+[node name="Button" type="Button" parent="PinnableControlNodeWindow"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 25.0
+offset_right = 451.0
+offset_bottom = 349.0
+text = "asdasdsad"
+
 [node name="ControlNodeWindow" parent="." instance=ExtResource("3_vun3q")]
+layout_mode = 0
 offset_left = 550.0
 offset_top = 81.0
 offset_right = 850.0

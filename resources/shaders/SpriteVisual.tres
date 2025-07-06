@@ -14,7 +14,7 @@ texture = SubResource("CanvasTexture_vbfr4")
 
 [resource]
 code = "shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
 
 uniform sampler2D Texture2DParameter : filter_nearest;
 
@@ -38,7 +38,7 @@ void fragment() {
 
 }
 "
-preview_params/Texture2DParameter = "Resource(\"res://resources/cat.png\")"
+preview_params/Texture2DParameter = "null"
 nodes/fragment/0/position = Vector2(560, 400)
 nodes/fragment/2/node = SubResource("VisualShaderNodeUVFunc_2xsc0")
 nodes/fragment/2/position = Vector2(-100, 640)

@@ -4,6 +4,7 @@ using Arch.System;
 using GodotEcsArch.sources.managers.Behaviors;
 using GodotEcsArch.sources.managers.Behaviors.States;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Profiler;
 using System.Runtime.CompilerServices;
 
 namespace GodotEcsArch.sources.systems.Character;
@@ -58,7 +59,10 @@ internal class CharacterCommonBehaviorSystem : BaseSystem<World, float>
     }
     public override void Update(in float t)
     {
-        World.InlineParallelChunkQuery(in query, new JobQuery(commandBuffer, t));
-        commandBuffer.Playback(World);
+        using (new ProfileScope("Behavior System"))
+        {
+            World.InlineParallelChunkQuery(in query, new JobQuery(commandBuffer, t));
+            commandBuffer.Playback(World);
+        }
     }
 }

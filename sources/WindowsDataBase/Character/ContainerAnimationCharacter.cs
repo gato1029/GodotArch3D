@@ -40,13 +40,45 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
 
     private void ButtonSaveAll_Pressed()
     {
+
+        if (objectData.animationDataArray != null)
+        {
+            foreach (var item in objectData.animationDataArray)
+            {
+                item.idMaterial = Animacion_Base.MaterialData.id;
+            }
+        }
+
+        if (objectData.animationExtraDataArray != null)
+        {
+            foreach (var item in objectData.animationExtraDataArray)
+            {
+                item.idMaterial = Animacion_Extra.MaterialData.id;
+            }
+        }
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChangued?.Invoke(this);
         OnNotifyChanguedSimple?.Invoke();        
     }
 
     private void ButtonSave_Pressed()
-    {      
+    {
+        if (objectData.animationDataArray != null)
+        {
+            foreach (var item in objectData.animationDataArray)
+            {
+                item.idMaterial = Animacion_Base.MaterialData.id;
+            }
+        }
+
+        if (objectData.animationExtraDataArray != null)
+        {
+            foreach (var item in objectData.animationExtraDataArray)
+            {
+                item.idMaterial = Animacion_Extra.MaterialData.id;
+            }
+        }
+
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChangued?.Invoke(this);
         OnNotifyChanguedSimple?.Invoke();

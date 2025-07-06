@@ -5,13 +5,19 @@ using System.Collections.Generic;
 
 public partial class ControlFramesArray : PanelContainer
 {
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+    [Export]
+    private bool AddButton = false;
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
 	{
         InitializeUI(); // Insertado por el generador de UI
         ButtonAdd.Pressed += ButtonAdd_Pressed;
         ButtonClearAll.Pressed += ButtonClearAll_Pressed;
-	}
+        if (!AddButton)
+        {
+            ButtonAdd.Visible = false;
+        }
+    }
 
     private void ButtonClearAll_Pressed()
     {

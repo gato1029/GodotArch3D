@@ -20,6 +20,11 @@ config/icon="res://icon.svg"
 DebugDraw="*res://addons/debug_drawing/DebugDraw.cs"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
 
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=900
+
 [dotnet]
 
 project/assembly_name="GodotEcsArch"
@@ -73,4 +78,5 @@ debugGridCollider={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=3
+textures/vram_compression/import_s3tc_bptc=true
 textures/decals/filter=2

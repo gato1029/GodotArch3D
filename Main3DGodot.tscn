@@ -1,10 +1,9 @@
-[gd_scene load_steps=13 format=3 uid="uid://cmwumcvxxgnjl"]
+[gd_scene load_steps=11 format=3 uid="uid://cmwumcvxxgnjl"]
 
 [ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_a2usr"]
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="2_xh56v"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_e6381"]
 [ext_resource type="Script" uid="uid://xfxpirr8k7b" path="res://sources/WindowsDataBase/HerramientaMenuBar.cs" id="3_kc28b"]
-[ext_resource type="Texture2D" uid="uid://btk75fbvbbjyc" path="res://resources/Textures/Character/baseCharacter.png" id="4_ong74"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="4_tksb4"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
 [ext_resource type="Texture2D" uid="uid://c5ccx8t7g4yrh" path="res://resources/Textures/TX Plant.png" id="5_yxrc8"]
@@ -15,10 +14,7 @@
 
 [sub_resource type="Environment" id="Environment_xh56v"]
 background_color = Color(1, 1, 1, 1)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_yxrc8"]
-atlas = ExtResource("4_ong74")
-region = Rect2(0, 1344, 64, 64)
+ambient_light_color = Color(0.5529655, 0.71749705, 0.9567016, 1)
 
 [node name="Main3dGodot" type="Node"]
 
@@ -101,24 +97,23 @@ item_0/id = 0
 auto_translate_mode = 2
 title = "Menu Tiles"
 size = Vector2i(110, 100)
-auto_translate = false
-item_count = 4
-item_0/text = "Tiles Simple"
+item_count = 3
+item_0/text = "Tiles"
 item_0/id = 0
-item_1/text = "Auto Tile"
+item_1/text = "Tile Animated"
 item_1/id = 1
-item_2/text = "Tile Animated"
+item_2/text = "Auto Tile"
 item_2/id = 2
-item_3/text = "Tile Dynamic"
-item_3/id = 3
 
 [node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1
+oversampling_override = 1.0
+size = Vector2i(200, 100)
 item_count = 2
 item_0/text = "Visualizar Posiciones"
 item_0/checkable = 1
 item_0/id = 0
-item_1/text = "rau"
+item_1/text = "Visualizar Editor"
 item_1/checkable = 1
 item_1/id = 1
 
@@ -146,6 +141,14 @@ item_0/id = 0
 item_1/text = "Creacion Accesorios"
 item_1/id = 1
 
+[node name="Mapas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+auto_translate_mode = 1
+item_count = 2
+item_0/text = "Nuevo Mapa"
+item_0/id = 0
+item_1/text = "Cargar Mapa"
+item_1/id = 1
+
 [node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -153,15 +156,6 @@ size_flags_vertical = 3
 [node name="HSplitContainer" type="HSplitContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="VBoxContainerLeft" type="VBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer"]
-layout_mode = 2
-
-[node name="TextureRect2" type="TextureRect" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerLeft"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture = SubResource("AtlasTexture_yxrc8")
 
 [node name="VBoxContainerRidht" type="VBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer"]
 layout_mode = 2
@@ -187,7 +181,7 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(1076, 603)
+size = Vector2i(1280, 855)
 render_target_update_mode = 4
 
 [node name="Render" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport"]

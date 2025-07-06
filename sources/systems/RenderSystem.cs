@@ -7,6 +7,7 @@ using Arch.System;
 using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Profiler;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using System;
@@ -139,8 +140,12 @@ internal class RenderSystem : BaseSystem<World, float>
     }
     public override void Update(in float t)
     {
-        World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
-        World.InlineParallelChunkQuery(in queryRenderLinked, new ChunkJobRenderLinked(commandBuffer, t));
+        using (new ProfileScope("Render System"))
+        {
+            World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
+            World.InlineParallelChunkQuery(in queryRenderLinked, new ChunkJobRenderLinked(commandBuffer, t));
+        }
+        
     }
 
     public override void AfterUpdate(in float t)

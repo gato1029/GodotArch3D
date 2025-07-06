@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode unshaded;
-
-uniform sampler2D main_texture: filter_nearest;
+render_mode cull_back,depth_draw_opaque;
+uniform sampler2D main_texture: filter_nearest, source_color;
 uniform float atlas_width;
 uniform float atlas_height;
 
@@ -38,7 +38,9 @@ void vertex() {
 	vec2 scale = get_aspect_ratio(vec2(anchoSubTexture,altoSubTexture));
     VERTEX.xy *= scale;
 }
-
+vec3 to_linear(vec3 srgb) {
+    return pow(srgb, vec3(2.2)); // Convierte de sRGB a lineal
+}
 void fragment() {
 
 	if (x == -1.0 )
@@ -64,10 +66,11 @@ void fragment() {
     //vec2 texCoord = UV * frameSize + frameOffset;
     vec4 texColor = texture(main_texture, texCoord);
     // Aplica el color del segmento al resultado final
-	texColor.a *= 1.0 - transparency;
+	//texColor.a *= 1.0 - transparency;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
 
-    ALBEDO = texColor.rgb * texColor.rgb * texColor.rgb;
+    ALBEDO = texColor.rgb;   //to_linear(texColor.rgb); //  * texColor.rgb to_linear(texColor.rgb);
+	//EMISSION =texColor.rgb;
     ALPHA = texColor.a ;
 	}
 	else

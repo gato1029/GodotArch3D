@@ -4,9 +4,10 @@ using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase;
 using System;
 using System.Collections.Generic;
+using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 
 
-public partial class WindowNewMaterial :  Window , IDetailWindow
+public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
 {
     FileDialog fileDialog;
     LineEdit linePathFile;
@@ -17,11 +18,10 @@ public partial class WindowNewMaterial :  Window , IDetailWindow
     ItemList itemListTiles;
     OptionButton typeMaterial;
 
-    //// Delegado para manejar la solicitud de actualización
-    //public delegate void RequestUpdateHandler();
-    //public event RequestUpdateHandler OnRequestUpdate;
-    public event IDetailWindow.RequestUpdateHandler OnRequestUpdate;
 
+    public event IFacadeWindow<MaterialData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
+
+    MaterialData objectData;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -48,11 +48,26 @@ public partial class WindowNewMaterial :  Window , IDetailWindow
         fileDialog.FileMode = FileDialog.FileModeEnum.OpenFile;
         fileDialog.Access = FileDialog.AccessEnum.Filesystem; // Acceso al sistema de archivos
         fileDialog.Filters = new string[] { "*.png ; PNG Images" }; // Filtros de archivo
-
+        fileDialog.AlwaysOnTop = true;
         // Conectar la señal "file_selected"
         fileDialog.FileSelected += OnFileSelected;
         // Agregar el nodo a la escena
         AddChild(fileDialog);
+        objectData = new MaterialData();
+    }
+
+    public void SetData(MaterialData data)
+    {
+        objectData = data;
+       
+        lineName.Text = objectData.name;
+        lineId.Text = objectData.id.ToString();
+        linePathFile.Text = objectData.pathTexture;
+        spinPixel_X.Value = objectData.divisionPixelX;
+        spinPixel_Y.Value = objectData.divisionPixelY;
+        typeMaterial.Selected = typeMaterial.GetItemIndex(objectData.type);
+        mode = 1;
+        TextureSplit_Clik();
     }
     public void LoadData(int id)
     {
@@ -83,6 +98,15 @@ public partial class WindowNewMaterial :  Window , IDetailWindow
     }
     private void Guardar_Click()
     {
+        if (linePathFile.Text.StartsWith("AssetExternals"))
+        {
+            mode = 1;
+        }
+        else
+        {
+            mode = 0;
+        }
+
         Image image;
         if (mode == 0)
         {
@@ -92,34 +116,31 @@ public partial class WindowNewMaterial :  Window , IDetailWindow
         {
             image = TextureHelper.LoadImageLocal(FileHelper.GetPathGameDB(linePathFile.Text));
         }
-        MaterialData materialData = new MaterialData();
-        materialData.pathTexture = linePathFile.Text;
-        if (lineName.Text == string.Empty)
-        {
-            lineName.Text = lineName.GetHashCode().ToString();
-        }
-        
-        materialData.name = lineName.Text;
-        materialData.heightTexture = image.GetHeight();
-        materialData.widhtTexture = image.GetWidth();
-        materialData.divisionPixelX = (int) spinPixel_X.Value;
-        materialData.divisionPixelY = (int)spinPixel_Y.Value;
-        materialData.type = typeMaterial.GetItemId(typeMaterial.GetSelectedId());
+
+        objectData.pathTexture = linePathFile.Text;
+
+
+        objectData.name = lineName.Text;
+        objectData.heightTexture = image.GetHeight();
+        objectData.widhtTexture = image.GetWidth();
+        objectData.divisionPixelX = (int) spinPixel_X.Value;
+        objectData.divisionPixelY = (int)spinPixel_Y.Value;
+        objectData.type = typeMaterial.GetItemId(typeMaterial.GetSelectedId());
         if (lineId.Text == string.Empty)
         {
             int idnext = DataBaseManager.Instance.NextID<MaterialData>();
             string path = FileHelper.CopyFileToAssetExternals(linePathFile.Text,"Material", idnext.ToString());
-            materialData.pathTexture = path;
-            DataBaseManager.Instance.InsertUpdate(materialData);
-            
+            objectData.pathTexture = path;
+            DataBaseManager.Instance.InsertUpdate(objectData);            
         }
         else
         {
-            materialData.id = int.Parse(lineId.Text);
-            //FileHelper.CopyFileToAssetExternals(linePathFile.Text, "Material", idnext.ToString());
-            DataBaseManager.Instance.InsertUpdate(materialData,int.Parse(lineId.Text));
+
+            string path = FileHelper.CopyFileToAssetExternals(linePathFile.Text, "Material", objectData.id.ToString());
+            objectData.pathTexture = path;
+            DataBaseManager.Instance.InsertUpdate(objectData, int.Parse(lineId.Text));
         }
-        OnRequestUpdate?.Invoke();
+        OnNotifyChanguedSimple?.Invoke();
         QueueFree();
 
     }
@@ -167,5 +188,5 @@ public partial class WindowNewMaterial :  Window , IDetailWindow
 	{
 	}
 
- 
+
 }

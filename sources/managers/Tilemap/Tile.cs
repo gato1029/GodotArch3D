@@ -51,23 +51,33 @@ namespace GodotEcsArch.sources.managers.Tilemap
             {
                 TileSimpleData simpleData = (TileSimpleData)tileData;
                 RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
-                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(simpleData.idInternalPosition, 0, 0, 0));                
+                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(simpleData.idInternalPosition, 0, 0, 0));
+              //  RenderingServer.MultimeshInstanceSetColor(rid, instance, tileData.color);
             }
             if (tileData.type == "TileDynamicData")
             {
                 TileDynamicData tileDynamicData = (TileDynamicData)tileData;
                 RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
                 RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileDynamicData.x, tileDynamicData.y, tileDynamicData.widht, tileDynamicData.height));
+            //    RenderingServer.MultimeshInstanceSetColor(rid, instance, tileData.color);
             }
             if (tileData.type == "TileAnimateData")
             {
                 TileAnimateData tileAnimateData = (TileAnimateData)tileData;
-                RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
-                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileAnimateData.idFrames[0], 0, 0, 0));
-                            
-                Entity entity = EcsManager.Instance.World.Create();
+                RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);       
+            //    RenderingServer.MultimeshInstanceSetColor(rid, instance, tileData.color);
+                   Entity entity = EcsManager.Instance.World.Create();
                 TileAnimation tileAnimation = new TileAnimation();
                 tileAnimation.TileAnimateData = tileAnimateData;
+                tileAnimation.frameRender = new Color
+                {
+                    R = tileAnimateData.framesArray[0].x,
+                    G = tileAnimateData.framesArray[0].y,
+                    B = tileAnimateData.framesArray[0].widht,
+                    A = tileAnimateData.framesArray[0].height
+                };
+
+
                 tileAnimation.currentFrameIndex = 0;
                 tileAnimation.complete = false;
                 tileAnimation.loop = true;
@@ -99,7 +109,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
         public Rid rid;
         public int instance;
         public TileAnimateData TileAnimateData;
-
+        public Color frameRender;
         public int currentFrame;
         public int currentFrameIndex;
         public float TimeSinceLastFrame;        

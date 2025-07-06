@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dy0ju3dd5c4p"]
+
+[node name="Label" type="Label"]
+offset_right = 40.0
+offset_bottom = 23.0
+scale = Vector2(0.25, 0.25)

@@ -63,6 +63,14 @@ internal class TilesManager : SingletonBase<TilesManager>
         }
         return tilesDictionary[idTile];
     }
+    public TileAnimateData GetTileDataAnimation(int idTile)
+    {
+        if (!tilesDictionary.ContainsKey(idTile))
+        {
+            return (TileAnimateData)RegisterTileData(idTile);
+        }
+        return (TileAnimateData)tilesDictionary[idTile];
+    }
     protected override void Destroy()
     {
         throw new NotImplementedException();

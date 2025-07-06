@@ -108,7 +108,8 @@ text = "Tipo:"
 [node name="OptionButton" type="OptionButton" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-selected = 0
+selected = 3
+allow_reselect = true
 item_count = 4
 popup/item_0/text = "TILES"
 popup/item_0/id = 0

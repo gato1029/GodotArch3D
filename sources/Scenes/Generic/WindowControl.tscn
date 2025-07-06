@@ -1,0 +1,66 @@
+[gd_scene load_steps=5 format=3 uid="uid://b3vpi20mhu5dp"]
+
+[ext_resource type="Script" uid="uid://744ait80yilr" path="res://sources/Scenes/Generic/WindowControl.cs" id="1_satdo"]
+[ext_resource type="Texture2D" uid="uid://ctrdqpgebtggh" path="res://resources/Textures/Emerald Treasure/images/buttons.png" id="2_kp13l"]
+[ext_resource type="Texture2D" uid="uid://mva6sfqxot7o" path="res://resources/Textures/Emerald Treasure/images/window_content_background.png" id="3_o3bhj"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sf50m"]
+atlas = ExtResource("2_kp13l")
+region = Rect2(8, 8, 220, 68)
+
+[node name="WindowControl" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_satdo")
+
+[node name="TitleBar" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+texture = SubResource("AtlasTexture_sf50m")
+expand_mode = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="TitleBar"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -15.5
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LabelTitle" type="Label" parent="TitleBar/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "Mi ventana"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TitleBar/HBoxContainer2"]
+layout_mode = 2
+
+[node name="ButtonMax" type="Button" parent="TitleBar/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "M"
+
+[node name="ButtonMin" type="Button" parent="TitleBar/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "M"
+
+[node name="ButtonClose" type="Button" parent="TitleBar/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "X"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Background" type="TextureRect" parent="MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("3_o3bhj")
+expand_mode = 3

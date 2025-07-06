@@ -63,8 +63,9 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
             this.divisionPixelX = divisionPixelX;
             this.divisionPixelY = divisionPixelY;
 
+            
             ShaderMaterial materialGeneric = null;
-            Texture2D texture2D;
+            Texture2D texture2D = null;
             float widht;
             float height;
             switch (type)
@@ -140,27 +141,21 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
                     mesh.SurfaceSetMaterial(0, shaderMaterial);
                     MaterialManager.Instance.RegisterMaterial(id, this);
                     break;                
-                case 4: // sin registrar para las animaciones de armas body
-                    materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshGeneric.tres");
-                    texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
-                    textureMaterial = texture2D;
-                    widht = texture2D.GetWidth();
-                    height = texture2D.GetHeight();
 
-                    shaderMaterial = (ShaderMaterial)materialGeneric.Duplicate();
-                    shaderMaterial.SetShaderParameter("main_texture", textureMaterial);
-                    shaderMaterial.SetShaderParameter("atlas_width", widht);
-                    shaderMaterial.SetShaderParameter("atlas_height", height);
-
-                    //mesh = MeshCreator.CreateSquareMesh(16, 16, new Vector2(divisionPixelX, divisionPixelY), new Vector3(0, 0, 0));
-                    //mesh.SurfaceSetMaterial(0, shaderMaterial);
-                    break;
                 default:
                     break;
             }
+
+            if (texture2D !=null)
+            {
+                AtlasTexture atlasTexture = new AtlasTexture();
+                atlasTexture.Atlas = texture2D;
+                textureVisual = atlasTexture;
+            }
             
-            
+
+
         }
-   
+
     }
 }

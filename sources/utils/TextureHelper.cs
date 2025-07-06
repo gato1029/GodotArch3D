@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,14 +27,43 @@ namespace GodotEcsArch.sources.utils
         }
         public static Texture LoadTextureLocal(string filePath)
         {
+            string rutaCarpeta = Path.GetDirectoryName(filePath) +"/DDS/";
+            string nombreSinExtension = Path.GetFileNameWithoutExtension(filePath);
+            string nuevaRuta = rutaCarpeta+ nombreSinExtension+".dds";
+
             // Crear una instancia de Image para cargar el archivo
-            Image image = new Image();
-            Error result = image.Load(filePath);
+
+            //   if (!File.Exists(nuevaRuta))
+            //   {
+            //       if (!Directory.Exists(rutaCarpeta))
+            //       {
+            //           Directory.CreateDirectory(rutaCarpeta);
+            //       }
+            //       Image image = new Image();
+            //       image.Load(filePath);
+            //       image.GenerateMipmaps();
+            //       Error result1 = image.Compress(Image.CompressMode.S3Tc, Image.CompressSource.Generic);
+            //       if (result1 == Error.Ok)
+            //       {
+            //           image.SaveDds(nuevaRuta);
+            //       }
+            //       else
+            //       {
+            //           GD.PrintErr($"Error al convertir: {filePath}. Error: {result1}");
+            //       }
+
+            //   }
+            //   var bytes = File.ReadAllBytes(nuevaRuta);
+            //   Image imageCompressed = new Image();
+            ////  Error result = imageCompressed.LoadDdsFromBuffer(bytes);
+            Image imageCompressed = new Image();
+            Error result = imageCompressed.Load(filePath);
 
             if (result == Error.Ok)
             {
                 // Convertir la imagen cargada en una textura
-                ImageTexture texture = ImageTexture.CreateFromImage(image);
+                ImageTexture texture = ImageTexture.CreateFromImage(imageCompressed);
+                    
                 return texture;
             }
 
@@ -157,5 +187,7 @@ namespace GodotEcsArch.sources.utils
 
             return true; // La textura está vacía
         }
+
+
     }
 }

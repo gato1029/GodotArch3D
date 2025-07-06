@@ -2,6 +2,7 @@ using Arch.Buffer;
 using Arch.Core;
 using Arch.System;
 using Godot;
+using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
@@ -42,7 +43,7 @@ public class AnimationTileSystem : BaseSystem<World, float>
             {
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
                 ref TileAnimation tileAnimation = ref Unsafe.Add(ref pointerTileAnimation, entityIndex);
-
+                var tileDataAnimation = TilesManager.Instance.GetTileDataAnimation(tileAnimation.TileAnimateData.id);
                 tileAnimation.TimeSinceLastFrame += _deltaTime;
                 if (tileAnimation.TimeSinceLastFrame >= tileAnimation.TileAnimateData.frameDuration && tileAnimation.loop)
                 {       
@@ -50,7 +51,12 @@ public class AnimationTileSystem : BaseSystem<World, float>
                     {
                         if (tileAnimation.loop)
                         {
-                            tileAnimation.currentFrame = tileAnimation.TileAnimateData.idFrames[0]; // Reinicia al frame inicial
+                            tileAnimation.frameRender.R = tileDataAnimation.framesArray[0].x;
+                            tileAnimation.frameRender.G = tileDataAnimation.framesArray[0].y;
+                            tileAnimation.frameRender.B = tileDataAnimation.framesArray[0].widht;
+                            tileAnimation.frameRender.A = tileDataAnimation.framesArray[0].height;
+
+                            //tileAnimation.currentFrame = tileAnimation.TileAnimateData.idFrames[0]; // Reinicia al frame inicial
                             tileAnimation.complete = true;
                             tileAnimation.currentFrameIndex = 0;
                         }
@@ -62,11 +68,16 @@ public class AnimationTileSystem : BaseSystem<World, float>
                     }
                     else
                     {
-                        tileAnimation.currentFrame = tileAnimation.TileAnimateData.idFrames[tileAnimation.currentFrameIndex];
+                        tileAnimation.frameRender.R = tileDataAnimation.framesArray[tileAnimation.currentFrameIndex].x;
+                        tileAnimation.frameRender.G = tileDataAnimation.framesArray[tileAnimation.currentFrameIndex].y;
+                        tileAnimation.frameRender.B = tileDataAnimation.framesArray[tileAnimation.currentFrameIndex].widht;
+                        tileAnimation.frameRender.A = tileDataAnimation.framesArray[tileAnimation.currentFrameIndex].height;
+
+                      //  tileAnimation.currentFrame = tileAnimation.TileAnimateData.idFrames[tileAnimation.currentFrameIndex];
                         tileAnimation.currentFrameIndex++;
-                    }
-                                                      
-                    RenderingServer.MultimeshInstanceSetCustomData(tileAnimation.rid, tileAnimation.instance, new Color(tileAnimation.currentFrame, tileAnimation.horizontalOrientation, 0, 0));
+                    }                                                      
+                    RenderingServer.MultimeshInstanceSetCustomData(tileAnimation.rid, tileAnimation.instance, tileAnimation.frameRender);
+                    
                     tileAnimation.TimeSinceLastFrame -= tileAnimation.TileAnimateData.frameDuration;
                 }
 

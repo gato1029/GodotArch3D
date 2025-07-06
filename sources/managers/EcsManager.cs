@@ -2,6 +2,7 @@ using Arch.Core;
 using Arch.LowLevel;
 using Arch.System;
 using Godot;
+using GodotEcsArch.sources.managers.Profiler;
 using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.systems.Character;
 using Schedulers;
@@ -125,13 +126,12 @@ public class EcsManager : SingletonBase<EcsManager>
         this.main3D = node3D;
         this.ridWorld3D = node3D.GetWorld3D().Scenario;
     }
+  
     public void UpdateSystems(float deltaTime, int tick)
     {
-        //groupDebugerArch.Update(in deltaTime);
+        
 
-
-  
-
+    
         groupMainCharacter.Update(in deltaTime);
 
         groupUnits.BeforeUpdate(in deltaTime);
@@ -144,6 +144,8 @@ public class EcsManager : SingletonBase<EcsManager>
         groupTransform.Update(in deltaTime);
         groupRender.BeforeUpdate(in deltaTime);
         groupRender.Update(in deltaTime);
+
+  
     }
 
     public void UpdateSystemsPhysics(float deltaTime, int tick)

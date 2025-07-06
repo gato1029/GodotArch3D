@@ -7,6 +7,7 @@ using Arch.System;
 using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Profiler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,13 +99,14 @@ namespace GodotEcsArch.sources.systems
         {
             //World.InlineParallelChunkQuery(in queryDynamicSprite, new ChunkJobUpdateCollider(commandBuffer, t));
 
+            using (new ProfileScope("Collision System"))
+            {
+                var job = new JobUpdateCollider((float)t, commandBuffer);
+                World.InlineEntityQuery<JobUpdateCollider, Position, Direction, ColliderSprite>(in queryDynamicSprite, ref job);
 
-            var job = new JobUpdateCollider((float)t, commandBuffer);
-            World.InlineEntityQuery<JobUpdateCollider, Position, Direction, ColliderSprite>(in queryDynamicSprite, ref job);
-            
-            var job2 = new UpdateColliderCharacter((float)t, commandBuffer);
-            World.InlineEntityQuery<UpdateColliderCharacter, PositionComponent>(in queryCharacter, ref job2);
-
+                var job2 = new UpdateColliderCharacter((float)t, commandBuffer);
+                World.InlineEntityQuery<UpdateColliderCharacter, PositionComponent>(in queryCharacter, ref job2);
+            }
             //CollisionManager.Instance.worldPhysic.Step(1/60);
             bool debug = Input.IsActionJustPressed("debugGridCollider");
             if (debug)

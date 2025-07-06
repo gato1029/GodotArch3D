@@ -40,12 +40,16 @@ using static Godot.HttpRequest;
 #endif
         // Obtener la ruta del directorio actual del juego (directorio donde se encuentra el ejecutable)
         string finalCarpet = "AssetExternals" + "/" + carpet;
+        string finalCarpetCompressed = "AssetExternals" + "/" + carpet+"/DDS";
         // Crear la ruta completa para la carpeta AssetExternals
         string destinationFolder = Path.Combine(gameDirectory, finalCarpet );
-
-            // Asegurarse de que la carpeta de destino exista, si no, crearla
-            
-            if (!Directory.Exists(destinationFolder))
+        string destinationFolderCompressed = Path.Combine(gameDirectory, finalCarpetCompressed);
+        // Asegurarse de que la carpeta de destino exista, si no, crearla
+        if (!Directory.Exists(finalCarpetCompressed))
+        {
+            Directory.CreateDirectory(finalCarpetCompressed);
+        }
+        if (!Directory.Exists(destinationFolder))
             {
                 Directory.CreateDirectory(destinationFolder);
             }
@@ -54,11 +58,22 @@ using static Godot.HttpRequest;
             string fileName = idName +"." +sourcePath.GetExtension(); // Obtener solo el nombre del archivo
             string destinationPath = Path.Combine(destinationFolder, fileName); // Ruta completa de destino
 
+            string destinationPathCompressed = Path.Combine(destinationFolder, idName + ".dds");
         // Usar la clase File para copiar el archivo
 
         try
         {
-            File.Copy(sourcePath, destinationPath,true);
+            if (!sourcePath.StartsWith("AssetExternals"))
+            {
+                File.Copy(sourcePath, destinationPath, true);
+
+                // Crear una instancia de Image para cargar el archivo
+                Image image = new Image();
+                Error result = image.Load(destinationPath);
+               
+                image.Compress(Image.CompressMode.S3Tc);            
+                image.SaveDds(destinationPathCompressed);
+            }
             return finalCarpet+"/"+fileName;
         }
         catch (Exception ex)

@@ -32,6 +32,8 @@ public partial class ContainerAnimation : PanelContainer
 
     List<FrameData> tiles = new List<FrameData>();
 
+    public MaterialData MaterialData { get => materialData; set => materialData = value; }
+
     //  public AnimationStateData ObjectData { get => objectData; set => objectData = value; }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

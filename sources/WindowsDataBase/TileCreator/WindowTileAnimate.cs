@@ -75,6 +75,8 @@ public partial class WindowTileAnimate : Window, IDetailWindow
         LoadMaterials();
         windowState = WindowState.NEW;
         currentTileAnimateSimpleData = new TileAnimateData();
+
+        optionMaterial.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
     }
 
     private void CollisionCheckBox_Pressed()

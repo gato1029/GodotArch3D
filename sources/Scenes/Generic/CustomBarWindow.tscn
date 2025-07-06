@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3 uid="uid://dg5ccvysgcvtv"]
+
+[ext_resource type="Texture2D" uid="uid://mva6sfqxot7o" path="res://resources/Textures/Emerald Treasure/images/window_content_background.png" id="2_6lld0"]
+
+[node name="ContenedorVentana" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("2_6lld0")
+expand_mode = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "asddas"
+
+[node name="Button2" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "asddas"

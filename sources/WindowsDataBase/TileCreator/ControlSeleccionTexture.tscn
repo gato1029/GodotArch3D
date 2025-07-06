@@ -1,0 +1,76 @@
+[gd_scene load_steps=5 format=3 uid="uid://74vwtruudwpm"]
+
+[ext_resource type="Script" uid="uid://b4r2o18txhtn7" path="res://sources/WindowsDataBase/TileCreator/ControlSeleccionTexture.cs" id="1_gxpiy"]
+[ext_resource type="Texture2D" uid="uid://c5ccx8t7g4yrh" path="res://resources/Textures/TX Plant.png" id="2_8pvis"]
+[ext_resource type="Shader" uid="uid://dg2vkenhkieyp" path="res://resources/shaders/gridUI.gdshader" id="2_c5utf"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8pvis"]
+shader = ExtResource("2_c5utf")
+shader_parameter/size = Vector2(1024, 1024)
+shader_parameter/line_width = 1.0000000475000002
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/grid_size = 16.0
+shader_parameter/grid_color = Color(0.3970625, 0.5764207, 0.9944393, 0.6509804)
+
+[node name="ControlSelectionTexture" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+focus_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+script = ExtResource("1_gxpiy")
+baseTexture = ExtResource("2_8pvis")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Division Grid:"
+
+[node name="SpinBoxCellSize" type="SpinBox" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+min_value = 4.0
+max_value = 512.0
+step = 4.0
+value = 8.0
+suffix = "Px"
+
+[node name="ContainerSelectionTexture" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+
+[node name="CenterContainerBase" type="CenterContainer" parent="VBoxContainer/ContainerSelectionTexture"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+focus_mode = 2
+
+[node name="TextureDraw" type="TextureRect" parent="VBoxContainer/ContainerSelectionTexture/CenterContainerBase"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_8pvis")
+stretch_mode = 5
+
+[node name="GridBase" type="ColorRect" parent="VBoxContainer/ContainerSelectionTexture/CenterContainerBase"]
+material = SubResource("ShaderMaterial_8pvis")
+layout_mode = 2
+
+[node name="Selection" type="ColorRect" parent="VBoxContainer/ContainerSelectionTexture/CenterContainerBase"]
+visible = false
+modulate = Color(1, 1, 1, 0.5)
+layout_mode = 2

@@ -1,0 +1,324 @@
+[gd_scene load_steps=7 format=3 uid="uid://bd8jxhwbo1jiu"]
+
+[ext_resource type="Script" uid="uid://cx82500djl5ti" path="res://sources/WindowsDataBase/TileCreator/WindowAnimatedTiles.cs" id="1_upq5f"]
+[ext_resource type="PackedScene" uid="uid://bjrgekdhtioub" path="res://sources/WindowsDataBase/Animation/ControlFramesArray.tscn" id="2_f5opg"]
+[ext_resource type="Texture2D" uid="uid://djjaf8wikv4mu" path="res://resources/cat.png" id="2_ug1c2"]
+[ext_resource type="PackedScene" uid="uid://dmxdagu8ng5ss" path="res://sources/WindowsDataBase/Generic/ControlGrid.tscn" id="2_x45a6"]
+[ext_resource type="PackedScene" uid="uid://eouyrgdv2i88" path="res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn" id="5_5xw4c"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_75pw8"]
+size = Vector2(16, 16)
+
+[node name="WindowAnimatedTiles" type="Window"]
+oversampling_override = 1.0
+title = "Tiles Animados"
+initial_position = 2
+size = Vector2i(1200, 800)
+always_on_top = true
+keep_title_visible = true
+script = ExtResource("1_upq5f")
+metadata/_tab_index = 5
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonBuscar" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Buscar Material"
+
+[node name="ButtonNuevo" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Nuevo Material"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HSplitContainer" type="HSplitContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Ancho Pixel:"
+
+[node name="SpinBoxWidthPixel" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 500.0
+value = 16.0
+
+[node name="Label2" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Alto Pixel:"
+
+[node name="SpinBox2HeightPixel" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 500.0
+value = 16.0
+
+[node name="ButtonSplit" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Dividir"
+
+[node name="Label3" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Zoom:"
+
+[node name="SpinBoxZoom" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 20.0
+value = 1.0
+
+[node name="ViewItems" type="ItemList" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+select_mode = 2
+allow_reselect = true
+max_columns = 30
+same_column_width = true
+icon_mode = 0
+icon_scale = 2.0
+
+[node name="FramesArray" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainer" instance=ExtResource("2_f5opg")]
+layout_mode = 2
+
+[node name="ContainerMain" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Zoom:"
+
+[node name="SpinBoxZoomGrid" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+min_value = 1.0
+value = 2.0
+
+[node name="ScrollContainerGrid" type="ScrollContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+scroll_horizontal = 250
+scroll_vertical = 250
+
+[node name="PanelBase" type="Control" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/ScrollContainerGrid"]
+custom_minimum_size = Vector2(960, 960)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="ControlGrid" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/ScrollContainerGrid/PanelBase" instance=ExtResource("2_x45a6")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -240.0
+offset_right = 240.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+pivot_offset = Vector2(240, 240)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="Panel" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid"]
+layout_mode = 2
+
+[node name="ControlSprite" type="Control" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel"]
+anchors_preset = 0
+
+[node name="Sprite2DView" type="Sprite2D" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSprite"]
+texture = ExtResource("2_ug1c2")
+
+[node name="CollisionShapeView" type="CollisionShape2D" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSprite"]
+visible = false
+shape = SubResource("RectangleShape2D_75pw8")
+
+[node name="PanelContainer" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="GridContainerAnimacion" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+columns = 2
+
+[node name="LabelSeleccion" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Seleccion Ordenada:"
+
+[node name="CheckBoxModeSelection" type="CheckBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+button_pressed = true
+text = "Ordenada"
+
+[node name="LabelFrameDuplicate" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Frames Duplicados:"
+
+[node name="CheckBoxFrameDuplicate" type="CheckBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="Label9" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Frame Duration"
+
+[node name="SpinBoxDuration" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+step = 0.01
+value = 0.1
+
+[node name="Label5" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "loop"
+
+[node name="CheckBoxLoop" type="CheckBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+button_pressed = true
+text = "Bucle"
+
+[node name="Label6" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Espejo Horizontal:"
+
+[node name="CheckBoxMirror" type="CheckBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="Label7" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Espejo Vertical:"
+
+[node name="CheckBoxMirrorV" type="CheckBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="Label10" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Tiene Collider:"
+
+[node name="CheckBoxHasCollider" type="CheckBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Offset del Tile"
+
+[node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+columns = 2
+
+[node name="Label3" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Offset X:"
+
+[node name="SpinBoxOffsetX" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = -100.0
+step = 0.10000000000582077
+
+[node name="Label2" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Offset Y:"
+
+[node name="SpinBoxOffsetY" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = -100.0
+step = 0.10000000000582077
+
+[node name="Label4" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Color Base:"
+
+[node name="ColorButtonBase" type="ColorPickerButton" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label5" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Escala:"
+
+[node name="SpinBoxScale" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+step = 0.10000000000582077
+value = 1.0000000000582077
+
+[node name="ColliderContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer" instance=ExtResource("5_5xw4c")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonSave" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/HSplitContainer/ContainerMain/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Guardar"

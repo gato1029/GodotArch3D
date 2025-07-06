@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
 using System;
@@ -23,8 +24,14 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         public float offsetX { get; set; }
         public float offsetY { get; set; }
 
+        public bool mirrorX { get; set; }
+        public bool mirrorY { get; set; }
+
+        public string colorString { get; set; } // Color en formato hexadecimal, por ejemplo: "#FF0000" para rojo
         [BsonIgnore]
         public Vector2 offsetInternal{ get;  set; }
+        [BsonIgnore]
+        public Color color { get; set; }
     }
     public class TileSimpleData : TileData
     {
@@ -48,23 +55,32 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         public float y { get; set; }
         public float widht { get; set; }
         public float height { get; set; }
+        public float widhtFormat { get; set; }
+        public float heightFormat { get; set; }
         public TileDynamicData()
         {
             type = nameof(TileDynamicData);
         
         }
         [BsonCtor]
-        public TileDynamicData(int idMaterial, float x, float y, float widht, float height, float offsetX, float offsetY) :base()
+        public TileDynamicData(int idMaterial, float x, float y, float widht, float height, float offsetX, float offsetY,string colorString) :base()
         {
             offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
             textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, (int)x, (int)y, widht, height);
-         
-         
+            if (colorString != null)
+            { 
+            var components = colorString.Trim('(', ')')
+                       .Split(',')
+                       .Select(s => float.Parse(s.Trim()))
+                       .ToArray();            
+            color = new Color(components[0], components[1], components[2], components[3]);
+            }
         }
     }
     public class TileAnimateData : TileData
     {
         public int[] idFrames { get; set; } // Cantidad de frames en la animacion
+        public FrameData[] framesArray { get; set; }
         public float frameDuration { get; set; } // Duración de cada frame
         public TileAnimateData()
         {
@@ -72,12 +88,21 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         }
 
         [BsonCtor]
-        public TileAnimateData(int idMaterial, int[] idFrames, float offsetX, float offsetY) : base()
+        public TileAnimateData(int idMaterial, FrameData[] framesArray, float offsetX, float offsetY, string colorString) : base()
         {
             offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
-            textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, idFrames[0]);
-
-        
+            if (framesArray != null && framesArray.Length>0)
+            {
+                textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, framesArray[0].x, framesArray[0].y, framesArray[0].widhtFormat, framesArray[0].heightFormat);
+            }
+            if (colorString != null)
+            {
+                var components = colorString.Trim('(', ')')
+                       .Split(',')
+                       .Select(s => float.Parse(s.Trim()))
+                       .ToArray();
+                color = new Color(components[0], components[1], components[2], components[3]);
+            }
         }
     }
 
