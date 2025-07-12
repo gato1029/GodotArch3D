@@ -4,10 +4,12 @@ using Arch.Core;
 using Arch.Core.Extensions;
 using Arch.System;
 using Auios.QuadTree;
-
 using Godot;
+using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.SpriteMapChunk;
 using GodotEcsArch.sources.managers.Tilemap;
 using System;
 using System.Collections.Generic;
@@ -36,6 +38,7 @@ internal class CollisionManager : SingletonBase<CollisionManager>
     public  SpatialHashMap<Entity> dynamicCollidersEntities;
     public  SpatialHashMap<Entity> MoveCollidersEntities;
     public SpatialHashMap<IDataTile> tileColliders;
+    public SpatialHashMap<IDataSprite> spriteColliders;
 
     public QuadTree<ColliderSprite> quadTreeColliders;
 
@@ -47,7 +50,7 @@ internal class CollisionManager : SingletonBase<CollisionManager>
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
         tileColliders = new SpatialHashMap<IDataTile>(8, delegate (IDataTile er) { return er.IdCollider; });
-
+        spriteColliders = new SpatialHashMap<IDataSprite>(8, delegate (IDataSprite er) { return er.idUnique; });
     }
 
     protected override void Destroy()
@@ -55,71 +58,81 @@ internal class CollisionManager : SingletonBase<CollisionManager>
       
     }
 
-    ColliderShape CreateColliderShape(GeometricShape2D shape2D)
-    {
-        ColliderShape colliderShape = new ColliderShape();
-        colliderShape.shape = shape2D;
-
-     
-        return colliderShape;
-    }
-
-    public  bool CheckAABBCollision(Vector2 positionA, Rect2 rectA,  Vector2 positionB, Rect2 rectB)
+    public static bool CheckAnyCollision(
+          Entity entity,
+          Vector2 movementNext,
+          GeometricShape2D collisionMove)
     {
         
-        Rect2 adjustedRectA = new Rect2(positionA - rectA.Position, rectA.Size);
-        Rect2 adjustedRectB = new Rect2(positionB - rectB.Position, rectB.Size);
 
-        Transform3D transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
-        transform3D = transform3D.Scaled(new Vector3(adjustedRectA.Size.X, adjustedRectA.Size.Y, 1));
-        transform3D.Origin = new Vector3(adjustedRectA.Position.X, adjustedRectA.Position.Y, 2);
-        
-        //DebugDraw.Circle(transform3D, 4, Colors.Coral, 0.1f,1<<2);
-        DebugDraw.Quad(transform3D, 1, Colors.Green, 0.0f); //debug   
-        
+        Rect2 aabb = new Rect2(movementNext, collisionMove.GetSizeQuad() * 2);
 
-        Transform3D transform3D2 = new Transform3D(Basis.Identity, Vector3.Zero);
-        transform3D2 = transform3D2.Scaled(new Vector3(adjustedRectB.Size.X, adjustedRectB.Size.Y, 1));
-        transform3D2.Origin = new Vector3(adjustedRectB.Position.X, adjustedRectB.Position.Y, 2);
-        DebugDraw.Quad(transform3D2, 1, Colors.Blue, 0.0f); //debug   
-        //DebugDraw.Circle(transform3D2, 2, Colors.Coral, 1);
-
-        return (adjustedRectA.Position.X + adjustedRectA.Size.X >= adjustedRectB.Position.X &&  
-                adjustedRectA.Position.X <= adjustedRectB.Position.X + adjustedRectB.Size.X &&  
-                adjustedRectA.Position.Y + adjustedRectA.Size.Y >= adjustedRectB.Position.Y  &&  
-                adjustedRectA.Position.Y <= adjustedRectB.Position.Y + adjustedRectB.Size.Y);   
-
-    }
-
-    public  Vector2 CalculateSizeBasedOnDirection(Vector2 originalSize, Vector2 direction)
-    {
-        ////Vector2 normalizedDirection = direction.Normalized();
-
-        float width = originalSize.X;
-        float height = originalSize.Y;
-
-        // Se establece un umbral para determinar si la direccion es principalmente horizontal o vertical
-        float threshold = 0.707f; // Aproximadamente 45 grados en términos de vector
-
-        // Determinar el ancho y el alto basado en la direccion
-        if (Math.Abs(direction.X) > threshold) // Direcciones horizontales
+        // 1. Chequeo contra entidades
+        var entities = CollisionManager.Instance.characterCollidersEntities.QueryAABB(aabb);
+        if (entities != null)
         {
-            width = originalSize.X;  // Mantiene el ancho original
-            height = 0;               // Altura se convierte en cero
-        }
-        else if (Math.Abs(direction.Y) > threshold) // Direcciones verticales
-        {
-            width = 0;                // Ancho se convierte en cero
-            height = originalSize.Y;  // Mantiene la altura original
-        }
-        else // Direcciones diagonales
-        {
-            // Puedes elegir mantener ambas dimensiones o una combinación
-            width = originalSize.X;   // Mantiene el ancho original
-            height = originalSize.Y;  // Mantiene la altura original
+            foreach (var item in entities.Values)
+            {
+                foreach (var itemInternal in item)
+                {
+                    if (itemInternal.Value.Id != entity.Id)
+                    {
+                        var characterComponentB = itemInternal.Value.Get<CharacterComponent>();
+                        var dataCharacterModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
+                        var characterB = dataCharacterModelB.animationCharacterBaseData;
+                        var colliderB = characterB.collisionMove.Multiplicity(dataCharacterModelB.scale);
+                        var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
+
+                        if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
         }
 
-        return new Vector2(width, height);
+        // 2. Chequeo contra tiles
+        var tileData = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+        if (tileData != null)
+        {
+            foreach (var item in tileData.Values)
+            {
+                foreach (var itemInternal in item)
+                {
+                    var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);
+                    var colliderB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);
+                    var positionB = itemInternal.Value.PositionCollider;
+
+                    if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // 3. Chequeo contra sprites
+        var spriteData = CollisionManager.Instance.spriteColliders.QueryAABB(aabb);
+        if (spriteData != null)
+        {
+            foreach (var item in spriteData.Values)
+            {
+                foreach (var itemInternal in item)
+                {
+                    var spriteInfo = itemInternal.Value.GetSpriteData();
+                    var colliderB = spriteInfo.collisionBody.Multiplicity(spriteInfo.scale);
+                    var positionB = itemInternal.Value.positionCollider;
+
+                    if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 

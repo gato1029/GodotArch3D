@@ -61,7 +61,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
         {
             if (!multimeshMaterialDict.ContainsKey(item))
             {
-                MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(item));
+                MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(item), ChunkManager.Instance.maxTileView);
                 multimeshMaterialDict.Add(item, multimeshMaterial);
             }
         }
@@ -246,16 +246,16 @@ public class TileMapChunkRender<TData> where TData : IDataTile
 
     private void CreateTile(ChunkData<TData> tileMapChunkData, Vector2I tilePositionChunk, Vector2I tilePositionGlobal, TileData tileData, TData dataGame)
     {
-        MultimeshMaterial multimeshMaterial = null;
+        //MultimeshMaterial multimeshMaterial = null;
 
         int idMaterial = tileData.idMaterial;
         IdMaterialLastUsed = idMaterial;
-        if (!multimeshMaterialDict.ContainsKey(tileData.idMaterial))
-        {
-            multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(tileData.idMaterial));
-            multimeshMaterialDict.Add(tileData.idMaterial, multimeshMaterial);
-        }
-        multimeshMaterial = multimeshMaterialDict[idMaterial];
+        //if (!multimeshMaterialDict.ContainsKey(tileData.idMaterial))
+        //{
+        //    multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(tileData.idMaterial), ChunkManager.Instance.maxTileView);
+        //    multimeshMaterialDict.Add(tileData.idMaterial, multimeshMaterial);
+        //}
+        //multimeshMaterial = multimeshMaterialDict[idMaterial];
 
         float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
         float y = MeshCreator.PixelsToUnits(tileSize.Y) / 2f;
@@ -311,7 +311,8 @@ public class TileMapChunkRender<TData> where TData : IDataTile
                     if (datatile != null && datatile.instance!=-1) //&& datatile.idMaterial != 0)
                     {
                         var dataTileInfo = TilesManager.Instance.GetTileData(datatile.idTile);
-                        multimeshMaterialDict[dataTileInfo.idMaterial].FreeInstance(datatile.rid, datatile.instance);
+                        // multimeshMaterialDict[dataTileInfo.idMaterial].FreeInstance(datatile.rid, datatile.instance);
+                        MultimeshManager.Instance.FreeInstance(datatile.rid, datatile.instance);
                         datatile.FreeTile();
                     }
                 }
@@ -374,7 +375,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
                     if (dataGame != null)
                     {
                         var tileData = TilesManager.Instance.GetTileData(dataGame.IdTile);
-                        (Rid, int) instance = multimeshMaterialDict[tileData.idMaterial].CreateInstance();
+                         (Rid, int) instance = MultimeshManager.Instance.CreateInstance();// multimeshMaterialDict[tileData.idMaterial].CreateInstance();
                         chunk.CreateUpdate(i, j,  instance.Item1, instance.Item2, dataGame.PositionWorld,dataGame.Scale, dataGame.IdTile);
                     }
                 }

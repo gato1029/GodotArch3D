@@ -17,7 +17,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
 
     ControlAccesoryAnimationBodyView controlAnimationBody;
 
-    ContainerAnimationTiles controlAnimationTiles;
+    ControlAnimationAccesory controlAnimationTiles;
 
     ContainerRequirements controlRequirements;
 
@@ -89,7 +89,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
         // Animaciones
         if (p_ObjectData.hasAnimationTile && p_ObjectData.animationTilesData != null)
         {
-            controlAnimationTiles = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ContainerAnimationTiles.tscn").Instantiate<ContainerAnimationTiles>();
+            controlAnimationTiles = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAnimationAccesory.tscn").Instantiate<ControlAnimationAccesory>();
             controlAnimationTiles.Name = "Control Animacion Tiles";
             TabContainerControl.AddChild(controlAnimationTiles);
             controlAnimationTiles.SetData( p_ObjectData.animationTilesData);
@@ -134,7 +134,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
         objectData.name = LineEditName.Text;
         objectData.description = TextEditDescription.Text;
 
-        objectData.miniatureData = ControlMiniatura.ObjectData;
+        objectData.miniatureData =   ControlMiniatura.ObjectData;
         objectData.accesoryClassType = (AccesoryClassType)OptionButtonClassAccesory.GetSelectedId();
         objectData.accesoryBodyPartType = (AccesoryBodyPartType)OptionButtonBodyAccesory.GetSelectedId();
         objectData.accesoryType = (AccesoryType)OptionButtonTypeAccesory.GetSelectedId();
@@ -242,7 +242,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
         if (CheckBoxAnimationTiles.ButtonPressed)
         {
 
-            controlAnimationTiles = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ContainerAnimationTiles.tscn").Instantiate<ContainerAnimationTiles>();
+            controlAnimationTiles = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAnimationAccesory.tscn").Instantiate<ControlAnimationAccesory>();
             controlAnimationTiles.Name = "Control Animacion Tiles";
             TabContainerControl.AddChild(controlAnimationTiles);
         }

@@ -2,9 +2,11 @@
 using Godot;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
@@ -42,9 +44,10 @@ namespace GodotEcsArch.sources.WindowsDataBase
             collectionNameMap[typeof(AccessoryData)] = "AccessoryData";
             collectionNameMap[typeof(CharacterModelBaseData)] = "CharacterModelBaseData";
             collectionNameMap[typeof(AccesoryAnimationBodyData)] = "AccesoryAnimationBodyData";
+            collectionNameMap[typeof(ResourceData)] = "ResourceData";
+            collectionNameMap[typeof(BuildingData)] = "BuildingData";
 
-            
-            
+            //RegisterCollection<BuildingData>("BuildingData");
 
             ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");            
             MaterialDataCollection.EnsureIndex(x => x.id, unique: true);
@@ -74,8 +77,27 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             ILiteCollection<AccesoryAnimationBodyData> AccesoryAnimationBodyDataCollection = db.GetCollection<AccesoryAnimationBodyData>("AccesoryAnimationBodyData");
             AccesoryAnimationBodyDataCollection.EnsureIndex(x => x.id, unique: true);
+
+            ILiteCollection<ResourceData> ResourceDataCollection = db.GetCollection<ResourceData>("ResourceData");
+            ResourceDataCollection.EnsureIndex(x => x.id, unique: true);
+
+            ILiteCollection<BuildingData> BuildingDataCollection = db.GetCollection<BuildingData>("BuildingData");
+            BuildingDataCollection.EnsureIndex(x => x.id, unique: true);
         }
 
+        public void RegisterCollection<T>(string collectionName) where T : class
+        {
+            if (!collectionNameMap.ContainsKey(typeof(T)))
+            {
+                collectionNameMap.Add(typeof(T), collectionName);
+                ILiteCollection<T> BuildingDataCollection = db.GetCollection<T>(collectionName);
+                BuildingDataCollection.EnsureIndex("_id", unique: true);
+            }
+            else
+            {
+                collectionNameMap[typeof(T)] = collectionName;
+            }
+        }
         public int NextID<T>()
         {
             var baseType = typeof(T).BaseType;

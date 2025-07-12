@@ -28,6 +28,7 @@ public partial class Camera3dGodot : Camera3D
         _viewport.Connect("size_changed", new Callable(this, "ViewPortChanged"));
        
         RenderManager.Instance.currentDisplay = RectRender();
+        RenderManager.Instance.camera3D = camera;
     }
 
  

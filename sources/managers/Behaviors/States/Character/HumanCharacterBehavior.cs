@@ -8,6 +8,7 @@ using GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.managers.SpriteMapChunk;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.systems;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
@@ -202,32 +203,8 @@ public class HumanCharacterBehavior : ICharacterBehavior
         if (directionComponent.value != moveDirection)
         {
             directionComponent.animationDirection = CommonOperations.GetDirectionAnimation(moveDirection);
-            directionComponent.value = moveDirection;
-            // r.value = Mathf.RadToDeg(d.value.Angle());
-            directionComponent.normalized = new Vector2(Math.Sign(moveDirection.X), Math.Sign(moveDirection.Y));
-            
-
-            // luego ponerlo en una solo funcion
-
-            //melleAtack.shapeCollider = characterWeapon.shapeColliderLeftRight;
-
-            //if (d.directionAnimation == AnimationDirection.UP || d.directionAnimation == AnimationDirection.DOWN)
-            //{
-            //    melleAtack.shapeCollider = characterWeapon.shapeColliderTopDown;
-            //}
-
-            //Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
-
-            //rectangle.DirectionTo(moveDirection.X, moveDirection.Y);
-
-            //Vector2 vector2 = Collision2D.RotatePosition(rectangle.OriginRelative, d.normalized);
-            //rectangle.OriginCurrent = vector2;
-
-            //ref Direction directionCharacter = ref entityCharacter.Get<Direction>();
-
-            //directionCharacter.value = d.value;
-            //directionCharacter.normalized = d.normalized;
-            //directionCharacter.directionAnimation = d.directionAnimation;
+            directionComponent.value = moveDirection;            
+            directionComponent.normalized = new Vector2(Math.Sign(moveDirection.X), Math.Sign(moveDirection.Y));            
         }
 
 
@@ -235,67 +212,8 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
         Vector2 movementNext = positionComponent.position + movement + collisionMove.OriginCurrent;
 
-        bool existCollision = false;
-
-        Rect2 aabb = new Rect2(movementNext, collisionMove.GetSizeQuad() * 2);
-        Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.characterCollidersEntities.QueryAABB(aabb);
-        if (data != null)
-        {
-            foreach (var item in data.Values)
-            {
-                foreach (var itemInternal in item)
-                {
-                    if (itemInternal.Value.Id != entity.Id)
-                    {
-                        CharacterComponent characterComponentB = itemInternal.Value.Get<CharacterComponent>();
-                        var dataCharacterModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
-                        AnimationCharacterBaseData characterB = dataCharacterModelB.animationCharacterBaseData;
-                        GeometricShape2D colliderB =  characterB.collisionMove.Multiplicity(dataCharacterModelB.scale);
-                        var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
-
-                        if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
-                        {
-                            existCollision = true;
-                            break;
-                        }
-                    }
-                }
-                if (existCollision)
-                {
-                    break;
-                }
-            }
-        }
-
-        if (!existCollision)
-        {
-            Dictionary<int, Dictionary<int, IDataTile>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
-            if (dataTile != null)
-            {
-                foreach (var item in dataTile.Values)
-                {
-                    foreach (var itemInternal in item)
-                    {
-                        var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);                        
-                        GeometricShape2D collisionB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);                                
-                        var positionB = itemInternal.Value.PositionCollider;// + collisionB.OriginCurrent;
-                        if (Collision2D.Collides(collisionMove, collisionB, movementNext, positionB))
-                        {
-                            existCollision = true;
-                            break;
-                        }
-
-                    }
-                    if (existCollision)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-
-
+        bool existCollision = CollisionManager.CheckAnyCollision(entity, movementNext, collisionMove);
+       
         if (!existCollision)
         {
             characterComponent.characterStateType = CharacterStateType.MOVING;

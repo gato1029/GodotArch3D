@@ -10,6 +10,8 @@ using GodotEcsArch.sources.WindowsDataBase.Weapons;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 
 public partial class HerramientaMenuBar : MenuBar
 {
@@ -89,23 +91,7 @@ public partial class HerramientaMenuBar : MenuBar
         switch (id)
         {
             case 0:
-                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/windowCharacterBase.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Character");
-                win.SetLoaddBAction(() =>
-                {
-                    var collection = DataBaseManager.Instance.FindAll<AnimationCharacterBaseData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
-                    {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
-                }
-                );
+                FacadeWindowDataSearch<ResourceData> winResources = new FacadeWindowDataSearch<ResourceData>("res://sources/WindowsDataBase/Resources/WindowResources.tscn", this);
                 break;
             case 1:
                 win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
@@ -127,23 +113,7 @@ public partial class HerramientaMenuBar : MenuBar
                 );
                 break;
             case 2:
-                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/Weapons/windowWeapons.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD, "Armas", true);
-                win.SetLoaddBAction(() =>
-                {
-                    var collection = DataBaseManager.Instance.FindAll<AnimationBaseData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
-                    {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
-                }
-                );
+                FacadeWindowDataSearch<BuildingData> winBuilding = new FacadeWindowDataSearch<BuildingData>("res://sources/WindowsDataBase/Building/WindowBuilding.tscn", this);
                 break;
             case 3:
                 var winInternal = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/WindowAccessory.tscn").Instantiate<WindowAccessory>();

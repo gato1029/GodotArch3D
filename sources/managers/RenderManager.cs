@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
     internal class RenderManager: SingletonBase<RenderManager>
     {
-
+    public Camera3D camera3D;
     public Rect2 currentDisplay;
     protected override void Initialize()
     {

@@ -93,15 +93,23 @@ public class TerrainMap
     private Vector2I chunkDimencion;
     [ProtoIgnore, JsonIgnore]
     private TileMapChunkRender<TerrainDataGame> tilemapTerrain;
+
+
+    [ProtoIgnore, JsonIgnore]
+    private string carpet = "Terrain";
+
     
-    
+
     [ProtoMember(1)]
-    public string mapName { get; set; }
+    public string pathMapParent { get; set; }
     [ProtoMember(2)]
-    public int layer { get; set; }
+    public int layer { get; set; }    
     [ProtoMember(3)]
+    public string pathCurrentCarpet { get; set; }
+    [ProtoMember(4)]
     public List<int> materialsUsed { get; set; } // esto con el fin de no demorar en cargar cada material
-    public TerrainMap(string Name, int Layer, bool SerializeOnUnload=false)
+
+    public TerrainMap(string pathMapParent, int Layer, bool SerializeOnUnload=false)
     {
         materialsUsed =new List<int>();
         terrainDictionary = new Dictionary<int, TerrainData>();
@@ -109,7 +117,8 @@ public class TerrainMap
         chunkDimencion = PositionsManager.Instance.chunkDimencion;
         tilemapTerrain = new TileMapChunkRender<TerrainDataGame>(layer,ChunkManager.Instance.tiles16X16, SerializeOnUnload);
         tilemapTerrain.OnChunSerialize += TilemapTerrain_OnChunSerialize;
-        mapName = Name;
+        this.pathMapParent = pathMapParent;
+        this.pathCurrentCarpet =  pathMapParent + "/" + carpet;
     }
     public static TerrainMap LoadMapfromFile(string Name)
     {
@@ -126,19 +135,15 @@ public class TerrainMap
 
     private void TilemapTerrain_OnChunSerialize(Vector2 arg1, ChunkData<TerrainDataGame> arg2)
     {
-        string name = arg1.X + "_" + arg1.Y;
-        string path = CommonAtributes.pathMaps+"/"+ mapName;
-        Serializer.Data.ChunkDataSerializable<TerrainDataGame> dataSer = arg2.ToSerializable();        
-        string pathCarpet = FileHelper.GetPathGameDB(path);
-        SerializerManager.SaveToFileBin(dataSer, pathCarpet, name);      
+        string name = arg1.X + "_" + arg1.Y;     
+        Serializer.Data.ChunkDataSerializable<TerrainDataGame> dataSer = arg2.ToSerializable();                
+        SerializerManager.SaveToFileBin(dataSer, pathCurrentCarpet, name);      
     }
 
     public void SaveAllMap()
     {
-        string path = CommonAtributes.pathMaps;
-        string pathCarpet = FileHelper.GetPathGameDB(path);
-
-        SerializerManager.SaveToFileJson(this, pathCarpet, mapName);
+   
+        SerializerManager.SaveToFileJson(this, pathMapParent, "DataTerrain");
 
         foreach (var item in tilemapTerrain.dataChunks)
         {
@@ -150,9 +155,8 @@ public class TerrainMap
     }
     public void LoadMapData()
     {
-        string path = CommonAtributes.pathMaps + "/" + mapName;
-        string pathCarpet = FileHelper.GetPathGameDB(path);
-        List<string> listFiles = FileHelper.GetAllFiles(pathCarpet);
+       
+        List<string> listFiles = FileHelper.GetAllFiles(pathCurrentCarpet);
         foreach (var item in listFiles)
         {
             string fullPath = item;

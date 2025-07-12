@@ -57,67 +57,8 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
         Vector2 movement = directionComponent.value * velocityComponent.velocity * delta;
         Vector2 pointNextCollision = positionComponent.position + movement + collisionMove.OriginCurrent;
 
-        bool existCollision = false;
-
-        Rect2 aabb = new Rect2(pointNextCollision, collisionMove.GetSizeQuad() * 2);
-        Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.characterCollidersEntities.QueryAABB(aabb);
-        if (data != null)
-        {
-            foreach (var item in data.Values)
-            {
-                foreach (var itemInternal in item)
-                {
-                    if (itemInternal.Value.Id != entity.Id)
-                    {
-                        CharacterComponent characterComponentB = itemInternal.Value.Get<CharacterComponent>();
-                        var dataModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
-                        AnimationCharacterBaseData characterB = dataModelB.animationCharacterBaseData;
-                        GeometricShape2D colliderB = characterB.collisionMove.Multiplicity(dataModelB.scale);
-                        var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
-
-                        if (Collision2D.Collides(collisionMove, colliderB, pointNextCollision, positionB))
-                        {
-                            existCollision = true;
-                            break;
-                        }
-                    }
-                }
-                if (existCollision)
-                {
-                    break;
-                }
-            }
-        }
-
-        //
-        if (!existCollision)
-        {
-            Dictionary<int, Dictionary<int, IDataTile>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
-            if (dataTile != null)
-            {
-                foreach (var item in dataTile.Values)
-                {
-                    foreach (var itemInternal in item)
-                    {
-
-                        var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);
-                        GeometricShape2D collisionB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);
-                        var positionB = itemInternal.Value.PositionCollider;// + collisionB.OriginCurrent;
-                        if (Collision2D.Collides(collisionMove, collisionB, pointNextCollision, positionB))
-                        {
-                            existCollision = true;
-                            break;
-                        }
-
-                    }
-                    if (existCollision)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
+        bool existCollision = CollisionManager.CheckAnyCollision(entity, pointNextCollision, collisionMove);
+      
         if (!existCollision)
         {
 

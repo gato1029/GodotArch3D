@@ -57,6 +57,7 @@ public enum DirectionArrowArray
 }
 public enum DirectionAnimationType
 {
+    NINGUNO,
     DOS,
     CUATRO,
     OCHO
@@ -70,7 +71,8 @@ public enum PositionAnimationType
     IZQUIERDA_ARRIBA,
     DERECHA_ARRIBA,
     IZQUIERDA_ABAJO,
-    DERECHA_ABAJO
+    DERECHA_ABAJO,
+    CENTRO
 }
 
 
@@ -116,6 +118,7 @@ public enum BonusType
     VELOCITY_ATTACK,
     SPACE_BAG,
     VELOCITY_MOVE,
+    RANGO_ATAQUE_EDIFICIOS,
 }
 public enum ElementType
 {

@@ -41,26 +41,40 @@ public partial class Main3D : Node3D
 
         terrainMap = new TerrainMap("Mapa2", 1, false);
 
-        for (int i = -5; i < 5; i++)
+        for (int i = -10; i < 100; i++)
         {
-            for (int j = -5; j < 5; j++)
+            for (int j = -10; j < 100; j++)
             {
                 terrainMap.AddUpdateTile(new Vector2I(i, j), 7);
             }
 
         }
-        terrainMap.AddUpdateTile(new Vector2I(8, 8), 8);
+        //terrainMap.AddUpdateTile(new Vector2I(8, 8), 8);
 
 
         //terrainMap.LoadMapData();
         //terrainMap.SaveAllMap();
+
+        MapResources mapResources = new MapResources("recursos", 10, false);
+        for (int i = -20; i < 20; i++)
+        {
+            for (int j = -20; j < 20; j++)
+            {
+                mapResources.AddSprite(new Vector2I(i, j), 1);
+            }
+
+        }
+       
+        
+        
+
         ChunkManager.Instance.ForcedUpdate();
 
 
-        CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(5, 5));
+        //CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(30, 30));
 
-        Vector2 wdd = new Vector2(8, 8);
-        CharacterCreatorManager.Instance.CreateNewCharacter(2, wdd);
+        //Vector2 wdd = new Vector2(8, 8);
+        //CharacterCreatorManager.Instance.CreateNewCharacter(2, wdd);
 
         //for (int i = 0; i < 5000; i++)
         //{
@@ -106,8 +120,11 @@ public partial class Main3D : Node3D
     int frameCounter = 0;
     public override void _Process(double delta)
     {
-        
-        
+
+    
+        //Vector2I screenSize = DisplayServer.ScreenGetSize();
+        //GD.Print("Resolución máxima del monitor: " + screenSize);
+
         ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
         //terrainMap.UpdatePositionChunk(PositionsManager.Instance.positionCamera);
         EcsManager.Instance.UpdateSystems((float)delta, 0);

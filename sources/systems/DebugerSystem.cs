@@ -104,7 +104,26 @@ internal class DebugerSystem : BaseSystem<World, float>
                     var accesoryCollision = dataAccesory;
                     if (accesoryCollision.hasBodyAnimation)
                     {
-                        for (int i=0; i<= Enum.GetNames(typeof(DirectionAnimationType)).Length; i++)
+                        var directionType = accesoryCollision.accesoryAnimationBodyData.animationStateData.directionAnimationType;
+                        int limit = 0;
+                        switch (directionType)
+                        {
+                            case DirectionAnimationType.NINGUNO:
+                                limit = 1;
+                                break;
+                            case DirectionAnimationType.DOS:
+                                limit = 2;
+                                break;
+                            case DirectionAnimationType.CUATRO:
+                                limit = 4;
+                                break;
+                            case DirectionAnimationType.OCHO:
+                                limit = 8;
+                                break;
+                            default:
+                                break;
+                        }
+                        for (int i=0; i< limit; i++)
                         {
                             var animacionData =accesoryCollision.accesoryAnimationBodyData.animationStateData.animationData[i];
                             if (animacionData.hasCollider)
@@ -391,9 +410,29 @@ internal class DebugerSystem : BaseSystem<World, float>
 
                     DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
                 }
+            }            
+        }
+        foreach (var item in CollisionManager.Instance.spriteColliders.cellMap)
+        {
+            foreach (var item2 in item.Value)
+            {
+
+                var tileInfo = item2.Value.GetSpriteData();
+
+                GeometricShape2D collisionB = tileInfo.collisionBody;
+                //GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
+                if (collisionB is Rectangle)
+                {
+                    float scale = tileInfo.scale;
+                    Rectangle shape = (Rectangle)collisionB;
+                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
+                    transform3DShape.Origin = new Vector3(item2.Value.positionCollider.X, item2.Value.positionCollider.Y, 1);
+
+                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
+                }
             }
-            
-        } 
+        }
     }
 }
 

@@ -58,6 +58,7 @@ namespace GodotEcsArch.sources.utils
             ////  Error result = imageCompressed.LoadDdsFromBuffer(bytes);
             Image imageCompressed = new Image();
             Error result = imageCompressed.Load(filePath);
+            result = imageCompressed.GenerateMipmaps();
 
             if (result == Error.Ok)
             {

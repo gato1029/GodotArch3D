@@ -1,4 +1,3 @@
-using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
@@ -13,12 +12,12 @@ public class AccessoryData : IdData
     public bool hasBodyAnimation { set; get; }
     public bool hasAnimationTile { set; get; }
     public bool hasRequirements { set; get; }
-    public MiniatureData miniatureData { set; get; }
+    public SpriteData miniatureData { set; get; }
     public AccesoryClassType accesoryClassType { set; get; }
     public AccesoryType accesoryType { set; get; }
     public AccesoryBodyPartType accesoryBodyPartType { set; get; }
     public int idBodyAnimationBaseData { set; get; }    
-    public AnimationTilesData animationTilesData { set; get; }
+    public SpriteAnimationData animationTilesData { set; get; }
     
     public BonusData[] bonusDataArray { get; set; }
     public ElementsData[] damageDataArray { get; set; }
@@ -35,28 +34,16 @@ public class AccessoryData : IdData
     }
 
     [BsonCtor]
-    public AccessoryData(MiniatureData miniatureData, int idBodyAnimationBaseData) : base()
+    public AccessoryData(SpriteData miniatureData, int idBodyAnimationBaseData) : base()
     {
-        if (miniatureData.idMaterial>0 && miniatureData.idTile>0)
+        if (miniatureData!=null && miniatureData.idMaterial>0 )
         {
-            var tile =DataBaseManager.Instance.FindById<TileDynamicData>(miniatureData.idTile);
-            textureVisual = tile.textureVisual;
+            
+            var atlas = MaterialManager.Instance.GetAtlasTexture(miniatureData.idMaterial, miniatureData.x, miniatureData.y, miniatureData.widht, miniatureData.height);            
+            textureVisual = atlas;
         }
         accesoryAnimationBodyData = DataBaseManager.Instance.FindById<AccesoryAnimationBodyData>(idBodyAnimationBaseData);
     }
-}
-public struct MiniatureData {
-    public int idMaterial { get; set; }
-    public int idTile { get; set; } 
-}
-public class AnimationTilesData {
-    public bool loop { set; get; }
-    public bool mirrorHorizontal { set; get; }
-    public float frameDuration {  set; get; }
-    public int idMaterialTiles { get; set; }
-    public int[] idFrames { get; set; }    
-    public bool hasCollider { get; set; }
-    public GeometricShape2D collider { get; set; }
 }
 public class RequirementsData
 {
@@ -64,7 +51,7 @@ public class RequirementsData
     public int level { get; set; }
 }
 public class ProjectileData
-{
+{    
     public bool hasAnimation { get; set; }
     public int idMaterialTiles {  set; get; }
     public int[] idTiles { get; set; }

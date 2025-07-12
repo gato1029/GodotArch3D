@@ -132,6 +132,10 @@ public partial class ControlAnimationState : PanelContainer
         switch (index)
         {
             case 0:
+                OptionButtonPosition.AddItem(PositionAnimationType.CENTRO.ToString());
+                break;
+
+            case 1:
                 foreach (PositionAnimationType type in Enum.GetValues(typeof(PositionAnimationType)))
                 {
                     OptionButtonPosition.AddItem(type.ToString());
@@ -142,7 +146,7 @@ public partial class ControlAnimationState : PanelContainer
                     }
                 }
                 break;
-            case 1:
+            case 2:
                 foreach (PositionAnimationType type in Enum.GetValues(typeof(PositionAnimationType)))
                 {
                     OptionButtonPosition.AddItem(type.ToString());
@@ -153,7 +157,7 @@ public partial class ControlAnimationState : PanelContainer
                     }
                 }
                 break;
-            case 2:
+            case 3:
                 foreach (PositionAnimationType type in Enum.GetValues(typeof(PositionAnimationType)))
                 {
                     OptionButtonPosition.AddItem(type.ToString());
@@ -174,6 +178,9 @@ public partial class ControlAnimationState : PanelContainer
       
         switch (objectData.directionAnimationType)
         {
+            case DirectionAnimationType.NINGUNO:
+                objectData.animationData = new AnimationData[1];
+                break;
             case DirectionAnimationType.DOS:
                 objectData.animationData = new AnimationData[2];
                 break;
@@ -194,7 +201,11 @@ public partial class ControlAnimationState : PanelContainer
         int c = 0;
         switch (index)
         {
-            case 0:
+            case 0:                                
+                    OptionButtonPosition.AddItem(PositionAnimationType.CENTRO.ToString());                                    
+                break;
+
+            case 1:
                 foreach (PositionAnimationType type in Enum.GetValues(typeof(PositionAnimationType)))
                 {
                     OptionButtonPosition.AddItem(type.ToString());
@@ -205,7 +216,7 @@ public partial class ControlAnimationState : PanelContainer
                     }
                 }                
                 break; 
-                case 1:
+                case 2:
                 foreach (PositionAnimationType type in Enum.GetValues(typeof(PositionAnimationType)))
                 {
                     OptionButtonPosition.AddItem(type.ToString());
@@ -216,7 +227,7 @@ public partial class ControlAnimationState : PanelContainer
                     }
                 }
                 break;
-                case 2:
+                case 3:
                 foreach (PositionAnimationType type in Enum.GetValues(typeof(PositionAnimationType)))
                 {
                     OptionButtonPosition.AddItem(type.ToString());

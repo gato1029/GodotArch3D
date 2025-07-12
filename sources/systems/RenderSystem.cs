@@ -114,8 +114,7 @@ internal class RenderSystem : BaseSystem<World, float>
                 ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
                 ref RenderGPUComponent renderComponent = ref Unsafe.Add(ref pointerRenderComponent, entityIndex);
                 ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
-                float renderZ = ((positionComponent.position.Y +renderComponent.originOffset.Y + renderComponent.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender ;
-                
+                float renderZ = ((positionComponent.position.Y +renderComponent.originOffset.Y ) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender + renderComponent.zOrdering;           
                 renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, renderZ);
                 RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);
 

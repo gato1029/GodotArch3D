@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://bwj1kqmxyq8dp"]
+
+[ext_resource type="Shader" uid="uid://w6gf76oil75j" path="res://resources/shaders/SpriteMultimeshGenericArray.gdshader" id="1_fykbm"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_fykbm")
+shader_parameter/transparency = 0.0

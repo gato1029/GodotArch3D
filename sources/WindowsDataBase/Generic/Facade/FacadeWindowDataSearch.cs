@@ -56,7 +56,7 @@ internal class FacadeWindowDataSearch<T> where T : class
         foreach (T item in result)
         {
             IdData data = item as IdData;
-            int id = windowDataSearch.ItemListView.AddItem(data.name, data.textureVisual);
+            int id = windowDataSearch.ItemListView.AddItem(data.id +":"+ data.name, data.textureVisual);
             windowDataSearch.ItemListView.SetItemMetadata(id, data.id);
         }
     }
@@ -88,7 +88,7 @@ internal class FacadeWindowDataSearch<T> where T : class
         foreach (T item in result)
         {
             IdData data = item as IdData;
-            int id = windowDataSearch.ItemListView.AddItem(data.name, data.textureVisual);
+            int id = windowDataSearch.ItemListView.AddItem(data.id +":"+data.name, data.textureVisual);
             windowDataSearch.ItemListView.SetItemMetadata(id, data.id);
         }
     }

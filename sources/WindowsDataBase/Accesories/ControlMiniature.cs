@@ -9,21 +9,20 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 public partial class ControlMiniature : PanelContainer
 {
 
-    MiniatureData objectData;
-    WindowViewDb windowViewDb;
+    SpriteData objectData;
+    
 
-    public MiniatureData ObjectData { get => objectData; set => objectData = value; }
+    public SpriteData ObjectData { get => objectData; set => objectData = value; }
 
-    public void SetData(MiniatureData pObjectData)
+    public void SetData(SpriteData pObjectData)
     {
-        objectData = pObjectData;
-        if (pObjectData.idTile>0)
+        if (pObjectData!=null)
         {
-            var data = DataBaseManager.Instance.FindById<TileDynamicData>(pObjectData.idTile);
-            TextureRectImage.Texture = data.textureVisual;
+            objectData = pObjectData;
+            var atlas = MaterialManager.Instance.GetAtlasTexture(objectData.idMaterial, objectData.x, objectData.y, objectData.widht, objectData.height);
+            TextureRectImage.Texture = atlas;
         }
         
-
     }
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
@@ -34,38 +33,27 @@ public partial class ControlMiniature : PanelContainer
     public override void _Ready()
 	{
 		InitializeUI();
-        ButtonNew.Pressed += ButtonNew_Pressed;
+        
         ButtonSelect.Pressed += ButtonSelect_Pressed;
 	}
-    private void ButtonNew_Pressed()
-    {
-        var newWindow = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileDinamic.tscn").Instantiate<WindowTileDinamic>();
-        AddChild(newWindow);
-        newWindow.Show();
-    }
+   
 
     private void ButtonSelect_Pressed()
     {
-        windowViewDb = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowViewDB.tscn").Instantiate<WindowViewDb>();
-        AddChild(windowViewDb);
-        windowViewDb.Show();
-        windowViewDb.WorkMode(true);
-        windowViewDb.LoadItems<TileDynamicData>();
-        windowViewDb.OnRequestSelectedItem += WindowViewDb_OnRequestSelectedItem;
-        windowViewDb.OnRequestFilterMaterial += WindowViewDb_OnRequestFilterMaterial;
+        var windowMini = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/WindowMiniature.tscn").Instantiate<WindowMiniature>();
+        windowMini.Show();
+        AddChild(windowMini);
+        if (objectData != null)
+        {
+            windowMini.SetData(objectData);
+        }
+        windowMini.OnNotifyChangued += WindowMini_OnNotifyChangued;
+        
     }
 
-
-    private void WindowViewDb_OnRequestFilterMaterial(int idMaterial)
+    private void WindowMini_OnNotifyChangued(WindowMiniature objectControl)
     {
-        windowViewDb.LoadItemsByMaterial<TileDynamicData>();
-    }
-
-    private void WindowViewDb_OnRequestSelectedItem(int id)
-    {
-        var data =DataBaseManager.Instance.FindById<TileDynamicData>(id);
-        objectData.idTile = data.id;
-        objectData.idMaterial = data.idMaterial;
-        TextureRectImage.Texture = data.textureVisual;
+        objectData = objectControl.ObjectData;
+        SetData(objectData);    
     }
 }

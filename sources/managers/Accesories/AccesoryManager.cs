@@ -89,7 +89,7 @@ internal class AccesoryManager : SingletonBase<AccesoryManager>
             RegisterAccesory(idAccesory, accesoryData);
         }
         accesoryData = accesories[idAccesory];
-
-        return MaterialManager.Instance.GetAtlasTexture(accesoryData.miniatureData.idMaterial, accesoryData.miniatureData.idTile);                
+        SpriteData miniatureData = accesoryData.miniatureData;
+        return MaterialManager.Instance.GetAtlasTexture(miniatureData.idMaterial, miniatureData.x, miniatureData.y, miniatureData.widht, miniatureData.height);
     }
 }

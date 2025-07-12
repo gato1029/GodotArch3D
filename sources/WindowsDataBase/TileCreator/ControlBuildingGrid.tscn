@@ -1,0 +1,93 @@
+[gd_scene load_steps=5 format=3 uid="uid://diki24d60o2xo"]
+
+[ext_resource type="Script" uid="uid://dlwne2l5wiigc" path="res://sources/WindowsDataBase/TileCreator/ControlBuildingGrid.cs" id="1_jx8df"]
+[ext_resource type="Texture2D" uid="uid://c5ccx8t7g4yrh" path="res://resources/Textures/TX Plant.png" id="2_jx8df"]
+[ext_resource type="Material" uid="uid://cswu7wwwabv33" path="res://resources/Material/MaterialGridCanvas.tres" id="2_w2pax"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_im6wl"]
+atlas = ExtResource("2_jx8df")
+region = Rect2(160, 16, 96, 140)
+
+[node name="ControlBuildingGrid" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+focus_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+script = ExtResource("1_jx8df")
+gridSize = Vector2i(30, 30)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Division Grid:"
+
+[node name="SpinBoxCellSize" type="SpinBox" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+min_value = 4.0
+max_value = 512.0
+step = 4.0
+value = 16.0
+editable = false
+suffix = "Px"
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Tamaño Grid:"
+
+[node name="SpinBoxGridSizeX" type="SpinBox" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 30.0
+value = 1.0
+suffix = "X"
+
+[node name="SpinBoxGridSizeY" type="SpinBox" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+max_value = 30.0
+value = 1.0
+suffix = "Y"
+
+[node name="ContainerSelectionTexture" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+
+[node name="CenterContainerBase" type="CenterContainer" parent="VBoxContainer/ContainerSelectionTexture"]
+custom_minimum_size = Vector2(192, 280)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+focus_mode = 2
+
+[node name="TextureDraw" type="TextureRect" parent="VBoxContainer/ContainerSelectionTexture/CenterContainerBase"]
+custom_minimum_size = Vector2(96, 140)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = SubResource("AtlasTexture_im6wl")
+expand_mode = 3
+stretch_mode = 3
+
+[node name="GridBase" type="ColorRect" parent="VBoxContainer/ContainerSelectionTexture/CenterContainerBase"]
+material = ExtResource("2_w2pax")
+custom_minimum_size = Vector2(192, 280)
+layout_mode = 2
+
+[node name="Selection" type="ColorRect" parent="VBoxContainer/ContainerSelectionTexture/CenterContainerBase"]
+visible = false
+modulate = Color(1, 1, 1, 0.5)
+layout_mode = 2

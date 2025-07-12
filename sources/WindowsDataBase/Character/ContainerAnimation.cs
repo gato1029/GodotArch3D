@@ -215,7 +215,7 @@ public partial class ContainerAnimation : PanelContainer
         
     }
 
-    public void SetData(AnimationTilesData pObjectData)
+    public void SetData(SpriteAnimationData pObjectData)
     {
         //objectData = pObjectData;
         //tiles = pObjectData.idFrames.ToList();

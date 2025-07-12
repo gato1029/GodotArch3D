@@ -12,21 +12,13 @@ public partial class MapsWindow : Window
 	{
         InitializeUI(); // Insertado por el generador de UI
         ButtonSave.Pressed += ButtonSave_Pressed;
-        mapLevelData = new MapLevelData();
+        
 
     }
 
     private void ButtonSave_Pressed()
-    {
-        mapLevelData.size = new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value);
-        mapLevelData.name = LineEditName.Text;
-        mapLevelData.description = TextEditDescription.Text;
-
-        string path = CommonAtributes.pathMaps;
-        string pathCarpet = FileHelper.GetPathGameDB(path);
-
-        SerializerManager.SaveToFileJson(mapLevelData, pathCarpet, mapLevelData.name);
-        
+    {       
+        mapLevelData = new MapLevelData(LineEditName.Text, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value), MapType.Mapa, 10,TextEditDescription.Text);                      
         MapManagerEditor.Instance.currentMapLevelData = mapLevelData;
     }
 

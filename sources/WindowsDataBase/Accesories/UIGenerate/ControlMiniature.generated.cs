@@ -4,14 +4,15 @@ using System;
 
 public partial class ControlMiniature : PanelContainer
 {
-    private Button ButtonNew;
-    private Button ButtonSelect;
-    private TextureRect TextureRectImage;
+    public delegate void EventNotifyChangued(ControlMiniature objectControl);
+    public event EventNotifyChangued OnNotifyChangued;
 
-    public  void InitializeUI()
+    private TextureRect TextureRectImage;
+    private Button ButtonSelect;
+
+    public void InitializeUI()
     {
-        ButtonNew = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/ButtonNew");
-        ButtonSelect = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/ButtonSelect");
         TextureRectImage = GetNode<TextureRect>("MarginContainer/VBoxContainer/TextureRectImage");
+        ButtonSelect = GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/ButtonSelect");
     }
 }

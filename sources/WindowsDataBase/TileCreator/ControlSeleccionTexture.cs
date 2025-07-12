@@ -25,7 +25,10 @@ public partial class ControlSeleccionTexture : MarginContainer
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
-        _shaderMaterial = (ShaderMaterial)GridBase.Material;
+        ShaderMaterial tempo = GD.Load<ShaderMaterial>("res://resources/Material/MaterialGridCanvas.tres");
+        _shaderMaterial = (ShaderMaterial)tempo.Duplicate();
+        GridBase.Material = _shaderMaterial;
+
         Selection.Modulate = new Color(1, 1, 1, 0.5f);
         Selection.Visible = false;
         SpinBoxCellSize.ValueChanged += SpinBoxCellSize_ValueChanged;
@@ -108,11 +111,7 @@ public partial class ControlSeleccionTexture : MarginContainer
                                 _startPosition.Y / baseScale,
                                 cellInternal / baseScale,
                                 cellInternal / baseScale
-                            );
-                            GD.Print(_startPosition.X / baseScale);
-                            GD.Print(_startPosition.Y / baseScale);
-                            GD.Print(cellInternal / baseScale);
-                            GD.Print(cellInternal / baseScale);
+                            );         
                         }
                         else
                         {
@@ -148,7 +147,7 @@ public partial class ControlSeleccionTexture : MarginContainer
         }
         if (v==1)
         {
-            SetScale(Mathf.Max(2, baseScale - 1));
+            SetScale(Mathf.Max(1, baseScale - 1));
         }
     }
 

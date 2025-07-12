@@ -18,6 +18,7 @@ public class MultimeshData
         multiMesh = new MultiMesh();
         multiMesh.Mesh = meshBase;
         multiMesh.UseCustomData = true;
+        multiMesh.UseColors = true;
         multiMesh.TransformFormat = MultiMesh.TransformFormatEnum.Transform3D;
         multiMesh.InstanceCount = maxInstances;
         multiMesh.VisibleInstanceCount = maxInstances;
