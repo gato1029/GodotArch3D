@@ -1,72 +1,45 @@
 using Godot;
 using GodotEcsArch.sources.managers.Textures;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Godot.HttpRequest;
 
 namespace GodotEcsArch.sources.managers.Multimesh;
 public class MultimeshManager:SingletonBase<MultimeshManager>
 {
-    
-    
-    public Dictionary<Rid, MultimeshData> multimeshDataDict;
-    int sizeMax = 10000; // instanciasMaximas
-
+    private Dictionary<MaterialType, MultimeshArrayMaterial> multiMeshArrayShaders;
     protected override void Initialize()
-    {          
-        multimeshDataDict = new Dictionary<Rid, MultimeshData>();
-
-        var listData = DataBaseManager.Instance.FindAll<MaterialData>();
-        foreach (var item in listData)
-        {
-            TextureArrayBuilder.Instance.SetTextureAt(item.id,FileHelper.GetPathGameDB(item.pathTexture));
-        }
-        TextureArrayBuilder.Instance.BuildAndApply();
+    {
+        multiMeshArrayShaders = new Dictionary<MaterialType, MultimeshArrayMaterial>();
+        AddMaterial(MaterialType.GENERICO);
+     
     }
-
+    private void AddMaterial(MaterialType materialType)
+    {
+        var tempo = new MultimeshArrayMaterial(materialType);
+        multiMeshArrayShaders.Add(materialType, tempo);
+    }
     protected override void Destroy()
     {
         throw new NotImplementedException();
     }
  
-    public void FreeInstance(Rid rid, int instance)
+    public void FreeInstance(MaterialType typeShader,Rid rid, int instance, int idMaterial)
     {
-        multimeshDataDict[rid].FreeInstance(instance);
-    }
-    public (Rid, int) CreateInstance()
-    {
-        MultimeshData multimeshData = null;
-        foreach (var item in multimeshDataDict)
-        {
-            multimeshData = item.Value;
-            if (multimeshData.freePositions.Count > 0)
-            {
-                multimeshData = item.Value;
-                break;
-            }
-        }
-
-        if (multimeshData == null)
-        {
-            multimeshData = new MultimeshData(TextureArrayBuilder.Instance.mesh, sizeMax);
-            multimeshDataDict.Add(multimeshData.rid, multimeshData);
-        }
-        else
-        {
-            if (!multimeshData.AvailbleSpace())
-            {
-                multimeshData = new MultimeshData(TextureArrayBuilder.Instance.mesh, sizeMax);
-                multimeshDataDict.Add(multimeshData.rid, multimeshData);
-            }
-
-        }
-
-        return (multimeshData.rid, multimeshData.CreateInstance());
-    }
-
+        multiMeshArrayShaders[typeShader].FreeInstance(rid, instance, idMaterial);
     
+    }
+    public (Rid rid, int instance, int materialBatchPosition) CreateInstance(MaterialType typeShader, int idMaterial)
+    {        
+        return multiMeshArrayShaders[typeShader].CreateInstance(idMaterial);
+    }
+   
 }
+

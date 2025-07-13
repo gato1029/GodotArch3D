@@ -4,6 +4,7 @@ using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
@@ -12,7 +13,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileData;
 
-public partial class WindowTerrain : Window, IDetailWindow
+public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
 {
     TerrainData terrainData;
 
@@ -32,7 +33,8 @@ public partial class WindowTerrain : Window, IDetailWindow
     bool isRule = false;
 
     CollisionShape2D collisionBody;
-    public event IDetailWindow.RequestUpdateHandler OnRequestUpdate;
+    
+    public event IFacadeWindow<TerrainData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -52,8 +54,7 @@ public partial class WindowTerrain : Window, IDetailWindow
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/Button2").Pressed += button_SearchRule;
 
         GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/Button4").Pressed += button_Dinamic;
-
-        buscarButton.Pressed += button_Search;
+       
   
         terrainData = new TerrainData();
         this.CloseRequested += WindowTerrain_CloseRequested;
@@ -61,32 +62,16 @@ public partial class WindowTerrain : Window, IDetailWindow
 
     private void button_Dinamic()
     {
-        WindowDataGeneric win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-        AddChild(win);
-        win.Show();
-        PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileDinamic.tscn");
-        win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR, "Tile Animado");
-        win.SetLoaddBAction(() =>
-        {
-            var collection = DataBaseManager.Instance.FindAll<TileDynamicData>();
-            List<IdData> ids = new List<IdData>();
-            foreach (var item in collection)
-            {
-                IdData iddata = item;
-                ids.Add(iddata);
-            }
-            return ids;
-        }
-        );
-        win.OnRequestSelectedItem += Win_OnRequestSelectedItemDinamic;
+        FacadeWindowDataSearch<TileDynamicData> windowDinamic = new FacadeWindowDataSearch<TileDynamicData>("res://sources/WindowsDataBase/TileCreator/WindowTiles.tscn", this, WindowType.SELECTED);     
+        windowDinamic.OnNotifySelected += WindowDinamic_OnNotifySelected;
     }
 
-    private void Win_OnRequestSelectedItemDinamic(int id)
+    private void WindowDinamic_OnNotifySelected(TileDynamicData objectSelected)
     {
         isRule = false;
-        var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileDynamicData>(id);
+        var data = objectSelected;
         spriteSelection.Texture = data.textureVisual;
-        currentTile = id;
+        currentTile = objectSelected.id;
         if (data.haveCollider)
         {
             Rectangle rect = (Rectangle)data.collisionBody;
@@ -96,27 +81,22 @@ public partial class WindowTerrain : Window, IDetailWindow
         }
     }
 
+
+
     private void button_SearchRule()
     {
+        FacadeWindowDataSearch<AutoTileData> windowRule = new FacadeWindowDataSearch<AutoTileData>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn", this, WindowType.SELECTED);
+ 
+        windowRule.OnNotifySelected += WindowRule_OnNotifySelected;
+    }
 
-        WindowDataGeneric win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-        AddChild(win);
-        win.Show();
-        PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn");
-        win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR, "Auto Tile");
-        win.SetLoaddBAction(() =>
-        {
-            var collection = DataBaseManager.Instance.FindAll<AutoTileData>();
-            List<IdData> ids = new List<IdData>();
-            foreach (var item in collection)
-            {
-                IdData iddata = item;
-                ids.Add(iddata);
-            }
-            return ids;
-        }
-        );
-        win.OnRequestSelectedItem += Win_OnRequestSelectedItemRule;
+    private void WindowRule_OnNotifySelected(AutoTileData objectSelected)
+    {
+        isRule = true;
+        var data = objectSelected;
+        spriteSelection.Texture = data.textureVisual;
+
+        currentRule = objectSelected.id ;
     }
 
     private void Win_OnRequestSelectedItemRule(int id)
@@ -127,34 +107,19 @@ public partial class WindowTerrain : Window, IDetailWindow
         
         currentRule = id;
     }
-        private void button_SearchAnimated()
+     private void button_SearchAnimated()
     {
-        WindowDataGeneric win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-        AddChild(win);
-        win.Show();
-        PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileAnimate.tscn");
-        win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR,"Tile Animado");
-        win.SetLoaddBAction(() =>
-        {
-            var collection = DataBaseManager.Instance.FindAll<TileAnimateData>();
-            List<IdData> ids = new List<IdData>();
-            foreach (var item in collection)
-            {
-                IdData iddata = item;
-                ids.Add(iddata);
-            }
-            return ids;
-        }
-        );
-        win.OnRequestSelectedItem += Win_OnRequestSelectedItemAnimated;
+
+        FacadeWindowDataSearch<TileAnimateData> windowTileAnimateData = new FacadeWindowDataSearch<TileAnimateData>("res://sources/WindowsDataBase/TileCreator/WindowAnimatedTiles.tscn", this, WindowType.SELECTED);
+        windowTileAnimateData.OnNotifySelected += WindowTileAnimateData_OnNotifySelected;
     }
 
-    private void Win_OnRequestSelectedItemAnimated(int id)
+    private void WindowTileAnimateData_OnNotifySelected(TileAnimateData objectSelected)
     {
         isRule = false;
-        var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileAnimateData>(id);
+        var data = objectSelected;
         spriteSelection.Texture = data.textureVisual;
-        currentTile = id;
+        currentTile = objectSelected.id;
         if (data.haveCollider)
         {
             Rectangle rect = (Rectangle)data.collisionBody;
@@ -165,32 +130,14 @@ public partial class WindowTerrain : Window, IDetailWindow
         }
     }
 
+
+
     private void WindowTerrain_CloseRequested()
     {
         QueueFree();
     }
 
-    private void button_Search()
-    {
-        WindowDataGeneric win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-        AddChild(win);
-        win.Show();
-        PackedScene ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowTileSimple.tscn");
-        win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.SELECTOR,"Tile Simple");
-        win.SetLoaddBAction(() =>
-        {
-            var collection = DataBaseManager.Instance.FindAll<TileSimpleData>();
-            List<IdData> ids = new List<IdData>();
-            foreach (var item in collection)
-            {
-                IdData iddata = item;
-                ids.Add(iddata);
-            }
-            return ids;
-        }
-        );
-        win.OnRequestSelectedItem += Win_OnRequestSelectedItem;
-    }
+   
 
     
     private void Win_OnRequestSelectedItem(int id)
@@ -214,7 +161,7 @@ public partial class WindowTerrain : Window, IDetailWindow
         terrainData.id = 0;
         terrainData.name = nameLine.Text + "_Copy";
         DataBaseManager.Instance.InsertUpdate(terrainData);
-        OnRequestUpdate?.Invoke();
+        OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }
     private void button_Save()
@@ -235,8 +182,8 @@ public partial class WindowTerrain : Window, IDetailWindow
         
         terrainData.isRule = isRule;
 
-        DataBaseManager.Instance.InsertUpdate(terrainData); 
-        OnRequestUpdate?.Invoke();
+        DataBaseManager.Instance.InsertUpdate(terrainData);
+        OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }
 
@@ -250,39 +197,42 @@ public partial class WindowTerrain : Window, IDetailWindow
     public override void _Process(double delta)
 	{
 	}
-
-    public void LoadData(int id)
+    public void SetData(TerrainData data)
     {
-        terrainData = DataBaseManager.Instance.FindById<TerrainData>(id);
+        terrainData = data;
 
         idBaseSpin.Value = terrainData.id;
-        nameLine.Text  = terrainData.name;
+        nameLine.Text = terrainData.name;
         if (terrainData.isRule)
         {
             var tileData = DataBaseManager.Instance.FindById<AutoTileData>(terrainData.idRule);
-            Win_OnRequestSelectedItemRule(tileData.id);
+            WindowRule_OnNotifySelected(tileData);
+            
         }
         else
         {
             var tileData = DataBaseManager.Instance.FindById<TileData>(terrainData.idTile);
             
-            if (tileData.type == "TileSimpleData")
-            {
-                Win_OnRequestSelectedItem(terrainData.idTile);                             
-            }
+         
             if (tileData.type == "TileDynamicData")
             {
-                Win_OnRequestSelectedItemDinamic(terrainData.idTile);                           
+                var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileDynamicData>(terrainData.idTile);
+                WindowDinamic_OnNotifySelected(dataInternal);
             }
             if (tileData.type == "TileAnimateData")
             {
-                Win_OnRequestSelectedItemAnimated(terrainData.idTile);
-            }
+                var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileAnimateData>(terrainData.idTile);
+                WindowTileAnimateData_OnNotifySelected(dataInternal);
                 
+            }
 
-        }
-        
 
-     
+        }        
     }
+    public void LoadData(int id)
+    {
+                    
+    }
+
+ 
 }

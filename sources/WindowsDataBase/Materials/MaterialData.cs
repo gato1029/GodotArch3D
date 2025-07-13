@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Materials
 {
+    public enum MaterialType
+    {
+        GENERICO = 0,
+        ARMAS = 1,
+    }
     public class IdData 
     {
         [BsonId]
@@ -46,8 +51,11 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         public ShaderMaterial shaderMaterial { get; set; }
         [BsonIgnore]
         public Texture textureMaterial { get; set; }
-        [BsonIgnore]
+        [BsonIgnore]        
         public Mesh mesh { get; set; }
+
+        [BsonIgnore]
+        public int idMaterialPositionBatch { get; set; }
         public MaterialData()
         {
             MaterialManager.Instance.RegisterMaterial(-1, this);            
@@ -71,61 +79,10 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
             switch (type)
             {
                 case 0:
-                    materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimesh.tres");
-                     texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
-                    textureMaterial = texture2D;
-                     widht = texture2D.GetWidth() / divisionPixelX;
-                     height = texture2D.GetHeight() / divisionPixelY;
-
-                    shaderMaterial = (ShaderMaterial)materialGeneric.Duplicate();
-                    shaderMaterial.SetShaderParameter("mtexture", textureMaterial);
-                    shaderMaterial.SetShaderParameter("ancho", widht);
-                    shaderMaterial.SetShaderParameter("alto", height);
-
-                    
-
-                    mesh = MeshCreator.CreateSquareMesh(divisionPixelX, divisionPixelY, new Vector2(divisionPixelX, divisionPixelY), new Vector3(0,0,0));
-                    mesh.SurfaceSetMaterial(0, shaderMaterial);
                     MaterialManager.Instance.RegisterMaterial(id, this);
+                    texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
                     break;
-
                 case 1:
-                    materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshDinamic.tres");
-                    texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
-                    textureMaterial = texture2D;
-
-                    widht = texture2D.GetWidth();
-                    height = texture2D.GetHeight();
-
-                    shaderMaterial = (ShaderMaterial)materialGeneric.Duplicate();
-                    shaderMaterial.SetShaderParameter("main_texture", textureMaterial);
-                    shaderMaterial.SetShaderParameter("atlas_width", widht);
-                    shaderMaterial.SetShaderParameter("atlas_height", height);
-
-                    mesh = MeshCreator.CreateSquareMesh(divisionPixelX, divisionPixelY, new Vector2(divisionPixelX, divisionPixelY), new Vector3(0, 0, 0));
-                    mesh.SurfaceSetMaterial(0, shaderMaterial);
-                    MaterialManager.Instance.RegisterMaterial(id, this);
-                    break;
-             
-                case 2:
-                    materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshCharacterCustom.tres");
-                    texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
-                    textureMaterial = texture2D;
-                    widht = texture2D.GetWidth() / divisionPixelX;
-                    height = texture2D.GetHeight() / divisionPixelY;
-
-                    shaderMaterial = (ShaderMaterial)materialGeneric.Duplicate();
-                    shaderMaterial.SetShaderParameter("body_texture", textureMaterial);
-                    shaderMaterial.SetShaderParameter("ancho", widht);
-                    shaderMaterial.SetShaderParameter("alto", height);
-
-                    shaderMaterial.SetShaderParameter("layers", 0);
-       
-                    mesh = MeshCreator.CreateSquareMesh(divisionPixelX, divisionPixelY, new Vector2(divisionPixelX, divisionPixelY), new Vector3(0, 0, 0));
-                    mesh.SurfaceSetMaterial(0, shaderMaterial);
-                    MaterialManager.Instance.RegisterMaterial(id, this);
-                    break;
-                case 3:
                     materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshGeneric.tres");
                     texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
                     textureMaterial = texture2D;
@@ -136,12 +93,10 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
                     shaderMaterial.SetShaderParameter("main_texture", textureMaterial);
                     shaderMaterial.SetShaderParameter("atlas_width", widht);
                     shaderMaterial.SetShaderParameter("atlas_height", height);
-                    
-                    mesh = MeshCreator.CreateSquareMesh(16, 16, new Vector2(divisionPixelX, divisionPixelY), new Vector3(0, 0, 0));
+                    mesh = MeshCreator.CreateSquareMesh(16, 16);
                     mesh.SurfaceSetMaterial(0, shaderMaterial);
                     MaterialManager.Instance.RegisterMaterial(id, this);
-                    break;                
-
+                    break;                                 
                 default:
                     break;
             }

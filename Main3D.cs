@@ -35,35 +35,36 @@ public partial class Main3D : Node3D
         PerformanceTimer.Instance.Enabled = true;
         EcsManager.Instance.SetNode3DMain(this);
         ChunkManager.Initialize();
+        var dd =MultimeshManager.Instance;
 
         //terrainMap = TerrainMap.LoadMapfromFile("Mapa1");
 
 
-        terrainMap = new TerrainMap("Mapa2", 1, false);
+        //terrainMap = new TerrainMap("Mapa2", 1, false);
 
-        for (int i = -10; i < 100; i++)
-        {
-            for (int j = -10; j < 100; j++)
-            {
-                terrainMap.AddUpdateTile(new Vector2I(i, j), 7);
-            }
+        //for (int i = -10; i < 10; i++)
+        //{
+        //    for (int j = -10; j < 10; j++)
+        //    {
+        //        terrainMap.AddUpdateTile(new Vector2I(i, j), 7);
+        //    }
 
-        }
+        //}
         //terrainMap.AddUpdateTile(new Vector2I(8, 8), 8);
 
 
         //terrainMap.LoadMapData();
         //terrainMap.SaveAllMap();
 
-        MapResources mapResources = new MapResources("recursos", 10, false);
-        for (int i = -20; i < 20; i++)
-        {
-            for (int j = -20; j < 20; j++)
-            {
-                mapResources.AddSprite(new Vector2I(i, j), 1);
-            }
+        //MapResources mapResources = new MapResources("recursos", 10, false);
+        //for (int i = -20; i < 20; i++)
+        //{
+        //    for (int j = -20; j < 20; j++)
+        //    {
+        //        mapResources.AddSprite(new Vector2I(i, j), 1);
+        //    }
 
-        }
+        //}
        
         
         
@@ -71,7 +72,7 @@ public partial class Main3D : Node3D
         ChunkManager.Instance.ForcedUpdate();
 
 
-        //CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(30, 30));
+        CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(0, 0));
 
         //Vector2 wdd = new Vector2(8, 8);
         //CharacterCreatorManager.Instance.CreateNewCharacter(2, wdd);
@@ -121,7 +122,8 @@ public partial class Main3D : Node3D
     public override void _Process(double delta)
     {
 
-    
+     
+
         //Vector2I screenSize = DisplayServer.ScreenGetSize();
         //GD.Print("Resolución máxima del monitor: " + screenSize);
 

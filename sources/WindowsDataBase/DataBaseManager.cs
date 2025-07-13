@@ -22,6 +22,13 @@ using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileD
 
 namespace GodotEcsArch.sources.WindowsDataBase
 {
+    
+    public class DataBaseFree
+    {
+        [BsonId]
+        public string id { get; set; }
+        public List<int> freeIds { get; set; }
+    }
     internal class DataBaseManager: SingletonBase<DataBaseManager>
     {
         LiteDatabase db;
@@ -46,8 +53,13 @@ namespace GodotEcsArch.sources.WindowsDataBase
             collectionNameMap[typeof(AccesoryAnimationBodyData)] = "AccesoryAnimationBodyData";
             collectionNameMap[typeof(ResourceData)] = "ResourceData";
             collectionNameMap[typeof(BuildingData)] = "BuildingData";
+            collectionNameMap[typeof(DataBaseFree)] = "DataBaseFree";
 
-            //RegisterCollection<BuildingData>("BuildingData");
+           // RegisterCollection<BuildingData>("DataBaseFree");
+
+
+            ILiteCollection<DataBaseFree> DataBaseFreeCollection = db.GetCollection<DataBaseFree>("DataBaseFree");
+            DataBaseFreeCollection.EnsureIndex(x => x.id, unique: true);
 
             ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");            
             MaterialDataCollection.EnsureIndex(x => x.id, unique: true);
@@ -161,7 +173,8 @@ namespace GodotEcsArch.sources.WindowsDataBase
             var collection = db.GetCollection<T>(collectionName);           
             collection.Insert(data);
         }
-        public void InsertUpdate<T>(T data, int id = -1)
+
+        public bool InsertUpdateGeneric<T>(T data, int id = -1) 
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
@@ -179,17 +192,101 @@ namespace GodotEcsArch.sources.WindowsDataBase
                     throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
                 }
             }
+         
+
+
             var collection = db.GetCollection<T>(collectionName);
+            bool resultado = false;
             if (id == -1)
             {
-                collection.Upsert( data);
+                resultado = collection.Upsert(data);
             }
             else
             {
-                collection.Upsert(id,data);
+                resultado = collection.Upsert(id, data);
             }
-            
+            return resultado;
         }
+
+        public bool InsertUpdate<T>(T data, int id = -1) 
+        {
+            var baseType = typeof(T).BaseType;
+            string collectionName;
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+                }
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+                }
+            }
+         
+            var collection = db.GetCollection<T>(collectionName);
+            bool resultado = false;
+            if (id == -1)
+            {
+                resultado = collection.Upsert( data);
+            }
+            else
+            {
+                resultado = collection.Upsert(id,data);
+            }
+            return resultado;
+        }
+
+        public bool InsertUpdateLog<T>(T data, int id = -1)
+        {
+            var baseType = typeof(T).BaseType;
+            string collectionName;
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+                }
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+                }
+            }
+            if (id == -1)
+            {
+                var FreeData = FindById<DataBaseFree>(collectionName);
+                if (FreeData != null)
+                {
+                    if (FreeData.freeIds.Count > 0)
+                    {
+                        var freeid = FreeData.freeIds[0];
+                        FreeData.freeIds.RemoveAt(0);
+                        id = freeid;
+                        InsertUpdateGeneric(FreeData);
+                    }
+
+                }
+            }
+
+            var collection = db.GetCollection<T>(collectionName);
+            bool resultado = false;
+            if (id == -1)
+            {
+                resultado = collection.Upsert(data);
+            }
+            else
+            {
+                resultado = collection.Upsert(id, data);
+            }
+            return resultado;
+        }
+
         protected override void Destroy()
         {
             throw new NotImplementedException();
@@ -237,7 +334,42 @@ namespace GodotEcsArch.sources.WindowsDataBase
             return collection.FindById(id); // Devuelve el documento o null si no se encuentra
 
         }
+        public T FindById<T>(string id) where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = typeof(T).BaseType;
+            string collectionName;
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+                }
+                else
+                {
+                    // Obtén la colección correspondiente
+                    var collectionBson = db.GetCollection<BsonDocument>(collectionName);
+                    var filteredDocuments = collectionBson.Query().Where(x => x["_id"] == id && x["type"] == currentType.Name).ToList();
 
+                    var result = filteredDocuments.Select(BsonMapper.Global.ToObject<T>).FirstOrDefault();
+                    // Busca el documento por ID
+                    return result; // Devuelve el documento o null si no se encuentra
+                }
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+                }
+            }
+
+            var collection = db.GetCollection<T>(collectionName);
+
+            // Busca el documento por ID
+            return collection.FindById(id); // Devuelve el documento o null si no se encuentra
+
+        }
         public bool ExistTile(int idMaterial, int idInternal)
         {
 
@@ -413,6 +545,15 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             var collection = db.GetCollection<BsonDocument>(collectionName);
 
+            var FreeData = FindById<DataBaseFree>(collectionName);
+            if (FreeData == null)
+            {
+                FreeData = new DataBaseFree();
+                FreeData.id = collectionName;
+                FreeData.freeIds = new List<int>();
+            }
+            FreeData.freeIds.Add(id);
+            InsertUpdateGeneric(FreeData);
             return collection.Delete(id);
   
         }

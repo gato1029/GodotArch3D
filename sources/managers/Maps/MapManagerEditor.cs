@@ -46,7 +46,10 @@ public class MapManagerEditor : SingletonBase<MapManagerEditor>
         InputMouse(@event);
         InputKeyboard(@event);
     }
-
+    private void DrawTilesBluePrint(int idData)
+    {
+        
+    }
     private void InputKeyboard(Godot.InputEvent @event)
     {
         if (@event is InputEventKey keyEvent && !keyEvent.Echo)

@@ -5,7 +5,7 @@ using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
 using System.Collections.Generic;
 
-public partial class WindowAutoTile : Window, IDetailWindow
+public partial class WindowAutoTile : Window, IFacadeWindow<AutoTileData>
 {
     List<WindowAutoTileItem> items;
     VBoxContainer vBoxContainerItems;
@@ -13,7 +13,8 @@ public partial class WindowAutoTile : Window, IDetailWindow
     LineEdit lineid;
     WindowState state;
     AutoTileData autoTileData;
-    public event IDetailWindow.RequestUpdateHandler OnRequestUpdate;
+    
+    public event IFacadeWindow<AutoTileData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
 
 
     // Called when the node enters the scene tree for the first time.
@@ -114,8 +115,7 @@ public partial class WindowAutoTile : Window, IDetailWindow
             autoTileData.name = lineName.Text;          
             DataBaseManager.Instance.InsertUpdate(autoTileData);
         }
-
-        OnRequestUpdate?.Invoke();
+        OnNotifyChanguedSimple?.Invoke();        
         QueueFree();
 
     }
@@ -125,10 +125,12 @@ public partial class WindowAutoTile : Window, IDetailWindow
 	{
 	}
 
-    public void LoadData(int id)
+   
+
+    public void SetData(AutoTileData data)
     {
         state = WindowState.UPDATE;
-        autoTileData=  DataBaseManager.Instance.FindById<AutoTileData>(id);
+        autoTileData = data;
         lineid.Text = autoTileData.id.ToString();
         lineName.Text = autoTileData.name;
 
@@ -138,7 +140,7 @@ public partial class WindowAutoTile : Window, IDetailWindow
             vBoxContainerItems.AddChild(itemWin);
             itemWin.LoadData(item);
             itemWin.SetPosition(items.Count);
-            items.Add(itemWin);                          
+            items.Add(itemWin);
             itemWin.OnRequestOrderItem += Item_OnRequestOrderItem;
             itemWin.OnDeleteItem += Item_OnDeleteItem;
 

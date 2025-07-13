@@ -165,7 +165,7 @@ public class SpriteMapChunk<TData> where TData: IDataSprite, new()
                     
                     if (datatile != null && datatile.instance != -1) //&& datatile.idMaterial != 0)
                     {
-                        MultimeshManager.Instance.FreeInstance(datatile.rid, datatile.instance);
+                        MultimeshManager.Instance.FreeInstance(0,datatile.rid, datatile.instance,datatile.idMaterial);
                         //multimeshMaterialDict[datatile.idMaterial].FreeInstance(datatile.rid, datatile.instance);
                         datatile.FreeRidRender();
                     }
@@ -209,14 +209,14 @@ public class SpriteMapChunk<TData> where TData: IDataSprite, new()
                     if (dataGame != null)
                     {
                         int idMaterial = dataGame.GetSpriteData().idMaterial;
-                        (Rid, int) instance = MultimeshManager.Instance.CreateInstance(); // multimeshMaterialDict[idMaterial].CreateInstance();
+                        var instanceComplex = MultimeshManager.Instance.CreateInstance(MaterialType.GENERICO,idMaterial); // multimeshMaterialDict[idMaterial].CreateInstance();
                         if (dataGame.isAnimation)
                         {
-                            chunkRender.CreateUpdate(i, j, instance.Item1, instance.Item2, dataGame.positionWorld, dataGame.GetSpriteData(), dataGame.GetAnimationStateData());
+                            chunkRender.CreateUpdate(i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.materialBatchPosition, dataGame.positionWorld, dataGame.GetSpriteData(), dataGame.GetAnimationStateData());
                         }
                         else
                         {
-                            chunkRender.CreateUpdate(i, j, instance.Item1, instance.Item2, dataGame.positionWorld, dataGame.GetSpriteData());
+                            chunkRender.CreateUpdate(i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.materialBatchPosition, dataGame.positionWorld, dataGame.GetSpriteData());
                         }
                         
                     }

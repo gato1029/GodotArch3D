@@ -35,7 +35,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
         {            
 
         }
-        public void UpdateTile(Rid rid, int instance, Vector3 worldPosition, float scale, int idTile)
+        public void UpdateTile(Rid rid, int instance, int positionBatchTexture, Vector3 worldPosition, float scale, int idTile)
         {
             transform3D = new Transform3D(Basis.Identity, worldPosition);
             transform3D = transform3D.ScaledLocal(new Vector3(scale, scale, 1));
@@ -44,28 +44,31 @@ namespace GodotEcsArch.sources.managers.Tilemap
             this.rid = rid;
             this.instance = instance;
             this.idTile = idTile;
-
+            
             TileData tileData = TilesManager.Instance.GetTileData(idTile);
             if (tileData.type == "TileSimpleData")
             {
                 TileSimpleData simpleData = (TileSimpleData)tileData;
+                
                 RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
                 RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(simpleData.idInternalPosition, 0, 0, 0));
-                RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, simpleData.idMaterial));
+                RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, positionBatchTexture));
                 //  RenderingServer.MultimeshInstanceSetColor(rid, instance, tileData.color);
             }
             if (tileData.type == "TileDynamicData")
             {
                 TileDynamicData tileDynamicData = (TileDynamicData)tileData;
+                
                 RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
                 RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileDynamicData.x, tileDynamicData.y, tileDynamicData.widht, tileDynamicData.height));
-                RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, tileDynamicData.idMaterial));
+                RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, positionBatchTexture));
             }
             if (tileData.type == "TileAnimateData")
             {
                 TileAnimateData tileAnimateData = (TileAnimateData)tileData;
+                
                 RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
-                RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, tileAnimateData.idMaterial));
+                RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, positionBatchTexture));
                 Entity entity = EcsManager.Instance.World.Create();
                 TileAnimation tileAnimation = new TileAnimation();
                 tileAnimation.TileAnimateData = tileAnimateData;

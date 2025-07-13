@@ -41,12 +41,6 @@ mesh = SubResource("SphereMesh_yxrc8")
 skeleton = NodePath("../../..")
 surface_material_override/0 = ExtResource("5_ong74")
 
-[node name="center2" type="MeshInstance3D" parent="Game/Components/Grid"]
-transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.25, 1.25, 0)
-mesh = SubResource("SphereMesh_yxrc8")
-skeleton = NodePath("../../..")
-surface_material_override/0 = ExtResource("5_ong74")
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Game"]
 environment = SubResource("Environment_xh56v")
 
@@ -125,19 +119,17 @@ item_1/id = 1
 
 [node name="Componentes" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1
-item_count = 6
+item_count = 5
 item_0/text = "Recursos"
 item_0/id = 0
 item_1/text = "Terrain"
 item_1/id = 1
 item_2/text = "Edificios"
 item_2/id = 2
-item_3/text = "Accesorios"
+item_3/text = "Animacion Personajes"
 item_3/id = 3
-item_4/text = "Animacion Personajes"
+item_4/text = "Creacion Personajes"
 item_4/id = 4
-item_5/text = "Creacion Personajes"
-item_5/id = 5
 
 [node name="Armamento" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
 auto_translate_mode = 1

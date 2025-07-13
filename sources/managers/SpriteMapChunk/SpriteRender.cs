@@ -13,14 +13,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GodotEcsArch.sources.managers.SpriteMapChunk;
 
-public interface IRenderGPU
-{
-    public int idMaterial { get; set; }
-    public Rid rid { get; set; }
-    public int instance { get; set; }
-    public void UpdateTile<TDataModel>(Rid rid, int instance, Vector3 worldPosition, TDataModel data);
-    public void FreeRidRender();
-}
+
 public class SpriteRender
 {    
     public EntityReference entityReference { get; set; }
@@ -30,6 +23,7 @@ public class SpriteRender
     public Transform3D transform3D { get; set; }
     public Vector2I tilePosition { get; set; }
     public int idMaterial { get; set; }
+   
     public SpriteRender(Vector2I tilePosition)
     {
         this.tilePosition = tilePosition;
@@ -39,7 +33,7 @@ public class SpriteRender
     {
 
     }
-    public void UpdateTile(Rid rid, int instance, Vector3 worldPosition, SpriteData data) 
+    public void UpdateTile(Rid rid, int instance, int textureBatchPosition,Vector3 worldPosition, SpriteData data) 
     {
        
         transform3D = new Transform3D(Basis.Identity, worldPosition);
@@ -49,13 +43,14 @@ public class SpriteRender
         isAnimate = false;
         this.rid = rid;
         this.instance = instance;
+        
 
         RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
         RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(data.x, data.y, data.widhtFormat, data.heightFormat));
-        RenderingServer.MultimeshInstanceSetColor(rid, instance,new Color(0,0,0, data.idMaterial));
+        RenderingServer.MultimeshInstanceSetColor(rid, instance,new Color(0,0,0, textureBatchPosition));
           
     }
-    public void UpdateTile(Rid rid, int instance, Vector3 worldPosition, SpriteData data, AnimationStateData dataAnimation)
+    public void UpdateTile(Rid rid, int instance, int textureBatchPosition, Vector3 worldPosition, SpriteData data, AnimationStateData dataAnimation)
     {
         isAnimate = true;
         transform3D = new Transform3D(Basis.Identity, worldPosition);
@@ -64,10 +59,10 @@ public class SpriteRender
         this.idMaterial = data.idMaterial;
         this.rid = rid;
         this.instance = instance;
-
+        
         RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
         RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(data.x, data.y, data.widhtFormat, data.heightFormat));
-        RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, data.idMaterial));
+        RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, textureBatchPosition));
         //if (data is SpriteData spriteData)
         //{
         //    transform3D = new Transform3D(Basis.Identity, worldPosition);

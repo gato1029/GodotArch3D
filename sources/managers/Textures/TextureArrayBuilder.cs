@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.managers.Textures;
-public class TextureArrayBuilder : SingletonBase<TextureArrayBuilder>
+public class TextureArrayBuilder
 {
     public ShaderMaterial TargetMaterial;
     public Mesh mesh { get; set; }
@@ -15,12 +15,12 @@ public class TextureArrayBuilder : SingletonBase<TextureArrayBuilder>
 
     private Dictionary<int, string> _imagePathMap = new();
 
-    protected override void Initialize()
+    public TextureArrayBuilder()
     {
         TargetMaterial = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshGenericArrayMaterial.tres");
     }
 
-    protected override void Destroy() { }
+   
 
     /// <summary>
     /// Asigna una imagen en una capa específica del array.

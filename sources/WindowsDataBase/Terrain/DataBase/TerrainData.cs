@@ -32,11 +32,13 @@ public class TerrainData :IdData
     {
         if (isRule)
         {
-            autoTileData = DataBaseManager.Instance.FindById<AutoTileData>(idRule);      
+            autoTileData = DataBaseManager.Instance.FindById<AutoTileData>(idRule);
+            textureVisual = autoTileData.textureVisual;
         }
         else
         {
             tileData = TilesManager.Instance.RegisterTileData(idTile);
+            textureVisual = tileData.textureVisual;
         }
     }
 }

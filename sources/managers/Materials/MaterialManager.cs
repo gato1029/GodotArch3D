@@ -101,4 +101,8 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         //}
     }
 
+    internal void SetMaterialPositionBatch(int idMaterial,int positionBatch)
+    {
+        materials[idMaterial].idMaterialPositionBatch = positionBatch;
+    }
 }

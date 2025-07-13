@@ -86,44 +86,21 @@ public partial class HerramientaMenuBar : MenuBar
 
     private void MenuComponentes_IdPressed(long id)
     {
-        WindowDataGeneric win;
-        PackedScene ps;
         switch (id)
         {
             case 0:
                 FacadeWindowDataSearch<ResourceData> winResources = new FacadeWindowDataSearch<ResourceData>("res://sources/WindowsDataBase/Resources/WindowResources.tscn", this);
                 break;
             case 1:
-                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/Terrain/windowTerrain.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD,"Terrenos",true);
-                win.SetLoaddBAction(() =>
-                {
-                    var collection = DataBaseManager.Instance.FindAll<TerrainData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
-                    {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
-                }
-                );
+                FacadeWindowDataSearch<TerrainData> winTerrain = new FacadeWindowDataSearch<TerrainData>("res://sources/WindowsDataBase/Terrain/windowTerrain.tscn", this);            
                 break;
             case 2:
                 FacadeWindowDataSearch<BuildingData> winBuilding = new FacadeWindowDataSearch<BuildingData>("res://sources/WindowsDataBase/Building/WindowBuilding.tscn", this);
-                break;
+                break;                        
             case 3:
-                var winInternal = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/WindowAccessory.tscn").Instantiate<WindowAccessory>();
-                AddChild(winInternal);
-                winInternal.PopupCentered();               
-                break;
-            case 4:
                 FacadeWindowDataSearch<AnimationCharacterBaseData> windowQuery = new FacadeWindowDataSearch<AnimationCharacterBaseData>("res://sources/WindowsDataBase/Character/WindowAnimationCharacterRefact.tscn", this);
                 break;
-            case 5:
+            case 4:
                 FacadeWindowDataSearch<CharacterModelBaseData> windowQueryModelData = new FacadeWindowDataSearch<CharacterModelBaseData>("res://sources/WindowsDataBase/CharacterCreator/WindowCharacterCreator.tscn", this);
                 break;
         }
@@ -135,9 +112,7 @@ public partial class HerramientaMenuBar : MenuBar
         {
             case 0:
                 FacadeWindowDataSearch<MaterialData> windowQuery = new FacadeWindowDataSearch<MaterialData>("res://sources/WindowsDataBase/Materials/windowNewMaterial.tscn", this);
-                //Window win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Materials/windowMaterial.tscn").Instantiate<Window>();               
-                //AddChild(win);
-                //win.Show();                
+             
                 break;
             default:
                 break;
@@ -157,23 +132,7 @@ public partial class HerramientaMenuBar : MenuBar
                 FacadeWindowDataSearch<TileAnimateData> windowQueryModelData = new FacadeWindowDataSearch<TileAnimateData>("res://sources/WindowsDataBase/TileCreator/WindowAnimatedTiles.tscn", this);
                 break;
             case 2:
-                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Generic/windowDataGeneric.tscn").Instantiate<WindowDataGeneric>();
-                AddChild(win);
-                win.Show();
-                ps = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn");
-                win.SetWindowDetail(ps, GodotEcsArch.sources.utils.WindowState.CRUD, "Auto Tile");
-                win.SetLoaddBAction(() =>
-                {
-                    var collection = DataBaseManager.Instance.FindAll<AutoTileData>();
-                    List<IdData> ids = new List<IdData>();
-                    foreach (var item in collection)
-                    {
-                        IdData iddata = item;
-                        ids.Add(iddata);
-                    }
-                    return ids;
-                }
-                );
+                FacadeWindowDataSearch<AutoTileData> windowAutoTile = new FacadeWindowDataSearch<AutoTileData>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn", this);            
                 break;
             default:
                 break;

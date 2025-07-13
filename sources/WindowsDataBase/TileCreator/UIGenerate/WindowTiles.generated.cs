@@ -27,6 +27,7 @@ public partial class WindowTiles : Window
     private Sprite2D Sprite2DView;
     private CollisionShape2D CollisionShapeView;
     private GridContainer GridContainerAnimacion;
+    private LineEdit LineEditName;
     private SpinBox SpinBoxOffsetX;
     private SpinBox SpinBoxOffsetY;
     private ColorPickerButton ColorButtonBase;
@@ -36,6 +37,7 @@ public partial class WindowTiles : Window
     private CheckBox CheckBoxHasCollider;
     private ColliderScene ColliderContainer;
     private Button ButtonSave;
+    private Button ButtonDelete;
 
     public void InitializeUI()
     {
@@ -64,6 +66,7 @@ public partial class WindowTiles : Window
         Sprite2DView = GetNode<Sprite2D>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSprite/Sprite2DView");
         CollisionShapeView = GetNode<CollisionShape2D>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSprite/CollisionShapeView");
         GridContainerAnimacion = GetNode<GridContainer>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion");
+        LineEditName = GetNode<LineEdit>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion/LineEditName");
         SpinBoxOffsetX = GetNode<SpinBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion/SpinBoxOffsetX");
         SpinBoxOffsetY = GetNode<SpinBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion/SpinBoxOffsetY");
         ColorButtonBase = GetNode<ColorPickerButton>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion/ColorButtonBase");
@@ -78,7 +81,8 @@ public partial class WindowTiles : Window
         CheckBoxHasCollider.Pressed += CheckBoxHasCollider_PressedUI;
         CheckBoxHasCollider_PressedUI();
         ColliderContainer = GetNode<ColliderScene>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ColliderContainer");
-        ButtonSave = GetNode<Button>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ButtonSave");
+        ButtonSave = GetNode<Button>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ButtonSave");
+        ButtonDelete = GetNode<Button>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ButtonDelete");
     }
 
     private void CloseRequestedWindow()

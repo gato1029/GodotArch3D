@@ -7,15 +7,10 @@
 size = Vector2(25.6, 48)
 
 [node name="WindowTerrain" type="Window"]
-gui_embed_subwindows = true
+oversampling_override = 1.0
 title = "Terrain"
 initial_position = 2
 size = Vector2i(800, 500)
-wrap_controls = true
-transient = true
-transient_to_focused = true
-exclusive = true
-always_on_top = true
 script = ExtResource("1_8ya2h")
 
 [node name="Panel" type="Panel" parent="."]
@@ -129,6 +124,7 @@ custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
 [node name="Button" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Tile"
@@ -136,14 +132,14 @@ text = "Buscar Tile"
 [node name="Button4" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Buscar Tile Dynamic"
+text = "Buscar Tile"
 
 [node name="Button3" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Buscar Tile Animate"
+text = "Buscar Tile Animado"
 
 [node name="Button2" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Buscar Tile Rule"
+text = "Buscar Tile Automatico"

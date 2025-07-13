@@ -154,8 +154,8 @@ value = 2.0
 [node name="ScrollContainerGrid" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-scroll_horizontal = 200
-scroll_vertical = 200
+scroll_horizontal = 100
+scroll_vertical = 100
 
 [node name="PanelBase" type="Control" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid"]
 custom_minimum_size = Vector2(960, 960)
@@ -200,6 +200,15 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 0
 columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
 
 [node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
 layout_mode = 2
@@ -267,7 +276,16 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="ButtonSave" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonSave" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Guardar"
+
+[node name="ButtonDelete" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Eliminar"

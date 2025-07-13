@@ -43,9 +43,18 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
         ViewItems.ItemSelected += ViewItems_ItemSelected;
         CheckBoxGenerateAll.Pressed += CheckBoxGenerateAll_Pressed;
         TabContainerOptions.TabChanged += TabContainerOptions_TabChanged;
-
         SpinBoxZoomGrid.ValueChanged += SpinBoxZoomGrid_ValueChanged;
+
+        ButtonDelete.Pressed += ButtonDelete_Pressed;
     }
+
+    private void ButtonDelete_Pressed()
+    {
+        DataBaseManager.Instance.RemoveById<TileDynamicData>(objectData.id);
+        OnNotifyChanguedSimple?.Invoke();
+        QueueFree();
+    }
+
     private void SpinBoxZoomGrid_ValueChanged(double value)
     {
         ControlGrid.Scale = new Vector2((float)value, (float)value);
@@ -190,6 +199,7 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
     public void SetData(TileDynamicData data)
     {
         objectData = data;
+        LineEditName.Text = objectData.name;
         ColorButtonBase.Color = objectData.color;
         SpinBoxOffsetY.Value = objectData.offsetY;
         SpinBoxOffsetX.Value = objectData.offsetX;
@@ -214,7 +224,15 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
     }
     private void ButtonSave_Pressed()
     {
-        objectData.name = materialData.name +"_"+objectData.id.ToString();
+        if (objectData.id == 0)
+        {
+            objectData.name = materialData.name + "_" + DataBaseManager.Instance.NextID<TileDynamicData>();
+        }
+        else
+        {
+            objectData.name = LineEditName.Text;
+        }
+        
         objectData.haveCollider = CheckBoxHasCollider.ButtonPressed;
         objectData.idMaterial = materialData.id;
         AtlasTexture atlasTexture = (AtlasTexture)Sprite2DView.Texture;
@@ -238,8 +256,10 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
         }
 
         DataBaseManager.Instance.InsertUpdate(objectData);
-        OnNotifyChanguedSimple?.Invoke();
-        QueueFree();
+       
+            OnNotifyChanguedSimple?.Invoke();
+            QueueFree();
+       
     }
     private void CheckBoxHasCollider_Pressed()
     {

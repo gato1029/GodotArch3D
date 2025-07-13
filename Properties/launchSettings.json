@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug WindowResources": {
+	"Godot Debug WindowNewMaterial": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.5-beta3_mono_win64/Godot_v4.5-beta3_mono_win64/Godot_v4.5-beta3_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Resources/WindowResources.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Materials/windowNewMaterial.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

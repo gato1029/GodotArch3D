@@ -10,37 +10,24 @@ using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
 {
     FileDialog fileDialog;
-    LineEdit linePathFile;
-    LineEdit lineName;
-    LineEdit lineId;
-    SpinBox spinPixel_X;
-    SpinBox spinPixel_Y;
-    ItemList itemListTiles;
-    OptionButton typeMaterial;
-
+    int mode = 0;
+    MaterialData objectData;
 
     public event IFacadeWindow<MaterialData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
-
-    MaterialData objectData;
+    // Called every frame. 'delta' is the elapsed time since the previous frame.
+    public override void _Process(double delta)
+    {
+        
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
-        CloseRequested += WindowTileCreator_CloseRequested;
-        GetNode<Button>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer/Button").Pressed += FileSearch;
-        GetNode<Button>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer5/ButtonDividir").Pressed += TextureSplit_Clik; ;
-        GetNode<Button>("Panel/MarginContainer/VBoxContainer/VBoxContainer/Button").Pressed += Guardar_Click; ;
-
-        linePathFile = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer/LineEdit3");
-        lineName = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/LineEdit2");
-        lineId = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/LineEdit");
-        itemListTiles = GetNode<ItemList>("Panel/MarginContainer/VBoxContainer/ItemList");
-
-        spinPixel_X = GetNode<SpinBox>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer5/SpinBoxX");
-        spinPixel_Y = GetNode<SpinBox>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer5/SpinBoxY");
-
-        typeMaterial = GetNode<OptionButton>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/OptionButton");
-
+        InitializeUI(); // Insertado por el generador de UI                                
+        ButtonDividir.Pressed+= TextureSplit_Clik; 
+        ButtonSearchFile.Pressed+= FileSearch;
+        ButtonSave.Pressed += Guardar_Click;
+        ButtonDelete.Pressed += ButtonDelete_Pressed;
         fileDialog = new FileDialog();
         fileDialog.Title = "Buscar Imagen";
 
@@ -59,46 +46,31 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
     public void SetData(MaterialData data)
     {
         objectData = data;
-       
-        lineName.Text = objectData.name;
-        lineId.Text = objectData.id.ToString();
-        linePathFile.Text = objectData.pathTexture;
-        spinPixel_X.Value = objectData.divisionPixelX;
-        spinPixel_Y.Value = objectData.divisionPixelY;
-        typeMaterial.Selected = typeMaterial.GetItemIndex(objectData.type);
-        mode = 1;
-        TextureSplit_Clik();
-    }
-    public void LoadData(int id)
-    {
-        var materialData = DataBaseManager.Instance.FindById<MaterialData>(id);
-        lineName.Text = materialData.name;
-        lineId.Text = materialData.id.ToString();
-        linePathFile.Text = materialData.pathTexture;
-        spinPixel_X.Value = materialData.divisionPixelX;
-        spinPixel_Y.Value = materialData.divisionPixelY;
-        typeMaterial.Selected = typeMaterial.GetItemIndex(materialData.type);
+
+        LineEditName.Text = objectData.name;
+        LineEditId.Text = objectData.id.ToString();
+        LineEditPath.Text = objectData.pathTexture;
+        SpinBoxX.Value = objectData.divisionPixelX;
+        SpinBoxY.Value = objectData.divisionPixelY;
+        OptionButtonType.Selected = OptionButtonType.GetItemIndex(objectData.type);
         mode = 1;
         TextureSplit_Clik();
     }
 
-    int mode = 0;
-    public void LoadMaterial(int id)
+    private void ButtonDelete_Pressed()
     {
-       var materialData = DataBaseManager.Instance.FindById<MaterialData>(id);
-        lineName.Text = materialData.name;
-        lineId.Text = materialData.id.ToString();
-        linePathFile.Text = materialData.pathTexture;
-        spinPixel_X.Value = materialData.divisionPixelX;
-        spinPixel_Y.Value = materialData.divisionPixelY;
-        typeMaterial.Selected = typeMaterial.GetItemIndex(materialData.type);
-        mode = 1;
-        TextureSplit_Clik();
-        
+        DataBaseManager.Instance.RemoveById<MaterialData>(objectData.id);
+        OnNotifyChanguedSimple?.Invoke();
+        QueueFree();
     }
+    private void FileSearch()
+    {
+        fileDialog.PopupCentered();
+    }
+
     private void Guardar_Click()
     {
-        if (linePathFile.Text.StartsWith("AssetExternals"))
+        if (LineEditPath.Text.StartsWith("AssetExternals"))
         {
             mode = 1;
         }
@@ -110,52 +82,58 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
         Image image;
         if (mode == 0)
         {
-             image = TextureHelper.LoadImageLocal(linePathFile.Text);
+             image = TextureHelper.LoadImageLocal(LineEditPath.Text);
         }
         else
         {
-            image = TextureHelper.LoadImageLocal(FileHelper.GetPathGameDB(linePathFile.Text));
+            image = TextureHelper.LoadImageLocal(FileHelper.GetPathGameDB(LineEditPath.Text));
         }
 
-        objectData.pathTexture = linePathFile.Text;
+        objectData.pathTexture = LineEditPath.Text;
 
 
-        objectData.name = lineName.Text;
+        objectData.name = LineEditName.Text;
         objectData.heightTexture = image.GetHeight();
         objectData.widhtTexture = image.GetWidth();
-        objectData.divisionPixelX = (int) spinPixel_X.Value;
-        objectData.divisionPixelY = (int)spinPixel_Y.Value;
-        objectData.type = typeMaterial.GetItemId(typeMaterial.GetSelectedId());
-        if (lineId.Text == string.Empty)
+        objectData.divisionPixelX = (int)SpinBoxX.Value;
+        objectData.divisionPixelY = (int)SpinBoxY.Value;
+        objectData.type = OptionButtonType.GetItemId(OptionButtonType.GetSelectedId());
+        if (LineEditId.Text == string.Empty)
         {
             int idnext = DataBaseManager.Instance.NextID<MaterialData>();
-            string path = FileHelper.CopyFileToAssetExternals(linePathFile.Text,"Material", idnext.ToString());
+            string path = FileHelper.CopyFileToAssetExternals(LineEditPath.Text,"Material", idnext.ToString());
             objectData.pathTexture = path;
-            DataBaseManager.Instance.InsertUpdate(objectData);            
+            DataBaseManager.Instance.InsertUpdateLog(objectData);            
         }
         else
         {
 
-            string path = FileHelper.CopyFileToAssetExternals(linePathFile.Text, "Material", objectData.id.ToString());
+            string path = FileHelper.CopyFileToAssetExternals(LineEditPath.Text, "Material", objectData.id.ToString());
             objectData.pathTexture = path;
-            DataBaseManager.Instance.InsertUpdate(objectData, int.Parse(lineId.Text));
+            DataBaseManager.Instance.InsertUpdateLog(objectData, int.Parse(LineEditId.Text));
         }
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
 
     }
 
+    private void OnFileSelected(string path)
+    {
+        LineEditPath.Text = path;
+        TextureSplit_Clik();
+    }
+
     private void TextureSplit_Clik()
     {
-        itemListTiles.Clear();
+        ItemListTiles.Clear();
         List<Texture> list;
         if (mode == 0)
         {
-             list = TextureHelper.SplitTexture(linePathFile.Text, new Vector2I((int)spinPixel_X.Value, (int)spinPixel_Y.Value));
+             list = TextureHelper.SplitTexture(LineEditPath.Text, new Vector2I((int)SpinBoxX.Value, (int)SpinBoxY.Value));
         }
         else
         {
-             list = TextureHelper.SplitTexture(FileHelper.GetPathGameDB(linePathFile.Text), new Vector2I((int)spinPixel_X.Value, (int)spinPixel_Y.Value));
+             list = TextureHelper.SplitTexture(FileHelper.GetPathGameDB(LineEditPath.Text), new Vector2I((int)SpinBoxX.Value, (int)SpinBoxY.Value));
         }
         
         for (int i = 0; i < list.Count; i++)
@@ -163,30 +141,8 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
             Texture item = list[i];
             if (!TextureHelper.IsTextureEmpty(item))
             {
-                itemListTiles.AddItem("ID:" + i, (Texture2D)item);
+                ItemListTiles.AddItem("ID:" + i, (Texture2D)item);
             }
         }
     }
-
-    private void FileSearch()
-    {
-        fileDialog.PopupCentered();
-    }
-
-    private void WindowTileCreator_CloseRequested()
-    {
-        QueueFree();
-    }
-
-    private void OnFileSelected(string path)
-    {
-        linePathFile.Text = path;
-        TextureSplit_Clik();
-    }
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
-	{
-	}
-
-
 }

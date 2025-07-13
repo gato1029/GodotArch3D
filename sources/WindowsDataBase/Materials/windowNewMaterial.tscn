@@ -3,17 +3,11 @@
 [ext_resource type="Script" uid="uid://dmgmnvt7ndtv1" path="res://sources/WindowsDataBase/Materials/WindowNewMaterial.cs" id="1_qiiyp"]
 
 [node name="WindowNewMaterial" type="Window"]
-gui_embed_subwindows = true
 oversampling_override = 1.0
 title = "Nuevo Material"
 initial_position = 3
 size = Vector2i(500, 500)
 current_screen = 0
-wrap_controls = true
-transient = true
-transient_to_focused = true
-exclusive = true
-always_on_top = true
 script = ExtResource("1_qiiyp")
 
 [node name="Panel" type="Panel" parent="."]
@@ -38,7 +32,7 @@ theme_override_constants/margin_bottom = 10
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
 
-[node name="ItemList" type="ItemList" parent="Panel/MarginContainer/VBoxContainer"]
+[node name="ItemListTiles" type="ItemList" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 max_columns = 20
@@ -64,12 +58,11 @@ layout_mode = 2
 size_flags_horizontal = 10
 text = "id:"
 
-[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
+[node name="LineEditId" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 placeholder_text = "Automatico"
-editable = false
 
 [node name="Label4" type="Label" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -80,13 +73,13 @@ text = "Ruta:"
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="LineEdit3" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer"]
+[node name="LineEditPath" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 editable = false
 
-[node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer"]
+[node name="ButtonSearchFile" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer"]
 layout_mode = 2
 text = "..."
 
@@ -95,7 +88,7 @@ layout_mode = 2
 size_flags_horizontal = 10
 text = "Nombre:"
 
-[node name="LineEdit2" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
+[node name="LineEditName" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 2
@@ -105,20 +98,17 @@ layout_mode = 2
 size_flags_horizontal = 10
 text = "Tipo:"
 
-[node name="OptionButton" type="OptionButton" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
+[node name="OptionButtonType" type="OptionButton" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-selected = 3
+selected = 0
+fit_to_longest_item = false
 allow_reselect = true
-item_count = 4
-popup/item_0/text = "TILES"
+item_count = 2
+popup/item_0/text = "GENERICO"
 popup/item_0/id = 0
-popup/item_1/text = "TILES_DINAMIC"
+popup/item_1/text = "ARMAS"
 popup/item_1/id = 1
-popup/item_2/text = "CUSTOM"
-popup/item_2/id = 2
-popup/item_3/text = "GENERIC"
-popup/item_3/id = 3
 
 [node name="Label3" type="Label" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -148,8 +138,18 @@ suffix = "px"
 layout_mode = 2
 text = "Dividir"
 
-[node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonSave" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
 text = "Guardar"
+
+[node name="ButtonDelete" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+text = "Eliminar"
