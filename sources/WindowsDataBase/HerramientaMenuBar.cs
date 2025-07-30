@@ -92,7 +92,7 @@ public partial class HerramientaMenuBar : MenuBar
                 FacadeWindowDataSearch<ResourceData> winResources = new FacadeWindowDataSearch<ResourceData>("res://sources/WindowsDataBase/Resources/WindowResources.tscn", this);
                 break;
             case 1:
-                FacadeWindowDataSearch<TerrainData> winTerrain = new FacadeWindowDataSearch<TerrainData>("res://sources/WindowsDataBase/Terrain/windowTerrain.tscn", this);            
+                FacadeWindowDataSearch<TerrainData> winTerrain = new FacadeWindowDataSearch<TerrainData>("res://sources/WindowsDataBase/Terrain/WindowTerrainDetail.tscn", this);            
                 break;
             case 2:
                 FacadeWindowDataSearch<BuildingData> winBuilding = new FacadeWindowDataSearch<BuildingData>("res://sources/WindowsDataBase/Building/WindowBuilding.tscn", this);
@@ -121,8 +121,7 @@ public partial class HerramientaMenuBar : MenuBar
 
     private void TileCreator_IdPressed(long id)
     {
-        WindowDataGeneric win;
-        PackedScene ps;
+
         switch (id)
         {
             case 0:

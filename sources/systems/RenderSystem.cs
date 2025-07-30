@@ -47,7 +47,8 @@ public struct Sprite
 internal class RenderSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
-   
+
+    private QueryDescription queryRenderSpriteGpu = new QueryDescription().WithAll<SpriteRenderGPUComponent, PositionComponent>();
     private QueryDescription queryRender = new QueryDescription().WithAll<PositionComponent,RenderGPUComponent>().WithNone<RenderGPULinkedComponent>();
     private QueryDescription queryRenderLinked = new QueryDescription().WithAll<CharacterComponent, PositionComponent, RenderGPUComponent,RenderGPULinkedComponent>();
 
@@ -55,7 +56,37 @@ internal class RenderSystem : BaseSystem<World, float>
     {
         commandBuffer = new CommandBuffer();        
     }
+    private struct ChunkJobRenderSpriteGpu : IChunkJob
+    {
+        private readonly float _deltaTime;
+        private readonly CommandBuffer _commandBuffer;
 
+        public ChunkJobRenderSpriteGpu(CommandBuffer commandBuffer, float deltaTime) : this()
+        {
+            _commandBuffer = commandBuffer;
+            _deltaTime = deltaTime;
+        }
+
+        public void Execute(ref Chunk chunk)
+        {
+            ref var pointerEntity = ref chunk.Entity(0);
+
+            ref var pointerPositionComponent = ref chunk.GetFirst<PositionComponent>();
+            ref var pointerSpriteRenderGPUComponent = ref chunk.GetFirst<SpriteRenderGPUComponent>();
+
+            foreach (var entityIndex in chunk)
+            {
+                ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
+                ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
+                ref SpriteRenderGPUComponent renderComponent = ref Unsafe.Add(ref pointerSpriteRenderGPUComponent, entityIndex);
+                float renderZ = ((positionComponent.position.Y + renderComponent.originOffset.Y + renderComponent.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender;
+                renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, renderZ);
+                RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);
+
+            }
+
+        }
+    }
     private struct ChunkJobRender : IChunkJob
     {
         private readonly float _deltaTime;
@@ -143,6 +174,7 @@ internal class RenderSystem : BaseSystem<World, float>
         {
             World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryRenderLinked, new ChunkJobRenderLinked(commandBuffer, t));
+            World.InlineParallelChunkQuery(in queryRenderSpriteGpu, new ChunkJobRenderSpriteGpu(commandBuffer, t));
         }
         
     }

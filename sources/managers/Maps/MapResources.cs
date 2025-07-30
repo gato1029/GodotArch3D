@@ -24,52 +24,29 @@ using System.Xml.Linq;
 namespace GodotEcsArch.sources.managers.Maps;
 
 [ProtoContract]
-public class ResourceDataGame : IDataSprite
+public class ResourceDataGame : DataItem
 {
-    public int idUnique { get ; set ; }
-    [ProtoMember(1)] public int idData { get ; set ; }
-    [ProtoMember(2)] public bool isAnimation { get ; set ; }
-    [ProtoMember(3)] public int amount { get; set; }
-
-    [ProtoIgnore, JsonIgnore] public Vector3 positionWorld { get ; set ; }
-    [ProtoIgnore, JsonIgnore] public Vector2 positionCollider { get ; set ; }
-    [ProtoIgnore, JsonIgnore] public Vector2I positionTileWorld { get ; set ; }
-    [ProtoIgnore, JsonIgnore] public Vector2I positionTileChunk { get ; set ; }
-
-    // Campos auxiliares solo para serialización
-    [ProtoMember(4)]
-    public ProtoVector3 positionWorldSerialized
-    {
-        get => positionWorld;
-        set => positionWorld = value;
-    }
-
-    [ProtoMember(5)]
-    public ProtoVector2 positionColliderSerialized
-    {
-        get => positionCollider;
-        set => positionCollider = value;
-    }
     [ProtoMember(6)]
-    public ProtoVector2I positionTileWorldSerialized
-    {
-        get => positionTileWorld;
-        set => positionTileWorld = value;
-    }
-    [ProtoMember(7)]
-    public ProtoVector2I positionTileChunkSerialized
-    {
-        get => positionTileChunk;
-        set => positionTileChunk = value;
-    }
-    public AnimationStateData GetAnimationStateData()
+    public int amount { get; set; }
+    public override AnimationStateData GetAnimationStateData()
     {
         return ResourcesGameManager.Instance.GetData(idData).animationData[0];
     }
 
-    public SpriteData GetSpriteData()
+    public override SpriteData GetSpriteData()
     {
         return ResourcesGameManager.Instance.GetData(idData).spriteData;
+    }
+
+    public override bool IsAnimation()
+    {
+        return ResourcesGameManager.Instance.GetData(idData).isAnimated;
+    }
+
+    public override void SetDataGame()
+    {
+        var data = ResourcesGameManager.Instance.GetData(idData);
+        amount = data.amount;
     }
 }
 
@@ -125,8 +102,7 @@ public class MapResources
         }
     }
     public void AddSprite(Vector2I positionGlobal, int idResources)
-    {
-        ResourceData resourceData = ResourcesGameManager.Instance.GetData(idResources);
-        chunkMap.AddUpdatedTile(positionGlobal, resourceData.spriteData,idResources, resourceData.isAnimated);
+    {        
+        chunkMap.AddUpdatedTile(positionGlobal, idResources);
     }
 }

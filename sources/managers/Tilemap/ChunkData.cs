@@ -1,5 +1,9 @@
 using Godot;
 using GodotEcsArch.sources.managers.Serializer.Data;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using Newtonsoft.Json;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +11,49 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.managers.Tilemap;
+
+
+public class DataItem
+{
+    public int idUnique { get; set; }
+    [ProtoMember(1)] public int idData { get; set; }
+    [ProtoIgnore, JsonIgnore] public Vector3 positionWorld { get; set; }
+    [ProtoIgnore, JsonIgnore] public Vector2 positionCollider { get; set; }
+    [ProtoIgnore, JsonIgnore] public Vector2I positionTileWorld { get; set; }
+    [ProtoIgnore, JsonIgnore] public Vector2I positionTileChunk { get; set; }
+    public virtual void SetDataGame() { }
+    public virtual SpriteData GetSpriteData() { return null; }
+    public virtual bool IsAnimation() { return false; }
+    public virtual AnimationStateData GetAnimationStateData() { return null; }
+    public virtual int GetTypeData() { return 0; }
+
+    // Campos auxiliares solo para serialización
+    [ProtoMember(2)]
+    public ProtoVector3 positionWorldSerialized
+    {
+        get => positionWorld;
+        set => positionWorld = value;
+    }
+
+    [ProtoMember(3)]
+    public ProtoVector2 positionColliderSerialized
+    {
+        get => positionCollider;
+        set => positionCollider = value;
+    }
+    [ProtoMember(4)]
+    public ProtoVector2I positionTileWorldSerialized
+    {
+        get => positionTileWorld;
+        set => positionTileWorld = value;
+    }
+    [ProtoMember(5)]
+    public ProtoVector2I positionTileChunkSerialized
+    {
+        get => positionTileChunk;
+        set => positionTileChunk = value;
+    }
+}
 public class ChunkData<T>
 {
     public Vector2 positionChunk { get; private set; }
@@ -44,6 +91,16 @@ public class ChunkData<T>
         }
 
     }
+
+    public void RemoveTile(Vector2I position)
+    {
+        changue = true;
+        if (tiles[position.X, position.Y] != null)
+        {
+            tiles[position.X, position.Y] = default;
+        }        
+    }
+
     public T GetTileAt(Vector2 localPos)
     {
         int x = (int)localPos.X;

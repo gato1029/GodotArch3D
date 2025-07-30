@@ -55,7 +55,7 @@ public partial class Camera3dGodot : Camera3D
         if (isInScreen())
         {
             MoveCamera((float)delta);
-
+            HandleMiddleMousePan((float)delta);
             var cameraPosition = camera.ProjectRayOrigin(GetViewport().GetMousePosition());
             PositionsManager.Instance.positionMouseCamera = new Vector2(cameraPosition.X, cameraPosition.Y);
             PositionsManager.Instance.positionMouseCameraPixel = ConvertMouseToPixel(PositionsManager.Instance.positionMouseCamera);
@@ -75,7 +75,7 @@ public partial class Camera3dGodot : Camera3D
 
     public Vector2 positionTile(Vector2 positionMouse)
     {
-        Vector2I tileSize = new Vector2I(32, 32);
+        Vector2I tileSize = new Vector2I(16, 16);
         int tileX = (int)MathF.Floor(positionMouse.X / tileSize.X);
         int tileY = (int)MathF.Floor(positionMouse.Y / tileSize.Y);
         return new Vector2(tileX,tileY);
@@ -131,6 +131,28 @@ public partial class Camera3dGodot : Camera3D
             RenderManager.Instance.currentDisplay = RectRender();
         }
     }
+    private Vector3 cameraInertia = Vector3.Zero;
+    private const float DragSensitivity = 0.00007f;     // Más pequeño = movimiento más lento
+    private const float InertiaDamping = 10.0f;         // Qué tan rápido desacelera
+    private const float InertiaThreshold = 0.01f;      // Para evitar vibraciones
+
+
+    private void HandleMiddleMousePan(float delta)
+    {
+        if (Input.IsMouseButtonPressed(MouseButton.Middle))
+        {
+            Vector2 mouseVelocity = Input.GetLastMouseVelocity();
+ 
+            camera.Position += new Vector3(
+     -mouseVelocity.X * DragSensitivity,
+     mouseVelocity.Y * DragSensitivity,
+     0
+ );
+
+            RenderManager.Instance.currentDisplay = RectRender();
+        }
+    }
+
 
     public Rect2 RectRender()
     {
@@ -162,6 +184,7 @@ public partial class Camera3dGodot : Camera3D
     {
         if (@event is InputEventMouseButton mouseEvent)
         {
+            if (!Input.IsKeyPressed(Key.Ctrl)) return;
             float zoomInput = 0;
             if (mouseEvent.ButtonIndex == MouseButton.WheelUp)
             {
@@ -173,9 +196,6 @@ public partial class Camera3dGodot : Camera3D
                 zoomInput = -1;
 
             }
-
-
-
             currentZoomSize = Mathf.Clamp(currentZoomSize - zoomInput * ZoomSpeed, MinZoomSize, MaxZoomSize);
             SetCameraZoom(currentZoomSize);
         }

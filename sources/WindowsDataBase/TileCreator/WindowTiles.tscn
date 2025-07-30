@@ -192,6 +192,7 @@ anchors_preset = 0
 texture = ExtResource("3_0i8bd")
 
 [node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSprite"]
+visible = false
 shape = SubResource("RectangleShape2D_tl00w")
 
 [node name="GridContainerAnimacion" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer"]
@@ -284,6 +285,11 @@ size_flags_horizontal = 4
 layout_mode = 2
 size_flags_vertical = 0
 text = "Guardar"
+
+[node name="ButtonSaveActive" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Guardar Activo"
 
 [node name="ButtonDelete" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2

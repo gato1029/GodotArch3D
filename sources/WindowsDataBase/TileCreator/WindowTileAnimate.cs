@@ -117,47 +117,47 @@ public partial class WindowTileAnimate : Window, IDetailWindow
 
     private void Update_Click()
     {
-        if (lineFramesTiles.Text.Contains(",") || lineFramesTiles.Text.Contains("-"))
-        {
-            string[] frames = lineFramesTiles.Text.Split(',');
-            if (lineFramesTiles.Text.Contains("-"))
-            {
-                frames = lineFramesTiles.Text.Split('-');
-                int ini = int.Parse(frames[0]);
-                int fin = int.Parse(frames[1]);
-                int[] arrayFrame = new int[(fin-ini)+1];
+        //if (lineFramesTiles.Text.Contains(",") || lineFramesTiles.Text.Contains("-"))
+        //{
+        //    string[] frames = lineFramesTiles.Text.Split(',');
+        //    if (lineFramesTiles.Text.Contains("-"))
+        //    {
+        //        frames = lineFramesTiles.Text.Split('-');
+        //        int ini = int.Parse(frames[0]);
+        //        int fin = int.Parse(frames[1]);
+        //        int[] arrayFrame = new int[(fin-ini)+1];
 
              
-                int index = 0;
-                for (int i = ini; i <=fin; i++)
-                {
-                    arrayFrame[index] = i;
+        //        int index = 0;
+        //        for (int i = ini; i <=fin; i++)
+        //        {
+        //            arrayFrame[index] = i;
               
 
-                    currentTileAnimateSimpleData.idMaterial = currentMaterialData.id;
-                    currentTileAnimateSimpleData.idFrames = arrayFrame;
-                    currentTileAnimateSimpleData.frameDuration = (float)fpsSpin.Value;
-                    index++;
+        //            currentTileAnimateSimpleData.idMaterial = currentMaterialData.id;
+        //            currentTileAnimateSimpleData.idFrames = arrayFrame;
+        //            currentTileAnimateSimpleData.frameDuration = (float)fpsSpin.Value;
+        //            index++;
                     
          
-                }                                
-            }
-            else
-            {
-                int index = 0;
-                int[] arrayFrame = new int[frames.Length];
+        //        }                                
+        //    }
+        //    else
+        //    {
+        //        int index = 0;
+        //        int[] arrayFrame = new int[frames.Length];
                
-                foreach (string item in frames)
-                {
-                    int frame = int.Parse(item);
-                    arrayFrame[index] = frame;                  
-                    currentTileAnimateSimpleData.idMaterial = currentMaterialData.id;
-                    currentTileAnimateSimpleData.idFrames = arrayFrame;
-                    currentTileAnimateSimpleData.frameDuration = (float) fpsSpin.Value;
-                    index ++;              
-                }
-            }
-        }
+        //        foreach (string item in frames)
+        //        {
+        //            int frame = int.Parse(item);
+        //            arrayFrame[index] = frame;                  
+        //            currentTileAnimateSimpleData.idMaterial = currentMaterialData.id;
+        //            currentTileAnimateSimpleData.idFrames = arrayFrame;
+        //            currentTileAnimateSimpleData.frameDuration = (float) fpsSpin.Value;
+        //            index ++;              
+        //        }
+        //    }
+        //}
     }
 
     private void Save_Click()
@@ -201,54 +201,54 @@ public partial class WindowTileAnimate : Window, IDetailWindow
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
-        if (currentTileAnimateSimpleData.idFrames!=null)
-        {
-            currentfps += delta;
-            if (currentfps >= currentTileAnimateSimpleData.frameDuration && currentTileAnimateSimpleData.idFrames.Length > 0)
-            {
-                var iFrame = currentTileAnimateSimpleData.idFrames[indexFrame];
-                indexFrame++;
-                currentfps = 0;
-                var data = MaterialManager.Instance.GetAtlasTexture(currentTileAnimateSimpleData.idMaterial, iFrame);
-                spriteSelection.Texture = data;
-            }
-            if (indexFrame >= currentTileAnimateSimpleData.idFrames.Length)
-            {
-                indexFrame = 0;
-            }
-        }
+        //if (currentTileAnimateSimpleData.idFrames!=null)
+        //{
+        //    currentfps += delta;
+        //    if (currentfps >= currentTileAnimateSimpleData.frameDuration && currentTileAnimateSimpleData.idFrames.Length > 0)
+        //    {
+        //        var iFrame = currentTileAnimateSimpleData.idFrames[indexFrame];
+        //        indexFrame++;
+        //        currentfps = 0;
+        //        var data = MaterialManager.Instance.GetAtlasTexture(currentTileAnimateSimpleData.idMaterial, iFrame);
+        //        spriteSelection.Texture = data;
+        //    }
+        //    if (indexFrame >= currentTileAnimateSimpleData.idFrames.Length)
+        //    {
+        //        indexFrame = 0;
+        //    }
+        //}
      
     }
 
     public void LoadData(int id)
     {      
           
-        currentTileAnimateSimpleData = DataBaseManager.Instance.FindById<TileAnimateData>(id);
-        collisionCheckBox.ButtonPressed = currentTileAnimateSimpleData.haveCollider;
-        CollisionCheckBox_Pressed();
-        string strFrames ="";
-        foreach (var item in currentTileAnimateSimpleData.idFrames)
-        {
-            strFrames = strFrames+"," + item.ToString();
-        }
-        strFrames = strFrames.Substr(1, strFrames.Length);
-        lineFramesTiles.Text = strFrames;
-        lineId.Text = currentTileAnimateSimpleData.id.ToString();
-        fpsSpin.Value = currentTileAnimateSimpleData.frameDuration;
-        currentMaterialData = MaterialManager.Instance.GetMaterial(currentTileAnimateSimpleData.idMaterial);
+        //currentTileAnimateSimpleData = DataBaseManager.Instance.FindById<TileAnimateData>(id);
+        //collisionCheckBox.ButtonPressed = currentTileAnimateSimpleData.haveCollider;
+        //CollisionCheckBox_Pressed();
+        //string strFrames ="";
+        //foreach (var item in currentTileAnimateSimpleData.idFrames)
+        //{
+        //    strFrames = strFrames+"," + item.ToString();
+        //}
+        //strFrames = strFrames.Substr(1, strFrames.Length);
+        //lineFramesTiles.Text = strFrames;
+        //lineId.Text = currentTileAnimateSimpleData.id.ToString();
+        //fpsSpin.Value = currentTileAnimateSimpleData.frameDuration;
+        //currentMaterialData = MaterialManager.Instance.GetMaterial(currentTileAnimateSimpleData.idMaterial);
 
-        ComboMaterial_Selected(currentMaterialData.id);
-        optionMaterial.Selected = currentMaterialData.id;
-        spriteSelection.Texture = currentTileAnimateSimpleData.textureVisual;
-        windowState = WindowState.UPDATE;
-        if (currentTileAnimateSimpleData.haveCollider)
-        {
-            Rectangle rect = (Rectangle)currentTileAnimateSimpleData.collisionBody;
-            bodyWidthSpin.Value = rect.widthPixel;
-            bodyHeightSpin.Value = rect.heightPixel;
-            bodyOffsetXSpin.Value = rect.originPixelX;
-            bodyOffsetYSpin.Value = rect.originPixelY;
-        }
+        //ComboMaterial_Selected(currentMaterialData.id);
+        //optionMaterial.Selected = currentMaterialData.id;
+        //spriteSelection.Texture = currentTileAnimateSimpleData.textureVisual;
+        //windowState = WindowState.UPDATE;
+        //if (currentTileAnimateSimpleData.haveCollider)
+        //{
+        //    Rectangle rect = (Rectangle)currentTileAnimateSimpleData.collisionBody;
+        //    bodyWidthSpin.Value = rect.widthPixel;
+        //    bodyHeightSpin.Value = rect.heightPixel;
+        //    bodyOffsetXSpin.Value = rect.originPixelX;
+        //    bodyOffsetYSpin.Value = rect.originPixelY;
+        //}
      
     }
 }

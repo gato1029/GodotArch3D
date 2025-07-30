@@ -54,9 +54,12 @@ namespace GodotEcsArch.sources.WindowsDataBase
             collectionNameMap[typeof(ResourceData)] = "ResourceData";
             collectionNameMap[typeof(BuildingData)] = "BuildingData";
             collectionNameMap[typeof(DataBaseFree)] = "DataBaseFree";
+            collectionNameMap[typeof(TextureMasterData)] = "TextureMasterData";
 
-           // RegisterCollection<BuildingData>("DataBaseFree");
+            // RegisterCollection<BuildingData>("DataBaseFree");
 
+            ILiteCollection<TextureMasterData> TextureMasterDataCollection = db.GetCollection<TextureMasterData>("TextureMasterData");
+            TextureMasterDataCollection.EnsureIndex(x => x.id, unique: true);
 
             ILiteCollection<DataBaseFree> DataBaseFreeCollection = db.GetCollection<DataBaseFree>("DataBaseFree");
             DataBaseFreeCollection.EnsureIndex(x => x.id, unique: true);
@@ -131,6 +134,19 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             var collection = db.GetCollection<BsonDocument>(collectionName);
 
+            int id = 0;
+            var FreeData = FindById<DataBaseFree>(collectionName);
+            if (FreeData != null)
+            {
+                if (FreeData.freeIds.Count > 0)
+                {
+                    var freeid = FreeData.freeIds.Min();             
+                    id = freeid;
+                    return id;
+                }
+
+            }
+            
             // Obtener el último ID de la colección
             var lastItem = collection.FindAll().OrderByDescending(item => item["_id"]).FirstOrDefault();
             if (lastItem == default)
@@ -265,8 +281,8 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 {
                     if (FreeData.freeIds.Count > 0)
                     {
-                        var freeid = FreeData.freeIds[0];
-                        FreeData.freeIds.RemoveAt(0);
+                        var freeid = FreeData.freeIds.Min();
+                        FreeData.freeIds.Remove(freeid);
                         id = freeid;
                         InsertUpdateGeneric(FreeData);
                     }

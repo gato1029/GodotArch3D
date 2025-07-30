@@ -1,158 +1,259 @@
 using LiteDB;
 using System;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
 {
     [Flags]
     public enum NeighborDirection
     {
-        None = 0,           // Ninguna dirección
-        Up = 1 << 0,        // Arriba (bit 0)
-        Right = 1 << 1,     // Derecha (bit 1)
-        Down = 1 << 2,      // Abajo (bit 2)
-        Left = 1 << 3,      // Izquierda (bit 3)
-        UpRight = 1 << 4,   // Arriba-Derecha (bit 4)
-        DownRight = 1 << 5, // Abajo-Derecha (bit 5)
-        DownLeft = 1 << 6,  // Abajo-Izquierda (bit 6)
-        UpLeft = 1 << 7     // Arriba-Izquierda (bit 7)
+        None = 0,
+        Up = 1 << 0,
+        Right = 1 << 1,
+        Down = 1 << 2,
+        Left = 1 << 3,
+        UpRight = 1 << 4,
+        DownRight = 1 << 5,
+        DownLeft = 1 << 6,
+        UpLeft = 1 << 7
     }
+
+    public enum NeighborState
+    {
+        Any = -1,
+        Empty = 0,
+        Filled = 1
+    }
+
+    public class NeighborCondition
+    {
+        public NeighborState State { get; set; } = NeighborState.Any;
+        public int SpecificTileId { get; set; }
+
+        public bool Matches(bool isConnected, TileData neighborTile)
+        {
+            if (State == NeighborState.Any)
+                return true;
+
+            if (State == NeighborState.Filled && !isConnected)
+                return false;
+
+            if (State == NeighborState.Empty && isConnected)
+                return false;
+
+            if (SpecificTileId!=0)
+            {
+                if (neighborTile == null || neighborTile.id != SpecificTileId)
+                    return false;
+            }
+
+            return true;
+        }
+        public bool Matches(bool isConnected, int neighborTileId)
+        {
+            if (State == NeighborState.Any)
+                return true;
+
+            if (State == NeighborState.Filled && !isConnected)
+                return false;
+
+            if (State == NeighborState.Empty && isConnected)
+                return false;
+
+            if (SpecificTileId != 0)
+            {
+                if (neighborTileId == 0 || neighborTileId != SpecificTileId)
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
     public class TileRuleData
     {
-        public byte neighborMask { get;  set; } // Byte que representa las conexiones
+        public byte neighborMask { get; set; }
 
         public bool checkIsNull { get; set; }
 
-        public int idTileDataCentral {  get; set; }
+        public int idTileDataCentral { get; set; }
         public int[] idsTileDataMask { get; set; }
 
         [BsonIgnore]
-        public TileData tileDataCentral { get; set; }     // Índice del tile correspondiente
+        public TileData tileDataCentral { get; set; }
+
         [BsonIgnore]
         public TileData[] tileDataMask { get; set; }
+
+        public NeighborCondition[] neighborConditions { get; set; }
+
         public TileRuleData(byte neighborMask, TileData tileData)
         {
             this.neighborMask = neighborMask;
             this.tileDataCentral = tileData;
             tileDataMask = new TileData[8];
             idsTileDataMask = new int[8];
+            neighborConditions = Enumerable.Range(0, 8).Select(_ => new NeighborCondition()).ToArray();
         }
 
         public TileRuleData()
-        {            
+        {
             tileDataMask = new TileData[8];
             idsTileDataMask = new int[8];
+            neighborConditions = Enumerable.Range(0, 8).Select(_ => new NeighborCondition()).ToArray();
             neighborMask = 0;
+
+            for (int i = 0; i < 8; i++)
+            {
+                neighborConditions[i] = new NeighborCondition
+                {
+                    State = NeighborState.Empty, // 👈 aquí se asigna
+                    SpecificTileId = 0
+                };
+            }
         }
-        // Método para actualizar NeighborMask usando el enum NeighborDirection
-        public void UpdateNeighborMask(NeighborDirection direction,  bool isConnected = false, TileData tileData = null)
+
+        public void UpdateNeighborMask(NeighborDirection direction, bool isConnected = false, TileData tileData = null)
         {
+            int index = GetDirectionIndex(direction);
+
             if (isConnected)
             {
-                // Enciende el bit correspondiente a la dirección
                 neighborMask |= (byte)direction;
-                tileDataMask[GetDirectionIndex(direction)] = tileData;
-                if (tileData!=null)
-                {
-                    idsTileDataMask[GetDirectionIndex(direction)] = tileData.id;
-                }
-                else
-                {
-                    idsTileDataMask[GetDirectionIndex(direction)] = 0;
-                }
-                
+                tileDataMask[index] = tileData;
+                idsTileDataMask[index] = tileData?.id ?? 0;
             }
             else
             {
-                // Apaga el bit correspondiente a la dirección
                 neighborMask &= (byte)~direction;
-                tileDataMask[GetDirectionIndex(direction)] = null;           
-                idsTileDataMask[GetDirectionIndex(direction)] = 0;
-                
+                tileDataMask[index] = null;
+                idsTileDataMask[index] = 0;
             }
         }
-        // Método auxiliar para convertir NeighborDirection a un índice (0-7)
+
         private int GetDirectionIndex(NeighborDirection direction)
         {
-            switch (direction)
+            return direction switch
             {
-                case NeighborDirection.Up: return 0;
-                case NeighborDirection.Right: return 1;
-                case NeighborDirection.Down: return 2;
-                case NeighborDirection.Left: return 3;
-                case NeighborDirection.UpRight: return 4;
-                case NeighborDirection.DownRight: return 5;
-                case NeighborDirection.DownLeft: return 6;
-                case NeighborDirection.UpLeft: return 7;
-                default:
-                    throw new ArgumentException("Dirección no válida.");
-            }
+                NeighborDirection.Up => 0,
+                NeighborDirection.Right => 1,
+                NeighborDirection.Down => 2,
+                NeighborDirection.Left => 3,
+                NeighborDirection.UpRight => 4,
+                NeighborDirection.DownRight => 5,
+                NeighborDirection.DownLeft => 6,
+                NeighborDirection.UpLeft => 7,
+                _ => throw new ArgumentException("Dirección no válida."),
+            };
         }
+
         public NeighborDirection GetDirectionFromIndex(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0: return NeighborDirection.Up;
-                case 1: return NeighborDirection.Right;
-                case 2: return NeighborDirection.Down;
-                case 3: return NeighborDirection.Left;
-                case 4: return NeighborDirection.UpRight;
-                case 5: return NeighborDirection.DownRight;
-                case 6: return NeighborDirection.DownLeft;
-                case 7: return NeighborDirection.UpLeft;
-                default:
-                    throw new ArgumentException("Índice no válido. Debe estar entre 0 y 7.");
-            }
+                0 => NeighborDirection.Up,
+                1 => NeighborDirection.Right,
+                2 => NeighborDirection.Down,
+                3 => NeighborDirection.Left,
+                4 => NeighborDirection.UpRight,
+                5 => NeighborDirection.DownRight,
+                6 => NeighborDirection.DownLeft,
+                7 => NeighborDirection.UpLeft,
+                _ => throw new ArgumentException("Índice no válido. Debe estar entre 0 y 7."),
+            };
         }
-        // Método para verificar si una dirección está conectada
+
         public bool IsDirectionConnected(NeighborDirection direction)
         {
             return (neighborMask & (byte)direction) != 0;
         }
+
         public bool IsDirectionConnected(int directionIndex)
         {
             NeighborDirection direction = GetDirectionFromIndex(directionIndex);
             return (neighborMask & (byte)direction) != 0;
         }
-        public bool Matches(byte neighborMaskIn)
-        {
-            if (checkIsNull)
-            {
-                return CompareNeighborMasks(this.neighborMask, neighborMaskIn);
-            }
-            // Compara si la máscara de vecinos coincide con la regla
-            return this.neighborMask == neighborMaskIn;
-        }
-        public bool CompareNeighborMasks(byte mask1, byte mask2)
-        {            
-            for (int i = 0; i < 8; i++) // Itera sobre cada bit (posición de dirección)
-            {
-                bool bit1 = (mask1 & (1 << i)) != 0;
-                bool bit2 = (mask2 & (1 << i)) != 0;
 
-                if (bit1 ==false && (bit1!=bit2))
-                {
+        public byte GetOppositeMask(byte mask)
+        {
+            return (byte)(~mask & 0xFF);
+        }
+
+        public void SetDirection(NeighborDirection direction, NeighborState state, int specificTileId)
+        {
+            int index = GetDirectionIndex(direction);
+            neighborConditions[index].State = state;
+            neighborConditions[index].SpecificTileId = specificTileId;
+        }
+
+        /// <summary>
+        /// Compara un inputMask y los tiles vecinos para verificar si esta regla aplica.
+        /// </summary>
+        public bool Matches(byte inputMask, TileData[] neighborTiles)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                var condition = neighborConditions[i];
+                bool isConnected = (inputMask & (1 << i)) != 0;
+                TileData neighbor = neighborTiles[i];
+
+                if (!condition.Matches(isConnected, neighbor))
                     return false;
-                }
-                //if (bit1==true && (bit2== true || bit2 ==false))
-                //{
-                    
-                //}
-                //else
-                //{
-                //    if (bit1 != bit2)
-                //    {
-                //        return false;
-                //    }
-                //}
-                
             }
 
             return true;
         }
-        public byte GetOppositeMask(byte mask)
+        public bool Matches(byte inputMask, int[] neighborTiles)
         {
-            return (byte)(~mask & 0xFF); // Invierte los bits y mantiene solo los primeros 8 bits
+            for (int i = 0; i < 8; i++)
+            {
+                var condition = neighborConditions[i];
+                bool isConnected = (inputMask & (1 << i)) != 0;
+                int neighborId = neighborTiles[i];
+
+                if (!condition.Matches(isConnected, neighborId))
+                    return false;
+            }
+
+            return true;
+        }
+        /// <summary>
+        /// Versión simple que ignora `TileData`, útil para reglas básicas.
+        /// </summary>
+        public bool Matches(byte inputMask)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                var condition = neighborConditions[i];
+                bool isConnected = (inputMask & (1 << i)) != 0;
+
+                if (!condition.Matches(isConnected, null))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Compara bit a bit que todos los bits apagados en mask1 también estén apagados en mask2.
+        /// </summary>
+        public bool IsCompatibleMask(byte mask1, byte mask2)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                bool bit1 = (mask1 & (1 << i)) != 0;
+                bool bit2 = (mask2 & (1 << i)) != 0;
+
+                if (!bit1 && bit2)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return $"Mask: {Convert.ToString(neighborMask, 2).PadLeft(8, '0')}, Central: {tileDataCentral?.id}, Conditions: [{string.Join(", ", neighborConditions.Select(c => $"{c.State} {(c.SpecificTileId !=0 ? $"(ID {c.SpecificTileId})" : "")}"))}]";
         }
     }
 }

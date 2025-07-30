@@ -3,6 +3,7 @@ using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
 using System.Data;
+using System.Linq;
 
 namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
 {
@@ -27,7 +28,11 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
                     }
                 }
             }
-            textureVisual = arrayTiles[0].tileDataCentral.textureVisual;
+            if (arrayTiles.Length>0)
+            {
+                textureVisual = arrayTiles[0].tileDataCentral.textureVisual;
+            }
+            
         }
         public AutoTileData()
         {
@@ -50,6 +55,47 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
             }
 
             return  null; // Si no encuentra coincidencia, usa la primera
+        }
+
+        public TileRuleData FindBestMatchingRule(byte mask, TileData[] neighborTiles)
+        {
+            foreach (var rule in arrayTiles)
+            {
+                bool usesSpecificIds = rule.neighborConditions.Any(c => c.SpecificTileId != 0);
+
+                if (usesSpecificIds)
+                {
+                    if (rule.Matches(mask, neighborTiles))
+                        return rule;
+                }
+                else
+                {
+                    if (rule.Matches(mask))
+                        return rule;
+                }
+            }
+
+            return null;
+        }
+        public TileRuleData FindBestMatchingRule(byte mask, int[] neighborTilesIds)
+        {
+            foreach (var rule in arrayTiles)
+            {
+                bool usesSpecificIds = rule.neighborConditions.Any(c => c.SpecificTileId != 0);
+
+                if (usesSpecificIds)
+                {
+                    if (rule.Matches(mask, neighborTilesIds))
+                        return rule;
+                }
+                else
+                {
+                    if (rule.Matches(mask))
+                        return rule;
+                }
+            }
+
+            return null;
         }
     }
 }

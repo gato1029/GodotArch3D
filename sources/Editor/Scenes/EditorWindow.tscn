@@ -1,23 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://c4fldu7j6ki1s"]
+[gd_scene load_steps=3 format=3 uid="uid://c4fldu7j6ki1s"]
 
 [ext_resource type="Script" uid="uid://dcl4pt3eitlg1" path="res://sources/Editor/Scenes/EditorWindow.cs" id="1_mmbnp"]
+[ext_resource type="PackedScene" uid="uid://cpvx7egeaiyi0" path="res://sources/Editor/Controls/ControlEditorTerrain.tscn" id="2_wh8m2"]
 
-[node name="EditorWindow" type="Window"]
-oversampling_override = 1.0
-title = "Editor"
-position = Vector2i(376, 219)
-size = Vector2i(400, 210)
-wrap_controls = true
-unresizable = true
-sharp_corners = true
+[node name="EditorWindow" type="PanelContainer"]
+custom_minimum_size = Vector2(400, 0)
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
 script = ExtResource("1_mmbnp")
 
 [node name="TabContainerItems" type="TabContainer" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 current_tab = 0
@@ -26,13 +20,8 @@ current_tab = 0
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TabContainerItems/Terreno"]
+[node name="ControlEditorTerrain" parent="TabContainerItems/Terreno" instance=ExtResource("2_wh8m2")]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="Recursos" type="TabBar" parent="TabContainerItems"]
 visible = false

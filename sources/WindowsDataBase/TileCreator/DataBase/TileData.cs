@@ -51,8 +51,12 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
     }
     public class TileDynamicData : TileData
     {
+        FrameData[] aleatoryTile { get; set; }
+        bool haveAleatory { get; set; }
         public float x { get; set; }
         public float y { get; set; }
+        public float xFormat { get; set; }
+        public float yFormat { get; set; }
         public float widht { get; set; }
         public float height { get; set; }
         public float widhtFormat { get; set; }
@@ -63,10 +67,10 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         
         }
         [BsonCtor]
-        public TileDynamicData(int idMaterial, float x, float y, float widht, float height, float offsetX, float offsetY,string colorString) :base()
+        public TileDynamicData(int idMaterial, float xFormat, float yFormat, float widhtFormat, float heightFormat, float offsetX, float offsetY,string colorString) :base()
         {
             offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
-            textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, (int)x, (int)y, widht, height);
+            textureVisual = MaterialManager.Instance.GetAtlasTexture(idMaterial, xFormat, yFormat, widhtFormat, heightFormat);
             if (colorString != null)
             { 
             var components = colorString.Trim('(', ')')
@@ -78,8 +82,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
         }
     }
     public class TileAnimateData : TileData
-    {
-        public int[] idFrames { get; set; } // Cantidad de frames en la animacion
+    {       
         public FrameData[] framesArray { get; set; }
         public float frameDuration { get; set; } // Duración de cada frame
         public TileAnimateData()

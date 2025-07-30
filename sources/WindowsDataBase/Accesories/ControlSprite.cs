@@ -182,7 +182,7 @@ public partial class ControlSprite : ScrollContainer
         objectData = data;
         materialData = MaterialManager.Instance.GetMaterial(objectData.idMaterial);
         
-        Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTexture(objectData.idMaterial, objectData.x, objectData.y, objectData.widht, objectData.height);
+        Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTextureInternal(objectData.idMaterial, objectData.x, objectData.y, objectData.widht, objectData.height);
         Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;
         Sprite2DView.FlipV = CheckBoxMirrorV.ButtonPressed;
 
@@ -262,7 +262,7 @@ public partial class ControlSprite : ScrollContainer
     {
         if (materialData != null)
         {
-            Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTexture(materialData.id, x, y, width, height);
+            Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTextureInternal(materialData.id, x, y, width, height);
             SaveAll();
             OnNotifyChangued?.Invoke(this);
         }

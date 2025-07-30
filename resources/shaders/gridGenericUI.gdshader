@@ -26,7 +26,7 @@ void fragment() {
     float base_width = line_width * 0.5;
 
     // Detectar si estamos cerca del centro (en píxeles)
-    vec2 half_grid = node_size * 0.5;
+    vec2 half_grid = node_size * 0.5 + offset;
     float center_x_dist = abs(pixel_pos.x - half_grid.x);
     float center_y_dist = abs(pixel_pos.y - half_grid.y);
 

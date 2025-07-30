@@ -9,6 +9,7 @@ namespace GodotEcsArch.sources.managers.Maps;
 
 public enum EditorMode
 {
+    APAGADO,
     TERRENO,
     RECURSOS,
     UNIDADES
@@ -18,6 +19,8 @@ public class MapManagerEditor : SingletonBase<MapManagerEditor>
     public MapLevelData currentMapLevelData { get; set; }
     public EditorMode editorMode { get; set; }
 
+    public bool enableEditor { get; set; }
+    public int idData { get; set; }
     public void Input(Godot.InputEvent @event)
     {
         switch (editorMode)
@@ -46,7 +49,7 @@ public class MapManagerEditor : SingletonBase<MapManagerEditor>
         InputMouse(@event);
         InputKeyboard(@event);
     }
-    private void DrawTilesBluePrint(int idData)
+    public void DrawTilesBluePrint(int idData)
     {
         
     }

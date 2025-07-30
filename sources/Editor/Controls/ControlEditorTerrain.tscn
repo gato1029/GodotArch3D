@@ -1,0 +1,174 @@
+[gd_scene load_steps=3 format=3 uid="uid://cpvx7egeaiyi0"]
+
+[ext_resource type="Texture2D" uid="uid://bfy5aob4otta4" path="res://resources/Textures/internal/image.png" id="1_dtmik"]
+[ext_resource type="Script" uid="uid://buehwgy68rjhg" path="res://sources/Editor/Controls/ControlEditorTerrain.cs" id="1_y23i0"]
+
+[node name="ControlEditorTerrain" type="MarginContainer"]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 431.0
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+script = ExtResource("1_y23i0")
+
+[node name="PanelContainerFocus" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainerFocus"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainerFocus/MarginContainer"]
+layout_mode = 2
+current_tab = 0
+
+[node name="Diseño" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+metadata/_tab_index = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+columns = 2
+
+[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Tamaño Grid X:"
+
+[node name="SpinBoxGridX" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 10.0
+value = 1.0
+
+[node name="Label2" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Tamaño Grid Y:"
+
+[node name="SpinBoxGridY" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 10.0
+value = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRectImage" type="TextureRect" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("1_dtmik")
+stretch_mode = 4
+
+[node name="ButtonSearch" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Buscar Terreno"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+columns = 2
+
+[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Posicion Chunk X:"
+
+[node name="SpinBoxChunkX" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = -1000.0
+max_value = 1000.0
+
+[node name="Label2" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Posicion Chunk Y:"
+
+[node name="SpinBoxChunkY" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = -1000.0
+max_value = 1000.0
+
+[node name="ButtonAutomaticTerrain" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Generar Terreno Automatico"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+
+[node name="ButtonRefresh" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer2"]
+layout_mode = 2
+text = "Refrescar Reglas"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer3"]
+layout_mode = 2
+text = "Capa:"
+
+[node name="OptionButtonLayer" type="OptionButton" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ItemListRules" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Capas" type="GridContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+visible = false
+layout_mode = 2
+columns = 2
+metadata/_tab_index = 1
+
+[node name="Label5" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+text = "Basico:"
+
+[node name="CheckBoxBasic" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+text = "Piso:"
+
+[node name="CheckBoxFloor" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+text = "Camino:"
+
+[node name="CheckBoxPath" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+text = "Agua:"
+
+[node name="CheckBoxWater" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2
+text = "Adornos:"
+
+[node name="CheckBoxOrnament" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+layout_mode = 2

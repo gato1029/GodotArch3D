@@ -1,4 +1,6 @@
 using Godot;
+using GodotEcsArch.sources.managers;
+using GodotEcsArch.sources.WindowsDataBase.Generic;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,38 @@ namespace GodotEcsArch.sources.utils
                 case NeighborDirection.UpLeft: return new Vector2I(tilePos.X - 1, tilePos.Y + 1);
                 default: return tilePos;
             }
+        }
+
+        public static Vector2 WorldPositionTile(Vector2I positionTile)
+        {
+            Vector2 tileSize = new Vector2(16, 16);
+            
+            float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
+            float y = MeshCreator.PixelsToUnits(tileSize.Y) / 2f;
+            Vector2 positionNormalize = positionTile * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
+            Vector2 positionCenter = positionNormalize + new Vector2(x, y);
+            return positionCenter;
+        }
+
+        public static RuleData FindBestMatchingRule(RuleData[] arrayRules,byte mask, int[] neighborTilesIds)
+        {
+            foreach (var rule in arrayRules)
+            {
+                bool usesSpecificIds = rule.neighborConditions.Any(c => c.SpecificTileId != 0);
+
+                if (usesSpecificIds)
+                {
+                    if (rule.Matches(mask, neighborTilesIds))
+                        return rule;
+                }
+                else
+                {
+                    if (rule.Matches(mask))
+                        return rule;
+                }
+            }
+
+            return null;
         }
     }
 }

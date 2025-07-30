@@ -1,12 +1,14 @@
 using Godot;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.utils;
-using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
+using RectangleBinPacking;
 using System;
 using System.Collections.Generic;
-using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
-using GodotEcsArch.sources.managers.Collision;
+using System.Reflection;
 
 public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
 {
@@ -46,6 +48,43 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
         SpinBoxZoomGrid.ValueChanged += SpinBoxZoomGrid_ValueChanged;
 
         ButtonDelete.Pressed += ButtonDelete_Pressed;
+        ButtonSaveActive.Pressed += ButtonSaveActive_Pressed;
+    }
+
+    private void ButtonSaveActive_Pressed()
+    {
+        objectData = new TileDynamicData();
+        AtlasTexture atlasTexture = (AtlasTexture)Sprite2DView.Texture;
+        string hash = atlasTexture.Region.Position.X.ToString() + atlasTexture.Region.Position.Y.ToString() + atlasTexture.Region.Size.X.ToString() + atlasTexture.Region.Size.Y.ToString();
+        int hash_unique = StableHash.FromString(hash);
+
+        objectData.name = materialData.category + "_" + materialData.name + "_" + hash_unique.ToString();
+
+        objectData.haveCollider = CheckBoxHasCollider.ButtonPressed;
+        objectData.idMaterial = materialData.id;
+
+        objectData.x = atlasTexture.Region.Position.X;
+        objectData.y = atlasTexture.Region.Position.Y;
+        objectData.widht = atlasTexture.Region.Size.X;
+        objectData.height = atlasTexture.Region.Size.Y;
+        objectData.scale = (float)SpinBoxScale.Value;
+        objectData.offsetX = (float)SpinBoxOffsetX.Value;
+        objectData.offsetY = (float)SpinBoxOffsetY.Value;
+        objectData.mirrorX = CheckBoxMirror.ButtonPressed;
+        objectData.mirrorY = CheckBoxMirrorV.ButtonPressed;
+        objectData.colorString = ColorButtonBase.Color.ToString();
+        CheckBoxMirrorV_Pressed();
+        CheckBoxMirror_Pressed();
+        if (!objectData.haveCollider)
+        {
+            objectData.collisionBody = null;
+        }
+
+        TextureHelper.RecalulateUVFormat(objectData);
+
+        DataBaseManager.Instance.InsertUpdate(objectData);
+
+        OnNotifyChanguedSimple?.Invoke();
     }
 
     private void ButtonDelete_Pressed()
@@ -74,6 +113,10 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
         if (CheckBoxGenerateAll.ButtonPressed)
         {
             ButtonSave.Text = "Guardar Todos Tiles";
+            for (int i = 0; i < ViewItems.GetItemCount(); i++)
+            {
+                ViewItems.Select(i,false);
+            }
         }
         else
         {
@@ -93,10 +136,12 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
         if (CheckBoxMultiSelection.ButtonPressed)
         {
             ViewItems.SelectMode = ItemList.SelectModeEnum.Toggle;
+            ButtonSave.Text = "Guardar Tiles Seleccionados";
         }
         else
         {
             ViewItems.SelectMode = ItemList.SelectModeEnum.Single;
+            ButtonSave.Text = "Guardar Tile";
         }
     }
 
@@ -218,24 +263,61 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
             CheckBoxHasCollider_PressedUI();
             CheckBoxHasCollider_Pressed();
         }
-       Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTexture(objectData.idMaterial, objectData.x, objectData.y, objectData.widht, objectData.height);
+       Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTextureInternal(objectData.idMaterial, objectData.x, objectData.y, objectData.widht, objectData.height);
         Sprite2DView.FlipH = CheckBoxMirror.ButtonPressed;
         Sprite2DView.FlipV = CheckBoxMirrorV.ButtonPressed;
     }
-    private void ButtonSave_Pressed()
+
+    private void SaveSelected()
     {
-        if (objectData.id == 0)
+        foreach (var item in ViewItems.GetSelectedItems())
         {
-            objectData.name = materialData.name + "_" + DataBaseManager.Instance.NextID<TileDynamicData>();
+            objectData = new TileDynamicData();
+            int id = (int)ViewItems.GetItemMetadata(item);
+            var texture = GetRegion(id);
+            AtlasTexture atlasTexture = (AtlasTexture)texture;
+            string hash = atlasTexture.Region.Position.X.ToString() + atlasTexture.Region.Position.Y.ToString() + atlasTexture.Region.Size.X.ToString() + atlasTexture.Region.Size.Y.ToString();
+            int hash_unique = StableHash.FromString(hash);
+            objectData.name = materialData.category + "_" + materialData.name + "_" + hash_unique.ToString();
+            objectData.haveCollider = CheckBoxHasCollider.ButtonPressed;
+            objectData.idMaterial = materialData.id;
+            
+            objectData.x = atlasTexture.Region.Position.X;
+            objectData.y = atlasTexture.Region.Position.Y;
+            objectData.widht = atlasTexture.Region.Size.X;
+            objectData.height = atlasTexture.Region.Size.Y;
+            objectData.scale = (float)SpinBoxScale.Value;
+            objectData.offsetX = (float)SpinBoxOffsetX.Value;
+            objectData.offsetY = (float)SpinBoxOffsetY.Value;
+            objectData.mirrorX = CheckBoxMirror.ButtonPressed;
+            objectData.mirrorY = CheckBoxMirrorV.ButtonPressed;
+            objectData.colorString = ColorButtonBase.Color.ToString();
+            CheckBoxMirrorV_Pressed();
+            CheckBoxMirror_Pressed();
+            if (!objectData.haveCollider)
+            {
+                objectData.collisionBody = null;
+            }
+
+            TextureHelper.RecalulateUVFormat(objectData);
+
+            DataBaseManager.Instance.InsertUpdate(objectData);
         }
-        else
-        {
-            objectData.name = LineEditName.Text;
-        }
+        OnNotifyChanguedSimple?.Invoke();
+        QueueFree();
+    }
+
+    private void SaveOne()
+    {
+        AtlasTexture atlasTexture = (AtlasTexture)Sprite2DView.Texture;
+        string hash = atlasTexture.Region.Position.X.ToString() + atlasTexture.Region.Position.Y.ToString() + atlasTexture.Region.Size.X.ToString() + atlasTexture.Region.Size.Y.ToString();
+        int hash_unique = StableHash.FromString(hash);
         
+            objectData.name = materialData.category + "_" + materialData.name + "_" + hash_unique.ToString();        
+
         objectData.haveCollider = CheckBoxHasCollider.ButtonPressed;
         objectData.idMaterial = materialData.id;
-        AtlasTexture atlasTexture = (AtlasTexture)Sprite2DView.Texture;
+        
         objectData.x = atlasTexture.Region.Position.X;
         objectData.y = atlasTexture.Region.Position.Y;
         objectData.widht = atlasTexture.Region.Size.X;
@@ -243,24 +325,36 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
         objectData.scale = (float)SpinBoxScale.Value;
         objectData.offsetX = (float)SpinBoxOffsetX.Value;
         objectData.offsetY = (float)SpinBoxOffsetY.Value;
-
         objectData.mirrorX = CheckBoxMirror.ButtonPressed;
         objectData.mirrorY = CheckBoxMirrorV.ButtonPressed;
         objectData.colorString = ColorButtonBase.Color.ToString();
-
         CheckBoxMirrorV_Pressed();
         CheckBoxMirror_Pressed();
         if (!objectData.haveCollider)
         {
-            objectData.collisionBody = null;            
+            objectData.collisionBody = null;
         }
 
+        TextureHelper.RecalulateUVFormat(objectData);
+
         DataBaseManager.Instance.InsertUpdate(objectData);
-       
-            OnNotifyChanguedSimple?.Invoke();
-            QueueFree();
+
+        OnNotifyChanguedSimple?.Invoke();
+        QueueFree();
+    }
+    private void ButtonSave_Pressed()
+    {
+        if (CheckBoxMultiSelection.ButtonPressed)
+        {
+            SaveSelected();
+        }
+        else
+        {
+            SaveOne();
+        }
        
     }
+
     private void CheckBoxHasCollider_Pressed()
     {
         if (CheckBoxHasCollider.ButtonPressed)
@@ -282,7 +376,7 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
     {
         if (materialData!=null)
         {
-            Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTexture(materialData.id, x, y, width, height);
+            Sprite2DView.Texture = MaterialManager.Instance.GetAtlasTextureInternal(materialData.id, x, y, width, height);
         }
         
     }
@@ -335,7 +429,7 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
 
         materialData = DataBaseManager.Instance.FindById<MaterialData>(id);
 
-        ControlTextureLocal.SetTexture((Texture2D)materialData.textureMaterial);
+        ControlTextureLocal.SetTexture((Texture2D)materialData.textureMaterial, materialData);
         SpinBox2HeightPixel.Value = materialData.divisionPixelY;
         SpinBoxWidthPixel.Value = materialData.divisionPixelX;
 
@@ -359,7 +453,8 @@ public partial class WindowTiles : Window, IFacadeWindow<TileDynamicData>
             Texture item = list[i];
             if (!TextureHelper.IsTextureEmpty(item))
             {
-                int idx = ViewItems.AddItem("ID:" + i, (Texture2D)item);
+                //int idx = ViewItems.AddItem("ID:" + i, (Texture2D)item);
+                int idx = ViewItems.AddIconItem((Texture2D)item);
                 ViewItems.SetItemMetadata(idx, i);
             }
         }

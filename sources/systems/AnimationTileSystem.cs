@@ -47,7 +47,7 @@ public class AnimationTileSystem : BaseSystem<World, float>
                 tileAnimation.TimeSinceLastFrame += _deltaTime;
                 if (tileAnimation.TimeSinceLastFrame >= tileAnimation.TileAnimateData.frameDuration && tileAnimation.loop)
                 {       
-                    if (tileAnimation.currentFrameIndex >= (tileAnimation.TileAnimateData.idFrames.Length))
+                    if (tileAnimation.currentFrameIndex >= (tileAnimation.TileAnimateData.framesArray.Length))
                     {
                         if (tileAnimation.loop)
                         {

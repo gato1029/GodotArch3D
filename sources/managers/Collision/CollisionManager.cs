@@ -38,7 +38,7 @@ internal class CollisionManager : SingletonBase<CollisionManager>
     public  SpatialHashMap<Entity> dynamicCollidersEntities;
     public  SpatialHashMap<Entity> MoveCollidersEntities;
     public SpatialHashMap<IDataTile> tileColliders;
-    public SpatialHashMap<IDataSprite> spriteColliders;
+    public SpatialHashMap<DataItem> spriteColliders;
 
     public QuadTree<ColliderSprite> quadTreeColliders;
 
@@ -50,7 +50,7 @@ internal class CollisionManager : SingletonBase<CollisionManager>
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
         tileColliders = new SpatialHashMap<IDataTile>(8, delegate (IDataTile er) { return er.IdCollider; });
-        spriteColliders = new SpatialHashMap<IDataSprite>(8, delegate (IDataSprite er) { return er.idUnique; });
+        spriteColliders = new SpatialHashMap<DataItem>(8, delegate (DataItem er) { return er.idUnique; });
     }
 
     protected override void Destroy()

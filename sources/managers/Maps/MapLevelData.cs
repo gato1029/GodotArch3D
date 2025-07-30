@@ -77,9 +77,9 @@ public class MapLevelData
     // luego agregar tiles para miniatura y posiciones de entrada
     
     [ProtoIgnore, JsonIgnore]
-    TerrainMap terrainMap;
+    public TerrainMap terrainMap { get; set; }
     [ProtoIgnore, JsonIgnore]
-    MapResources mapResources;
+    public MapResources mapResources { get; set; }
     // buildsMap buildsMap;
 
     public MapLevelData(string name, Vector2I size, MapType mapType, int layer, string description, bool unlimit =false)
@@ -96,8 +96,8 @@ public class MapLevelData
         SerializerManager.SaveToFileJson(this, pathCurrentCarpet, "Data");
 
         terrainMap = new TerrainMap(pathCurrentCarpet + "/InternalData", layer);
-        mapResources = new MapResources(pathCurrentCarpet+"/InternalData", layer + 1);
-        SaveAll();
+        //mapResources = new MapResources(pathCurrentCarpet+"/InternalData", layer + 1);
+      //  SaveAll();
     }
     public void SaveAll()
     {

@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
@@ -8,9 +9,7 @@ using System.Collections.Generic;
 public partial class WindowAutoTile : Window, IFacadeWindow<AutoTileData>
 {
     List<WindowAutoTileItem> items;
-    VBoxContainer vBoxContainerItems;
-    LineEdit lineName;
-    LineEdit lineid;
+            
     WindowState state;
     AutoTileData autoTileData;
     
@@ -20,42 +19,63 @@ public partial class WindowAutoTile : Window, IFacadeWindow<AutoTileData>
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
-        CloseRequested += Close_Button;
-        vBoxContainerItems = GetNode<VBoxContainer>("Panel/MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer");
-
-        lineName = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/LineEdit3");
-        lineid = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/LineEdit");
-
-        GetNode<Button>("Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer/Button").Pressed += Save_Pressed;
-        GetNode<Button>("Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer/Button2").Pressed += NewRule_Pressed;
-
+        InitializeUI(); // Insertado por el generador de UI                                
+        ButtonSave.Pressed += Save_Pressed;
+        ButtonSaveActive.Pressed += SaveActive_Pressed;
+        ButtonNewRule.Pressed+= NewRule_Pressed;
         state = WindowState.NEW;
         items = new List<WindowAutoTileItem>();
+        autoTileData = new AutoTileData();
     }
 
-    private void Close_Button()
+    private void SaveActive_Pressed()
     {
-        QueueFree();
+        SaveAll();
     }
+
+
 
     private void NewRule_Pressed()
     {
+        int insertPosition = items.Count; // por defecto al final
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            if (items[i].IsSelected)
+            {
+                insertPosition = i;
+                break;
+            }
+        }
+
         WindowAutoTileItem item = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTileItem.tscn").Instantiate<WindowAutoTileItem>();
-        vBoxContainerItems.AddChild(item);
-        item.SetPosition(items.Count);
-        items.Add(item);
+
+        // Insertar en la UI y en la lista lógica
+        GridContainerItems.AddChild(item);
+        GridContainerItems.MoveChild(item, insertPosition);
+        items.Insert(insertPosition, item);
+
+        // Reasignar posiciones visuales
+        for (int i = 0; i < items.Count; i++)
+            items[i].SetPosition(i);
 
         item.OnRequestOrderItem += Item_OnRequestOrderItem;
         item.OnDeleteItem += Item_OnDeleteItem;
-        
-    }
+        item.OnSelected += () => Item_OnSelected(item); // nuevo evento
 
+        item.SetSelected(true); // seleccionar el nuevo por defecto
+    }
+    private void Item_OnSelected(WindowAutoTileItem selectedItem)
+    {
+        foreach (var item in items)
+            item.SetSelected(item == selectedItem);
+    }
     private void Item_OnDeleteItem(int position, WindowAutoTileItem windowAutoTileItem)
     {
         
-        for (int i = position+1; i < vBoxContainerItems.GetChildCount(); i++)
+        for (int i = position+1; i < GridContainerItems.GetChildCount(); i++)
         {
-            var node = vBoxContainerItems.GetChild<WindowAutoTileItem>(i);
+            var node = GridContainerItems.GetChild<WindowAutoTileItem>(i);
             node.SetPosition(i-1);
         }
         items.Remove(windowAutoTileItem);
@@ -66,11 +86,11 @@ public partial class WindowAutoTile : Window, IFacadeWindow<AutoTileData>
 
         if (id == 1) //up
         {
-            if (position < vBoxContainerItems.GetChildCount())
+            if (position < GridContainerItems.GetChildCount())
             {
-                var node = vBoxContainerItems.GetChild<WindowAutoTileItem>(position+1);
+                var node = GridContainerItems.GetChild<WindowAutoTileItem>(position+1);
                 node.SetPosition(position);
-                vBoxContainerItems.MoveChild(windowAutoTileItem, position + 1);
+                GridContainerItems.MoveChild(windowAutoTileItem, position + 1);
                 windowAutoTileItem.SetPosition(position + 1);
                 
             }
@@ -80,9 +100,9 @@ public partial class WindowAutoTile : Window, IFacadeWindow<AutoTileData>
         {
             if (position>0)
             {
-                var node = vBoxContainerItems.GetChild<WindowAutoTileItem>(position - 1);
+                var node = GridContainerItems.GetChild<WindowAutoTileItem>(position - 1);
                 node.SetPosition(position);
-                vBoxContainerItems.MoveChild(windowAutoTileItem, position - 1);
+                GridContainerItems.MoveChild(windowAutoTileItem, position - 1);
                 windowAutoTileItem.SetPosition(position - 1);
             }
             
@@ -91,30 +111,39 @@ public partial class WindowAutoTile : Window, IFacadeWindow<AutoTileData>
         
     }
 
- 
 
-    private void Save_Pressed()
+    private void SaveAll()
     {
         List<TileRuleData> tileRuleDatas = new List<TileRuleData>();
-        foreach (var item in vBoxContainerItems.GetChildren())
+        foreach (var item in GridContainerItems.GetChildren())
         {
             WindowAutoTileItem windowAutoTileItem = (WindowAutoTileItem)item;
             tileRuleDatas.Add(windowAutoTileItem.tileRuleData);
         }
         if (state == WindowState.UPDATE)
         {
-            AutoTileData autoTileData = new AutoTileData(tileRuleDatas.ToArray(), true);
-            autoTileData.id = int.Parse(lineid.Text);
-            autoTileData.name = lineName.Text;            
+            autoTileData = new AutoTileData(tileRuleDatas.ToArray(), true);
+            autoTileData.id = int.Parse(LineEditId.Text);
+            autoTileData.name = LineEditName.Text;
             DataBaseManager.Instance.InsertUpdate(autoTileData, autoTileData.id);
         }
         else
         {
-            AutoTileData autoTileData = new AutoTileData(tileRuleDatas.ToArray(),true);
-            autoTileData.id = int.Parse(lineid.Text);
-            autoTileData.name = lineName.Text;          
+            autoTileData = new AutoTileData(tileRuleDatas.ToArray(), true);
+            autoTileData.id = int.Parse(LineEditId.Text);
+            autoTileData.name = LineEditName.Text;
             DataBaseManager.Instance.InsertUpdate(autoTileData);
         }
+        if (autoTileData.id!=0)
+        {
+            AutoTileManager.Instance.RegisterTileData(autoTileData.id);
+        }
+        
+      
+    }
+    private void Save_Pressed()
+    {
+        SaveAll();
         OnNotifyChanguedSimple?.Invoke();        
         QueueFree();
 
@@ -131,19 +160,19 @@ public partial class WindowAutoTile : Window, IFacadeWindow<AutoTileData>
     {
         state = WindowState.UPDATE;
         autoTileData = data;
-        lineid.Text = autoTileData.id.ToString();
-        lineName.Text = autoTileData.name;
+        LineEditId.Text = autoTileData.id.ToString();
+        LineEditName.Text = autoTileData.name;
 
         foreach (var item in autoTileData.arrayTiles)
         {
             WindowAutoTileItem itemWin = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileCreator/windowAutoTileItem.tscn").Instantiate<WindowAutoTileItem>();
-            vBoxContainerItems.AddChild(itemWin);
+            GridContainerItems.AddChild(itemWin);
             itemWin.LoadData(item);
             itemWin.SetPosition(items.Count);
             items.Add(itemWin);
             itemWin.OnRequestOrderItem += Item_OnRequestOrderItem;
             itemWin.OnDeleteItem += Item_OnDeleteItem;
-
+            itemWin.OnSelected += () => Item_OnSelected(itemWin); // nuevo evento
         }
     }
 }

@@ -1,12 +1,14 @@
-[gd_scene load_steps=11 format=3 uid="uid://cmwumcvxxgnjl"]
+[gd_scene load_steps=13 format=3 uid="uid://cmwumcvxxgnjl"]
 
 [ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_a2usr"]
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="2_xh56v"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_e6381"]
 [ext_resource type="Script" uid="uid://xfxpirr8k7b" path="res://sources/WindowsDataBase/HerramientaMenuBar.cs" id="3_kc28b"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="4_tksb4"]
+[ext_resource type="PackedScene" uid="uid://ckwoyhgb501je" path="res://sources/Editor/Controls/EditorPanel.tscn" id="5_namcl"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
 [ext_resource type="Texture2D" uid="uid://c5ccx8t7g4yrh" path="res://resources/Textures/TX Plant.png" id="5_yxrc8"]
+[ext_resource type="Script" uid="uid://bnwmpmtuqvith" path="res://sources/Editor/ViewPortContainerEditor.cs" id="6_yxrc8"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_namcl"]
 
@@ -163,6 +165,9 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="AnimatedPanelContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer" instance=ExtResource("5_namcl")]
+layout_mode = 2
+
 [node name="PanelContainer" type="Panel" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -176,10 +181,11 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 stretch = true
+script = ExtResource("6_yxrc8")
 
 [node name="SubViewport" type="SubViewport" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(1280, 855)
+size = Vector2i(817, 855)
 render_target_update_mode = 4
 
 [node name="Render" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport"]
@@ -199,7 +205,7 @@ size = 10.0
 script = ExtResource("4_tksb4")
 MouseEdgeMargin = 5.0
 MinZoomSize = 10.0
-MaxZoomSize = 20.0
+MaxZoomSize = 30.0
 
 [node name="center" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D"]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, -10)

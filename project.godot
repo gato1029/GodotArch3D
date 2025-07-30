@@ -31,7 +31,7 @@ project/assembly_name="GodotEcsArch"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/UIGeneratorCSharp/plugin.cfg", "res://addons/debug_drawing/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/dockable_container/plugin.cfg", "res://addons/godot_visualstudio_debugger/plugin.cfg", "res://addons/grid_display/plugin.cfg", "res://addons/spanning_table/plugin.cfg", "res://addons/tnowe_extra_controls/plugin.cfg")
+enabled=PackedStringArray("res://addons/UIGeneratorCSharp/plugin.cfg", "res://addons/animated_box_container_cs/plugin.cfg", "res://addons/animated_panel_container_cs/plugin.cfg", "res://addons/debug_drawing/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/dockable_container/plugin.cfg", "res://addons/godot_visualstudio_debugger/plugin.cfg", "res://addons/grid_display/plugin.cfg", "res://addons/spanning_table/plugin.cfg", "res://addons/tnowe_extra_controls/plugin.cfg")
 
 [input]
 
@@ -77,6 +77,4 @@ debugGridCollider={
 
 [rendering]
 
-textures/canvas_textures/default_texture_filter=3
 textures/vram_compression/import_s3tc_bptc=true
-textures/decals/filter=2

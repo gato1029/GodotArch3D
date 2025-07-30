@@ -121,32 +121,23 @@ public struct CharacterCommonBehaviorComponent
 
 internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
 {
-    public Dictionary<int, MultimeshMaterial> multimeshMaterialDict;
-    private int layerRenderCharacters = 10;
+
+    private int layerRenderCharacters = 20;
     protected override void Initialize()
     {
-        multimeshMaterialDict = new Dictionary<int, MultimeshMaterial>();
+    
     }
 
     public void CreateNewCharacter(int idCharacterBase, Vector2 positionInitial)
     {
         CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(idCharacterBase);
-        int idMaterial = 0;
-        if (!multimeshMaterialDict.ContainsKey(characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial))
-        {
-            idMaterial = characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial;
-            MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(idMaterial));
-            multimeshMaterialDict.Add(idMaterial, multimeshMaterial);
-        }
-        else
-        {
-            idMaterial = characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial;
-        }
+        int idMaterial = characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial;
+        
 
 
         Entity entity = EcsManager.Instance.World.Create();
         AddBase(entity, characterBaseData);
-        AddRender(entity, characterBaseData, multimeshMaterialDict[idMaterial], positionInitial);
+        AddRender(entity, characterBaseData, idMaterial, positionInitial);
         AddMove(entity, positionInitial, characterBaseData);
         AddAnimations(entity, characterBaseData);
         AddSoulCharacter(entity, characterBaseData, positionInitial);
@@ -159,9 +150,9 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         
     }
 
-    private void AddRender(Entity entity, CharacterModelBaseData characterBaseData, MultimeshMaterial multimeshMaterial, Vector2 positionInitial)
+    private void AddRender(Entity entity, CharacterModelBaseData characterBaseData, int idMaterial, Vector2 positionInitial)
     {
-        var inst = multimeshMaterial.CreateInstance();
+        var inst = MultimeshManager.Instance.CreateInstance(idMaterial);
 
         GeometricShape2D colliderB = characterBaseData.animationCharacterBaseData.collisionMove.Multiplicity(characterBaseData.scale);
 
@@ -339,8 +330,7 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
     {
         var dataModel =  CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
         int idMaterial = dataModel.animationCharacterBaseData.animationDataArray[0].idMaterial;
-
-        CharacterCreatorManager.Instance.multimeshMaterialDict[idMaterial].FreeInstance(rid, instance);
+        MultimeshManager.Instance.FreeInstance(rid,instance,idMaterial);        
         RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Color(-1, -1, -1, -1));
 
         CollisionManager.Instance.characterCollidersEntities.RemoveItem(entity.Reference());

@@ -9,21 +9,29 @@ shader = ExtResource("1_q7ek5")
 shader_parameter/cell_size = Vector2(16, 16)
 shader_parameter/node_size = Vector2(480, 480)
 shader_parameter/line_width = 0.10000000475000001
-shader_parameter/center_line_width_factor = 2.0000000475000004
-shader_parameter/offset = Vector2(0, 0)
+shader_parameter/center_line_width_factor = 2.0
+shader_parameter/offset = Vector2(8, 8)
 shader_parameter/center_line_color = Color(1, 0, 0, 0.8)
 shader_parameter/grid_color = Color(0.08627452, 1, 1, 0.2)
 
 [node name="ControlGrid" type="CenterContainer"]
 custom_minimum_size = Vector2(480, 480)
-offset_right = 480.0
-offset_bottom = 480.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -240.0
+offset_right = 240.0
+offset_bottom = 240.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("2_lyn1b")
 GridResolution = Vector2i(30, 30)
 
 [node name="ControlRect" type="ColorRect" parent="."]
+z_index = 4
 material = SubResource("ShaderMaterial_5xw4c")
 custom_minimum_size = Vector2(480, 480)
 layout_mode = 2

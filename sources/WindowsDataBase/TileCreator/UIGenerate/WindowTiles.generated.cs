@@ -37,6 +37,7 @@ public partial class WindowTiles : Window
     private CheckBox CheckBoxHasCollider;
     private ColliderScene ColliderContainer;
     private Button ButtonSave;
+    private Button ButtonSaveActive;
     private Button ButtonDelete;
 
     public void InitializeUI()
@@ -82,6 +83,7 @@ public partial class WindowTiles : Window
         CheckBoxHasCollider_PressedUI();
         ColliderContainer = GetNode<ColliderScene>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ColliderContainer");
         ButtonSave = GetNode<Button>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ButtonSave");
+        ButtonSaveActive = GetNode<Button>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ButtonSaveActive");
         ButtonDelete = GetNode<Button>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ButtonDelete");
     }
 

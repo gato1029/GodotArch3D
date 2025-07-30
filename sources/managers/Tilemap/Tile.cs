@@ -18,6 +18,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
     public class Tile
     {        
         public int idTile { get; set; }
+        public int idMaterial { get; set; }
         public EntityReference entityReference { get; set; }
         public bool isAnimate { get; set; }       
         public Rid rid { get; set; }
@@ -30,6 +31,7 @@ namespace GodotEcsArch.sources.managers.Tilemap
         {
             this.tilePosition = tilePosition;
             transform3D = new Transform3D(Basis.Identity, Vector3.Zero);
+            instance = -1;
         }
         public Tile()
         {            
@@ -46,21 +48,13 @@ namespace GodotEcsArch.sources.managers.Tilemap
             this.idTile = idTile;
             
             TileData tileData = TilesManager.Instance.GetTileData(idTile);
-            if (tileData.type == "TileSimpleData")
-            {
-                TileSimpleData simpleData = (TileSimpleData)tileData;
-                
-                RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
-                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(simpleData.idInternalPosition, 0, 0, 0));
-                RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, positionBatchTexture));
-                //  RenderingServer.MultimeshInstanceSetColor(rid, instance, tileData.color);
-            }
+            this.idMaterial = tileData.idMaterial;
             if (tileData.type == "TileDynamicData")
             {
                 TileDynamicData tileDynamicData = (TileDynamicData)tileData;
                 
                 RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
-                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileDynamicData.x, tileDynamicData.y, tileDynamicData.widht, tileDynamicData.height));
+                RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(tileDynamicData.xFormat, tileDynamicData.yFormat, tileDynamicData.widhtFormat, tileDynamicData.heightFormat));
                 RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, positionBatchTexture));
             }
             if (tileData.type == "TileAnimateData")

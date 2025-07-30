@@ -22,10 +22,12 @@
     <PackageReference Include="LiteDB" Version="5.0.21" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="protobuf-net" Version="3.2.52" />
+    <PackageReference Include="RectangleBinPacking" Version="1.0.2" />
     <PackageReference Include="StructureOfArraysGenerator" Version="1.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Udun.FastNoiseLite" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="resources\" />

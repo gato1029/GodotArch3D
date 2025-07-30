@@ -35,6 +35,9 @@ public partial class Main3D : Node3D
         PerformanceTimer.Instance.Enabled = true;
         EcsManager.Instance.SetNode3DMain(this);
         ChunkManager.Initialize();
+
+        MapLevelData mapLevelData = new MapLevelData("Demo", new Vector2I(100, 100), MapType.Mapa, 10, "Demo");
+        MapManagerEditor.Instance.currentMapLevelData = mapLevelData;
         var dd =MultimeshManager.Instance;
 
         //terrainMap = TerrainMap.LoadMapfromFile("Mapa1");
@@ -46,7 +49,7 @@ public partial class Main3D : Node3D
         //{
         //    for (int j = -10; j < 10; j++)
         //    {
-        //        terrainMap.AddUpdateTile(new Vector2I(i, j), 7);
+        //        terrainMap.AddUpdateTile(new Vector2I(i, j), 1);
         //    }
 
         //}
@@ -65,11 +68,11 @@ public partial class Main3D : Node3D
         //    }
 
         //}
-       
-        
-        
 
-        ChunkManager.Instance.ForcedUpdate();
+
+
+
+        //ChunkManager.Instance.ForcedUpdate();
 
 
         CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(0, 0));
@@ -138,6 +141,6 @@ public partial class Main3D : Node3D
         frameCounter++;
         TimeGodot.UpdateDelta((float)delta);
         EcsManager.Instance.UpdateSystemsPhysics((float)delta, 0);
-        PerformanceTimer.Instance.PrintAll(30, frameCounter);
+        //PerformanceTimer.Instance.PrintAll(30, frameCounter);
     }
 }

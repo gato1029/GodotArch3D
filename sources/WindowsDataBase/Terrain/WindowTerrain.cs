@@ -16,48 +16,30 @@ using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileD
 public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
 {
     TerrainData terrainData;
-
-    Button buscarButton;
-    OptionButton optionMaterial;
-    ItemList itemListTiles;
-    
-    
-
-    Sprite2D spriteSelection;
-    LineEdit nameLine;
-    SpinBox idBaseSpin;
-
+                          
     int currentTile;
     int currentRule;
 
     bool isRule = false;
 
-    CollisionShape2D collisionBody;
+    
     
     public event IFacadeWindow<TerrainData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
-        spriteSelection = GetNode<Sprite2D>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/Control/CenterContainer/Sprite2D");
-        buscarButton = GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/Button");
-        collisionBody = GetNode<CollisionShape2D>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/Control/CenterContainer/Sprite2D/CollisionBody");
-        
-    
-        idBaseSpin = GetNode<SpinBox>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer/SpinBox");
-        nameLine = GetNode<LineEdit>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer/LineEdit");
+        InitializeUI(); // Insertado por el generador de UI                                             
+        ButtonSave.Pressed += button_Save;
+        ButtonSearchAnimate.Pressed += button_SearchAnimated;
+        ButtonSearchAuto.Pressed+= button_SearchRule;
+        ButtonSearchTile.Pressed += button_Dinamic;         
+        terrainData = new TerrainData();        
 
-        GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/HBoxContainer/Button").Pressed += button_Save;
-
-        GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/Button3").Pressed += button_SearchAnimated;
-
-        GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/Button2").Pressed += button_SearchRule;
-
-        GetNode<Button>("Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/Button4").Pressed += button_Dinamic;
-       
-  
-        terrainData = new TerrainData();
-        this.CloseRequested += WindowTerrain_CloseRequested;
+        foreach (TerrainType tipo in Enum.GetValues(typeof(TerrainType)))
+        {
+            OptionButtonType.AddItem(tipo.ToString());
+        }
     }
 
     private void button_Dinamic()
@@ -70,13 +52,13 @@ public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
     {
         isRule = false;
         var data = objectSelected;
-        spriteSelection.Texture = data.textureVisual;
+        Sprite2DImage.Texture = data.textureVisual;
         currentTile = objectSelected.id;
         if (data.haveCollider)
         {
             Rectangle rect = (Rectangle)data.collisionBody;
-            collisionBody.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
-            var shape = (RectangleShape2D)collisionBody.Shape;
+            CollisionBodyCollider.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
+            var shape = (RectangleShape2D)CollisionBodyCollider.Shape;
             shape.Size = new Vector2((float)rect.widthPixel, (float)rect.heightPixel);
         }
     }
@@ -94,7 +76,7 @@ public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
     {
         isRule = true;
         var data = objectSelected;
-        spriteSelection.Texture = data.textureVisual;
+        Sprite2DImage.Texture = data.textureVisual;
 
         currentRule = objectSelected.id ;
     }
@@ -103,7 +85,7 @@ public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
     {
         isRule = true;
         var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.AutoTileData>(id);
-        spriteSelection.Texture = data.textureVisual;
+        Sprite2DImage.Texture = data.textureVisual;
         
         currentRule = id;
     }
@@ -118,14 +100,14 @@ public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
     {
         isRule = false;
         var data = objectSelected;
-        spriteSelection.Texture = data.textureVisual;
+        Sprite2DImage.Texture = data.textureVisual;
         currentTile = objectSelected.id;
         if (data.haveCollider)
         {
             Rectangle rect = (Rectangle)data.collisionBody;
 
-            collisionBody.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
-            var shape = (RectangleShape2D)collisionBody.Shape;
+            CollisionBodyCollider.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
+            var shape = (RectangleShape2D)CollisionBodyCollider.Shape;
             shape.Size = new Vector2((float)rect.widthPixel, (float)rect.heightPixel);
         }
     }
@@ -144,13 +126,13 @@ public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
     {
         isRule = false;
         var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileSimpleData>(id);
-        spriteSelection.Texture = data.textureVisual;
+        Sprite2DImage.Texture = data.textureVisual;
         currentTile = id;
         if (data.haveCollider)
         {
             Rectangle rect = (Rectangle)data.collisionBody;
-            collisionBody.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
-            var shape = (RectangleShape2D)collisionBody.Shape;
+            CollisionBodyCollider.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
+            var shape = (RectangleShape2D)CollisionBodyCollider.Shape;
             shape.Size = new Vector2((float)rect.widthPixel, (float)rect.heightPixel);
         }
         
@@ -159,29 +141,22 @@ public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
     private void button_Copy()
     {
         terrainData.id = 0;
-        terrainData.name = nameLine.Text + "_Copy";
+        terrainData.name = LineEditName.Text + "_Copy";
+        terrainData.category = LineEditCategory.Text;
+        terrainData.terrainType = (TerrainType)OptionButtonType.Selected;
         DataBaseManager.Instance.InsertUpdate(terrainData);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }
     private void button_Save()
     {
-        terrainData.id = (int)idBaseSpin.Value;
-        terrainData.name = nameLine.Text;
-        if (isRule)
-        {
-            terrainData.idRule = currentRule;
-            terrainData.idTile = 0;
-        }
-        else
-        {
-            terrainData.idTile = currentTile;
-            terrainData.idRule = 0;
-        }
-        
+        terrainData.id = (int)SpinBoxId.Value;
+        terrainData.name = LineEditName.Text;
+
         
         terrainData.isRule = isRule;
-
+        terrainData.category = LineEditCategory.Text;
+        terrainData.terrainType = (TerrainType)OptionButtonType.Selected;
         DataBaseManager.Instance.InsertUpdate(terrainData);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
@@ -199,35 +174,37 @@ public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
 	}
     public void SetData(TerrainData data)
     {
-        terrainData = data;
+        //terrainData = data;
 
-        idBaseSpin.Value = terrainData.id;
-        nameLine.Text = terrainData.name;
-        if (terrainData.isRule)
-        {
-            var tileData = DataBaseManager.Instance.FindById<AutoTileData>(terrainData.idRule);
-            WindowRule_OnNotifySelected(tileData);
+        //SpinBoxId.Value = terrainData.id;
+        //LineEditName.Text = terrainData.name;
+        //LineEditCategory.Text = terrainData.category;
+        //OptionButtonType.Selected = (int)terrainData.terrainType;
+        //if (terrainData.isRule)
+        //{
+        //    var tileData = DataBaseManager.Instance.FindById<AutoTileData>(terrainData.idRule);
+        //    WindowRule_OnNotifySelected(tileData);
             
-        }
-        else
-        {
-            var tileData = DataBaseManager.Instance.FindById<TileData>(terrainData.idTile);
+        //}
+        //else
+        //{
+        //    var tileData = DataBaseManager.Instance.FindById<TileData>(terrainData.idTile);
             
          
-            if (tileData.type == "TileDynamicData")
-            {
-                var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileDynamicData>(terrainData.idTile);
-                WindowDinamic_OnNotifySelected(dataInternal);
-            }
-            if (tileData.type == "TileAnimateData")
-            {
-                var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileAnimateData>(terrainData.idTile);
-                WindowTileAnimateData_OnNotifySelected(dataInternal);
+        //    if (tileData.type == "TileDynamicData")
+        //    {
+        //        var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileDynamicData>(terrainData.idTile);
+        //        WindowDinamic_OnNotifySelected(dataInternal);
+        //    }
+        //    if (tileData.type == "TileAnimateData")
+        //    {
+        //        var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileAnimateData>(terrainData.idTile);
+        //        WindowTileAnimateData_OnNotifySelected(dataInternal);
                 
-            }
+        //    }
 
 
-        }        
+        //}        
     }
     public void LoadData(int id)
     {

@@ -12,6 +12,7 @@ public partial class WindowNewMaterial : Window
     private LineEdit LineEditPath;
     private Button ButtonSearchFile;
     private LineEdit LineEditName;
+    private LineEdit LineEditCategory;
     private OptionButton OptionButtonType;
     private SpinBox SpinBoxX;
     private SpinBox SpinBoxY;
@@ -27,6 +28,7 @@ public partial class WindowNewMaterial : Window
         LineEditPath = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer/LineEditPath");
         ButtonSearchFile = GetNode<Button>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer/ButtonSearchFile");
         LineEditName = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/LineEditName");
+        LineEditCategory = GetNode<LineEdit>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/LineEditCategory");
         OptionButtonType = GetNode<OptionButton>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/OptionButtonType");
         OptionButtonType.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
         SpinBoxX = GetNode<SpinBox>("Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer/HBoxContainer5/SpinBoxX");

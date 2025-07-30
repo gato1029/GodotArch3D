@@ -1,0 +1,106 @@
+[gd_scene load_steps=4 format=3 uid="uid://cccsg3x7jhvix"]
+
+[ext_resource type="Script" uid="uid://718xv0cuch1m" path="res://sources/WindowsDataBase/Generic/Controls/ControlRuleItem.cs" id="1_qsdah"]
+[ext_resource type="Texture2D" uid="uid://csq8it2of8m72" path="res://resources/Textures/internal/cancel.png" id="2_yuaeu"]
+[ext_resource type="Texture2D" uid="uid://bfy5aob4otta4" path="res://resources/Textures/internal/image.png" id="3_fvurx"]
+
+[node name="ControlRuleItem" type="PanelContainer"]
+offset_right = 220.0
+offset_bottom = 290.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_qsdah")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="LabelRule" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "Rule: 1"
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+columns = 3
+
+[node name="Button7" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button0" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button4" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button3" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="ButtonCentral" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("3_fvurx")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button1" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button6" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button2" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button5" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+icon = ExtResource("2_yuaeu")
+icon_alignment = 1
+expand_icon = true
+
+[node name="ButtonDelete" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Eliminar"

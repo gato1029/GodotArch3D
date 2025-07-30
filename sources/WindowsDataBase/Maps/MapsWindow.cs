@@ -6,20 +6,19 @@ using System;
 
 public partial class MapsWindow : Window
 {
-    MapLevelData mapLevelData;
+    
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
         InitializeUI(); // Insertado por el generador de UI
-        ButtonSave.Pressed += ButtonSave_Pressed;
-        
-
+        ButtonSave.Pressed += ButtonSave_Pressed;        
     }
 
     private void ButtonSave_Pressed()
-    {       
-        mapLevelData = new MapLevelData(LineEditName.Text, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value), MapType.Mapa, 10,TextEditDescription.Text);                      
+    {
+        MapLevelData mapLevelData = new MapLevelData(LineEditName.Text, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value), MapType.Mapa, 10,TextEditDescription.Text);                      
         MapManagerEditor.Instance.currentMapLevelData = mapLevelData;
+        QueueFree();
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

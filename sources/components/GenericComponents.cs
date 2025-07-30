@@ -32,6 +32,13 @@ public struct VelocityComponent
 }
 
 [Component]
+public struct TilePositionComponent
+{
+    public int x;
+    public int y;
+}
+
+[Component]
 public struct PositionComponent
 {
     public Vector2 position;    
@@ -66,7 +73,20 @@ public struct GpuInstance
     public Rid rid;
     public int instance;
 }
-
+[Component]
+public struct SpriteRenderGPUComponent
+{
+    public Rid rid;
+    public int instance;
+    public int layerRender;
+    public int arrayPositiontexture;
+    public int idMaterial;
+    public float zOrdering;
+    public Vector2 originOffset;
+    public float scale;
+    public Color uvMap;
+    public Transform3D transform;
+}
 internal class GenericComponents
 {
 }

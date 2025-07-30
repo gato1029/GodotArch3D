@@ -27,13 +27,17 @@ public class MultimeshArrayMaterial
         multimeshDataDict = new Dictionary<int, Dictionary<Rid, MultimeshData>>();
         materialToGroup = new Dictionary<int, int>();
 
-        BsonExpression bsonExpression = BsonExpression.Create("type = @0", (int)typeMaterial);
-        var listData = DataBaseManager.Instance.FindAllFilter<MaterialData>(bsonExpression);
+
+        BsonExpression bsonExpression = BsonExpression.Create("materialType = @0", typeMaterial.ToString());
+        var listData = DataBaseManager.Instance.FindAllFilter<TextureMasterData>(bsonExpression);
+
+        //BsonExpression bsonExpression = BsonExpression.Create("type = @0", (int)typeMaterial);
+        //var listData = DataBaseManager.Instance.FindAllFilter<MaterialData>(bsonExpression);
 
         
         groupArrayBuilder = new Dictionary<int, TextureArrayBuilder>();
 
-        var groupedTextures = new List<List<MaterialData>>();
+        var groupedTextures = new List<List<TextureMasterData>>();
         // Dividir materiales en bloques de 256 capas
         for (int i = 0; i < listData.Count; i += MAX_LAYERS)
         {
@@ -43,13 +47,17 @@ public class MultimeshArrayMaterial
         // Crear multimesh y texture array por grupo
         for (int i = 0; i < groupedTextures.Count; i++)
         {
-            List<MaterialData> textureGroup = groupedTextures[i];
+            List<TextureMasterData> textureGroup = groupedTextures[i];
             var texBuilder = new TextureArrayBuilder();
             for (int ii = 0; ii < textureGroup.Count; ii++)
             {
-                MaterialData item = textureGroup[ii];
+                TextureMasterData item = textureGroup[ii];
                 texBuilder.SetTextureAt(ii, FileHelper.GetPathGameDB(item.pathTexture));
-                MaterialManager.Instance.SetMaterialPositionBatch(item.id, ii);
+                foreach (var idMat in item.listMaterials)
+                {
+                    MaterialManager.Instance.SetMaterialPositionBatch(idMat, ii);
+                }
+                
             }
             texBuilder.BuildAndApply();
             groupArrayBuilder.Add(i, texBuilder);
@@ -57,9 +65,13 @@ public class MultimeshArrayMaterial
             Dictionary<Rid, MultimeshData> multimeshDataDictInternal = new Dictionary<Rid, MultimeshData>();
             multimeshDataDict.Add(i, multimeshDataDictInternal);
 
-            foreach (MaterialData item in textureGroup)
+            foreach (TextureMasterData item in textureGroup)
             {
-                AddToGroup(i, item);
+                foreach (var itemMaterial in item.listMaterials)
+                {
+                    AddToGroup(i, itemMaterial);
+                }
+                
             }
         }
 
@@ -71,11 +83,11 @@ public class MultimeshArrayMaterial
             return groupId;
         return 0;
     }
-    void AddToGroup(int groupId, MaterialData material)
+    void AddToGroup(int groupId, int materialId)
     {
-        if (!materialToGroup.ContainsKey(material.id))
+        if (!materialToGroup.ContainsKey(materialId))
         {
-            materialToGroup[material.id] = groupId;
+            materialToGroup[materialId] = groupId;
         }
     }
     public void FreeInstance(Rid rid, int instance,int idMaterial)

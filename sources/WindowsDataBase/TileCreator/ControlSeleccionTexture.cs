@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
 
 [Tool]
@@ -37,6 +38,12 @@ public partial class ControlSeleccionTexture : MarginContainer
             SetTexture(baseTexture);
             cellInternal = cellSize * baseScale;
         }
+        MouseEntered += ControlSeleccionTexture_MouseEntered;
+    }
+
+    private void ControlSeleccionTexture_MouseEntered()
+    {
+        CenterContainerBase.GrabFocus();
     }
 
     private void SpinBoxCellSize_ValueChanged(double value)
@@ -253,8 +260,12 @@ public partial class ControlSeleccionTexture : MarginContainer
         }
     }
 
-    public void SetTexture(Texture2D texture)
+    public void SetTexture(Texture2D texture, MaterialData materialData =null)
     {
+        if (materialData!=null)
+        {
+            SpinBoxCellSize.Value = materialData.divisionPixelX;
+        }
         baseTexture = texture;
 
         if (texture != null)

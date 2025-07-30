@@ -3,9 +3,10 @@
 [ext_resource type="Script" uid="uid://dhjxkrv42cw02" path="res://sources/WindowsDataBase/TileCreator/WindowAutoTile.cs" id="1_ki3g1"]
 
 [node name="WindowAutoTile" type="Window"]
+oversampling_override = 1.0
 title = "Auto Tile"
 initial_position = 3
-size = Vector2i(450, 600)
+size = Vector2i(800, 600)
 current_screen = 0
 wrap_controls = true
 transient = true
@@ -39,11 +40,10 @@ theme_override_constants/separation = 10
 
 [node name="VBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
 
 [node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 2
+size_flags_horizontal = 3
 size_flags_vertical = 4
 columns = 2
 
@@ -52,7 +52,7 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "Id Autotile:"
 
-[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
+[node name="LineEditId" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -64,21 +64,28 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "Nombre:"
 
-[node name="LineEdit3" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
+[node name="LineEditName" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 0
 
-[node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="ButtonSave" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Guardar"
 
-[node name="Button2" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="ButtonSaveActive" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Guardar Activo"
+
+[node name="ButtonNewRule" type="Button" parent="Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -90,6 +97,8 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 draw_focus_border = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/ScrollContainer"]
+[node name="GridContainerItems" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/ScrollContainer"]
 layout_mode = 2
-size_flags_horizontal = 6
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 3

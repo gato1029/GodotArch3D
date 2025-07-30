@@ -17,7 +17,8 @@ public class TextureArrayBuilder
 
     public TextureArrayBuilder()
     {
-        TargetMaterial = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshGenericArrayMaterial.tres");
+        ShaderMaterial materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshGenericArrayMaterial.tres");
+        TargetMaterial = (ShaderMaterial)materialGeneric.Duplicate();
     }
 
    

@@ -19,14 +19,14 @@ namespace GodotEcsArch.sources.managers.Tilemap
         {
             this.size = size;
             this.positionLocal = positionChunk;
-            tiles = new Tile[size.X, size.Y];
+            tiles = new Tile[size.X, size.Y];            
         }
 
         public void CreateUpdate(int x, int y,  Rid rid, int instance, int positionBatchTexture, Vector3 worldPosition, float scale, int idTile)
         {
             if (tiles[x, y] == null)
             {
-                tiles[x, y] = new Tile();
+                tiles[x, y] = new Tile(new Vector2I(x,y));
             }  
             tiles[x, y].UpdateTile( rid, instance, positionBatchTexture, worldPosition, scale, idTile);            
         }
@@ -59,5 +59,6 @@ namespace GodotEcsArch.sources.managers.Tilemap
 
             return null; // Fuera de los límites
         }
+
     }
 }

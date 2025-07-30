@@ -39,6 +39,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
 
     public class FrameData
     {
+        public float xFormat { get; set; }
+        public float yFormat { get; set; }
         public float x { get; set; }
         public float y { get; set; }
         public float widht { get; set; }

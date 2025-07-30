@@ -18,6 +18,18 @@ using static Godot.TextServer;
 using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileData;
 
 namespace GodotEcsArch.sources.managers.Tilemap;
+
+public interface IDataTile
+{
+    public int IdTile { get; set; }
+    public Vector3 PositionWorld { get; set; }
+    public float Scale { get; set; }
+    public int IdCollider { get; set; }
+    public Vector2 PositionCollider { get; set; }
+    public Vector2I PositionTileWorld { get; set; }
+    public Vector2I PositionTileChunk { get; set; }
+}
+
 public class TileMapChunkRender<TData> where TData : IDataTile
 {
     public event Action<Vector2, ChunkData<TData>> OnChunSerialize;
@@ -32,7 +44,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
 
     private bool serializableUnload;
     public Dictionary<Vector2, ChunkData<TData>> dataChunks = new Dictionary<Vector2, ChunkData<TData>>();
-    private Dictionary<Vector2, ChunkRender> loadedChunks = new Dictionary<Vector2, ChunkRender>();
+    private Dictionary<Vector2, ChunkRender> loadedChunksRender = new Dictionary<Vector2, ChunkRender>();
     private Queue<ChunkRender> chunkPool = new Queue<ChunkRender>();
 
 
@@ -115,6 +127,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
 
         if (dataChunks.ContainsKey(chunkPosition))
         {
+            
             CreateTile(dataChunks[chunkPosition],tilePositionGlobal, tilePositionChunk,  autoTileData, dataGame);
 
         }
@@ -128,12 +141,13 @@ public class TileMapChunkRender<TData> where TData : IDataTile
 
     private void CreateTile(ChunkData<TData> chunkData, Vector2I tilePositionGlobal, Vector2I tilePositionChunk,  AutoTileData autoTileData, TData dataGame)
     {
-        byte neighborMask = CalculateNeighborMask(tilePositionGlobal); //
-        TileRuleData bestRule = autoTileData.FindBestMatchingRule(neighborMask);
-        
+        //byte neighborMask = CalculateNeighborMask(tilePositionGlobal); //
+        var neighborTileMask = GetNeighborTileIdsAndMask(tilePositionGlobal);
+        TileRuleData bestRule = autoTileData.FindBestMatchingRule(neighborTileMask.mask, neighborTileMask.neighborTileIds);
+       
         if (bestRule == null)
         {
-            GD.PrintErr($"❌ No se encontró una regla válida para mask {neighborMask}");
+            GD.PrintErr($"❌ No se encontró una regla válida para mask {neighborTileMask.mask}");
             return;
         }
         // 🟢 Colocar el tile en la posición dada
@@ -150,37 +164,74 @@ public class TileMapChunkRender<TData> where TData : IDataTile
             var dataValue = GetTileGlobalPosition(neighborPos);
             if (dataValue != null) // Si hay un tile vecino
             {
-                byte newMask = CalculateNeighborMask(neighborPos);
-
+                //byte newMask = CalculateNeighborMask(neighborPos);
+                var neighborTileMask = GetNeighborTileIdsAndMask(neighborPos);
+                
                 foreach (var kvp in autoTileData.arrayTiles)
                 {
-                    TileRuleData bestRule = autoTileData.FindBestMatchingRule(newMask);
-
+                    //TileRuleData bestRule = autoTileData.FindBestMatchingRule(newMask);
+                    TileRuleData bestRule = autoTileData.FindBestMatchingRule(neighborTileMask.mask, neighborTileMask.neighborTileIds);
                     if (bestRule != null)
                     {
                         AddUpdatedTile(neighborPos, bestRule.tileDataCentral, dataValue);                      
+                        Refresh(neighborPos);
                         break;
                     }
                 }
             }
         }
     }
-    private int GetDirectionIndex(NeighborDirection direction)
+    private void UpdateNeighborsNotData(Vector2I tilePosGlobal, AutoTileData autoTileData)
     {
-        switch (direction)
+        for (int i = 0; i < 8; i++)
         {
-            case NeighborDirection.Up: return 0;
-            case NeighborDirection.Right: return 1;
-            case NeighborDirection.Down: return 2;
-            case NeighborDirection.Left: return 3;
-            case NeighborDirection.UpRight: return 4;
-            case NeighborDirection.DownRight: return 5;
-            case NeighborDirection.DownLeft: return 6;
-            case NeighborDirection.UpLeft: return 7;
-            default:
-                throw new ArgumentException("Dirección no válida.");
+            NeighborDirection direction = GetDirectionFromIndex(i);
+            Vector2I neighborPos = TilesHelper.GetNeighborPosition(tilePosGlobal, direction);
+
+            var dataValue = GetTileGlobalPosition(neighborPos);
+            if (dataValue != null) // Si hay un tile vecino
+            {
+                //byte newMask = CalculateNeighborMask(neighborPos);
+                var neighborTileMask = GetNeighborTileIdsAndMask(neighborPos);
+                foreach (var kvp in autoTileData.arrayTiles)
+                {
+                    //TileRuleData bestRule = autoTileData.FindBestMatchingRule(newMask);
+                    TileRuleData bestRule = autoTileData.FindBestMatchingRule(neighborTileMask.mask, neighborTileMask.neighborTileIds);
+                    if (bestRule != null)
+                    {
+                        AddUpdatedTile(neighborPos, bestRule.tileDataCentral, dataValue);
+                        Refresh(neighborPos);
+                        break;
+                    }
+                }
+            }
         }
     }
+    private (int[] neighborTileIds, byte mask) GetNeighborTileIdsAndMask(Vector2I tilePosGlobal)
+    {
+        int[] neighborTileIds = new int[8];
+        byte mask = 0;
+
+        for (int i = 0; i < 8; i++)
+        {
+            NeighborDirection direction = (NeighborDirection)(1 << i);
+            Vector2I neighborPos = TilesHelper.GetNeighborPosition(tilePosGlobal, direction);
+            var neighborData = GetTileGlobalPosition(neighborPos);
+
+            if (neighborData != null && neighborData.IdTile != 0)
+            {
+                neighborTileIds[i] = neighborData.IdTile;
+                mask |= (byte)direction;
+            }
+            else
+            {
+                neighborTileIds[i] = 0; // 0 indica que no hay tile
+            }
+        }
+
+        return (neighborTileIds, mask);
+    }
+
     public NeighborDirection GetDirectionFromIndex(int index)
     {
         switch (index)
@@ -221,18 +272,29 @@ public class TileMapChunkRender<TData> where TData : IDataTile
 
 
 
-    public void AddUpdatedTile(Vector2I tilePositionGlobal, TileData tileData, TData dataGame)
+    public bool  AddUpdatedTile(Vector2I tilePositionGlobal, TileData tileData, TData dataGame)
     {
         var chunkPosition = chunkManager.ChunkPosition(tilePositionGlobal);
         var tilePositionChunk = chunkManager.TilePositionInChunk(chunkPosition, tilePositionGlobal);
 
+        if (dataGame ==null)   
+        {
+            return false;
+        }
         //var chunkPosition = PositionsManager.Instance.ChunkPosition(tilePositionGlobal, ChunkSize);
         //var tilePositionChunk = PositionsManager.Instance.TilePositionInChunk(chunkPosition, tilePositionGlobal, ChunkSize);
 
         if (dataChunks.ContainsKey(chunkPosition))
         {
-            CreateTile( dataChunks[chunkPosition], tilePositionChunk, tilePositionGlobal, tileData, dataGame);
-
+            if (dataChunks[chunkPosition].GetTileAt(tilePositionChunk)!= null && dataChunks[chunkPosition].GetTileAt(tilePositionChunk).IdTile == tileData.id)
+            {
+                return false;
+            }
+            else
+            {
+                CreateTile(dataChunks[chunkPosition], tilePositionChunk, tilePositionGlobal, tileData, dataGame);
+            }
+            
         }
         else
         {
@@ -240,6 +302,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
             dataChunks.Add(chunkPosition, tilemapDataChunk);
             CreateTile( dataChunks[chunkPosition], tilePositionChunk, tilePositionGlobal, tileData, dataGame);
         }
+        return true;
     }
 
 
@@ -299,9 +362,9 @@ public class TileMapChunkRender<TData> where TData : IDataTile
 
     private void Instance_OnChunkUnload(Godot.Vector2 chunkPos)
     {
-        if (loadedChunks.ContainsKey(chunkPos))
+        if (loadedChunksRender.ContainsKey(chunkPos))
         {
-            ChunkRender tileMapChunkRender = loadedChunks[chunkPos];
+            ChunkRender tileMapChunkRender = loadedChunksRender[chunkPos];
 
             for (int i = 0; i < tileMapChunkRender.size.X; i++)
             {
@@ -312,7 +375,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
                     {
                         var dataTileInfo = TilesManager.Instance.GetTileData(datatile.idTile);
                         // multimeshMaterialDict[dataTileInfo.idMaterial].FreeInstance(datatile.rid, datatile.instance);
-                        MultimeshManager.Instance.FreeInstance(0, datatile.rid, datatile.instance,dataTileInfo.idMaterial);
+                        MultimeshManager.Instance.FreeInstance( datatile.rid, datatile.instance,dataTileInfo.idMaterial);
                         datatile.FreeTile();
                     }
                 }
@@ -321,7 +384,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
             {
                 chunkPool.Enqueue(tileMapChunkRender);
             }
-            loadedChunks.Remove(chunkPos);
+            loadedChunksRender.Remove(chunkPos);
             if (serializableUnload && dataChunks[chunkPos].changue)
             {
                 OnChunSerialize?.Invoke(chunkPos, dataChunks[chunkPos]);// SaveOnDisk(chunkPos);
@@ -351,18 +414,24 @@ public class TileMapChunkRender<TData> where TData : IDataTile
 
         return chunk;
     }
+    
     private void Instance_OnChunkLoad(Godot.Vector2 chunkPos)
     {
+        int instanciasCargadas = 0;
+        // Si ya esta cargado, no hagas nada
+        if (loadedChunksRender.ContainsKey(chunkPos))
+            return;
+
         if (dataChunks.ContainsKey(chunkPos))
         {
-            ChunkRender chunk;
+            ChunkRender chunkRender;
             if (chunkPool.Count > 0)
             {
-                chunk = chunkPool.Dequeue();
+                chunkRender = chunkPool.Dequeue();
             }
             else
             {
-                chunk = new ChunkRender(chunkPos, ChunkSize);
+                chunkRender = new ChunkRender(chunkPos, ChunkSize);
             }
 
             ChunkData<TData> tileMapChunkData = dataChunks[chunkPos];
@@ -374,14 +443,91 @@ public class TileMapChunkRender<TData> where TData : IDataTile
                     var dataGame = tileMapChunkData.tiles[i, j];
                     if (dataGame != null)
                     {
+                        //
                         var tileData = TilesManager.Instance.GetTileData(dataGame.IdTile);
-                        var instanceComplex = MultimeshManager.Instance.CreateInstance(MaterialType.GENERICO, tileData.idMaterial);// multimeshMaterialDict[tileData.idMaterial].CreateInstance();
-                        chunk.CreateUpdate(i, j,  instanceComplex.rid, instanceComplex.instance, instanceComplex.materialBatchPosition, dataGame.PositionWorld,dataGame.Scale, dataGame.IdTile);
+                        var instanceComplex = MultimeshManager.Instance.CreateInstance( tileData.idMaterial);// multimeshMaterialDict[tileData.idMaterial].CreateInstance();
+                        chunkRender.CreateUpdate(i, j,  instanceComplex.rid, instanceComplex.instance, instanceComplex.materialBatchPosition, dataGame.PositionWorld,dataGame.Scale, dataGame.IdTile);
+                        instanciasCargadas++;
                     }
                 }
+            }           
+            loadedChunksRender.Add(chunkPos, chunkRender);                      
+        }
+    }
+
+    public void Remove(Vector2I tilePositionGlobal, AutoTileData autoTileData)
+    {
+        var chunkPosition = chunkManager.ChunkPosition(tilePositionGlobal);
+        var tilePositionChunk = chunkManager.TilePositionInChunk(chunkPosition, tilePositionGlobal);
+
+        if (dataChunks.ContainsKey(chunkPosition))
+        {
+            if (dataChunks[chunkPosition].GetTileAt(tilePositionChunk) != null )
+            {
+               var data = dataChunks[chunkPosition].GetTileAt(tilePositionChunk);
+
+                dataChunks[chunkPosition].RemoveTile(tilePositionChunk);
+
+                if (loadedChunksRender.ContainsKey(chunkPosition))
+                {
+                    ChunkRender tileMapChunkRender = loadedChunksRender[chunkPosition];
+                    var datatile = tileMapChunkRender.tiles[tilePositionChunk.X, tilePositionChunk.Y];
+                    if (datatile != null && datatile.instance != -1) 
+                    {
+                        var dataTileInfo = TilesManager.Instance.GetTileData(datatile.idTile);                        
+                        MultimeshManager.Instance.FreeInstance(datatile.rid, datatile.instance, dataTileInfo.idMaterial);
+                        datatile.FreeTile();
+                       
+                        UpdateNeighborsNotData(tilePositionGlobal, autoTileData);
+                    }
+                }
+                
+                
             }
-            loadedChunks.Add(chunkPos, chunk);
+           
 
         }
+    }
+    internal void Refresh(Vector2I tilePositionGlobal)
+    {
+        var chunkPosition = chunkManager.ChunkPosition(tilePositionGlobal);
+        var tilePositionChunk = chunkManager.TilePositionInChunk(chunkPosition, tilePositionGlobal);
+
+        // Cargar el chunk si aún no está en render
+        if (!loadedChunksRender.TryGetValue(chunkPosition, out var chunk))
+        {
+            Instance_OnChunkLoad(chunkPosition);
+            if (!loadedChunksRender.TryGetValue(chunkPosition, out chunk))
+                return;
+        }
+
+        if (!dataChunks.TryGetValue(chunkPosition, out var tileMapChunkData))
+            return;
+
+        TData tileData = tileMapChunkData.tiles[tilePositionChunk.X, tilePositionChunk.Y];
+        if (tileData == null)
+            return;
+
+        // liberar el tile Renderizado     
+        Tile tileRender = chunk.GetTileAt(tilePositionChunk);
+        if (tileRender != null && tileRender.instance!=-1)
+        {
+            MultimeshManager.Instance.FreeInstance(tileRender.rid, tileRender.instance, tileRender.idMaterial);
+            tileRender.FreeTile();
+        }
+
+        var tileInfo = TilesManager.Instance.GetTileData(tileData.IdTile);
+        var instance = MultimeshManager.Instance.CreateInstance(tileInfo.idMaterial);
+
+        chunk.CreateUpdate(
+            tilePositionChunk.X,
+            tilePositionChunk.Y,
+            instance.rid,
+            instance.instance,
+            instance.materialBatchPosition,
+            tileData.PositionWorld,
+            tileData.Scale,
+            tileData.IdTile
+        );
     }
 }

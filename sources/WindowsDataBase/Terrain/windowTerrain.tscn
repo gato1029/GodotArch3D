@@ -52,13 +52,13 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Button" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/HBoxContainer"]
+[node name="ButtonSave" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Guardar Todo"
 
-[node name="Button2" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/HBoxContainer"]
+[node name="ButtonCopy" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -75,11 +75,11 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="Sprite2D" type="Sprite2D" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/Control/CenterContainer"]
+[node name="Sprite2DImage" type="Sprite2D" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/Control/CenterContainer"]
 scale = Vector2(3, 3)
 texture = ExtResource("2_5nmb4")
 
-[node name="CollisionBody" type="CollisionShape2D" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/Control/CenterContainer/Sprite2D"]
+[node name="CollisionBodyCollider" type="CollisionShape2D" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer3/Control/CenterContainer/Sprite2DImage"]
 position = Vector2(0, 6.4)
 shape = SubResource("RectangleShape2D_03fyf")
 
@@ -106,11 +106,11 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 columns = 2
 
-[node name="Label" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
+[node name="LabelId" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
 layout_mode = 2
 text = "Id:"
 
-[node name="SpinBox" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
+[node name="SpinBoxId" type="SpinBox" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
 layout_mode = 2
 tooltip_text = "Un identificador para determinar cual es su base ejemplo. Insecto de Cuatro Armas, Humano Global (Arco, Espada, Hechizo)"
 editable = false
@@ -119,8 +119,23 @@ editable = false
 layout_mode = 2
 text = "Nombre:"
 
-[node name="LineEdit" type="LineEdit" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
+[node name="LineEditName" type="LineEdit" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Categoria:"
+
+[node name="LineEditCategory" type="LineEdit" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Tipo:"
+
+[node name="OptionButtonType" type="OptionButton" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer/GridContainer"]
 layout_mode = 2
 
 [node name="Button" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
@@ -129,17 +144,17 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Tile"
 
-[node name="Button4" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
+[node name="ButtonSearchTile" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Tile"
 
-[node name="Button3" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
+[node name="ButtonSearchAnimate" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Tile Animado"
 
-[node name="Button2" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
+[node name="ButtonSearchAuto" type="Button" parent="Panel/MarginContainer/HSplitContainer/HBoxContainer/VBoxContainer/Basico/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Tile Automatico"

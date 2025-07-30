@@ -46,7 +46,7 @@ public class SpriteRender
         
 
         RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
-        RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(data.x, data.y, data.widhtFormat, data.heightFormat));
+        RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(data.xFormat, data.yFormat, data.widhtFormat, data.heightFormat));
         RenderingServer.MultimeshInstanceSetColor(rid, instance,new Color(0,0,0, textureBatchPosition));
           
     }
@@ -61,7 +61,7 @@ public class SpriteRender
         this.instance = instance;
         
         RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
-        RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(data.x, data.y, data.widhtFormat, data.heightFormat));
+        RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Godot.Color(data.xFormat, data.yFormat, data.widhtFormat, data.heightFormat));
         RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, textureBatchPosition));
         //if (data is SpriteData spriteData)
         //{

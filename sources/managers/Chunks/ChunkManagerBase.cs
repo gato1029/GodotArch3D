@@ -39,8 +39,6 @@ public class ChunkManagerBase
     }
     public Vector2I TilePositionInChunk(Vector2I chunkPositon, Vector2I TilePositionGlobal)
     {
-        //var calc = chunkPositon * chunkDimencion;
-        //return TilePositionGlobal - calc;
         Vector2I basePosition = chunkPositon * chunkDimencion;
         Vector2I local = TilePositionGlobal - basePosition;
 
