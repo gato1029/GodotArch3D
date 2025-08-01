@@ -14,7 +14,7 @@ public class ChunkManagerBase
 
     public event Action<Vector2> OnChunkLoad;
     public event Action<Vector2> OnChunkUnload;
-
+    public event Action OnChunkProcessingCompleted;
     private ConcurrentQueue<(Vector2, bool)> chunkQueue = new ConcurrentQueue<(Vector2, bool)>();
     private Thread workerThread;
     private bool isRunning = true;
@@ -29,10 +29,13 @@ public class ChunkManagerBase
 
 
 
-    public ChunkManagerBase(Vector2I viewDistance,Vector2I chunkSize, Vector2I tileSize)
+    public ChunkManagerBase(Vector2I totalViewChunks, Vector2I chunkSize, Vector2I tileSize)
     {
         chunkDimencion = chunkSize;
-        ViewDistance = viewDistance;
+        ViewDistance = new Vector2I(
+            totalViewChunks.X / 2,
+            totalViewChunks.Y / 2
+        );
         workerThread = new Thread(ProcessChunkQueue);
         workerThread.Start();
         this.tileSize = tileSize;
@@ -80,7 +83,22 @@ public class ChunkManagerBase
         playerChunkPosCurrent = Position;
         UpdateChunks();
     }
+    public List<Vector2> GetVisibleChunks(Vector2 position)
+    {
+        Vector2 centerChunk = WorldToChunkCoords(position);
+        List<Vector2> visibleChunks = new();
 
+        for (int x = -ViewDistance.X; x <= ViewDistance.X; x++)
+        {
+            for (int y = -ViewDistance.Y; y <= ViewDistance.Y; y++)
+            {
+                Vector2 chunk = centerChunk + new Vector2(x, y);
+                visibleChunks.Add(chunk);
+            }
+        }
+
+        return visibleChunks;
+    }
     private void UpdateChunks()
     {
         
@@ -125,6 +143,8 @@ public class ChunkManagerBase
 
     private void ProcessChunkQueue()
     {
+        bool hasPendingNotification = false;
+
         while (isRunning)
         {
             if (chunkQueue.TryDequeue(out var chunkTask))
@@ -136,10 +156,23 @@ public class ChunkManagerBase
                     OnChunkLoad?.Invoke(chunkPos);
                 else
                     OnChunkUnload?.Invoke(chunkPos);
+                hasPendingNotification = true;
             }
             else
             {
-                Thread.Sleep(10); // Pequenia pausa para evitar consumo alto de CPU
+                // La cola está vacía
+                if (hasPendingNotification)
+                {
+                    hasPendingNotification = false;
+
+                    // Enviar notificación al hilo principal una vez terminado el trabajo
+                    MainThreadDispatcher.Instance.Enqueue(() =>
+                    {
+                        OnChunkProcessingCompleted?.Invoke();
+                    });
+                }
+
+                Thread.Sleep(10); // Pequeña pausa para evitar consumo alto de CPU
             }
         }
     }

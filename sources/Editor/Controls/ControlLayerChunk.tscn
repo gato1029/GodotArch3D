@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://bft4c152vev73"]
+
+[ext_resource type="Script" uid="uid://dqfh6l5n0o1yh" path="res://sources/Editor/Controls/ControlLayerChunk.cs" id="1_pwd6u"]
+
+[node name="ControlLayerChunk" type="PanelContainer"]
+offset_right = 221.0
+offset_bottom = 50.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+script = ExtResource("1_pwd6u")
+
+[node name="VBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="CheckBoxEnable" type="CheckBox" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Habilitado"
+
+[node name="HBoxContainer2" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="LabelRendering" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Renderizadas:"
+
+[node name="LabelReal" type="Label" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Reales:"

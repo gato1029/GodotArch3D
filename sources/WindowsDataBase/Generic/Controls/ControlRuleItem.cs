@@ -360,6 +360,8 @@ public partial class ControlRuleItem : PanelContainer
                         NeighborState.Empty => "res://resources/Textures/internal/cancel.png",
                         _ => "res://resources/Textures/internal/exclamation.PNG"
                     };
+
+
                     button.Icon = GD.Load<Texture2D>(path);
                 }
             }

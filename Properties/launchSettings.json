@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug Main3dGodot": {
+	"Godot Debug ControlEditorTerrain": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.5-beta3_mono_win64/Godot_v4.5-beta3_mono_win64/Godot_v4.5-beta3_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./Main3DGodot.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/Editor/Controls/ControlEditorTerrain.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

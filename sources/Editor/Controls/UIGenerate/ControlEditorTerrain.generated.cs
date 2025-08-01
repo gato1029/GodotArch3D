@@ -19,12 +19,10 @@ public partial class ControlEditorTerrain : MarginContainer
     private Button ButtonRefresh;
     private OptionButton OptionButtonLayer;
     private ItemList ItemListRules;
-    private GridContainer Capas;
-    private CheckBox CheckBoxBasic;
-    private CheckBox CheckBoxFloor;
-    private CheckBox CheckBoxPath;
-    private CheckBox CheckBoxWater;
-    private CheckBox CheckBoxOrnament;
+    private MarginContainer CapasDiseño;
+    private VBoxContainer ContainerLayers;
+    private MarginContainer CapasReales;
+    private VBoxContainer ContainerLayersReal;
 
     public void InitializeUI()
     {
@@ -41,61 +39,9 @@ public partial class ControlEditorTerrain : MarginContainer
         OptionButtonLayer = GetNode<OptionButton>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer3/OptionButtonLayer");
         OptionButtonLayer.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
         ItemListRules = GetNode<ItemList>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/ItemListRules");
-        Capas = GetNode<GridContainer>("PanelContainerFocus/MarginContainer/TabContainer/Capas");
-        CheckBoxBasic = GetNode<CheckBox>("PanelContainerFocus/MarginContainer/TabContainer/Capas/CheckBoxBasic");
-        CheckBoxBasic.Pressed += CheckBoxBasic_PressedUI;
-        CheckBoxBasic_PressedUI();
-        CheckBoxFloor = GetNode<CheckBox>("PanelContainerFocus/MarginContainer/TabContainer/Capas/CheckBoxFloor");
-        CheckBoxFloor.Pressed += CheckBoxFloor_PressedUI;
-        CheckBoxFloor_PressedUI();
-        CheckBoxPath = GetNode<CheckBox>("PanelContainerFocus/MarginContainer/TabContainer/Capas/CheckBoxPath");
-        CheckBoxPath.Pressed += CheckBoxPath_PressedUI;
-        CheckBoxPath_PressedUI();
-        CheckBoxWater = GetNode<CheckBox>("PanelContainerFocus/MarginContainer/TabContainer/Capas/CheckBoxWater");
-        CheckBoxWater.Pressed += CheckBoxWater_PressedUI;
-        CheckBoxWater_PressedUI();
-        CheckBoxOrnament = GetNode<CheckBox>("PanelContainerFocus/MarginContainer/TabContainer/Capas/CheckBoxOrnament");
-        CheckBoxOrnament.Pressed += CheckBoxOrnament_PressedUI;
-        CheckBoxOrnament_PressedUI();
-    }
-
-    private void CheckBoxBasic_PressedUI()
-    {
-        if (CheckBoxBasic.ButtonPressed)
-            CheckBoxBasic.Text = "";
-        else
-            CheckBoxBasic.Text = "No ";
-    }
-
-    private void CheckBoxFloor_PressedUI()
-    {
-        if (CheckBoxFloor.ButtonPressed)
-            CheckBoxFloor.Text = "";
-        else
-            CheckBoxFloor.Text = "No ";
-    }
-
-    private void CheckBoxPath_PressedUI()
-    {
-        if (CheckBoxPath.ButtonPressed)
-            CheckBoxPath.Text = "";
-        else
-            CheckBoxPath.Text = "No ";
-    }
-
-    private void CheckBoxWater_PressedUI()
-    {
-        if (CheckBoxWater.ButtonPressed)
-            CheckBoxWater.Text = "";
-        else
-            CheckBoxWater.Text = "No ";
-    }
-
-    private void CheckBoxOrnament_PressedUI()
-    {
-        if (CheckBoxOrnament.ButtonPressed)
-            CheckBoxOrnament.Text = "";
-        else
-            CheckBoxOrnament.Text = "No ";
+        CapasDiseño = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño");
+        ContainerLayers = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño/ScrollContainer/ContainerLayers");
+        CapasReales = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasReales");
+        ContainerLayersReal = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasReales/ScrollContainer/ContainerLayersReal");
     }
 }

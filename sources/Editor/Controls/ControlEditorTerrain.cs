@@ -47,47 +47,45 @@ public partial class ControlEditorTerrain : MarginContainer
 
         LoadItemsRules();
         terrainMapLevelDesign = TerrainMapLevelDesign.Piso;
-        CheckBoxFloor.Pressed += CheckBoxFloor_Pressed;
-        CheckBoxPath.Pressed += CheckBoxPath_Pressed;
-        CheckBoxWater.Pressed += CheckBoxWater_Pressed;
-        CheckBoxOrnament.Pressed += CheckBoxOrnament_Pressed;
-        CheckBoxBasic.Pressed += CheckBoxBasic_Pressed;
+
+       
 
         foreach (TerrainMapLevelDesign item in Enum.GetValues(typeof(TerrainMapLevelDesign)))
         {
             OptionButtonLayer.AddItem(item.ToString());
         }
-        terrainGenerator = new TerrainGenerator(MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapTerrainBasic, 12379723, true, false);
-        terrainGenerator.SetTerrainDistribution(0.1f, 0.9f, 0.0f);
+        terrainGenerator = new TerrainGenerator(MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapTerrainBasic, 12451323, true, false);
+        terrainGenerator.SetTerrainDistribution(0.1f, 0.8f, 0.1f);
 
-
+        LoadItemsLayers();
+        //LoadITemsRealLayers();
     }
 
-
-    private void CheckBoxBasic_Pressed()
+    private void LoadITemsRealLayers()
     {
-        MapManagerEditor.Instance.currentMapLevelData.terrainMap.EnableLayer(CheckBoxBasic.ButtonPressed, TerrainMapLevelDesign.Basico);
+        foreach (var item in MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal)
+        {
+            ControlLayerChunk controlLayer = GD.Load<PackedScene>("res://sources/Editor/Controls/ControlLayerChunk.tscn").Instantiate<ControlLayerChunk>();
+            ContainerLayersReal.AddChild(controlLayer);
+            controlLayer.SetSpriteMapChunk(item.Value);
+        }
     }
 
-    private void CheckBoxOrnament_Pressed()
+    private void LoadItemsLayers()
     {
-        MapManagerEditor.Instance.currentMapLevelData.terrainMap.EnableLayer(CheckBoxOrnament.ButtonPressed, TerrainMapLevelDesign.Ornamentos);
+        ControlLayerChunk controlLayerBasic = GD.Load<PackedScene>("res://sources/Editor/Controls/ControlLayerChunk.tscn").Instantiate<ControlLayerChunk>();
+        ContainerLayers.AddChild(controlLayerBasic);
+        controlLayerBasic.SetSpriteMapChunk(MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapTerrainBasic);
+        foreach (var item in MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerDesign)
+        {
+            ControlLayerChunk controlLayer = GD.Load<PackedScene>("res://sources/Editor/Controls/ControlLayerChunk.tscn").Instantiate<ControlLayerChunk>();
+            ContainerLayers.AddChild(controlLayer);
+            controlLayer.SetSpriteMapChunk(item.Value);
+        }
+                
     }
 
-    private void CheckBoxWater_Pressed()
-    {
-        MapManagerEditor.Instance.currentMapLevelData.terrainMap.EnableLayer(CheckBoxWater.ButtonPressed, TerrainMapLevelDesign.Agua);
-    }
 
-    private void CheckBoxPath_Pressed()
-    {
-        MapManagerEditor.Instance.currentMapLevelData.terrainMap.EnableLayer(CheckBoxPath.ButtonPressed, TerrainMapLevelDesign.Camino);
-    }
-
-    private void CheckBoxFloor_Pressed()
-    {
-        MapManagerEditor.Instance.currentMapLevelData.terrainMap.EnableLayer(CheckBoxFloor.ButtonPressed, TerrainMapLevelDesign.Piso);
-    }
 
     private void ButtonRefresh_Pressed()
     {
@@ -124,9 +122,21 @@ public partial class ControlEditorTerrain : MarginContainer
 
     private void ButtonAutomaticTerrain_Pressed()
     {
+        foreach (var item in MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerDesign)
+        {
+            item.Value.SetRenderEnabled(false);
+        }
+
         Vector2I chunk =  new Vector2I((int)SpinBoxChunkX.Value, (int)SpinBoxChunkY.Value);        
-        var data = terrainGenerator.Generate(chunk, 10);
+       // var data = terrainGenerator.GenerateTerrain(chunk, GenerateMode.RadiusAroundChunk, new Vector2I(2,2));
+        var data = terrainGenerator.GenerateTerrain( new Vector2I(0,0), GenerateMode.CenteredByTileDimensions, new Vector2I(1024,1024));
         terrainGenerator.AplicarChunksAlMapaBase(data);
+        terrainGenerator.AplicarChunksAlMapaDisenio(data, TerrainCategoryType.Bosque);
+                
+        foreach (var item in MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerDesign)
+        {
+            item.Value.SetRenderEnabled(true);
+        }
     }
 
     private void SpinBoxGrid_ValueChanged(double value)
@@ -261,11 +271,11 @@ public partial class ControlEditorTerrain : MarginContainer
 
             if (Input.IsMouseButtonPressed(MouseButton.Left))
             {
-                MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(tileCoords, objectSelected.id, (TerrainMapLevelDesign)OptionButtonLayer.Selected);
+                MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(tileCoords, objectSelected.id);
             }
             else if (Input.IsMouseButtonPressed(MouseButton.Right))
             {
-                MapManagerEditor.Instance.currentMapLevelData.terrainMap.RemoveTile(tileCoords, objectSelected.id, (TerrainMapLevelDesign)OptionButtonLayer.Selected);
+                MapManagerEditor.Instance.currentMapLevelData.terrainMap.RemoveTile(tileCoords, objectSelected.id);
             }
         }
     }

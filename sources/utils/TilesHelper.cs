@@ -39,13 +39,14 @@ namespace GodotEcsArch.sources.utils
             return positionCenter;
         }
 
-        public static RuleData FindBestMatchingRule(RuleData[] arrayRules,byte mask, int[] neighborTilesIds)
+        public static RuleData FindBestMatchingRule(RuleData[] arrayRules, byte mask, int[] neighborTilesIds)
         {
             foreach (var rule in arrayRules)
             {
-                bool usesSpecificIds = rule.neighborConditions.Any(c => c.SpecificTileId != 0);
+                // Verificamos si la regla requiere evaluar conexión (es decir, cualquier estado distinto a Any)
+                bool needsNeighborInfo = rule.neighborConditions.Any(c => c.State != NeighborState.Any || c.SpecificTileId != 0);
 
-                if (usesSpecificIds)
+                if (needsNeighborInfo)
                 {
                     if (rule.Matches(mask, neighborTilesIds))
                         return rule;

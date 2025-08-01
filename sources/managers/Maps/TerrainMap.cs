@@ -27,7 +27,13 @@ using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileD
 
 namespace GodotEcsArch.sources.managers.Maps;
 
-
+public enum TerrainMapReal
+{
+    Agua = 0,
+    Suelo = 1,
+    Elevacion = 2,
+    Ornamentos = 3
+}
 public enum TerrainMapLevelDesign
 {
     Basico = -1,
@@ -78,29 +84,23 @@ public class TerrainMap
     [ProtoIgnore, JsonIgnore]
     private SpriteMapChunk<TerrainDataGame> mapTerrainBasic; // representaciones Basicas no renderiza
 
+    // agua - fondo -shader N1
+    // piso y borde agua, caminos P1
+    // elevacion P2
+    // ornamentos P3
     [ProtoIgnore, JsonIgnore]
-    private SpriteMapChunk<TerrainDataGame> mapTerrainCompleteLevel0; // piso y agua Efecto
-    [ProtoIgnore, JsonIgnore]
-    private SpriteMapChunk<TerrainDataGame> mapTerrainCompleteLevel1; // agua y elevacion
-    [ProtoIgnore, JsonIgnore]
-    private SpriteMapChunk<TerrainDataGame> mapTerrainCompleteOrnaments;
+    private LayerChunksMaps<TerrainDataGame> mapLayerReal;
 
 
-    // estos se usaran para el diseño
+    // estos se usaran solo para el diseño   
+
     [ProtoIgnore, JsonIgnore]
-    private SpriteMapChunk<TerrainDataGame> mapTerrainFloor;
-    [ProtoIgnore, JsonIgnore]
-    private SpriteMapChunk<TerrainDataGame> mapTerrainPath;
-    [ProtoIgnore, JsonIgnore]
-    private SpriteMapChunk<TerrainDataGame> mapTerrainWater;
-    [ProtoIgnore, JsonIgnore]
-    private SpriteMapChunk<TerrainDataGame> mapTerrainOrnaments;
+    private LayerChunksMaps<TerrainDataGame> mapLayerDesign;
 
     [ProtoIgnore, JsonIgnore]
     private string carpet = "Terrain";
 
     
-
     [ProtoMember(1)]
     public string pathMapParent { get; set; }
     [ProtoMember(2)]
@@ -110,23 +110,44 @@ public class TerrainMap
     [ProtoMember(4)]
     public List<int> materialsUsed { get; set; } // esto con el fin de no demorar en cargar cada material
     public SpriteMapChunk<TerrainDataGame> MapTerrainBasic { get => mapTerrainBasic; set => mapTerrainBasic = value; }
+    public LayerChunksMaps<TerrainDataGame> MapLayerDesign { get => mapLayerDesign; set => mapLayerDesign = value; }
+    public LayerChunksMaps<TerrainDataGame> MapLayerReal { get => mapLayerReal; set => mapLayerReal = value; }
 
     public TerrainMap(string pathMapParent, int Layer, bool SerializeOnUnload=false)
     {
         materialsUsed =new List<int>();        
         layer = Layer;        
         chunkDimencion = PositionsManager.Instance.chunkDimencion;
-        mapTerrainBasic = new SpriteMapChunk<TerrainDataGame>(layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
+        
 
-        mapTerrainCompleteLevel0 = new SpriteMapChunk<TerrainDataGame>(layer,ChunkManager.Instance.tiles16X16, SerializeOnUnload);
+        mapLayerDesign = new LayerChunksMaps<TerrainDataGame>();
 
-        mapTerrainFloor = new SpriteMapChunk<TerrainDataGame>(layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
-        mapTerrainPath = new SpriteMapChunk<TerrainDataGame>(layer+1, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
-        mapTerrainWater = new SpriteMapChunk<TerrainDataGame>(layer+1, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
-        mapTerrainOrnaments = new SpriteMapChunk<TerrainDataGame>(layer + 2, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
+        int layerDesign = layer;
+        mapTerrainBasic = new SpriteMapChunk<TerrainDataGame>("Basico", layerDesign - 2, ChunkManager.Instance.tiles16X16, SerializeOnUnload,false);
+        mapLayerDesign.AddLayer(TerrainType.Agua.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.Agua.ToString(), layerDesign - 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+        mapLayerDesign.AddLayer(TerrainType.PisoBase.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.PisoBase.ToString(), layerDesign, ChunkManager.Instance.tiles16X16, SerializeOnUnload));        
+        mapLayerDesign.AddLayer(TerrainType.CaminoPiso.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.CaminoPiso.ToString(), layerDesign + 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));        
+        //mapLayerDesign.AddLayer(TerrainType.AguaBorde.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.AguaBorde.ToString(), layerDesign, ChunkManager.Instance.tiles16X16, SerializeOnUnload));        
+        mapLayerDesign.AddLayer(TerrainType.Elevacion.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.Elevacion.ToString(), layerDesign + 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+        mapLayerDesign.AddLayer(TerrainType.Ornamentos.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.Ornamentos.ToString(), layerDesign + 2, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+
+        mapLayerDesign.AddAlias(TerrainType.CaminoPiso.ToString(), TerrainType.CaminoAgua.ToString());
+        mapLayerDesign.AddAlias(TerrainType.PisoBase.ToString(), TerrainType.AguaBorde.ToString());
+        mapLayerDesign.AddAlias(TerrainType.Elevacion.ToString(), TerrainType.ElevacionBase.ToString());
+
+
+        mapLayerReal = new LayerChunksMaps<TerrainDataGame>();
+
+        mapLayerReal.AddLayer(TerrainMapReal.Agua.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Agua.ToString(), layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+        mapLayerReal.AddLayer(TerrainMapReal.Suelo.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Suelo.ToString(), layer + 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+        mapLayerReal.AddLayer(TerrainMapReal.Elevacion.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Elevacion.ToString(), layer + 2, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+        mapLayerReal.AddLayer(TerrainMapReal.Ornamentos.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Ornamentos.ToString(), layer + 3, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+
+
+
 
         
-        mapTerrainCompleteLevel0.OnChunSerialize += TilemapTerrain_OnChunSerialize;
+      //  mapTerrainCompleteLevel0.OnChunSerialize += TilemapTerrain_OnChunSerialize;
 
 
         this.pathMapParent = pathMapParent;
@@ -141,7 +162,7 @@ public class TerrainMap
         TerrainMap dataInfo = SerializerManager.LoadFromFileJson<TerrainMap>(fullPath);
         TerrainMap newMap = new TerrainMap(Name, dataInfo.layer, false);                
 
-        newMap.mapTerrainCompleteLevel0.LoadMaterials(dataInfo.materialsUsed);
+        //newMap.mapTerrainCompleteLevel0.LoadMaterials(dataInfo.materialsUsed);
         newMap.LoadMapData();
         return newMap;
     }
@@ -156,15 +177,15 @@ public class TerrainMap
     public void SaveAllMap()
     {
    
-        SerializerManager.SaveToFileJson(this, pathMapParent, "DataTerrain");
+        //SerializerManager.SaveToFileJson(this, pathMapParent, "DataTerrain");
 
-        foreach (var item in mapTerrainCompleteLevel0.dataChunks)
-        {
-            if (item.Value.changue)
-            {
-                TilemapTerrain_OnChunSerialize(item.Key, item.Value);
-            }            
-        }
+        //foreach (var item in mapTerrainCompleteLevel0.dataChunks)
+        //{
+        //    if (item.Value.changue)
+        //    {
+        //        TilemapTerrain_OnChunSerialize(item.Key, item.Value);
+        //    }            
+        //}
     }
     public void LoadMapData()
     {
@@ -178,193 +199,47 @@ public class TerrainMap
         //}
 
     }
-    public void EnableLayer(bool enable, TerrainMapLevelDesign terrainMapLevelDesign)
+    public void EnableLayer(bool enable, TerrainType terrainType)
     {
-        switch (terrainMapLevelDesign)
-        {
-            case TerrainMapLevelDesign.Completo:
-                mapTerrainCompleteLevel0.SetRenderEnabled(enable);
-                break;
-            case TerrainMapLevelDesign.Piso:
-                mapTerrainFloor.SetRenderEnabled(enable);
-                break;
-            case TerrainMapLevelDesign.Camino:
-                mapTerrainPath.SetRenderEnabled(enable);
-                break;
-            case TerrainMapLevelDesign.Agua:
-                mapTerrainWater.SetRenderEnabled(enable);
-                break;
-            case TerrainMapLevelDesign.Ornamentos:
-                mapTerrainOrnaments.SetRenderEnabled(enable);
-                break;
-            case TerrainMapLevelDesign.Basico:                
-                mapTerrainBasic.SetRenderEnabled(enable);
-                break;
-            default:
-                break;
-        }
+        mapLayerDesign.GetLayer(terrainType.ToString()).SetRenderEnabled(enable);        
     }
-    public void AddUpdateTile(Vector2I tilePositionGlobal, int idTerrain, TerrainMapLevelDesign terrainMapLevelDesign)
+    public void EnableLayerInternal(bool enable)
+    {
+        mapTerrainBasic.SetRenderEnabled(enable);        
+    }
+    public void AddUpdateTile(Vector2I tilePositionGlobal, int idTerrain, int forceDataRuleNro =-1)
     {
         var data = TerrainManager.Instance.GetData(idTerrain);
 
-        switch (terrainMapLevelDesign)
+        if (data.isRule && forceDataRuleNro == -1)
         {
-            case TerrainMapLevelDesign.Completo:
-                if (data.isRule)
-                {
-
-                    mapTerrainCompleteLevel0.AddUpdatedTileRule(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainCompleteLevel0.AddUpdatedTile(tilePositionGlobal, idTerrain);
-                }
-                mapTerrainCompleteLevel0.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Piso:
-                if (data.isRule)
-                {
-
-                    mapTerrainFloor.AddUpdatedTileRule(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainFloor.AddUpdatedTile(tilePositionGlobal, idTerrain);
-                }
-                mapTerrainFloor.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Camino:
-                if (data.isRule)
-                {
-                    mapTerrainPath.AddUpdatedTileRule(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainPath.AddUpdatedTile(tilePositionGlobal, idTerrain);
-                }
-                mapTerrainPath.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Agua:
-                if (data.isRule)
-                {
-                    mapTerrainWater.AddUpdatedTileRule(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainWater.AddUpdatedTile(tilePositionGlobal, idTerrain);
-                }
-                mapTerrainWater.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Ornamentos:
-                if (data.isRule)
-                {
-                    mapTerrainOrnaments.AddUpdatedTileRule(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainOrnaments.AddUpdatedTile(tilePositionGlobal, idTerrain);
-                }
-                mapTerrainOrnaments.Refresh(tilePositionGlobal);
-                break;
-            default:
-                break;
+            mapLayerDesign.GetLayer(data.terrainType.ToString()).AddUpdatedTileRule(tilePositionGlobal, data.rules);            
         }
-   
-
+        else
+        {
+            if (forceDataRuleNro!=-1)
+            {
+                idTerrain = data.rules[forceDataRuleNro].idDataCentral;
+            }
+            mapLayerDesign.GetLayer(data.terrainType.ToString()).AddUpdatedTile(tilePositionGlobal, idTerrain);            
+        }
+        //mapLayerDesign.GetLayer(data.terrainType.ToString()).Refresh(tilePositionGlobal);        
     }
 
-    public void RemoveTile(Vector2I tilePositionGlobal, int idTerrain, TerrainMapLevelDesign terrainMapLevelDesign)
+    public void RemoveTile(Vector2I tilePositionGlobal, int idTerrain)
     {
         var data = TerrainManager.Instance.GetData(idTerrain);
-        switch (terrainMapLevelDesign)
+        if (data.isRule)
         {
-            case TerrainMapLevelDesign.Completo:
-                if (data.isRule)
-                {
-
-                    mapTerrainCompleteLevel0.Remove(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainCompleteLevel0.Remove(tilePositionGlobal);
-                }
-                mapTerrainCompleteLevel0.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Piso:
-                if (data.isRule)
-                {
-
-                    mapTerrainFloor.Remove(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainFloor.Remove(tilePositionGlobal);
-                }
-                mapTerrainFloor.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Camino:
-                if (data.isRule)
-                {
-                    mapTerrainPath.Remove(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainPath.Remove(tilePositionGlobal);
-                }
-                mapTerrainPath.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Agua:
-                if (data.isRule)
-                {
-                    mapTerrainWater.Remove(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainWater.Remove(tilePositionGlobal);
-                }
-                mapTerrainWater.Refresh(tilePositionGlobal);
-                break;
-            case TerrainMapLevelDesign.Ornamentos:
-                if (data.isRule)
-                {
-                    mapTerrainOrnaments.Remove(tilePositionGlobal, data.rules, (int)data.terrainType);
-                }
-                else
-                {
-                    mapTerrainOrnaments.Remove(tilePositionGlobal);
-                }
-                mapTerrainOrnaments.Refresh(tilePositionGlobal);
-                break;
-            default:
-                break;
-        }   
-    }
-
-    public void AddTileBasicConfig(Vector2I tilePositionGlobal, TerrainType terrainType)
-    {
-        switch (terrainType)
-        {           
-            case TerrainType.PisoBase:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 68);
-                break;
-            case TerrainType.Elevacion:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 70);
-                break;
-            case TerrainType.Agua:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 69);
-                break;
-            case TerrainType.CaminoPiso:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 72);
-                break;
-            case TerrainType.CaminoAgua:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 71);
-                break;                            
-            default:
-                break;
+            mapLayerDesign.GetLayer(data.terrainType.ToString()).Remove(tilePositionGlobal, data.rules);
         }
-        
+        else
+        {
+            mapLayerDesign.GetLayer(data.terrainType.ToString()).Remove(tilePositionGlobal);
+        }
+      //  mapLayerDesign.GetLayer(data.terrainType.ToString()).Refresh(tilePositionGlobal);
     }
+
     private void AddMaterialInternal(int idMaterial)
     {
         if (!materialsUsed.Contains(idMaterial) && idMaterial != 0)

@@ -22,7 +22,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
     {
         Any = -1,
         Empty = 0,
-        Filled = 1
+        Filled = 1,
+        FilledNotRendering = 2
     }
 
     public class NeighborCondition
@@ -41,6 +42,13 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
             if (State == NeighborState.Empty && isConnected)
                 return false;
 
+            if (State == NeighborState.FilledNotRendering)
+            {
+                if (!isConnected)
+                    return false;
+                // No importa si neighborTile es null, se considera válido si está conectado
+                return true;
+            }
             if (SpecificTileId!=0)
             {
                 if (neighborTile == null || neighborTile.id != SpecificTileId)
@@ -59,7 +67,13 @@ namespace GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase
 
             if (State == NeighborState.Empty && isConnected)
                 return false;
-
+            if (State == NeighborState.FilledNotRendering)
+            {
+                if (!isConnected)
+                    return false;
+                // No importa si neighborTile es null, se considera válido si está conectado
+                return true;
+            }
             if (SpecificTileId != 0)
             {
                 if (neighborTileId == 0 || neighborTileId != SpecificTileId)

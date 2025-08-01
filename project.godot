@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 DebugDraw="*res://addons/debug_drawing/DebugDraw.cs"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
+MainThreadDispatcher="*res://sources/utils/MainThreadDispatcher.cs"
 
 [display]
 

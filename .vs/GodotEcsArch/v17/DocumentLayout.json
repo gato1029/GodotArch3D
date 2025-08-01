@@ -3,48 +3,52 @@
   "WorkspaceRootPath": "D:\\GitKraken\\GodotArch3D\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\editor\\controls\\controleditorterrain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\editor\\controls\\controleditorterrain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\maps\\terraingenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\maps\\terraingenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\camera3dgodot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:camera3dgodot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\terrain\\database\\terraindata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\terrain\\database\\terraindata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\maps\\terrainmap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\maps\\terrainmap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\editor\\scenes\\editorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\editor\\scenes\\editorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\terrain\\windowterraindetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\terrain\\windowterraindetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\tilemap\\chunkdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\tilemap\\chunkdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\editor\\controls\\controleditorterrain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\editor\\controls\\controleditorterrain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\spritemapchunk\\spritemapchunk.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\spritemapchunk\\spritemapchunk.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\chunks\\chunkmanagerbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\chunks\\chunkmanagerbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\maps\\terrainmap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\maps\\terrainmap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\managers\\chunks\\chunkmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\chunks\\chunkmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\editor\\controls\\controllayerchunk.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\editor\\controls\\controllayerchunk.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\tilecreator\\database\\tileruledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilecreator\\database\\tileruledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\windowsdatabase\\generic\\controls\\controlruleitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\generic\\controls\\controlruleitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\utils\\tileshelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\utils\\tileshelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\addons\\debug_drawing\\debugdraw.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:addons\\debug_drawing\\debugdraw.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotarch3d\\sources\\editor\\scenes\\editorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\editor\\scenes\\editorwindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -58,15 +62,143 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "TerrainData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\Terrain\\DataBase\\TerrainData.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAWwBkAAAABAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "ChunkManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Chunks\\ChunkManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Chunks\\ChunkManager.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Chunks\\ChunkManager.cs",
+              "RelativeToolTip": "sources\\managers\\Chunks\\ChunkManager.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAmwCkAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-29T23:22:42.033Z",
+              "WhenOpened": "2025-08-01T03:04:07.068Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "TilesHelper.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\utils\\TilesHelper.cs",
+              "RelativeDocumentMoniker": "sources\\utils\\TilesHelper.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\utils\\TilesHelper.cs",
+              "RelativeToolTip": "sources\\utils\\TilesHelper.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAArwD0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-01T00:05:25.484Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ControlRuleItem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Generic\\Controls\\ControlRuleItem.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Generic\\Controls\\ControlRuleItem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Generic\\Controls\\ControlRuleItem.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\Generic\\Controls\\ControlRuleItem.cs",
+              "ViewState": "AgIAACABAAAAAAAAAAAAAFoBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-01T00:00:19.269Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "TileRuleData.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\DataBase\\TileRuleData.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileCreator\\DataBase\\TileRuleData.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\TileCreator\\DataBase\\TileRuleData.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TileCreator\\DataBase\\TileRuleData.cs",
+              "ViewState": "AgIAACwAAAAAAAAAAAAhwFIAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-31T23:09:58.334Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TerrainMap.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainMap.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Maps\\TerrainMap.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainMap.cs",
+              "RelativeToolTip": "sources\\managers\\Maps\\TerrainMap.cs",
+              "ViewState": "AgIAAHEAAAAAAAAAAAAWwHwAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-31T17:45:22.547Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "DebugDraw.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\addons\\debug_drawing\\DebugDraw.cs",
+              "RelativeDocumentMoniker": "addons\\debug_drawing\\DebugDraw.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\addons\\debug_drawing\\DebugDraw.cs",
+              "RelativeToolTip": "addons\\debug_drawing\\DebugDraw.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-31T16:59:47.145Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ControlLayerChunk.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Controls\\ControlLayerChunk.cs",
+              "RelativeDocumentMoniker": "sources\\Editor\\Controls\\ControlLayerChunk.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Controls\\ControlLayerChunk.cs",
+              "RelativeToolTip": "sources\\Editor\\Controls\\ControlLayerChunk.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAcwBQAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-31T15:41:30.107Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "EditorWindow.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Scenes\\EditorWindow.cs",
+              "RelativeDocumentMoniker": "sources\\Editor\\Scenes\\EditorWindow.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Scenes\\EditorWindow.cs",
+              "RelativeToolTip": "sources\\Editor\\Scenes\\EditorWindow.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABwAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-28T20:37:51.857Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TerrainGenerator.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainGenerator.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Maps\\TerrainGenerator.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainGenerator.cs",
+              "RelativeToolTip": "sources\\managers\\Maps\\TerrainGenerator.cs",
+              "ViewState": "AgIAAAMBAAAAAAAAAAAswBQBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-28T20:25:31.547Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ControlEditorTerrain.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Controls\\ControlEditorTerrain.cs",
+              "RelativeDocumentMoniker": "sources\\Editor\\Controls\\ControlEditorTerrain.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Controls\\ControlEditorTerrain.cs",
+              "RelativeToolTip": "sources\\Editor\\Controls\\ControlEditorTerrain.cs",
+              "ViewState": "AgIAAHUAAAAAAAAAAAAiwIMAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-28T02:20:25.172Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SpriteMapChunk.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
+              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
+              "RelativeToolTip": "sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
+              "ViewState": "AgIAAD8AAAAAAAAAAAArwEIAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-28T02:11:03.929Z",
               "EditorCaption": ""
             },
             {
@@ -77,126 +209,9 @@
               "RelativeDocumentMoniker": "Main3D.cs",
               "ToolTip": "D:\\GitKraken\\GodotArch3D\\Main3D.cs",
               "RelativeToolTip": "Main3D.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAACcAAABFAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAWwIQAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-29T22:52:57.16Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Camera3dGodot.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\Camera3dGodot.cs",
-              "RelativeDocumentMoniker": "Camera3dGodot.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\Camera3dGodot.cs",
-              "RelativeToolTip": "Camera3dGodot.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAABFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-29T22:44:03.355Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "ChunkManagerBase.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Chunks\\ChunkManagerBase.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\Chunks\\ChunkManagerBase.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Chunks\\ChunkManagerBase.cs",
-              "RelativeToolTip": "sources\\managers\\Chunks\\ChunkManagerBase.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAQwCcAAAADAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-29T21:50:42.813Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "TerrainMap.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainMap.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\Maps\\TerrainMap.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainMap.cs",
-              "RelativeToolTip": "sources\\managers\\Maps\\TerrainMap.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAjwB4AAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-28T02:22:08.449Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "EditorWindow.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Scenes\\EditorWindow.cs",
-              "RelativeDocumentMoniker": "sources\\Editor\\Scenes\\EditorWindow.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Scenes\\EditorWindow.cs",
-              "RelativeToolTip": "sources\\Editor\\Scenes\\EditorWindow.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-28T20:37:51.857Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ChunkData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Tilemap\\ChunkData.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\Tilemap\\ChunkData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Tilemap\\ChunkData.cs",
-              "RelativeToolTip": "sources\\managers\\Tilemap\\ChunkData.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABoAAABOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-28T20:27:16.957Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "TerrainGenerator.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainGenerator.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\Maps\\TerrainGenerator.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\Maps\\TerrainGenerator.cs",
-              "RelativeToolTip": "sources\\managers\\Maps\\TerrainGenerator.cs",
-              "ViewState": "AgIAADIAAAAAAAAAAAArwDgAAAApAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-28T20:25:31.547Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ControlEditorTerrain.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Controls\\ControlEditorTerrain.cs",
-              "RelativeDocumentMoniker": "sources\\Editor\\Controls\\ControlEditorTerrain.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\Editor\\Controls\\ControlEditorTerrain.cs",
-              "RelativeToolTip": "sources\\Editor\\Controls\\ControlEditorTerrain.cs",
-              "ViewState": "AgIAACQAAAAAAAAAAAAvwDwAAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-28T02:20:25.172Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "SpriteMapChunk.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
-              "RelativeToolTip": "sources\\managers\\SpriteMapChunk\\SpriteMapChunk.cs",
-              "ViewState": "AgIAABcBAAAAAAAAAAAjwGcAAABAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-28T02:11:03.929Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "WindowTerrainDetail.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\WindowTerrainDetail.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Terrain\\WindowTerrainDetail.cs",
-              "ToolTip": "D:\\GitKraken\\GodotArch3D\\sources\\WindowsDataBase\\Terrain\\WindowTerrainDetail.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\Terrain\\WindowTerrainDetail.cs",
-              "ViewState": "AgIAADUAAAAAAAAAAAAwwCUAAAAgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-28T02:05:50.459Z",
               "EditorCaption": ""
             }
           ]

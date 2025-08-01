@@ -8,10 +8,10 @@ anchors_preset = 9
 anchor_bottom = 1.0
 offset_right = 431.0
 grow_vertical = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 script = ExtResource("1_y23i0")
 
 [node name="PanelContainerFocus" type="PanelContainer" parent="."]
@@ -132,43 +132,34 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Capas" type="GridContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+[node name="CapasDiseño" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
 visible = false
 layout_mode = 2
-columns = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 metadata/_tab_index = 1
 
-[node name="Label5" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
-layout_mode = 2
-text = "Basico:"
-
-[node name="CheckBoxBasic" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+[node name="ContainerLayers" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño/ScrollContainer"]
 layout_mode = 2
-text = "Piso:"
+size_flags_horizontal = 3
 
-[node name="CheckBoxFloor" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+[node name="CapasReales" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+visible = false
 layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 2
 
-[node name="Label2" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
-layout_mode = 2
-text = "Camino:"
-
-[node name="CheckBoxPath" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
-layout_mode = 2
-
-[node name="Label3" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
-layout_mode = 2
-text = "Agua:"
-
-[node name="CheckBoxWater" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasReales"]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
+[node name="ContainerLayersReal" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasReales/ScrollContainer"]
 layout_mode = 2
-text = "Adornos:"
-
-[node name="CheckBoxOrnament" type="CheckBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Capas"]
-layout_mode = 2
+size_flags_horizontal = 3

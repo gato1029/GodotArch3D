@@ -121,6 +121,10 @@ internal class CollisionManager : SingletonBase<CollisionManager>
                 foreach (var itemInternal in item)
                 {
                     var spriteInfo = itemInternal.Value.GetSpriteData();
+                    if (spriteInfo==null)
+                    {
+                        return false;
+                    }
                     var colliderB = spriteInfo.collisionBody.Multiplicity(spriteInfo.scale);
                     var positionB = itemInternal.Value.positionCollider;
 

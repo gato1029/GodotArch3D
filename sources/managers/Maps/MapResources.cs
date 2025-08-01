@@ -78,7 +78,7 @@ public class MapResources
 
         layer = Layer;
         chunkDimencion = PositionsManager.Instance.chunkDimencion;
-        chunkMap = new SpriteMapChunk<ResourceDataGame>(layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
+        chunkMap = new SpriteMapChunk<ResourceDataGame>("Recursos",layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
         chunkMap.OnChunSerialize += ChunkMap_OnChunSerialize;
         this.pathMapParent = pathMapParent;
         this.pathCurrentCarpet = pathMapParent + "/" + carpet;
