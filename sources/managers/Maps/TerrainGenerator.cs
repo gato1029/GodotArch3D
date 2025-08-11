@@ -2,6 +2,7 @@ using Arch.Core;
 using Godot;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.SpriteMapChunk;
+using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using LiteDB;
@@ -9,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 public enum VecindadTipo
 {
@@ -44,7 +45,7 @@ public class TerrainGenerator
 {
     private FastNoiseLite elevationNoise;
     private float elevationScale = 0.01f;
-    private Random random;
+    
     private bool useElevation;
     private SpriteMapChunk<TerrainDataGame> mapTerrainBasic; // representaciones Basicas no renderiza
     private VecindadTipo vecindadTipo;
@@ -59,7 +60,7 @@ public class TerrainGenerator
         elevationNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
         elevationNoise.SetFrequency(elevationScale);
 
-        random = new Random(seed);
+       
         this.useElevation = useElevation;
         this.vecindadTipo = vecindadTipo;
     }
@@ -105,7 +106,7 @@ public class TerrainGenerator
     }
 
 
-    private List<TerrainType> GetNeighborTerrains(Vector2I pos, Dictionary<Vector2I, TerrainType> terrainCache)
+    private List<TerrainType> GetNeighborTerrains(Vector2I pos)
     {
         List<TerrainType> neighbors = new();
 
@@ -127,12 +128,6 @@ public class TerrainGenerator
         foreach (var dir in directions)
         {
             Vector2I neighborPos = pos + dir;
-
-            if (terrainCache.TryGetValue(neighborPos, out var neighborType))
-            {
-                neighbors.Add(neighborType);
-            }
-     
             var data = mapTerrainBasic.GetTileGlobalPosition(neighborPos);
             if (data != null)
             {
@@ -142,7 +137,8 @@ public class TerrainGenerator
 
         return neighbors;
     }
-    private List<(Vector2I pos, TerrainType type)> GetNeighborTerrainsComplete(Vector2I pos, Dictionary<Vector2I, TerrainType> map)
+
+    private List<(Vector2I pos, TerrainType type)> GetNeighborTerrainsComplete(Vector2I pos)
     {
         Vector2I[] allDirs = new[]
         {
@@ -160,40 +156,31 @@ public class TerrainGenerator
 
         foreach (var dir in allDirs)
         {
-            Vector2I neighbor = pos + dir;
-            if (map.TryGetValue(neighbor, out var terrain))
+            Vector2I neighbor = pos + dir;           
+            var data = mapTerrainBasic.GetTileGlobalPosition(neighbor);
+            if (data != null)
             {
-                result.Add((neighbor, terrain));
+                var dataType = (TerrainType)data.GetTypeData();
+                result.Add((neighbor, dataType));
             }
             else
             {
-                var data = mapTerrainBasic.GetTileGlobalPosition(neighbor);
-                if (data != null)
-                {
-                    var dataType = (TerrainType)data.GetTypeData();
-                    result.Add((neighbor, dataType));
-                }
-                else
-                {
-                    // fuera del mapa = suelo
-                    result.Add((neighbor, TerrainType.PisoBase));
-                }
-            }
+                // fuera del mapa = suelo
+                result.Add((neighbor, TerrainType.PisoBase));
+            }           
         }
 
         return result;
     }
-
-    public List<TileTerrainAutomaticChunk> GenerateTerrain(
+    public void GenerateTerrainOptimized(
     Vector2I originChunk,
     GenerateMode mode,
     Vector2I sizeOrRangeInTilesOrChunks)
     {
         Vector2I chunkSize = mapTerrainBasic.ChunkSize;
-        List<TileTerrainAutomaticChunk> chunks = new();
-        Dictionary<Vector2I, TerrainType> terrainCache = new();
 
         int minChunkX, minChunkY, maxChunkX, maxChunkY;
+        int halfWidth = 0, halfHeight = 0;
 
         if (mode == GenerateMode.CenteredByTileDimensions)
         {
@@ -204,6 +191,10 @@ public class TerrainGenerator
             minChunkY = -totalChunksY / 2;
             maxChunkX = minChunkX + totalChunksX;
             maxChunkY = minChunkY + totalChunksY;
+
+            // Precalcular límites de filtrado
+            halfWidth = sizeOrRangeInTilesOrChunks.X / 2;
+            halfHeight = sizeOrRangeInTilesOrChunks.Y / 2;
         }
         else // RadiusAroundChunk
         {
@@ -219,217 +210,139 @@ public class TerrainGenerator
             for (int chunkX = minChunkX; chunkX < maxChunkX; chunkX++)
             {
                 Vector2I chunkCoord = new Vector2I(chunkX, chunkY);
-                var chunkData = new TileTerrainAutomaticChunk(chunkCoord, chunkSize);
+                Vector2I chunkBasePos = chunkCoord * chunkSize;
+
+                bool isCenterChunk =
+                    (mode == GenerateMode.CenteredByTileDimensions && chunkCoord == Vector2I.Zero) ||
+                    (mode == GenerateMode.RadiusAroundChunk && chunkCoord == originChunk);
 
                 for (int y = 0; y < chunkSize.Y; y++)
                 {
+                    int globalY = chunkBasePos.Y + y;
+
+                    // Filtrado Y si es por dimensiones
+                    if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalY) > halfHeight)
+                        continue;
+
                     for (int x = 0; x < chunkSize.X; x++)
                     {
-                        Vector2I globalPos = chunkCoord * chunkSize + new Vector2I(x, y);
+                        int globalX = chunkBasePos.X + x;
 
-                        if (mode == GenerateMode.CenteredByTileDimensions)
-                        {
-                            if (Math.Abs(globalPos.X) > sizeOrRangeInTilesOrChunks.X / 2 ||
-                                Math.Abs(globalPos.Y) > sizeOrRangeInTilesOrChunks.Y / 2)
-                                continue;
-                        }
+                        // Filtrado X si es por dimensiones
+                        if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalX) > halfWidth)
+                            continue;
 
-                        List<TerrainType> neighbors = GetNeighborTerrains(globalPos, terrainCache);
+                        Vector2I globalPos = new Vector2I(globalX, globalY);
+
+                        List<TerrainType> neighbors = GetNeighborTerrains(globalPos);
                         TerrainType terrain = GetTerrainWithContext(globalPos, neighbors);
 
-                        bool isCenterChunk =
-                            (mode == GenerateMode.CenteredByTileDimensions && chunkCoord == Vector2I.Zero) ||
-                            (mode == GenerateMode.RadiusAroundChunk && chunkCoord == originChunk);
-
-                        if (generarCaminos && isCenterChunk)
+                        if (generarCaminos && isCenterChunk &&
+                            (x == chunkSize.X / 2 || y == chunkSize.Y / 2))
                         {
-                            if (x == chunkSize.X / 2 || y == chunkSize.Y / 2)
-                            {
-                                if (terrain == TerrainType.PisoBase)
-                                    terrain = TerrainType.CaminoPiso;
-                                else if (terrain == TerrainType.Agua)
-                                    terrain = TerrainType.CaminoAgua;
-                            }
+                            if (terrain == TerrainType.PisoBase)
+                                terrain = TerrainType.CaminoPiso;
+                            else if (terrain == TerrainType.Agua)
+                                terrain = TerrainType.CaminoAgua;
                         }
 
-                        chunkData.dataInternal[x, y] = new TileAutoChunk
-                        {
-                            xGlobal = globalPos.X,
-                            yGlobal = globalPos.Y,
-                            terrainType = terrain
-                        };
-
-                        terrainCache[globalPos] = terrain;
+                        AddTileBasicConfig(globalPos, terrain);
                     }
                 }
-
-                chunks.Add(chunkData);
             }
         }
 
-        PostProcessWaterBorders(chunks, chunkSize);
-        LimpiarBordesAislados(chunks, chunkSize);
-        RefinarElevacionesSueltas(chunks, chunkSize);
-        MarcarBordesElevacionConBase(chunks, chunkSize);
-
-        return chunks;
+        //Post - procesado directamente sobre mapTerrainBasic
+        PostProcessWaterBordersOptimized(originChunk, mode, sizeOrRangeInTilesOrChunks);
+        LimpiarBordesAisladosOptimized(originChunk, mode, sizeOrRangeInTilesOrChunks);
+        RefinarElevacionesSueltasOptimized(originChunk, mode, sizeOrRangeInTilesOrChunks);
+        MarcarBordesElevacionConBaseOptimized(originChunk, mode, sizeOrRangeInTilesOrChunks);
+        AgregarBordesLimiteOptimized(originChunk, sizeOrRangeInTilesOrChunks, 2);
     }
 
 
-    private void RefinarElevacionesSueltas(List<TileTerrainAutomaticChunk> chunks, Vector2I chunkSize)
+  
+
+    private void AgregarBordesLimiteOptimized(
+    Vector2I mapaCentroGlobal,
+    Vector2I tamanoMapaGlobal, // en tiles
+    int grosorBorde)
     {
-        // Construimos un mapa global para consulta rápida
-        Dictionary<Vector2I, TerrainType> terrainMap = new();
+        Vector2I chunkSize = mapTerrainBasic.ChunkSize;
 
-        foreach (var chunk in chunks)
+        // Cálculo de límites del mapa
+        Vector2I mitadMapa = tamanoMapaGlobal / 2;
+        int minX = mapaCentroGlobal.X - mitadMapa.X;
+        int maxX = mapaCentroGlobal.X + mitadMapa.X - 1;
+        int minY = mapaCentroGlobal.Y - mitadMapa.Y;
+        int maxY = mapaCentroGlobal.Y + mitadMapa.Y - 1;
+
+        HashSet<Vector2I> bordePositions = new();
+
+        // Generar posiciones del borde en grosor
+        for (int d = 1; d <= grosorBorde; d++)
         {
-            for (int y = 0; y < chunkSize.Y; y++)
+            for (int x = minX - d; x <= maxX + d; x++)
             {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    var tile = chunk.dataInternal[x, y];
-                    Vector2I global = new(tile.xGlobal, tile.yGlobal);
-                    terrainMap[global] = tile.terrainType;
-                }
+                bordePositions.Add(new Vector2I(x, minY - d)); // borde inferior
+                bordePositions.Add(new Vector2I(x, maxY + d)); // borde superior
+            }
+
+            for (int y = minY - (d - 1); y <= maxY + (d - 1); y++)
+            {
+                bordePositions.Add(new Vector2I(minX - d, y)); // borde izquierdo
+                bordePositions.Add(new Vector2I(maxX + d, y)); // borde derecho
             }
         }
 
-        // Direcciones cardinales (N, E, S, O)
-        Vector2I[] dirs = new[]
+        // Asignar directamente en mapTerrainBasic
+        foreach (var pos in bordePositions)
         {
-        new Vector2I(0, -1),
-        new Vector2I(1, 0),
-        new Vector2I(0, 1),
-        new Vector2I(-1, 0),
-    };
+            var tile = mapTerrainBasic.GetTileGlobalPosition(pos);
 
-        // Evaluar cada tile de elevación
-        foreach (var chunk in chunks)
-        {
-            for (int y = 0; y < chunkSize.Y; y++)
+            // Solo asignar si no hay tile o está vacío
+            if (tile == null || (TerrainType)tile.GetTypeData() == default)
             {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    ref var tile = ref chunk.dataInternal[x, y];
-
-                    if (tile.terrainType != TerrainType.Elevacion)
-                        continue;
-
-                    Vector2I pos = new(tile.xGlobal, tile.yGlobal);
-                    int count = 0;
-
-                    foreach (var dir in dirs)
-                    {
-                        Vector2I neighborPos = pos + dir;
-
-                        if (terrainMap.TryGetValue(neighborPos, out var t))
-                        {
-                            if (t == TerrainType.Elevacion)
-                                count++;
-                        }
-                        else
-                        {
-                            var data = mapTerrainBasic.GetTileGlobalPosition(neighborPos);
-                            if (data != null)
-                            {
-                                var type = (TerrainType)data.GetTypeData();
-                                if (type == TerrainType.Elevacion)
-                                    count++;
-                            }
-                        }
-                    }
-
-                    if (count < 2)
-                    {
-                        tile.terrainType = TerrainType.PisoBase; // Tile de elevación inválido
-                    }
-                }
-            }
-        }
-    }
-
-    private void MarcarBordesElevacionConBase(List<TileTerrainAutomaticChunk> chunks, Vector2I chunkSize)
-    {
-        // Mapa global para ubicar tiles rápidamente
-        Dictionary<Vector2I, TerrainType> terrainMap = new();
-
-        foreach (var chunk in chunks)
-        {
-            for (int y = 0; y < chunkSize.Y; y++)
-            {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    var tile = chunk.dataInternal[x, y];
-                    Vector2I global = new(tile.xGlobal, tile.yGlobal);
-                    terrainMap[global] = tile.terrainType;
-                }
-            }
-        }
-
-        Vector2I[] dirs = new[]
-        {
-        new Vector2I(0, -1),
-        new Vector2I(1, 0),
-        new Vector2I(0, 1),
-        new Vector2I(-1, 0),
-    };
-
-        foreach (var chunk in chunks)
-        {
-            for (int y = 0; y < chunkSize.Y; y++)
-            {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    ref var tile = ref chunk.dataInternal[x, y];
-
-                    // Solo nos interesan tiles de tipo Elevacion
-                    if (tile.terrainType != TerrainType.Elevacion)
-                        continue;
-
-                    Vector2I pos = new(tile.xGlobal, tile.yGlobal);
-
-                    foreach (var dir in dirs)
-                    {
-                        Vector2I neighborPos = pos + dir;
-
-                        if (terrainMap.TryGetValue(neighborPos, out var neighborType))
-                        {
-                            if (neighborType != TerrainType.Elevacion && neighborType != TerrainType.ElevacionBase)
-                            {
-                                tile.terrainType = TerrainType.ElevacionBase;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            // Si no hay vecino, asumimos que es borde
-                            tile.terrainType = TerrainType.ElevacionBase;
-                            break;
-                        }
-                    }
-                }
+                AddTileBasicConfig(pos, TerrainType.Limite);
             }
         }
     }
 
 
 
-    private void LimpiarBordesAislados(List<TileTerrainAutomaticChunk> chunks, Vector2I chunkSize)
-    {
-        // Creamos un mapa global para consultar tipos de terreno
-        Dictionary<Vector2I, TerrainType> terrainMap = new();
 
-        foreach (var chunk in chunks)
+
+
+    private void RefinarElevacionesSueltasOptimized(
+    Vector2I originChunk,
+    GenerateMode mode,
+    Vector2I sizeOrRangeInTilesOrChunks)
+    {
+        Vector2I chunkSize = mapTerrainBasic.ChunkSize;
+
+        int minChunkX, minChunkY, maxChunkX, maxChunkY;
+        int halfWidth = 0, halfHeight = 0;
+
+        if (mode == GenerateMode.CenteredByTileDimensions)
         {
-            for (int y = 0; y < chunkSize.Y; y++)
-            {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    var tile = chunk.dataInternal[x, y];
-                    Vector2I pos = new(tile.xGlobal, tile.yGlobal);
-                    terrainMap[pos] = tile.terrainType;
-                }
-            }
+            int totalChunksX = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.X / chunkSize.X);
+            int totalChunksY = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.Y / chunkSize.Y);
+
+            minChunkX = -totalChunksX / 2;
+            minChunkY = -totalChunksY / 2;
+            maxChunkX = minChunkX + totalChunksX;
+            maxChunkY = minChunkY + totalChunksY;
+
+            halfWidth = sizeOrRangeInTilesOrChunks.X / 2;
+            halfHeight = sizeOrRangeInTilesOrChunks.Y / 2;
+        }
+        else // RadiusAroundChunk
+        {
+            int range = sizeOrRangeInTilesOrChunks.X;
+            minChunkX = originChunk.X - range + 1;
+            minChunkY = originChunk.Y - range + 1;
+            maxChunkX = originChunk.X + range;
+            maxChunkY = originChunk.Y + range;
         }
 
         // Direcciones cardinales
@@ -441,126 +354,360 @@ public class TerrainGenerator
         new Vector2I(-1, 0),  // Oeste
     };
 
-        // Verificamos cada tile de tipo AguaBorde
-        foreach (var chunk in chunks)
+        for (int chunkY = minChunkY; chunkY < maxChunkY; chunkY++)
         {
-            for (int y = 0; y < chunkSize.Y; y++)
+            for (int chunkX = minChunkX; chunkX < maxChunkX; chunkX++)
             {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    ref var tile = ref chunk.dataInternal[x, y];
+                Vector2I chunkCoord = new Vector2I(chunkX, chunkY);
+                Vector2I chunkBasePos = chunkCoord * chunkSize;
 
-                    if (tile.terrainType != TerrainType.AguaBorde)
+                for (int y = 0; y < chunkSize.Y; y++)
+                {
+                    int globalY = chunkBasePos.Y + y;
+                    if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalY) > halfHeight)
                         continue;
 
-                    Vector2I pos = new(tile.xGlobal, tile.yGlobal);
-                    int count = 0;
-
-                    foreach (var dir in dirs)
+                    for (int x = 0; x < chunkSize.X; x++)
                     {
-                        Vector2I neighborPos = pos + dir;
+                        int globalX = chunkBasePos.X + x;
+                        if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalX) > halfWidth)
+                            continue;
 
-                        if (terrainMap.TryGetValue(neighborPos, out var t))
+                        Vector2I pos = new(globalX, globalY);
+                        var tile = mapTerrainBasic.GetTileGlobalPosition(pos);
+
+                        if ((TerrainType)tile.GetTypeData() != TerrainType.Elevacion)
+                            continue;
+
+                        int count = 0;
+
+                        foreach (var dir in dirs)
                         {
-                            if (t == TerrainType.Agua || t == TerrainType.AguaBorde)
-                                count++;
-                        }
-                        else
-                        {
-                            var data = mapTerrainBasic.GetTileGlobalPosition(neighborPos);
-                            if (data != null)
+                            Vector2I neighborPos = pos + dir;
+                            var neighborTile = mapTerrainBasic.GetTileGlobalPosition(neighborPos);
+
+                            if (neighborTile != null &&
+                                (TerrainType)neighborTile.GetTypeData() == TerrainType.Elevacion)
                             {
-                                var dataType = (TerrainType)data.GetTypeData();
-                                if (dataType == TerrainType.Agua || dataType == TerrainType.AguaBorde)
-                                    count++;
+                                count++;
                             }
                         }
-                    }
 
-                    if (count < 2)
-                    {
-                        tile.terrainType = TerrainType.PisoBase; // AguaBorde inválida
+                        // Si menos de 2 vecinos son elevación → convertir a piso base
+                        if (count < 2)
+                        {
+                            AddTileBasicConfig(pos, TerrainType.PisoBase);
+                        }
                     }
                 }
             }
         }
     }
 
-    private void PostProcessWaterBorders(List<TileTerrainAutomaticChunk> chunks, Vector2I chunkSize)
-    {
-        Dictionary<Vector2I, TerrainType> terrainMap = new();
 
-        foreach (var chunk in chunks)
+    private void MarcarBordesElevacionConBaseOptimized(
+    Vector2I originChunk,
+    GenerateMode mode,
+    Vector2I sizeOrRangeInTilesOrChunks)
+    {
+        Vector2I chunkSize = mapTerrainBasic.ChunkSize;
+
+        int minChunkX, minChunkY, maxChunkX, maxChunkY;
+        int halfWidth = 0, halfHeight = 0;
+
+        if (mode == GenerateMode.CenteredByTileDimensions)
         {
-            for (int y = 0; y < chunkSize.Y; y++)
-            {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    var tile = chunk.dataInternal[x, y];
-                    Vector2I global = new Vector2I(tile.xGlobal, tile.yGlobal);
-                    terrainMap[global] = tile.terrainType;
-                }
-            }
+            int totalChunksX = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.X / chunkSize.X);
+            int totalChunksY = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.Y / chunkSize.Y);
+
+            minChunkX = -totalChunksX / 2;
+            minChunkY = -totalChunksY / 2;
+            maxChunkX = minChunkX + totalChunksX;
+            maxChunkY = minChunkY + totalChunksY;
+
+            halfWidth = sizeOrRangeInTilesOrChunks.X / 2;
+            halfHeight = sizeOrRangeInTilesOrChunks.Y / 2;
+        }
+        else // RadiusAroundChunk
+        {
+            int range = sizeOrRangeInTilesOrChunks.X;
+            minChunkX = originChunk.X - range + 1;
+            minChunkY = originChunk.Y - range + 1;
+            maxChunkX = originChunk.X + range;
+            maxChunkY = originChunk.Y + range;
         }
 
-        foreach (var chunk in chunks)
+        // Direcciones cardinales
+        Vector2I[] dirs = new[]
         {
-            for (int y = 0; y < chunkSize.Y; y++)
-            {
-                for (int x = 0; x < chunkSize.X; x++)
-                {
-                    ref TileAutoChunk tile = ref chunk.dataInternal[x, y];
+        new Vector2I(0, -1),  // abajo
+        new Vector2I(1, 0),   // derecha
+        new Vector2I(0, 1),   // arriba
+        new Vector2I(-1, 0),  // izquierda
+    };
 
-                    if (tile.terrainType != TerrainType.Agua)
+        for (int chunkY = minChunkY; chunkY < maxChunkY; chunkY++)
+        {
+            for (int chunkX = minChunkX; chunkX < maxChunkX; chunkX++)
+            {
+                Vector2I chunkCoord = new Vector2I(chunkX, chunkY);
+                Vector2I chunkBasePos = chunkCoord * chunkSize;
+
+                for (int y = 0; y < chunkSize.Y; y++)
+                {
+                    int globalY = chunkBasePos.Y + y;
+                    if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalY) > halfHeight)
                         continue;
 
-                    Vector2I pos = new(tile.xGlobal, tile.yGlobal);
-                    var neighbors = GetNeighborTerrainsComplete(pos, terrainMap);
-
-                    bool isBorder = false;
-                    int nonWaterCardinals = 0;
-
-                    foreach (var (neighborPos, terrain) in neighbors)
+                    for (int x = 0; x < chunkSize.X; x++)
                     {
-                        if (terrain != TerrainType.Agua && terrain != TerrainType.AguaBorde)
-                        {
-                            var dir = neighborPos - pos;
+                        int globalX = chunkBasePos.X + x;
+                        if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalX) > halfWidth)
+                            continue;
 
-                            // cardinal
-                            if (Math.Abs(dir.X) + Math.Abs(dir.Y) == 1)
+                        Vector2I pos = new(globalX, globalY);
+                        var tile = mapTerrainBasic.GetTileGlobalPosition(pos);
+                        if (tile == null || (TerrainType)tile.GetTypeData() != TerrainType.Elevacion)
+                            continue;
+
+                        foreach (var dir in dirs)
+                        {
+                            Vector2I neighborPos = pos + dir;
+                            var neighborTile = mapTerrainBasic.GetTileGlobalPosition(neighborPos);
+                            var neighborType = neighborTile != null
+                                ? (TerrainType)neighborTile.GetTypeData()
+                                : (TerrainType?)null;
+
+                            // Detectar borde
+                            if (neighborType == null ||
+                                (neighborType != TerrainType.Elevacion && neighborType != TerrainType.ElevacionBorde))
                             {
-                                isBorder = true;
-                                nonWaterCardinals++;
+                                AddTileBasicConfig(pos, TerrainType.ElevacionBorde);
+
+                                // Si el borde está al sur, marcar hasta 2 tiles hacia abajo como ElevacionBase
+                                if (dir.X == 0 && dir.Y == -1)
+                                {
+                                    for (int i = 1; i <= 2; i++)
+                                    {
+                                        Vector2I abajo = new(pos.X, pos.Y - i);
+                                        var abajoTile = mapTerrainBasic.GetTileGlobalPosition(abajo);
+
+                                        if (abajoTile != null &&
+                                            (TerrainType)abajoTile.GetTypeData() != TerrainType.Elevacion)
+                                        {
+                                            AddTileBasicConfig(abajo, TerrainType.ElevacionBase);
+                                        }
+                                        else
+                                        {
+                                            break; // detenemos extensión si es Elevacion o no hay tile
+                                        }
+                                    }
+                                }
+                                break; // ya marcado, no revisar otras direcciones
                             }
                         }
                     }
+                }
+            }
+        }
+    }
 
-                    // si solo hay contacto diagonal con no-agua, aun así consideramos borde
-                    if (!isBorder)
+
+    private void LimpiarBordesAisladosOptimized(
+    Vector2I originChunk,
+    GenerateMode mode,
+    Vector2I sizeOrRangeInTilesOrChunks)
+    {
+        Vector2I chunkSize = mapTerrainBasic.ChunkSize;
+
+        int minChunkX, minChunkY, maxChunkX, maxChunkY;
+        int halfWidth = 0, halfHeight = 0;
+
+        if (mode == GenerateMode.CenteredByTileDimensions)
+        {
+            int totalChunksX = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.X / chunkSize.X);
+            int totalChunksY = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.Y / chunkSize.Y);
+
+            minChunkX = -totalChunksX / 2;
+            minChunkY = -totalChunksY / 2;
+            maxChunkX = minChunkX + totalChunksX;
+            maxChunkY = minChunkY + totalChunksY;
+
+            halfWidth = sizeOrRangeInTilesOrChunks.X / 2;
+            halfHeight = sizeOrRangeInTilesOrChunks.Y / 2;
+        }
+        else // RadiusAroundChunk
+        {
+            int range = sizeOrRangeInTilesOrChunks.X;
+            minChunkX = originChunk.X - range + 1;
+            minChunkY = originChunk.Y - range + 1;
+            maxChunkX = originChunk.X + range;
+            maxChunkY = originChunk.Y + range;
+        }
+
+        // Direcciones cardinales
+        Vector2I[] dirs = new[]
+        {
+        new Vector2I(0, -1),  // Norte
+        new Vector2I(1, 0),   // Este
+        new Vector2I(0, 1),   // Sur
+        new Vector2I(-1, 0),  // Oeste
+    };
+
+        for (int chunkY = minChunkY; chunkY < maxChunkY; chunkY++)
+        {
+            for (int chunkX = minChunkX; chunkX < maxChunkX; chunkX++)
+            {
+                Vector2I chunkCoord = new Vector2I(chunkX, chunkY);
+                Vector2I chunkBasePos = chunkCoord * chunkSize;
+
+                for (int y = 0; y < chunkSize.Y; y++)
+                {
+                    int globalY = chunkBasePos.Y + y;
+                    if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalY) > halfHeight)
+                        continue;
+
+                    for (int x = 0; x < chunkSize.X; x++)
                     {
+                        int globalX = chunkBasePos.X + x;
+                        if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalX) > halfWidth)
+                            continue;
+
+                        Vector2I pos = new(globalX, globalY);
+                        var tile = mapTerrainBasic.GetTileGlobalPosition(pos);
+
+                        if ((TerrainType)tile.GetTypeData() != TerrainType.AguaBorde)
+                            continue;
+
+                        int count = 0;
+
+                        foreach (var dir in dirs)
+                        {
+                            Vector2I neighborPos = pos + dir;
+                            var neighborTile = mapTerrainBasic.GetTileGlobalPosition(neighborPos);
+
+                            if (neighborTile != null)
+                            {
+                                var tType = (TerrainType)neighborTile.GetTypeData();
+                                if (tType == TerrainType.Agua || tType == TerrainType.AguaBorde)
+                                    count++;
+                            }
+                        }
+
+                        // Si menos de 2 vecinos son agua/agua borde → lo convertimos en piso base
+                        if (count < 2)
+                        {
+                            AddTileBasicConfig(pos, TerrainType.PisoBase);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void PostProcessWaterBordersOptimized(
+    Vector2I originChunk,
+    GenerateMode mode,
+    Vector2I sizeOrRangeInTilesOrChunks)
+    {
+        Vector2I chunkSize = mapTerrainBasic.ChunkSize;
+
+        int minChunkX, minChunkY, maxChunkX, maxChunkY;
+        int halfWidth = 0, halfHeight = 0;
+
+        if (mode == GenerateMode.CenteredByTileDimensions)
+        {
+            int totalChunksX = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.X / chunkSize.X);
+            int totalChunksY = (int)Math.Ceiling((double)sizeOrRangeInTilesOrChunks.Y / chunkSize.Y);
+
+            minChunkX = -totalChunksX / 2;
+            minChunkY = -totalChunksY / 2;
+            maxChunkX = minChunkX + totalChunksX;
+            maxChunkY = minChunkY + totalChunksY;
+
+            halfWidth = sizeOrRangeInTilesOrChunks.X / 2;
+            halfHeight = sizeOrRangeInTilesOrChunks.Y / 2;
+        }
+        else // RadiusAroundChunk
+        {
+            int range = sizeOrRangeInTilesOrChunks.X;
+            minChunkX = originChunk.X - range + 1;
+            minChunkY = originChunk.Y - range + 1;
+            maxChunkX = originChunk.X + range;
+            maxChunkY = originChunk.Y + range;
+        }
+
+        for (int chunkY = minChunkY; chunkY < maxChunkY; chunkY++)
+        {
+            for (int chunkX = minChunkX; chunkX < maxChunkX; chunkX++)
+            {
+                Vector2I chunkCoord = new Vector2I(chunkX, chunkY);
+                Vector2I chunkBasePos = chunkCoord * chunkSize;
+
+                for (int y = 0; y < chunkSize.Y; y++)
+                {
+                    int globalY = chunkBasePos.Y + y;
+                    if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalY) > halfHeight)
+                        continue;
+
+                    for (int x = 0; x < chunkSize.X; x++)
+                    {
+                        int globalX = chunkBasePos.X + x;
+                        if (mode == GenerateMode.CenteredByTileDimensions && Math.Abs(globalX) > halfWidth)
+                            continue;
+
+                        Vector2I pos = new(globalX, globalY);
+
+                        var tile = mapTerrainBasic.GetTileGlobalPosition(pos);
+                        if ((TerrainType)tile.GetTypeData() != TerrainType.Agua)
+                            continue;
+
+                        var neighbors = GetNeighborTerrainsComplete(pos);
+
+                        bool isBorder = false;
+                        int nonWaterCardinals = 0;
+
                         foreach (var (neighborPos, terrain) in neighbors)
                         {
                             if (terrain != TerrainType.Agua && terrain != TerrainType.AguaBorde)
                             {
                                 var dir = neighborPos - pos;
-
-                                if (Math.Abs(dir.X) == 1 && Math.Abs(dir.Y) == 1) // diagonal
+                                if (Math.Abs(dir.X) + Math.Abs(dir.Y) == 1) // cardinal
                                 {
                                     isBorder = true;
-                                    break;
+                                    nonWaterCardinals++;
                                 }
                             }
                         }
-                    }
 
-                    if (isBorder)
-                        tile.terrainType = TerrainType.AguaBorde;
+                        // Verificar diagonales si no hay cardinales
+                        if (!isBorder)
+                        {
+                            foreach (var (neighborPos, terrain) in neighbors)
+                            {
+                                if (terrain != TerrainType.Agua && terrain != TerrainType.AguaBorde)
+                                {
+                                    var dir = neighborPos - pos;
+                                    if (Math.Abs(dir.X) == 1 && Math.Abs(dir.Y) == 1)
+                                    {
+                                        isBorder = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (isBorder)
+                        {                            
+                            AddTileBasicConfig(pos, TerrainType.AguaBorde);                            
+                        }
+                    }
                 }
             }
         }
     }
-   
-   
+
     public void AplicarChunksAlMapaBase(List<TileTerrainAutomaticChunk> chunks)
     {
         foreach (var chunk in chunks)
@@ -579,137 +726,150 @@ public class TerrainGenerator
             }
         }
     }
-    public void AplicarChunkAlMapaReal(List<TileTerrainAutomaticChunk> chunks)
+
+    public static IEnumerable<Vector2I> GetChunksInRange(
+    Vector2I originChunk,
+    Vector2I sizeOrRangeInTilesOrChunks,
+    GenerateMode mode)
     {
-        foreach (var item in chunks)
+        List<Vector2I> chunks = new();
+
+        switch (mode)
         {
-            foreach (var itemMap in MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerDesign)
-            {
-                TerrainType terrainType = (TerrainType)Enum.Parse(typeof(TerrainType), itemMap.Key);
-                var chunkDesign = itemMap.Value.GetTilesByChunk(item.chunkPosition);
-                if (chunkDesign != null)
+            case GenerateMode.CenteredByTileDimensions:
                 {
-                    int width = chunkDesign.tiles.GetLength(0);
-                    int height = chunkDesign.tiles.GetLength(1);
+                    // sizeOrRangeInTilesOrChunks = tamaño en tiles
+                    Vector2I halfChunks = new(
+                        Mathf.CeilToInt(sizeOrRangeInTilesOrChunks.X / 2f),
+                        Mathf.CeilToInt(sizeOrRangeInTilesOrChunks.Y / 2f)
+                    );
 
-                    for (int y = 0; y < height; y++)
+                    Vector2I start = originChunk - halfChunks;
+                    Vector2I end = originChunk + halfChunks;
+
+                    for (int cy = start.Y; cy <= end.Y; cy++)
                     {
-                        for (int x = 0; x < width; x++)
+                        for (int cx = start.X; cx <= end.X; cx++)
                         {
-                            var dataItem = chunkDesign.tiles[x, y];
-                            if (dataItem != null)
-                            {
-
-
-                                var globalPos = dataItem.positionTileWorld;
-                                TerrainType terrainTypeInternal = (TerrainType)dataItem.GetTypeData();
-                                switch (terrainType)
-                                {
-                                    case TerrainType.PisoBase:
-                                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Suelo.ToString()).AddUpdatedTile(globalPos, dataItem.idData);
-                                        break;
-                                    case TerrainType.Elevacion:
-                                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Elevacion.ToString()).AddUpdatedTile(globalPos, dataItem.idData);
-                                        break;
-                                    case TerrainType.Agua:
-                                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Agua.ToString()).AddUpdatedTile(globalPos, dataItem.idData);
-                                        break;
-                                    case TerrainType.CaminoPiso:
-                                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Suelo.ToString()).AddUpdatedTile(globalPos, dataItem.idData);
-                                        break;
-                                    case TerrainType.CaminoAgua:
-                                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Suelo.ToString()).AddUpdatedTile(globalPos, dataItem.idData);
-                                        break;
-                                    case TerrainType.AguaBorde:
-                                        if (terrainTypeInternal == TerrainType.AguaBorde)
-                                        {
-                                            MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Suelo.ToString()).AddUpdatedTile(globalPos, dataItem.idData);
-                                        }
-                                        else
-                                        {
-                                            MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Suelo.ToString()).Remove(globalPos);
-                                        }
-                                            break;
-                                    case TerrainType.Ornamentos:
-                                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.MapLayerReal.GetLayer(TerrainMapReal.Ornamentos.ToString()).AddUpdatedTile(globalPos, dataItem.idData);
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
+                            chunks.Add(new Vector2I(cx, cy));
                         }
                     }
                 }
-             }
+                break;
+
+            case GenerateMode.RadiusAroundChunk:
+                {
+                    // sizeOrRangeInTilesOrChunks.X = radio en chunks
+                    int radius = sizeOrRangeInTilesOrChunks.X;
+
+                    for (int dy = -radius; dy <= radius; dy++)
+                    {
+                        for (int dx = -radius; dx <= radius; dx++)
+                        {
+                            chunks.Add(new Vector2I(originChunk.X + dx, originChunk.Y + dy));
+                        }
+                    }
+                }
+                break;
         }
+
+        return chunks;
     }
-    public void AplicarChunksAlMapaDisenio(List<TileTerrainAutomaticChunk> chunks, TerrainCategoryType terrainCategoryType)
+
+    public void AplicarMapaDisenioOptimized(Vector2I originChunk,
+    GenerateMode mode,
+    Vector2I sizeOrRangeInTilesOrChunks, TerrainCategoryType terrainCategoryType)
     {
-        BsonExpression bsonExpression = BsonExpression.Create("category = @0 and isRule = @1", terrainCategoryType.ToString(), true);
+        // 1. Cargar tabla de equivalencias TerrainType -> idData
+        BsonExpression bsonExpression = BsonExpression.Create(
+            "category = @0 and isRule = @1",
+            terrainCategoryType.ToString(),
+            true
+        );
         var result = DataBaseManager.Instance.FindAllFilter<TerrainData>(bsonExpression);
 
         Dictionary<TerrainType, int> tableData = result.ToDictionary(r => r.terrainType, r => r.id);
+        tableData[TerrainType.Limite] = 0;
+        tableData[TerrainType.ElevacionBorde] = 0;
 
-        // Fase 1: recopilar todos los tiles
+        // 2. Recopilar tiles solo del rango de chunks
         List<(Vector2I pos, TerrainType terrainType, int idData)> allTiles = new();
+        IEnumerable<Vector2I> chunksToProcess = GetChunksInRange(originChunk, sizeOrRangeInTilesOrChunks, mode);
 
-        foreach (var chunk in chunks)
+        foreach (var chunkPos in chunksToProcess)
         {
-            int width = chunk.dataInternal.GetLength(0);
-            int height = chunk.dataInternal.GetLength(1);
+            var tiles = mapTerrainBasic.GetTilesByChunk(chunkPos);
+            if (tiles == null) continue;
 
-            for (int y = 0; y < height; y++)
+            for (int x = 0; x < tiles.size.X; x++)
             {
-                for (int x = 0; x < width; x++)
+                for (int y = 0; y < tiles.size.Y; y++)
                 {
-                    TileAutoChunk tile = chunk.dataInternal[x, y];
-                    Vector2I globalPos = new Vector2I(tile.xGlobal, tile.yGlobal);
-                    TerrainType terrainType = tile.terrainType;
+                    var tileData = tiles.GetTileAt(x, y);
+                    if (tileData == null)
+                        continue;
 
+                    TerrainType terrainType = (TerrainType)tileData.GetTypeData();
                     if (!tableData.ContainsKey(terrainType))
-                        continue; // O lanzar advertencia
+                        continue;
 
                     int idData = tableData[terrainType];
+
+                    // Convertir coordenadas locales del chunk a coordenadas globales
+                    Vector2I globalPos = new Vector2I(
+                        chunkPos.X * tiles.size.X + x,
+                        chunkPos.Y * tiles.size.Y + y
+                    );
 
                     allTiles.Add((globalPos, terrainType, idData));
                 }
             }
         }
 
-        // Fase 2: ordenar los tiles por tipo (orden de pintado)
+        // 3. Orden de pintado
         TerrainType[] ordenPintado = new TerrainType[]
         {
         TerrainType.Agua,
         TerrainType.PisoBase,
+        TerrainType.Limite,
         TerrainType.AguaBorde,
         TerrainType.Elevacion,
-        TerrainType.ElevacionBase
+        TerrainType.ElevacionBase,
+        TerrainType.ElevacionBorde,
         };
+        int idPiso = tableData[TerrainType.PisoBase];
 
-        // Fase 3: aplicar los tiles por orden
+        // 4. Aplicar al mapa en orden
         foreach (var tipo in ordenPintado)
         {
             foreach (var (pos, terrainType, idData) in allTiles.Where(t => t.terrainType == tipo))
             {
                 switch (terrainType)
                 {
-                    case TerrainType.PisoBase:                        
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idData,0);
+                    case TerrainType.Limite:
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
                         break;
 
-                    case TerrainType.Elevacion:                        
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
+                    case TerrainType.PisoBase:
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData, 0);
                         break;
+
+                    case TerrainType.Elevacion:
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
+                        break;
+
                     case TerrainType.ElevacionBase:
-                        int idPiso = tableData[TerrainType.PisoBase];
-                        int idElevacion = tableData[TerrainType.Elevacion];
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idElevacion);                        
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso,0);
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
                         break;
+
+                    case TerrainType.ElevacionBorde:
+                        int idElevacion = tableData[TerrainType.Elevacion];
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idElevacion);
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
+                        break;
+
                     case TerrainType.Agua:
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
-                        //int idBordeRemove = tableData[TerrainType.AguaBorde];
-                       // MapManagerEditor.Instance.currentMapLevelData.terrainMap.RemoveTile(pos, idBordeRemove);
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
                         break;
 
                     case TerrainType.CaminoPiso:
@@ -717,22 +877,26 @@ public class TerrainGenerator
                     case TerrainType.AguaBorde:
                         int idAguaBorde = tableData[TerrainType.AguaBorde];
                         int idAgua = tableData[TerrainType.Agua];
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idAguaBorde);
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idAgua);
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idAguaBorde);
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idAgua);
                         break;
 
                     default:
-                        MapManagerEditor.Instance.currentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
+                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
                         break;
                 }
             }
         }
     }
 
+
     public void AddTileBasicConfig(Vector2I tilePositionGlobal, TerrainType terrainType)
     {
         switch (terrainType)
         {
+            case TerrainType.Limite:
+                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 2);
+                break;
             case TerrainType.PisoBase:
                 mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 68);
                 break;
@@ -754,10 +918,12 @@ public class TerrainGenerator
             case TerrainType.ElevacionBase:
                 mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 74);
                 break;
+            case TerrainType.ElevacionBorde:
+                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 10);
+                break;
             default:
                 break;
         }
-        mapTerrainBasic.Refresh(tilePositionGlobal);
 
     }
     private float Normalize(float value)
@@ -765,3 +931,4 @@ public class TerrainGenerator
         return (value + 1f) / 2f;
     }
 }
+

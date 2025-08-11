@@ -17,7 +17,7 @@ public partial class MapsWindow : Window
     private void ButtonSave_Pressed()
     {
         MapLevelData mapLevelData = new MapLevelData(LineEditName.Text, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value), MapType.Mapa, 10,TextEditDescription.Text);                      
-        MapManagerEditor.Instance.currentMapLevelData = mapLevelData;
+        MapManagerEditor.Instance.CurrentMapLevelData = mapLevelData;
         QueueFree();
     }
 

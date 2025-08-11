@@ -18,13 +18,15 @@ internal class ResourcesGameManager: SingletonBase<ResourcesGameManager>
         if (!dictionary.ContainsKey(id))
         {
             var data = DataBaseManager.Instance.FindById<ResourceData>(id);
+           
             dictionary.Add(id, data);
         }
     }
     public void RegisterData(int id, ResourceData data)
-    {
+    {        
         if (!dictionary.ContainsKey(id))
         {
+        
             dictionary.Add(id, data);
         }
     }

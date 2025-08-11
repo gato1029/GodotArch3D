@@ -32,7 +32,9 @@ public enum TerrainType
     CaminoAgua = 5,     
     AguaBorde = 6,
     ElevacionBase = 7,
-    Ornamentos = 8
+    Ornamentos = 8,
+    Limite=9,
+    ElevacionBorde = 10,
 }
 public class TerrainData :IdData
 {

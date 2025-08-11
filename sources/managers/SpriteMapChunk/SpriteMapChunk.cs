@@ -2,6 +2,8 @@ using Godot;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.Multimesh;
+using GodotEcsArch.sources.managers.serializer;
+using GodotEcsArch.sources.managers.Serializer.Data;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
@@ -11,7 +13,9 @@ using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,14 +35,22 @@ public interface IDataSprite
     public SpriteData GetSpriteData();
     public bool IsAnimation();
 }
+
+public enum FormatSave
+{
+    JSON,
+    BINARIO
+}
 public interface ISpriteMapChunk
 {
     public event Action<int> OnRealInstanceCountChanged;
     public event Action<int> OnRenderingInstanceCountChanged;
+    public string GetName();
+
     public int GetRealInstanceCount();
     public int GetRenderingInstanceCount();
-    public string GetName();
     public void SetRenderEnabled(bool enabled);
+    public bool GetRenderEnable();
 }
 public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new() 
 {
@@ -49,18 +61,18 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
     private Queue<ChunkRenderGPU> chunkPoolRender = new Queue<ChunkRenderGPU>();
 
     private int idMaterialLastUsed = 0;
-    private int realInstanceCount = 0;
-    private int renderingInstanceCount = 0;
-
     private Dictionary<Vector2, ChunkRenderGPU> loadedChunksRender = new();
-
-    private bool renderEnabled = true;
-
-    private bool serializableUnload;
     private string name;
-
-    public SpriteMapChunk(string name,int layer, ChunkManagerBase ChunkManager, bool SerializableUnload = false, bool render = true)
+    private int realInstanceCount = 0;
+    private bool renderEnabled = true;
+    private int renderingInstanceCount = 0;
+    private bool serializableUnload;
+    private string carpetSave;
+    private FormatSave formatSave;
+    public SpriteMapChunk(string name, string carpetSave,int layer, ChunkManagerBase ChunkManager, bool SerializableUnload = false, bool render = true, FormatSave formatSave = FormatSave.BINARIO)
     {
+        this.formatSave = formatSave;
+        this.carpetSave = carpetSave + "/" + name;
         this.name = name;
         serializableUnload = SerializableUnload;
         this.chunkManager = ChunkManager;
@@ -76,37 +88,112 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
     }
 
-    private void ChunkManager_OnChunkProcessingCompleted()
-    {
-        RecalculateRenderingInstanceCounts();
-         OnRenderingInstanceCountChanged?.Invoke(renderingInstanceCount);
-    }
-
-    string ISpriteMapChunk.GetName()
-    {
-        return name;
-    }
-    int ISpriteMapChunk.GetRealInstanceCount()
-    {
-        return realInstanceCount;
-    }
-
-    int ISpriteMapChunk.GetRenderingInstanceCount()
-    {
-        return renderingInstanceCount;
-    }
     public event Action<Vector2, ChunkData<TData>> OnChunSerialize;
 
     public event Action<int> OnRealInstanceCountChanged;
+
     public event Action<int> OnRenderingInstanceCountChanged;
 
     public Vector2I ChunkSize { get; private set; }
-    public int IdMaterialLastUsed { get => idMaterialLastUsed; set => idMaterialLastUsed = value; }
-    public int layer { get; set; }
-    public int maxPool { get; set; }
-    public Vector2I tileSize { get; set; }
-    
 
+    public int IdMaterialLastUsed { get => idMaterialLastUsed; set => idMaterialLastUsed = value; }
+
+    public int layer { get; set; }
+
+    public int maxPool { get; set; }
+
+    public Vector2I tileSize { get; set; }
+    public string CarpetSave { get => carpetSave; set => carpetSave = value; }
+    public bool GetRenderEnable()
+    {
+        return renderEnabled;
+    }
+    public void LoadAll()
+    {
+        List<string> listFiles = FileHelper.GetAllFiles(carpetSave);
+        foreach (var item in listFiles)
+        {
+            string fullPath = item;
+            Serializer.Data.ChunkDataSerializable<TData> data = SerializerManager.LoadFromFileBin<Serializer.Data.ChunkDataSerializable<TData>>(fullPath);
+            CreateChunkData(data);
+        }
+    }
+
+    public void ClearAllFiles()
+    {
+        List<string> listFiles = FileHelper.GetAllFiles(carpetSave);
+        foreach (var item in listFiles)
+        {
+            string fullPath = item;            
+            FileHelper.DeleteFile(fullPath);
+        }
+    }
+    public void SaveAll()
+    {
+        foreach (var item in dataChunks)
+        {
+            var chunkData = item.Value;
+            SaveChunk(chunkData);
+        }
+    }
+    public void SaveChunk(ChunkData<TData> chunkData)
+    {
+        if (chunkData.changue) // solo se guarda si hubo algun cambio
+        {
+            string name = chunkData.positionChunk.X + "_" + chunkData.positionChunk.Y;
+            var dataSer = chunkData.ToSerializable();
+            switch (formatSave)
+            {
+                case FormatSave.BINARIO:
+                    SerializerManager.SaveToFileBin(dataSer, carpetSave, name);
+                    break;
+                case FormatSave.JSON:
+                    SerializerManager.SaveToFileJson(dataSer, carpetSave, name);
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        
+    }
+    public ChunkData<TData> FromSerializable(ChunkDataSerializable<TData> serializable)
+    {
+        var chunk = new ChunkData<TData>(
+            serializable.PositionChunk,  // Se convierte implícitamente a Vector2
+            serializable.Size            // Se convierte implícitamente a Vector2I
+        );
+
+        foreach (var tile in serializable.Tiles)
+        {
+            var pos = tile.Position; // ProtoVector2I -> Vector2I (implícito)
+            chunk.tiles[pos.X, pos.Y] = tile.Value;
+        }
+
+        return chunk;
+    }
+    public void CreateChunkData(ChunkDataSerializable<TData> serializable)
+    {
+
+        ChunkData<TData> data = FromSerializable(serializable);
+        if (!dataChunks.ContainsKey(data.positionChunk))
+        {
+            dataChunks.Add(data.positionChunk, data);
+
+            foreach (var item in data.tiles)
+            {
+                if (item != null && item.idData!=0)
+                {
+                    item.SetDataGame();
+                }
+            }
+        }
+        else
+        {
+            dataChunks[data.positionChunk] = data;
+        }
+
+    }
     public void AddUpdatedTile(Vector2I tilePositionGlobal, int idData)
     {
         if (idData == 0) // caso vacio delete
@@ -128,10 +215,10 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
             dataChunks.Add(chunkPosition, tilemapDataChunk);
             CreateTile(dataChunks[chunkPosition], tilePositionChunk, tilePositionGlobal, idData);
 
-         
+
         }
-    
-      
+
+
     }
 
     public void AddUpdatedTileRule(Vector2I tilePositionGlobal, RuleData[] ruleDataArray)
@@ -187,7 +274,8 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     {
                         if (tile.GetSpriteData().haveCollider)
                         {
-                            CollisionManager.Instance.spriteColliders.RemoveItem(tile.positionCollider, tile);
+                            tile.ClearDataGame();
+                            //CollisionManager.Instance.spriteColliders.RemoveItem(tile.positionCollider, tile);
                         }
                     }
                 }
@@ -217,6 +305,11 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         }
     }
 
+    string ISpriteMapChunk.GetName()
+    {
+        return name;
+    }
+
     public List<TData> GetOccupiedTiles()
     {
         var occupiedTiles = new List<TData>();
@@ -241,6 +334,16 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         return occupiedTiles;
     }
 
+    int ISpriteMapChunk.GetRealInstanceCount()
+    {
+        return realInstanceCount;
+    }
+
+    int ISpriteMapChunk.GetRenderingInstanceCount()
+    {
+        return renderingInstanceCount;
+    }
+
     public TData GetTileGlobalPosition(Vector2I tilePositionGlobal)
     {
         var chunkPosition = PositionsManager.Instance.ChunkPosition(tilePositionGlobal, ChunkSize);
@@ -259,13 +362,57 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         {
             return dataChunks[chunkPosition];
         }
-        
+
         return null;
     }
+
     public void LoadMaterials(List<int> materialsUsed)
     {
-  
+
     }
+
+    public void RecalculateRealInstanceCount()
+    {
+        int total = 0;
+        foreach (var chunk in dataChunks.Values)
+        {
+            for (int x = 0; x < chunk.size.X; x++)
+            {
+                for (int y = 0; y < chunk.size.Y; y++)
+                {
+                    var tile = chunk.tiles[x, y];
+                    if (tile != null && tile.idData != 0)
+                    {
+                        total++;
+                    }
+                }
+            }
+        }
+        realInstanceCount = total;
+    }
+
+    public void RecalculateRenderingInstanceCounts()
+    {
+        renderingInstanceCount = 0;
+
+        foreach (var chunkRender in loadedChunksRender.Values)
+        {
+            for (int x = 0; x < chunkRender.size.X; x++)
+            {
+                for (int y = 0; y < chunkRender.size.Y; y++)
+                {
+                    var renderTile = chunkRender.tiles[x, y];
+                    if (renderTile != null && renderTile.instance != -1)
+                    {
+                        renderingInstanceCount++;
+                    }
+                }
+            }
+        }
+
+
+    }
+
     public void Remove(Vector2I tilePositionGlobal, RuleData[] autoTileData = null)
     {
         var chunkPosition = chunkManager.ChunkPosition(tilePositionGlobal);
@@ -292,8 +439,11 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                         {
                             UpdateNeighbors(tilePositionGlobal, autoTileData);
                         }
+                        data.ClearDataGame();
+                        //CollisionManager.Instance.spriteColliders.RemoveItem(data.positionCollider, data);
                         realInstanceCount--;
                         OnRealInstanceCountChanged?.Invoke(realInstanceCount);
+
                     }
                 }
 
@@ -332,7 +482,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     cantChunk++;
                 }
             }
-            GD.Print(name+" ChunkRenderizados:" + cantChunk);
+            GD.Print(name + " ChunkRenderizados:" + cantChunk);
             // Paso 2: eliminar los que ya no son visibles
             var toRemove = loadedChunksRender.Keys.Where(pos => !visibleSet.Contains(pos)).ToList();
             foreach (var chunkPos in toRemove)
@@ -342,7 +492,6 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
             }
         }
     }
-
 
     internal void Refresh(Vector2I tilePositionGlobal)
     {
@@ -402,6 +551,11 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
     }
 
+    private void ChunkManager_OnChunkProcessingCompleted()
+    {
+        RecalculateRenderingInstanceCounts();
+         OnRenderingInstanceCountChanged?.Invoke(renderingInstanceCount);
+    }
     private void CreateTile(ChunkData<TData> tileMapChunkData, Vector2I tilePositionChunk, Vector2I tilePositionGlobal, int idData)
     {
         if (idData == 0)
@@ -413,13 +567,17 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         if (!tileMapChunkData.ExistTile(tilePositionChunk))
         {
             dataGame = new TData();
-            dataGame.idUnique = TileNumeratorManager.Instance.getNumerator();
+            //dataGame.idUnique = TileNumeratorManager.Instance.getNumerator();
             realInstanceCount++; // nuevo tile real
             OnRealInstanceCountChanged?.Invoke(realInstanceCount);
         }
         else
         {
             dataGame = tileMapChunkData.GetTileAt(tilePositionChunk);
+            if (dataGame.idData == idData)
+            {
+                return;
+            }
         }
         dataGame.idData = idData;
 
@@ -441,23 +599,25 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         //dataGame.Scale = spriteData.scale;        
         dataGame.positionTileChunk = tilePositionChunk;
         dataGame.positionTileWorld = tilePositionGlobal;
-
+        dataGame.positionCollider = positionReal;
 
         tileMapChunkData.CreateUpdateTile(tilePositionChunk, dataGame);
 
 
-        if (spriteData.haveCollider)
-        {
+        //if (spriteData.haveCollider)
+        //{
 
-            posicionCollider = positionNormalize + new Vector2(x, y) + spriteData.collisionBody.Multiplicity(spriteData.scale).OriginCurrent;//+ new Vector2(x, y);
-            dataGame.positionCollider = posicionCollider;
-            CollisionManager.Instance.spriteColliders.AddUpdateItem(posicionCollider, dataGame);
-        }
-        else
-        {
-            dataGame.positionCollider = posicionCollider;
-            CollisionManager.Instance.spriteColliders.RemoveItem(posicionCollider, dataGame);
-        }
+        //    posicionCollider = positionNormalize + new Vector2(x, y) + spriteData.collisionBody.Multiplicity(spriteData.scale).OriginCurrent;//+ new Vector2(x, y);
+        //    dataGame.positionCollider = posicionCollider;
+            
+        //    CollisionManager.Instance.spriteColliders.AddUpdateItem(positionReal,);            
+            
+        //}
+        //else
+        //{
+        //    dataGame.positionCollider = posicionCollider;
+        //    CollisionManager.Instance.spriteColliders.RemoveItem(posicionCollider, dataGame);
+        //}
         dataGame.SetDataGame();
         Refresh(tilePositionGlobal);
     }
@@ -581,7 +741,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
             loadedChunksRender.Remove(chunkPos);
             if (serializableUnload && dataChunks[chunkPos].changue)
             {
-                OnChunSerialize?.Invoke(chunkPos, dataChunks[chunkPos]);// SaveOnDisk(chunkPos);
+                SaveChunk(dataChunks[chunkPos]);
             }
 
         }
@@ -616,45 +776,6 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
             }
         }
     }
-    public void RecalculateRealInstanceCount()
-    {
-        int total = 0;
-        foreach (var chunk in dataChunks.Values)
-        {
-            for (int x = 0; x < chunk.size.X; x++)
-            {
-                for (int y = 0; y < chunk.size.Y; y++)
-                {
-                    var tile = chunk.tiles[x, y];
-                    if (tile != null && tile.idData != 0)
-                    {
-                        total++;
-                    }
-                }
-            }
-        }
-        realInstanceCount = total;
-    }
-    public void RecalculateRenderingInstanceCounts()
-    {
-        renderingInstanceCount = 0;
 
-        foreach (var chunkRender in loadedChunksRender.Values)
-        {
-            for (int x = 0; x < chunkRender.size.X; x++)
-            {
-                for (int y = 0; y < chunkRender.size.Y; y++)
-                {
-                    var renderTile = chunkRender.tiles[x, y];
-                    if (renderTile != null && renderTile.instance != -1)
-                    {
-                        renderingInstanceCount++;
-                    }
-                }
-            }
-        }
-
-       
-    }
-
+    
 }

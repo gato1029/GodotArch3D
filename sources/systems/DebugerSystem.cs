@@ -374,7 +374,9 @@ internal class DebugerSystem : BaseSystem<World, float>
         if (debug)
         {
             DebugActive = !DebugActive;
-            DebugTiles();
+          //  DebugTiles();
+        //    DebugTerrain();
+            DebugResourceSource();
         }
 
         if (DebugActive)
@@ -385,9 +387,61 @@ internal class DebugerSystem : BaseSystem<World, float>
 
             World.InlineParallelChunkQuery(in queryColliderCharacter, new ChunkJobDebugColliderCharacter(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryDirection, new ChunkJobDebugDirectionComponent(commandBuffer, t));
-            CollisionManager.Instance.tileColliders.DrawGrid(Colors.Bisque);
+            CollisionManager.Instance.terrainColliders.DrawGrid(Colors.Bisque);
         }
 
+    }
+    private void DebugResourceSource()
+    {
+        foreach (var item in CollisionManager.Instance.ResourceSourceColliders.CellMap)
+        {
+            foreach (var itemCollider in item.Value)
+            {
+                for (int i = 0; i < itemCollider.Shapes.Count; i++)
+                {
+                    GeometricShape2D itemShape = itemCollider.Shapes[i];
+                    Vector2 position = itemCollider.Positions[i];
+                    switch (itemShape)
+                    {
+                        case Rectangle rect:
+                            Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                            transform3DShape = transform3DShape.Scaled(new Vector3(rect.Width , rect.Height , 1));
+                            transform3DShape.Origin = new Vector3(position.X, position.Y, 30);
+
+                            DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 10);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    }
+    private void DebugTerrain()
+    {
+        foreach (var item in CollisionManager.Instance.terrainColliders.CellMap)
+        {
+            foreach (var itemCollider in item.Value)
+            {
+                for (int i = 0; i < itemCollider.Shapes.Count; i++)
+                {
+                    GeometricShape2D itemShape = itemCollider.Shapes[i];
+                    Vector2 position = itemCollider.Positions[i];
+                    switch (itemShape)
+                    {
+                        case Rectangle rect:
+                            Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                            transform3DShape = transform3DShape.Scaled(new Vector3(rect.Width * rect.scale, rect.Height * rect.scale, 1));
+                            transform3DShape.Origin = new Vector3(position.X, position.Y, 30);
+
+                            DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed,10);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     private void DebugTiles()

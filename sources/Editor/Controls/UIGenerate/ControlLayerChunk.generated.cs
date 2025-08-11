@@ -8,6 +8,7 @@ public partial class ControlLayerChunk : PanelContainer
     public event EventNotifyChangued OnNotifyChangued;
 
     private HBoxContainer VBoxContainer;
+    private Label LabelName;
     private CheckBox CheckBoxEnable;
     private VBoxContainer HBoxContainer2;
     private Label LabelRendering;
@@ -16,6 +17,7 @@ public partial class ControlLayerChunk : PanelContainer
     public void InitializeUI()
     {
         VBoxContainer = GetNode<HBoxContainer>("VBoxContainer");
+        LabelName = GetNode<Label>("VBoxContainer/HBoxContainer/LabelName");
         CheckBoxEnable = GetNode<CheckBox>("VBoxContainer/HBoxContainer/CheckBoxEnable");
         CheckBoxEnable.Pressed += CheckBoxEnable_PressedUI;
         CheckBoxEnable_PressedUI();

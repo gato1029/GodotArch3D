@@ -11,6 +11,7 @@ using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.SpriteMapChunk;
 using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,11 +39,14 @@ internal class CollisionManager : SingletonBase<CollisionManager>
     public  SpatialHashMap<Entity> dynamicCollidersEntities;
     public  SpatialHashMap<Entity> MoveCollidersEntities;
     public SpatialHashMap<IDataTile> tileColliders;
-    public SpatialHashMap<DataItem> spriteColliders;
+    public SpatialHashMap<TerrainDataGame> spriteColliders;
 
     public QuadTree<ColliderSprite> quadTreeColliders;
 
     public SpatialHashMap<Entity> characterCollidersEntities;
+
+    public SpatialHashMapColliders<TerrainDataGame> terrainColliders;
+    public SpatialHashMapColliders<ResourceSourceDataGame> ResourceSourceColliders;
     protected override void Initialize()
     {
         characterCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
@@ -50,7 +54,9 @@ internal class CollisionManager : SingletonBase<CollisionManager>
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
         tileColliders = new SpatialHashMap<IDataTile>(8, delegate (IDataTile er) { return er.IdCollider; });
-        spriteColliders = new SpatialHashMap<DataItem>(8, delegate (DataItem er) { return er.idUnique; });
+        spriteColliders = new SpatialHashMap<TerrainDataGame>(8, delegate (TerrainDataGame er) { return er.idUnique; });
+        terrainColliders = new SpatialHashMapColliders<TerrainDataGame>(8);
+        ResourceSourceColliders = new SpatialHashMapColliders<ResourceSourceDataGame>(8);
     }
 
     protected override void Destroy()
@@ -65,7 +71,7 @@ internal class CollisionManager : SingletonBase<CollisionManager>
     {
         
 
-        Rect2 aabb = new Rect2(movementNext, collisionMove.GetSizeQuad() * 2);
+        Rect2 aabb = new Rect2(movementNext - (collisionMove.GetSizeQuad()/2), collisionMove.GetSizeQuad());
 
         // 1. Chequeo contra entidades
         var entities = CollisionManager.Instance.characterCollidersEntities.QueryAABB(aabb);
@@ -93,51 +99,58 @@ internal class CollisionManager : SingletonBase<CollisionManager>
         }
 
         // 2. Chequeo contra tiles
-        var tileData = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
-        if (tileData != null)
-        {
-            foreach (var item in tileData.Values)
-            {
-                foreach (var itemInternal in item)
-                {
-                    var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);
-                    var colliderB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);
-                    var positionB = itemInternal.Value.PositionCollider;
+        //var tileData = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+        //if (tileData != null)
+        //{
+        //    foreach (var item in tileData.Values)
+        //    {
+        //        foreach (var itemInternal in item)
+        //        {
+        //            var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);
+        //            var colliderB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);
+        //            var positionB = itemInternal.Value.PositionCollider;
 
-                    if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
+        //            if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //}
 
         // 3. Chequeo contra sprites
-        var spriteData = CollisionManager.Instance.spriteColliders.QueryAABB(aabb);
-        if (spriteData != null)
+        //Dictionary<TerrainDataGame, List<(GeometricShape2D shape, Vector2 position)>> terrainData = CollisionManager.Instance.spriteColliders.QueryAABBWithShapes(aabb);
+   
+        //if (terrainData != null)
+        //{
+        //    foreach (var item in terrainData)
+        //    {
+        //        var spriteBase = item.Key;
+        //        foreach (var itemGeometric in item.Value)
+        //        {
+
+        //            var colliderB = itemGeometric.shape.Multiplicity(spriteBase.GetSpriteData().scale);
+        //            var positionB = itemGeometric.position;
+
+        //            if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //}
+                
+        if (Instance.terrainColliders.IntersectsAABB(aabb))
         {
-            foreach (var item in spriteData.Values)
-            {
-                foreach (var itemInternal in item)
-                {
-                    var spriteInfo = itemInternal.Value.GetSpriteData();
-                    if (spriteInfo==null)
-                    {
-                        return false;
-                    }
-                    var colliderB = spriteInfo.collisionBody.Multiplicity(spriteInfo.scale);
-                    var positionB = itemInternal.Value.positionCollider;
-
-                    if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
-                    {
-                        return true;
-                    }
-                }
-            }
+            return true;
         }
-
+        if (Instance.ResourceSourceColliders.IntersectsAABB(aabb))
+        {
+            return true;
+        }
         return false;
     }
+
 
 
 }

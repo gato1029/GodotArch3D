@@ -29,8 +29,7 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         if (objectControl.SelectedBuildings.Count>0)
         {
             objectData.buildingPosition = objectControl.GetBuildingPosition();
-        }
-        
+        }        
     }
 
     private void ControlSpriteBasico_OnNotifyChangued(ControlSprite objectControl)
@@ -49,7 +48,7 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         SpinBoxRangeAttack.Value = objectData.attackRange;
         SpinBoxChargueAttack.Value = objectData.attackCooldown;
         SpinBoxTimeBuild.Value = objectData.timeToBuild;
-        ControlSpriteMiniatura.SetData(objectData.miniatura);
+       // ControlSpriteMiniatura.SetData(objectData.miniatura);
         ControlSpriteBasico.SetData(objectData.spriteData);
         ContainerAnimationBasico.SetData(objectData.animationData.ToArray());
         ControlBuildingGridBasic.SetTexture(ControlSpriteBasico.GetSprite().Texture);
@@ -64,14 +63,14 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         objectData.attackRange = (int)SpinBoxRangeAttack.Value;
         objectData.attackCooldown = (int)SpinBoxChargueAttack.Value;
         objectData.timeToBuild = (int)SpinBoxTimeBuild.Value;
-        objectData.miniatura = ControlSpriteMiniatura.ObjectData;
+      //  objectData.miniatura = ControlSpriteMiniatura.ObjectData;
         objectData.spriteData = ControlSpriteBasico.ObjectData;
         objectData.animationData = ContainerAnimationBasico.GetData().ToList();
 
-        if (objectData.miniatura.idMaterial == 0)
-        {
-            objectData.miniatura = null;
-        }
+        //if (objectData.miniatura.idMaterial == 0)
+        //{
+        //    objectData.miniatura = null;
+        //}
         if (objectData.spriteData.idMaterial == 0)
         {
             objectData.spriteData = null;
@@ -103,6 +102,7 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
             default:
                 break;
         }
+
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

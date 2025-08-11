@@ -10,8 +10,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
+public enum ResourceType
+{
+    Recurso,   // Ej: oro, comida, energía
+    Material    // Ej: lingote, tablón, ladrillo
+}
 public class ResourceData:IdData
-{    
+{        
+    public ResourceType resourceType {  get; set; } 
     public string description { get; set; }
     public int amount { get; set; }
     public bool isAnimated { get; set; }

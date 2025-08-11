@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3 uid="uid://dxj8xoytaxr5"]
+
+[ext_resource type="Script" uid="uid://bak0n0v8acin0" path="res://addons/UIGenCS/UI/UiInterfaceGenerator.cs" id="1_74ap8"]
+[ext_resource type="Texture2D" uid="uid://cgdx2y3hlgrfe" path="res://addons/UIGenCS/UI/code24.png" id="2_6j8dc"]
+[ext_resource type="Texture2D" uid="uid://lt4hgm4ti2ry" path="res://addons/UIGenCS/UI/c-sharp.png" id="3_yfbwy"]
+
+[node name="UiInterfaceGenerator" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 0
+script = ExtResource("1_74ap8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+offset_right = 116.0
+offset_bottom = 32.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MenuButtonOptions" type="MenuButton" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "Config Options"
+icon = ExtResource("2_6j8dc")
+
+[node name="ButtonGenerate" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+tooltip_text = "Generate Automatic Interface c#"
+text = "Private
+"
+icon = ExtResource("3_yfbwy")
+flat = true

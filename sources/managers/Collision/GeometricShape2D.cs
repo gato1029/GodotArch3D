@@ -12,7 +12,8 @@ namespace GodotEcsArch.sources.managers.Collision
     {
         public float originPixelX { get; set; }
         public float originPixelY { get; set; }
-
+        public float scale { get; set; }
+       // public float rotation { get; set; }
         public float widthPixel { get; set; }
         public float heightPixel { get; set; }
 
@@ -20,7 +21,10 @@ namespace GodotEcsArch.sources.managers.Collision
         public Vector2 OriginRelative { get;  set; }
         [BsonIgnore]
         public Vector2 OriginCurrent { get;  set; }
+        
         public abstract Vector2 GetSizeQuad();
         public abstract GeometricShape2D Multiplicity(float value);
+        public abstract GeometricShape2D MultiplicityInternal(float value);
+        public abstract Vector2[] GetVertices(Vector2 position);
     }
 }

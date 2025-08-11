@@ -10,7 +10,22 @@ using static Godot.HttpRequest;
 
     internal class FileHelper
     {
-        public static List<string> GetAllFiles(string folderPath)
+    public static void DeleteFile(string filePath)
+    {
+        // Soporta rutas absolutas y rutas internas del proyecto (res:// o user://)
+        string resolvedPath = ProjectSettings.GlobalizePath(filePath);
+
+        if (File.Exists(resolvedPath))
+        {
+            File.Delete(resolvedPath);
+           
+        }
+        else
+        {
+            GD.PrintErr($"El archivo no existe: {resolvedPath}");
+        }
+    }
+    public static List<string> GetAllFiles(string folderPath)
         {
             string path = ProjectSettings.GlobalizePath(folderPath);
             List<string> fileList = new List<string>();

@@ -12,9 +12,13 @@ script = ExtResource("1_pwd6u")
 [node name="VBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
-custom_minimum_size = Vector2(150, 0)
+[node name="HBoxContainer" type="VBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
+
+[node name="LabelName" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Nombre:"
 
 [node name="CheckBoxEnable" type="CheckBox" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2

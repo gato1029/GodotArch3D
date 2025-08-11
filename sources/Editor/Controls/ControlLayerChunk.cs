@@ -17,8 +17,8 @@ public partial class ControlLayerChunk : PanelContainer
         this.spriteMapChunk.OnRenderingInstanceCountChanged += SpriteMapChunk_OnRenderingInstanceCountChanged;
         this.spriteMapChunk.OnRealInstanceCountChanged += SpriteMapChunk_OnRealInstanceCountChanged;
 
-        CheckBoxEnable.Text = spriteMapChunk.GetName();
-       // CheckBoxEnable.ButtonPressed = true;
+        LabelName.Text = spriteMapChunk.GetName();
+        CheckBoxEnable.ButtonPressed = spriteMapChunk.GetRenderEnable();
         CheckBoxEnable.Pressed += CheckBoxEnable_Pressed;
 	}
 

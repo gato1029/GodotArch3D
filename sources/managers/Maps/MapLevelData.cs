@@ -3,6 +3,7 @@ using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.managers.serializer;
 using GodotEcsArch.sources.managers.Serializer.Data;
+using GodotEcsArch.sources.managers.SpriteMapChunk;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
@@ -17,6 +18,11 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.managers.Maps;
 
+public enum MapInfoType
+{
+    Terreno,
+    FuenteRecursos
+}
 public enum MapType
 {
     Mapa = 0,
@@ -45,6 +51,12 @@ public class MapDataMarker
     [ProtoIgnore, JsonIgnore]
     public Vector2 positionOut { get; set; }
 }
+
+public class MapInfo
+{
+    public MapInfoType mapInfoType  { get; set; }
+    public string InternalPath { get; set; }
+}
 [ProtoContract]
 public class MapLevelData
 {
@@ -53,7 +65,7 @@ public class MapLevelData
     {
         get => size;
         set => size = value;
-    }
+    }    
     [ProtoMember(2)]
     public string name { get; set; }
     [ProtoMember(3)]
@@ -70,6 +82,9 @@ public class MapLevelData
 
     [ProtoMember(8)]
     public List<MapDataMarker> mapDataMarkers { get; set; }
+
+    [ProtoMember(9)]
+    public List<MapInfo> mapInfoDetail { get; set; }
         
     [ProtoIgnore, JsonIgnore]
     public Vector2I size { get; set; }
@@ -78,6 +93,10 @@ public class MapLevelData
     
     [ProtoIgnore, JsonIgnore]
     public TerrainMap terrainMap { get; set; }
+
+    [ProtoIgnore, JsonIgnore]
+    public ResourceSourceMap resourceSourceMap { get; set; }
+
     [ProtoIgnore, JsonIgnore]
     public MapResources mapResources { get; set; }
     // buildsMap buildsMap;
@@ -90,20 +109,27 @@ public class MapLevelData
         this.maptype = mapType;        
         this.layer = layer;
         this.description = description;
+        mapInfoDetail = new List<MapInfo>();
         string path = CommonAtributes.pathMaps+"/"+name;
         string pathCarpet = FileHelper.GetPathGameDB(path);
         pathCurrentCarpet = pathCarpet;
-        SerializerManager.SaveToFileJson(this, pathCurrentCarpet, "Data");
-
+        
         terrainMap = new TerrainMap(pathCurrentCarpet + "/InternalData", layer);
-        //mapResources = new MapResources(pathCurrentCarpet+"/InternalData", layer + 1);
-      //  SaveAll();
+        resourceSourceMap = new ResourceSourceMap(pathCurrentCarpet + "/InternalData", layer);
+        //----
+        mapInfoDetail.Add(new MapInfo { mapInfoType = MapInfoType.Terreno, InternalPath = terrainMap.pathCurrentCarpet});
+        mapInfoDetail.Add(new MapInfo { mapInfoType = MapInfoType.FuenteRecursos, InternalPath = resourceSourceMap.pathCurrentCarpet });
+        //mapResources = new MapResources(pathCurrentCarpet+"/InternalData", layer + 1);      
+
+
     }
     public void SaveAll()
     {
         SerializerManager.SaveToFileJson(this, pathCurrentCarpet, "Data");
+        
         terrainMap.SaveAllMap();
-        mapResources.SaveAllMap();
+        resourceSourceMap.SaveAllMap();
+       // mapResources.SaveAllMap();
     }
     public void AddMap(Vector2 positionIn, string pathNewMap)
     {
@@ -111,8 +137,18 @@ public class MapLevelData
         mapDataMarker.positionIn = positionIn;
         mapDataMarker.path = pathNewMap;
     }
-    public void LoadMaps()
+    public static MapLevelData LoadMap(string pathData)
     {
-        
+        MapLevelData loadMap  = SerializerManager.LoadFromFileJson<MapLevelData>(pathData);
+        loadMap.terrainMap.LoadMapData();
+        loadMap.resourceSourceMap.LoadMapData();
+
+        return loadMap;
+    }
+
+    public void ClearAll()
+    {
+        terrainMap.ClearMap();
+        resourceSourceMap.ClearMap();
     }
 }

@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.Serializer.Data;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
@@ -12,16 +13,18 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.managers.Tilemap;
 
-
+[ProtoContract]
+[ProtoInclude(100, typeof(TerrainDataGame))] // <--- IMPORTANTE
 public class DataItem
 {
-    public int idUnique { get; set; }
+    [ProtoIgnore, JsonIgnore] public int idUnique { get; set; }
     [ProtoMember(1)] public int idData { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector3 positionWorld { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector2 positionCollider { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector2I positionTileWorld { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector2I positionTileChunk { get; set; }
     public virtual void SetDataGame() { }
+    public virtual void ClearDataGame() { }
     public virtual SpriteData GetSpriteData() { return null; }
     public virtual bool IsAnimation() { return false; }
     public virtual AnimationStateData GetAnimationStateData() { return null; }
@@ -113,7 +116,15 @@ public class ChunkData<T>
 
         return default; // Fuera de los límites
     }
+    public T GetTileAt(int x, int y)
+    {
+        if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
+        {
+            return tiles[x, y];
+        }
 
+        return default; // Fuera de los límites
+    }
     public ChunkDataSerializable<T> ToSerializable()
     {
         var serializable = new ChunkDataSerializable<T>

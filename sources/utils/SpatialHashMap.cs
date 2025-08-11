@@ -3,6 +3,7 @@ using Arch.LowLevel;
 using Arch.LowLevel.Jagged;
 
 using Godot;
+using GodotEcsArch.sources.managers.Collision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ internal class SpatialHashMap<TItem>
     public readonly Dictionary<int, Dictionary<int, TItem>> cellMap;
     private readonly Dictionary<int, int> mapItems;
     private readonly Dictionary<Vector2, Transform3D> gridPositions; // draw grid
+    private readonly Dictionary<int, List<(GeometricShape2D shape, Vector2 position)>> shapesByItem;
 
     private readonly Func<TItem, int> getPositionItem;
 
@@ -96,6 +98,32 @@ internal class SpatialHashMap<TItem>
         xform.Origin = new Vector3(plot.X, plot.Y, 1);
         DebugDraw.Quad(xform, cellSize, Colors.Purple, 200); //debug
     }
+
+    public void AddShapeToItemAtPosition(TItem item, GeometricShape2D shape, Vector2 shapePosition)
+    {
+        int itemId = getPositionItem(item);
+        int cellIndex = GetCellIndex(shapePosition);
+
+        if (!cellMap.ContainsKey(cellIndex))
+        {
+            addGridPosition(shapePosition);
+            cellMap[cellIndex] = new Dictionary<int, TItem>();
+        }
+
+        cellMap[cellIndex][itemId] = item;
+
+        if (!shapesByItem.ContainsKey(itemId))
+            shapesByItem[itemId] = new();
+
+        shapesByItem[itemId].Add((shape, shapePosition));
+
+        if (!mapItems.ContainsKey(itemId))
+        {
+            mapItems[itemId] = cellIndex;
+            count++;
+        }
+    }
+
     public void AddUpdateItem(Vector2 positionCell, in TItem item)
     {
         int itemId = getPositionItem(item);
@@ -145,17 +173,77 @@ internal class SpatialHashMap<TItem>
             count--;         
         }
     }
-    public void RemoveItem(TItem item)
-    {       
-        int itemId = getPositionItem(item);
-        int cellIndex = mapItems[itemId];
+    //public void RemoveItem(TItem item)
+    //{       
+    //    int itemId = getPositionItem(item);
+    //    int cellIndex = mapItems[itemId];
 
-        if (cellMap.ContainsKey(cellIndex))
+    //    if (cellMap.ContainsKey(cellIndex))
+    //    {
+    //        cellMap[cellIndex].Remove(itemId);
+    //        mapItems.Remove(itemId);
+    //        count--;
+    //    }
+    //}
+    public void RemoveItem(TItem item)
+    {
+        int itemId = getPositionItem(item);
+
+        if (shapesByItem.TryGetValue(itemId, out var shapeList))
         {
-            cellMap[cellIndex].Remove(itemId);
+            foreach (var (_, pos) in shapeList)
+            {
+                int shapeCellIndex = GetCellIndex(pos);
+                if (cellMap.ContainsKey(shapeCellIndex))
+                    cellMap[shapeCellIndex].Remove(itemId);
+            }
+
+            shapesByItem.Remove(itemId);
+        }
+
+        if (mapItems.TryGetValue(itemId, out int cellIndex))
+        {
+            if (cellMap.ContainsKey(cellIndex))
+                cellMap[cellIndex].Remove(itemId);
+
             mapItems.Remove(itemId);
             count--;
         }
+    }
+    public Dictionary<TItem, List<(GeometricShape2D shape, Vector2 position)>> QueryAABBWithShapes(Rect2 aabb)
+    {
+        var result = new Dictionary<TItem, List<(GeometricShape2D shape, Vector2 position)>>();
+
+        var quadrants = QueryAABB(aabb); // usa el método base que ya tienes
+
+        foreach (var cell in quadrants.Values)
+        {
+            foreach (var kvp in cell)
+            {
+                int itemId = kvp.Key;
+                TItem item = kvp.Value;
+
+                if (!shapesByItem.TryGetValue(itemId, out var shapeList))
+                    continue;
+
+                var shapesInside = shapeList
+                    .Where(entry => aabb.HasPoint(entry.position))
+                    .ToList();
+
+                if (shapesInside.Count > 0)
+                {
+                    if (!result.ContainsKey(item))
+                        result[item] = new List<(GeometricShape2D, Vector2)>();
+
+                    foreach (var (shape, position) in shapesInside)
+                    {
+                        result[item].Add((shape, position));
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public Dictionary<int, TItem> QueryPosition(Vector2 positionCell) 

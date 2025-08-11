@@ -29,11 +29,13 @@ namespace GodotEcsArch.sources.managers.Collision
             Direction = new Vector2(1, 0); 
             this.OriginRelative = originRelative;
             this.OriginCurrent = originRelative;
-        
+            this.scale = 1;
         }
         public override Rectangle Multiplicity(float value)
         {
-            return new Rectangle(Width * value, Height * value,OriginCurrent * value);
+            Rectangle nr = new Rectangle(Width * value, Height * value, OriginCurrent * value);
+            nr.scale = value;
+            return nr;
         }
         [BsonCtor]
         public Rectangle(float widthPixel, float heightPixel, float originPixelX, float originPixelY) : base()
@@ -112,6 +114,32 @@ namespace GodotEcsArch.sources.managers.Collision
         public override Godot.Vector2 GetSizeQuad()
         {
             return new Godot.Vector2(Width, Height);
+        }
+
+        public override Rectangle MultiplicityInternal(float value)
+        {
+            this.OriginalWidth = this.OriginalWidth * value;
+            this.OriginalHeight = this.OriginalHeight * value;
+            this.Width = this.OriginalWidth * value;
+            this.Height = this.OriginalHeight * value;
+            this.Direction = new Vector2(1, 0);
+            this.OriginRelative = OriginRelative * value;
+            this.OriginCurrent = OriginCurrent * value;
+            this.scale = value;
+            return this;
+        }
+
+        public override Godot.Vector2[] GetVertices(Godot.Vector2 position)
+        {
+            Godot.Vector2 size = GetSizeQuad();
+            Godot.Vector2 half = size / 2f;
+            return new Godot.Vector2[]
+            {
+                position + new Godot.Vector2(-half.X, -half.Y),
+                position + new Godot.Vector2( half.X, -half.Y),
+                position + new Godot.Vector2(-half.X,  half.Y),
+                position + new Godot.Vector2( half.X,  half.Y)
+            };
         }
     }
 }

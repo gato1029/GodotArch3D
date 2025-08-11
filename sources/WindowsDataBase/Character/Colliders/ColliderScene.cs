@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 public partial class ColliderScene : VBoxContainer
@@ -14,6 +15,7 @@ public partial class ColliderScene : VBoxContainer
     [Export] SpinBox spinBoxOffsetX;
     [Export] SpinBox spinBoxOffsetY;
     [Export] OptionButton optionButtonType;
+    [Export] SpinBox spinBoxRotation;
     public GeometricShape2D data { get; set; }
 
     ColliderType type = ColliderType.RECTANGLE;
@@ -21,34 +23,36 @@ public partial class ColliderScene : VBoxContainer
     public event RequestNotifyPreview OnNotifyPreview;
 
     // Called when the node enters the scene tree for the first time.
-
+    bool flag = false;
     public void SetData(GeometricShape2D Data)
     {
+        flag = false;
         this.data = Data;
+    //    spinBoxRotation.Value = data.rotation;
         switch (data)
         {
             case Rectangle rect1:
                 type = ColliderType.RECTANGLE;
-                spinBoxHeight.Visible = true;             
-                spinBoxHeight.Value = rect1.heightPixel;
-                spinBoxWidth.Value = rect1.widthPixel;
-                spinBoxOffsetX.Value = rect1.originPixelX;
-                spinBoxOffsetY.Value = rect1.originPixelY;
                 optionButtonType.Select(0);
+                spinBoxHeight.Visible = true;             
+                spinBoxHeight.Value = data.heightPixel;
+                spinBoxWidth.Value = data.widthPixel;
+                spinBoxOffsetX.Value = data.originPixelX;
+                spinBoxOffsetY.Value = data.originPixelY;
+                
                 break;
             case Circle circle1:
-                type = ColliderType.CIRCLE;                
-                spinBoxHeight.Visible = false;               
-                spinBoxWidth.Value = circle1.widthPixel;
-                spinBoxOffsetX.Value = circle1.originPixelX;
-                spinBoxOffsetY.Value = circle1.originPixelY;
+                type = ColliderType.CIRCLE;
                 optionButtonType.Select(1);
+                spinBoxHeight.Visible = false;               
+                spinBoxWidth.Value = data.widthPixel;
+                spinBoxOffsetX.Value = data.originPixelX;
+                spinBoxOffsetY.Value = data.originPixelY;                
                 break;
             default:
                 break;
         }
-        createCollider();
-        OnNotifyPreview?.Invoke(data);
+        flag = true;
     }
 
     public void SetOcluccionButton()
@@ -70,7 +74,14 @@ public partial class ColliderScene : VBoxContainer
         spinBoxHeight.ValueChanged += SpinBox_ValueChanged;
         spinBoxOffsetX.ValueChanged += SpinBox_ValueChanged;
         spinBoxOffsetY.ValueChanged += SpinBox_ValueChanged;
+        spinBoxRotation.ValueChanged += SpinBoxRotation_ValueChanged;
+        flag = true;
+    }
+
+    private void SpinBoxRotation_ValueChanged(double value)
+    {
         createCollider();
+        OnNotifyPreview?.Invoke(data);
     }
 
     private void OptionButtonType_ItemSelected(long index)
@@ -100,17 +111,22 @@ public partial class ColliderScene : VBoxContainer
 
     void createCollider()
     {
-        switch (type)
+        if (flag)
         {
-            case ColliderType.RECTANGLE:
-                data = new Rectangle((float)spinBoxWidth.Value, (float)spinBoxHeight.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
-                break;
-            case ColliderType.CIRCLE:
-                data = new Circle((float)spinBoxWidth.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
-                break;
-            default:
-                break;
+            switch (type)
+            {
+                case ColliderType.RECTANGLE:
+                    data = new Rectangle((float)spinBoxWidth.Value, (float)spinBoxHeight.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
+                    break;
+                case ColliderType.CIRCLE:
+                    data = new Circle((float)spinBoxWidth.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
+                    break;
+                default:
+                    break;
+            }
+            //data.rotation = (float)spinBoxRotation.Value;
         }
+     
     }
     private void ButtonPreview_Pressed()
     {

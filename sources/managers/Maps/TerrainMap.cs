@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static SpriteMultimesh;
 using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileData;
 
@@ -47,11 +48,40 @@ public enum TerrainMapLevelDesign
 [ProtoContract]
 public class TerrainDataGame:DataItem
 {
-
-
     public override void SetDataGame()
     {
-        
+        if (GetSpriteData().haveCollider)
+        {
+            if (idUnique!=0)
+            {
+                CollisionManager.Instance.terrainColliders.RemoveCollider(idUnique);
+                idUnique = 0;
+            }            
+            if (GetSpriteData().listCollisionBody != null)
+            {
+                foreach (var item in GetSpriteData().listCollisionBody)
+                {
+                    var posCollider = positionCollider + item.MultiplicityInternal(GetSpriteData().scale).OriginCurrent;
+                    idUnique = CollisionManager.Instance.terrainColliders.AddShapeToObject(this, item, posCollider);
+                }
+            }
+        }
+        else
+        {
+            if (idUnique != 0)
+            {
+                CollisionManager.Instance.terrainColliders.RemoveCollider(idUnique);
+                idUnique = 0;
+            }
+        }
+    }
+    public override void ClearDataGame()
+    {
+        if (idUnique != 0)
+        {
+            CollisionManager.Instance.terrainColliders.RemoveCollider(idUnique);
+            idUnique = 0;
+        }
     }
     public override SpriteData GetSpriteData()
     {
@@ -74,6 +104,12 @@ public class TerrainDataGame:DataItem
     }
 }
 
+
+[ProtoContract]
+public class TerrainMapInfo
+{
+    public int Seed {  get; set; }
+}
 [ProtoContract]
 public class TerrainMap
 {    
@@ -83,121 +119,77 @@ public class TerrainMap
 
     [ProtoIgnore, JsonIgnore]
     private SpriteMapChunk<TerrainDataGame> mapTerrainBasic; // representaciones Basicas no renderiza
-
-    // agua - fondo -shader N1
-    // piso y borde agua, caminos P1
-    // elevacion P2
-    // ornamentos P3
-    [ProtoIgnore, JsonIgnore]
-    private LayerChunksMaps<TerrainDataGame> mapLayerReal;
-
-
-    // estos se usaran solo para el diseño   
-
+    
     [ProtoIgnore, JsonIgnore]
     private LayerChunksMaps<TerrainDataGame> mapLayerDesign;
 
     [ProtoIgnore, JsonIgnore]
     private string carpet = "Terrain";
 
-    
-    [ProtoMember(1)]
+    [ProtoIgnore, JsonIgnore]
+    private string name = "TerrainData";
+
+  
     public string pathMapParent { get; set; }
-    [ProtoMember(2)]
+   
     public int layer { get; set; }    
-    [ProtoMember(3)]
+   
     public string pathCurrentCarpet { get; set; }
-    [ProtoMember(4)]
+
+    public int seed { get; set; }
+
     public List<int> materialsUsed { get; set; } // esto con el fin de no demorar en cargar cada material
     public SpriteMapChunk<TerrainDataGame> MapTerrainBasic { get => mapTerrainBasic; set => mapTerrainBasic = value; }
-    public LayerChunksMaps<TerrainDataGame> MapLayerDesign { get => mapLayerDesign; set => mapLayerDesign = value; }
-    public LayerChunksMaps<TerrainDataGame> MapLayerReal { get => mapLayerReal; set => mapLayerReal = value; }
-
-    public TerrainMap(string pathMapParent, int Layer, bool SerializeOnUnload=false)
+    public LayerChunksMaps<TerrainDataGame> MapLayerDesign { get => mapLayerDesign; set => mapLayerDesign = value; } 
+    public TerrainMap(string pathMapParent, int Layer)
     {
         materialsUsed =new List<int>();        
         layer = Layer;        
         chunkDimencion = PositionsManager.Instance.chunkDimencion;
-        
+        this.pathMapParent = pathMapParent;
+        this.pathCurrentCarpet = pathMapParent + "/" + carpet;
 
-        mapLayerDesign = new LayerChunksMaps<TerrainDataGame>();
+        mapLayerDesign = new LayerChunksMaps<TerrainDataGame>(pathCurrentCarpet);
 
         int layerDesign = layer;
-        mapTerrainBasic = new SpriteMapChunk<TerrainDataGame>("Basico", layerDesign - 2, ChunkManager.Instance.tiles16X16, SerializeOnUnload,false);
-        mapLayerDesign.AddLayer(TerrainType.Agua.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.Agua.ToString(), layerDesign - 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
-        mapLayerDesign.AddLayer(TerrainType.PisoBase.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.PisoBase.ToString(), layerDesign, ChunkManager.Instance.tiles16X16, SerializeOnUnload));        
-        mapLayerDesign.AddLayer(TerrainType.CaminoPiso.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.CaminoPiso.ToString(), layerDesign + 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));        
-        //mapLayerDesign.AddLayer(TerrainType.AguaBorde.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.AguaBorde.ToString(), layerDesign, ChunkManager.Instance.tiles16X16, SerializeOnUnload));        
-        mapLayerDesign.AddLayer(TerrainType.Elevacion.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.Elevacion.ToString(), layerDesign + 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
-        mapLayerDesign.AddLayer(TerrainType.Ornamentos.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainType.Ornamentos.ToString(), layerDesign + 2, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
+        mapTerrainBasic = new SpriteMapChunk<TerrainDataGame>("Basico",pathCurrentCarpet, 10, ChunkManager.Instance.tiles16X16, false,false);
+        mapLayerDesign.AddLayer(TerrainType.Agua.ToString(),14);
+        mapLayerDesign.AddLayer(TerrainType.PisoBase.ToString(), 15);        
+        mapLayerDesign.AddLayer(TerrainType.CaminoPiso.ToString(), 16);                
+        mapLayerDesign.AddLayer(TerrainType.Elevacion.ToString(),  19);
+        mapLayerDesign.AddLayer(TerrainType.Ornamentos.ToString(), 20);
 
         mapLayerDesign.AddAlias(TerrainType.CaminoPiso.ToString(), TerrainType.CaminoAgua.ToString());
         mapLayerDesign.AddAlias(TerrainType.PisoBase.ToString(), TerrainType.AguaBorde.ToString());
-        mapLayerDesign.AddAlias(TerrainType.Elevacion.ToString(), TerrainType.ElevacionBase.ToString());
-
-
-        mapLayerReal = new LayerChunksMaps<TerrainDataGame>();
-
-        mapLayerReal.AddLayer(TerrainMapReal.Agua.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Agua.ToString(), layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
-        mapLayerReal.AddLayer(TerrainMapReal.Suelo.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Suelo.ToString(), layer + 1, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
-        mapLayerReal.AddLayer(TerrainMapReal.Elevacion.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Elevacion.ToString(), layer + 2, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
-        mapLayerReal.AddLayer(TerrainMapReal.Ornamentos.ToString(), new SpriteMapChunk<TerrainDataGame>(TerrainMapReal.Ornamentos.ToString(), layer + 3, ChunkManager.Instance.tiles16X16, SerializeOnUnload));
-
-
-
-
-        
-      //  mapTerrainCompleteLevel0.OnChunSerialize += TilemapTerrain_OnChunSerialize;
-
-
-        this.pathMapParent = pathMapParent;
-        this.pathCurrentCarpet =  pathMapParent + "/" + carpet;
-        //AddEmptyId(1);
-    }
-    public static TerrainMap LoadMapfromFile(string Name)
-    {
-        string pathCarpet = FileHelper.GetPathGameDB(CommonAtributes.pathMaps);
-        string fullPath = pathCarpet + "/" + Name+".json";
-        
-        TerrainMap dataInfo = SerializerManager.LoadFromFileJson<TerrainMap>(fullPath);
-        TerrainMap newMap = new TerrainMap(Name, dataInfo.layer, false);                
-
-        //newMap.mapTerrainCompleteLevel0.LoadMaterials(dataInfo.materialsUsed);
-        newMap.LoadMapData();
-        return newMap;
-    }
-
-    private void TilemapTerrain_OnChunSerialize(Vector2 arg1, ChunkData<TerrainDataGame> arg2)
-    {
-        string name = arg1.X + "_" + arg1.Y;     
-        Serializer.Data.ChunkDataSerializable<TerrainDataGame> dataSer = arg2.ToSerializable();                
-        SerializerManager.SaveToFileBin(dataSer, pathCurrentCarpet, name);      
+        mapLayerDesign.AddAlias(TerrainType.Elevacion.ToString(), TerrainType.ElevacionBase.ToString());                
     }
 
     public void SaveAllMap()
     {
-   
-        //SerializerManager.SaveToFileJson(this, pathMapParent, "DataTerrain");
-
-        //foreach (var item in mapTerrainCompleteLevel0.dataChunks)
-        //{
-        //    if (item.Value.changue)
-        //    {
-        //        TilemapTerrain_OnChunSerialize(item.Key, item.Value);
-        //    }            
-        //}
+        SerializerManager.SaveToFileJson(new TerrainMapInfo { Seed = this.seed }, pathCurrentCarpet, name);
+        mapTerrainBasic.SaveAll();
+        mapLayerDesign.SaveAll();
     }
     public void LoadMapData()
     {
-       
-        //List<string> listFiles = FileHelper.GetAllFiles(pathCurrentCarpet);
-        //foreach (var item in listFiles)
-        //{
-        //    string fullPath = item;
-        //    Serializer.Data.ChunkDataSerializable<TerrainDataGame> data = SerializerManager.LoadFromFileBin<Serializer.Data.ChunkDataSerializable<TerrainDataGame>>(fullPath);
-        //    tilemapTerrain.CreateChunkData(data);
-        //}
-
+        var pathFull = pathCurrentCarpet +"/"+ name+".json";
+        var dataInfo = SerializerManager.LoadFromFileJson<TerrainMapInfo>(pathFull);
+        this.seed = dataInfo.Seed;
+        mapTerrainBasic.SetRenderEnabled(false);
+        mapLayerDesign.SetRenderEnableAllLayers(false);
+        mapTerrainBasic.LoadAll();
+        mapLayerDesign.LoadAll();        
+        mapLayerDesign.SetRenderEnableAllLayers(true);
+    }
+    public void ClearFilesChunks()
+    {
+        MapTerrainBasic.ClearAllFiles();
+        mapLayerDesign.ClearAllFiles();
+    }
+    public void ClearMap()
+    {        
+        mapTerrainBasic.ClearAllChunks();
+        mapLayerDesign.ClearAll();        
     }
     public void EnableLayer(bool enable, TerrainType terrainType)
     {

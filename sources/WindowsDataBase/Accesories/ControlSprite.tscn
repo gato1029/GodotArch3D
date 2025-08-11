@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://74vwtruudwpm" path="res://sources/WindowsDataBase/TileCreator/ControlSeleccionTexture.tscn" id="2_3psuu"]
 [ext_resource type="PackedScene" uid="uid://dmxdagu8ng5ss" path="res://sources/WindowsDataBase/Generic/ControlGrid.tscn" id="3_oic1v"]
 [ext_resource type="Texture2D" uid="uid://djjaf8wikv4mu" path="res://resources/cat.png" id="4_obu12"]
-[ext_resource type="PackedScene" uid="uid://eouyrgdv2i88" path="res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn" id="5_x7ut7"]
+[ext_resource type="PackedScene" uid="uid://7qitk1hya1sf" path="res://sources/WindowsDataBase/Character/Colliders/windowColliders.tscn" id="6_3psuu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tl00w"]
 size = Vector2(16, 16)
@@ -41,8 +41,9 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="TabContainerOptions" type="TabContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 2
 current_tab = 0
 
 [node name="PorSegmentos" type="TabBar" parent="MarginContainer/VBoxContainer/HSplitContainer/TabContainerOptions"]
@@ -164,79 +165,81 @@ anchors_preset = 0
 [node name="Sprite2DView" type="Sprite2D" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal"]
 texture = ExtResource("4_obu12")
 
-[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal"]
-visible = false
+[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal/Sprite2DView"]
 shape = SubResource("RectangleShape2D_tl00w")
 
-[node name="GridContainerAnimacion" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="GridContainerAnimacion" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 0
 columns = 2
 
-[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 text = "Offset X:"
 
-[node name="SpinBoxOffsetX" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="SpinBoxOffsetX" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 min_value = -100.0
 step = 0.10000000000582077
 
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 text = "Offset Y:"
 
-[node name="SpinBoxOffsetY" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="SpinBoxOffsetY" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 min_value = -100.0
 step = 0.10000000000582077
 
-[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 text = "Color Base:"
 
-[node name="ColorButtonBase" type="ColorPickerButton" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="ColorButtonBase" type="ColorPickerButton" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 
-[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 text = "Escala:"
 
-[node name="SpinBoxScale" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="SpinBoxScale" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 step = 0.10000000000582077
 value = 1.0000000000582077
 
-[node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 size_flags_horizontal = 8
 text = "Espejo Horizontal:"
 
-[node name="CheckBoxMirror" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="CheckBoxMirror" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 text = "Habilitado"
 
-[node name="Label7" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="Label7" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 size_flags_horizontal = 8
 text = "Espejo Vertical:"
 
-[node name="CheckBoxMirrorV" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="CheckBoxMirrorV" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 text = "Habilitado"
 
-[node name="Label10" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="Label10" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 size_flags_horizontal = 8
 text = "Tiene Collider:"
 
-[node name="CheckBoxHasCollider" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/GridContainerAnimacion"]
+[node name="CheckBoxHasCollider" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 text = "Habilitado"
 
-[node name="ColliderContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer" instance=ExtResource("5_x7ut7")]
+[node name="ControlCollider" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("6_3psuu")]
 visible = false
 layout_mode = 2
-size_flags_horizontal = 4

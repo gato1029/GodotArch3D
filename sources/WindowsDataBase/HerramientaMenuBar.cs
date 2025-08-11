@@ -1,17 +1,20 @@
 using Godot;
-using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.managers.Maps;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Weapons;
 using System;
 using System.Collections.Generic;
-using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Weapons;
-using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
-using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 
 public partial class HerramientaMenuBar : MenuBar
 {
@@ -62,10 +65,42 @@ public partial class HerramientaMenuBar : MenuBar
                 AddChild(win);
                 win.Popup();
                 break;
+                case 1:
+                ShowFileExplorer();
+                    break;
             default:
+
                 break;
         }
     }
+
+    public void ShowFileExplorer()
+    { 
+        FileDialog fileDialog;
+        // Crear y configurar el FileDialog
+        fileDialog = new FileDialog
+        {
+            Name = "FileDialog",
+            Access = FileDialog.AccessEnum.Filesystem,
+            FileMode = FileDialog.FileModeEnum.OpenFile,
+            Filters = new string[] { "*.json ; JSON Files" }
+        };
+        // 👉 Establece la ruta por defecto
+        fileDialog.CurrentDir = FileHelper.GetPathGameDB( CommonAtributes.pathMaps); // O usa "res://data" si es dentro del proyecto
+        // Conectar la señal de selección de archivo
+        fileDialog.FileSelected += (string path) =>
+        {
+            MapManagerEditor.Instance.CurrentMapLevelData = MapLevelData.LoadMap(path);            
+        };
+
+        // Agregar el FileDialog como hijo para que funcione
+        AddChild(fileDialog);
+
+        // Mostrar el diálogo
+        fileDialog.PopupCentered();
+    }
+
+    
 
     private void MenuArmamento_IdPressed(long id)
     {
@@ -102,6 +137,9 @@ public partial class HerramientaMenuBar : MenuBar
                 break;
             case 4:
                 FacadeWindowDataSearch<CharacterModelBaseData> windowQueryModelData = new FacadeWindowDataSearch<CharacterModelBaseData>("res://sources/WindowsDataBase/CharacterCreator/WindowCharacterCreator.tscn", this);
+                break;
+            case 5:
+                FacadeWindowDataSearch<ResourceSourceData> windowResourcesSource = new FacadeWindowDataSearch<ResourceSourceData>("res://sources/WindowsDataBase/ResourceSource/WindowResourcesSource.tscn", this);
                 break;
         }
     }

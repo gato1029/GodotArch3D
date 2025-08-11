@@ -17,7 +17,8 @@ public class SpriteData {
     public float height { get; set; }
     public float widhtFormat { get; set; }
     public float heightFormat { get; set; }
-    public GeometricShape2D collisionBody { get; set; }        
+    public GeometricShape2D collisionBody { get; set; }
+    public GeometricShape2D[] listCollisionBody{get; set;}
     public float scale { get; set; }
     public float offsetX { get; set; }
     public float offsetY { get; set; }
@@ -47,6 +48,7 @@ public class SpriteData {
                        .ToArray();
             color = new Color(components[0], components[1], components[2], components[3]);
         }
+
     }
 }
 

@@ -1,0 +1,119 @@
+[gd_scene load_steps=3 format=3 uid="uid://cvogo8yfb6kg5"]
+
+[ext_resource type="Script" uid="uid://bas8km6bxk5sf" path="res://sources/Editor/Controls/ControlEditorResourceSources.cs" id="1_mwccm"]
+[ext_resource type="Texture2D" uid="uid://bfy5aob4otta4" path="res://resources/Textures/internal/image.png" id="2_dj4cb"]
+
+[node name="ControlEditorResourceSources" type="MarginContainer"]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 431.0
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+script = ExtResource("1_mwccm")
+
+[node name="PanelContainerFocus" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainerFocus"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainerFocus/MarginContainer"]
+layout_mode = 2
+current_tab = 0
+
+[node name="Diseño" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+metadata/_tab_index = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+
+[node name="TextureRectImage" type="TextureRect" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer2"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_dj4cb")
+stretch_mode = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="SpinBoxSeed" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+max_value = 1000000.0
+prefix = "Semilla:"
+
+[node name="ButtonSeedRandom" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Aleatorio"
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+columns = 2
+
+[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Posicion Chunk X:"
+
+[node name="SpinBoxChunkX" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = -1000.0
+max_value = 1000.0
+
+[node name="Label2" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Posicion Chunk Y:"
+
+[node name="SpinBoxChunkY" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = -1000.0
+max_value = 1000.0
+
+[node name="ButtonAutomatic" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Generar Recursos Automaticos"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+
+[node name="ButtonRefresh" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer2"]
+layout_mode = 2
+text = "Refrescar"
+
+[node name="ItemListData" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CapasDiseño" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño"]
+layout_mode = 2
+
+[node name="ContainerLayers" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3

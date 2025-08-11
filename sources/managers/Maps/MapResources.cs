@@ -74,14 +74,15 @@ public class MapResources
 
     public MapResources(string pathMapParent, int Layer, bool SerializeOnUnload = false)
     {
+        this.pathMapParent = pathMapParent;
+        this.pathCurrentCarpet = pathMapParent + "/" + carpet;
         materialsUsed = new List<int>();
 
         layer = Layer;
         chunkDimencion = PositionsManager.Instance.chunkDimencion;
-        chunkMap = new SpriteMapChunk<ResourceDataGame>("Recursos",layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
+        chunkMap = new SpriteMapChunk<ResourceDataGame>("Recursos", pathCurrentCarpet, layer, ChunkManager.Instance.tiles16X16, SerializeOnUnload);
         chunkMap.OnChunSerialize += ChunkMap_OnChunSerialize;
-        this.pathMapParent = pathMapParent;
-        this.pathCurrentCarpet = pathMapParent + "/" + carpet;
+        
     }
 
     private void ChunkMap_OnChunSerialize(Vector2 arg1, ChunkData<ResourceDataGame> arg2)

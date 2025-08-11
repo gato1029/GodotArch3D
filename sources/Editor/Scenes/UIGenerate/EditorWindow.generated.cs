@@ -7,18 +7,22 @@ public partial class EditorWindow : PanelContainer
     public delegate void EventNotifyChangued(EditorWindow objectControl);
     public event EventNotifyChangued OnNotifyChangued;
 
+    private Button ButtonSaveAll;
+    private SpinBox SpinBoxGridX;
+    private SpinBox SpinBoxGridY;
     private TabContainer TabContainerItems;
     private TabBar Terreno;
-    private ControlEditorTerrain ControlEditorTerrain;
     private TabBar Recursos;
     private TabBar Unidades;
 
     public void InitializeUI()
     {
-        TabContainerItems = GetNode<TabContainer>("TabContainerItems");
-        Terreno = GetNode<TabBar>("TabContainerItems/Terreno");
-        ControlEditorTerrain = GetNode<ControlEditorTerrain>("TabContainerItems/Terreno/ControlEditorTerrain");
-        Recursos = GetNode<TabBar>("TabContainerItems/Recursos");
-        Unidades = GetNode<TabBar>("TabContainerItems/Unidades");
+        ButtonSaveAll = GetNode<Button>("VBoxContainer/ButtonSaveAll");
+        SpinBoxGridX = GetNode<SpinBox>("VBoxContainer/GridContainer/SpinBoxGridX");
+        SpinBoxGridY = GetNode<SpinBox>("VBoxContainer/GridContainer/SpinBoxGridY");
+        TabContainerItems = GetNode<TabContainer>("VBoxContainer/TabContainerItems");
+        Terreno = GetNode<TabBar>("VBoxContainer/TabContainerItems/Terreno");
+        Recursos = GetNode<TabBar>("VBoxContainer/TabContainerItems/Recursos");
+        Unidades = GetNode<TabBar>("VBoxContainer/TabContainerItems/Unidades");
     }
 }

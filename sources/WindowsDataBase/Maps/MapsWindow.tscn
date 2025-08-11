@@ -70,12 +70,12 @@ layout_mode = 2
 
 [node name="SpinBoxWidth" type="SpinBox" parent="MarginContainer/Panel/VBoxContainer/GridContainer/VBoxContainer"]
 layout_mode = 2
-max_value = 1000.0
+max_value = 10000.0
 suffix = "Ancho"
 
 [node name="SpinBox2Height" type="SpinBox" parent="MarginContainer/Panel/VBoxContainer/GridContainer/VBoxContainer"]
 layout_mode = 2
-max_value = 1000.0
+max_value = 10000.0
 suffix = "Alto"
 
 [node name="ButtonSave" type="Button" parent="MarginContainer/Panel/VBoxContainer"]

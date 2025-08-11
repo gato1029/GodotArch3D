@@ -7,6 +7,7 @@ using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
@@ -55,6 +56,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             collectionNameMap[typeof(BuildingData)] = "BuildingData";
             collectionNameMap[typeof(DataBaseFree)] = "DataBaseFree";
             collectionNameMap[typeof(TextureMasterData)] = "TextureMasterData";
+            collectionNameMap[typeof(ResourceSourceData)] = "ResourceSourceData";
 
             // RegisterCollection<BuildingData>("DataBaseFree");
 
@@ -67,7 +69,8 @@ namespace GodotEcsArch.sources.WindowsDataBase
             ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");            
             MaterialDataCollection.EnsureIndex(x => x.id, unique: true);
 
-     
+            ILiteCollection<ResourceSourceData> ResourceSourceDataCollection = db.GetCollection<ResourceSourceData>("ResourceSourceData");
+            ResourceSourceDataCollection.EnsureIndex(x => x.id, unique: true);
 
             ILiteCollection<TileData> TileDataCollection = db.GetCollection<TileData>("Tiles");
             TileDataCollection.EnsureIndex(x => x.id, unique: true);

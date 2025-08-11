@@ -1,6 +1,7 @@
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using LiteDB;
 using System;
 using System.Collections.Generic;
@@ -10,23 +11,20 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 
-public enum CostInputType
-{
-    Recurso,   // Ej: oro, comida, energía
-    Material    // Ej: lingote, tablón, ladrillo
-}
+
 public enum BuildingType
 {
     Ninguno = 0,
     ProductorMaterial = 1,
     ProductorUnidades = 2,
-    TorreDefensa = 3, // Edificio de defensa, como una torre
-    Procesador = 4,
+    ProductorRecurso = 3,
+    TorreDefensa = 4, // Edificio de defensa, como una torre
+    Procesador = 5,
 }
 public class CostInput
 {
     public int id; // ID del coste, puede ser el ID de un recurso o material
-    public CostInputType costInputType; // Tipo: recurso o material
+    public ResourceType costInputType; // Tipo: recurso o material
     public int amount;  
 }
 public class MaterialOutput
@@ -65,7 +63,6 @@ public class BuildingPosition
 public class BuildingData:IdData
 {
     public BuildingPosition buildingPosition { get; set; } // posicion de construccion
-    public SpriteData miniatura { get; set; } // Miniatura del edificio, puede ser una textura o atlas
     public SpriteData spriteData { get; set; } // Datos del sprite del edificio, puede ser una textura o atlas
     public List<AnimationStateData> animationData { get; set; } = null; // Datos de la animación del edificio, si aplica
     public int level { get; set; } = 1; // Nivel del edificio, por defecto 1
@@ -88,11 +85,11 @@ public class BuildingData:IdData
     {
     }
     [BsonCtor]
-    public BuildingData(SpriteData miniatura)
+    public BuildingData(SpriteData spriteData)
     {
-        if (miniatura!= null &&miniatura.idMaterial>0)
+        if (spriteData!= null &&spriteData.idMaterial>0)
         {
-            textureVisual = MaterialManager.Instance.GetAtlasTexture(miniatura.idMaterial, miniatura.x, miniatura.y, miniatura.widht, miniatura.height);
+            textureVisual = MaterialManager.Instance.GetAtlasTexture(spriteData.idMaterial, spriteData.x, spriteData.y, spriteData.widht, spriteData.height);
         }
         
     }

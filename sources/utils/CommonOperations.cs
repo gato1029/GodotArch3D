@@ -1,6 +1,7 @@
 
 using Godot;
 using GodotEcsArch.sources.components;
+using GodotPlugins.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,13 @@ using System.Threading.Tasks;
 internal class CommonOperations
 {
     static RandomNumberGenerator rngInternal = new RandomNumberGenerator();
+
+    private static readonly Random rng = new Random();
+
+    public static int GetRandomInt(int min = 1, int max = 1_000_000)
+    {
+        return rngInternal.RandiRange(min, max + 1);
+    }
     public static Vector2 QuantizeDirection(Vector2 direction)
     {
         float quantizedX = 0;

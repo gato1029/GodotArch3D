@@ -30,8 +30,7 @@ public partial class ControlSprite : ScrollContainer
         ButtonSearchMaterial.Pressed += ButtonBuscar_Pressed;
 
         ControlTextureLocal.OnNotifySelection += ControlTextureLocal_OnNotifySelection;
-       
-        ColliderContainer.OnNotifyPreview += Control_OnNotifyPreview;
+               
         CheckBoxHasCollider.Pressed += CheckBoxHasCollider_Pressed;
 
         CheckBoxMirrorV.Pressed += CheckBoxMirrorV_Pressed;
@@ -47,11 +46,49 @@ public partial class ControlSprite : ScrollContainer
         ViewItems.ItemSelected += ViewItems_ItemSelected;
 
         SpinBoxZoomGrid.ValueChanged += SpinBoxZoomGrid_ValueChanged;
+
+        ControlCollider.OnNotifyPreview += ControlCollider_OnNotifyPreview;
+        ControlCollider.OnNotifySave += ControlCollider_OnNotifySave;
+    }
+
+    private void ControlCollider_OnNotifySave()
+    {
+
+        objectData.listCollisionBody = ControlCollider.GetAllCollidersData().ToArray();
+        OnNotifyChangued?.Invoke(this);
+    }
+    GeometricShape2D geometricTemp;
+    private void ControlCollider_OnNotifyPreview(GeometricShape2D itemData)
+    {
+        if (itemData!=null)
+        {
+            objectData.collisionBody = itemData;
+            geometricTemp = itemData;
+            CollisionShapeView.Position = new Vector2((float)itemData.originPixelX, ((float)itemData.originPixelY * (-1)))* CollisionShapeView.Scale;
+         //   CollisionShapeView.RotationDegrees = itemData.rotation;
+            switch (itemData)
+            {
+                case Rectangle:
+                    var shape = new RectangleShape2D();
+                    CollisionShapeView.Shape = shape;
+                    shape.Size = new Vector2((float)itemData.widthPixel, (float)itemData.heightPixel);
+                    break;
+                case Circle:
+                    var shapeC = new CircleShape2D();
+                    CollisionShapeView.Shape = shapeC;
+                    shapeC.Radius = itemData.widthPixel;
+                    break;
+                default:
+                    break;
+            }
+            OnNotifyChangued?.Invoke(this);
+        }
+      
     }
 
     private void SpinBoxOffXsetTile_ValueChanged(double value)
     {
-        Sprite2DView.Offset = new Vector2((float)SpinBoxOffsetX.Value, (float)SpinBoxOffsetY.Value * (-1));
+        Sprite2DView.Position = new Vector2((float)SpinBoxOffsetX.Value, (float)SpinBoxOffsetY.Value * (-1));
         objectData.offsetX = (float)SpinBoxOffsetX.Value;
         OnNotifyChangued?.Invoke(this);
     }
@@ -105,16 +142,34 @@ public partial class ControlSprite : ScrollContainer
         }
 
     }
+    
     private void SpinBoxScale_ValueChanged(double value)
     {
-        ControlSpriteInternal.Scale = new Vector2((float)value, (float)value);        
-        objectData.scale = (float)SpinBoxScale.Value;
+        float scaleValueCollision = (float)value;
+
+        // Escalar el sprite
+        ControlSpriteInternal.Scale = new Vector2(scaleValueCollision, scaleValueCollision);
+
+        // Compensar la escala en CollisionShapeView
+        if (scaleValueCollision != 0)
+            CollisionShapeView.Scale = new Vector2(1f / scaleValueCollision, 1f / scaleValueCollision);
+        else
+            CollisionShapeView.Scale = Vector2.One; // evitar división por cero
+        if (geometricTemp!=null)
+        {
+            CollisionShapeView.Position = new Vector2((float)geometricTemp.originPixelX, ((float)geometricTemp.originPixelY * (-1))) * CollisionShapeView.Scale;
+        }       
+        //CollisionShapeView.Position = objectData.collisionBody. * CollisionShapeView.Scale;
+        // Guardar el valor en el objeto de datos
+        objectData.scale = (float)value;
+
+        // Notificar cambio
         OnNotifyChangued?.Invoke(this);
     }
 
     private void SpinBoxOffYsetTile_ValueChanged(double value)
     {
-        Sprite2DView.Offset = new Vector2((float)SpinBoxOffsetX.Value, (float)SpinBoxOffsetY.Value * (-1));        
+        Sprite2DView.Position = new Vector2((float)SpinBoxOffsetX.Value, (float)SpinBoxOffsetY.Value * (-1));        
         objectData.offsetY = (float)SpinBoxOffsetY.Value;
         OnNotifyChangued?.Invoke(this);
     }
@@ -153,28 +208,7 @@ public partial class ControlSprite : ScrollContainer
         objectData.mirrorX = CheckBoxMirror.ButtonPressed;
         OnNotifyChangued?.Invoke(this);
     }
-    private void Control_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData)
-    {
-        objectData.collisionBody = itemData;
-
-        CollisionShapeView.Position = new Vector2((float)itemData.originPixelX, (float)itemData.originPixelY * (-1));
-        switch (itemData)
-        {
-            case Rectangle:
-                var shape = new RectangleShape2D();
-                CollisionShapeView.Shape = shape;
-                shape.Size = new Vector2((float)itemData.widthPixel, (float)itemData.heightPixel);
-                break;
-            case Circle:
-                var shapeC = new CircleShape2D();
-                CollisionShapeView.Shape = shapeC;
-                shapeC.Radius = itemData.widthPixel;
-                break;
-            default:
-                break;
-        }
-        OnNotifyChangued?.Invoke(this);
-    }
+   
     public void SetData(SpriteData data)
     {
         if (data == null)
@@ -208,10 +242,16 @@ public partial class ControlSprite : ScrollContainer
         WindowViewDb_OnRequestSelectedItem(materialData.id);
         if (objectData.haveCollider)
         {
-            ColliderContainer.SetData(objectData.collisionBody);
+            if (objectData.listCollisionBody!=null&& objectData.listCollisionBody.Length>0)
+            {
+                ControlCollider.SetData(objectData.listCollisionBody.ToList());
+                ControlCollider_OnNotifyPreview(objectData.listCollisionBody[0]);
+            }
+            
+            //ColliderContainer.SetData(objectData.collisionBody);
             CheckBoxHasCollider.ButtonPressed = true;
-            Control_OnNotifyPreview(objectData.collisionBody);
-            CheckBoxHasCollider_PressedUI();
+            //Control_OnNotifyPreview(objectData.collisionBody);
+         //  -- CheckBoxHasCollider_PressedUI();
             CheckBoxHasCollider_Pressed();
         }
 
@@ -234,6 +274,11 @@ public partial class ControlSprite : ScrollContainer
         if (!objectData.haveCollider)
         {
             objectData.collisionBody = null;
+            objectData.listCollisionBody = null;
+        }
+        else
+        {
+            objectData.listCollisionBody = ControlCollider.GetAllCollidersData().ToArray();
         }
         //OnNotifyChanguedSimple?.Invoke();
       
@@ -243,16 +288,16 @@ public partial class ControlSprite : ScrollContainer
     {
         if (CheckBoxHasCollider.ButtonPressed)
         {
-            ColliderContainer.Visible = true;
+            ControlCollider.Visible = true;
             CollisionShapeView.Visible = true;
-            if (objectData.collisionBody == null)
-            {
-                Control_OnNotifyPreview(new Rectangle(16, 16, 0, 0));
-            }
+            //if (objectData.collisionBody == null)
+            //{
+            //    Control_OnNotifyPreview(new Rectangle(16, 16, 0, 0));
+            //}
         }
         else
         {
-            ColliderContainer.Visible = false;
+            ControlCollider.Visible = false;
             CollisionShapeView.Visible = false;
         }
         objectData.haveCollider = CheckBoxHasCollider.ButtonPressed;
