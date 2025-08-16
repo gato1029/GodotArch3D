@@ -18,6 +18,7 @@
     <PackageReference Include="Arch.System" Version="1.0.5" />
     <PackageReference Include="Arch.System.SourceGenerator" Version="1.2.1" />
     <PackageReference Include="Auios.QuadTree" Version="1.2.0" />
+    <PackageReference Include="GoRogue" Version="2.6.4" />
     <PackageReference Include="ImGui.NET" Version="1.91.0.1" />
     <PackageReference Include="LiteDB" Version="5.0.21" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

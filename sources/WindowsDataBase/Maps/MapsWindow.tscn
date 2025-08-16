@@ -51,6 +51,7 @@ text = "Nombre:"
 
 [node name="LineEditName" type="LineEdit" parent="MarginContainer/Panel/VBoxContainer/GridContainer"]
 layout_mode = 2
+text = "demo1"
 
 [node name="Label2" type="Label" parent="MarginContainer/Panel/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -71,11 +72,13 @@ layout_mode = 2
 [node name="SpinBoxWidth" type="SpinBox" parent="MarginContainer/Panel/VBoxContainer/GridContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 10000.0
+value = 512.0
 suffix = "Ancho"
 
 [node name="SpinBox2Height" type="SpinBox" parent="MarginContainer/Panel/VBoxContainer/GridContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 10000.0
+value = 512.0
 suffix = "Alto"
 
 [node name="ButtonSave" type="Button" parent="MarginContainer/Panel/VBoxContainer"]

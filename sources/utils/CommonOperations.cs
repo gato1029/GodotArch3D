@@ -16,7 +16,7 @@ internal class CommonOperations
 
     public static int GetRandomInt(int min = 1, int max = 1_000_000)
     {
-        return rngInternal.RandiRange(min, max + 1);
+        return rngInternal.RandiRange(min, max);
     }
     public static Vector2 QuantizeDirection(Vector2 direction)
     {

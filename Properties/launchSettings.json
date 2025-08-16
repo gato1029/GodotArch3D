@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug WindowResourcesSource": {
+	"Godot Debug MapsWindow": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.5-beta3_mono_win64/Godot_v4.5-beta3_mono_win64/Godot_v4.5-beta3_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/ResourceSource/WindowResourcesSource.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Maps/MapsWindow.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}
