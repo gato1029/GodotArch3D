@@ -47,6 +47,7 @@ internal class CollisionManager : SingletonBase<CollisionManager>
 
     public SpatialHashMapColliders<TerrainDataGame> terrainColliders;
     public SpatialHashMapColliders<ResourceSourceDataGame> ResourceSourceColliders;
+    public SpatialHashMapColliders<BuildingDataGame> BuildingsColliders;
     protected override void Initialize()
     {
         characterCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
@@ -55,8 +56,10 @@ internal class CollisionManager : SingletonBase<CollisionManager>
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
         tileColliders = new SpatialHashMap<IDataTile>(8, delegate (IDataTile er) { return er.IdCollider; });
         spriteColliders = new SpatialHashMap<TerrainDataGame>(8, delegate (TerrainDataGame er) { return er.idUnique; });
+
         terrainColliders = new SpatialHashMapColliders<TerrainDataGame>(8);
         ResourceSourceColliders = new SpatialHashMapColliders<ResourceSourceDataGame>(8);
+        BuildingsColliders = new SpatialHashMapColliders<BuildingDataGame>(8);
     }
 
     protected override void Destroy()
@@ -145,6 +148,10 @@ internal class CollisionManager : SingletonBase<CollisionManager>
             return true;
         }
         if (Instance.ResourceSourceColliders.IntersectsAABB(aabb))
+        {
+            return true;
+        }
+        if (Instance.BuildingsColliders.IntersectsAABB(aabb))
         {
             return true;
         }

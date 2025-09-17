@@ -136,9 +136,9 @@ public class ResourceSourceMap
         mapData.AddUpdatedTile(tilePositionGlobal, data.id);                
     }
 
-    public void RemoveTile(Vector2I tilePositionGlobal, int idTerrain)
+    public void RemoveTile(Vector2I tilePositionGlobal, int idData)
     {
-        var data = ResourceSourceManager.Instance.GetData(idTerrain);
+        var data = ResourceSourceManager.Instance.GetData(idData);
         mapData.Remove(tilePositionGlobal);                
     }
 }

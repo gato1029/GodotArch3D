@@ -60,8 +60,6 @@ public class MapResources
     [ProtoIgnore, JsonIgnore]
     private string carpet = "Resources";
 
-
-
     [ProtoMember(1)]
     public string pathMapParent { get; set; }
     [ProtoMember(2)]

@@ -107,11 +107,11 @@ public partial class WindowTerrainDetail : Window, IFacadeWindow<TerrainData>
         if (!objectData.isRule)
         {
             string code = objectData.spriteData.x.ToString() + objectData.spriteData.y.ToString() + objectData.spriteData.widht.ToString() + objectData.spriteData.height.ToString();
-            objectData.name = OptionButtonCategory.GetItemText(OptionButtonCategory.Selected) + LineEditName.Text + "_" + StableHash.FromString(code).ToString();
+            objectData.name = OptionButtonCategory.GetItemText(OptionButtonCategory.Selected) + " "+objectData.terrainType.ToString() + "_" + StableHash.FromString(code).ToString();
         }
         else
         {
-            objectData.name = LineEditName.Text;
+            objectData.name = "Regla " + objectData.terrainType.ToString() +" " + OptionButtonCategory.GetItemText(OptionButtonCategory.Selected);
         }
         
         if (objectData.isAnimated)

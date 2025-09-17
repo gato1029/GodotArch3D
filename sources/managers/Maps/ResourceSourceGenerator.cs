@@ -6,6 +6,7 @@ using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,32 @@ public class ResourceGenerationConfig
     public float frecuenciaRuido;
     public float umbralColocacion;
     public float distancePoison;
+    public int vecindadTerrenoBase;
+    public bool overrite;
     public HashSet<TerrainType> terrenosPermitidos; // opcional, si quieres filtrar por terreno
+    public HashSet<ResourceSourceType> recursosPermitidos; // opcional, si quieres filtrar por terreno
+    public int prioridad; // <- nuevo
+    public int radioDisco = 0;
+    public List<int> idsDisponibles = new List<int>();
+
+    
+
+    public void SetIds(Dictionary<ResourceSourceType, HashSet<int>> resourcesList)
+    {
+        foreach (var tipo in recursosPermitidos)
+        {
+            if (resourcesList.TryGetValue(tipo, out var lista))
+            {
+                idsDisponibles.AddRange(lista);
+            }
+        }
+    }
+
+    public int GetRandomId()
+    {
+        int index = CommonOperations.GetRandomInt(0, idsDisponibles.Count - 1);
+        return idsDisponibles[index];
+    }
 }
 
 public class ResourceSourceGenerator
@@ -26,7 +52,7 @@ public class ResourceSourceGenerator
     private SpriteMapChunk<TerrainDataGame> mapTerrainBase; // mapa de terreno 
     private Vector2I sizeMap;
     private Dictionary<ResourceSourceType, HashSet<int>> resourcesList = new Dictionary<ResourceSourceType, HashSet<int>>();
-    private Dictionary<ResourceSourceType, ResourceGenerationConfig> configuraciones;    
+    private List<ResourceGenerationConfig> configuraciones = new List<ResourceGenerationConfig>();
     public ResourceSourceGenerator(MapLevelData mapLevelData)
     {
         this.mapResourceSource = mapLevelData.resourceSourceMap.MapData;
@@ -38,33 +64,72 @@ public class ResourceSourceGenerator
     }
     private void ConfigurarGeneracion()
     {
-        configuraciones = new Dictionary<ResourceSourceType, ResourceGenerationConfig>();
+
+        configuraciones = new ();
 
         // Árboles
-        configuraciones[ResourceSourceType.Arboles] = new ResourceGenerationConfig
+        configuraciones.Add(  new ResourceGenerationConfig
         {
-            frecuenciaRuido = 0.06f,
-            umbralColocacion = 0.4f,
-            distancePoison = 2,
-            terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase }
-        };
+            frecuenciaRuido = 0.01f,                 // Zonas amplias, claros más grandes y naturales
+            umbralColocacion = 0.001f,                // Muy permisivo (casi siempre árbol, a veces claro)
+            distancePoison = 1.5f,                   // Árboles apretados, bosque cerrado
+            vecindadTerrenoBase = 1,
+            prioridad = 1,
+            overrite = false,
+            terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase },
+            recursosPermitidos = new HashSet<ResourceSourceType> { ResourceSourceType.Arboles },
+        });
 
-        // Minas de oro
-        //configuraciones[ResourceSourceType.MinaOro] = new ResourceGenerationConfig
-        //{
-        //    frecuenciaRuido = 0.08f,
-        //    umbralColocacion = 0.6f,
-        //    terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase }
-        //};
-
-        // Piedras
-        configuraciones[ResourceSourceType.Piedras] = new ResourceGenerationConfig
+        // configuracion claro 
+        configuraciones.Add(new ResourceGenerationConfig
+        {
+            frecuenciaRuido = 0.08f,                 // ruido más suave, menos parches
+            umbralColocacion = 0.7f,                 // muy exigente → pocos claros
+            distancePoison = 30f,                   // Árboles apretados, bosque cerrado
+            vecindadTerrenoBase = 1,
+            prioridad = 2,
+            overrite = true,
+            radioDisco = 10,
+            terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase },
+            recursosPermitidos = new HashSet<ResourceSourceType> { ResourceSourceType.FloresVisual, ResourceSourceType.CespedVisual },
+        });
+        configuraciones.Add( new ResourceGenerationConfig
         {
             frecuenciaRuido = 0.08f,
             umbralColocacion = 0.7f,
             distancePoison = 10,
-            terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase }
-        };
+            vecindadTerrenoBase = 1,
+            prioridad = 3,
+            overrite = false,
+            terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase },
+            recursosPermitidos = new HashSet<ResourceSourceType> { ResourceSourceType.Piedras },
+        });
+        configuraciones.Add(new ResourceGenerationConfig
+        {
+            frecuenciaRuido = 0.12f,                   // Parchecitos más pequeños y variados
+            umbralColocacion = 0.6f,                   // Menor densidad (más raro que aparezcan)
+            distancePoison = 5,                        // Bien espaciadas para que no se agrupen demasiado
+            vecindadTerrenoBase = 0,
+            prioridad = 4,
+            overrite = false,
+            terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase },
+            recursosPermitidos = new HashSet<ResourceSourceType> { ResourceSourceType.FloresVisual },
+        });
+        configuraciones.Add( new ResourceGenerationConfig
+        {
+            frecuenciaRuido = 0.0f,                   // Parche grande, sin cortes bruscos
+            umbralColocacion = 0.0f,                  // Mucha cobertura (más fácil que aparezca)
+            distancePoison = 1,                        // Muy juntos para formar "alfombra"
+            vecindadTerrenoBase = 0,
+            prioridad = 10,
+            overrite = false,
+            terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase },
+            recursosPermitidos = new HashSet<ResourceSourceType> { ResourceSourceType.CespedVisual },
+        });
+        foreach (var item in configuraciones)
+        {
+            item.SetIds(resourcesList);
+        }
     }
     private void LoadResourcesSource()
     {
@@ -83,11 +148,23 @@ public class ResourceSourceGenerator
             
         }
     }
-    private int GetRandomResourceId(ResourceSourceType tipo)
+    private int GetRandomResourceId(HashSet<ResourceSourceType> tipos)
     {
-        var list = resourcesList[tipo].ToList();
-        int id = list[CommonOperations.GetRandomInt(0, list.Count - 1)];
-        return id;
+        var idsDisponibles = new List<int>();
+
+        foreach (var tipo in tipos)
+        {
+            if (resourcesList.TryGetValue(tipo, out var lista))
+            {
+                idsDisponibles.AddRange(lista);
+            }
+        }
+
+        if (idsDisponibles.Count == 0)
+            return 0; // o lanzar excepción, depende de tu lógica
+
+        int index = CommonOperations.GetRandomInt(0, idsDisponibles.Count - 1);
+        return idsDisponibles[index];
     }
     public void Create()
     {
@@ -100,9 +177,10 @@ public class ResourceSourceGenerator
         int startY = -(sizeMap.Y / 2);
         int endY = sizeMap.Y / 2;
 
-        foreach (var tipoRecurso in configuraciones.Keys)
+        foreach (var config in configuraciones.OrderBy(c => c.prioridad))
         {
-            var config = configuraciones[tipoRecurso];
+            var tipoRecurso = config.recursosPermitidos;
+            
 
             FastNoiseLite noise = new FastNoiseLite();
             noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
@@ -114,17 +192,47 @@ public class ResourceSourceGenerator
             foreach (var pos in puntosPoisson)
             {
                 Vector2I positionGlobal = new Vector2I(pos.X - sizeMap.X / 2, pos.Y - sizeMap.Y / 2); // si necesitas offset
-
+          
                 TerrainDataGame terreno = mapTerrainBase.GetTileGlobalPosition(positionGlobal);
                 if (terreno == null || !config.terrenosPermitidos.Contains((TerrainType)terreno.GetTypeData()))
                     continue;
 
                 float valorRuido = noise.GetNoise(positionGlobal.X, positionGlobal.Y);
 
-                if (valorRuido >= config.umbralColocacion && !TieneVecino(positionGlobal,2))
+                if (valorRuido >= config.umbralColocacion && !TieneVecino(positionGlobal,config.vecindadTerrenoBase))
                 {
-                    int id =GetRandomResourceId(tipoRecurso);                
-                    mapResourceSource.AddUpdatedTile(positionGlobal, id);
+
+                    if (config.overrite)
+                    {
+                        
+                        if (config.radioDisco > 0 )
+                        {
+                            var puntosDisco = GenerarDisco(positionGlobal, config.radioDisco, config.terrenosPermitidos);
+                            foreach (var posDis in puntosDisco)
+                            {
+                                int id = config.GetRandomId();
+                                mapResourceSource.AddUpdatedTile(posDis, id);
+                            }
+                        }
+                        else
+                        {
+                            int id = config.GetRandomId();
+                            mapResourceSource.AddUpdatedTile(positionGlobal, id);
+                        }
+                        
+                    }
+                    else
+                    {
+                        var data = mapResourceSource.GetTileGlobalPosition(positionGlobal);
+                        if (data == null || data.idData == 0)
+                        {
+                            int id = config.GetRandomId();
+                            mapResourceSource.AddUpdatedTile(positionGlobal, id);
+                        }
+                    }
+                    
+                    
+                    
                 }
             }
 
@@ -132,7 +240,30 @@ public class ResourceSourceGenerator
 
         mapResourceSource.SetRenderEnabled(true);
     }
+    List<Vector2I> GenerarDisco(Vector2I centro, int radio, HashSet<TerrainType> terrenosPermitidos)
+    {
+        var puntos = new List<Vector2I>();
 
+        for (int dx = -radio; dx <= radio; dx++)
+        {
+            for (int dy = -radio; dy <= radio; dy++)
+            {
+                if (dx * dx + dy * dy <= radio * radio) // dentro del círculo
+                {
+                    var pos = new Vector2I(centro.X + dx, centro.Y + dy);
+
+                    // Verificar si el terreno permite colocar
+                    TerrainDataGame terreno = mapTerrainBase.GetTileGlobalPosition(pos);
+                    if (terreno != null && terrenosPermitidos.Contains((TerrainType)terreno.GetTypeData()))
+                    {
+                        puntos.Add(pos);
+                    }
+                }
+            }
+        }
+
+        return puntos;
+    }
     private bool TieneVecino(Vector2I pos, int distancia)
     {
         for (int dy = -distancia; dy <= distancia; dy++)

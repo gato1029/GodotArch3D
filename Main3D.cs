@@ -38,7 +38,7 @@ public partial class Main3D : Node3D
 
         //MapLevelData mapLevelData = new MapLevelData("Demo", new Vector2I(100, 100), MapType.Mapa, 10, "Demo");
         //MapManagerEditor.Instance.currentMapLevelData = mapLevelData;
-        var dd =MultimeshManager.Instance;
+        //var dd =MultimeshManager.Instance;
 
         //terrainMap = TerrainMap.LoadMapfromFile("Mapa1");
 

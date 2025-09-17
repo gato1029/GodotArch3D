@@ -28,13 +28,7 @@ using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileD
 
 namespace GodotEcsArch.sources.managers.Maps;
 
-public enum TerrainMapReal
-{
-    Agua = 0,
-    Suelo = 1,
-    Elevacion = 2,
-    Ornamentos = 3
-}
+
 public enum TerrainMapLevelDesign
 {
     Basico = -1,
@@ -157,11 +151,14 @@ public class TerrainMap
         mapLayerDesign.AddLayer(TerrainType.PisoBase.ToString(), 15);        
         mapLayerDesign.AddLayer(TerrainType.CaminoPiso.ToString(), 16);                
         mapLayerDesign.AddLayer(TerrainType.Elevacion.ToString(),  19);
+        mapLayerDesign.AddLayer(TerrainType.Muro.ToString(), 19);
         mapLayerDesign.AddLayer(TerrainType.Ornamentos.ToString(), 20);
 
         mapLayerDesign.AddAlias(TerrainType.CaminoPiso.ToString(), TerrainType.CaminoAgua.ToString());
         mapLayerDesign.AddAlias(TerrainType.PisoBase.ToString(), TerrainType.AguaBorde.ToString());
-        mapLayerDesign.AddAlias(TerrainType.Elevacion.ToString(), TerrainType.ElevacionBase.ToString());                
+        mapLayerDesign.AddAlias(TerrainType.Elevacion.ToString(), TerrainType.ElevacionBase.ToString());
+        mapLayerDesign.AddAlias(TerrainType.CaminoPiso.ToString(), TerrainType.Mosaico.ToString());
+        mapLayerDesign.AddAlias(TerrainType.CaminoPiso.ToString(), TerrainType.PisoDetalle.ToString());
     }
 
     public void SaveAllMap()
@@ -214,10 +211,13 @@ public class TerrainMap
                 idTerrain = data.rules[forceDataRuleNro].idDataCentral;
             }
             mapLayerDesign.GetLayer(data.terrainType.ToString()).AddUpdatedTile(tilePositionGlobal, idTerrain);            
-        }
-        //mapLayerDesign.GetLayer(data.terrainType.ToString()).Refresh(tilePositionGlobal);        
+        }          
     }
-
+    public void AddUpdateTileSimple(Vector2I tilePositionGlobal, int idTerrain)
+    {
+        var data = TerrainManager.Instance.GetData(idTerrain);      
+        mapLayerDesign.GetLayer(data.terrainType.ToString()).AddUpdatedTile(tilePositionGlobal, idTerrain);        
+    }
     public void RemoveTile(Vector2I tilePositionGlobal, int idTerrain)
     {
         var data = TerrainManager.Instance.GetData(idTerrain);

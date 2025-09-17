@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://c4fldu7j6ki1s"]
+[gd_scene load_steps=5 format=3 uid="uid://c4fldu7j6ki1s"]
 
 [ext_resource type="Script" uid="uid://dcl4pt3eitlg1" path="res://sources/Editor/Scenes/EditorWindow.cs" id="1_mmbnp"]
 [ext_resource type="PackedScene" uid="uid://cpvx7egeaiyi0" path="res://sources/Editor/Controls/ControlEditorTerrain.tscn" id="2_wh8m2"]
 [ext_resource type="PackedScene" uid="uid://cvogo8yfb6kg5" path="res://sources/Editor/Controls/ControlEditorResourceSources.tscn" id="3_t12e2"]
+[ext_resource type="PackedScene" uid="uid://bdle5xvcfn40v" path="res://sources/Editor/Controls/ControlEditorBuilding.tscn" id="4_5dc0b"]
 
 [node name="EditorWindow" type="PanelContainer"]
 custom_minimum_size = Vector2(400, 0)
@@ -56,9 +57,10 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-current_tab = 0
+current_tab = 2
 
 [node name="Terreno" type="TabBar" parent="VBoxContainer/TabContainerItems"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -77,10 +79,21 @@ anchor_right = 1.0
 offset_right = 0.0
 grow_horizontal = 2
 
+[node name="Edificios" type="TabBar" parent="VBoxContainer/TabContainerItems"]
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="ControlEditorBuilding" parent="VBoxContainer/TabContainerItems/Edificios" instance=ExtResource("4_5dc0b")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+offset_right = 0.0
+grow_horizontal = 2
+
 [node name="Unidades" type="TabBar" parent="VBoxContainer/TabContainerItems"]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 2
+metadata/_tab_index = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainerItems/Unidades"]
 layout_mode = 1

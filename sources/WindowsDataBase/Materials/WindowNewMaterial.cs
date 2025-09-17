@@ -141,7 +141,7 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
             
         }
        
-        if (objectData.type <= 4 && ChangeTexture)
+        if (objectData.type <= 5 && ChangeTexture)
         {
             GenerateMasterAtlas();
         }

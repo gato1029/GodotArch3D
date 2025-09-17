@@ -17,7 +17,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         PERSONAJES = 2,
         ESTRUCTURAS = 3,
         ITEMS = 4,
-        ACCESORIOS_ANIMADOS = 5,
+        MAZMORRAS = 5,
+        ACCESORIOS_ANIMADOS = 6,
     }
     public class IdData 
     {
@@ -106,7 +107,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
             Texture2D texture2D = null;
             float widht;
             float height;
-            if (type<=4)
+            if (type<=5)
             {
                 MaterialManager.Instance.RegisterMaterial(id, this);
                 texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));

@@ -21,13 +21,14 @@ namespace GodotEcsArch.sources.managers.Maps;
 public enum MapInfoType
 {
     Terreno,
-    FuenteRecursos
+    FuenteRecursos,
+    Edificios
 }
 public enum MapType
 {
     Mapa = 0,
     Habitacion = 1,
-    Calabozo = 2
+    Mazmorra = 2
 }
 [ProtoContract]
 public class MapDataMarker
@@ -99,6 +100,9 @@ public class MapLevelData
 
     [ProtoIgnore, JsonIgnore]
     public MapResources mapResources { get; set; }
+
+    [ProtoIgnore, JsonIgnore]
+    public MapBuildings mapBuildings { get; set; }
     // buildsMap buildsMap;
 
     public MapLevelData(string name, Vector2I size, MapType mapType, int layer, string description, bool unlimit =false)
@@ -116,9 +120,12 @@ public class MapLevelData
         
         terrainMap = new TerrainMap(pathCurrentCarpet + "/InternalData", layer);
         resourceSourceMap = new ResourceSourceMap(pathCurrentCarpet + "/InternalData", layer);
+        mapBuildings = new MapBuildings(pathCurrentCarpet + "/InternalData", layer);
         //----
         mapInfoDetail.Add(new MapInfo { mapInfoType = MapInfoType.Terreno, InternalPath = terrainMap.pathCurrentCarpet});
         mapInfoDetail.Add(new MapInfo { mapInfoType = MapInfoType.FuenteRecursos, InternalPath = resourceSourceMap.pathCurrentCarpet });
+        mapInfoDetail.Add(new MapInfo { mapInfoType = MapInfoType.Edificios, InternalPath = mapBuildings.pathCurrentCarpet });
+        
         //mapResources = new MapResources(pathCurrentCarpet+"/InternalData", layer + 1);      
 
 
@@ -129,6 +136,7 @@ public class MapLevelData
         
         terrainMap.SaveAllMap();
         resourceSourceMap.SaveAllMap();
+        mapBuildings.SaveAllMap();
        // mapResources.SaveAllMap();
     }
     public void AddMap(Vector2 positionIn, string pathNewMap)
@@ -150,5 +158,6 @@ public class MapLevelData
     {
         terrainMap.ClearMap();
         resourceSourceMap.ClearMap();
+        mapBuildings.ClearMap();
     }
 }

@@ -15,6 +15,8 @@ public enum ResourceSourceType
     Arboles = 0,
     MinaOro = 1,
     Piedras = 2,
+    CespedVisual = 3,
+    FloresVisual = 4,
 }
 public class ResourceSourceData:IdData
 {
@@ -23,6 +25,7 @@ public class ResourceSourceData:IdData
     public int amount { get; set; }             // Cuánto puede dar en total (ej. 3 de madera)        
     public int idResourceProduce { get; set; }
     public bool isAnimated { get; set; }    
+    public bool isOnlyVisual { get; set; } = false;
     public BuildingPosition buildingPosition { get; set; } // posicion de construccion
     public SpriteData spriteData { get; set; }    
     public List<AnimationStateData> animationData { get; set; } = null; // Datos de la animación, si aplica

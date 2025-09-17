@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using System;
@@ -22,6 +23,30 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         ButtonSave.Pressed += ButtonSave_Pressed;
         ControlSpriteBasico.OnNotifyChangued += ControlSpriteBasico_OnNotifyChangued;
         ControlBuildingGridBasic.OnNotifyChangued += ControlBuildingGridBasic_OnNotifyChangued;
+        CheckBoxIsAnimated.Pressed += CheckBoxIsAnimated_Pressed;
+    }
+    ContainerAnimation ContainerAnimationBasico = null;
+    ScrollContainer scrollContainer;
+    private void CheckBoxIsAnimated_Pressed()
+    {
+        if (CheckBoxIsAnimated.ButtonPressed)
+        {
+            scrollContainer = new ScrollContainer();
+            scrollContainer.Name = "Animacion";
+            scrollContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            ContainerAnimationBasico = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/ContainerAnimation.tscn").Instantiate<ContainerAnimation>();
+            ContainerAnimationBasico.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+            ContainerAnimationBasico.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            scrollContainer.AddChild(ContainerAnimationBasico);
+            TabContainerBase.AddChild(scrollContainer);
+
+        }
+        else
+        {
+            TabContainerBase.RemoveChild(scrollContainer);
+            scrollContainer = null;
+            ContainerAnimationBasico = null;
+        }
     }
 
     private void ControlBuildingGridBasic_OnNotifyChangued(ControlBuildingGrid objectControl)
@@ -48,11 +73,17 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         SpinBoxRangeAttack.Value = objectData.attackRange;
         SpinBoxChargueAttack.Value = objectData.attackCooldown;
         SpinBoxTimeBuild.Value = objectData.timeToBuild;
-       // ControlSpriteMiniatura.SetData(objectData.miniatura);
+        // ControlSpriteMiniatura.SetData(objectData.miniatura);
         ControlSpriteBasico.SetData(objectData.spriteData);
-        ContainerAnimationBasico.SetData(objectData.animationData.ToArray());
+        CheckBoxIsAnimated.ButtonPressed = objectData.isAnimated;
+
+        if (objectData.isAnimated) 
+        { 
+            ContainerAnimationBasico.SetData(objectData.animationData.ToArray());
+        }
         ControlBuildingGridBasic.SetTexture(ControlSpriteBasico.GetSprite().Texture);
         ControlBuildingGridBasic.SetBuildingPosition(objectData.buildingPosition);
+        
     }
     private void ButtonSave_Pressed()
     {
@@ -65,7 +96,8 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         objectData.timeToBuild = (int)SpinBoxTimeBuild.Value;
       //  objectData.miniatura = ControlSpriteMiniatura.ObjectData;
         objectData.spriteData = ControlSpriteBasico.ObjectData;
-        objectData.animationData = ContainerAnimationBasico.GetData().ToList();
+      
+        objectData.isAnimated = CheckBoxIsAnimated.ButtonPressed;
 
         //if (objectData.miniatura.idMaterial == 0)
         //{
@@ -75,10 +107,11 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         {
             objectData.spriteData = null;
         }
-        if (objectData.animationData.Count > 0)
+        if (objectData.isAnimated && objectData.animationData.Count > 0)
         {
-            objectData.animationData = null;
-        }             
+            objectData.animationData = ContainerAnimationBasico.GetData().ToList();
+        }
+        TextureHelper.RecalulateUVFormat(objectData.spriteData);
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();

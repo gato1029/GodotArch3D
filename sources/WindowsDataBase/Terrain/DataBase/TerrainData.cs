@@ -20,6 +20,7 @@ public enum TerrainCategoryType
 {
     Generico = 0,
     Bosque = 1,
+    MazmorraBase = 20,
 }
 
 public enum TerrainType
@@ -35,6 +36,13 @@ public enum TerrainType
     Ornamentos = 8,
     Limite=9,
     ElevacionBorde = 10,
+    Muro = 11,    
+    Mosaico = 12,
+    PisoDetalle = 13,
+    CaminoPiso2 = 14,
+    CaminoPiso3 = 15,
+    CaminoPiso4 = 16,
+    CaminoPiso5 = 17,
 }
 public class TerrainData :IdData
 {

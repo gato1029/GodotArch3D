@@ -64,6 +64,7 @@ public class BuildingData:IdData
 {
     public BuildingPosition buildingPosition { get; set; } // posicion de construccion
     public SpriteData spriteData { get; set; } // Datos del sprite del edificio, puede ser una textura o atlas
+    public bool isAnimated { get; set; } = false; // Es una animacion o no
     public List<AnimationStateData> animationData { get; set; } = null; // Datos de la animación del edificio, si aplica
     public int level { get; set; } = 1; // Nivel del edificio, por defecto 1
     public int maxHealth { get; set; } = 100; // Salud máxima del edificio, por defecto 100    
@@ -89,7 +90,7 @@ public class BuildingData:IdData
     {
         if (spriteData!= null &&spriteData.idMaterial>0)
         {
-            textureVisual = MaterialManager.Instance.GetAtlasTexture(spriteData.idMaterial, spriteData.x, spriteData.y, spriteData.widht, spriteData.height);
+            textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(spriteData.idMaterial, spriteData.x, spriteData.y, spriteData.widht, spriteData.height);
         }
         
     }

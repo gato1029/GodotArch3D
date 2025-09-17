@@ -22,7 +22,8 @@ public partial class UiInterfaceGenerator : Control
             return;
 
         _isInitialized = true;
-        
+        //MenuButtonOptions = GetNode<MenuButton>("VBoxContainer/HBoxContainer/MenuButtonOptions");
+        //ButtonGenerate = GetNode<Button>("VBoxContainer/HBoxContainer/ButtonGenerate");
         InitializeUI(); // Insertado por el generador de UI
         ItemStates =new Dictionary<int, bool>();
         ButtonGenerate.Pressed += ButtonGenerate_Pressed;

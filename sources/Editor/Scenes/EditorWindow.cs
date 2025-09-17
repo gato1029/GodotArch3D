@@ -57,6 +57,7 @@ public partial class EditorWindow : PanelContainer
                 selectedTabMode = EditorMode.RECURSOS;
                 break;
             case 2:
+                selectedTabMode = EditorMode.EDIFICIOS;
                 break;
                
             default:

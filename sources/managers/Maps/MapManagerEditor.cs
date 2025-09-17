@@ -12,7 +12,8 @@ public enum EditorMode
     APAGADO,
     TERRENO,
     RECURSOS,
-    UNIDADES
+    UNIDADES,
+    EDIFICIOS
 }
 public class MapManagerEditor : SingletonBase<MapManagerEditor>
 { 

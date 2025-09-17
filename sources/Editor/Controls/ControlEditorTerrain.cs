@@ -20,12 +20,14 @@ using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using static Godot.ClassDB;
 
 
 public partial class ControlEditorTerrain : MarginContainer
 {
     private TerrainData objectSelected;
     private TerrainMap terrainMap;
+    private MapType mapType;
     Vector2I sizeMap = Vector2I.Zero;
     public override void _Ready()
     {
@@ -50,7 +52,8 @@ public partial class ControlEditorTerrain : MarginContainer
 
         MapManagerEditor.Instance.OnMapLevelDataChanged += Instance_OnMapLevelDataChanged;
         ButtonSeedRandom.Pressed += ButtonSeedRandom_Pressed;
-        
+        SpinBoxSeed.Value = CommonOperations.GetRandomInt();
+
     }
     private void ItemListRules_ItemSelected(long index)
     {
@@ -104,6 +107,7 @@ public partial class ControlEditorTerrain : MarginContainer
     private void Instance_OnMapLevelDataChanged(MapLevelData obj)
     {
         terrainMap = obj.terrainMap;
+        mapType = obj.maptype;
         sizeMap = obj.size;
         SpinBoxSeed.Value = terrainMap.seed;
         LoadItemsLayers();
@@ -132,38 +136,72 @@ public partial class ControlEditorTerrain : MarginContainer
     {
         if (terrainMap != null)
         {
-            foreach (var item in terrainMap.MapLayerDesign)
+            switch (mapType)
             {
-                item.Value.SetRenderEnabled(false);
+                case MapType.Mapa:
+                    GenerateTerrainMap();
+                    break;
+                case MapType.Habitacion:
+                    break;
+                case MapType.Mazmorra:
+                    GenerateDungeon();
+                    break;
+                default:
+                    break;
             }
-            TerrainGenerator terrainGenerator = new TerrainGenerator(terrainMap.MapTerrainBasic, (int)SpinBoxSeed.Value, true, false);
-            using (new ProfileScope("Terrain Generator"))
-            {
-                terrainMap.ClearMap();
-                terrainMap.ClearFilesChunks();
-           
-                terrainGenerator.SetTerrainDistribution(0.1f, 0.8f, 0.1f);
-                Vector2I chunk = new Vector2I((int)SpinBoxChunkX.Value, (int)SpinBoxChunkY.Value);
-                // var data = terrainGenerator.GenerateTerrain(chunk, GenerateMode.RadiusAroundChunk, new Vector2I(2,2));
-                terrainGenerator.GenerateTerrainOptimized(new Vector2I(0, 0), GenerateMode.CenteredByTileDimensions, sizeMap);
-           
-            }
-            using (new ProfileScope("Terrain Generator Plot"))
-            {
-                terrainGenerator.AplicarMapaDisenioOptimized(new Vector2I(0, 0), GenerateMode.CenteredByTileDimensions, sizeMap, TerrainCategoryType.Bosque);               
-                terrainMap.seed = (int)SpinBoxSeed.Value;
-            }
-            foreach (var item in terrainMap.MapLayerDesign)
-            {
-                item.Value.SetRenderEnabled(true);
-            }
-            PerformanceTimer.Instance.PrintAll(1, 1);
+
+
         }
         else
         {
             Message.ShowMessage(this, "No se encontro Mapa");
         }
 
+    }
+    private void GenerateDungeon()
+    {
+        foreach (var item in terrainMap.MapLayerDesign)
+        {
+            item.Value.SetRenderEnabled(false);
+        }
+        DungeonGenerator dungeonGenerator = new DungeonGenerator(sizeMap.X, sizeMap.Y);
+        dungeonGenerator.GenerateRandomFilled();
+        terrainMap.ClearMap();
+        terrainMap.ClearFilesChunks();
+        dungeonGenerator.ExportInGame(terrainMap, TerrainCategoryType.MazmorraBase);
+        foreach (var item in terrainMap.MapLayerDesign)
+        {
+            item.Value.SetRenderEnabled(true);
+        }
+    }
+    private void GenerateTerrainMap()
+    {
+        foreach (var item in terrainMap.MapLayerDesign)
+        {
+            item.Value.SetRenderEnabled(false);
+        }
+        TerrainGenerator terrainGenerator = new TerrainGenerator(terrainMap.MapTerrainBasic, (int)SpinBoxSeed.Value, true, false);
+        using (new ProfileScope("Terrain Generator"))
+        {
+            terrainMap.ClearMap();
+            terrainMap.ClearFilesChunks();
+
+            terrainGenerator.SetTerrainDistribution(0.1f, 0.8f, 0.1f);
+            Vector2I chunk = new Vector2I((int)SpinBoxChunkX.Value, (int)SpinBoxChunkY.Value);
+            // var data = terrainGenerator.GenerateTerrain(chunk, GenerateMode.RadiusAroundChunk, new Vector2I(2,2));
+            terrainGenerator.GenerateTerrainOptimized(new Vector2I(0, 0), GenerateMode.CenteredByTileDimensions, sizeMap);
+
+        }
+        using (new ProfileScope("Terrain Generator Plot"))
+        {
+            terrainGenerator.AplicarMapaDisenioOptimized(new Vector2I(0, 0), GenerateMode.CenteredByTileDimensions, sizeMap, TerrainCategoryType.Bosque);
+            terrainMap.seed = (int)SpinBoxSeed.Value;
+        }
+        foreach (var item in terrainMap.MapLayerDesign)
+        {
+            item.Value.SetRenderEnabled(true);
+        }
+        PerformanceTimer.Instance.PrintAll(1, 1);
     }
 
     private void ButtonRefresh_Pressed()
@@ -203,17 +241,24 @@ public partial class ControlEditorTerrain : MarginContainer
 
     private void ApplyPaint()
     {
-        foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
+        if (objectSelected!=null)
         {
-            terrainMap.AddUpdateTile(tilePos, objectSelected.id);
+            foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
+            {
+                terrainMap.AddUpdateTile(tilePos, objectSelected.id);
+            }
         }
+        
     }
 
     private void ApplyErase()
     {
-        foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
+        if (objectSelected != null)
         {
-            terrainMap.RemoveTile(tilePos, objectSelected.id);
+            foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
+            {
+                terrainMap.RemoveTile(tilePos, objectSelected.id);
+            }
         }
     }
 }

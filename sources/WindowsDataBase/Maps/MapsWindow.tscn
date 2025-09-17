@@ -53,6 +53,13 @@ text = "Nombre:"
 layout_mode = 2
 text = "demo1"
 
+[node name="Label4" type="Label" parent="MarginContainer/Panel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Tipo:"
+
+[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/Panel/VBoxContainer/GridContainer"]
+layout_mode = 2
+
 [node name="Label2" type="Label" parent="MarginContainer/Panel/VBoxContainer/GridContainer"]
 layout_mode = 2
 text = "Descripcion:"

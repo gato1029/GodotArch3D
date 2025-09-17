@@ -1,0 +1,10 @@
+id: GodotEcsArch
+language: CSharp
+name:
+  Default: GodotEcsArch
+qualifiedName:
+  Default: GodotEcsArch
+type: Assembly
+modifiers: {}
+items: []
+references: {}
