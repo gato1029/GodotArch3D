@@ -51,8 +51,9 @@ public partial class StatsContainer : PanelContainer
             foreach (var item in statsDatas)
             {
                 var node = packedScene.Instantiate<ControlStats>();
-                node.SetData(item);
+                
                 boxContainer.AddChild(node);
+                node.SetData(item);
             }
         }
     }

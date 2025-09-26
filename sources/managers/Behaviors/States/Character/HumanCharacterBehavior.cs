@@ -25,7 +25,7 @@ public class HumanCharacterBehavior : ICharacterBehavior
     public string Name => "Human";
 
  
-    public void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer)
+    public void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer, float delta)
     {
         ref CharacterAtackComponent characterAtackComponent = ref entity.Get<CharacterAtackComponent>();
         switch (characterComponent.characterStateType)
@@ -54,10 +54,17 @@ public class HumanCharacterBehavior : ICharacterBehavior
             case CharacterStateType.TAKE_HIT:
                 
                 animation.stateAnimation = 4;
-                if (animation.animationComplete)
+                //if (animation.animationComplete)
+                //{
+                //    characterComponent.characterStateType = CharacterStateType.IDLE;
+
+                //}
+                characterComponent.hitStunTimer -= delta; // o tu delta global
+
+                // Si ya pasó el tiempo de "stun", volvemos a IDLE
+                if (characterComponent.hitStunTimer <= 0f)
                 {
                     characterComponent.characterStateType = CharacterStateType.IDLE;
-
                 }
                 break;
             case CharacterStateType.TAKE_STUN:
@@ -154,40 +161,45 @@ public class HumanCharacterBehavior : ICharacterBehavior
         var animacionData = dataAccesory.accesoryAnimationBodyData.animationStateData.animationData[(int)directionComponent.animationDirection];
         if (animacionData.hasCollider)
         {
+            ColliderComponent colliderComponent = entity.Get<ColliderComponent>();
+            TeamComponent team = entity.Get<TeamComponent>();
             var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
             GeometricShape2D collision = animacionData.collider.Multiplicity(dataCharacterModel.scale);
             
             Vector2 positionRelative = positionComponent.position + collision.OriginCurrent;
 
-            Rect2 aabb = new Rect2(positionRelative, collision.GetSizeQuad() * 2);
-            Dictionary<int, Dictionary<int, Entity>> data = CollisionManager.Instance.characterCollidersEntities.QueryAABB(aabb);
-            if (data != null)
+             Rect2 aabb = new Rect2(positionRelative -(collision.GetSizeQuad() / 2), collision.GetSizeQuad());
+            
+            //Rect2 aabb2 = new Rect2(positionRelative, collision.GetSizeQuad()); // - (collision.GetSizeQuad() / 2)
+            //Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+            //transform3DShape = transform3DShape.Scaled(new Vector3(aabb2.Size.X, aabb2.Size.Y, 1));
+            //transform3DShape.Origin = new Vector3(aabb2.Position.X,aabb2.Position.Y, 30);
+            //DebugDraw.Quad(transform3DShape, 1, Colors.Coral, 5);
+
+            var dataQuery = CollisionManager.Instance.characterCollidersEntities.GetCollidingOwnersInAABBExternal(dataCharacterModel.collisionBody, aabb,colliderComponent.idCollider);
+          
+            foreach (var item in dataQuery)
             {
-                foreach (var item in data.Values)
+                TeamComponent teamB = item.Get<TeamComponent>();
+
+                if (item.Id != entity.Id && teamB.team != team.team)
                 {
-                    foreach (var itemInternal in item)
+                    ref CharacterComponent characterComponentB = ref item.TryGetRef<CharacterComponent>(out bool exist1);
+                    var dataCharacterModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
+
+                    GeometricShape2D colliderB = dataCharacterModelB.collisionBody;
+                    var positionB = item.Get<PositionComponent>().position + colliderB.OriginCurrent;
+                    if (Collision2D.Collides(collision, colliderB, positionRelative, positionB))
                     {
-                        Entity entityObjetive = itemInternal.Value;
-                        if (entityObjetive.Id != entity.Id)
-                        {
-                            
-                            ref CharacterComponent characterComponentB =ref itemInternal.Value.TryGetRef<CharacterComponent>(out bool exist);
-                            var dataCharacterModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
-
-                            AnimationCharacterBaseData characterB = dataCharacterModelB.animationCharacterBaseData;
-                            GeometricShape2D colliderB = characterB.collisionBody.Multiplicity(dataCharacterModelB.scale);
-                            var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
-
-                            if (Collision2D.Collides(collision, colliderB, positionRelative, positionB))
-                            {                              
-                                characterComponentB.characterStateType = CharacterStateType.TAKE_HIT;
-                                BehaviorManager.Instance.AplyDamageCharacter(entity, entityObjetive);                                
-                            }
-                        }
+                        characterComponentB.characterStateType = CharacterStateType.TAKE_HIT;
+                        BehaviorManager.Instance.AplyDamageCharacter(entity, item);
                     }
-                
+
+                    //characterComponentB.characterStateType = CharacterStateType.TAKE_HIT;
+                    //BehaviorManager.Instance.AplyDamageCharacter(entity, item);
                 }
             }
+         
 
         }
 
@@ -211,8 +223,16 @@ public class HumanCharacterBehavior : ICharacterBehavior
         Vector2 movement = directionComponent.value * velocityComponent.velocity * delta;
 
         Vector2 movementNext = positionComponent.position + movement + collisionMove.OriginCurrent;
+        bool existCollision = false;
+        
+        existCollision = CollisionManager.CheckAnyCollisionMoveUnitOnly(entity, movementNext, collisionMove);
+        if (!existCollision)
+        {
+            existCollision = CollisionManager.CheckAnyCollisionStatic(entity, movementNext, collisionMove);
+        }
 
-        bool existCollision = CollisionManager.CheckAnyCollision(entity, movementNext, collisionMove);
+        
+
        
         if (!existCollision)
         {

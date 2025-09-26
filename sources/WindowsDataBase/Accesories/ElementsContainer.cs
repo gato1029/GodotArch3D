@@ -52,8 +52,9 @@ public partial class ElementsContainer : PanelContainer
             foreach (var item in elementsDatas)
             {
                 var node = packedScene.Instantiate<ControlElements>();
-                node.SetData(item);
                 boxContainer.AddChild(node);
+                node.SetData(item);
+                
             }
         }
         

@@ -10,6 +10,7 @@ using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Profiler;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ internal class RenderSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
 
-    private QueryDescription queryRenderSpriteGpu = new QueryDescription().WithAll<SpriteRenderGPUComponent, PositionComponent>();
+    private QueryDescription queryRenderSpriteGpu = new QueryDescription().WithAll<PositionComponent,SpriteRenderGPUComponent >();
     private QueryDescription queryRender = new QueryDescription().WithAll<PositionComponent,RenderGPUComponent>().WithNone<RenderGPULinkedComponent>();
     private QueryDescription queryRenderLinked = new QueryDescription().WithAll<CharacterComponent, PositionComponent, RenderGPUComponent,RenderGPULinkedComponent>();
 
@@ -80,9 +81,9 @@ internal class RenderSystem : BaseSystem<World, float>
                 ref PositionComponent positionComponent = ref Unsafe.Add(ref pointerPositionComponent, entityIndex);
                 ref SpriteRenderGPUComponent renderComponent = ref Unsafe.Add(ref pointerSpriteRenderGPUComponent, entityIndex);
                 float renderZ = ((positionComponent.position.Y + renderComponent.originOffset.Y + renderComponent.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + renderComponent.layerRender;
-                renderComponent.transform.Origin = new Vector3(positionComponent.position.X, positionComponent.position.Y, renderZ);
-                RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);
-
+                renderComponent.transform.Origin = new Vector3(positionComponent.position.X + renderComponent.originOffset.X, positionComponent.position.Y + renderComponent.originOffset.Y, renderZ);
+                RenderingServer.MultimeshInstanceSetTransform(renderComponent.rid, renderComponent.instance, renderComponent.transform);       
+                
             }
 
         }
@@ -172,6 +173,7 @@ internal class RenderSystem : BaseSystem<World, float>
     {
         using (new ProfileScope("Render System"))
         {
+            
             World.InlineParallelChunkQuery(in queryRender, new ChunkJobRender(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryRenderLinked, new ChunkJobRenderLinked(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryRenderSpriteGpu, new ChunkJobRenderSpriteGpu(commandBuffer, t));

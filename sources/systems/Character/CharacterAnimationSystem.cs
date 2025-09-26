@@ -81,8 +81,8 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                     {
                         if (animationData.loop)
                         {
-                            characterAnimationComponent.currentframeData.R = animationData.frameDataArray[0].x; // Reinicia al frame inicial
-                            characterAnimationComponent.currentframeData.G = animationData.frameDataArray[0].y; // Reinicia al frame inicial
+                            characterAnimationComponent.currentframeData.R = animationData.frameDataArray[0].xFormat; // Reinicia al frame inicial
+                            characterAnimationComponent.currentframeData.G = animationData.frameDataArray[0].yFormat; // Reinicia al frame inicial
                             characterAnimationComponent.currentframeData.B = animationData.frameDataArray[0].widhtFormat; // Reinicia al frame inicial
                             characterAnimationComponent.currentframeData.A = animationData.frameDataArray[0].heightFormat; // Reinicia al frame inicial
 
@@ -98,8 +98,8 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                     }
                     else
                     {
-                        characterAnimationComponent.currentframeData.R = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].x; // Reinicia al frame inicial
-                        characterAnimationComponent.currentframeData.G = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].y; // Reinicia al frame inicial
+                        characterAnimationComponent.currentframeData.R = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].xFormat; // Reinicia al frame inicial
+                        characterAnimationComponent.currentframeData.G = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].yFormat; // Reinicia al frame inicial
                         characterAnimationComponent.currentframeData.B = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].widhtFormat; // Reinicia al frame inicial
                         characterAnimationComponent.currentframeData.A = animationData.frameDataArray[characterAnimationComponent.currentFrameIndex].heightFormat; // Reinicia al frame inicial
              

@@ -5,6 +5,7 @@ using Arch.System;
 using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Multimesh;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
         private CommandBuffer commandBuffer;
         private QueryDescription queryRemove = new QueryDescription().WithAll<PendingRemove,Sprite3D>();
         private QueryDescription queryRemoveGPU = new QueryDescription().WithAll<PendingRemove, RenderGPUComponent, CharacterComponent>();
+        private QueryDescription queryRemoveSpriteGPU = new QueryDescription().WithAll<PendingRemove, SpriteRenderGPUComponent>();
     public RemoveSystem(World world) : base(world)
         {
             commandBuffer = new CommandBuffer();
@@ -97,12 +99,41 @@ using System.Threading.Tasks;
             }
         }
     }
-    
+    private struct ChunkJobSpriteGpu : IChunkJob
+    {
+        private readonly float _deltaTime;
+        private readonly CommandBuffer _commandBuffer;
+        private readonly World _world;
+
+        public ChunkJobSpriteGpu(CommandBuffer commandBuffer, float deltaTime, World world) : this()
+        {
+            _commandBuffer = commandBuffer;
+            _deltaTime = deltaTime;
+            _world = world;
+        }
+
+        public void Execute(ref Chunk chunk)
+        {
+            ref var pointerEntity = ref chunk.Entity(0);            
+            ref var pointerSpriteGpu = ref chunk.GetFirst<SpriteRenderGPUComponent>();
+            
+            foreach (var entityIndex in chunk)
+            {
+                ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
+                ref SpriteRenderGPUComponent s = ref Unsafe.Add(ref pointerSpriteGpu, entityIndex);
+
+                MultimeshManager.Instance.FreeInstance(s.rid, s.instance, s.idMaterial);
+                RenderingServer.MultimeshInstanceSetCustomData(s.rid, s.instance, new Color(-1, -1, -1, -1));
+            }
+        }
+    }
     public override void AfterUpdate(in float t)
     {
         World.InlineParallelChunkQuery(in queryRemove, new ChunkJob(commandBuffer, t,World));
         World.InlineParallelChunkQuery(in queryRemoveGPU, new ChunkJobRemoveGpu(commandBuffer, t, World));
+        World.InlineParallelChunkQuery(in queryRemoveSpriteGPU, new ChunkJobSpriteGpu(commandBuffer, t, World));
         commandBuffer.Playback(World);
+        
     }
 }
    

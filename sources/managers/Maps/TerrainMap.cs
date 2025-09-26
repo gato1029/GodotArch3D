@@ -53,11 +53,12 @@ public class TerrainDataGame:DataItem
             }            
             if (GetSpriteData().listCollisionBody != null)
             {
-                foreach (var item in GetSpriteData().listCollisionBody)
-                {
-                    var posCollider = positionCollider + item.MultiplicityInternal(GetSpriteData().scale).OriginCurrent;
-                    idUnique = CollisionManager.Instance.terrainColliders.AddShapeToObject(this, item, posCollider);
-                }
+                idUnique = CollisionManager.Instance.terrainColliders.AddColliderObject(this, GetSpriteData().listCollisionBody.ToList(), positionCollider);
+                //foreach (var item in GetSpriteData().listCollisionBody)
+                //{
+                //    var posCollider = positionCollider + item.MultiplicityInternal(GetSpriteData().scale).OriginCurrent;
+                //    idUnique = CollisionManager.Instance.terrainColliders.AddShapeToObject(this, item, posCollider);
+                //}
             }
         }
         else

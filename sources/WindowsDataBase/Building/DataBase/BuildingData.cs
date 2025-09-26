@@ -17,9 +17,11 @@ public enum BuildingType
     Ninguno = 0,
     ProductorMaterial = 1,
     ProductorUnidades = 2,
-    ProductorRecurso = 3,
+    ProductorRecurso = 3,    
     TorreDefensa = 4, // Edificio de defensa, como una torre
     Procesador = 5,
+    GeneradorMejoras = 6,
+    Adorno = 7,
 }
 public class CostInput
 {
@@ -64,12 +66,14 @@ public class BuildingData:IdData
 {
     public BuildingPosition buildingPosition { get; set; } // posicion de construccion
     public SpriteData spriteData { get; set; } // Datos del sprite del edificio, puede ser una textura o atlas
+    public SpriteData spriteBullet { get; set; } // Datos del sprite del proyectil, si lo tuviese    
     public bool isAnimated { get; set; } = false; // Es una animacion o no
     public List<AnimationStateData> animationData { get; set; } = null; // Datos de la animación del edificio, si aplica
     public int level { get; set; } = 1; // Nivel del edificio, por defecto 1
     public int maxHealth { get; set; } = 100; // Salud máxima del edificio, por defecto 100    
     public float attackRange { get; set; } = 0f; // Rango de ataque, por defecto 0 (sin ataque)
     public float attackCooldown { get; set; } = 0f; // Tiempo de recarga del ataque, por defecto 0 (sin ataque)
+    
     public string description { get; set; }
     public BuildingType buildingType { get; set; } = BuildingType.Ninguno;    
     public float timeToBuild { get; set; } // Tiempo hasta terminar la construccion     
@@ -81,7 +85,7 @@ public class BuildingData:IdData
     public int idBuildingUpgrade { get; set; } = 0; // ID del edificio al que se puede mejorar, 0 si no hay mejora disponible
     public List<ElementsData> attackPowers { get; set; } = null; // Poder de ataque del edificio, si aplica
     public List<ElementsData> defensePowers { get; set; } = null; // Poder de defensa del edificio, si aplica
-
+    public List<BonusData> bonusPowers { get; set; } = null; // Poderes Bonus
     public BuildingData()
     {
     }

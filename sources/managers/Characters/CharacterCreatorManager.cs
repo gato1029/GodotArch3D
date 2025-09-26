@@ -38,10 +38,12 @@ public enum CharacterStateType
 [Component]
 public struct CharacterComponent
 {
-    public CharacterStateType characterStateType;  
+    public CharacterStateType characterStateType;    
     public int idCharacterBaseData; // CharacterModelBaseData
     public int healthBase;
     public int damageBase;
+
+    public float hitStunTimer;   // << nuevo campo
     public float speedAtackBase;    
     public int[] accessoryArray; // AccessoryData
 }
@@ -50,11 +52,7 @@ public struct CharacterAtackComponent
 {
     public bool isAttack;
 }
-[Component]
-public struct CharacterUnitComponent
-{
-    public int team;
-}
+
 [Component]
 public struct CharacterUnitMovementFixedComponent
 {
@@ -85,8 +83,7 @@ public struct CharacterAccesoriesComponent
     public int idArmor;
 }
 
-[Component]
-public struct CharacterColliderComponent { }
+
 
 [Component]
 public struct CharacterAnimationComponent
@@ -117,17 +114,21 @@ public struct CharacterCommonBehaviorComponent
     public int idAttackBehavior; // ICharacterAttackBehavior
     public int idMoveBehavior; // ICharacterMoveBehavior
     public int idStateBehavior;
+    // Nuevo campo para time slicing
+    public float collisionCheckCooldown;
+    public float collisionAttackCheckCooldown;
+    
 }
 
 internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
 {
 
     private int layerRenderCharacters = 20;
+    public int totalUnits { get; set; } = 0;
     protected override void Initialize()
     {
     
     }
-
     public void CreateNewCharacter(int idCharacterBase, Vector2 positionInitial)
     {
         CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(idCharacterBase);
@@ -144,9 +145,9 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
 
         if (characterBaseData.animationCharacterBaseData.collisionBody != null || characterBaseData.animationCharacterBaseData.collisionMove != null)
         {
-            AddColliderBody(entity, characterBaseData.animationCharacterBaseData, positionInitial);
+            AddColliderBody(entity, characterBaseData, positionInitial);
         }
-
+        totalUnits++;
         
     }
 
@@ -154,6 +155,7 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
     {
         var inst = MultimeshManager.Instance.CreateInstance(idMaterial);
 
+        
         GeometricShape2D colliderB = characterBaseData.animationCharacterBaseData.collisionMove.Multiplicity(characterBaseData.scale);
 
         Vector2 originOffset = colliderB.OriginCurrent;
@@ -182,19 +184,22 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
     private void AddBase(Entity entity, CharacterModelBaseData baseData)
     {
         if (baseData.animationCharacterBaseData.hasCompositeAnimation)
-        {          
+        {
+            entity.Add(new HealthComponent { current = 1000 });
             int[] accessoryArray = new int[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
             accessoryArray[(int)AccesoryAvatarType.WEAPON] = 2;// AccesoryManager.Instance.GetAccesory(2);
             entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 1000000, speedAtackBase = 0.1f, accessoryArray = accessoryArray, characterStateType = CharacterStateType.IDLE  });
         }
         else
         {
+            entity.Add(new HealthComponent { current = 100 });
             entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 100, speedAtackBase = 0.0f, accessoryArray = null, characterStateType = CharacterStateType.IDLE });
         }                       
     }
     private void AddMove(Entity entity, Vector2 positionInitial, CharacterModelBaseData characterBaseData)
     {
         float velocity = 3;
+        
         foreach (var item in characterBaseData.bonusDataArray)
         {
             switch (item.type)
@@ -208,21 +213,26 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
                 case BonusType.VELOCITY_MOVE:
                     velocity = item.value;
                     break;
+                case BonusType.RANGO_ATAQUE_EDIFICIOS:
+                    break;
+                case BonusType.VELOCIDAD_PROYECTIL:
+                    break;
                 default:
                     break;
             }
         }
-        
+
 
         entity.Add(new PositionComponent { position = positionInitial });
         entity.Add(new DirectionComponent { animationDirection = AnimationDirection.LEFT });
-        entity.Add(new VelocityComponent { velocity = 5 });
+        entity.Add(new VelocityComponent { velocity = velocity });
         
     }
 
     private void AddSoulCharacter(Entity entity , CharacterModelBaseData characterBaseData, Vector2 positionInitial)
     {
-        CharacterUnitComponent unitComponent = new CharacterUnitComponent();
+
+        TeamComponent teamComponent = new TeamComponent();
         switch (characterBaseData.characterBehaviorType)
         {
             case CharacterBehaviorType.NINGUNO:
@@ -232,22 +242,25 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
                 CharacterAtackComponent characterAtackComponent = new CharacterAtackComponent { isAttack = false };
                 behaviorCharacterComponent.characterBehavior = BehaviorManager.Instance.GetBehavior(1);
                 entity.Add(behaviorCharacterComponent);
-                entity.Add(characterAtackComponent);                
-                unitComponent.team = 1;
-                entity.Add(unitComponent);
+                entity.Add(characterAtackComponent);
+                teamComponent.team = 2;
+                entity.Add(teamComponent);
                 break;
-            case CharacterBehaviorType.GENERICO:                
-                unitComponent.team = 2;
-                entity.Add(unitComponent);
+            case CharacterBehaviorType.GENERICO:
+                
+                teamComponent.team = 2;
+                entity.Add(teamComponent);
                 CharacterCommonBehaviorComponent characterCommonBehaviorComponent =  new CharacterCommonBehaviorComponent();
-              
+                characterCommonBehaviorComponent.collisionCheckCooldown = 0;
                 AddMoveType(entity, ref characterCommonBehaviorComponent,characterBaseData, positionInitial);
                 AddAtackType(entity, ref characterCommonBehaviorComponent, characterBaseData, positionInitial);
                 entity.Add(characterCommonBehaviorComponent);
+            
                 break;
             default:
                 break;
-        }        
+        }
+       
     }
 
     private void AddAtackType(Entity entity, ref CharacterCommonBehaviorComponent characterCommonBehaviorComponent, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
@@ -320,10 +333,11 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         entity.Add<CharacterAnimationComponent>(characterAnimationComponent);
     }
 
-    private void AddColliderBody(Entity entity, AnimationCharacterBaseData characterBaseData, Vector2 positionInitial)
+    private void AddColliderBody(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
     {
-        entity.Add<CharacterColliderComponent>();
-        CollisionManager.Instance.characterCollidersEntities.AddUpdateItem(positionInitial, entity);
+        int idCollider = CollisionManager.Instance.characterCollidersEntities.AddColliderObject(entity, characterBaseData.collisionMove, positionInitial);
+
+        entity.Add<ColliderComponent>(new ColliderComponent { idCollider = idCollider });
     }
 
     public void RemoveCharacter(Entity entity, CharacterComponent characterComponent, Rid rid, int instance)
@@ -333,7 +347,10 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         MultimeshManager.Instance.FreeInstance(rid,instance,idMaterial);        
         RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Color(-1, -1, -1, -1));
 
-        CollisionManager.Instance.characterCollidersEntities.RemoveItem(entity.Reference());
+        //CollisionManager.Instance.characterCollidersEntities.RemoveItem(entity.Reference());
+        
+        CollisionManager.Instance.characterCollidersEntities.RemoveCollider(entity.Get<ColliderComponent>().idCollider);
+        totalUnits--;
     }
  
 

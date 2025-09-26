@@ -181,7 +181,7 @@ columns = 2
 
 [node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
-text = "Offset X:"
+text = "Offset Sprite X:"
 
 [node name="SpinBoxOffsetX" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
@@ -190,7 +190,7 @@ step = 0.10000000000582077
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
-text = "Offset Y:"
+text = "Offset Sprite Y:"
 
 [node name="SpinBoxOffsetY" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
@@ -211,7 +211,7 @@ text = "Escala:"
 [node name="SpinBoxScale" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2
 step = 0.10000000000582077
-value = 1.0000000000582077
+value = 1.00000000005821
 
 [node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion"]
 layout_mode = 2

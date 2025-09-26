@@ -367,7 +367,7 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
 
     private void NormalizeAnimationCharacter(MaterialData idMaterial, InsertResult placement) 
     {
-        var expression = BsonExpression.Create("ANY(animationDataArray.idMaterial) = @0", idMaterial.id);
+        var expression = BsonExpression.Create("$.animationDataArray[*].idMaterial ANY = @0", idMaterial.id);
         var listData = DataBaseManager.Instance.FindAllFilter<AnimationCharacterBaseData>(expression);
 
         foreach (var item in listData)

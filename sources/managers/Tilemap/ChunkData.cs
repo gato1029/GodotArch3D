@@ -23,6 +23,7 @@ public class DataItem
     [ProtoIgnore, JsonIgnore] public Vector2 positionCollider { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector2I positionTileWorld { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector2I positionTileChunk { get; set; }
+    [ProtoIgnore, JsonIgnore] public Vector2 positionReal { get; set; }
     public virtual void SetDataGame() { }
     public virtual void ClearDataGame() { }
     public virtual SpriteData GetSpriteData() { return null; }
@@ -55,6 +56,12 @@ public class DataItem
     {
         get => positionTileChunk;
         set => positionTileChunk = value;
+    }
+    [ProtoMember(6)]
+    public ProtoVector2 positionRealChunkSerialized
+    {
+        get => positionReal;
+        set => positionReal = value;
     }
 }
 public class ChunkData<T>

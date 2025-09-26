@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 internal class AnimationSystem : BaseSystem<World, float>
 {
+    //corregirlo
     private CommandBuffer commandBuffer;
     private QueryDescription queryAnimation = new QueryDescription().WithAll<Animation,Sprite3D,Transform,Direction>();
 

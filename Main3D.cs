@@ -22,13 +22,16 @@ using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Profiler;
+using GodotEcsArch.sources.managers.Buildings;
+using GodotEcsArch.sources.components;
 public partial class Main3D : Node3D
 {
     MultimeshMaterial multimeshMaterial;
     TerrainMap terrainMap;
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
 
-   
+
+    int squareId;
     public override void _Ready()
 	{
 
@@ -36,6 +39,19 @@ public partial class Main3D : Node3D
         EcsManager.Instance.SetNode3DMain(this);
         ChunkManager.Initialize();
 
+        //var w = EcsManager.Instance.World;
+        //var dat =ProjectilePool.Instance.SpawnProjectile();
+        //ProjectilePool.Instance.ReturnProjectile(dat);
+        //ProjectilePool.Instance._commandBuffer.Playback(w);
+        
+
+        WireShape.Instance.DrawGrid(1024, 1024, 16, new Vector2(0, 0), 20, Colors.DarkCyan);
+        //int idg=WireShape.Instance.DrawIsometricGrid(10, 10, 32, new Vector2(0, 0), 20, Colors.ForestGreen,true);
+        //float tt = (10 * 16)/2;
+        //WireShape.Instance.UpdateShapePositionPixel(idg, new Vector2(-tt,-tt));
+
+        int id =WireShape.Instance.DrawFilledSquare(new Vector2(16, 16), new Vector2(0, 0), 30, Colors.SeaGreen, .5f);
+        WireShape.Instance.UpdateShapePositionPixel(id, new Vector2(24,24));
         //MapLevelData mapLevelData = new MapLevelData("Demo", new Vector2I(100, 100), MapType.Mapa, 10, "Demo");
         //MapManagerEditor.Instance.currentMapLevelData = mapLevelData;
         //var dd =MultimeshManager.Instance;
@@ -77,18 +93,48 @@ public partial class Main3D : Node3D
 
         CharacterCreatorManager.Instance.CreateNewCharacter(1, new Vector2(0, 0));
 
-        //Vector2 wdd = new Vector2(8, 8);
+
+
+
+
+
+        //Vector2 wdd = new Vector2(5, 5);
         //CharacterCreatorManager.Instance.CreateNewCharacter(2, wdd);
+        // Dibujar un cuadrado
+        //squareId = WireShape.Instance.DrawSquare(
+        //    new Vector2(32, 32),
+        //    new Vector2(1, 1),
+        //    20,
+        //    Colors.Green
+        //);
 
-        //for (int i = 0; i < 5000; i++)
-        //{
 
-        //    Vector2 dd = GetRandomVector2(new Vector2(-100, -100), new Vector2(100, 100));
-        //    CharacterCreatorManager.Instance.CreateNewCharacter(2, dd);
-        //}
+        //int arrowId = WireShape.Instance.DrawArrow(new Vector2(0,0), new Vector2(0, 32),20, Colors.Green);
 
+        //WireShape.Instance.RotateArrow(arrowId, 90);
+
+        //var sprite =BuildingManager.Instance.GetData(5).spriteBullet;
+        //SpriteHelper.CreateEntity(sprite, 1, new Vector2(3, 3), 30, new Vector2(0, 0));
+
+        //var spriteBase = BuildingManager.Instance.GetData(5).spriteBullet;
+        //var sprite = SpriteHelper.CreateSpriteRenderGpuComponent(spriteBase, spriteBase.scale, new Vector2(0,0), 30);
+        //Entity entity = EcsManager.Instance.World.Create();
+        //entity.Add(sprite);
+        //entity.Add(new PositionComponent { position = new Vector2(4, 4) });
+        for (int i = 0; i < 0; i++)
+        {
+
+            //Vector2 dd = GetRandomVector2(new Vector2(-50, -50), new Vector2(100, 100));
+            //CharacterCreatorManager.Instance.CreateNewCharacter(2, dd);
+       
+        }        
     }
-
+    
+    public override void _ExitTree()
+    {
+       
+        
+    }
 
     public override void _Input(InputEvent @event)
     {
@@ -118,7 +164,7 @@ public partial class Main3D : Node3D
     public override void _Process(double delta)
     {
 
-     
+       
 
         //Vector2I screenSize = DisplayServer.ScreenGetSize();
         //GD.Print("Resolución máxima del monitor: " + screenSize);

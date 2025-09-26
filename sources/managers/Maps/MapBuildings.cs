@@ -26,30 +26,27 @@ public class BuildingDataGame : DataItem
     public override void SetDataGame()
     {
         
-        if (GetSpriteData().haveCollider)
-        {
-            if (idUnique != 0)
-            {
-                CollisionManager.Instance.BuildingsColliders.RemoveCollider(idUnique);
-                idUnique = 0;
-            }
-            if (GetSpriteData().listCollisionBody != null)
-            {
-                foreach (var item in GetSpriteData().listCollisionBody)
-                {
-                    var posCollider = positionCollider + item.OriginCurrent;
-                    idUnique = CollisionManager.Instance.BuildingsColliders.AddShapeToObject(this, item, posCollider);
-                }
-            }
-        }
-        else
-        {
-            if (idUnique != 0)
-            {
-                CollisionManager.Instance.BuildingsColliders.RemoveCollider(idUnique);
-                idUnique = 0;
-            }
-        }
+        //if (GetSpriteData().haveCollider)
+        //{
+        //    if (idUnique != 0)
+        //    {
+        //        CollisionManager.Instance.BuildingsColliders.RemoveCollider(idUnique);
+        //        idUnique = 0;
+        //    }
+        //    if (GetSpriteData().listCollisionBody != null)
+        //    {
+        //        idUnique = CollisionManager.Instance.BuildingsColliders.AddColliderObject(this, GetSpriteData().listCollisionBody.ToList(), positionCollider);
+       
+        //    }
+        //}
+        //else
+        //{
+        //    if (idUnique != 0)
+        //    {
+        //        CollisionManager.Instance.BuildingsColliders.RemoveCollider(idUnique);
+        //        idUnique = 0;
+        //    }
+        //}
         if (!existEntity)
         {
             CreateEntity();
@@ -58,14 +55,14 @@ public class BuildingDataGame : DataItem
     private void CreateEntity()
     {
         existEntity = true;
+        entity = BuildingCreator.Instance.CreateBuilding(idData, positionReal, positionCollider);
     }
     public override void ClearDataGame()
     {
         if (idUnique != 0)
-        {
-            CollisionManager.Instance.BuildingsColliders.RemoveCollider(idUnique);
+        {            
             idUnique = 0;
-            //destroy entity
+            BuildingCreator.Instance.Destroy(entity);            
         }
     }
     public override SpriteData GetSpriteData()

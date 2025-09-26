@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.managers.Animations;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
@@ -64,13 +65,12 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         FacadeWindowDataSearch<AnimationCharacterBaseData> window = new FacadeWindowDataSearch<AnimationCharacterBaseData>("res://sources/WindowsDataBase/Character/WindowAnimationCharacterRefact.tscn",this,WindowType.SELECTED);
         window.OnNotifySelected += Window_OnNotifySelected;
     }
-
+    
     private void Window_OnNotifySelected(AnimationCharacterBaseData objectSelected)
     {
-        objectData.idAnimationCharacterBaseData = objectSelected.id;
-
+        objectData.idAnimationCharacterBaseData = objectSelected.id;    
         FrameData iFrame = objectSelected.animationDataArray[0].animationData[0].frameDataArray[0];
-        var dataTexture = MaterialManager.Instance.GetAtlasTexture(objectSelected.animationDataArray[0].idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+        var dataTexture = MaterialManager.Instance.GetAtlasTextureInternal(objectSelected.animationDataArray[0].idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
         Sprite2DView.Texture = dataTexture;
 
         
@@ -94,7 +94,11 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         objectData.unitMoveType = (UnitMoveType)OptionButtonUnitMoveType.GetSelectedId();
 
         objectData.unitMoveData = new UnitMoveData { radiusMove = (float)SpinBoxRadiusMove.Value, radiusSearch = (float)SpinBoxRadiusSearch.Value };
-        
+
+        AnimationCharacterBaseData animationCharacterBaseDataSelected = AnimationCharacterManager.Instance.GetCharacterBaseData(objectData.idAnimationCharacterBaseData);
+        objectData.collisionMove = animationCharacterBaseDataSelected.collisionMove.Multiplicity(objectData.scale);
+        objectData.collisionBody = animationCharacterBaseDataSelected.collisionBody.Multiplicity(objectData.scale);
+
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChangued?.Invoke(this);
         OnNotifyChanguedSimple?.Invoke();

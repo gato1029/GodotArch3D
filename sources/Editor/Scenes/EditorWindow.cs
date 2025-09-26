@@ -59,7 +59,9 @@ public partial class EditorWindow : PanelContainer
             case 2:
                 selectedTabMode = EditorMode.EDIFICIOS;
                 break;
-               
+            case 3:
+                selectedTabMode = EditorMode.UNIDADES;
+                break;
             default:
                 break;
         }

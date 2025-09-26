@@ -1,0 +1,83 @@
+[gd_scene load_steps=3 format=3 uid="uid://yi68toaxplp"]
+
+[ext_resource type="Script" uid="uid://dpntn0njroh67" path="res://sources/Editor/Controls/ControlEditorUnit.cs" id="1_43oa1"]
+[ext_resource type="Texture2D" uid="uid://bfy5aob4otta4" path="res://resources/Textures/internal/image.png" id="2_tvvk3"]
+
+[node name="ControlEditorUnits" type="MarginContainer"]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 431.0
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+script = ExtResource("1_43oa1")
+
+[node name="PanelContainerFocus" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainerFocus"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainerFocus/MarginContainer"]
+layout_mode = 2
+current_tab = 0
+
+[node name="Disenio" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+metadata/_tab_index = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio"]
+layout_mode = 2
+
+[node name="TextureRectImage" type="TextureRect" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio/VBoxContainer2"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_tvvk3")
+stretch_mode = 4
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio"]
+layout_mode = 2
+
+[node name="ButtonRefresh" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio/HBoxContainer2"]
+layout_mode = 2
+text = "Refrescar"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio/HBoxContainer3"]
+layout_mode = 2
+text = "Unidades Totales:"
+
+[node name="SpinBoxTotalUnits" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio/HBoxContainer3"]
+layout_mode = 2
+max_value = 100000.0
+editable = false
+
+[node name="ItemListData" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainer/Disenio"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Detalle Unidades" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Detalle Unidades"]
+layout_mode = 2
+
+[node name="ContainerLayers" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Detalle Unidades/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3

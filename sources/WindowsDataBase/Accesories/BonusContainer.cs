@@ -49,9 +49,9 @@ public partial class BonusContainer : PanelContainer
         {
             foreach (var item in bonusDatas)
             {
-                var node = packedScene.Instantiate<ControlBonus>();
-                node.SetData(item);
+                var node = packedScene.Instantiate<ControlBonus>();                
                 boxContainer.AddChild(node);
+                node.SetData(item);
             }
         }
     }

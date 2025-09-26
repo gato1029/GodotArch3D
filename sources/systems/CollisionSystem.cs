@@ -24,7 +24,7 @@ namespace GodotEcsArch.sources.systems
 
         private CommandBuffer commandBuffer;
         private QueryDescription queryDynamicSprite = new QueryDescription().WithAll<Position, Direction, ColliderSprite>();
-        private QueryDescription queryCharacter = new QueryDescription().WithAll<PositionComponent, CharacterColliderComponent>();
+        private QueryDescription queryCharacter = new QueryDescription().WithAll<PositionComponent, ColliderComponent>();
         public CollisionSystem(World world) : base(world)
         {
             commandBuffer = new CommandBuffer();
@@ -77,42 +77,58 @@ namespace GodotEcsArch.sources.systems
             }
         }
 
-        private readonly struct UpdateColliderCharacter : IForEachWithEntity<PositionComponent>
+        private readonly struct UpdateColliderCharacter : IForEachWithEntity<PositionComponent,ColliderComponent>
         {
             private readonly float _deltaTime;
             private readonly CommandBuffer _commandBuffer;
+            private readonly int _batchIndex;
+            private readonly int _numBatches;
 
-            public UpdateColliderCharacter(float deltaTime, CommandBuffer commandBuffer)
+            public UpdateColliderCharacter(float deltaTime, CommandBuffer commandBuffer, int batchIndex, int numBatches)
             {
                 _deltaTime = deltaTime;
                 _commandBuffer = commandBuffer;
-
+                _batchIndex = batchIndex;
+                _numBatches = numBatches;
             }
+
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Update(Entity entity, ref PositionComponent p)
+            public void Update(Entity entity, ref PositionComponent p, ref ColliderComponent c)
             {
-                CollisionManager.Instance.characterCollidersEntities.AddUpdateItem(p.position, entity);
+                if ((c.idCollider % _numBatches) == _batchIndex)
+                {
+                    CollisionManager.Instance.characterCollidersEntities
+                        .UpdateColliderPosition(c.idCollider, p.position);
+                }
             }
         }
+        private int batchIndex = 0;
+        private float batchTimer = 0f;
+        private const float batchInterval = 0.02f; // cada 20ms rota batch
+        private const int TargetUpdatesPerFrame = 600; // cuántos colliders máximo por frame
 
+        private int NumBatches = 1;
         public override void Update(in float t)
         {
-            //World.InlineParallelChunkQuery(in queryDynamicSprite, new ChunkJobUpdateCollider(commandBuffer, t));
-
-            using (new ProfileScope("Collision System"))
+            // 🔹 calcular cuántos batches necesito
+            int totalColliders = CollisionManager.Instance.characterCollidersEntities.Count;
+            NumBatches = Math.Max(1, (int)Math.Ceiling(totalColliders / (float)TargetUpdatesPerFrame));
+            
+            // 🔹 avanzar el índice de batch con deltaTime
+            batchTimer += t;
+            if (batchTimer >= batchInterval)
             {
-                var job = new JobUpdateCollider((float)t, commandBuffer);
-                World.InlineEntityQuery<JobUpdateCollider, Position, Direction, ColliderSprite>(in queryDynamicSprite, ref job);
+                batchTimer -= batchInterval;
+                batchIndex = (batchIndex + 1) % NumBatches;
+            }
 
-                var job2 = new UpdateColliderCharacter((float)t, commandBuffer);
-                World.InlineEntityQuery<UpdateColliderCharacter, PositionComponent>(in queryCharacter, ref job2);
-            }
-            //CollisionManager.Instance.worldPhysic.Step(1/60);
-            bool debug = Input.IsActionJustPressed("debugGridCollider");
-            if (debug)
-            {
-                CollisionManager.Instance.dynamicCollidersEntities.DrawGrid(Colors.WebPurple);
-            }
+            var job = new UpdateColliderCharacter(t, commandBuffer, batchIndex, NumBatches);
+            World.InlineEntityQuery<UpdateColliderCharacter, PositionComponent, ColliderComponent>(
+                in queryCharacter, ref job
+            );
+
+
+        
         }
     }
 }

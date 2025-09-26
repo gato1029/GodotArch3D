@@ -33,9 +33,31 @@ namespace GodotEcsArch.sources.managers.Collision
         }
         public override Rectangle Multiplicity(float value)
         {
-            Rectangle nr = new Rectangle(Width * value, Height * value, OriginCurrent * value);
-            nr.scale = value;
-            return nr;
+            // Escalamos tanto ancho como alto en base a los originales
+            float newWidth = OriginalWidth * value;
+            float newHeight = OriginalHeight * value;
+
+            // Escalamos también el origen relativo
+            var newOriginRelative = OriginRelative * value;
+
+            // Crear el nuevo rectángulo
+            var scaledRect = new Rectangle(newWidth, newHeight)
+            {
+                OriginRelative = newOriginRelative,
+                OriginCurrent = newOriginRelative, // mantenemos coherencia
+                scale = this.scale * value,        // acumulamos escala
+                Direction = this.Direction,        // copiamos la dirección
+                widthPixel = this.widthPixel * value,
+                heightPixel = this.heightPixel * value,
+                originPixelX = this.originPixelX * value,
+                originPixelY = this.originPixelY * value
+            };
+
+            return scaledRect;
+
+            //Rectangle nr = new Rectangle(Width * value, Height * value, OriginCurrent * value);
+            //nr.scale = value;
+            //return nr;
         }
         [BsonCtor]
         public Rectangle(float widthPixel, float heightPixel, float originPixelX, float originPixelY) : base()

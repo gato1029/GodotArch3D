@@ -43,106 +43,63 @@ internal class CollisionManager : SingletonBase<CollisionManager>
 
     public QuadTree<ColliderSprite> quadTreeColliders;
 
-    public SpatialHashMap<Entity> characterCollidersEntities;
+    public SpatialHashMapColliders<Entity> characterCollidersEntities;
 
     public SpatialHashMapColliders<TerrainDataGame> terrainColliders;
     public SpatialHashMapColliders<ResourceSourceDataGame> ResourceSourceColliders;
-    public SpatialHashMapColliders<BuildingDataGame> BuildingsColliders;
+
+    public SpatialHashMapColliders<Entity> BuildingsColliders;
     protected override void Initialize()
     {
-        characterCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
+        characterCollidersEntities = new SpatialHashMapColliders<Entity>(3); 
 
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
         tileColliders = new SpatialHashMap<IDataTile>(8, delegate (IDataTile er) { return er.IdCollider; });
         spriteColliders = new SpatialHashMap<TerrainDataGame>(8, delegate (TerrainDataGame er) { return er.idUnique; });
 
-        terrainColliders = new SpatialHashMapColliders<TerrainDataGame>(8);
-        ResourceSourceColliders = new SpatialHashMapColliders<ResourceSourceDataGame>(8);
-        BuildingsColliders = new SpatialHashMapColliders<BuildingDataGame>(8);
+        terrainColliders = new SpatialHashMapColliders<TerrainDataGame>(2);
+        ResourceSourceColliders = new SpatialHashMapColliders<ResourceSourceDataGame>(4);
+        BuildingsColliders = new SpatialHashMapColliders<Entity>(4);
     }
 
     protected override void Destroy()
     {
       
     }
-
-    public static bool CheckAnyCollision(
-          Entity entity,
-          Vector2 movementNext,
-          GeometricShape2D collisionMove)
+    public static bool CheckAnyCollisionMoveUnits(Entity entity,Vector2 movementNext, GeometricShape2D collisionShape)
     {
-        
-
-        Rect2 aabb = new Rect2(movementNext - (collisionMove.GetSizeQuad()/2), collisionMove.GetSizeQuad());
-
-        // 1. Chequeo contra entidades
-        var entities = CollisionManager.Instance.characterCollidersEntities.QueryAABB(aabb);
-        if (entities != null)
+        var teamOrigin = entity.Get<TeamComponent>();
+        Rect2 aabb = new Rect2(movementNext - (collisionShape.GetSizeQuad() / 2), collisionShape.GetSizeQuad());
+        var data = Instance.characterCollidersEntities.GetCollidingOwnersInAABB(aabb, entity.Get<ColliderComponent>().idCollider);
+        if (data != null)
         {
-            foreach (var item in entities.Values)
+            foreach (var item in data)
             {
-                foreach (var itemInternal in item)
+                var team = item.Get<TeamComponent>();
+                if (teamOrigin.team != team.team )
                 {
-                    if (itemInternal.Value.Id != entity.Id)
-                    {
-                        var characterComponentB = itemInternal.Value.Get<CharacterComponent>();
-                        var dataCharacterModelB = CharacterModelManager.Instance.GetCharacterModel(characterComponentB.idCharacterBaseData);
-                        var characterB = dataCharacterModelB.animationCharacterBaseData;
-                        var colliderB = characterB.collisionMove.Multiplicity(dataCharacterModelB.scale);
-                        var positionB = itemInternal.Value.Get<PositionComponent>().position + colliderB.OriginCurrent;
-
-                        if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
         }
+        return false;
+    }
+    public static List<Entity> CheckAnyEntityColliders(Vector2 position, GeometricShape2D shape)
+    {
+        List<Entity> list = new List<Entity>();
+                 
+        Rect2 aabb = new Rect2(position - (shape.GetSizeQuad() / 2), shape.GetSizeQuad());
+        
+        return Instance.characterCollidersEntities.GetCollidingOwnersInAABB(aabb);
+    }
+    public static bool CheckAnyCollisionStatic(
+          Entity entity,
+          Vector2 movementNext,
+          GeometricShape2D collisionShape)
+    {        
+        Rect2 aabb = new Rect2(movementNext - (collisionShape.GetSizeQuad()/2), collisionShape.GetSizeQuad());
 
-        // 2. Chequeo contra tiles
-        //var tileData = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
-        //if (tileData != null)
-        //{
-        //    foreach (var item in tileData.Values)
-        //    {
-        //        foreach (var itemInternal in item)
-        //        {
-        //            var tileInfo = TilesManager.Instance.GetTileData(itemInternal.Value.IdTile);
-        //            var colliderB = tileInfo.collisionBody.Multiplicity(tileInfo.scale);
-        //            var positionB = itemInternal.Value.PositionCollider;
-
-        //            if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
-        //            {
-        //                return true;
-        //            }
-        //        }
-        //    }
-        //}
-
-        // 3. Chequeo contra sprites
-        //Dictionary<TerrainDataGame, List<(GeometricShape2D shape, Vector2 position)>> terrainData = CollisionManager.Instance.spriteColliders.QueryAABBWithShapes(aabb);
-   
-        //if (terrainData != null)
-        //{
-        //    foreach (var item in terrainData)
-        //    {
-        //        var spriteBase = item.Key;
-        //        foreach (var itemGeometric in item.Value)
-        //        {
-
-        //            var colliderB = itemGeometric.shape.Multiplicity(spriteBase.GetSpriteData().scale);
-        //            var positionB = itemGeometric.position;
-
-        //            if (Collision2D.Collides(collisionMove, colliderB, movementNext, positionB))
-        //            {
-        //                return true;
-        //            }
-        //        }
-        //    }
-        //}
-                
         if (Instance.terrainColliders.IntersectsAABB(aabb))
         {
             return true;
@@ -158,7 +115,37 @@ internal class CollisionManager : SingletonBase<CollisionManager>
         return false;
     }
 
+    public static bool CheckAnyCollisionMoveUnitOnly(
+        Entity entity,
+        Vector2 movementNext,
+        GeometricShape2D collisionShape)
+    {
+        Rect2 aabb = new Rect2(movementNext - (collisionShape.GetSizeQuad() / 2), collisionShape.GetSizeQuad());
 
+        if (Instance.characterCollidersEntities.IntersectsAABB(aabb, entity.Get<ColliderComponent>().idCollider))
+        {
+            return true;
+        }
+ 
+        return false;
+    }
 
+    internal static bool CheckSegmentCollision(Vector2 startPos, Vector2 endPos, GeometricShape2D collisionShape)
+    {
+        // 1. Rectángulo que cubre el trayecto completo
+        Vector2 shapeSize = collisionShape.GetSizeQuad();
+        Rect2 sweptAABB = new Rect2(
+            new Vector2(Mathf.Min(startPos.X, endPos.X), Mathf.Min(startPos.Y, endPos.Y)) - shapeSize / 2f,
+            new Vector2(Mathf.Abs(endPos.X - startPos.X), Mathf.Abs(endPos.Y - startPos.Y)) + shapeSize
+        );
+        // 2. Revisar primero si cae en alguna celda de estáticos
+        if (!Instance.terrainColliders.IntersectsAABB(sweptAABB) &&
+            !Instance.ResourceSourceColliders.IntersectsAABB(sweptAABB) &&
+            !Instance.BuildingsColliders.IntersectsAABB(sweptAABB))
+        {
+            return false; // rápido: no hay nada en el trayecto
+        }
+        return true;
+    }
 }
 

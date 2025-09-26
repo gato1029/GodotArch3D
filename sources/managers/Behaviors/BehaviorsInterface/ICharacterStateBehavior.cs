@@ -10,5 +10,5 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 public interface ICharacterStateBehavior
 {
-    void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterCommonBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer);
+    void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterCommonBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer, float deltaTime);
 }

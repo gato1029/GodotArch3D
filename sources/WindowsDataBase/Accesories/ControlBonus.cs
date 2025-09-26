@@ -25,7 +25,8 @@ public partial class ControlBonus : HBoxContainer
     {
         bonusData = Data;
         spinBoxValue.Value = bonusData.value;
-        optionButtonCombo.Selected = (int)bonusData.type;
+        int index = (int)bonusData.type;
+        optionButtonCombo.Selected = index;
     }
     public override void _Ready()
     {

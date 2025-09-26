@@ -10,5 +10,5 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 public interface ICharacterAttackBehavior
 {
-    void ControllerBehavior(Entity entity, ref CharacterComponent characterComponent, ref CharacterCommonBehaviorComponent characterCommonBehaviorComponent, ref CommandBuffer commandBuffer, float delta);
+    void ControllerBehavior(Entity entity, ref CharacterComponent characterComponent, ref CharacterCommonBehaviorComponent characterCommonBehaviorComponent, ref CommandBuffer commandBuffer, float delta, int batchIndex, int numBatches);
 }

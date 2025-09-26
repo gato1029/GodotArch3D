@@ -31,11 +31,7 @@ public class ResourceSourceDataGame : DataItem
             }
             if (GetSpriteData().listCollisionBody != null)
             {
-                foreach (var item in GetSpriteData().listCollisionBody)
-                {
-                    var posCollider = positionCollider + item.OriginCurrent;
-                    idUnique = CollisionManager.Instance.ResourceSourceColliders.AddShapeToObject(this, item, posCollider);
-                }
+                idUnique = CollisionManager.Instance.ResourceSourceColliders.AddColliderObject(this, GetSpriteData().listCollisionBody.ToList(), positionCollider);                   
             }
         }
         else

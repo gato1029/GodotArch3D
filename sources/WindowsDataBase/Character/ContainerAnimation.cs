@@ -239,7 +239,7 @@ public partial class ContainerAnimation : PanelContainer
                 FrameData iFrame = animationData.frameDataArray[indexFrame];
                 indexFrame++;
                 currentfps = 0;
-                var dataTexture = MaterialManager.Instance.GetAtlasTexture(materialData.id,iFrame.x,iFrame.y,iFrame.widht, iFrame.height);
+                var dataTexture = MaterialManager.Instance.GetAtlasTextureInternal(materialData.id,iFrame.x,iFrame.y,iFrame.widht, iFrame.height);
                 Sprite2DView.Texture = dataTexture;
             }
             if (CheckBoxLoop.ButtonPressed && indexFrame >= animationData.frameDataArray.Length)

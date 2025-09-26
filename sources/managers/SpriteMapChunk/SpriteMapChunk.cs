@@ -558,6 +558,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
     }
     private void CreateTile(ChunkData<TData> tileMapChunkData, Vector2I tilePositionChunk, Vector2I tilePositionGlobal, int idData)
     {
+        GD.Print("posicion global Tile:"+tilePositionGlobal);
         if (idData == 0)
         {
             return;
@@ -595,11 +596,14 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
 
         Vector2 posicionCollider = positionReal;
+        dataGame.positionReal = positionCenter;
         dataGame.positionWorld = new Vector3(positionReal.X, positionReal.Y, (positionCenter.Y * CommonAtributes.LAYER_MULTIPLICATOR) + layer);
         //dataGame.Scale = spriteData.scale;        
         dataGame.positionTileChunk = tilePositionChunk;
         dataGame.positionTileWorld = tilePositionGlobal;
         dataGame.positionCollider = positionReal;
+        
+        GD.Print("posicion real:" + positionReal);
 
         tileMapChunkData.CreateUpdateTile(tilePositionChunk, dataGame);
 

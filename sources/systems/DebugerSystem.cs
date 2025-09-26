@@ -44,7 +44,7 @@ internal class DebugerSystem : BaseSystem<World, float>
 
 
     private QueryDescription queryDirection = new QueryDescription().WithAll<DirectionComponent, PositionComponent>();
-    private QueryDescription queryColliderCharacter = new QueryDescription().WithAll<CharacterComponent,CharacterColliderComponent>();
+    private QueryDescription queryColliderCharacter = new QueryDescription().WithAll<CharacterComponent,ColliderComponent>();
 
     public DebugerSystem(World world) : base(world)
     {
@@ -78,10 +78,10 @@ internal class DebugerSystem : BaseSystem<World, float>
                 float scale = dataCharacterModel.scale;
                 if (dataCharacterModel.animationCharacterBaseData.collisionBody is Rectangle)
                 {
-                    Rectangle shape = (Rectangle)dataCharacterModel.animationCharacterBaseData.collisionBody;
+                    Rectangle shape = (Rectangle)dataCharacterModel.collisionBody;
                     Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
-                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
-                    transform3DShape.Origin = new Vector3(positionComponent.position.X + shape.OriginCurrent.X * scale, positionComponent.position.Y + shape.OriginCurrent.Y * scale, 1);
+                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width, shape.Height, 1));
+                    transform3DShape.Origin = new Vector3(positionComponent.position.X + shape.OriginCurrent.X, positionComponent.position.Y + shape.OriginCurrent.Y, 1);
                     
                     DebugDraw.Quad(transform3DShape, 1, Colors.Red, 0.0f); 
                 }
@@ -89,10 +89,10 @@ internal class DebugerSystem : BaseSystem<World, float>
              
                 if (dataCharacterModel.animationCharacterBaseData.collisionMove is Rectangle)
                 {
-                    Rectangle shape2 = (Rectangle)dataCharacterModel.animationCharacterBaseData.collisionMove;
+                    Rectangle shape2 = (Rectangle)dataCharacterModel.collisionMove;
                     Transform3D transform3DShape2 = new Transform3D(Basis.Identity, Vector3.Zero);
-                    transform3DShape2 = transform3DShape2.Scaled(new Vector3(shape2.Width*scale, shape2.Height * scale, 1));
-                    transform3DShape2.Origin = new Vector3(positionComponent.position.X + shape2.OriginCurrent.X * scale, positionComponent.position.Y + shape2.OriginCurrent.Y * scale, 1);
+                    transform3DShape2 = transform3DShape2.Scaled(new Vector3(shape2.Width, shape2.Height, 1));
+                    transform3DShape2.Origin = new Vector3(positionComponent.position.X + shape2.OriginCurrent.X, positionComponent.position.Y + shape2.OriginCurrent.Y, 1);
                     DebugDraw.Quad(transform3DShape2, 1, Colors.Green, 0.0f); //debug
                 }
            
@@ -196,7 +196,7 @@ internal class DebugerSystem : BaseSystem<World, float>
                     transform3DShape2.Origin = new Vector3(position.value.X + shape2.OriginCurrent.X, position.value.Y + shape2.OriginCurrent.Y, 1);
                     DebugDraw.Sphere(transform3DShape2, shape2.Radius, Colors.Green, 0.0f); //debug
                 }
-                DebugDraw.Quad(t.transformInternal, .1f, Colors.BlueViolet, 0.0f); //center          
+                DebugDraw.Quad(t.transformInternal, .01f, Colors.BlueViolet, 0.0f); //center          
 
                 //Transform3D transform3DAABB = new Transform3D(Basis.Identity, Vector3.Zero);
                 //transform3DAABB = transform3DAABB.Scaled(new Vector3(c.aabbMove.Size.X, c.aabbMove.Size.Y, 1));
@@ -387,7 +387,7 @@ internal class DebugerSystem : BaseSystem<World, float>
 
             World.InlineParallelChunkQuery(in queryColliderCharacter, new ChunkJobDebugColliderCharacter(commandBuffer, t));
             World.InlineParallelChunkQuery(in queryDirection, new ChunkJobDebugDirectionComponent(commandBuffer, t));
-            CollisionManager.Instance.terrainColliders.DrawGrid(Colors.Bisque);
+            CollisionManager.Instance.characterCollidersEntities.DrawGrid(Colors.Bisque);
         }
 
     }
@@ -400,7 +400,7 @@ internal class DebugerSystem : BaseSystem<World, float>
                 for (int i = 0; i < itemCollider.Shapes.Count; i++)
                 {
                     GeometricShape2D itemShape = itemCollider.Shapes[i];
-                    Vector2 position = itemCollider.Positions[i];
+                    Vector2 position = itemCollider.Position+ itemShape.OriginCurrent;
                     switch (itemShape)
                     {
                         case Rectangle rect:
@@ -426,7 +426,7 @@ internal class DebugerSystem : BaseSystem<World, float>
                 for (int i = 0; i < itemCollider.Shapes.Count; i++)
                 {
                     GeometricShape2D itemShape = itemCollider.Shapes[i];
-                    Vector2 position = itemCollider.Positions[i];
+                    Vector2 position = itemCollider.Position + itemShape.OriginCurrent;
                     switch (itemShape)
                     {
                         case Rectangle rect:

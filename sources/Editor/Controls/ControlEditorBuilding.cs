@@ -119,6 +119,7 @@ public partial class ControlEditorBuilding : MarginContainer
         {
             foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
             {
+                GD.Print("posicion creacion:"+tilePos);
                 mapBase.AddUpdateTile(tilePos, objectSelected.id);
             }
         }

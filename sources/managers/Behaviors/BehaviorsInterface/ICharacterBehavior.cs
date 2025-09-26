@@ -12,6 +12,6 @@ namespace GodotEcsArch.sources.managers.Behaviors.BehaviorsInterface;
 public  interface ICharacterBehavior
 {
     public string Name { get; }
-    void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer);
+    void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer,float delta);
     void ControllerBehavior(Entity entity, ref CharacterComponent characterComponent, ref CharacterBehaviorComponent characterBehaviorComponent , ref CommandBuffer commandBuffer, float delta);
 }

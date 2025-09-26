@@ -4,7 +4,9 @@ using Arch.System;
 using Godot;
 using GodotEcsArch.sources.managers.Profiler;
 using GodotEcsArch.sources.systems;
+using GodotEcsArch.sources.systems.Buildings;
 using GodotEcsArch.sources.systems.Character;
+using GodotEcsArch.sources.systems.Combat;
 using Schedulers;
 using System;
 using System.Collections.Generic;
@@ -68,7 +70,12 @@ public class EcsManager : SingletonBase<EcsManager>
 
         groupMainCharacter = new Group<float>("MainCharacter", new MainCharacterSystem(world));
 
-        groupUnits = new Group<float>("Units" ,new BehaviorCharacterSystem(world), new CharacterBehaviorSystem(world), new CharacterCommonBehaviorSystem(world));
+        groupUnits = new Group<float>("Units" ,new BehaviorCharacterSystem(world), new CharacterBehaviorSystem(world), new CharacterCommonBehaviorSystem(world),
+            new TargetingSystem(world),
+            new RangedAttackSystem(world),
+            new ProjectileSystem(world),
+            new TakeHitSystem(world),
+            new DeathSystem(world));
         groupRemove = new Group<float>("Remove", new RemoveSystem(world));
 
         groupDebugerArch = new Group<float>("DebugerArch", new DebugerManager(world));

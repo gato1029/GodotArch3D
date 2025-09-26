@@ -65,8 +65,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
     public class AnimationCharacterBaseData : IdData
     {
         public float zOrderingOrigin { get; set; }
-        public bool hasCompositeAnimation { get; set; }
-
+        public bool hasCompositeAnimation { get; set; }        
         public GeometricShape2D collisionMove { get; set; }
         public GeometricShape2D collisionBody { get; set; }
 
@@ -85,7 +84,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
                     if (dataAnim.animationData[0].frameDataArray!=null)
                     {
                         FrameData iFrame = dataAnim.animationData[0].frameDataArray[0];
-                        textureVisual = MaterialManager.Instance.GetAtlasTexture(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+                        textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
                     }
                  
                 }

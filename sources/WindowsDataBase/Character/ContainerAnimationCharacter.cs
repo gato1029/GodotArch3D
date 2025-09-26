@@ -109,7 +109,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
         {
             AnimationStateData dataAnim = data.animationDataArray[0];
             FrameData iFrame = dataAnim.animationData[0].frameDataArray[0];
-            var dataTexture = MaterialManager.Instance.GetAtlasTexture(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+            var dataTexture = MaterialManager.Instance.GetAtlasTextureInternal(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
             Sprite2DView.Texture = dataTexture;
         }
 
@@ -130,7 +130,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
             if (data.animationData[0].frameDataArray!=null)
             {
                 FrameData iFrame = data.animationData[0].frameDataArray[0];
-                var dataTexture = MaterialManager.Instance.GetAtlasTexture(data.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+                var dataTexture = MaterialManager.Instance.GetAtlasTextureInternal(data.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
                 Sprite2DView.Texture = dataTexture;
             }
            
@@ -149,6 +149,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
 
     private void PanelCuerpo_OnNotifyPreview(GeometricShape2D geometricShape2D)
     {
+        
         objectData.collisionBody = geometricShape2D;
         CollisionShapeView.Position = new Vector2((float)geometricShape2D.originPixelX, (float)geometricShape2D.originPixelY * (-1));
         switch (geometricShape2D)
@@ -169,7 +170,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
     }
 
     private void PanelMovimiento_OnNotifyPreview(GeometricShape2D geometricShape2D)
-    {
+    {        
         objectData.collisionMove = geometricShape2D;
         CollisionShapeView.Position = new Vector2((float)geometricShape2D.originPixelX, (float)geometricShape2D.originPixelY * (-1));
         switch (geometricShape2D)

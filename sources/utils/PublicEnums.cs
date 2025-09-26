@@ -114,11 +114,12 @@ public enum WeaponType
 }
 public enum BonusType
 {
-    DURABILITY,
-    VELOCITY_ATTACK,
-    SPACE_BAG,
-    VELOCITY_MOVE,
-    RANGO_ATAQUE_EDIFICIOS,
+    DURABILITY = 0,
+    VELOCITY_ATTACK = 1,
+    SPACE_BAG = 2,
+    VELOCITY_MOVE = 3,
+    RANGO_ATAQUE_EDIFICIOS= 4,
+    VELOCIDAD_PROYECTIL = 5,
 }
 public enum ElementType
 {

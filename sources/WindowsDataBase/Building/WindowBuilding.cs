@@ -27,6 +27,9 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
     }
     ContainerAnimation ContainerAnimationBasico = null;
     ScrollContainer scrollContainer;
+
+    
+
     private void CheckBoxIsAnimated_Pressed()
     {
         if (CheckBoxIsAnimated.ButtonPressed)
@@ -84,6 +87,11 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         ControlBuildingGridBasic.SetTexture(ControlSpriteBasico.GetSprite().Texture);
         ControlBuildingGridBasic.SetBuildingPosition(objectData.buildingPosition);
         
+        ControlTower();
+        if (objectData.buildingType == BuildingType.TorreDefensa)
+        {
+            ControlBulletSprite.SetData(data.spriteBullet);            
+        }
     }
     private void ButtonSave_Pressed()
     {
@@ -91,9 +99,9 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         objectData.description = TextEditDescription.Text;
         objectData.buildingType = (BuildingType)OptionButtonTypeBuilding.Selected;
         objectData.maxHealth = (int)SpinBoxMaxHealth.Value;
-        objectData.attackRange = (int)SpinBoxRangeAttack.Value;
-        objectData.attackCooldown = (int)SpinBoxChargueAttack.Value;
-        objectData.timeToBuild = (int)SpinBoxTimeBuild.Value;
+        objectData.attackRange = (float)SpinBoxRangeAttack.Value;
+        objectData.attackCooldown = (float)SpinBoxChargueAttack.Value;
+        objectData.timeToBuild = (float)SpinBoxTimeBuild.Value;
       //  objectData.miniatura = ControlSpriteMiniatura.ObjectData;
         objectData.spriteData = ControlSpriteBasico.ObjectData;
       
@@ -111,6 +119,11 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         {
             objectData.animationData = ContainerAnimationBasico.GetData().ToList();
         }
+        if (objectData.buildingType == BuildingType.TorreDefensa)
+        {
+            objectData.spriteBullet = ControlBulletSprite.ObjectData;
+            TextureHelper.RecalulateUVFormat(objectData.spriteBullet);
+        }
         TextureHelper.RecalulateUVFormat(objectData.spriteData);
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChanguedSimple?.Invoke();
@@ -119,6 +132,7 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
 
     private void OptionButtonTypeBuilding_ItemSelected(long index)
     {
+        ClearControls();
         BuildingType type = (BuildingType)index;
         switch (type)
         {
@@ -129,6 +143,7 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
             case BuildingType.ProductorUnidades:
                 break;
             case BuildingType.TorreDefensa:
+                ControlTower();
                 break;
             case BuildingType.Procesador:
                 break;
@@ -137,7 +152,32 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         }
 
     }
+    ControlSprite ControlBulletSprite = null;
+    TabBar tabBullet =null;
 
+    private void ClearControls()
+    {
+        if (tabBullet!=null)
+        {
+            TabContainerBase.RemoveChild(tabBullet);
+            tabBullet = null;
+            ControlBulletSprite = null;
+        }        
+    }
+    private void ControlTower()
+    {
+        tabBullet = new TabBar();
+        tabBullet.Name = "Proyectil";
+        tabBullet.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        ControlBulletSprite = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlSprite.tscn").Instantiate<ControlSprite>();
+        ControlBulletSprite.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+        ControlBulletSprite.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        tabBullet.AddChild(ControlBulletSprite);
+        TabContainerBase.AddChild(tabBullet);
+
+ 
+       
+    }
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
 	{

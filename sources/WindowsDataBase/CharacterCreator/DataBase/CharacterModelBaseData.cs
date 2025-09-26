@@ -1,4 +1,5 @@
 using GodotEcsArch.sources.managers.Animations;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
@@ -28,7 +29,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         public ElementsData[] damageDataArray { get; set; }
         public ElementsData[] defenseDataArray { get; set; }
         public StatsData[] statsDataArray { get; set; }
-
+        public GeometricShape2D collisionMove { get; set; }
+        public GeometricShape2D collisionBody { get; set; }
         [BsonIgnore]
         public AnimationCharacterBaseData animationCharacterBaseData { get; set; }
         public CharacterModelBaseData()
@@ -49,7 +51,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
                     if (dataAnim.animationData[0].frameDataArray != null)
                     {
                         FrameData iFrame = dataAnim.animationData[0].frameDataArray[0];
-                        textureVisual = MaterialManager.Instance.GetAtlasTexture(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+                        textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
                     }
 
                 }

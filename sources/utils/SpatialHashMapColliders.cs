@@ -3,33 +3,26 @@ using GodotEcsArch.sources.managers.Collision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 public class ColliderData<T>
 {
     public int Id { get; }
     public T Owner { get; }
-
-    public List<GeometricShape2D> Shapes { get; }
-    public List<Vector2> Positions { get; }
+    public Vector2 Position { get; set; } // posición global del collider
+    public List<GeometricShape2D> Shapes { get; }   
 
     public ColliderData(int id, T owner)
     {
         Id = id;
         Owner = owner;
-        Shapes = new List<GeometricShape2D>();
-        Positions = new List<Vector2>();
+        Shapes = new List<GeometricShape2D>();     
     }
 
-    public void AddShape(GeometricShape2D shape, Vector2 position)
+    public void AddShape(GeometricShape2D shape)
     {
         Shapes.Add(shape);
-        Positions.Add(position);
     }
 
-    public void UpdateShapePosition(int index, Vector2 newPosition)
-    {
-        if (index >= 0 && index < Positions.Count)
-            Positions[index] = newPosition;
-    }
     public override bool Equals(object obj)
     {
         return obj is ColliderData<T> other && this.Id == other.Id;
@@ -53,9 +46,10 @@ public class SpatialHashMapColliders<T>
 
     public Dictionary<int, HashSet<ColliderData<T>>>  CellMap => cellMap;
     private readonly Dictionary<Vector2, Transform3D> gridPositions = new(); // draw grid
+    public int Count = 0;
     public SpatialHashMapColliders(float cellSize)
     {
-        this.cellSize = cellSize;
+        this.cellSize = MeshCreator.PixelsToUnits(16 * cellSize); ;
     }
 
     private int GetCellIndex(Vector2 position)
@@ -76,23 +70,26 @@ public class SpatialHashMapColliders<T>
     {
         foreach (var item in gridPositions)
         {
-            DebugDraw.Quad(item.Value, cellSize, color, 100); //debug    
+            DebugDraw.Quad(item.Value, 1, color, 100); //debug    
+           
         }
 
     }
     void addGridPosition(Vector2 positionCell)
     {
-        Vector2 vector2 = GetCellIndexNormalized(positionCell);
-        if (!gridPositions.ContainsKey(vector2))
+        
+        float sizeRealWorld = cellSize;
+        
+        if (!gridPositions.ContainsKey(positionCell))
         {
-            Vector2 plot = (vector2 * cellSize) + new Vector2(cellSize / 2, cellSize / 2);
-            Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
-            xform.Origin = new Vector3(plot.X, plot.Y, 1);
-            gridPositions.Add(vector2, xform);
-        }
-        
-        
 
+            Vector2 plot = (sizeRealWorld * positionCell) + new Vector2(sizeRealWorld/2, sizeRealWorld/2);
+            Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
+            xform = xform.Scaled(new Vector3(sizeRealWorld, sizeRealWorld, 1));
+            xform.Origin = new Vector3(plot.X, plot.Y, 1);
+            gridPositions.Add(positionCell, xform);            
+            
+        }                
     }
     private Vector2 GetCellIndexNormalized(Vector2 position)
     {
@@ -105,10 +102,10 @@ public class SpatialHashMapColliders<T>
         Vector2 size = shape.GetSizeQuad(); // asumimos que es el tamaño total
         return new Rect2(position - (size / 2), size);
     }
-    private List<int> GetCellsCoveredBy(Rect2 aabb)
+    private List<int> GetCellsCoveredBy(Rect2 aabb, out List<Vector2I> puntos)
     {
         List<int> cells = new();
-
+        puntos = new List<Vector2I>();
         int startX = (int)Math.Floor(aabb.Position.X / cellSize);
         int startY = (int)Math.Floor(aabb.Position.Y / cellSize);
         int endX = (int)Math.Floor((aabb.Position.X + aabb.Size.X) / cellSize);
@@ -119,15 +116,21 @@ public class SpatialHashMapColliders<T>
             for (int y = startY; y <= endY; y++)
             {
                 int cell = CantorPairing(x, y);
+               // GD.Print("Celdas a dibujar:" + x +"<-->"+  y);
                 cells.Add(cell);
+                puntos.Add(new Vector2I(x, y));
             }
         }
 
         return cells;
     }
-
-    public int AddShapeToObject(T owner, GeometricShape2D shape, Vector2 position)
+    public int AddColliderObject(T owner, GeometricShape2D shape, Vector2 colliderPosition)
     {
+        return AddColliderObject(owner, new List<GeometricShape2D> { shape }, colliderPosition);
+    }
+    public int AddColliderObject(T owner, List<GeometricShape2D> shapes, Vector2 colliderPosition)
+    {
+       
         int colliderId;
         ColliderData<T> data;
 
@@ -135,7 +138,11 @@ public class SpatialHashMapColliders<T>
         if (!objectToColliderId.TryGetValue(owner, out colliderId))
         {
             colliderId = UniqueIdGenerator.GetNextId<T>();
-            data = new ColliderData<T>(colliderId, owner);
+            data = new ColliderData<T>(colliderId, owner)
+            {
+                Position = colliderPosition
+            };
+
             colliders[colliderId] = data;
             objectToColliderId[owner] = colliderId;
             shapeIndicesByCollider[colliderId] = new List<int>();
@@ -143,35 +150,46 @@ public class SpatialHashMapColliders<T>
         else
         {
             data = colliders[colliderId];
+            data.Position = colliderPosition; // actualizar si se pasa nueva
         }
 
-        // Agregar la nueva forma
-        int shapeIndex = data.Shapes.Count;
-        data.AddShape(shape, position);
-        shapeIndicesByCollider[colliderId].Add(shapeIndex);
 
-        // ⚠️ En lugar de una sola celda, obtenemos el AABB del shape
-        Rect2 shapeBounds = GetShapeBounds(shape, position);
-        List<int> coveredCells = GetCellsCoveredBy(shapeBounds);
-
-        // Registrar en todas las celdas cubiertas
-        foreach (int cell in coveredCells)
+        // Procesar todas las shapes
+        foreach (var shape in shapes)
         {
-            if (!cellMap.TryGetValue(cell, out var set))
+            Vector2 positionShape = colliderPosition + shape.OriginCurrent;
+            // Calcular posición global de la shape
+          
+            // Agregar shape al collider
+            int shapeIndex = data.Shapes.Count;
+            data.AddShape(shape);
+            shapeIndicesByCollider[colliderId].Add(shapeIndex);
+
+            // AABB de la shape
+            Rect2 shapeBounds = GetShapeBounds(shape, positionShape);
+            List<int> coveredCells = GetCellsCoveredBy(shapeBounds, out List<Vector2I> puntos);
+
+            //foreach (var point in puntos)
+            //{
+            //    addGridPosition(point);
+            //}
+            // Registrar en todas las celdas cubiertas
+            foreach (int cell in coveredCells)
             {
-                set = new HashSet<ColliderData<T>>();
-                cellMap[cell] = set;
+                if (!cellMap.TryGetValue(cell, out var set))
+                {
+                    set = new HashSet<ColliderData<T>>();
+                    cellMap[cell] = set;
+                }
+                set.Add(data);
+                // guardar la posición para dibujar                
             }
-            set.Add(data); // No necesitas chequear Contains
-            
-            //addGridPosition(CellIndexToVector(cell)); // opcional: dibujar celda
+
+            // Guardar referencia del shape → celdas cubiertas
+            shapeToCell[HashShapeKey(colliderId, shapeIndex)] = coveredCells;
         }
-
-        // Podés registrar la lista de celdas cubiertas si querés trackear luego
-        shapeToCell[HashShapeKey(colliderId, shapeIndex)] = coveredCells;
-
-
-        return colliderId;
+        Count++;
+        return colliderId;       
     }
     private Vector2 CellIndexToVector(int cell)
     {
@@ -187,41 +205,59 @@ public class SpatialHashMapColliders<T>
         }
         return Vector2.Zero;
     }
-
-    public void UpdateShapePosition(int colliderId, int shapeIndex, Vector2 newPosition)
+    public void UpdateColliderPosition(int colliderId, Vector2 newPosition)
     {
-        if (!colliders.TryGetValue(colliderId, out var data)) return;
-        if (shapeIndex < 0 || shapeIndex >= data.Shapes.Count) return;
+        
+        if (!colliders.TryGetValue(colliderId, out var data))
+            return;
 
-        var shape = data.Shapes[shapeIndex];
-        Rect2 oldBounds = GetShapeBounds(shape, data.Positions[shapeIndex]);
-        Rect2 newBounds = GetShapeBounds(shape, newPosition);
-
-        List<int> oldCells = shapeToCell.GetValueOrDefault(HashShapeKey(colliderId, shapeIndex)) ?? new();
-        List<int> newCells = GetCellsCoveredBy(newBounds);
-
-        // Eliminar de celdas antiguas donde ya no debe estar
-        foreach (var cell in oldCells)
+        // Iterar todas las shapes asociadas al collider
+        for (int shapeIndex = 0; shapeIndex < data.Shapes.Count; shapeIndex++)
         {
-            if (!newCells.Contains(cell))
-                cellMap[cell]?.Remove(data);
-        }
+            var shape = data.Shapes[shapeIndex];
 
-        // Agregar a nuevas celdas
-        foreach (var cell in newCells)
-        {
-            if (!cellMap.TryGetValue(cell, out var set))
+            // Posición global de esta shape
+            Vector2 shapeWorldPos = newPosition + shape.OriginCurrent;
+
+            // AABB nuevo y viejo
+            Rect2 newBounds = GetShapeBounds(shape, shapeWorldPos);
+            List<int> newCells = GetCellsCoveredBy(newBounds, out List<Vector2I> puntos);
+
+            int shapeKey = HashShapeKey(colliderId, shapeIndex);
+            List<int> oldCells = shapeToCell.GetValueOrDefault(shapeKey) ?? new();
+
+            //foreach (var point in puntos)
+            //{
+            //    addGridPosition(point);
+            //}
+            // Sacar de las celdas antiguas donde ya no está
+            foreach (var cell in oldCells)
             {
-                set = new HashSet<ColliderData<T>>();
-                cellMap[cell] = set;
+                if (!newCells.Contains(cell) && cellMap.TryGetValue(cell, out var set))
+                {
+                    set.Remove(data);
+                    if (set.Count == 0)
+                        cellMap.Remove(cell); // limpieza opcional
+                }
             }
-            set.Add(data); // No necesitas chequear Contains
-            // addGridPosition(CellIndexToVector(cell));
+
+            // Insertar en las nuevas celdas
+            foreach (var cell in newCells)
+            {
+                if (!cellMap.TryGetValue(cell, out var set))
+                {
+                    set = new HashSet<ColliderData<T>>();
+                    cellMap[cell] = set;
+                }
+                set.Add(data);
+            }
+
+            // Actualizar shape → celdas
+            shapeToCell[shapeKey] = newCells;
         }
 
-        // Actualizar posición y celdas asociadas
-        data.UpdateShapePosition(shapeIndex, newPosition);
-        shapeToCell[HashShapeKey(colliderId, shapeIndex)] = newCells;
+        // Actualizar la posición del collider
+        data.Position = newPosition;
     }
 
 
@@ -257,32 +293,24 @@ public class SpatialHashMapColliders<T>
         objectToColliderId.Remove(data.Owner);
         colliders.Remove(colliderId);
         shapeIndicesByCollider.Remove(colliderId);
+        Count--;
     }
 
+    private static readonly ThreadLocal<HashSet<int>> visitedCellsPoolA =
+    new(() => new HashSet<int>());
 
-    private Vector2[] GetRectVertices(Rect2 rect)
+    private static readonly ThreadLocal<HashSet<int>> testedShapesPoolA =
+        new(() => new HashSet<int>());
+    public List<T> GetCollidingOwnersInAABB(Rect2 area, int excludeColliderId = 0)
     {
-        // Calculamos la mitad del tamaño del rectángulo
-        Vector2 halfSize = rect.Size / 2;
+        var visitedCells = visitedCellsPoolA.Value!;
+        var alreadyCheckedColliders = testedShapesPoolA.Value!;
 
-        // Calculamos los vértices en función del centro
-        Vector2[] vertices = new Vector2[4]
-        {
-        rect.Position - halfSize, // Superior izquierdo
-        rect.Position + new Vector2(halfSize.X, -halfSize.Y), // Superior derecho
-        rect.Position + new Vector2(-halfSize.X, halfSize.Y), // Inferior izquierdo
-        rect.Position + halfSize, // Inferior derecho
-        };
-
-        return vertices;
-    }
-    public List<T> GetCollidingOwnersInAABB(Rect2 area)
-    {
-        HashSet<int> visitedCells = new();
-        HashSet<int> alreadyCheckedColliders = new(); // Para evitar repetir el mismo objeto
+        visitedCells.Clear();
+        alreadyCheckedColliders.Clear();
         List<T> result = new();
 
-        List<int> coveredCells = GetCellsCoveredBy(area);
+        List<int> coveredCells = GetCellsCoveredBy(area, out List<Vector2I> puntos);
 
         foreach (int cell in coveredCells)
         {
@@ -292,14 +320,16 @@ public class SpatialHashMapColliders<T>
 
             foreach (var data in list)
             {
+                if (excludeColliderId != 0 && data.Id == excludeColliderId)
+                    continue;
                 if (!alreadyCheckedColliders.Add(data.Id)) continue;
 
                 for (int i = 0; i < data.Shapes.Count; i++)
                 {
                     var shape = data.Shapes[i];
-                    var pos = data.Positions[i];
+                    Vector2 shapeWorldPos = data.Position + shape.OriginCurrent;
 
-                    if (IsShapeInAABB(shape, pos, area))
+                    if (IsShapeInAABB(shape, shapeWorldPos, area))
                     {
                         result.Add(data.Owner);
                         break; // 💡 Ya colisionó, no seguimos evaluando más shapes de este owner
@@ -311,6 +341,86 @@ public class SpatialHashMapColliders<T>
         return result;
     }
 
+    public List<T> GetCollidingOwnersInAABBExternal(GeometricShape2D shapeOrigin,Rect2 area, int excludeColliderId = 0)
+    {
+        var visitedCells = visitedCellsPoolA.Value!;
+        var alreadyCheckedColliders = testedShapesPoolA.Value!;
+
+        visitedCells.Clear();
+        alreadyCheckedColliders.Clear();
+        List<T> result = new();
+
+        List<int> coveredCells = GetCellsCoveredBy(area, out List<Vector2I> puntos);
+
+        foreach (int cell in coveredCells)
+        {
+            if (!visitedCells.Add(cell)) continue;
+
+            if (!cellMap.TryGetValue(cell, out var list)) continue;
+
+            foreach (var data in list)
+            {
+                if (excludeColliderId != 0 && data.Id == excludeColliderId)
+                    continue;
+                if (!alreadyCheckedColliders.Add(data.Id)) continue;
+
+                for (int i = 0; i < data.Shapes.Count; i++)
+                {
+                    var shape = data.Shapes[i];
+                    Vector2 shapeWorldPos = data.Position + shapeOrigin.OriginCurrent;
+
+                    if (IsShapeInAABB(shapeOrigin, shapeWorldPos, area))
+                    {
+                        result.Add(data.Owner);
+                        break; // 💡 Ya colisionó, no seguimos evaluando más shapes de este owner
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+    public List<(T Owner, GeometricShape2D Shape, Vector2 Position)> QueryAABBBrutePoints(Rect2 area, int excludeColliderId = 0)
+    {
+        HashSet<int> visitedCells = new();
+        HashSet<(int, int)> addedShapes = new(); // (colliderId, shapeIndex)
+
+        List<(T, GeometricShape2D, Vector2)> result = new();
+
+        List<int> coveredCells = GetCellsCoveredBy(area, out List<Vector2I> puntos);
+
+        foreach (int cell in coveredCells)
+        {
+            if (visitedCells.Contains(cell)) continue;
+            visitedCells.Add(cell);
+
+            if (!cellMap.TryGetValue(cell, out var list)) continue;
+
+            foreach (var data in list)
+            {
+                if (excludeColliderId != 0 && data.Id == excludeColliderId)
+                    continue;
+                for (int i = 0; i < data.Shapes.Count; i++)
+                {
+                    var shape = data.Shapes[i];
+                    Vector2 position = data.Position;
+
+                    var shapeKey = (data.Id, i);
+                    if (addedShapes.Contains(shapeKey)) continue;
+                    
+                    // ✅ Aquí filtramos: solo añadimos si el punto está dentro del área
+                    if (area.HasPoint(position))
+                    {
+                        GD.Print("Punto:" + position);
+                        result.Add((data.Owner, shape, position));
+                    }
+
+                }
+            }
+        }
+
+        return result;
+    }
     public List<(T Owner, GeometricShape2D Shape, Vector2 Position)> QueryAABBBrute(Rect2 area)
     {
         HashSet<int> visitedCells = new();
@@ -318,7 +428,7 @@ public class SpatialHashMapColliders<T>
 
         List<(T, GeometricShape2D, Vector2)> result = new();
 
-        List<int> coveredCells = GetCellsCoveredBy(area);
+        List<int> coveredCells = GetCellsCoveredBy(area, out List<Vector2I> puntos);
 
         foreach (int cell in coveredCells)
         {
@@ -332,15 +442,14 @@ public class SpatialHashMapColliders<T>
                 for (int i = 0; i < data.Shapes.Count; i++)
                 {
                     var shape = data.Shapes[i];
-                    var pos = data.Positions[i];
+                    Vector2 shapeWorldPos = data.Position + shape.OriginCurrent;
 
                     var shapeKey = (data.Id, i);
                     if (addedShapes.Contains(shapeKey)) continue;
 
-                    if (IsShapeInAABB(shape, pos, area))
+                    if (IsShapeInAABB(shape, shapeWorldPos, area))
                     {
-                        result.Add((data.Owner, shape, pos));
-                        addedShapes.Add(shapeKey);
+                        result.Add((data.Owner, shape, shapeWorldPos));
                     }
                 }
             }
@@ -348,13 +457,19 @@ public class SpatialHashMapColliders<T>
 
         return result;
     }
+    private static readonly ThreadLocal<HashSet<int>> visitedCellsPool =
+        new(() => new HashSet<int>());
 
-    public bool IntersectsAABB(Rect2 area)
+    private static readonly ThreadLocal<HashSet<(int, int)>> testedShapesPool =
+        new(() => new HashSet<(int, int)>());
+    public bool IntersectsAABB(Rect2 area, int excludeColliderId = 0)
     {
-        HashSet<int> visitedCells = new();
-        HashSet<(int, int)> testedShapes = new(); // (colliderId, shapeIndex)
+        var visitedCells = visitedCellsPool.Value!;
+        var testedShapes = testedShapesPool.Value!;
+        visitedCells.Clear();
+        testedShapes.Clear();
 
-        List<int> coveredCells = GetCellsCoveredBy(area);
+        List<int> coveredCells = GetCellsCoveredBy(area, out List<Vector2I> puntos);
 
         foreach (int cell in coveredCells)
         {
@@ -364,15 +479,18 @@ public class SpatialHashMapColliders<T>
 
             foreach (var data in list)
             {
+                if (excludeColliderId != 0 && data.Id == excludeColliderId)
+                    continue;
+
                 for (int i = 0; i < data.Shapes.Count; i++)
                 {
                     var shapeKey = (data.Id, i);
                     if (!testedShapes.Add(shapeKey)) continue;
 
                     var shape = data.Shapes[i];
-                    var pos = data.Positions[i];
+                    Vector2 shapeWorldPos = data.Position + shape.OriginCurrent;
 
-                    if (IsShapeInAABB(shape, pos, area))
+                    if (IsShapeInAABB(shape, shapeWorldPos, area))
                         return true; // apenas encuentra uno, corta
                 }
             }

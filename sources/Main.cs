@@ -2,6 +2,7 @@
 using Arch.Core;
 using Arch.Core.Extensions;
 using Godot;
+using GodotEcsArch.sources.managers.Characters;
 using ImGuiGodot;
 using ImGuiNET;
 using System.Drawing;
@@ -16,7 +17,7 @@ public partial class Main : Node2D
     public   override void _Ready()
     {
 
-
+        
     }
 
     private Vector2 GetRandomVector2(Vector2 min, Vector2 max)

@@ -33,6 +33,7 @@ script = ExtResource("1_a2usr")
 
 [node name="grid" type="MeshInstance3D" parent="Game/Components/Grid"]
 transform = Transform3D(1024, 0, 0, 0, 1024, 0, 0, 0, 1, 0, 0, -50)
+visible = false
 mesh = SubResource("QuadMesh_namcl")
 skeleton = NodePath("../../../../Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D")
 surface_material_override/0 = ExtResource("2_xh56v")
@@ -195,7 +196,7 @@ render_target_update_mode = 4
 [node name="Render" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport"]
 
 [node name="Sprite3D" type="Sprite3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 visible = false
 texture = ExtResource("5_yxrc8")
 region_enabled = true

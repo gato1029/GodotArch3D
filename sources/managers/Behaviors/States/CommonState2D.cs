@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.managers.Behaviors.States;
 public class CommonState2D : ICharacterStateBehavior
 {
-    public void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterCommonBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer)
+    public void ControllerState(Entity entity, ref CharacterComponent characterComponent, ref CharacterAnimationComponent animation, ref CharacterCommonBehaviorComponent characterBehaviorComponent, ref CommandBuffer commandBuffer, float deltaTime)
     {
         switch (characterComponent.characterStateType)
         {
@@ -34,11 +34,18 @@ public class CommonState2D : ICharacterStateBehavior
                 }
                 break;
             case CharacterStateType.TAKE_HIT:
-                animation.stateAnimation = 4;  
-                if (animation.animationComplete)
-                {                  
+                animation.stateAnimation = 4;
+                //if (animation.animationComplete)
+                //{                  
+                //    characterComponent.characterStateType = CharacterStateType.IDLE;
+                //}
+                characterComponent.hitStunTimer -= deltaTime; // o tu delta global
+
+                // Si ya pasó el tiempo de "stun", volvemos a IDLE
+                if (characterComponent.hitStunTimer <= 0f)
+                {
                     characterComponent.characterStateType = CharacterStateType.IDLE;
-                }                                                
+                }
                 break;
             case CharacterStateType.TAKE_STUN:
                 animation.stateAnimation = 5;
