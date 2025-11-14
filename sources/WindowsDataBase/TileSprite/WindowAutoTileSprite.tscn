@@ -1,0 +1,78 @@
+[gd_scene load_steps=7 format=3 uid="uid://rqi3s6xacdyd"]
+
+[ext_resource type="Script" uid="uid://dgb07d464jyqf" path="res://sources/WindowsDataBase/TileSprite/WindowAutoTileSprite.cs" id="1_cp2y5"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="1_txhh5"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="2_vpy2h"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="4_reppr"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="5_2j6ps"]
+[ext_resource type="Texture2D" uid="uid://gnsswjongsbo" path="res://resources/Textures/iconos/Save as.png" id="5_i6bwj"]
+
+[node name="WindowAutoTileSprite" type="Window"]
+oversampling_override = 1.0
+title = "Auto Tile Sprite"
+position = Vector2i(0, 36)
+size = Vector2i(400, 600)
+script = ExtResource("1_cp2y5")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+columns = 6
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Nombre"
+
+[node name="LineEditName" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonAdd" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+texture_normal = ExtResource("1_txhh5")
+script = ExtResource("2_vpy2h")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonSave" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+texture_normal = ExtResource("4_reppr")
+script = ExtResource("2_vpy2h")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDuplicate" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+texture_normal = ExtResource("5_i6bwj")
+script = ExtResource("2_vpy2h")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDelete" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+texture_normal = ExtResource("5_2j6ps")
+script = ExtResource("2_vpy2h")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainerItems" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

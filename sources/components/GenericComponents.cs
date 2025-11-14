@@ -1,12 +1,13 @@
+using Arch.AOT.SourceGenerator;
+using Arch.Core;
+using Arch.Core.Extensions;
 using Godot;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Arch.AOT.SourceGenerator;
-using Arch.Core;
-using Arch.Core.Extensions;
 
 namespace GodotEcsArch.sources.components;
 
@@ -43,6 +44,7 @@ public struct PositionComponent
 {
     public Vector2 position; 
     public Vector2 lastPosition; // 💡 nuevo campo para el sweep
+    public Vector2 positionFuture;    
 }
 [Component]
 public struct DirectionComponent
@@ -55,12 +57,23 @@ public struct DirectionComponent
 public struct ColliderComponent
 {
     public int idCollider;
+    public Rect2 aabb;
+    public Vector2 position;
 }
+[Component]
+public struct PendingSpriteComponent
+{
+    public SpriteData spriteData;   // Referencia a los datos base (ej: textura, material, scale, etc.)
+    public Vector2 position;        // Posición inicial donde debe instanciarse
+    public int zIndex;            // Orden de render (opcional)
+}
+
 [Component]
 public struct RenderGPUComponent
 {
     public Rid rid;
     public int instance;
+    public int idMaterial;
     public int layerRender;
     public float zOrdering;
     public Vector2 originOffset;
@@ -92,7 +105,12 @@ public struct SpriteRenderGPUComponent
     public Color uvMap;
     public Transform3D transform;
 }
-
+[Component]
+public struct TargetPositionComponent
+{
+    public Vector2 targetPosition;
+    public float arrivalThreshold;
+}
 [Component]
 public struct RangeComponent
 {
@@ -100,9 +118,11 @@ public struct RangeComponent
 }
 
 [Component]
-public struct TargetingComponent
+public struct TargetingRangeComponent
 {
     public Entity targetEntity;
+    public Rect2 targetAabb;
+    public bool hasTarget;
 }
 [Component]
 public struct TeamComponent
@@ -198,7 +218,83 @@ public struct DamageOnHitComponent
 public struct ActiveProjectileComponent 
 {
     public bool isActive;
+    public bool isInitialized; // <- false al principio, true después de la primera vez
 }
+[Component]
+public struct PlayerInputComponent
+{
+    public Vector2 moveDirection;
+    public bool attackPressed;
+    public bool attackReleased;
+}
+
+public enum MovementMode
+{
+    PointToPoint = 0,
+    FreeWander = 1,      // nuevo modo: se mueve libremente dentro del radio
+    Orbit = 2 // reservado para más adelante
+}
+[Component]
+public struct RadiusMovementComponent
+{
+    public Vector2 center;           // Centro del radio
+    public float desiredRadius;      // Radio máximo
+    public Vector2 currentTarget;    // Objetivo actual (solo para RandomWander)
+    public MovementMode mode;  // Modo de movimiento
+    public bool hasTarget;           // Solo para RandomWander
+
+    // ⏱️ cooldown para nueva búsqueda de destino
+    public float movementCooldown;
+    public float cooldownTimer;
+}
+[Component]
+public struct MeleeTargetCandidateComponent
+{
+    // 🔹 Referencia directa al enemigo elegido
+    public Entity target;
+
+    // 🔹 Última posición conocida del enemigo al momento de asignarse
+    public Godot.Vector2 lastKnownPosition;
+
+    // 🔹 (Opcional) tiempo de validez, útil para evitar targets colgados
+    public float timeToLive;
+}
+/// <summary>
+/// Define el radio de búsqueda de enemigos para unidades melee.
+/// No es la distancia de ataque, sino hasta dónde pueden detectar rivales.
+/// </summary>
+[Component]
+public struct EnemySearchRadiusComponent
+{
+    public float radius;
+    public float cooldownSearch; // espera actual entre búsquedas
+    public int failedAttempts;          // cuántos intentos seguidos fallaron
+    public float longCooldownTimer;     // temporizador para backoff largo
+}
+[Component]
+public struct MeleeAttackComponent
+{    
+    public float attackCooldown;   // opcional, cooldown propio
+    public MeleeAttackType attackType;
+    public float attackRange;
+    public int damage;
+
+    public float cooldownTimer;
+}
+
+/// <summary>
+/// Indica que la entidad debe ser destruida después de procesar sus recursos.
+/// </summary>
+[Component]
+public struct PendingDestroyComponent { }
+
+public enum MeleeAttackType
+{
+    Physics,   // Usa colliders (el actual)
+    Direct     // Ataque directo al target sin colisiones
+}
+
+
 internal class GenericComponents
 {
 }

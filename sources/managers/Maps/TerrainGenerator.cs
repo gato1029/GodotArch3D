@@ -780,150 +780,150 @@ public class TerrainGenerator
     GenerateMode mode,
     Vector2I sizeOrRangeInTilesOrChunks, TerrainCategoryType terrainCategoryType)
     {
-        // 1. Cargar tabla de equivalencias TerrainType -> idData
-        BsonExpression bsonExpression = BsonExpression.Create(
-            "category = @0 and isRule = @1",
-            terrainCategoryType.ToString(),
-            true
-        );
-        var result = DataBaseManager.Instance.FindAllFilter<TerrainData>(bsonExpression);
+        //// 1. Cargar tabla de equivalencias TerrainType -> idData
+        //BsonExpression bsonExpression = BsonExpression.Create(
+        //    "category = @0 and isRule = @1",
+        //    terrainCategoryType.ToString(),
+        //    true
+        //);
+        //var result = DataBaseManager.Instance.FindAllFilter<TerrainData>(bsonExpression);
 
-        Dictionary<TerrainType, int> tableData = result.ToDictionary(r => r.terrainType, r => r.id);
-        tableData[TerrainType.Limite] = 0;
-        tableData[TerrainType.ElevacionBorde] = 0;
+        //Dictionary<TerrainType, int> tableData = result.ToDictionary(r => r.terrainType, r => r.id);
+        //tableData[TerrainType.Limite] = 0;
+        //tableData[TerrainType.ElevacionBorde] = 0;
 
-        // 2. Recopilar tiles solo del rango de chunks
-        List<(Vector2I pos, TerrainType terrainType, int idData)> allTiles = new();
-        IEnumerable<Vector2I> chunksToProcess = GetChunksInRange(originChunk, sizeOrRangeInTilesOrChunks, mode);
+        //// 2. Recopilar tiles solo del rango de chunks
+        //List<(Vector2I pos, TerrainType terrainType, int idData)> allTiles = new();
+        //IEnumerable<Vector2I> chunksToProcess = GetChunksInRange(originChunk, sizeOrRangeInTilesOrChunks, mode);
 
-        foreach (var chunkPos in chunksToProcess)
-        {
-            var tiles = mapTerrainBasic.GetTilesByChunk(chunkPos);
-            if (tiles == null) continue;
+        //foreach (var chunkPos in chunksToProcess)
+        //{
+        //    var tiles = mapTerrainBasic.GetTilesByChunk(chunkPos);
+        //    if (tiles == null) continue;
 
-            for (int x = 0; x < tiles.size.X; x++)
-            {
-                for (int y = 0; y < tiles.size.Y; y++)
-                {
-                    var tileData = tiles.GetTileAt(x, y);
-                    if (tileData == null)
-                        continue;
+        //    for (int x = 0; x < tiles.size.X; x++)
+        //    {
+        //        for (int y = 0; y < tiles.size.Y; y++)
+        //        {
+        //            var tileData = tiles.GetTileAt(x, y);
+        //            if (tileData == null)
+        //                continue;
 
-                    TerrainType terrainType = (TerrainType)tileData.GetTypeData();
-                    if (!tableData.ContainsKey(terrainType))
-                        continue;
+        //            TerrainType terrainType = (TerrainType)tileData.GetTypeData();
+        //            if (!tableData.ContainsKey(terrainType))
+        //                continue;
 
-                    int idData = tableData[terrainType];
+        //            int idData = tableData[terrainType];
 
-                    // Convertir coordenadas locales del chunk a coordenadas globales
-                    Vector2I globalPos = new Vector2I(
-                        chunkPos.X * tiles.size.X + x,
-                        chunkPos.Y * tiles.size.Y + y
-                    );
+        //            // Convertir coordenadas locales del chunk a coordenadas globales
+        //            Vector2I globalPos = new Vector2I(
+        //                chunkPos.X * tiles.size.X + x,
+        //                chunkPos.Y * tiles.size.Y + y
+        //            );
 
-                    allTiles.Add((globalPos, terrainType, idData));
-                }
-            }
-        }
+        //            allTiles.Add((globalPos, terrainType, idData));
+        //        }
+        //    }
+        //}
 
-        // 3. Orden de pintado
-        TerrainType[] ordenPintado = new TerrainType[]
-        {
-        TerrainType.Agua,
-        TerrainType.PisoBase,
-        TerrainType.Limite,
-        TerrainType.AguaBorde,
-        TerrainType.Elevacion,
-        TerrainType.ElevacionBase,
-        TerrainType.ElevacionBorde,
-        };
-        int idPiso = tableData[TerrainType.PisoBase];
+        //// 3. Orden de pintado
+        //TerrainType[] ordenPintado = new TerrainType[]
+        //{
+        //TerrainType.Agua,
+        //TerrainType.PisoBase,
+        //TerrainType.Limite,
+        //TerrainType.AguaBorde,
+        //TerrainType.Elevacion,
+        //TerrainType.ElevacionBase,
+        //TerrainType.ElevacionBorde,
+        //};
+        //int idPiso = tableData[TerrainType.PisoBase];
 
-        // 4. Aplicar al mapa en orden
-        foreach (var tipo in ordenPintado)
-        {
-            foreach (var (pos, terrainType, idData) in allTiles.Where(t => t.terrainType == tipo))
-            {
-                switch (terrainType)
-                {
-                    case TerrainType.Limite:
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
-                        break;
+        //// 4. Aplicar al mapa en orden
+        //foreach (var tipo in ordenPintado)
+        //{
+        //    foreach (var (pos, terrainType, idData) in allTiles.Where(t => t.terrainType == tipo))
+        //    {
+        //        switch (terrainType)
+        //        {
+        //            case TerrainType.Limite:
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
+        //                break;
 
-                    case TerrainType.PisoBase:
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData, 0);
-                        break;
+        //            case TerrainType.PisoBase:
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData, 0);
+        //                break;
 
-                    case TerrainType.Elevacion:
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
-                        break;
+        //            case TerrainType.Elevacion:
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
+        //                break;
 
-                    case TerrainType.ElevacionBase:
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
-                        break;
+        //            case TerrainType.ElevacionBase:
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
+        //                break;
 
-                    case TerrainType.ElevacionBorde:
-                        int idElevacion = tableData[TerrainType.Elevacion];
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idElevacion);
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
-                        break;
+        //            case TerrainType.ElevacionBorde:
+        //                int idElevacion = tableData[TerrainType.Elevacion];
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idElevacion);
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idPiso, 0);
+        //                break;
 
-                    case TerrainType.Agua:
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
-                        break;
+        //            case TerrainType.Agua:
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
+        //                break;
 
-                    case TerrainType.CaminoPiso:
-                    case TerrainType.CaminoAgua:
-                    case TerrainType.AguaBorde:
-                        int idAguaBorde = tableData[TerrainType.AguaBorde];
-                        int idAgua = tableData[TerrainType.Agua];
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idAguaBorde);
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idAgua);
-                        break;
+        //            case TerrainType.CaminoPiso:
+        //            case TerrainType.CaminoAgua:
+        //            case TerrainType.AguaBorde:
+        //                int idAguaBorde = tableData[TerrainType.AguaBorde];
+        //                int idAgua = tableData[TerrainType.Agua];
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idAguaBorde);
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idAgua);
+        //                break;
 
-                    default:
-                        MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
-                        break;
-                }
-            }
-        }
+        //            default:
+        //                MapManagerEditor.Instance.CurrentMapLevelData.terrainMap.AddUpdateTile(pos, idData);
+        //                break;
+        //        }
+        //    }
+        //}
     }
 
 
     public void AddTileBasicConfig(Vector2I tilePositionGlobal, TerrainType terrainType)
     {
-        switch (terrainType)
-        {
-            case TerrainType.Limite:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 2);
-                break;
-            case TerrainType.PisoBase:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 68);
-                break;
-            case TerrainType.Elevacion:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 70);
-                break;
-            case TerrainType.Agua:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 69);
-                break;
-            case TerrainType.CaminoPiso:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 72);
-                break;
-            case TerrainType.CaminoAgua:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 71);
-                break;
-            case TerrainType.AguaBorde:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 73);
-                break;
-            case TerrainType.ElevacionBase:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 74);
-                break;
-            case TerrainType.ElevacionBorde:
-                mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 10);
-                break;
-            default:
-                break;
-        }
+        //switch (terrainType)
+        //{
+        //    case TerrainType.Limite:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 2);
+        //        break;
+        //    case TerrainType.PisoBase:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 68);
+        //        break;
+        //    case TerrainType.Elevacion:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 70);
+        //        break;
+        //    case TerrainType.Agua:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 69);
+        //        break;
+        //    case TerrainType.CaminoPiso:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 72);
+        //        break;
+        //    case TerrainType.CaminoAgua:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 71);
+        //        break;
+        //    case TerrainType.AguaBorde:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 73);
+        //        break;
+        //    case TerrainType.ElevacionBase:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 74);
+        //        break;
+        //    case TerrainType.ElevacionBorde:
+        //        mapTerrainBasic.AddUpdatedTile(tilePositionGlobal, 10);
+        //        break;
+        //    default:
+        //        break;
+        //}
 
     }
     private float Normalize(float value)

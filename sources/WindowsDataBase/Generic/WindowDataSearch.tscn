@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://c2vv1gtw5355w"]
+[gd_scene load_steps=3 format=3 uid="uid://c2vv1gtw5355w"]
 
 [ext_resource type="Script" uid="uid://d3kbiqo5awqyj" path="res://sources/WindowsDataBase/Generic/WindowDataSearch.cs" id="1_u3s4t"]
+[ext_resource type="PackedScene" uid="uid://duwqcne4ov8wl" path="res://sources/KuroTiles/ControlGrouping.tscn" id="2_svqaq"]
 
 [node name="WindowDataSearch" type="Window"]
+oversampling_override = 1.0
 title = "Elementos"
 position = Vector2i(0, 36)
 size = Vector2i(900, 600)
@@ -32,7 +34,18 @@ layout_mode = 2
 
 [node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-columns = 2
+columns = 4
+
+[node name="HBoxContainerAgrupador" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer/GridContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/GridContainer/HBoxContainerAgrupador"]
+layout_mode = 2
+text = "Agrupador:"
+
+[node name="ControlGroupingSearch" parent="Panel/MarginContainer/VBoxContainer/GridContainer/HBoxContainerAgrupador" instance=ExtResource("2_svqaq")]
+layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -41,6 +54,7 @@ text = "Nombre:"
 [node name="LineEditSearch" type="LineEdit" parent="Panel/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 4
 
 [node name="ButtonNew" type="Button" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2

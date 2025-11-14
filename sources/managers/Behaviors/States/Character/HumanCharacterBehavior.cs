@@ -225,11 +225,11 @@ public class HumanCharacterBehavior : ICharacterBehavior
         Vector2 movementNext = positionComponent.position + movement + collisionMove.OriginCurrent;
         bool existCollision = false;
         
-        existCollision = CollisionManager.CheckAnyCollisionMoveUnitOnly(entity, movementNext, collisionMove);
-        if (!existCollision)
-        {
-            existCollision = CollisionManager.CheckAnyCollisionStatic(entity, movementNext, collisionMove);
-        }
+        //existCollision = CollisionManager.CheckAnyCollisionMoveUnitOnly(entity, movementNext, collisionMove);
+        //if (!existCollision)
+        //{
+        //    existCollision = CollisionManager.CheckAnyCollisionStatic(entity, movementNext, collisionMove);
+        //}
 
         
 
@@ -246,8 +246,4 @@ public class HumanCharacterBehavior : ICharacterBehavior
 
     }
 
-    bool AtackIsPosible()
-    {
-        return false; 
-    }
 }

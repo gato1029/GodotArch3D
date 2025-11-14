@@ -15,46 +15,52 @@ namespace GodotEcsArch.sources.systems.Combat
 {
     internal class RangedAttackSystem : BaseSystem<World, float>
     {
-        private CommandBuffer commandBuffer;
+        private CommandBuffer sharedCommandBuffer;
+        private CommandBuffer internalCommandBuffer;
+        private World sharedWorld;
 
         private QueryDescription queryAttack = new QueryDescription()
-            .WithAll<AttackCooldownComponent, AttackRangeComponent, AttackDamageComponent, PositionComponent, TargetingComponent>();
+            .WithAll<AttackCooldownComponent, AttackRangeComponent, AttackDamageComponent, PositionComponent, TargetingRangeComponent>();
 
-        public RangedAttackSystem(World world) : base(world)
+        public RangedAttackSystem(World world, CommandBuffer sharedCommandBuffer) : base(world)
         {
-            commandBuffer = new CommandBuffer();
+            this.sharedCommandBuffer = sharedCommandBuffer;
+            sharedWorld = world;
+            internalCommandBuffer = new CommandBuffer();
         }
 
         private struct ChunkJobAttack : IChunkJob
         {
             private readonly float _deltaTime;
-            private  CommandBuffer _commandBuffer;
-           
+            private CommandBuffer _commandBuffer;
 
             public ChunkJobAttack(CommandBuffer commandBuffer, float deltaTime) : this()
             {
                 _commandBuffer = commandBuffer;
                 _deltaTime = deltaTime;
-              
             }
 
             public void Execute(ref Chunk chunk)
             {
-                ref var pointerEntity = ref chunk.Entity(0);
                 ref var pointerCooldown = ref chunk.GetFirst<AttackCooldownComponent>();
                 ref var pointerRange = ref chunk.GetFirst<AttackRangeComponent>();
                 ref var pointerDamage = ref chunk.GetFirst<AttackDamageComponent>();
                 ref var pointerPos = ref chunk.GetFirst<PositionComponent>();
-                ref var pointerTargeting = ref chunk.GetFirst<TargetingComponent>();
+                ref var pointerTargeting = ref chunk.GetFirst<TargetingRangeComponent>();
 
                 foreach (var entityIndex in chunk)
                 {
-                    ref Entity self = ref Unsafe.Add(ref pointerEntity, entityIndex);
+                    ref Entity self = ref chunk.Entity(entityIndex);
+                    if (!self.IsAlive())
+                        continue;
+                    if (self.Has<DeadComponent>() || self.Has<PendingDestroyComponent>())
+                        continue;
+
                     ref AttackCooldownComponent cooldown = ref Unsafe.Add(ref pointerCooldown, entityIndex);
                     ref AttackRangeComponent range = ref Unsafe.Add(ref pointerRange, entityIndex);
                     ref AttackDamageComponent damage = ref Unsafe.Add(ref pointerDamage, entityIndex);
                     ref PositionComponent position = ref Unsafe.Add(ref pointerPos, entityIndex);
-                    ref TargetingComponent targeting = ref Unsafe.Add(ref pointerTargeting, entityIndex);
+                    ref TargetingRangeComponent targeting = ref Unsafe.Add(ref pointerTargeting, entityIndex);
 
                     // Reducir cooldown
                     if (cooldown.timeLeft > 0)
@@ -63,100 +69,119 @@ namespace GodotEcsArch.sources.systems.Combat
                         continue;
                     }
 
-                    // Validar si hay un objetivo
-                    if (!targeting.targetEntity.IsAlive())
+                    // Validar si hay target
+                    if (!targeting.hasTarget || !targeting.targetEntity.IsAlive())
                         continue;
 
-                    // Validar que siga en rango
+
                     var targetPos = targeting.targetEntity.Get<PositionComponent>().position;
                     float distSq = (position.position - targetPos).LengthSquared();
                     if (distSq > range.attackRange * range.attackRange)
+                    {
+                        targeting.hasTarget = false;
+                        targeting.targetEntity = Entity.Null;
                         continue;
+                    }
 
-                    // 🔫 Atacar
+                    if (targeting.targetEntity.Has<BuildingComponent>())
+                    {
+                        continue;
+                    }
+                        
+
+                    // Atacar
                     PerformAttack(self, targeting.targetEntity, damage);
 
-                    // Reiniciar cooldown
+                    // marcar que ya no tiene target hasta que el targeting system lo actualice
+                    targeting.hasTarget = false;
+                    targeting.targetEntity = Entity.Null;
+                    
+
+                    // Resetear cooldown
                     cooldown.timeLeft = cooldown.maxCooldown;
                 }
             }
+
             private void PerformAttack(Entity self, Entity target, AttackDamageComponent damage)
             {
-                // Verificamos que el target sea válido
                 if (!target.IsAlive() || target.Has<DeadComponent>())
                     return;
 
+                if (target.Has<BuildingComponent>())
+                {
+                    GameLog.LogCat("atacando a un edificio");
+                }
                 var selfPos = self.Get<PositionComponent>().position;
                 var targetPos = target.Get<PositionComponent>().position;
-
-                // Obtener un proyectil del pool
-                Entity projectile = ProjectilePool.Instance.SpawnProjectile(_commandBuffer);
-                if (projectile == Entity.Null)
-                    return; // pool vacío                
 
                 if (self.Has<BuildingComponent>())
                 {
                     var id = self.Get<BuildingComponent>().id;
                     var spriteBase = BuildingManager.Instance.GetData(id).spriteBullet;
-                    var sprite = SpriteHelper.CreateSpriteRenderGpuComponent(spriteBase, spriteBase.scale, selfPos, 30);
-                    _commandBuffer.Add(projectile,sprite);
-                   // GD.Print("Id projectil:" + projectile.Id);
-                }
 
-                // Posición inicial del proyectil = posición del atacante
-                _commandBuffer.Set(projectile, new PositionComponent
-                {
-                    position = selfPos,
-                    lastPosition = selfPos // opcional, para el sweep si lo usas
-                });
-                // Calcular dirección solo para proyectil Direct
-                Vector2 direction = (targetPos - selfPos).Normalized();
-                // Agregar datos de movimiento del proyectil
-                _commandBuffer.Set(projectile, new ProjectileComponent
-                {
-                    source = self,
-                    target = target,
-                    speed = 7f, // ajustar según arma
-                    type = ProjectileTypeShoot.Direct,
-                    direction = direction,           // para proyectil recto
-                    initialTargetPos = targetPos     // posición original del target
-                });
+                    Entity projectile = _commandBuffer.Create(
+                    [
+                        typeof(ProjectileComponent),
+                typeof(PositionComponent),
+                typeof(DamageOnHitComponent),
+                typeof(TakeHitComponent),
+                typeof(ActiveProjectileComponent),
+            ]);
 
-                // Daño que hará al impactar
-                _commandBuffer.Set(projectile, new DamageOnHitComponent
-                {
-                    damage = damage.damage
-                });
-
-                // Efectos especiales
-                if (self.Has<AttackEffectComponent>())
-                {
-                    ref var effect = ref self.Get<AttackEffectComponent>();
-
-                    switch (effect.effectType)
+                    _commandBuffer.Add(projectile, new PendingSpriteComponent
                     {
-                        case AttackEffectType.Stun:
+                        spriteData = spriteBase,
+                        position = selfPos,
+                        zIndex = 30
+                    });
+
+                    _commandBuffer.Set(projectile, new PositionComponent
+                    {
+                        position = selfPos,
+                        lastPosition = selfPos
+                    });
+
+                    Vector2 direction = (targetPos - selfPos).Normalized();
+
+                    _commandBuffer.Set(projectile, new ProjectileComponent
+                    {
+                        source = self,
+                        target = target,
+                        speed = 7f,
+                        type = ProjectileTypeShoot.Direct,
+                        direction = direction,
+                        initialTargetPos = targetPos
+                    });
+
+                    _commandBuffer.Set(projectile, new DamageOnHitComponent
+                    {
+                        damage = damage.damage
+                    });
+
+                    if (self.Has<AttackEffectComponent>())
+                    {
+                        ref var effect = ref self.Get<AttackEffectComponent>();
+                        if (effect.effectType == AttackEffectType.Stun)
+                        {
                             _commandBuffer.Set(projectile, new TakeHitComponent
                             {
                                 stunTime = effect.duration
                             });
-                            break;
-
-                        case AttackEffectType.None:
-                        default:
-                            break;
+                        }
                     }
                 }
-            }     
-
             }
+        }
+
 
         public override void Update(in float t)
         {
-            
-            World.InlineParallelChunkQuery(in queryAttack, new ChunkJobAttack(commandBuffer, t));
-            commandBuffer.Playback(World);
-            GD.Print("Total proyectiles:"+ProjectilePool.Instance.GetTotal());
+            //GD.Print("antes:"+World.CountEntities(in queryAttack));  // Antes del Playback
+
+            sharedWorld.InlineParallelChunkQuery(in queryAttack, new ChunkJobAttack(internalCommandBuffer, t));
+            internalCommandBuffer.Playback(sharedWorld);
+            //commandBuffer.Dispose();
+            //GD.Print("Despues"+World.CountEntities(in queryAttack));  // Después del Playback        
         }
     }
 }

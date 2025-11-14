@@ -28,7 +28,7 @@ public partial class Camera3dGodot : Camera3D
         _viewport.Connect("size_changed", new Callable(this, "ViewPortChanged"));
        
         RenderManager.Instance.currentDisplay = RectRender();
-        RenderManager.Instance.camera3D = camera;
+        RenderManager.Instance.camera3D = camera;        
     }
 
  
@@ -49,28 +49,27 @@ public partial class Camera3dGodot : Camera3D
         return true;
     }
     // Called every frame. 'delta' is the elapsed time since the previous frame.
+
+    private float delta = 0f;
     public override void _Process(double delta)
     {
-        
+        this.delta = (float)delta;
         if (isInScreen())
         {
-            MoveCamera((float)delta);
-            HandleMiddleMousePan((float)delta);
+            MoveCamera(this.delta);
             var cameraPosition = camera.ProjectRayOrigin(GetViewport().GetMousePosition());
             PositionsManager.Instance.positionMouseCamera = new Vector2(cameraPosition.X, cameraPosition.Y);
             PositionsManager.Instance.positionMouseCameraPixel = ConvertMouseToPixel(PositionsManager.Instance.positionMouseCamera);
 
             PositionsManager.Instance.positionMouseTileGlobal = positionTile(PositionsManager.Instance.positionMouseCameraPixel);// new Vector2(MathF.Floor(cameraPosition.X), MathF.Floor(cameraPosition.Y));
             PositionsManager.Instance.positionMouseChunk = new Vector2(
-                MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.X / PositionsManager.Instance.chunkDimencion.X),  
+                MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.X / PositionsManager.Instance.chunkDimencion.X),
                 MathF.Floor(PositionsManager.Instance.positionMouseTileGlobal.Y / PositionsManager.Instance.chunkDimencion.Y));
 
             var calc = PositionsManager.Instance.positionMouseChunk * PositionsManager.Instance.chunkDimencion;
             PositionsManager.Instance.positionMouseTileChunk = PositionsManager.Instance.positionMouseTileGlobal - calc;
             PositionsManager.Instance.positionCamera = new Vector2(this.Position.X, this.Position.Y);
-           
         }
-      
     }
 
     public Vector2 positionTile(Vector2 positionMouse)
@@ -182,6 +181,13 @@ public partial class Camera3dGodot : Camera3D
     }
     public override void _Input(InputEvent @event)
     {
+        if (isInScreen())
+        {
+            
+            HandleMiddleMousePan(delta);
+            
+
+        }
         if (@event is InputEventMouseButton mouseEvent)
         {
             if (!Input.IsKeyPressed(Key.Ctrl)) return;

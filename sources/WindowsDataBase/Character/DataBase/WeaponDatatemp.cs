@@ -30,14 +30,14 @@ public class ShieldData : IdData
     StatsResistData statsResistData { get; set; }
 }
 
-public class BulletData: IdData
-{
-    public int idMaterial { set; get; }
-    public int idWeapon { set; get; }
-    public string colorBase { set; get; }
-    public float baseDamage { get; set; }
-    public float speedMove { get; set; }
-    public float distanceMax { get; set; }
-    public int impactMax { get; set; }
-    public AnimationData[] animationDataArray { get; set; }
-}
+//public class BulletData: IdData
+//{
+//    public int idMaterial { set; get; }
+//    public int idWeapon { set; get; }
+//    public string colorBase { set; get; }
+//    public float baseDamage { get; set; }
+//    public float speedMove { get; set; }
+//    public float distanceMax { get; set; }
+//    public int impactMax { get; set; }
+//    public AnimationData[] animationDataArray { get; set; }
+//}

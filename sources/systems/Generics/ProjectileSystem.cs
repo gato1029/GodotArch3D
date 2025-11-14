@@ -5,20 +5,24 @@ using Arch.System;
 using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Multimesh;
+using GodotEcsArch.sources.utils;
 using System.Runtime.CompilerServices;
 
 namespace GodotEcsArch.sources.systems.Combat
 {
     internal class ProjectileSystem : BaseSystem<World, float>
     {
-        private CommandBuffer commandBuffer;
-
+        private CommandBuffer sharedCommandBuffer;
+        private CommandBuffer internalCommandBuffer;
+        private World sharedWorld;
         private QueryDescription queryProjectiles = new QueryDescription()
             .WithAll<ProjectileComponent, PositionComponent>();
 
-        public ProjectileSystem(World world) : base(world)
+        public ProjectileSystem(World world, CommandBuffer sharedCommandBuffer) : base(world)
         {
-            commandBuffer = new CommandBuffer();
+            sharedWorld = world;
+            internalCommandBuffer = new CommandBuffer();
+            this.sharedCommandBuffer = sharedCommandBuffer;
         }
 
         private struct ChunkJobProjectile : IChunkJob
@@ -40,19 +44,15 @@ namespace GodotEcsArch.sources.systems.Combat
                 ref var pointerActiveProj = ref chunk.GetFirst<ActiveProjectileComponent>();
                 foreach (var i in chunk)
                 {
-                    ref Entity projectile = ref Unsafe.Add(ref pointerEntity, i);
+                    ref Entity entity = ref Unsafe.Add(ref pointerEntity, i);
                     ref PositionComponent position = ref Unsafe.Add(ref pointerPos, i);
                     ref ProjectileComponent proj = ref Unsafe.Add(ref pointerProj, i);
                     ref ActiveProjectileComponent projAct = ref Unsafe.Add(ref pointerActiveProj, i);
-                    if (!projAct.isActive)
+
+                    if (!proj.target.IsAlive() || proj.target.Has<DeadComponent>() || proj.target.Has<PendingDestroyComponent>())
                     {
-                        continue;
-                    }
-                    if (!proj.target.IsAlive() || proj.target.Has<DeadComponent>())
-                    {
-                        ProjectilePool.Instance.ReturnProjectile(projectile, _commandBuffer);
-                        //FreeProjectileGPU(projectile);
-                        //_commandBuffer.Destroy(projectile);
+
+                        _commandBuffer.Add<PendingDestroyComponent>(in entity);
                         continue;
                     }
                     position.lastPosition = position.position;
@@ -60,13 +60,13 @@ namespace GodotEcsArch.sources.systems.Combat
                     switch (proj.type)
                     {
                         case ProjectileTypeShoot.Direct:
-                            UpdateStraightProjectile(ref projectile, ref position, ref proj);
+                            UpdateStraightProjectile(ref entity, ref position, ref proj);
                             break;
                         case ProjectileTypeShoot.Homing:
-                            UpdateHomingProjectile(ref projectile, ref position, ref proj);
+                            UpdateHomingProjectile(ref entity, ref position, ref proj);
                             break;
                         case ProjectileTypeShoot.Physics:
-                            UpdatePhysicsProjectile(ref projectile, ref position, ref proj);
+                            UpdatePhysicsProjectile(ref entity, ref position, ref proj);
                             break;
                     }
                 }
@@ -77,7 +77,7 @@ namespace GodotEcsArch.sources.systems.Combat
                 // Si el target murió o ya no está vivo → destruir proyectil
                 if (!proj.target.IsAlive() || proj.target.Has<DeadComponent>())
                 {
-                    _commandBuffer.Destroy(projectile);
+                    _commandBuffer.Add<PendingDestroyComponent>(projectile);
                     return;
                 }
 
@@ -92,9 +92,9 @@ namespace GodotEcsArch.sources.systems.Combat
                 if (distSq < .01f) // umbral de impacto (4px de radio)
                 {
                     GD.Print("Posicion proyectil:" + position.position);
-                    OnHit(projectile, proj.target);
-                    FreeProjectileGPU(projectile);
-                    _commandBuffer.Destroy(projectile);
+                    OnHit(projectile,ref proj.target);
+                  //  FreeProjectileGPU(projectile);
+                    _commandBuffer.Add<PendingDestroyComponent>(projectile);
                 }
             }
             private void UpdateStraightProjectile(ref Entity projectile, ref PositionComponent position, ref ProjectileComponent proj)
@@ -115,17 +115,16 @@ namespace GodotEcsArch.sources.systems.Combat
                         float impactRadius = .2f; // ej. 4px de radio
                         if (distSqToTarget <= impactRadius)
                         {
-                            OnHit(projectile, proj.target); // aplicar daño
+                            OnHit(projectile,ref proj.target); // aplicar daño
                         }
                     }
 
                     // Devolver proyectil al pool en vez de destruirlo
-                    ProjectilePool.Instance.ReturnProjectile(projectile,_commandBuffer);
+                    //ProjectilePool.Instance.ReturnProjectile(projectile,_commandBuffer);
                     //// liberar GPU siempre, independientemente de si hubo impacto
                     //FreeProjectileGPU(projectile);
-
                     //// destruir proyectil
-                    //_commandBuffer.Destroy(projectile);
+                    _commandBuffer.Add<PendingDestroyComponent>(projectile);
                 }
             }
 
@@ -141,9 +140,10 @@ namespace GodotEcsArch.sources.systems.Combat
                 float distSq = (position.position - targetPos).LengthSquared();
                 if (distSq < 0.01f)
                 {
-                    OnHit(projectile, proj.target);
+                    OnHit(projectile,ref proj.target);
                     // Devolver proyectil al pool en vez de destruirlo
-                    ProjectilePool.Instance.ReturnProjectile(projectile, _commandBuffer);
+                    _commandBuffer.Add<PendingDestroyComponent>(projectile);
+                    //ProjectilePool.Instance.ReturnProjectile(projectile, _commandBuffer);
                 }
             }
             private void UpdatePhysicsProjectile(ref Entity projectile, ref PositionComponent position, ref ProjectileComponent proj)
@@ -153,8 +153,12 @@ namespace GodotEcsArch.sources.systems.Combat
                 // 🚧 Aquí más adelante se puede conectar con un sistema de colisiones físicas
             }
 
-            private void OnHit(Entity projectile, Entity target)
+            private void OnHit(Entity projectile,ref Entity target)
             {
+                if (target.Has<BuildingComponent>())
+                {
+                    GameLog.LogCat("error en proyectil");
+                }
                 // Aplicar daño
                 if (projectile.Has<DamageOnHitComponent>() && target.IsAlive())
                 {
@@ -166,15 +170,19 @@ namespace GodotEcsArch.sources.systems.Combat
 
                         if (health.current <= 0)
                             _commandBuffer.Add<DeadComponent>(target);
+                        else
+                        {
+                            // Aplicar efectos (ej. Stun)
+                            if (projectile.Has<TakeHitComponent>() && target.IsAlive())
+                            {
+                                 var hit =  projectile.Get<TakeHitComponent>();
+                                _commandBuffer.Add(target, new TakeHitComponent { stunTime = hit.stunTime });
+                            }
+                        }
                     }
                 }
 
-                // Aplicar efectos (ej. Stun)
-                if (projectile.Has<TakeHitComponent>() && target.IsAlive())
-                {
-                    ref var hit = ref projectile.Get<TakeHitComponent>();
-                    _commandBuffer.Add(target, new TakeHitComponent { stunTime = hit.stunTime });
-                }
+              
             }
             private void FreeProjectileGPU(Entity projectile)
             {
@@ -197,8 +205,8 @@ namespace GodotEcsArch.sources.systems.Combat
 
         public override void Update(in float t)
         {
-            World.InlineParallelChunkQuery(in queryProjectiles, new ChunkJobProjectile(commandBuffer, t));
-            commandBuffer.Playback(World);
+            sharedWorld.InlineParallelChunkQuery(in queryProjectiles, new ChunkJobProjectile(internalCommandBuffer, t));
+            internalCommandBuffer.Playback(sharedWorld);
 
             //ProjectilePool.Instance.Update(t);
         }

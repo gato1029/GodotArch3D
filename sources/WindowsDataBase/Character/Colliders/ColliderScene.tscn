@@ -77,13 +77,11 @@ layout_mode = 2
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 max_value = 1000.0
-value = 20.0
 prefix = "W:"
 
 [node name="SpinBox2" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 max_value = 1000.0
-value = 20.0
 prefix = "H:"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer3"]

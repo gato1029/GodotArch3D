@@ -1,0 +1,86 @@
+[gd_scene load_steps=4 format=3 uid="uid://yuvpw7g7eyr1"]
+
+[ext_resource type="Script" uid="uid://c30wwqwtyiisq" path="res://sources/KuroTiles/WindowKuroRuleItem.cs" id="1_6qhue"]
+[ext_resource type="PackedScene" uid="uid://bmfkhl38jkdfi" path="res://sources/KuroTiles/ControlKuroRuleItem.tscn" id="2_6qhue"]
+[ext_resource type="PackedScene" uid="uid://c3ttigs8l4153" path="res://sources/KuroTiles/ControlListTileSprite.tscn" id="2_b3fqv"]
+
+[node name="WindowKuroRuleItem" type="Popup"]
+oversampling_override = 1.0
+initial_position = 2
+size = Vector2i(600, 400)
+visible = true
+borderless = false
+always_on_top = true
+script = ExtResource("1_6qhue")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/PanelContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Tiles:"
+
+[node name="ControlListTileSprite" parent="MarginContainer/VBoxContainer/PanelContainer/HBoxContainer2" instance=ExtResource("2_b3fqv")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Modo render Debajo:"
+
+[node name="OptionButtonUnderRender" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CheckBoxAllGroup" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Algun Grupo o Ningun Grupo"
+
+[node name="ItemsGrupos" type="ItemList" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+max_columns = 6
+same_column_width = true
+fixed_column_width = 64
+icon_mode = 0
+fixed_icon_size = Vector2i(64, 64)
+
+[node name="PanelContainer2" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="ControlRuleKuroItem" parent="MarginContainer/VBoxContainer/HBoxContainer/PanelContainer2" instance=ExtResource("2_6qhue")]
+layout_mode = 2

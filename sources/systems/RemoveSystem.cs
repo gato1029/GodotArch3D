@@ -129,7 +129,7 @@ using System.Threading.Tasks;
     }
     public override void AfterUpdate(in float t)
     {
-        World.InlineParallelChunkQuery(in queryRemove, new ChunkJob(commandBuffer, t,World));
+        //World.InlineParallelChunkQuery(in queryRemove, new ChunkJob(commandBuffer, t,World));
         World.InlineParallelChunkQuery(in queryRemoveGPU, new ChunkJobRemoveGpu(commandBuffer, t, World));
         World.InlineParallelChunkQuery(in queryRemoveSpriteGPU, new ChunkJobSpriteGpu(commandBuffer, t, World));
         commandBuffer.Playback(World);

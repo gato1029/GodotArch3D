@@ -17,7 +17,10 @@ public partial class ControlEditorTerrain : MarginContainer
     private SpinBox SpinBoxChunkY;
     private Button ButtonAutomaticTerrain;
     private Button ButtonRefresh;
+    private TabBar Automatico;
     private ItemList ItemListRules;
+    private TabBar Individual;
+    private ItemList ItemListIndividual;
     private MarginContainer CapasDiseño;
     private VBoxContainer ContainerLayers;
 
@@ -33,7 +36,10 @@ public partial class ControlEditorTerrain : MarginContainer
         SpinBoxChunkY = GetNode<SpinBox>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer/SpinBoxChunkY");
         ButtonAutomaticTerrain = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/ButtonAutomaticTerrain");
         ButtonRefresh = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer2/ButtonRefresh");
-        ItemListRules = GetNode<ItemList>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/ItemListRules");
+        Automatico = GetNode<TabBar>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer/Automatico");
+        ItemListRules = GetNode<ItemList>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer/Automatico/ItemListRules");
+        Individual = GetNode<TabBar>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer/Individual");
+        ItemListIndividual = GetNode<ItemList>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer/Individual/ItemListIndividual");
         CapasDiseño = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño");
         ContainerLayers = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño/ScrollContainer/ContainerLayers");
     }

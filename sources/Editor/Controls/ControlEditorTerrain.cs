@@ -16,10 +16,13 @@ using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using static Flecs.NET.Core.Ecs.Units;
 using static Godot.ClassDB;
 
 
@@ -29,12 +32,13 @@ public partial class ControlEditorTerrain : MarginContainer
     private TerrainMap terrainMap;
     private MapType mapType;
     Vector2I sizeMap = Vector2I.Zero;
+    private AutoTileSpriteData currentAutoTileSpriteData=null;
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI    
         // Configuración inicial del preview
         PlacementPreview.Instance.Configure(tileId: 1, layer: 20);
-        SelectionBlueprint.Instance.Configure(1, 30);
+        SelectionBlueprint.Instance.Configure(1762385049549000, 30);
         // Configuración inicial del blueprint
         SelectionBlueprint.Instance.Create(
             size: new Vector2I(1, 1),
@@ -48,25 +52,45 @@ public partial class ControlEditorTerrain : MarginContainer
         ItemListRules.ItemSelected += ItemListRules_ItemSelected;
         ButtonRefresh.Pressed += ButtonRefresh_Pressed;
 
-        LoadItemsRules();
+        
 
         MapManagerEditor.Instance.OnMapLevelDataChanged += Instance_OnMapLevelDataChanged;
         ButtonSeedRandom.Pressed += ButtonSeedRandom_Pressed;
         SpinBoxSeed.Value = CommonOperations.GetRandomInt();
 
     }
+
+    TerrainTileEntry currentTerrain=null;
+    
     private void ItemListRules_ItemSelected(long index)
     {
-        int idData = (int)ItemListRules.GetItemMetadata((int)index);
-        var data = TerrainManager.Instance.GetData(idData);
-        WinTerrain_OnNotifySelected(data);
+        currentTerrain = (TerrainTileEntry)ItemListRules.GetItemMetadata((int)index);
+
+        var data = MasterDataManager.GetData<AutoTileSpriteData>(currentTerrain.TileId);
+        SetAutoTileSpriteData(data);
+    }
+
+    private void SetAutoTileSpriteData(AutoTileSpriteData data)
+    {
+        if (objectSelected == null)
+            return;
+        // Actualizar el objeto seleccionado con la nueva regla
+        currentAutoTileSpriteData = data;
+        Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
+        var sprite = MasterDataManager.GetData<TileSpriteData>(currentAutoTileSpriteData.tileRuleTemplates[0].TileCentral.idTileSprite);   
+        PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, sprite);
     }
     private void WinTerrain_OnNotifySelected(TerrainData objectSelected)
     {
         this.objectSelected = objectSelected;
         TextureRectImage.Texture = objectSelected.textureVisual;
-        Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-        PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
+        //Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
+
+        //var tempo = MasterDataManager.GetData<AutoTileSpriteData>(objectSelected.idSurface);
+        //var sprite = MasterDataManager.GetData<TileSpriteData>(tempo.tileRuleTemplates[0].TileCentral.idTileSprite);
+        //PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, sprite.spriteData);
+
+        LoadItemsRules();
     }
     private void LoadItemsLayers()
     {
@@ -88,21 +112,13 @@ public partial class ControlEditorTerrain : MarginContainer
     private void LoadItemsRules()
     {
         ItemListRules.Clear();
-        BsonExpression bsonExpression = null;
-        List<TerrainData> result = new List<TerrainData>();
-
-        string expressionText = "isRule = @0";
-        bsonExpression = BsonExpression.Create(expressionText, true);
-        result = DataBaseManager.Instance.FindAllFilter<TerrainData>(bsonExpression);
-
-        for (int i = 0; i < result.Count; i++)
+        
+        foreach (var item in objectSelected.idsAutoTileSprite)
         {
-            TerrainData item = result[i];
-            AtlasTexture atlasTexture = MaterialManager.Instance.GetAtlasTextureInternal(item.spriteData);
-            ItemListRules.AddItem(item.name, atlasTexture);
-            ItemListRules.SetItemMetadata(i, item.id);
+            var dataAuto = MasterDataManager.GetData<AutoTileSpriteData>(item.TileId);
+            int index =ItemListRules.AddItem(dataAuto.name, dataAuto.textureVisual);
+            ItemListRules.SetItemMetadata(index, item);
         }
-
     }
     private void Instance_OnMapLevelDataChanged(MapLevelData obj)
     {
@@ -162,7 +178,7 @@ public partial class ControlEditorTerrain : MarginContainer
     {
         foreach (var item in terrainMap.MapLayerDesign)
         {
-            item.Value.SetRenderEnabled(false);
+            item.Value.SetRenderEnabledGlobal(false);
         }
         DungeonGenerator dungeonGenerator = new DungeonGenerator(sizeMap.X, sizeMap.Y);
         dungeonGenerator.GenerateRandomFilled();
@@ -171,14 +187,14 @@ public partial class ControlEditorTerrain : MarginContainer
         dungeonGenerator.ExportInGame(terrainMap, TerrainCategoryType.MazmorraBase);
         foreach (var item in terrainMap.MapLayerDesign)
         {
-            item.Value.SetRenderEnabled(true);
+            item.Value.SetRenderEnabledGlobal(true);
         }
     }
     private void GenerateTerrainMap()
     {
         foreach (var item in terrainMap.MapLayerDesign)
         {
-            item.Value.SetRenderEnabled(false);
+            item.Value.SetRenderEnabledGlobal(false);
         }
         TerrainGenerator terrainGenerator = new TerrainGenerator(terrainMap.MapTerrainBasic, (int)SpinBoxSeed.Value, true, false);
         using (new ProfileScope("Terrain Generator"))
@@ -199,13 +215,16 @@ public partial class ControlEditorTerrain : MarginContainer
         }
         foreach (var item in terrainMap.MapLayerDesign)
         {
-            item.Value.SetRenderEnabled(true);
+            item.Value.SetRenderEnabledGlobal(true);
         }
         PerformanceTimer.Instance.PrintAll(1, 1);
     }
 
     private void ButtonRefresh_Pressed()
     {
+        if (objectSelected == null)
+            return;
+        objectSelected = MasterDataManager.GetData<TerrainData>(objectSelected.id);
         LoadItemsRules();
 
     }
@@ -224,11 +243,14 @@ public partial class ControlEditorTerrain : MarginContainer
             return;
 
         // Mostrar preview si hay objeto seleccionado
-        if (objectSelected != null )
+        if (currentAutoTileSpriteData != null )
         {
             // Crear preview si cambio dimencion
             if (PlacementPreview.Instance.Size != SelectionBlueprint.Instance.Size)
-                PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
+            {
+                var sprite = MasterDataManager.GetData<TileSpriteData>(currentAutoTileSpriteData.tileRuleTemplates[0].TileCentral.idTileSprite);
+                PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, sprite);                
+            }
         }
 
         // Pintar o borrar tiles
@@ -241,24 +263,30 @@ public partial class ControlEditorTerrain : MarginContainer
 
     private void ApplyPaint()
     {
-        if (objectSelected!=null)
+        
+        if (objectSelected!=null && currentAutoTileSpriteData!=null)
         {
+            List<Vector2I> tilesToUpdate = new List<Vector2I>();
             foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
             {
-                terrainMap.AddUpdateTile(tilePos, objectSelected.id);
+                tilesToUpdate.Add(tilePos);                
             }
+            
+            terrainMap.AddUpdateTileSprite(tilesToUpdate, objectSelected.id, currentTerrain);
         }
         
     }
 
     private void ApplyErase()
     {
-        if (objectSelected != null)
+        if (objectSelected != null && currentAutoTileSpriteData != null)
         {
+            List<Vector2I> tilesToUpdate = new List<Vector2I>();
             foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
             {
-                terrainMap.RemoveTile(tilePos, objectSelected.id);
+                tilesToUpdate.Add(tilePos);                
             }
+            terrainMap.RemoveTileSprite(tilesToUpdate, objectSelected.id, currentTerrain);
         }
     }
 }

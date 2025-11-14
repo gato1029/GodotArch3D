@@ -11,6 +11,8 @@ using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Generic;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TileSprite;
+using GodotFlecs.sources.KuroTiles;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,23 +20,24 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Flecs.NET.Core.Ecs.Units;
 
 namespace GodotEcsArch.sources.managers.SpriteMapChunk;
 
-public interface IDataSprite
-{
-    public int idData { get; set; }
-    public int idUnique { get; set; }
-    public bool isAnimation { get; set; }
-    public Vector2 positionCollider { get; set; }
-    public Vector2I positionTileChunk { get; set; }
-    public Vector2I positionTileWorld { get; set; }
-    public Vector3 positionWorld { get; set; }
-    public AnimationStateData GetAnimationStateData();
+//public interface IDataSprite
+//{
+//    public int idData { get; set; }
+//    public int idUnique { get; set; }
+//    public bool isAnimation { get; set; }
+//    public Vector2 positionCollider { get; set; }
+//    public Vector2I positionTileChunk { get; set; }
+//    public Vector2I positionTileWorld { get; set; }
+//    public Vector3 positionWorld { get; set; }
+//    public AnimationStateData GetAnimationStateData();
 
-    public SpriteData GetSpriteData();
-    public bool IsAnimation();
-}
+//    public SpriteData GetSpriteData();
+//    public bool IsAnimation();
+//}
 
 public enum FormatSave
 {
@@ -49,7 +52,7 @@ public interface ISpriteMapChunk
 
     public int GetRealInstanceCount();
     public int GetRenderingInstanceCount();
-    public void SetRenderEnabled(bool enabled);
+    public void SetRenderEnabledGlobal(bool enabled);
     public bool GetRenderEnable();
 }
 public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new() 
@@ -85,7 +88,6 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
         this.layer = layer;
         renderEnabled = render;
-
     }
 
     public event Action<Vector2, ChunkData<TData>> OnChunSerialize;
@@ -182,7 +184,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
             foreach (var item in data.tiles)
             {
-                if (item != null && item.idData!=0)
+                if (item != null && item.idDataTileSprite!=0)
                 {
                     item.SetDataGame();
                 }
@@ -194,11 +196,13 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         }
 
     }
-    public void AddUpdatedTile(Vector2I tilePositionGlobal, int idData)
+
+    public void AddUpdatedTileSprite(Vector2I tilePositionGlobal, TileTemplate idData)
     {
-        if (idData == 0) // caso vacio delete
+        if (idData.idTileSprite == 0) // caso vacio delete
         {
-            Remove(tilePositionGlobal);
+            RemoveTileSprite(tilePositionGlobal);
+            Refresh(tilePositionGlobal);
             return;
         }
         var chunkPosition = chunkManager.ChunkPosition(tilePositionGlobal);
@@ -217,25 +221,24 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
 
         }
-
-
     }
-
-    public void AddUpdatedTileRule(Vector2I tilePositionGlobal, RuleData[] ruleDataArray)
+    public void AddUpdatedAutoTileSprite(Vector2I tilePositionGlobal, long idAutoTileSprite, List<SpriteMapChunk<TerrainDataGame>> underLayers=null)
     {
+        var dataAuto = MasterDataManager.GetData<AutoTileSpriteData>(idAutoTileSprite);
+        
         var chunkPosition = chunkManager.ChunkPosition(tilePositionGlobal);
         var tilePositionChunk = chunkManager.TilePositionInChunk(chunkPosition, tilePositionGlobal);
         if (dataChunks.ContainsKey(chunkPosition))
         {
 
-            CreateTileRule(dataChunks[chunkPosition], tilePositionGlobal, tilePositionChunk, ruleDataArray);
+            CreateTileRule(dataChunks[chunkPosition], tilePositionGlobal, tilePositionChunk, dataAuto, underLayers);
 
         }
         else
         {
             var tilemapDataChunk = new ChunkData<TData>(chunkPosition, ChunkSize);
             dataChunks.Add(chunkPosition, tilemapDataChunk);
-            CreateTileRule(dataChunks[chunkPosition], tilePositionGlobal, tilePositionChunk, ruleDataArray);
+            CreateTileRule(dataChunks[chunkPosition], tilePositionGlobal, tilePositionChunk, dataAuto, underLayers);
         }
     }
 
@@ -272,11 +275,23 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     TData tile = chunk.tiles[x, y];
                     if (tile != null)
                     {
-                        if (tile.GetSpriteData().haveCollider)
+                        bool haveCollider = false;
+                        switch (tile.GetSpriteData().tileSpriteType)
+                        {
+                            case TileSpriteType.Static:
+                                haveCollider = tile.GetSpriteData().spriteData.haveCollider;
+                                break;
+                            case TileSpriteType.Animated:
+                                haveCollider = tile.GetSpriteData().animationData.haveCollider;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (haveCollider)
                         {
                             tile.ClearDataGame();
-                            //CollisionManager.Instance.spriteColliders.RemoveItem(tile.positionCollider, tile);
-                        }
+                        }                        
                     }
                 }
             }
@@ -323,7 +338,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                 for (int y = 0; y < chunkData.size.Y; y++)
                 {
                     TData tile = chunkData.tiles[x, y];
-                    if (tile != null && tile.idData != 0)
+                    if (tile != null && tile.idDataTileSprite != 0)
                     {
                         occupiedTiles.Add(tile);
                     }
@@ -344,6 +359,35 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         return renderingInstanceCount;
     }
 
+    public void SetTileRenderGlobalPosition(Vector2I tilePositionGlobal, bool isRender)
+    {
+        if (!renderEnabled) return; // 🚫 No cargar render si está deshabilitado
+
+        var chunkPosition = PositionsManager.Instance.ChunkPosition(tilePositionGlobal, ChunkSize);
+        var tilePositionChunk = PositionsManager.Instance.TilePositionInChunk(chunkPosition, tilePositionGlobal, ChunkSize);
+        if (dataChunks.ContainsKey(chunkPosition))
+        {
+            var data = dataChunks[chunkPosition].GetTileAt(tilePositionChunk);
+            if (data!=null && data.idDataTileSprite!=0)
+            {
+                data.render = isRender;
+                if (data.render==false)
+                {                                        
+                    if (loadedChunksRender.TryGetValue(chunkPosition, out var chunk))
+                    {
+                        // liberar el tile Renderizado     
+                        SpriteRender tileRender = chunk.GetTileAt(tilePositionChunk);
+                        if (tileRender != null && tileRender.instance != -1)
+                        {
+                            MultimeshManager.Instance.FreeInstance(tileRender.rid, tileRender.instance, tileRender.idMaterial);
+                            tileRender.FreeRidRenderForced();
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
     public TData GetTileGlobalPosition(Vector2I tilePositionGlobal)
     {
         var chunkPosition = PositionsManager.Instance.ChunkPosition(tilePositionGlobal, ChunkSize);
@@ -381,7 +425,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                 for (int y = 0; y < chunk.size.Y; y++)
                 {
                     var tile = chunk.tiles[x, y];
-                    if (tile != null && tile.idData != 0)
+                    if (tile != null && tile.idDataTileSprite != 0)
                     {
                         total++;
                     }
@@ -412,8 +456,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
 
     }
-
-    public void Remove(Vector2I tilePositionGlobal, RuleData[] autoTileData = null)
+    public void RemoveTileSprite(Vector2I tilePositionGlobal, bool forced =false, long idAutoTileSprite = 0, List<SpriteMapChunk<TerrainDataGame>> layerUnder=null)
     {
         var chunkPosition = chunkManager.ChunkPosition(tilePositionGlobal);
         var tilePositionChunk = chunkManager.TilePositionInChunk(chunkPosition, tilePositionGlobal);
@@ -431,30 +474,53 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     ChunkRenderGPU tileMapChunkRender = loadedChunksRender[chunkPosition];
                     var datatile = tileMapChunkRender.tiles[tilePositionChunk.X, tilePositionChunk.Y];
                     if (datatile != null && datatile.instance != -1)
-                    {
-                        //  var dataTileInfo = TilesManager.Instance.GetTileData(datatile.);
+                    {                    
                         MultimeshManager.Instance.FreeInstance(datatile.rid, datatile.instance, datatile.idMaterial);
-                        datatile.FreeRidRender();
-                        if (autoTileData != null)
+                        if (forced)
                         {
-                            UpdateNeighbors(tilePositionGlobal, autoTileData);
+                            datatile.FreeRidRenderForced();
                         }
-                        data.ClearDataGame();
-                        //CollisionManager.Instance.spriteColliders.RemoveItem(data.positionCollider, data);
+                        else
+                        {
+                            datatile.FreeRidRender();
+                        }                        
+                        if (idAutoTileSprite != 0)
+                        {
+                            var autoData = MasterDataManager.GetData<AutoTileSpriteData>(idAutoTileSprite);
+                            UpdateNeighborsTileSprite(tilePositionGlobal, autoData,layerUnder);                            
+                        }
+                        data.ClearDataGame();                        
                         realInstanceCount--;
+
+                        if (layerUnder != null)
+                        {
+                            foreach (var item in layerUnder)
+                            {
+                                var daGame = item.GetTileGlobalPosition(tilePositionGlobal);
+                                if (daGame != null && daGame.idDataTileSprite != 0)
+                                {
+                                    item.SetTileRenderGlobalPosition(tilePositionGlobal, true);
+                                    item.Refresh(tilePositionGlobal);
+                                }
+                            }
+                        }
                         OnRealInstanceCountChanged?.Invoke(realInstanceCount);
+
 
                     }
                 }
 
 
             }
-
-
         }
     }
+  
 
-    public void SetRenderEnabled(bool enabled)
+    public void SetRenderEnableManual(bool enabled)
+    {
+        renderEnabled = enabled;
+    }
+    public void SetRenderEnabledGlobal(bool enabled)
     {
         renderEnabled = enabled;
 
@@ -482,7 +548,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     cantChunk++;
                 }
             }
-            GD.Print(name + " ChunkRenderizados:" + cantChunk);
+          
             // Paso 2: eliminar los que ya no son visibles
             var toRemove = loadedChunksRender.Keys.Where(pos => !visibleSet.Contains(pos)).ToList();
             foreach (var chunkPos in toRemove)
@@ -502,17 +568,28 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         // Cargar el chunk si aún no está en render
         if (!loadedChunksRender.TryGetValue(chunkPosition, out var chunk))
         {
-            Instance_OnChunkLoad(chunkPosition);
+            // Crea el chunk render
+            CreateChunkRender(chunkPosition);
             if (!loadedChunksRender.TryGetValue(chunkPosition, out chunk))
+            {
+                //caso cuando no se pudo crear el chunk render, que ocurre con vecindades a un no cargadas
                 return;
+            }
+            //loadedChunksRender[chunkPosition];
+ 
         }
 
         if (!dataChunks.TryGetValue(chunkPosition, out var tileMapChunkData))
             return;
 
-        TData spriteData = tileMapChunkData.tiles[tilePositionChunk.X, tilePositionChunk.Y];
+        TData spriteData = tileMapChunkData.tiles[tilePositionChunk.X, tilePositionChunk.Y];        
         if (spriteData == null)
             return;
+
+        if (!spriteData.render)
+        {
+            return; // si no se debe renderizar, salir
+        }
 
         // liberar el tile Renderizado     
         SpriteRender tileRender = chunk.GetTileAt(tilePositionChunk);
@@ -523,29 +600,48 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         }
 
         //   var tileInfo = TilesManager.Instance.GetTileData(tileData.idData);
-        var instance = MultimeshManager.Instance.CreateInstance(spriteData.GetSpriteData().idMaterial);
+        (Rid rid, int instance, int material, int layerTexture) instance = default;
+        switch (spriteData.GetSpriteData().tileSpriteType)
+        {
+            case TileSpriteType.Static:
+                 instance = MultimeshManager.Instance.CreateInstance(spriteData.GetSpriteData().spriteData.idMaterial);
+                break;
+            case TileSpriteType.Animated:
+                instance = MultimeshManager.Instance.CreateInstance(spriteData.GetSpriteData().animationData.idMaterial);
+                break;
+            default:
+                break;
+        }
+        
+
         if (spriteData.IsAnimation())
         {
+         
             chunk.CreateUpdate(
+            spriteData.idDataTileSprite,
             tilePositionChunk.X,
             tilePositionChunk.Y,
             instance.rid,
             instance.instance,
-            instance.materialBatchPosition,
+            instance.layerTexture,
             spriteData.positionWorld,
-            spriteData.GetSpriteData(), spriteData.GetAnimationStateData()
+            spriteData.layer,
+            spriteData.GetSpriteData().animationData
             );
         }
         else
         {
-            chunk.CreateUpdate(
+          
+          chunk.CreateUpdate(
+          spriteData.idDataTileSprite,
           tilePositionChunk.X,
           tilePositionChunk.Y,
           instance.rid,
           instance.instance,
-          instance.materialBatchPosition,
+          instance.layerTexture,
           spriteData.positionWorld,
-          spriteData.GetSpriteData()
+          spriteData.layer,
+          spriteData.GetSpriteData().spriteData
       );
         }
 
@@ -556,10 +652,11 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         RecalculateRenderingInstanceCounts();
          OnRenderingInstanceCountChanged?.Invoke(renderingInstanceCount);
     }
-    private void CreateTile(ChunkData<TData> tileMapChunkData, Vector2I tilePositionChunk, Vector2I tilePositionGlobal, int idData)
-    {
-        GD.Print("posicion global Tile:"+tilePositionGlobal);
-        if (idData == 0)
+
+    
+    private void CreateTile(ChunkData<TData> tileMapChunkData, Vector2I tilePositionChunk, Vector2I tilePositionGlobal, TileTemplate tileTemplate)
+    {                       
+        if (tileTemplate.idTileSprite == 0)
         {
             return;
         }
@@ -575,15 +672,41 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         else
         {
             dataGame = tileMapChunkData.GetTileAt(tilePositionChunk);
-            if (dataGame.idData == idData)
+            if (dataGame.idDataTileSprite == tileTemplate.idTileSprite)
             {
                 return;
             }
         }
-        dataGame.idData = idData;
-
-        SpriteData spriteData = dataGame.GetSpriteData();
-        int idMaterial = spriteData.idMaterial;
+        dataGame.idDataTileSprite = tileTemplate.idTileSprite;
+        dataGame.idGroup = tileTemplate.idGroup;
+        dataGame.layer = layer;
+        dataGame.render = true;
+        float scale = 1f;
+        Vector2 offset = Vector2.Zero;
+        int idMaterial = 0;
+        float yDepthRender = 0f;
+        
+        switch (dataGame.GetSpriteData().tileSpriteType)
+        {
+            case TileSpriteType.Static:
+                SpriteData spriteData = dataGame.GetSpriteData().spriteData;
+                idMaterial = spriteData.idMaterial;
+                offset = spriteData.offsetInternal;
+                scale = spriteData.scale;
+                yDepthRender = spriteData.yDepthRender;
+                break;
+            case TileSpriteType.Animated:
+                SpriteAnimationData animationData = dataGame.GetSpriteData().animationData;
+                idMaterial = animationData.idMaterial;
+                offset = animationData.offsetInternal;
+                scale = animationData.scale;
+                yDepthRender = animationData.yDepthRender;
+                break;
+            default:
+                break;
+        }
+        
+        
         IdMaterialLastUsed = idMaterial;
 
         float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
@@ -592,91 +715,327 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
         Vector2 positionNormalize = tilePositionGlobal * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
         Vector2 positionCenter = positionNormalize + new Vector2(x, y);
-        Vector2 positionReal = positionNormalize + new Vector2(x, y) + new Vector2(spriteData.offsetInternal.X * spriteData.scale, spriteData.offsetInternal.Y * spriteData.scale);
+        Vector2 positionReal = positionCenter + new Vector2(offset.X * scale, offset.Y * scale);
 
 
-        Vector2 posicionCollider = positionReal;
+        Vector2 posicionCollider = positionCenter;
         dataGame.positionReal = positionCenter;
-        dataGame.positionWorld = new Vector3(positionReal.X, positionReal.Y, (positionCenter.Y * CommonAtributes.LAYER_MULTIPLICATOR) + layer);
+        dataGame.positionWorld = new Vector3(positionReal.X, positionReal.Y, ((positionReal.Y+yDepthRender) * CommonAtributes.LAYER_MULTIPLICATOR) + layer);
         //dataGame.Scale = spriteData.scale;        
         dataGame.positionTileChunk = tilePositionChunk;
         dataGame.positionTileWorld = tilePositionGlobal;
-        dataGame.positionCollider = positionReal;
-        
-        GD.Print("posicion real:" + positionReal);
+        dataGame.positionCollider = posicionCollider;
 
         tileMapChunkData.CreateUpdateTile(tilePositionChunk, dataGame);
 
-
-        //if (spriteData.haveCollider)
-        //{
-
-        //    posicionCollider = positionNormalize + new Vector2(x, y) + spriteData.collisionBody.Multiplicity(spriteData.scale).OriginCurrent;//+ new Vector2(x, y);
-        //    dataGame.positionCollider = posicionCollider;
-            
-        //    CollisionManager.Instance.spriteColliders.AddUpdateItem(positionReal,);            
-            
-        //}
-        //else
-        //{
-        //    dataGame.positionCollider = posicionCollider;
-        //    CollisionManager.Instance.spriteColliders.RemoveItem(posicionCollider, dataGame);
-        //}
         dataGame.SetDataGame();
         Refresh(tilePositionGlobal);
     }
 
-    private void CreateTileRule(ChunkData<TData> chunkData, Vector2I tilePositionGlobal, Vector2I tilePositionChunk, RuleData[] ruleDataArray)
+   
+    private void CreateTileRule(ChunkData<TData> chunkData, Vector2I tilePositionGlobal, Vector2I tilePositionChunk, AutoTileSpriteData rule, List<SpriteMapChunk<TerrainDataGame>> underLayers = null)
     {
         //byte neighborMask = CalculateNeighborMask(tilePositionGlobal); //
-        
-        var neighborTileMask = GetNeighborTileIdsAndMask(tilePositionGlobal);
-        RuleData bestRule = TilesHelper.FindBestMatchingRule(ruleDataArray, neighborTileMask.mask, neighborTileMask.neighborTileIds);
 
-        if (bestRule == null)
+        var neighborTileMask = CreateTileEnvironment(tilePositionGlobal);
+
+        TileRuleTemplate bestRule = null; 
+
+        foreach (var ruleTemplate in rule.tileRuleTemplates)
         {
-           // GD.PrintErr($"❌ No se encontró una regla válida para mask {neighborTileMask.mask}");
+            if (ruleTemplate.MatchesEnvironment(neighborTileMask))
+            {
+                //bestRule = ruleTemplate;
+                //break;
+                if (underLayers == null)
+                {
+                    bestRule = ruleTemplate;
+                    break;
+                }
+                else
+                {
+
+                    int grupoActual = ruleTemplate.neighborConditionTemplateCenter.groupId;
+                    var UnderRender = ruleTemplate.neighborConditionTemplateCenter.UnderNeighborType;
+                    if (grupoActual == 0)
+                    {
+                        bestRule = ruleTemplate;
+
+                        foreach (var item in underLayers)
+                        {
+                            var dataTemp = item.GetTileGlobalPosition(tilePositionGlobal);
+                            if (dataTemp != null)
+                            {                               
+                                switch (UnderRender)
+                                {
+                                    case UnderNeighborType.NoHacerNada:
+                                        item.SetTileRenderGlobalPosition(tilePositionGlobal, true);
+                                        item.Refresh(tilePositionGlobal);
+                                        break;
+                                    case UnderNeighborType.Ocultar:
+                                        item.SetTileRenderGlobalPosition(tilePositionGlobal, false);
+                                        break;
+                                    case UnderNeighborType.Eliminar:
+                                        item.RemoveTileSprite(tilePositionGlobal, true);
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+                            }                           
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        bool underRuleExist = false;
+                        foreach (var item in underLayers)
+                        {
+                            var dataTemp = item.GetTileGlobalPosition(tilePositionGlobal);
+                            if (dataTemp != null)
+                            {
+                                int grupoInferior = dataTemp.idGroup;
+                                if (grupoActual == grupoInferior)
+                                {
+                                    switch (UnderRender)
+                                    {
+                                        case UnderNeighborType.NoHacerNada:
+                                            item.SetTileRenderGlobalPosition(tilePositionGlobal, true);
+                                            item.Refresh(tilePositionGlobal);
+                                            break;
+                                        case UnderNeighborType.Ocultar:
+                                            item.SetTileRenderGlobalPosition(tilePositionGlobal, false);
+                                            break;
+                                        case UnderNeighborType.Eliminar:
+                                            item.RemoveTileSprite(tilePositionGlobal, true);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    
+                                    underRuleExist = true;
+                                }
+                            }
+                        }
+                        if (underRuleExist == true)
+                        {
+                            bestRule = ruleTemplate;
+                            break;
+                        }
+                    }
+
+                }
+            }
+        }
+       
+        if (bestRule == null)
+        {       
             return;
         }
-        // 🟢 Colocar el tile en la posición dada
-        CreateTile(chunkData, tilePositionChunk, tilePositionGlobal, bestRule.idDataCentral);
-        UpdateNeighbors(tilePositionGlobal, ruleDataArray);
-    }
-    private (int[] neighborTileIds, byte mask) GetNeighborTileIdsAndMask(Vector2I tilePosGlobal)
-    {
-        int[] neighborTileIds = new int[8];
-        byte mask = 0;
 
+        // 🟢 Colocar el tile en la posición dada
+        TileTemplate tileTemplate;
+        if (bestRule.IsRandomTiles)
+        {
+            int randomIndex = (int)(GD.Randi() % bestRule.RandomTiles.Count);
+            tileTemplate = bestRule.RandomTiles[randomIndex];
+        }
+        else
+        {
+            tileTemplate = bestRule.TileCentral;
+        }
+
+        CreateTile(chunkData, tilePositionChunk, tilePositionGlobal, tileTemplate);
+        UpdateNeighborsTileSprite(tilePositionGlobal, rule,underLayers);
+    }
+
+    private void UpdateNeighborsTileSprite(Vector2I tilePositionGlobal, AutoTileSpriteData rule, List<SpriteMapChunk<TerrainDataGame>> underLayers = null)
+    {
         for (int i = 0; i < 8; i++)
         {
-            NeighborDirection direction = (NeighborDirection)(1 << i);
-            Vector2I neighborPos = TilesHelper.GetNeighborPosition(tilePosGlobal, direction);
+            NeighborPosition neighborPosition = (NeighborPosition)i;
+
+            //  NeighborDirection direction = GetDirectionFromIndex(i);
+            Vector2I neighborPos = GetNeighborPositionTileSprite(tilePositionGlobal, neighborPosition);
+
+            //Vector2I neighborPos = TilesHelper.GetNeighborPosition(tilePosGlobal, direction);
+
+            var dataValue = GetTileGlobalPosition(neighborPos);
+            if (dataValue != null) // Si hay un tile vecino
+            {
+                //byte newMask = CalculateNeighborMask(neighborPos);
+                var tileEnviroment = CreateTileEnvironment(neighborPos);
+               // var neighborTileMask = GetNeighborTileIdsAndMask(neighborPos);
+
+                foreach (var kvp in rule.tileRuleTemplates)
+                {
+                    //TileRuleData bestRule = autoTileData.FindBestMatchingRule(newMask);                   
+                    if (kvp.MatchesEnvironment(tileEnviroment))
+                    {
+                        TileTemplate tileTemplate;
+                        if (kvp.IsRandomTiles)
+                        {
+                            int randomIndex = (int)(GD.Randi() % kvp.RandomTiles.Count);
+                            tileTemplate = kvp.RandomTiles[randomIndex];
+                        }
+                        else
+                        {
+                            tileTemplate = kvp.TileCentral;
+                        }
+                        ///
+                        if (underLayers == null)
+                        {
+                            AddUpdatedTileSprite(neighborPos, tileTemplate);
+                            break;
+                        }
+                        else
+                        {
+                            int grupoActual = kvp.neighborConditionTemplateCenter.groupId;
+                            var UnderRender = kvp.neighborConditionTemplateCenter.UnderNeighborType;
+                            if (grupoActual == 0)
+                            {
+                                AddUpdatedTileSprite(neighborPos, tileTemplate);
+                                if (underLayers!=null)
+                                {
+                                    foreach (var item in underLayers)
+                                    {
+                                        var dataTemp = item.GetTileGlobalPosition(neighborPos);
+                                        if (dataTemp != null)
+                                        {                                           
+                                            switch (UnderRender)
+                                            {
+                                                case UnderNeighborType.NoHacerNada:
+                                                    item.SetTileRenderGlobalPosition(neighborPos, true);
+                                                    item.Refresh(neighborPos);
+                                                    break;
+                                                case UnderNeighborType.Ocultar:
+                                                    item.SetTileRenderGlobalPosition(neighborPos, false);
+                                                    break;
+                                                case UnderNeighborType.Eliminar:
+                                                    item.RemoveTileSprite(neighborPos, true);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }                                              
+                                            
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                            else
+                            {
+                                bool underRuleExist = false;
+                                foreach (var item in underLayers)
+                                {
+                                    var dataTemp = item.GetTileGlobalPosition(neighborPos);
+                                    if (dataTemp != null)
+                                    {
+                                        int grupoInferior = dataTemp.idGroup;
+                                        if (grupoActual == grupoInferior)
+                                        {
+                                            switch (UnderRender)
+                                            {
+                                                case UnderNeighborType.NoHacerNada:
+                                                    item.SetTileRenderGlobalPosition(neighborPos, true);
+                                                    item.Refresh(neighborPos);
+                                                    break;
+                                                case UnderNeighborType.Ocultar:
+                                                    item.SetTileRenderGlobalPosition(neighborPos, false);
+                                                    break;
+                                                case UnderNeighborType.Eliminar:
+                                                    item.RemoveTileSprite(neighborPos, true);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                            underRuleExist = true;
+                                        }
+                                    }
+                                }
+                                if (underRuleExist == true)
+                                {
+                                    AddUpdatedTileSprite(neighborPos, tileTemplate);
+                                    break;
+                                }
+                            }
+                        }
+                        //AddUpdatedTileSprite(neighborPos, tileTemplate);
+                        //break;
+                    }
+                }
+            }
+        }
+    }
+    public Vector2I GetNeighborPositionTileSprite(Vector2I tilePos, NeighborPosition direction)
+    {
+        switch (direction)
+        {
+            case NeighborPosition.Arriba: return new Vector2I(tilePos.X, tilePos.Y + 1);
+            case NeighborPosition.Derecha: return new Vector2I(tilePos.X + 1, tilePos.Y);
+            case NeighborPosition.Abajo: return new Vector2I(tilePos.X, tilePos.Y - 1);
+            case NeighborPosition.Izquierda: return new Vector2I(tilePos.X - 1, tilePos.Y);
+            case NeighborPosition.ArribaDerecha: return new Vector2I(tilePos.X + 1, tilePos.Y + 1);
+            case NeighborPosition.AbajoDerecha: return new Vector2I(tilePos.X + 1, tilePos.Y - 1);
+            case NeighborPosition.AbajoIzquierda: return new Vector2I(tilePos.X - 1, tilePos.Y - 1);
+            case NeighborPosition.ArribaIzquierda: return new Vector2I(tilePos.X - 1, tilePos.Y + 1);
+            default: return tilePos;
+        }
+    }
+    private TileEnvironment CreateTileEnvironment(Vector2I tilePositionGlobal)
+    {
+        TileEnvironment tileEnvironment = new TileEnvironment();
+        for (int i = 0; i < 8; i++)
+        {
+            NeighborPosition neighborPosition = (NeighborPosition)i;
+            Vector2I neighborPos = GetNeighborPositionTileSprite(tilePositionGlobal, neighborPosition);
             var neighborData = GetTileGlobalPosition(neighborPos);
 
-            if (neighborData != null && neighborData.idData != 0) //
+            if (neighborData != null && neighborData.idDataTileSprite != 0) //
             {
-
-                neighborTileIds[i] = neighborData.idData;
-                mask |= (byte)direction;
+                tileEnvironment.Set(neighborPosition, neighborData.idDataTileSprite, neighborData.idGroup);
+                // neighborTileIds[i] = neighborData.idDataTileSprite; // aqui borre
+               // mask |= (byte)direction;
 
             }
             else
             {
-                neighborTileIds[i] = 0; // 0 indica que no hay tile
+                tileEnvironment.Set(neighborPosition,0,0); // 0 indica que no hay tile
             }
         }
+        return tileEnvironment;
+    }
+   
+    private void CreateChunkRender(Godot.Vector2 chunkPos)
+    {
+        // Si ya esta cargado, no hagas nada
+        if (loadedChunksRender.ContainsKey(chunkPos))
+            return;
+        if (dataChunks.ContainsKey(chunkPos))
+        {
 
-        return (neighborTileIds, mask);
+            ChunkRenderGPU chunkRender=null;
+            if (chunkPoolRender.Count > 0)
+            {
+                chunkRender = chunkPoolRender.Dequeue();
+            }
+            else
+            {
+                chunkRender = new ChunkRenderGPU(chunkPos, ChunkSize);
+            }           
+            loadedChunksRender.Add(chunkPos, chunkRender);
+        }
     }
 
     private void Instance_OnChunkLoad(Godot.Vector2 chunkPos)
-    {
+    {        
         if (!renderEnabled) return; // 🚫 No cargar render si está deshabilitado
         // Si ya esta cargado, no hagas nada
         if (loadedChunksRender.ContainsKey(chunkPos))
             return;
         if (dataChunks.ContainsKey(chunkPos))
         {
+            
             ChunkRenderGPU chunkRender;
             if (chunkPoolRender.Count > 0)
             {
@@ -695,25 +1054,35 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                 for (int j = 0; j < tileMapChunkData.size.Y; j++)
                 {
                     TData dataGame = tileMapChunkData.tiles[i, j];
-                    if (dataGame != null)
+                    if (dataGame != null && dataGame.render)
                     {
-                        int idMaterial = dataGame.GetSpriteData().idMaterial;
+                        int idMaterial = 0;
+                        switch (dataGame.GetSpriteData().tileSpriteType)
+                        {
+                            case TileSpriteType.Static:
+                                idMaterial = dataGame.GetSpriteData().spriteData.idMaterial;
+                                break;
+                            case TileSpriteType.Animated:
+                                idMaterial = dataGame.GetSpriteData().animationData.idMaterial;
+                                break;
+                            default:
+                                break;
+                        }
                         var instanceComplex = MultimeshManager.Instance.CreateInstance(idMaterial); // multimeshMaterialDict[idMaterial].CreateInstance();
                         if (dataGame.IsAnimation())
                         {
-                            chunkRender.CreateUpdate(i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.materialBatchPosition, dataGame.positionWorld, dataGame.GetSpriteData(), dataGame.GetAnimationStateData());
+                        
+                            chunkRender.CreateUpdate(dataGame.idDataTileSprite, i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.layerTexture, dataGame.positionWorld, dataGame.layer, dataGame.GetSpriteData().animationData);
                         }
                         else
                         {
-                            chunkRender.CreateUpdate(i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.materialBatchPosition, dataGame.positionWorld, dataGame.GetSpriteData());
+                            chunkRender.CreateUpdate(dataGame.idDataTileSprite, i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.layerTexture, dataGame.positionWorld, dataGame.layer, dataGame.GetSpriteData().spriteData);
                         }
-                        renderingInstanceCount++;
-                      
+                        renderingInstanceCount++;                      
                     }
                 }
             }
             loadedChunksRender.Add(chunkPos, chunkRender);
-
         }
     }
 
@@ -752,34 +1121,6 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
     }
 
-    private void UpdateNeighbors(Vector2I tilePosGlobal, RuleData[] ruleDataArray)
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            NeighborDirection direction = GetDirectionFromIndex(i);
-            Vector2I neighborPos = TilesHelper.GetNeighborPosition(tilePosGlobal, direction);
 
-            var dataValue = GetTileGlobalPosition(neighborPos);
-            if (dataValue != null) // Si hay un tile vecino
-            {
-                //byte newMask = CalculateNeighborMask(neighborPos);
-                var neighborTileMask = GetNeighborTileIdsAndMask(neighborPos);
 
-                foreach (var kvp in ruleDataArray)
-                {
-                    //TileRuleData bestRule = autoTileData.FindBestMatchingRule(newMask);
-                    RuleData bestRule = TilesHelper.FindBestMatchingRule(ruleDataArray, neighborTileMask.mask, neighborTileMask.neighborTileIds);
-                    
-                    if (bestRule != null)
-                    {
-                        AddUpdatedTile(neighborPos, bestRule.idDataCentral);
-                        Refresh(neighborPos);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    
 }

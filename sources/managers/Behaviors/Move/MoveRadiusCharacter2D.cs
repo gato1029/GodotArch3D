@@ -35,7 +35,7 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
             Vector2 targetDirection = (unitMovementComponent.nextDestination - positionComponent.position).Normalized();
 
             directionComponent.animationDirection = CommonOperations.GetDirectionAnimationLeftRight(targetDirection);
-            directionComponent.value = targetDirection; 
+            directionComponent.value = targetDirection;
             directionComponent.normalized = new Vector2(Math.Sign(targetDirection.X), Math.Sign(targetDirection.Y));
         }
         else
@@ -73,7 +73,7 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
         // Cooldown local para cada unidad
         if (characterBehaviorComponent.collisionCheckCooldown <= 0f && batchId == batchIndex)
         {
-            existCollision = CollisionManager.CheckAnyCollisionMoveUnitOnly(entity, pointNextCollision, collisionMove);
+            //existCollision = CollisionManager.CheckAnyCollisionMoveUnitOnly(entity, pointNextCollision, collisionMove);
             if (!existCollision)
             {
                 existCollision = CollisionManager.CheckSegmentCollision(startPos, endPos, collisionMove);

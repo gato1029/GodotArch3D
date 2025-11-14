@@ -117,9 +117,11 @@ public partial class ColliderScene : VBoxContainer
             {
                 case ColliderType.RECTANGLE:
                     data = new Rectangle((float)spinBoxWidth.Value, (float)spinBoxHeight.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
+                    data.scale = 1;
                     break;
                 case ColliderType.CIRCLE:
                     data = new Circle((float)spinBoxWidth.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
+                    data.scale = 1;
                     break;
                 default:
                     break;

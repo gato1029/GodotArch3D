@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
@@ -39,7 +40,20 @@ public partial class WindowAccesoryAnimation : Window,IFacadeWindow<AccesoryAnim
 
     private void ButtonSave_Pressed()
     {
-        objectData.name = LineEditName.Text;                
+        objectData.name = LineEditName.Text;
+
+        if (objectData.animationStateData != null)
+        {                       
+            foreach (var itemAni in objectData.animationStateData.animationData)
+            {
+                foreach (var itemFrame in itemAni.frameDataArray)
+                {
+                    TextureHelper.RecalulateUVFormat(itemFrame, objectData.animationStateData.idMaterial, itemAni);
+                }
+            }
+            
+        }
+
         DataBaseManager.Instance.InsertUpdate(objectData);  
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();        

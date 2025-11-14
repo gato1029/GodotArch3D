@@ -1,14 +1,21 @@
+
+using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Resources;
 using GodotEcsArch.sources.managers.serializer;
 using GodotEcsArch.sources.managers.SpriteMapChunk;
 using GodotEcsArch.sources.managers.Terrain;
 using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
+using GodotFlecs.sources.Flecs;
+using GodotFlecs.sources.Flecs.Components;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -17,125 +24,74 @@ using System.Text;
 using System.Threading.Tasks;
 namespace GodotEcsArch.sources.managers.Maps;
 
-[ProtoContract]
-public class ResourceSourceDataGame : DataItem
-{
-    public override void SetDataGame()
-    {
-        if (GetSpriteData().haveCollider)
-        {
-            if (idUnique != 0)
-            {
-                CollisionManager.Instance.ResourceSourceColliders.RemoveCollider(idUnique);
-                idUnique = 0;
-            }
-            if (GetSpriteData().listCollisionBody != null)
-            {
-                idUnique = CollisionManager.Instance.ResourceSourceColliders.AddColliderObject(this, GetSpriteData().listCollisionBody.ToList(), positionCollider);                   
-            }
-        }
-        else
-        {
-            if (idUnique != 0)
-            {
-                CollisionManager.Instance.ResourceSourceColliders.RemoveCollider(idUnique);
-                idUnique = 0;
-            }
-        }
-    }
-    public override void ClearDataGame()
-    {
-        if (idUnique != 0)
-        {
-            CollisionManager.Instance.ResourceSourceColliders.RemoveCollider(idUnique);
-            idUnique = 0;
-        }
-    }
-    public override SpriteData GetSpriteData()
-    {
-        return ResourceSourceManager.Instance.GetData(idData).spriteData;
-    }
-
-    public override bool IsAnimation()
-    {
-        return ResourceSourceManager.Instance.GetData(idData).isAnimated;
-    }
-
-    public override AnimationStateData GetAnimationStateData()
-    {
-        return ResourceSourceManager.Instance.GetData(idData).animationData[0];
-    }
-
-    public override int GetTypeData()
-    {
-        return (int)ResourceSourceManager.Instance.GetData(idData).resourceSourceType;
-    }
-}
 
 public class ResourceSourceMap
 {
     
     private Vector2I chunkDimencion;
-
-    private SpriteMapChunk<ResourceSourceDataGame> mapData; 
+    private EntityChunkRender entityChunkRender { get; set; }
 
     private string carpet = "ResourceSource";
 
     private string name = "ResourceSourceData";
-
 
     public string pathMapParent { get; set; }
 
     public int layer { get; set; }
 
     public string pathCurrentCarpet { get; set; }
-    public SpriteMapChunk<ResourceSourceDataGame> MapData { get => mapData; set => mapData = value; }
+
 
     public ResourceSourceMap(string pathMapParent, int Layer)
-    {
-      
+    {      
         layer = 20;
-        chunkDimencion = PositionsManager.Instance.chunkDimencion;
-        this.pathMapParent = pathMapParent;
-        this.pathCurrentCarpet = pathMapParent + "/" + carpet;   
-        
-        mapData = new SpriteMapChunk<ResourceSourceDataGame>("ResourceSource", pathCurrentCarpet, layer, ChunkManager.Instance.tiles16X16, false, true);   
+        entityChunkRender = new EntityChunkRender(ChunkManager.Instance.tiles16X16);
     }
 
-    public void SaveAllMap()
-    {        
-        mapData.SaveAll();
-       
-    }
-    public void LoadMapData()
+  
+    public void AddUpdateResource(Vector2I tilePositionGlobal,long idResource)
     {
-        var pathFull = pathCurrentCarpet + "/" + name + ".json";
-        mapData.SetRenderEnabled(false);
-        mapData.LoadAll();
-       
-    }
-    public void ClearFilesChunks()
-    {
-        mapData.ClearAllFiles();        
-    }
-    public void ClearMap()
-    {
-        mapData.ClearAllChunks();        
-    }
-    public void EnableLayer(bool enable)
-    {
-        mapData.SetRenderEnabled(enable);
-    }
-    public void AddUpdateTile(Vector2I tilePositionGlobal, int idData, int forceDataRuleNro = -1)
-    {
-        var data = ResourceSourceManager.Instance.GetData(idData);
-        mapData.AddUpdatedTile(tilePositionGlobal, data.id);                
+        bool isPosible =EntityChunkMap.Instance.IsPosibleAddEntity(tilePositionGlobal, layer);
+        if (!isPosible)
+        {
+            return;
+        }
+
+        var data = MasterDataManager.GetData<ResourceSourceData>(idResource);
+        int randomIndex = GD.RandRange(0, data.listIdTileSpriteData.Count - 1);
+
+        long idTileSpriteData = data.listIdTileSpriteData[randomIndex];
+
+        var dataTileSprite = MasterDataManager.GetData<TileSpriteData>(idTileSpriteData);
+
+        Vector2I tileSize =ChunkManager.Instance.tiles16X16.chunkDimencion;
+        float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
+        float y = MeshCreator.PixelsToUnits(tileSize.Y) / 2f;
+
+
+        Vector2 positionNormalize = tilePositionGlobal * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
+        Vector2 positionCenter = positionNormalize + new Vector2(x, y);
+
+        var colliderBody = dataTileSprite.spriteData.collisionBody;
+
+        Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
+        var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
+
+        Entity entityResource = FlecsManager.Instance.WorldFlecs.Entity();
+        int idCollider = CollisionManager.Instance.BuildingsCollidersFlecs.AddColliderObject(entityResource, colliderBody, positionCenter, colliderBody);
+
+        entityResource.Set(new PositionComponent { position = positionCenter, tilePosition = tilePositionGlobal });
+        entityResource.Set(new IdGenericComponent(idResource, EntityType.RECURSO));
+        entityResource.Set(new TileSpriteComponent(idTileSpriteData));        
+        entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero));
+
+        EntityChunkMap.Instance.AddEntityToChunk(entityResource, tilePositionGlobal, layer);
     }
 
-    public void RemoveTile(Vector2I tilePositionGlobal, int idData)
+    public void RemoveTile(Vector2I tilePositionGlobal)
     {
-        var data = ResourceSourceManager.Instance.GetData(idData);
-        mapData.Remove(tilePositionGlobal);                
+        var entity= EntityChunkMap.Instance.GetEntityInChunk(tilePositionGlobal, EntityType.RECURSO, layer);
+        EntityChunkMap.Instance.RemoveEntityFromChunk(entity,tilePositionGlobal);          
     }
 }
 

@@ -98,41 +98,41 @@ public partial class WindowTerrainDetail : Window, IFacadeWindow<TerrainData>
     private void Save()
     {
 
-        objectData.spriteData = ControlSprite.ObjectData;
-        objectData.isAnimated = CheckBoxHasAnimation.ButtonPressed;
-        objectData.isRule = CheckBoxHasRule.ButtonPressed;
-        objectData.category = OptionButtonCategory.GetItemText(OptionButtonCategory.Selected);
-        objectData.terrainType = (TerrainType)OptionButtonType.Selected;
+        //objectData.spriteData = ControlSprite.ObjectData;
+        //objectData.isAnimated = CheckBoxHasAnimation.ButtonPressed;
+        //objectData.isRule = CheckBoxHasRule.ButtonPressed;
+        //objectData.category = OptionButtonCategory.GetItemText(OptionButtonCategory.Selected);
+        //objectData.terrainType = (TerrainType)OptionButtonType.Selected;
 
-        if (!objectData.isRule)
-        {
-            string code = objectData.spriteData.x.ToString() + objectData.spriteData.y.ToString() + objectData.spriteData.widht.ToString() + objectData.spriteData.height.ToString();
-            objectData.name = OptionButtonCategory.GetItemText(OptionButtonCategory.Selected) + " "+objectData.terrainType.ToString() + "_" + StableHash.FromString(code).ToString();
-        }
-        else
-        {
-            objectData.name = "Regla " + objectData.terrainType.ToString() +" " + OptionButtonCategory.GetItemText(OptionButtonCategory.Selected);
-        }
+        //if (!objectData.isRule)
+        //{
+        //    string code = objectData.spriteData.x.ToString() + objectData.spriteData.y.ToString() + objectData.spriteData.widht.ToString() + objectData.spriteData.height.ToString();
+        //    objectData.name = OptionButtonCategory.GetItemText(OptionButtonCategory.Selected) + " "+objectData.terrainType.ToString() + "_" + StableHash.FromString(code).ToString();
+        //}
+        //else
+        //{
+        //    objectData.name = "Regla " + objectData.terrainType.ToString() +" " + OptionButtonCategory.GetItemText(OptionButtonCategory.Selected);
+        //}
         
-        if (objectData.isAnimated)
-        {
-            objectData.animationData = ContainerAnimationBasico.GetData();
-        }
-        else
-        {
-            objectData.animationData = null;
-        }
-        if (objectData.isRule)
-        {
-            objectData.rules = controlRules.GetData().ToArray();
-        }
-        else
-        {
-            objectData.rules = null;
-        }
-        TextureHelper.RecalulateUVFormat(objectData.spriteData);      
-        DataBaseManager.Instance.InsertUpdate(objectData);
-        TerrainManager.Instance.RegisterUpdateData(objectData.id,objectData);
+        //if (objectData.isAnimated)
+        //{
+        //    objectData.animationData = ContainerAnimationBasico.GetData();
+        //}
+        //else
+        //{
+        //    objectData.animationData = null;
+        //}
+        //if (objectData.isRule)
+        //{
+        //    objectData.rules = controlRules.GetData().ToArray();
+        //}
+        //else
+        //{
+        //    objectData.rules = null;
+        //}
+        //TextureHelper.RecalulateUVFormat(objectData.spriteData);      
+        //DataBaseManager.Instance.InsertUpdate(objectData);
+        //TerrainManager.Instance.RegisterUpdateData(objectData.id,objectData);
         
         
     }
@@ -158,63 +158,63 @@ public partial class WindowTerrainDetail : Window, IFacadeWindow<TerrainData>
 
     private void RegulationRules(RuleData[] rules)
     {
-        if (rules != null)
-        {
-            foreach (var item in rules)
-            {
-                if (item.idDataCentral!=0)
-                {
-                    item.dataCentral = TerrainManager.Instance.GetData(item.idDataCentral).spriteData;
-                }
-                else
-                {
-                    item.dataCentral = null;
-                }
+        //if (rules != null)
+        //{
+        //    foreach (var item in rules)
+        //    {
+        //        if (item.idDataCentral!=0)
+        //        {
+        //            item.dataCentral = TerrainManager.Instance.GetData(item.idDataCentral).spriteData;
+        //        }
+        //        else
+        //        {
+        //            item.dataCentral = null;
+        //        }
 
-                for (int i = 0; i < item.neighborConditions.Length; i++)
-                {
-                    NeighborCondition itemNeigh = item.neighborConditions[i];
-                    if (itemNeigh.SpecificTileId != 0)
-                    {
-                        var sprite = TerrainManager.Instance.GetData(itemNeigh.SpecificTileId).spriteData;
-                        item.dataNeighbor[i] = sprite;
-                    }
-                }
-            }
-        }
+        //        for (int i = 0; i < item.neighborConditions.Length; i++)
+        //        {
+        //            NeighborCondition itemNeigh = item.neighborConditions[i];
+        //            if (itemNeigh.SpecificTileId != 0)
+        //            {
+        //                var sprite = TerrainManager.Instance.GetData(itemNeigh.SpecificTileId).spriteData;
+        //                item.dataNeighbor[i] = sprite;
+        //            }
+        //        }
+        //    }
+        //}
     }
     public void SetData(TerrainData data)
     {
-        objectData = data;
-        LineEditName.Text = data.name;  
-        CheckBoxHasAnimation.ButtonPressed = data.isAnimated;
+        //objectData = data;
+        //LineEditName.Text = data.name;  
+        //CheckBoxHasAnimation.ButtonPressed = data.isAnimated;
 
-        CheckBoxHasRule.ButtonPressed  = objectData.isRule;
-        int index = Enumerable.Range(0, OptionButtonCategory.ItemCount)
-                      .FirstOrDefault(i => OptionButtonCategory.GetItemText(i) == objectData.category);
+        //CheckBoxHasRule.ButtonPressed  = objectData.isRule;
+        //int index = Enumerable.Range(0, OptionButtonCategory.ItemCount)
+        //              .FirstOrDefault(i => OptionButtonCategory.GetItemText(i) == objectData.category);
 
-        OptionButtonCategory.Selected = index;
-        OptionButtonType.Selected = (int)objectData.terrainType;
+        //OptionButtonCategory.Selected = index;
+        //OptionButtonType.Selected = (int)objectData.terrainType;
 
-        if (objectData.isRule)
-        {
-            CheckBoxHasRule_Pressed();
-            RegulationRules(objectData.rules);
-            controlRules.SetData(objectData.rules);
-        }
-        if (data.isAnimated)
-        {
-            CheckBoxHasAnimation_Pressed();
-        }
-        if (objectData.animationData != null)
-        {
-            ContainerAnimationBasico.SetData(objectData.animationData.ToArray());
-        }
-        if (data.spriteData != null)
-        {
-            ControlSprite.SetData(data.spriteData);
+        //if (objectData.isRule)
+        //{
+        //    CheckBoxHasRule_Pressed();
+        //    RegulationRules(objectData.rules);
+        //    controlRules.SetData(objectData.rules);
+        //}
+        //if (data.isAnimated)
+        //{
+        //    CheckBoxHasAnimation_Pressed();
+        //}
+        //if (objectData.animationData != null)
+        //{
+        //    ContainerAnimationBasico.SetData(objectData.animationData.ToArray());
+        //}
+        //if (data.spriteData != null)
+        //{
+        //    ControlSprite.SetData(data.spriteData);
       
-        }
+        //}
 
     }
 }

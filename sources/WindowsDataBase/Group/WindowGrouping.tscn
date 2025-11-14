@@ -1,0 +1,63 @@
+[gd_scene load_steps=3 format=3 uid="uid://dv1nuj2rl2sjc"]
+
+[ext_resource type="Script" uid="uid://dka20m2il44ft" path="res://sources/WindowsDataBase/Group/WindowGrouping.cs" id="1_lrfli"]
+[ext_resource type="PackedScene" uid="uid://omg22kdm131a" path="res://sources/KuroTiles/ControlKuroTile.tscn" id="2_s06yv"]
+
+[node name="WindowGrouping" type="Window"]
+oversampling_override = 1.0
+title = "Agrupador"
+size = Vector2i(300, 200)
+always_on_top = true
+script = ExtResource("1_lrfli")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Textura:"
+
+[node name="TileTexture" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_s06yv")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="ButtonSave" type="Button" parent="MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Guardar"

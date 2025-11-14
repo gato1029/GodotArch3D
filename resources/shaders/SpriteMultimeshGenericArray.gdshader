@@ -1,6 +1,12 @@
 shader_type spatial;
-render_mode unshaded;
-render_mode cull_back, depth_draw_opaque;
+
+//render_mode unshaded;
+//render_mode cull_back, depth_draw_opaque;
+
+render_mode cull_back, depth_draw_opaque, diffuse_burley, specular_schlick_ggx;
+// 🔹 Modo de render simple sin reflejos, pero con sombras
+//render_mode diffuse_lambert, cull_back, depth_draw_opaque;
+
 uniform sampler2DArray mtexture_array :  filter_nearest, source_color;
 
 uniform float transparency : hint_range(0.0, 1.0) = 0.0;

@@ -29,7 +29,7 @@ public partial class ControlLayerChunk : PanelContainer
 
     private void CheckBoxEnable_Pressed()
     {
-        spriteMapChunk.SetRenderEnabled(CheckBoxEnable.ButtonPressed);        
+        spriteMapChunk.SetRenderEnabledGlobal(CheckBoxEnable.ButtonPressed);        
     }
 
     private void SpriteMapChunk_OnRenderingInstanceCountChanged(int obj)

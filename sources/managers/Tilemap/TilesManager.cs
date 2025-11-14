@@ -88,7 +88,7 @@ internal class TilesManager : SingletonBase<TilesManager>
 
         RenderingServer.MultimeshInstanceSetTransform(instanceComplex.rid, instanceComplex.instance, transform3D);
         RenderingServer.MultimeshInstanceSetCustomData(instanceComplex.rid, instanceComplex.instance, new Color(data.x, data.y, data.widhtFormat, data.heightFormat));
-        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Color(0, 0, 0, instanceComplex.materialBatchPosition));
+        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Color(0, 0, 0, instanceComplex.layerTexture));
 
         return entity;
     }
@@ -107,7 +107,7 @@ internal class TilesManager : SingletonBase<TilesManager>
         spriteRenderGPU.idMaterial = data.idMaterial;
         spriteRenderGPU.rid = instanceComplex.rid;
         spriteRenderGPU.instance = instanceComplex.instance;
-        spriteRenderGPU.arrayPositiontexture = instanceComplex.materialBatchPosition;
+        spriteRenderGPU.arrayPositiontexture = instanceComplex.layerTexture;
         spriteRenderGPU.uvMap = new Color(data.xFormat, data.yFormat, data.widhtFormat, data.heightFormat);
         spriteRenderGPU.transform = transform3D;
         spriteRenderGPU.layerRender = layer;
@@ -126,7 +126,7 @@ internal class TilesManager : SingletonBase<TilesManager>
 
         RenderingServer.MultimeshInstanceSetTransform(instanceComplex.rid, instanceComplex.instance, transform3D);
         RenderingServer.MultimeshInstanceSetCustomData(instanceComplex.rid, instanceComplex.instance, spriteRenderGPU.uvMap);
-        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Color(0, 0, 0, instanceComplex.materialBatchPosition));
+        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Color(0, 0, 0, instanceComplex.layerTexture));
         return entity;
     }
 

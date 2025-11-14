@@ -12,13 +12,15 @@ namespace GodotEcsArch.sources.systems.Combat
     internal class TakeHitSystem : BaseSystem<World, float>
     {
         private CommandBuffer commandBuffer;
+        private World sharedWorld;
 
         private QueryDescription queryTakeHit = new QueryDescription()
             .WithAll<TakeHitComponent, CharacterComponent>();
 
-        public TakeHitSystem(World world) : base(world)
+        public TakeHitSystem(World world, CommandBuffer sharedCommandBuffer) : base(world)
         {
-            commandBuffer = new CommandBuffer();
+            sharedWorld = world;
+            commandBuffer = sharedCommandBuffer;
         }
 
         private struct ChunkJobTakeHit : IChunkJob
@@ -55,8 +57,8 @@ namespace GodotEcsArch.sources.systems.Combat
 
         public override void Update(in float t)
         {
-            World.InlineParallelChunkQuery(in queryTakeHit, new ChunkJobTakeHit(commandBuffer));
-            commandBuffer.Playback(World);
+            sharedWorld.InlineParallelChunkQuery(in queryTakeHit, new ChunkJobTakeHit(commandBuffer));
+            //commandBuffer.Playback(World);
         }
     }
 }

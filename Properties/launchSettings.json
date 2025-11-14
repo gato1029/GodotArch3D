@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug WindowBuilding": {
+	"Godot Debug WindowTileSprite": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.5-stable_mono_win64/Godot_v4.5-stable_mono_win64/Godot_v4.5-stable_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Building/WindowBuilding.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/TileSprite/WindowTileSprite.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

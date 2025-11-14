@@ -48,7 +48,7 @@ public class MultimeshManager:SingletonBase<MultimeshManager>
         multiMeshArrayShaders[typeShader].FreeInstance(rid, instance, idMaterial);
     
     }
-    public (Rid rid, int instance, int materialBatchPosition) CreateInstance( int idMaterial)
+    public (Rid rid, int instance, int material, int layerTexture) CreateInstance( int idMaterial)
     {
         MaterialType typeShader = (MaterialType)MaterialManager.Instance.GetMaterial(idMaterial).type;
         return multiMeshArrayShaders[typeShader].CreateInstance(idMaterial);

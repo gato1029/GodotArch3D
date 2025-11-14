@@ -21,7 +21,7 @@ public partial class EditorWindow : PanelContainer
         TabContainerItems.TabChanged += TabContainerItems_TabChanged;
         ButtonSaveAll.Pressed += ButtonSaveAll_Pressed;
         blueprint = SelectionBlueprint.Instance;
-        blueprint.Configure(1, 30);
+        //blueprint.Configure(1, 30);
         blueprint.Create(new Vector2I(1, 1), new Vector2I(0, 0));
         SpinBoxGridX.ValueChanged += SpinBoxGrid_ValueChanged;
         SpinBoxGridY.ValueChanged += SpinBoxGrid_ValueChanged;

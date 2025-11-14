@@ -1,10 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://cboqtlx1evylg"]
+[gd_scene load_steps=6 format=3 uid="uid://cboqtlx1evylg"]
 
 [ext_resource type="Script" uid="uid://do50j55kqdye5" path="res://sources/WindowsDataBase/Character/ContainerAnimationCharacter.cs" id="1_r0j85"]
 [ext_resource type="PackedScene" uid="uid://nl3w2xabpse7" path="res://sources/WindowsDataBase/Character/ContainerAnimation.tscn" id="2_1go7i"]
+[ext_resource type="PackedScene" uid="uid://diihyk3a3k7ha" path="res://sources/WindowsDataBase/TileCreator/ControlGridGeneric.tscn" id="3_1go7i"]
 [ext_resource type="PackedScene" uid="uid://eouyrgdv2i88" path="res://sources/WindowsDataBase/Character/Colliders/ColliderScene.tscn" id="3_650ey"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mlu17"]
+size = Vector2(16, 16)
 
 [node name="ContainerAnimationCharacter" type="Window"]
 oversampling_override = 1.0
@@ -61,12 +63,23 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 
-[node name="PanelImage" type="Panel" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer"]
+custom_minimum_size = Vector2(600, 600)
+layout_mode = 2
+
+[node name="ControlGridGeneric" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/ScrollContainer" instance=ExtResource("3_1go7i")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+gridSize = Vector2i(12, 12)
+baseScale = 3
+
+[node name="PanelImage" type="Panel" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/ScrollContainer/ControlGridGeneric"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/PanelImage"]
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/ScrollContainer/ControlGridGeneric/PanelImage"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -78,10 +91,11 @@ grow_vertical = 2
 scale = Vector2(3, 3)
 size_flags_horizontal = 8
 size_flags_vertical = 4
+metadata/_edit_use_anchors_ = true
 
-[node name="Sprite2DView" type="Sprite2D" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/PanelImage/Control"]
+[node name="Sprite2DView" type="Sprite2D" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/ScrollContainer/ControlGridGeneric/PanelImage/Control"]
 
-[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/PanelImage/Control"]
+[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/CenterContainer/ScrollContainer/ControlGridGeneric/PanelImage/Control"]
 shape = SubResource("RectangleShape2D_mlu17")
 
 [node name="VBoxContainerBasico" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer"]
@@ -114,6 +128,27 @@ text = "Animacion Compuesta:"
 [node name="CheckBoxAnimationComposite" type="CheckBox" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/GridContainer"]
 layout_mode = 2
 text = "Habilitada"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer3"]
+layout_mode = 2
+text = "Imagen Offset"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer3"]
+layout_mode = 2
+
+[node name="SpinBoxOffsetSpriteX" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer3/HBoxContainer"]
+layout_mode = 2
+min_value = -100.0
+step = 0.1
+prefix = "X:"
+
+[node name="SpinBoxOffsetSpriteY" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico/VBoxContainer3/HBoxContainer"]
+layout_mode = 2
+step = 0.1
+prefix = "Y:"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Datos Basicos/HBoxContainer/VBoxContainerBasico"]
 layout_mode = 2

@@ -30,23 +30,23 @@ public class ResourceDataGame : DataItem
     public int amount { get; set; }
     public override AnimationStateData GetAnimationStateData()
     {
-        return ResourcesGameManager.Instance.GetData(idData).animationData[0];
+        return null; // ResourcesGameManager.Instance.GetData(idDataTileSprite).animationData[0];
     }
 
-    public override SpriteData GetSpriteData()
+    public override TileSpriteData GetSpriteData()
     {
-        return ResourcesGameManager.Instance.GetData(idData).spriteData;
+        return null; // ResourcesGameManager.Instance.GetData(idDataTileSprite).spriteData;
     }
 
     public override bool IsAnimation()
     {
-        return ResourcesGameManager.Instance.GetData(idData).isAnimated;
+        return false; // ResourcesGameManager.Instance.GetData(idDataTileSprite).isAnimated;
     }
 
     public override void SetDataGame()
     {
-        var data = ResourcesGameManager.Instance.GetData(idData);
-        amount = data.amount;
+        //var data = ResourcesGameManager.Instance.GetData(idDataTileSprite);
+        //amount = data.amount;
     }
 }
 
@@ -102,6 +102,6 @@ public class MapResources
     }
     public void AddSprite(Vector2I positionGlobal, int idResources)
     {        
-        chunkMap.AddUpdatedTile(positionGlobal, idResources);
+        //chunkMap.AddUpdatedTile(positionGlobal, idResources);
     }
 }

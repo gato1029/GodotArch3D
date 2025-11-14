@@ -132,9 +132,9 @@ public partial class ControlRuleItem : PanelContainer
                             FacadeWindowDataSearch<TerrainData> winTerrain = new FacadeWindowDataSearch<TerrainData>("res://sources/WindowsDataBase/Terrain/windowTerrain.tscn", this, WindowType.SELECTED);
                             winTerrain.OnNotifySelected += (TerrainData objectSelected) =>
                             {
-                                ButtonCentral.Icon = objectSelected.textureVisual;
-                                tileRuleData.dataCentral = objectSelected.spriteData;
-                                tileRuleData.idDataCentral = objectSelected.id;
+                                //ButtonCentral.Icon = objectSelected.textureVisual;
+                                //tileRuleData.dataCentral = objectSelected.spriteData;
+                                //tileRuleData.idDataCentral = objectSelected.id;
                             };
                             break;
                         case TypeRule.Recursos:
@@ -301,10 +301,10 @@ public partial class ControlRuleItem : PanelContainer
                                 winTerrain.OnNotifySelected += (TerrainData objectSelected) =>
                                 {
                                     button.Icon = objectSelected.textureVisual;
-                                    tileRuleData.UpdateNeighborMask(direction, check, objectSelected.id);
-                                    var condition = tileRuleData.neighborConditions[id];
-                                    condition.State = NeighborState.Filled;
-                                    condition.SpecificTileId = objectSelected.id;
+                                    //tileRuleData.UpdateNeighborMask(direction, check, objectSelected.id);
+                                    //var condition = tileRuleData.neighborConditions[id];
+                                    //condition.State = NeighborState.Filled;
+                                    //condition.SpecificTileId = objectSelected.id;
 
                                 };
                                 break;

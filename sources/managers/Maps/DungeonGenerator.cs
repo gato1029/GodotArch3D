@@ -464,56 +464,56 @@ public class DungeonGenerator
     }
     public void ExportInGame(TerrainMap terrainMap, TerrainCategoryType terrainCategoryType)
     {
-        Random rand = new Random();
+        //Random rand = new Random();
         
         
-        // 1. Cargar tabla de equivalencias TerrainType -> idData
-        BsonExpression bsonExpression = BsonExpression.Create(
-            "category = @0 and isRule = @1",
-            terrainCategoryType.ToString(),
-            true
-        );
-        var result = DataBaseManager.Instance.FindAllFilter<TerrainData>(bsonExpression);
+        //// 1. Cargar tabla de equivalencias TerrainType -> idData
+        //BsonExpression bsonExpression = BsonExpression.Create(
+        //    "category = @0 and isRule = @1",
+        //    terrainCategoryType.ToString(),
+        //    true
+        //);
+        //var result = DataBaseManager.Instance.FindAllFilter<TerrainData>(bsonExpression);
 
-        List<TerrainData> listMosaico = ElementosTerrain(terrainCategoryType, TerrainType.Mosaico);
-        List<TerrainData> listDetallePiso = ElementosTerrain(terrainCategoryType, TerrainType.PisoDetalle);
+        //List<TerrainData> listMosaico = ElementosTerrain(terrainCategoryType, TerrainType.Mosaico);
+        //List<TerrainData> listDetallePiso = ElementosTerrain(terrainCategoryType, TerrainType.PisoDetalle);
 
-        Dictionary<TerrainType, int> tableData = result.ToDictionary(r => r.terrainType, r => r.id);
-        int offsetX = Width / 2;
-        int offsetY = Height / 2;
+        //Dictionary<TerrainType, int> tableData = result.ToDictionary(r => r.terrainType, r => r.id);
+        //int offsetX = Width / 2;
+        //int offsetY = Height / 2;
 
-        int idPiso = tableData[TerrainType.PisoBase];
-        for (int y = 0; y < Height; y++)
-        {
-            for (int x = 0; x < Width; x++)
-            {
-                Vector2I pos = new Vector2I(x - offsetX, y - offsetY);
-                switch (map[x, y])
-                {
+        //int idPiso = tableData[TerrainType.PisoBase];
+        //for (int y = 0; y < Height; y++)
+        //{
+        //    for (int x = 0; x < Width; x++)
+        //    {
+        //        Vector2I pos = new Vector2I(x - offsetX, y - offsetY);
+        //        switch (map[x, y])
+        //        {
                     
-                    case TileTypeDungeon.Floor:
+        //            case TileTypeDungeon.Floor:
                         
-                        terrainMap.AddUpdateTile(pos, idPiso, 0);
-                        break;
-                    case TileTypeDungeon.Wall:
-                        int idMuro = tableData[TerrainType.Muro];
-                        terrainMap.AddUpdateTile(pos, idMuro);                        
-                        terrainMap.AddUpdateTile(pos, idPiso, 0);
-                        break;
-                    case TileTypeDungeon.BaldosaPiso:
-                        int idMosaico = listMosaico[rand.Next(0, listMosaico.Count - 1)].id;
-                        terrainMap.AddUpdateTileSimple(pos, idMosaico);
-                        terrainMap.AddUpdateTile(pos, idPiso, 0);
-                        break;
-                    case TileTypeDungeon.DetallePiso:
-                        int DetallePiso = listDetallePiso[rand.Next(0, listDetallePiso.Count - 1)].id;
-                        terrainMap.AddUpdateTileSimple(pos, DetallePiso);
-                        terrainMap.AddUpdateTile(pos, idPiso, 0);
-                        break;
-                }
-            }
+        //                terrainMap.AddUpdateTile(pos, idPiso, 0);
+        //                break;
+        //            case TileTypeDungeon.Wall:
+        //                int idMuro = tableData[TerrainType.Muro];
+        //                terrainMap.AddUpdateTile(pos, idMuro);                        
+        //                terrainMap.AddUpdateTile(pos, idPiso, 0);
+        //                break;
+        //            case TileTypeDungeon.BaldosaPiso:
+        //                int idMosaico = listMosaico[rand.Next(0, listMosaico.Count - 1)].id;
+        //                terrainMap.AddUpdateTileSimple(pos, idMosaico);
+        //                terrainMap.AddUpdateTile(pos, idPiso, 0);
+        //                break;
+        //            case TileTypeDungeon.DetallePiso:
+        //                int DetallePiso = listDetallePiso[rand.Next(0, listDetallePiso.Count - 1)].id;
+        //                terrainMap.AddUpdateTileSimple(pos, DetallePiso);
+        //                terrainMap.AddUpdateTile(pos, idPiso, 0);
+        //                break;
+        //        }
+        //    }
         
-        }
+        //}
     }
 
     private List<TerrainData> ElementosTerrain(TerrainCategoryType terrainCategoryType, TerrainType terrainType)

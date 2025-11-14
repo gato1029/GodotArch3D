@@ -1,0 +1,95 @@
+[gd_scene load_steps=9 format=3 uid="uid://dmcw3l84ihfmh"]
+
+[ext_resource type="Texture2D" uid="uid://ckhwqyahgd2jq" path="res://resources/Textures/iconos/Grip Lines.png" id="1_6n60a"]
+[ext_resource type="Script" uid="uid://cu6w3src1vkhh" path="res://sources/WindowsDataBase/TileSprite/ControlMiniatureRule.cs" id="1_myfw2"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="2_myfw2"]
+[ext_resource type="PackedScene" uid="uid://bmfkhl38jkdfi" path="res://sources/KuroTiles/ControlKuroRuleItem.tscn" id="3_h8b7f"]
+[ext_resource type="Texture2D" uid="uid://bn4gk1s5kwt14" path="res://resources/Textures/iconos/AddRed.png" id="4_yldqn"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="5_1uoq6"]
+[ext_resource type="Texture2D" uid="uid://b06f131suyagf" path="res://resources/Textures/iconos/Edit.png" id="6_h8b7f"]
+[ext_resource type="Texture2D" uid="uid://cwno51rhj8a2g" path="res://resources/Textures/iconos/Copy.png" id="8_yldqn"]
+
+[node name="ControlMiniatureRule" type="PanelContainer"]
+offset_top = 188.0
+offset_right = 258.0
+offset_bottom = 188.0
+script = ExtResource("1_myfw2")
+
+[node name="vbox" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="vbox"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="vbox"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TextureRectCenter" type="TextureRect" parent="vbox/HBoxContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_default_cursor_shape = 6
+texture = ExtResource("1_6n60a")
+stretch_mode = 5
+
+[node name="PanelBackgroud" type="PanelContainer" parent="vbox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControlKuroTileWid" parent="vbox/HBoxContainer/PanelBackgroud" instance=ExtResource("3_h8b7f")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="vbox/HBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+
+[node name="ButtonAddBehind" type="TextureButton" parent="vbox/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+texture_normal = ExtResource("4_yldqn")
+script = ExtResource("2_myfw2")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="vbox/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 6
+
+[node name="ButtonEdit" type="TextureButton" parent="vbox/HBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 6
+texture_normal = ExtResource("6_h8b7f")
+script = ExtResource("2_myfw2")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDelete" type="TextureButton" parent="vbox/HBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 6
+texture_normal = ExtResource("5_1uoq6")
+script = ExtResource("2_myfw2")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDuplicate" type="TextureButton" parent="vbox/HBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 6
+texture_normal = ExtResource("8_yldqn")
+script = ExtResource("2_myfw2")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonAddAfter" type="TextureButton" parent="vbox/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 8
+texture_normal = ExtResource("4_yldqn")
+script = ExtResource("2_myfw2")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="HSeparator" type="HSeparator" parent="vbox"]
+layout_mode = 2

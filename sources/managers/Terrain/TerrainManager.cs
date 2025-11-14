@@ -58,17 +58,17 @@ internal class TerrainManager:SingletonBase<TerrainManager>
 
     public bool CheckExist(SpriteData spriteData)
     {
-        var atlasA = MaterialManager.Instance.GetAtlasTextureInternal(spriteData);
+        //var atlasA = MaterialManager.Instance.GetAtlasTextureInternal(spriteData);
 
-        foreach (var item in dictionary)
-        {
-            var atlasB = MaterialManager.Instance.GetAtlasTextureInternal(item.Value.spriteData);
-            if (TextureHelper.AreAtlasTexturesFullyEqual(atlasA, atlasB))
-            {
-                return true;
-            }
+        //foreach (var item in dictionary)
+        //{
+        //    var atlasB = MaterialManager.Instance.GetAtlasTextureInternal(item.Value.spriteData);
+        //    if (TextureHelper.AreAtlasTexturesFullyEqual(atlasA, atlasB))
+        //    {
+        //        return true;
+        //    }
             
-        }
+        //}
         return false;
     }
 }

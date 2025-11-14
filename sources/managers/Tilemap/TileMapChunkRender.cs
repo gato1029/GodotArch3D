@@ -446,7 +446,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
                         //
                         var tileData = TilesManager.Instance.GetTileData(dataGame.IdTile);
                         var instanceComplex = MultimeshManager.Instance.CreateInstance( tileData.idMaterial);// multimeshMaterialDict[tileData.idMaterial].CreateInstance();
-                        chunkRender.CreateUpdate(i, j,  instanceComplex.rid, instanceComplex.instance, instanceComplex.materialBatchPosition, dataGame.PositionWorld,dataGame.Scale, dataGame.IdTile);
+                        chunkRender.CreateUpdate(i, j,  instanceComplex.rid, instanceComplex.instance, instanceComplex.layerTexture, dataGame.PositionWorld,dataGame.Scale, dataGame.IdTile);
                         instanciasCargadas++;
                     }
                 }
@@ -524,7 +524,7 @@ public class TileMapChunkRender<TData> where TData : IDataTile
             tilePositionChunk.Y,
             instance.rid,
             instance.instance,
-            instance.materialBatchPosition,
+            instance.layerTexture,
             tileData.PositionWorld,
             tileData.Scale,
             tileData.IdTile

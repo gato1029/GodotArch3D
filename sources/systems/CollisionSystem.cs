@@ -8,6 +8,7 @@ using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Profiler;
+using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +25,10 @@ namespace GodotEcsArch.sources.systems
 
         private CommandBuffer commandBuffer;
         private QueryDescription queryDynamicSprite = new QueryDescription().WithAll<Position, Direction, ColliderSprite>();
-        private QueryDescription queryCharacter = new QueryDescription().WithAll<PositionComponent, ColliderComponent>();
-        public CollisionSystem(World world) : base(world)
+        private QueryDescription queryCharacter = new QueryDescription().WithAll<PositionComponent, ColliderComponent,CharacterComponent>().WithNone<BuildingComponent>();
+        public CollisionSystem(World world,CommandBuffer commandBuffer) : base(world)
         {
-            commandBuffer = new CommandBuffer();
+            this.commandBuffer = commandBuffer;
      
         }
 
@@ -77,7 +78,7 @@ namespace GodotEcsArch.sources.systems
             }
         }
 
-        private readonly struct UpdateColliderCharacter : IForEachWithEntity<PositionComponent,ColliderComponent>
+        private readonly struct UpdateColliderCharacter : IForEachWithEntity<PositionComponent,ColliderComponent,CharacterComponent>
         {
             private readonly float _deltaTime;
             private readonly CommandBuffer _commandBuffer;
@@ -93,12 +94,21 @@ namespace GodotEcsArch.sources.systems
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Update(Entity entity, ref PositionComponent p, ref ColliderComponent c)
+            public void Update(Entity entity, ref PositionComponent p, ref ColliderComponent c, ref CharacterComponent cp)
             {
-                if ((c.idCollider % _numBatches) == _batchIndex)
+                if (entity.IsAlive())
                 {
-                    CollisionManager.Instance.characterCollidersEntities
-                        .UpdateColliderPosition(c.idCollider, p.position);
+                    if (entity.Has<BuildingComponent>())
+                    {
+                      
+                        GameLog.LogCat("collision character incorrecta con build");
+                    }
+                    if ((c.idCollider % _numBatches) == _batchIndex)
+                    {
+
+                        CollisionManager.Instance.characterCollidersEntities
+                                              .UpdateColliderPosition(c.idCollider, p.position);
+                    }
                 }
             }
         }
@@ -123,7 +133,7 @@ namespace GodotEcsArch.sources.systems
             }
 
             var job = new UpdateColliderCharacter(t, commandBuffer, batchIndex, NumBatches);
-            World.InlineEntityQuery<UpdateColliderCharacter, PositionComponent, ColliderComponent>(
+            World.InlineEntityQuery<UpdateColliderCharacter, PositionComponent, ColliderComponent, CharacterComponent>(
                 in queryCharacter, ref job
             );
 

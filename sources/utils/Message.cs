@@ -30,6 +30,7 @@ public static class Message
 
 
         // Mostrar el diálogo centrado
+        dialog.AlwaysOnTop = true;
         dialog.PopupCentered();
         return dialog;
     }
@@ -52,7 +53,7 @@ public static class Message
                 dialog.QueueFree();
             }
         };
-
+        dialog.AlwaysOnTop = true;
         dialog.PopupCentered();
         return dialog;
     }

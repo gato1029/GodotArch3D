@@ -1,14 +1,16 @@
-[gd_scene load_steps=4 format=3 uid="uid://bd6jffokvlvnb"]
+[gd_scene load_steps=6 format=3 uid="uid://bd6jffokvlvnb"]
 
 [ext_resource type="Script" uid="uid://crvukfcba0ycw" path="res://sources/WindowsDataBase/ResourceSource/WindowResourcesSource.cs" id="1_iygqm"]
-[ext_resource type="PackedScene" uid="uid://b6egvt5e1uled" path="res://sources/WindowsDataBase/Accesories/ControlSprite.tscn" id="2_8s3mg"]
-[ext_resource type="PackedScene" uid="uid://diki24d60o2xo" path="res://sources/WindowsDataBase/TileCreator/ControlBuildingGrid.tscn" id="3_sov6a"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="2_iygqm"]
+[ext_resource type="PackedScene" uid="uid://c3ttigs8l4153" path="res://sources/KuroTiles/ControlListTileSprite.tscn" id="2_txpe7"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_2rugs"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="4_2rugs"]
 
 [node name="WindowResourcesSource" type="Window"]
 oversampling_override = 1.0
 title = "Recursos"
 initial_position = 2
-size = Vector2i(1200, 800)
+size = Vector2i(450, 600)
 script = ExtResource("1_iygqm")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -22,110 +24,86 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="TabContainerBase" type="TabContainer" parent="MarginContainer"]
-layout_mode = 2
-current_tab = 0
-
-[node name="Informacion Basica" type="TabBar" parent="MarginContainer/TabContainerBase"]
-layout_mode = 2
-metadata/_tab_index = 0
-
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/TabContainerBase/Informacion Basica"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -150.0
-offset_right = 150.0
-offset_bottom = 58.0
-grow_horizontal = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 4
 columns = 2
 
-[node name="Label5" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label5" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 text = "Tipo:"
 
-[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 text = "Nombre:"
 
-[node name="LineEditName" type="LineEdit" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label7" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Tile:"
+
+[node name="ControlTileSprite" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource("2_txpe7")]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Descripcion:"
 
-[node name="TextEditDescription" type="TextEdit" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="TextEditDescription" type="TextEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(300, 300)
 layout_mode = 2
 size_flags_horizontal = 2
 size_flags_vertical = 0
 wrap_mode = 1
 
-[node name="Label4" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
-text = "Tiene Animacion:"
+text = "Cantidad:"
 
-[node name="CheckBoxHasAnimation" type="CheckBox" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
-layout_mode = 2
-
-[node name="Label2" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
-layout_mode = 2
-text = "Cantidad"
-
-[node name="SpinBoxAmount" type="SpinBox" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="SpinBoxAmount" type="SpinBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 
-[node name="ButtonSave" type="Button" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="Label4" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Puntos Salud:"
+
+[node name="SpinBoxHealthPoints" type="SpinBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label6" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Explotable:"
+
+[node name="CheckBoxIsExploitable" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+tooltip_text = "Cuando el recurso debe permanecer disponible por que da muchos recursos, ejemplo una mina"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Guardar"
 
-[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(200, 200)
+[node name="ButtonSave" type="TextureButton" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 4
+texture_normal = ExtResource("2_iygqm")
+script = ExtResource("3_2rugs")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="Control" type="Control" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/CenterContainer"]
+[node name="ButtonDelete" type="TextureButton" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-
-[node name="Sprite2DViewCentral" type="Sprite2D" parent="MarginContainer/TabContainerBase/Informacion Basica/MarginContainer/HBoxContainer/CenterContainer/Control"]
-
-[node name="Sprite" type="TabBar" parent="MarginContainer/TabContainerBase"]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 1
-
-[node name="ControlSprite" parent="MarginContainer/TabContainerBase/Sprite" instance=ExtResource("2_8s3mg")]
-layout_mode = 1
-
-[node name="Disposicion" type="TabBar" parent="MarginContainer/TabContainerBase"]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 2
-
-[node name="ControlBuildingGridBasic" parent="MarginContainer/TabContainerBase/Disposicion" instance=ExtResource("3_sov6a")]
-layout_mode = 1
-gridSize = Vector2i(1, 1)
+texture_normal = ExtResource("4_2rugs")
+script = ExtResource("3_2rugs")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"

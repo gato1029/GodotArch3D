@@ -5,11 +5,11 @@ using System;
 [Tool]
 public partial class ControlSeleccionTexture : MarginContainer
 {
-    [Export] public int baseScale = 2;
+    [Export] public float baseScale = 2;
     [Export] public Texture2D baseTexture;
-    [Export] public int cellSize = 8;
+    [Export] public float cellSize = 8;
 
-    private int cellInternal = 8;
+    private float cellInternal = 8;
     private Vector2 _startPosition;
     private Vector2 _endPosition;
     private bool _isSelecting = false;
@@ -154,7 +154,7 @@ public partial class ControlSeleccionTexture : MarginContainer
         }
         if (v==1)
         {
-            SetScale(Mathf.Max(1, baseScale - 1));
+            SetScale(Mathf.Max(0.5f, baseScale - 0.1f));
         }
     }
 
@@ -206,10 +206,10 @@ public partial class ControlSeleccionTexture : MarginContainer
         int maxX = Mathf.Max(_startCell.X, _endCell.X);
         int maxY = Mathf.Max(_startCell.Y, _endCell.Y);
 
-        int pixelX = minX * cellInternal;
-        int pixelY = minY * cellInternal;
-        int pixelWidth = (maxX - minX + 1) * cellInternal;
-        int pixelHeight = (maxY - minY + 1) * cellInternal;
+        float pixelX = minX * cellInternal;
+        float pixelY = minY * cellInternal;
+        float pixelWidth = (maxX - minX + 1) * cellInternal;
+        float pixelHeight = (maxY - minY + 1) * cellInternal;
 
         if (pixelWidth > 0 && pixelHeight > 0)
         {
@@ -239,7 +239,7 @@ public partial class ControlSeleccionTexture : MarginContainer
         return new Vector2(clampedX, clampedY);
     }
 
-    public void SetScale(int scale)
+    public void SetScale(float scale)
     {
         baseScale = scale;
         cellInternal = cellSize * baseScale;

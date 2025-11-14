@@ -1,0 +1,227 @@
+[gd_scene load_steps=10 format=3 uid="uid://cfk6nlh8toxus"]
+
+[ext_resource type="Script" uid="uid://bg1asma4221lc" path="res://sources/WindowsDataBase/TileSprite/WindowTileSprite.cs" id="1_ao2wx"]
+[ext_resource type="PackedScene" uid="uid://omg22kdm131a" path="res://sources/KuroTiles/ControlKuroTile.tscn" id="2_7hy0e"]
+[ext_resource type="PackedScene" uid="uid://cinkv05bue1lv" path="res://sources/KuroTiles/ControlListTextures.tscn" id="3_4l6m5"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="3_hx15v"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="3_uojsg"]
+[ext_resource type="PackedScene" uid="uid://sv8lb7mas3mp" path="res://sources/WindowsDataBase/Generic/Controls/ControlSpriteEdit.tscn" id="3_y55g4"]
+[ext_resource type="PackedScene" uid="uid://7qitk1hya1sf" path="res://sources/WindowsDataBase/Character/Colliders/windowColliders.tscn" id="4_ao2wx"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="4_uojsg"]
+[ext_resource type="Texture2D" uid="uid://gnsswjongsbo" path="res://resources/Textures/iconos/Save as.png" id="5_47ght"]
+
+[node name="WindowTileSprite" type="Window"]
+oversampling_override = 1.0
+title = "TileSprite"
+initial_position = 1
+size = Vector2i(820, 600)
+script = ExtResource("1_ao2wx")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="LineEditCode" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+placeholder_text = "Codigo Autogenerado"
+editable = false
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Agrupador:"
+
+[node name="LineEditGrouping" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+placeholder_text = "Hacer Click"
+editable = false
+
+[node name="Label4" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Tipo:"
+
+[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="CheckBoxIsAnimation" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label2" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Tile:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="ControlTile" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer/VBoxContainer" instance=ExtResource("2_7hy0e")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="ControlListTexturesAnimated" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer/VBoxContainer" instance=ExtResource("3_4l6m5")]
+visible = false
+layout_mode = 2
+
+[node name="Label5" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Offset Sprite X:"
+
+[node name="SpinBoxOffsetX" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+min_value = -100.0
+step = 0.10000000000582077
+
+[node name="Label6" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Offset Sprite Y:"
+
+[node name="SpinBoxOffsetY" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+min_value = -100.0
+step = 0.10000000000582077
+
+[node name="Label7" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Escala:"
+
+[node name="SpinBoxScale" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+step = 0.10000000000582077
+value = 1.00000000005821
+
+[node name="Label12" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Profundidad Y:"
+
+[node name="SpinBoxDepht" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+step = 0.10000000000582077
+
+[node name="Label8" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+visible = false
+layout_mode = 2
+text = "Color Base:"
+
+[node name="ColorButtonBase" type="ColorPickerButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label9" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Espejo Horizontal:"
+
+[node name="CheckBoxMirrorHorizontal" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Habilitado"
+
+[node name="Label10" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Espejo Vertical:"
+
+[node name="CheckBoxMirrorVertical" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Habilitado"
+
+[node name="Label11" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Tiene Collider:"
+
+[node name="CheckBoxHasCollider" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Habilitado"
+
+[node name="GridContainerAnimated" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+visible = false
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fps:"
+
+[node name="SpinBoxFps" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+layout_mode = 2
+step = 0.1
+value = 0.1
+
+[node name="Label2" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Bucle:"
+
+[node name="CheckBoxLoop" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+layout_mode = 2
+button_pressed = true
+text = "Habilitado"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+
+[node name="ButtonSave" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_uojsg")
+script = ExtResource("4_uojsg")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonSaveSimilar" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "Duplicar"
+texture_normal = ExtResource("5_47ght")
+script = ExtResource("4_uojsg")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDelete" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_hx15v")
+script = ExtResource("4_uojsg")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ControlSpriteEdit" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer" instance=ExtResource("3_y55g4")]
+layout_mode = 2
+
+[node name="ControlCollider" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer" instance=ExtResource("4_ao2wx")]
+visible = false
+layout_mode = 2

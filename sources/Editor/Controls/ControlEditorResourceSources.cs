@@ -22,7 +22,7 @@ public partial class ControlEditorResourceSources : MarginContainer
         InitializeUI(); // Insertado por el generador de UI    
         // Configuración inicial del preview
         PlacementPreview.Instance.Configure(tileId: 1, layer: 20);
-        SelectionBlueprint.Instance.Configure(1, 30);
+       // SelectionBlueprint.Instance.Configure(1, 30);
         // Configuración inicial del blueprint
         SelectionBlueprint.Instance.Create(
             size: new Vector2I(1, 1),
@@ -67,9 +67,9 @@ public partial class ControlEditorResourceSources : MarginContainer
         for (int i = 0; i < result.Count; i++)
         {
             ResourceSourceData item = result[i];
-            AtlasTexture atlasTexture = MaterialManager.Instance.GetAtlasTextureInternal(item.spriteData);
-            ItemListData.AddItem(item.name, atlasTexture);
-            ItemListData.SetItemMetadata(i, item.id);
+            //AtlasTexture atlasTexture = MaterialManager.Instance.GetAtlasTextureInternal(item.spriteData);
+            //ItemListData.AddItem(item.name, atlasTexture);
+            //ItemListData.SetItemMetadata(i, item.id);
         }
     }
 
@@ -91,7 +91,7 @@ public partial class ControlEditorResourceSources : MarginContainer
         
         TextureRectImage.Texture = objectSelected.textureVisual;
         Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-        PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
+     //   PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
     }
 
     public override void _Input(InputEvent @event)
@@ -111,8 +111,8 @@ public partial class ControlEditorResourceSources : MarginContainer
         if (objectSelected != null)
         {
             // Crear preview si cambio dimencion
-            if (PlacementPreview.Instance.Size != SelectionBlueprint.Instance.Size)
-                PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
+            if (PlacementPreview.Instance.Size != SelectionBlueprint.Instance.Size) { }
+          //      PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
         }
 
         // Pintar o borrar tiles
@@ -128,7 +128,7 @@ public partial class ControlEditorResourceSources : MarginContainer
         {
             foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
             {
-                mapBase.AddUpdateTile(tilePos, objectSelected.id);
+                //mapBase.AddUpdateTile(tilePos, objectSelected.id);
             }
         }        
     }
@@ -139,7 +139,7 @@ public partial class ControlEditorResourceSources : MarginContainer
         {
             foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
             {
-                mapBase.RemoveTile(tilePos, objectSelected.id);
+                //mapBase.RemoveTile(tilePos, objectSelected.id);
             }
         }
     }

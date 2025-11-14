@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
 using System;
@@ -64,7 +65,14 @@ namespace GodotEcsArch.sources.WindowsDataBase.Character.DataBase
 
     public class AnimationCharacterBaseData : IdData
     {
+        public float offsetSpritePixelX { get; set; }
+        public float offsetSpritePixelY { get; set; }
+
+        public float offsetSpriteX { get; set; }
+        public float offsetSpriteY { get; set; }
+
         public float zOrderingOrigin { get; set; }
+        
         public bool hasCompositeAnimation { get; set; }        
         public GeometricShape2D collisionMove { get; set; }
         public GeometricShape2D collisionBody { get; set; }

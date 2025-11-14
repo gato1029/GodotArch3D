@@ -27,8 +27,6 @@ public partial class ControlSprite : ScrollContainer
     private GridContainer GridContainerAnimacion;
     private SpinBox SpinBoxOffsetX;
     private SpinBox SpinBoxOffsetY;
-    private SpinBox SpinBoxOriginX;
-    private SpinBox SpinBoxOriginY;
     private ColorPickerButton ColorButtonBase;
     private SpinBox SpinBoxScale;
     private CheckBox CheckBoxMirror;
@@ -54,12 +52,10 @@ public partial class ControlSprite : ScrollContainer
         ControlGrid = GetNode<ControlGrid>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid");
         ControlSpriteInternal = GetNode<Control>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal");
         Sprite2DView = GetNode<Sprite2D>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal/Sprite2DView");
-        CollisionShapeView = GetNode<CollisionShape2D>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal/Sprite2DView/CollisionShapeView");
+        CollisionShapeView = GetNode<CollisionShape2D>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal/CollisionShapeView");
         GridContainerAnimacion = GetNode<GridContainer>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion");
         SpinBoxOffsetX = GetNode<SpinBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion/SpinBoxOffsetX");
         SpinBoxOffsetY = GetNode<SpinBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion/SpinBoxOffsetY");
-        SpinBoxOriginX = GetNode<SpinBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion/HBoxContainer/SpinBoxOriginX");
-        SpinBoxOriginY = GetNode<SpinBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion/HBoxContainer/SpinBoxOriginY");
         ColorButtonBase = GetNode<ColorPickerButton>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion/ColorButtonBase");
         SpinBoxScale = GetNode<SpinBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion/SpinBoxScale");
         CheckBoxMirror = GetNode<CheckBox>("MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/HBoxContainer2/GridContainerAnimacion/CheckBoxMirror");

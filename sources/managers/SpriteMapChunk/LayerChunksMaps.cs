@@ -72,7 +72,7 @@ public class LayerChunksMaps<T> : IEnumerable<KeyValuePair<string, SpriteMapChun
     {
         foreach (var item in layers)
         {
-            item.Value.SetRenderEnabled(render);
+            item.Value.SetRenderEnabledGlobal(render);
         }
     }
     public void LoadAll()

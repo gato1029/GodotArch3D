@@ -1,15 +1,17 @@
-using Arch.Core;
-using Arch.Core.Extensions;
+
+using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.components;
-using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.Flecs.Creators;
+using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotFlecs.sources.Flecs.Components;
 using System.Collections.Generic;
 
 public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
 {
     private Entity[,] gridEntities;
-    private int tileId;
+    private long tileId = 1762385049549000;
     private int renderLayer;
 
     public Vector2I Size { get; private set; }
@@ -26,7 +28,7 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
     {
      
     }
-    public void Configure(int tileId, int renderLayer)
+    public void Configure(long tileId, int renderLayer)
     {
         this.renderLayer = renderLayer;
         this.tileId = tileId;
@@ -48,16 +50,23 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
                 Vector2I tilePos = centerTile + offset;
 
                 Vector2 worldPos = TilesHelper.WorldPositionTile(tilePos);
+                TileSpriteData tileData = MasterDataManager.GetData<TileSpriteData>(tileId);
+                if (tileData!=null)
+                {
+                    var entity = TileSpriteCreator.Instance.CreateSingleSprite(tileData.spriteData, worldPos, tilePos, renderLayer);
 
-                Entity entity = TilesManager.Instance.CreateTileDinamic(tileId, 1, worldPos, renderLayer, Vector2.Zero);
-                gridEntities[i, j] = entity;
+                    gridEntities[i, j] = entity;
+                }
+              
+                //Entity entity = TilesManager.Instance.CreateTileDinamic(tileId, 1, worldPos, renderLayer, Vector2.Zero);
+                
 
-                ref var tilePosition = ref entity.Get<TilePositionComponent>();
-                tilePosition.x = tilePos.X;
-                tilePosition.y = tilePos.Y;
+                //ref var tilePosition = ref entity.Get<TilePositionComponent>();
+                //tilePosition.x = tilePos.X;
+                //tilePosition.y = tilePos.Y;
 
-                ref var position = ref entity.Get<PositionComponent>();
-                position.position = worldPos;
+                //ref var position = ref entity.Get<PositionComponent>();
+                //position.position = worldPos;
             }
         }
     }
@@ -79,12 +88,9 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
                 Vector2I newTilePos = targetTilePosition + offset;
                 Vector2 newWorldPos = TilesHelper.WorldPositionTile(newTilePos);
 
-                ref var position = ref entity.Get<PositionComponent>();
+                ref var position = ref entity.GetMut<PositionComponent>();
                 position.position = newWorldPos;
-
-                ref var tilePosition = ref entity.Get<TilePositionComponent>();
-                tilePosition.x = newTilePos.X;
-                tilePosition.y = newTilePos.Y;
+                position.tilePosition = newTilePos;
             }
         }
     }
@@ -98,7 +104,13 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
             for (int j = 0; j < Size.Y; j++)
             {
                 if (gridEntities[i, j].IsAlive())
-                    TilesManager.Instance.FreeTileEntity(gridEntities[i, j]);
+                {
+                    var entity = gridEntities[i, j];
+                    var renderComp = entity.Get<RenderGPUComponent>();
+                    MultimeshManager.Instance.FreeInstance(renderComp.rid, renderComp.instance, renderComp.idMaterial);
+                    entity.Destruct();
+                }
+                  
             }
         }
         gridEntities = null;
@@ -115,8 +127,8 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
                 var e = gridEntities[x, y];
                 if (!e.IsAlive()) continue;
 
-                var tile = e.Get<TilePositionComponent>();
-                yield return (e, new Vector2I(tile.x, tile.y));
+                var tile = e.Get<PositionComponent>();
+                yield return (e, tile.tilePosition);
             }
         }
     }

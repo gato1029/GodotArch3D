@@ -1,14 +1,15 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.utils;
-using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using static Flecs.NET.Core.Ecs.Units;
 
 
 public partial class ContainerAnimationCharacter : Window, IFacadeWindow<AnimationCharacterBaseData>
@@ -35,7 +36,18 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
         ButtonSave.Pressed += ButtonSave_Pressed;
         ButtonSaveAll.Pressed += ButtonSaveAll_Pressed;
         CloseRequested += ContainerAnimationCharacter_CloseRequested;
+        SpinBoxOffsetSpriteX.ValueChanged += SpinBoxOffsetSpriteX_ValueChanged;
+        SpinBoxOffsetSpriteY.ValueChanged += SpinBoxOffsetSpriteY_ValueChanged;
+    }
 
+    private void SpinBoxOffsetSpriteY_ValueChanged(double value)
+    {
+        Sprite2DView.Position = new Vector2(Sprite2DView.Position.X, (float)value) * (-1);
+    }
+
+    private void SpinBoxOffsetSpriteX_ValueChanged(double value)
+    {
+        Sprite2DView.Position = new Vector2( (float)value, Sprite2DView.Position.Y);
     }
 
     private void ButtonSaveAll_Pressed()
@@ -46,6 +58,13 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
             foreach (var item in objectData.animationDataArray)
             {
                 item.idMaterial = Animacion_Base.MaterialData.id;
+                foreach (var itemAni in item.animationData)
+                {
+                    foreach (var itemFrame in itemAni.frameDataArray)
+                    {
+                        TextureHelper.RecalulateUVFormat(itemFrame,item.idMaterial, itemAni);                        
+                    }                    
+                }                               
             }
         }
 
@@ -54,8 +73,16 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
             foreach (var item in objectData.animationExtraDataArray)
             {
                 item.idMaterial = Animacion_Extra.MaterialData.id;
+                foreach (var itemAni in item.animationData)
+                {
+                    foreach (var itemFrame in itemAni.frameDataArray)
+                    {
+                        TextureHelper.RecalulateUVFormat(itemFrame, item.idMaterial,itemAni);
+                    }
+                }
             }
         }
+        
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChangued?.Invoke(this);
         OnNotifyChanguedSimple?.Invoke();        
@@ -68,6 +95,13 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
             foreach (var item in objectData.animationDataArray)
             {
                 item.idMaterial = Animacion_Base.MaterialData.id;
+                foreach (var itemAni in item.animationData)
+                {
+                    foreach (var itemFrame in itemAni.frameDataArray)
+                    {
+                        TextureHelper.RecalulateUVFormat(itemFrame, item.idMaterial, itemAni);
+                    }
+                }
             }
         }
 
@@ -76,8 +110,22 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
             foreach (var item in objectData.animationExtraDataArray)
             {
                 item.idMaterial = Animacion_Extra.MaterialData.id;
+                foreach (var itemAni in item.animationData)
+                {
+                    foreach (var itemFrame in itemAni.frameDataArray)
+                    {
+                        TextureHelper.RecalulateUVFormat(itemFrame, item.idMaterial,itemAni);
+                    }
+                }
             }
         }
+
+        objectData.offsetSpritePixelX = (float)SpinBoxOffsetSpriteX.Value;
+        objectData.offsetSpritePixelY = (float)SpinBoxOffsetSpriteY.Value;
+
+        objectData.offsetSpriteX = MeshCreator.PixelsToUnits(objectData.offsetSpritePixelX);
+        objectData.offsetSpriteY = MeshCreator.PixelsToUnits(objectData.offsetSpritePixelY);
+
 
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChangued?.Invoke(this);
@@ -97,6 +145,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
 
     public void SetData(AnimationCharacterBaseData data)
     {
+
        objectData = data;
        LineEditName.Text = data.name;
        SpinBoxZordering.Value = data.zOrderingOrigin;
@@ -105,6 +154,8 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
        Animacion_Extra.SetData(data.animationExtraDataArray);
        PanelMovimiento.SetData(data.collisionMove);
        PanelCuerpo.SetData(data.collisionBody);        
+        SpinBoxOffsetSpriteX.Value = data.offsetSpritePixelX;
+        SpinBoxOffsetSpriteY.Value = data.offsetSpritePixelY;
         if (data.animationDataArray != null)
         {
             AnimationStateData dataAnim = data.animationDataArray[0];

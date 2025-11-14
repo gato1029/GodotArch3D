@@ -48,14 +48,14 @@ public class ResourceGenerationConfig
 
 public class ResourceSourceGenerator
 {
-    private SpriteMapChunk<ResourceSourceDataGame> mapResourceSource; // mapa de fuentes de recursos
+    //private SpriteMapChunk<ResourceSourceDataGame> mapResourceSource; // mapa de fuentes de recursos
     private SpriteMapChunk<TerrainDataGame> mapTerrainBase; // mapa de terreno 
     private Vector2I sizeMap;
     private Dictionary<ResourceSourceType, HashSet<int>> resourcesList = new Dictionary<ResourceSourceType, HashSet<int>>();
     private List<ResourceGenerationConfig> configuraciones = new List<ResourceGenerationConfig>();
     public ResourceSourceGenerator(MapLevelData mapLevelData)
     {
-        this.mapResourceSource = mapLevelData.resourceSourceMap.MapData;
+        //this.mapResourceSource = mapLevelData.resourceSourceMap.MapData;
         this.mapTerrainBase = mapLevelData.terrainMap.MapTerrainBasic;
         sizeMap = mapLevelData.size;
         LoadResourcesSource();
@@ -77,7 +77,7 @@ public class ResourceSourceGenerator
             prioridad = 1,
             overrite = false,
             terrenosPermitidos = new HashSet<TerrainType> { TerrainType.PisoBase },
-            recursosPermitidos = new HashSet<ResourceSourceType> { ResourceSourceType.Arboles },
+            recursosPermitidos = new HashSet<ResourceSourceType> { ResourceSourceType.Arbol },
         });
 
         // configuracion claro 
@@ -133,20 +133,20 @@ public class ResourceSourceGenerator
     }
     private void LoadResourcesSource()
     {
-        var list =DataBaseManager.Instance.FindAll<ResourceSourceData>();
-        foreach (var resourceSource in list) {
-            if (resourcesList.ContainsKey(resourceSource.resourceSourceType))
-            {
-                resourcesList[resourceSource.resourceSourceType].Add(resourceSource.id);
-            }
-            else
-            {
-                HashSet<int> ints = new HashSet<int>();
-                ints.Add(resourceSource.id);
-                resourcesList[resourceSource.resourceSourceType] = ints;
-            }
+        //var list =DataBaseManager.Instance.FindAll<ResourceSourceData>();
+        //foreach (var resourceSource in list) {
+        //    if (resourcesList.ContainsKey(resourceSource.resourceSourceType))
+        //    {
+        //        resourcesList[resourceSource.resourceSourceType].Add(resourceSource.id);
+        //    }
+        //    else
+        //    {
+        //        HashSet<int> ints = new HashSet<int>();
+        //        ints.Add(resourceSource.id);
+        //        resourcesList[resourceSource.resourceSourceType] = ints;
+        //    }
             
-        }
+        //}
     }
     private int GetRandomResourceId(HashSet<ResourceSourceType> tipos)
     {
@@ -168,9 +168,9 @@ public class ResourceSourceGenerator
     }
     public void Create()
     {
-        mapResourceSource.SetRenderEnabled(false);
-        mapResourceSource.ClearAllChunks();
-        mapResourceSource.ClearAllFiles();
+        //mapResourceSource.SetRenderEnabledGlobal(false);
+        //mapResourceSource.ClearAllChunks();
+        //mapResourceSource.ClearAllFiles();
 
         int startX = -(sizeMap.X / 2);
         int endX = sizeMap.X / 2;
@@ -179,66 +179,67 @@ public class ResourceSourceGenerator
 
         foreach (var config in configuraciones.OrderBy(c => c.prioridad))
         {
-            var tipoRecurso = config.recursosPermitidos;
-            
+            //    var tipoRecurso = config.recursosPermitidos;
 
-            FastNoiseLite noise = new FastNoiseLite();
-            noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-            noise.SetFrequency(config.frecuenciaRuido);
-            noise.SetSeed(CommonOperations.GetRandomInt());
-     
-            var puntosPoisson = GenerarPuntosPoissonOptimizado(sizeMap.X, sizeMap.Y, config.distancePoison);
 
-            foreach (var pos in puntosPoisson)
-            {
-                Vector2I positionGlobal = new Vector2I(pos.X - sizeMap.X / 2, pos.Y - sizeMap.Y / 2); // si necesitas offset
-          
-                TerrainDataGame terreno = mapTerrainBase.GetTileGlobalPosition(positionGlobal);
-                if (terreno == null || !config.terrenosPermitidos.Contains((TerrainType)terreno.GetTypeData()))
-                    continue;
+            //    FastNoiseLite noise = new FastNoiseLite();
+            //    noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+            //    noise.SetFrequency(config.frecuenciaRuido);
+            //    noise.SetSeed(CommonOperations.GetRandomInt());
 
-                float valorRuido = noise.GetNoise(positionGlobal.X, positionGlobal.Y);
+            //    var puntosPoisson = GenerarPuntosPoissonOptimizado(sizeMap.X, sizeMap.Y, config.distancePoison);
 
-                if (valorRuido >= config.umbralColocacion && !TieneVecino(positionGlobal,config.vecindadTerrenoBase))
-                {
+            //    foreach (var pos in puntosPoisson)
+            //    {
+            //        Vector2I positionGlobal = new Vector2I(pos.X - sizeMap.X / 2, pos.Y - sizeMap.Y / 2); // si necesitas offset
 
-                    if (config.overrite)
-                    {
-                        
-                        if (config.radioDisco > 0 )
-                        {
-                            var puntosDisco = GenerarDisco(positionGlobal, config.radioDisco, config.terrenosPermitidos);
-                            foreach (var posDis in puntosDisco)
-                            {
-                                int id = config.GetRandomId();
-                                mapResourceSource.AddUpdatedTile(posDis, id);
-                            }
-                        }
-                        else
-                        {
-                            int id = config.GetRandomId();
-                            mapResourceSource.AddUpdatedTile(positionGlobal, id);
-                        }
-                        
-                    }
-                    else
-                    {
-                        var data = mapResourceSource.GetTileGlobalPosition(positionGlobal);
-                        if (data == null || data.idData == 0)
-                        {
-                            int id = config.GetRandomId();
-                            mapResourceSource.AddUpdatedTile(positionGlobal, id);
-                        }
-                    }
-                    
-                    
-                    
-                }
-            }
+            //        TerrainDataGame terreno = mapTerrainBase.GetTileGlobalPosition(positionGlobal);
+            //        if (terreno == null || !config.terrenosPermitidos.Contains((TerrainType)terreno.GetTypeData()))
+            //            continue;
 
+            //        float valorRuido = noise.GetNoise(positionGlobal.X, positionGlobal.Y);
+
+            //        if (valorRuido >= config.umbralColocacion && !TieneVecino(positionGlobal,config.vecindadTerrenoBase))
+            //        {
+
+            //            if (config.overrite)
+            //            {
+
+            //                if (config.radioDisco > 0 )
+            //                {
+            //                    var puntosDisco = GenerarDisco(positionGlobal, config.radioDisco, config.terrenosPermitidos);
+            //                    foreach (var posDis in puntosDisco)
+            //                    {
+            //                        int id = config.GetRandomId();
+            //                        mapResourceSource.AddUpdatedTile(posDis, id);
+            //                    }
+            //                }
+            //                else
+            //                {
+            //                    int id = config.GetRandomId();
+            //                    mapResourceSource.AddUpdatedTile(positionGlobal, id);
+            //                }
+
+            //            }
+            //            else
+            //            {
+            //                var data = mapResourceSource.GetTileGlobalPosition(positionGlobal);
+            //                if (data == null || data.idDataTileSprite == 0)
+            //                {
+            //                    int id = config.GetRandomId();
+            //                    mapResourceSource.AddUpdatedTile(positionGlobal, id);
+            //                }
+            //            }
+
+
+
+            //        }
+            //    }
+
+            //}
+
+            //mapResourceSource.SetRenderEnabled(true);
         }
-
-        mapResourceSource.SetRenderEnabled(true);
     }
     List<Vector2I> GenerarDisco(Vector2I centro, int radio, HashSet<TerrainType> terrenosPermitidos)
     {

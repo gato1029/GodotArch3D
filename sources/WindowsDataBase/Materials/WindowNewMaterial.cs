@@ -125,6 +125,14 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
         objectData.divisionPixelY = (int)SpinBoxY.Value;
         objectData.category = LineEditCategory.Text;
         objectData.type = OptionButtonType.GetItemId(OptionButtonType.GetSelectedId());
+
+        if (objectData.type == 6   )
+        {
+
+            objectData.originXTextureMaster = 0;
+            objectData.originYTextureMaster = 0;
+            objectData.idTextureMaster = -1;
+        }
         if (LineEditId.Text == string.Empty)
         {
             int idnext = DataBaseManager.Instance.NextID<MaterialData>();
@@ -145,6 +153,7 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
         {
             GenerateMasterAtlas();
         }
+  
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }

@@ -18,7 +18,10 @@ namespace GodotEcsArch.sources.managers.Tilemap;
 public class DataItem
 {
     [ProtoIgnore, JsonIgnore] public int idUnique { get; set; }
-    [ProtoMember(1)] public int idData { get; set; }
+    [ProtoMember(1)] public long idDataTileSprite { get; set; }
+    [ProtoMember(2)] public int idGroup { get; set; }
+    [ProtoMember(3)] public int layer { get; set; }
+    [ProtoMember(4)] public bool render { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector3 positionWorld { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector2 positionCollider { get; set; }
     [ProtoIgnore, JsonIgnore] public Vector2I positionTileWorld { get; set; }
@@ -26,38 +29,38 @@ public class DataItem
     [ProtoIgnore, JsonIgnore] public Vector2 positionReal { get; set; }
     public virtual void SetDataGame() { }
     public virtual void ClearDataGame() { }
-    public virtual SpriteData GetSpriteData() { return null; }
+    public virtual TileSpriteData GetSpriteData() { return null; }
     public virtual bool IsAnimation() { return false; }
     public virtual AnimationStateData GetAnimationStateData() { return null; }
     public virtual int GetTypeData() { return 0; }
 
     // Campos auxiliares solo para serialización
-    [ProtoMember(2)]
+    [ProtoMember(5)]
     public ProtoVector3 positionWorldSerialized
     {
         get => positionWorld;
         set => positionWorld = value;
     }
 
-    [ProtoMember(3)]
+    [ProtoMember(6)]
     public ProtoVector2 positionColliderSerialized
     {
         get => positionCollider;
         set => positionCollider = value;
     }
-    [ProtoMember(4)]
+    [ProtoMember(7)]
     public ProtoVector2I positionTileWorldSerialized
     {
         get => positionTileWorld;
         set => positionTileWorld = value;
     }
-    [ProtoMember(5)]
+    [ProtoMember(8)]
     public ProtoVector2I positionTileChunkSerialized
     {
         get => positionTileChunk;
         set => positionTileChunk = value;
     }
-    [ProtoMember(6)]
+    [ProtoMember(9)]
     public ProtoVector2 positionRealChunkSerialized
     {
         get => positionReal;

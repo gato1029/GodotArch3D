@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Buildings;
 using GodotEcsArch.sources.managers.Maps;
@@ -19,7 +20,7 @@ public partial class ControlEditorBuilding : MarginContainer
         InitializeUI();
         // Configuración inicial del preview
         PlacementPreview.Instance.Configure(tileId: 1, layer: 20);
-        SelectionBlueprint.Instance.Configure(1, 30);
+   
         // Configuración inicial del blueprint
         SelectionBlueprint.Instance.Create(
             size: new Vector2I(1, 1),
@@ -82,7 +83,7 @@ public partial class ControlEditorBuilding : MarginContainer
 
         TextureRectImage.Texture = objectSelected.textureVisual;
         Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-        PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
+       // PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
     }
 
     public override void _Input(InputEvent @event)
@@ -102,8 +103,8 @@ public partial class ControlEditorBuilding : MarginContainer
         if (objectSelected != null)
         {
             // Crear preview si cambio dimencion
-            if (PlacementPreview.Instance.Size != SelectionBlueprint.Instance.Size)
-                PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
+            if (PlacementPreview.Instance.Size != SelectionBlueprint.Instance.Size) { }
+               // PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
         }
 
         // Pintar o borrar tiles
@@ -112,6 +113,7 @@ public partial class ControlEditorBuilding : MarginContainer
 
         if (Input.IsMouseButtonPressed(MouseButton.Right))
             ApplyErase();
+        
     }
     private void ApplyPaint()
     {
@@ -119,8 +121,8 @@ public partial class ControlEditorBuilding : MarginContainer
         {
             foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
             {
-                GD.Print("posicion creacion:"+tilePos);
-                mapBase.AddUpdateTile(tilePos, objectSelected.id);
+                GlobalData.PendingBuildingQueue.Enqueue((tilePos, objectSelected.id));
+                //mapBase.AddUpdateTile(tilePos, objectSelected.id);
             }
         }
     }
@@ -132,6 +134,7 @@ public partial class ControlEditorBuilding : MarginContainer
             foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
             {
                 mapBase.RemoveTile(tilePos, objectSelected.id);
+                
             }
         }
     }

@@ -13,7 +13,29 @@ internal class CommonOperations
     static RandomNumberGenerator rngInternal = new RandomNumberGenerator();
 
     private static readonly Random rng = new Random();
+    public static Vector2 GetMidPointByDirection(Rect2 rect, AnimationDirection direction)
+    {
+        Vector2 pos = rect.Position;
+        Vector2 size = rect.Size;
 
+        switch (direction)
+        {
+            case AnimationDirection.UP:
+                return new Vector2(pos.X + size.X / 2f, pos.Y);
+
+            case AnimationDirection.DOWN:
+                return new Vector2(pos.X + size.X / 2f, pos.Y + size.Y);
+
+            case AnimationDirection.LEFT:
+                return new Vector2(pos.X, pos.Y + size.Y / 2f);
+
+            case AnimationDirection.RIGHT:
+                return new Vector2(pos.X + size.X, pos.Y + size.Y / 2f);
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+        }
+    }
     public static int GetRandomInt(int min = 1, int max = 1_000_000)
     {
         return rngInternal.RandiRange(min, max);

@@ -1,15 +1,19 @@
 
 using Godot;
 using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Group;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
 using LiteDB;
 using System;
@@ -57,7 +61,12 @@ namespace GodotEcsArch.sources.WindowsDataBase
             collectionNameMap[typeof(DataBaseFree)] = "DataBaseFree";
             collectionNameMap[typeof(TextureMasterData)] = "TextureMasterData";
             collectionNameMap[typeof(ResourceSourceData)] = "ResourceSourceData";
+            collectionNameMap[typeof(BulletData)] = "BulletData";
 
+            RegisterCollection<GroupData>("GroupData");
+            RegisterCollection<TileSpriteData>("TileSpriteData");
+            RegisterCollection<GroupingData>("GroupingData");
+            RegisterCollection<AutoTileSpriteData>("AutoTileSpriteData");
             // RegisterCollection<BuildingData>("DataBaseFree");
 
             ILiteCollection<TextureMasterData> TextureMasterDataCollection = db.GetCollection<TextureMasterData>("TextureMasterData");
@@ -101,6 +110,9 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             ILiteCollection<BuildingData> BuildingDataCollection = db.GetCollection<BuildingData>("BuildingData");
             BuildingDataCollection.EnsureIndex(x => x.id, unique: true);
+
+            ILiteCollection<BulletData> BulletDataCollection = db.GetCollection<BulletData>("BulletData");
+            BulletDataCollection.EnsureIndex(x => x.id, unique: true);
         }
 
         public void RegisterCollection<T>(string collectionName) where T : class
@@ -120,7 +132,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType !=typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType !=typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -174,7 +186,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             // Obtener el tipo base de T
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -197,7 +209,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -227,11 +239,11 @@ namespace GodotEcsArch.sources.WindowsDataBase
             return resultado;
         }
 
-        public bool InsertUpdate<T>(T data, int id = -1) 
+        public bool InsertUpdate<T>(T data, long id = -1) 
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -256,6 +268,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             {
                 resultado = collection.Upsert(id,data);
             }
+            
             return resultado;
         }
 
@@ -263,7 +276,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -317,12 +330,12 @@ namespace GodotEcsArch.sources.WindowsDataBase
         /// <typeparam name="T">Tipo del dato que se buscará</typeparam>
         /// <param name="id">El ID del documento que se quiere encontrar</param>
         /// <returns>El documento si se encuentra, o null si no</returns>
-        public T FindById<T>(int id) where T : class
+        public T FindById<T>(long id) where T : class
         {
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -353,12 +366,68 @@ namespace GodotEcsArch.sources.WindowsDataBase
             return collection.FindById(id); // Devuelve el documento o null si no se encuentra
 
         }
+
+        public T FindById<T>(int id) where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = typeof(T).BaseType;
+            string collectionName;
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+                }
+                else
+                {
+                    // Obtén la colección correspondiente
+                    var collectionBson = db.GetCollection<BsonDocument>(collectionName);
+                    var filteredDocuments = collectionBson.Query().Where(x => x["_id"] == id && x["type"] == currentType.Name).ToList();
+
+                    var result = filteredDocuments.Select(BsonMapper.Global.ToObject<T>).FirstOrDefault();
+                    // Busca el documento por ID
+                    return result; // Devuelve el documento o null si no se encuentra
+                }
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+                }
+            }
+
+            var collection = db.GetCollection<T>(collectionName);
+
+            // Busca el documento por ID
+            return collection.FindById(id); // Devuelve el documento o null si no se encuentra
+
+        }
+        public T FindByIdGlobal<T>(object id) where T : class
+        {
+            if (id.GetType() == typeof(int))
+            {
+                int ids = (int)id;
+                return FindById<T>(ids);
+            }
+            if (id.GetType() == typeof(long))
+            {
+                long ids = (long)id;
+                return FindById<T>(ids);
+            }
+            if (id.GetType() == typeof(string))
+            {
+                string ids = (string)id;
+                return FindById<T>(ids);
+            }
+            return default;
+        }
         public T FindById<T>(string id) where T : class
         {
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -410,7 +479,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -446,7 +515,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -479,12 +548,112 @@ namespace GodotEcsArch.sources.WindowsDataBase
             return result.ToList(); // Devuelve el documento o null si no se encuentra
         }
 
+        public List<T> FindAllByGroupName<T>(long idGroup, string name) where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = typeof(T).BaseType;
+
+            bool filterByName = !string.IsNullOrWhiteSpace(name);
+
+            string collectionName;
+
+            // ------------------------
+            // Caso: T tiene colección padre
+            // ------------------------
+            if (baseType != null &&
+                baseType != typeof(object) &&
+                baseType != typeof(IdData) &&
+                baseType != typeof(IdDataLong))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                    throw new InvalidOperationException(
+                        $"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+
+                var collectionBson = db.GetCollection<BsonDocument>(collectionName);
+
+                var query = collectionBson.Query()
+                    .Where(x =>
+                        x["type"] == currentType.Name &&
+                        x["idGrouping"].AsInt64 == idGroup
+                    );
+
+                // Agregar filtro por name solo si corresponde
+                if (filterByName)
+                {
+                    query = query.Where(x => x["name"].AsString.Contains(name));
+                }
+
+                return query.ToList()
+                    .Select(BsonMapper.Global.ToObject<T>)
+                    .ToList();
+            }
+
+            // ------------------------
+            // Caso: colección normal
+            // ------------------------
+            if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                throw new InvalidOperationException(
+                    $"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+
+            var collection = db.GetCollection<BsonDocument>(collectionName);
+
+            var query2 = collection.Query()
+                .Where(x => x["idGrouping"].AsInt64 == idGroup);
+
+            if (filterByName)
+            {
+                query2 = query2.Where(x => x["name"].AsString.Contains(name));
+            }
+
+            return query2.ToList()
+                .Select(BsonMapper.Global.ToObject<T>)
+                .ToList(); ;
+        }
+
+
+        public bool FindByName<T>(string name) where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = typeof(T).BaseType;
+            string collectionName;
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+                }
+                else
+                {
+                    // Obtén la colección correspondiente
+                    var collectionBson = db.GetCollection<BsonDocument>(collectionName);
+                    var filteredDocuments = collectionBson.Query().Where(x => x["type"] == currentType.Name && x["name"].AsString.Contains(name)).ToList();
+
+                    var result2 = filteredDocuments.Select(BsonMapper.Global.ToObject<T>);
+                    // Busca el documento por ID
+                    return result2.Count() > 0;
+                }
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+                }
+            }
+            var regex = new System.Text.RegularExpressions.Regex(name, RegexOptions.IgnoreCase);
+
+            var collection = db.GetCollection<BsonDocument>(collectionName);
+            var filteredDocuments2 = collection.Query().Where(x => x["name"].AsString.Contains(name)).ToList();
+            var result = filteredDocuments2.Select(BsonMapper.Global.ToObject<T>);
+            // Busca el documento por ID
+            return result.Count()>0; // Devuelve el documento o null si no se encuentra
+        }
         public List<T> FindAll<T>() where T : class
         {
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -519,7 +688,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -547,7 +716,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -576,6 +745,31 @@ namespace GodotEcsArch.sources.WindowsDataBase
             return collection.Delete(id);
   
         }
+        public bool RemoveDirectById<T>(long id) where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = typeof(T).BaseType;
+            string collectionName;
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+                }
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
+                {
+                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
+                }
+            }
 
+            var collection = db.GetCollection<BsonDocument>(collectionName);
+            return collection.Delete(id);
+
+        }
+
+ 
     }
 }

@@ -21,8 +21,8 @@ namespace GodotEcsArch.sources.systems.Character;
 internal class CharacterAnimationSystem : BaseSystem<World, float>
 {
     private CommandBuffer commandBuffer;
-    private QueryDescription query = new QueryDescription().WithAll<CharacterAnimationComponent, CharacterComponent,DirectionComponent, RenderGPUComponent>().WithNone<RenderGPULinkedComponent>();
-    private QueryDescription queryLinkedGpu = new QueryDescription().WithAll<CharacterAnimationComponent, CharacterComponent, DirectionComponent, RenderGPUComponent, RenderGPULinkedComponent>();
+    private QueryDescription query = new QueryDescription().WithAll<CharacterAnimationComponent, CharacterComponent,DirectionComponent, RenderGPUComponent>().WithNone<RenderGPULinkedComponent,PendingDestroyComponent>();
+    private QueryDescription queryLinkedGpu = new QueryDescription().WithAll<CharacterAnimationComponent, CharacterComponent, DirectionComponent, RenderGPUComponent, RenderGPULinkedComponent>().WithNone<PendingDestroyComponent>();
 
     public CharacterAnimationSystem(World world) : base(world)
     {
@@ -52,11 +52,16 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
             foreach (var entityIndex in chunk)
             {
                 ref Entity entity = ref Unsafe.Add(ref pointerEntity, entityIndex);
+                if (!entity.IsAlive())
+                {
+                    continue;
+                }
                 ref CharacterAnimationComponent characterAnimationComponent = ref Unsafe.Add(ref pointerCharacterAnimationComponent, entityIndex);
                 ref CharacterComponent characterComponent = ref Unsafe.Add(ref pointerCharacterComponent, entityIndex);
                 ref DirectionComponent directionComponent = ref Unsafe.Add(ref pointerDirectionComponent, entityIndex);
                 ref RenderGPUComponent renderGPUComponent = ref Unsafe.Add(ref pointerRenderGPUComponent, entityIndex);
 
+               
                 int stateAnimation = characterAnimationComponent.stateAnimation;
                 var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
                 AnimationStateData animationStateData = dataCharacterModel.animationCharacterBaseData.animationDataArray[stateAnimation];
@@ -151,7 +156,7 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                 
                 ref CharacterAtackComponent characterAtackComponent = ref entity.Get<CharacterAtackComponent>();
 
-                
+                animComp.animationComplete = false;
                 if (animComp.lastStateAnimation != stateAnimation)
                 {
                     animComp.TimeSinceLastFrame = 0f;
@@ -173,17 +178,20 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
 
                     if (animComp.currentFrameIndex >= animData.frameDataArray.Length)
                     {
+                        animComp.animationComplete = true;
                         if (animData.loop)
                         {
-                            animComp.currentFrameIndex = 0;
-                            animComp.animationComplete = true;
+                            animComp.currentFrameIndex = 0;                           
                             animComp.active = true;
                         }
                         else
-                        {
-                            animComp.animationComplete = true;
+                        {                           
                             animComp.active = false;
                         }
+                    }
+                    else
+                    {
+                        animComp.animationComplete = false;
                     }
 
                     if (animComp.active)
@@ -204,7 +212,7 @@ internal class CharacterAnimationSystem : BaseSystem<World, float>
                         RenderingServer.MultimeshInstanceSetCustomData(linkedWeapon.rid, linkedWeapon.instance, colorWeapon);
                         RenderMainAndAccessories(animComp, renderGPU, renderLinked, charComp, stateAnimation);
                         animComp.currentFrameIndex++;
-                                    
+                                                         
                     }             
                 }
              

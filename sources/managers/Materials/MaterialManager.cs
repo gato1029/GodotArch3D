@@ -106,7 +106,9 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         atlasTexture.Region = new Rect2(x, y, materialData.divisionPixelX, materialData.divisionPixelY);
         return atlasTexture;
     }
-
+    /// <summary>
+    /// Retorna un AtlasTexture considerando el TextureMasterData asociado al MaterialData
+    /// </summary>
     public AtlasTexture GetAtlasTexture(int idMaterial, float x, float y, float width, float height)
     {
         MaterialData materialData=null;
@@ -121,7 +123,7 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         {
             materialData = materials[idMaterial];
         }
-        if (materialData.type <= 4)
+        if (materialData.type <= 5)
         {
             textureMasterData = GetTextureMaster(materialData.idTextureMaster);
             textureBase = (Texture2D)textureMasterData.texture;
@@ -136,11 +138,13 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         atlasTexture.Region = new Rect2(x, y, width, height);           
         return atlasTexture;
     }
+    /// <summary>
+    /// Retorna un AtlasTexture sin usar TextureMasterData es decir usa directamente el textureMaterial del MaterialData
+    /// </summary>
 
     public AtlasTexture GetAtlasTextureInternal(int idMaterial, float x, float y, float width, float height)
     {
-        MaterialData materialData = null;
-        TextureMasterData textureMasterData;
+        MaterialData materialData = null;       
         Texture2D textureBase = null;
         if (!materials.ContainsKey(idMaterial))
         {

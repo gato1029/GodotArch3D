@@ -2,6 +2,7 @@ using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using LiteDB;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
-public enum ResourceType
-{
-    Recurso,   // Ej: oro, comida, energía
-    Material    // Ej: lingote, tablón, ladrillo
-}
+
 public class ResourceData:IdData
 {        
     public ResourceType resourceType {  get; set; } 

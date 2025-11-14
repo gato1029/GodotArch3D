@@ -45,22 +45,30 @@ internal class CollisionManager : SingletonBase<CollisionManager>
 
     public SpatialHashMapColliders<Entity> characterCollidersEntities;
 
+    public SpatialHashMapColliders<Flecs.NET.Core.Entity> characterEntitiesFlecs;
+
     public SpatialHashMapColliders<TerrainDataGame> terrainColliders;
-    public SpatialHashMapColliders<ResourceSourceDataGame> ResourceSourceColliders;
+
+    public SpatialHashMapColliders<Flecs.NET.Core.Entity> ResourceSourceCollidersFlecs;
 
     public SpatialHashMapColliders<Entity> BuildingsColliders;
+    public SpatialHashMapColliders<Flecs.NET.Core.Entity> BuildingsCollidersFlecs;
     protected override void Initialize()
     {
-        characterCollidersEntities = new SpatialHashMapColliders<Entity>(3); 
+        characterCollidersEntities = new SpatialHashMapColliders<Entity>(3);
+        
 
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
         tileColliders = new SpatialHashMap<IDataTile>(8, delegate (IDataTile er) { return er.IdCollider; });
         spriteColliders = new SpatialHashMap<TerrainDataGame>(8, delegate (TerrainDataGame er) { return er.idUnique; });
 
-        terrainColliders = new SpatialHashMapColliders<TerrainDataGame>(2);
-        ResourceSourceColliders = new SpatialHashMapColliders<ResourceSourceDataGame>(4);
+        terrainColliders = new SpatialHashMapColliders<TerrainDataGame>(2);        
         BuildingsColliders = new SpatialHashMapColliders<Entity>(4);
+
+        characterEntitiesFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(2);
+        BuildingsCollidersFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(2);
+        ResourceSourceCollidersFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(2);
     }
 
     protected override void Destroy()
@@ -99,30 +107,29 @@ internal class CollisionManager : SingletonBase<CollisionManager>
           GeometricShape2D collisionShape)
     {        
         Rect2 aabb = new Rect2(movementNext - (collisionShape.GetSizeQuad()/2), collisionShape.GetSizeQuad());
-
+        
         if (Instance.terrainColliders.IntersectsAABB(aabb))
         {
+    
             return true;
         }
-        if (Instance.ResourceSourceColliders.IntersectsAABB(aabb))
-        {
-            return true;
-        }
+      
         if (Instance.BuildingsColliders.IntersectsAABB(aabb))
         {
+          
             return true;
         }
         return false;
     }
 
     public static bool CheckAnyCollisionMoveUnitOnly(
-        Entity entity,
+        int idCollider,
         Vector2 movementNext,
         GeometricShape2D collisionShape)
     {
         Rect2 aabb = new Rect2(movementNext - (collisionShape.GetSizeQuad() / 2), collisionShape.GetSizeQuad());
 
-        if (Instance.characterCollidersEntities.IntersectsAABB(aabb, entity.Get<ColliderComponent>().idCollider))
+        if (Instance.characterCollidersEntities.IntersectsAABB(aabb, idCollider))
         {
             return true;
         }
@@ -134,18 +141,82 @@ internal class CollisionManager : SingletonBase<CollisionManager>
     {
         // 1. Rectángulo que cubre el trayecto completo
         Vector2 shapeSize = collisionShape.GetSizeQuad();
+        //+(shapeSize / 2f)
         Rect2 sweptAABB = new Rect2(
-            new Vector2(Mathf.Min(startPos.X, endPos.X), Mathf.Min(startPos.Y, endPos.Y)) - shapeSize / 2f,
-            new Vector2(Mathf.Abs(endPos.X - startPos.X), Mathf.Abs(endPos.Y - startPos.Y)) + shapeSize
+            new Vector2(Mathf.Min(startPos.X, endPos.X), Mathf.Min(startPos.Y, endPos.Y)) +collisionShape.OriginCurrent,
+            new Vector2(Mathf.Abs(endPos.X - startPos.X), Mathf.Abs(endPos.Y - startPos.Y)) //+ shapeSize
         );
         // 2. Revisar primero si cae en alguna celda de estáticos
         if (!Instance.terrainColliders.IntersectsAABB(sweptAABB) &&
-            !Instance.ResourceSourceColliders.IntersectsAABB(sweptAABB) &&
+          
             !Instance.BuildingsColliders.IntersectsAABB(sweptAABB))
         {
             return false; // rápido: no hay nada en el trayecto
         }
+        else
+        {
+            
+        }
         return true;
+    }
+
+    // 🔹 Empuja al punto fuera de la colisión según el tipo de collider
+    public static Vector2 ResolvePenetration(Vector2 position, Vector2 pointNextCollision, GeometricShape2D shape)
+    {
+        switch (shape)
+        {
+            case Circle circle:
+                return ResolveCirclePenetration(position, circle, pointNextCollision);
+
+            case Rectangle rect:
+                return ResolveAabbPenetration(position, rect, pointNextCollision);
+
+            default:
+                // Si no sabemos manejar la forma, devolvemos la posición original
+                return position;
+        }
+    }
+
+    private static Vector2 ResolveCirclePenetration(Vector2 pos, Circle circle, Vector2 pointNextCollision)
+    {
+        Vector2 center = circle.OriginCurrent;
+        float radius = circle.Radius;
+
+        Vector2 dir = pos - center;
+        float dist = dir.Length();
+
+        if (dist < radius)
+        {
+            // saca al punto justo en la frontera del círculo
+            dir = dir.Normalized();
+            pos = center + dir * (radius + 0.001f); // pequeño epsilon
+        }
+
+        return pos;
+    }
+
+    private static Vector2 ResolveAabbPenetration(Vector2 pos, Rectangle rect, Vector2 pointNextCollision)
+    {
+        Rect2 aabb = new Rect2(pointNextCollision - (rect.GetSizeQuad() / 2), rect.GetSizeQuad());
+        WireShape.Instance.DrawFilledSquare(aabb.Size, aabb.Position, 40, Colors.Red, 1, WireShape.TypeDraw.NORMAL);
+        if (aabb.HasPoint(pos))
+        {
+            // calcula cuánto está penetrando por cada lado
+            float left = pos.X - aabb.Position.X;
+            float right = (aabb.Position.X + aabb.Size.X) - pos.X;
+            float top = pos.Y - aabb.Position.Y;
+            float bottom = (aabb.Position.Y + aabb.Size.Y) - pos.Y;
+
+            // elige el desplazamiento más corto
+            float min = Math.Min(Math.Min(left, right), Math.Min(top, bottom));
+
+            if (min == left) pos.X = aabb.Position.X - 0.001f;
+            else if (min == right) pos.X = aabb.Position.X + aabb.Size.X + 0.001f;
+            else if (min == top) pos.Y = aabb.Position.Y - 0.001f;
+            else if (min == bottom) pos.Y = aabb.Position.Y + aabb.Size.Y + 0.001f;
+        }
+
+        return pos;
     }
 }
 

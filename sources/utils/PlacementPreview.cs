@@ -1,20 +1,18 @@
-using Arch.Core;
-using Arch.Core.Extensions;
+
+using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.components;
-using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.Flecs.Creators;
+using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GodotFlecs.sources.Flecs;
+using GodotFlecs.sources.Flecs.Components;
+
 
 namespace GodotEcsArch.sources.utils;
 public class PlacementPreview : SingletonBase<PlacementPreview>
 {
     private Entity[,] previewEntities;
-    private int previewTileId;
+    private long previewTileId;
     private int renderLayer;
 
     public Vector2I Size { get; private set; }
@@ -22,14 +20,14 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
     protected override void Initialize() { }
     protected override void Destroy() { Clear(); }
 
-    public void Configure(int tileId, int layer)
+    public void Configure(long tileId, int layer)
     {
         previewTileId = tileId;
         renderLayer = layer;
         Size = new Vector2I(0, 0);
     }
 
-    public void Create(Vector2I size, Vector2I centerTile, SpriteData spriteData)
+    public void Create(Vector2I size, Vector2I centerTile, TileSpriteData tileSpriteData)
     {
         Clear();
         Size = size;
@@ -46,27 +44,16 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
 
                 Vector2 worldPos = TilesHelper.WorldPositionTile(tilePos);
 
+                var entity = TileSpriteCreator.Instance.CreateSingleSprite(tileSpriteData, worldPos,tilePos,renderLayer);
                 // Crear la entidad del preview usando SpriteData
-                Entity entity = SpriteHelper.CreateEntity(
-                    spriteData,
-                    spriteData.scale,
-                    worldPos,
-                    renderLayer,
-                    spriteData.offsetInternal
-                );
 
                 previewEntities[i, j] = entity;
 
-                ref var tilePosition = ref entity.Get<TilePositionComponent>();
-                tilePosition.x = tilePos.X;
-                tilePosition.y = tilePos.Y;
-
-                ref var position = ref entity.Get<PositionComponent>();
-                position.position = worldPos;
             }
         }
     }
 
+  
 
     public void Move(Vector2I targetTilePosition)
     {
@@ -82,7 +69,7 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
             {
                 Entity entity = previewEntities[x, y];
                 if (!entity.IsAlive()) continue;
-                var spriteData = entity.Get<SpriteRenderGPUComponent>();
+                var spriteData = entity.Get<RenderGPUComponent>();
                 Vector2I offset = new(x - halfSize.X, y - halfSize.Y);
                 Vector2I newTilePos = targetTilePosition + offset;
                 Vector2 newWorldPos = TilesHelper.WorldPositionTile(newTilePos);
@@ -92,12 +79,9 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
                 Vector2 positionReal = positionNormalize + new Vector2(xx, yy) + new Vector2(spriteData.originOffset.X * spriteData.scale, spriteData.originOffset.Y * spriteData.scale);
 
 
-                ref var position = ref entity.Get<PositionComponent>();
+                ref var position = ref entity.GetMut<PositionComponent>();
                 position.position = positionReal;
-
-                ref var tilePosition = ref entity.Get<TilePositionComponent>();
-                tilePosition.x = newTilePos.X;
-                tilePosition.y = newTilePos.Y;
+                position.tilePosition = newTilePos;                
             }
         }
     }
@@ -111,7 +95,12 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
             for (int j = 0; j < Size.Y; j++)
             {
                 if (previewEntities[i, j].IsAlive())
-                    TilesManager.Instance.FreeTileEntity(previewEntities[i, j]);
+                {
+                    var entity = previewEntities[i, j];
+                    var renderComp = entity.Get<RenderGPUComponent>();  
+                    MultimeshManager.Instance.FreeInstance(renderComp.rid,renderComp.instance,renderComp.idMaterial);
+                    entity.Destruct();
+                }
             }
         }
         previewEntities = null;

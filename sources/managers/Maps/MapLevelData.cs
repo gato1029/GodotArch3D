@@ -135,7 +135,7 @@ public class MapLevelData
         SerializerManager.SaveToFileJson(this, pathCurrentCarpet, "Data");
         
         terrainMap.SaveAllMap();
-        resourceSourceMap.SaveAllMap();
+        //resourceSourceMap.SaveAllMap();
         mapBuildings.SaveAllMap();
        // mapResources.SaveAllMap();
     }
@@ -149,7 +149,7 @@ public class MapLevelData
     {
         MapLevelData loadMap  = SerializerManager.LoadFromFileJson<MapLevelData>(pathData);
         loadMap.terrainMap.LoadMapData();
-        loadMap.resourceSourceMap.LoadMapData();
+        //loadMap.resourceSourceMap.LoadMapData();
 
         return loadMap;
     }
@@ -157,7 +157,7 @@ public class MapLevelData
     public void ClearAll()
     {
         terrainMap.ClearMap();
-        resourceSourceMap.ClearMap();
+        //resourceSourceMap.ClearMap();
         mapBuildings.ClearMap();
     }
 }

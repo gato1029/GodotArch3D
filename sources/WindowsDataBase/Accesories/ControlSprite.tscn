@@ -165,7 +165,7 @@ anchors_preset = 0
 [node name="Sprite2DView" type="Sprite2D" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal"]
 texture = ExtResource("4_obu12")
 
-[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal/Sprite2DView"]
+[node name="CollisionShapeView" type="CollisionShape2D" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer/ScrollContainerGrid/PanelBase/ControlGrid/Panel/ControlSpriteInternal"]
 shape = SubResource("RectangleShape2D_tl00w")
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/HBoxContainer/VBoxContainer"]

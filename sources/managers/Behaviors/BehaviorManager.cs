@@ -137,9 +137,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
         }
 
         public void AplyDamageCharacter(Entity origin, Entity destiny)
-        {
-            
-
+        {            
             CharacterComponent unitA = origin.Get<CharacterComponent>();
             ref CharacterComponent unitB = ref destiny.TryGetRef<CharacterComponent>(out bool exist);
             unitB.hitStunTimer = 0.25f; // 150ms de reacción visual

@@ -29,7 +29,7 @@ internal class SpriteHelper
         spriteRenderGPU.idMaterial = spriteRender.idMaterial;
         spriteRenderGPU.rid = instanceComplex.rid;
         spriteRenderGPU.instance = instanceComplex.instance;
-        spriteRenderGPU.arrayPositiontexture = instanceComplex.materialBatchPosition;
+        spriteRenderGPU.arrayPositiontexture = instanceComplex.layerTexture;
         spriteRenderGPU.uvMap = new Color(spriteRender.xFormat, spriteRender.yFormat, spriteRender.widhtFormat, spriteRender.heightFormat);
         spriteRenderGPU.transform = transform3D;
         spriteRenderGPU.layerRender = layer;
@@ -49,7 +49,7 @@ internal class SpriteHelper
 
         RenderingServer.MultimeshInstanceSetTransform(instanceComplex.rid, instanceComplex.instance, transform3D);
         RenderingServer.MultimeshInstanceSetCustomData(instanceComplex.rid, instanceComplex.instance, spriteRenderGPU.uvMap);
-        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Color(0, 0, 0, instanceComplex.materialBatchPosition));
+        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Color(0, 0, 0, instanceComplex.layerTexture));
         return entity;
     }
 
@@ -60,6 +60,29 @@ internal class SpriteHelper
 
         var instanceComplex = MultimeshManager.Instance.CreateInstance(spriteRender.idMaterial);
 
+        SpriteRenderGPUComponent spriteRenderGPU = new SpriteRenderGPUComponent();
+        spriteRenderGPU.idMaterial = spriteRender.idMaterial;
+        spriteRenderGPU.rid = instanceComplex.rid;
+        spriteRenderGPU.instance = instanceComplex.instance;
+        spriteRenderGPU.arrayPositiontexture = instanceComplex.layerTexture;
+        spriteRenderGPU.uvMap = new Color(spriteRender.xFormat, spriteRender.yFormat, spriteRender.widhtFormat, spriteRender.heightFormat);
+        spriteRenderGPU.transform = transform3D;
+        spriteRenderGPU.layerRender = layer;
+        spriteRenderGPU.zOrdering = zOrdering;
+        spriteRenderGPU.originOffset = spriteRender.offsetInternal;
+        spriteRenderGPU.scale = scale;
+        RenderingServer.MultimeshInstanceSetTransform(instanceComplex.rid, instanceComplex.instance, transform3D);
+        RenderingServer.MultimeshInstanceSetCustomData(instanceComplex.rid, instanceComplex.instance, spriteRenderGPU.uvMap);
+        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Color(0, 0, 0, instanceComplex.layerTexture));
+
+        return spriteRenderGPU;
+    }
+
+    public static SpriteRenderGPUComponent CreateSpriteRenderGpuComponentRecicled(SpriteData spriteRender, float scale, Vector2 worldPosition, int layer, (Rid rid, int instance, int materialBatchPosition) instanceComplex, int zOrdering = 0)
+    {
+        Transform3D transform3D = new Transform3D(Basis.Identity, new Vector3(worldPosition.X, worldPosition.Y, worldPosition.Y));
+        transform3D = transform3D.ScaledLocal(new Vector3(scale, scale, 1));
+        
         SpriteRenderGPUComponent spriteRenderGPU = new SpriteRenderGPUComponent();
         spriteRenderGPU.idMaterial = spriteRender.idMaterial;
         spriteRenderGPU.rid = instanceComplex.rid;

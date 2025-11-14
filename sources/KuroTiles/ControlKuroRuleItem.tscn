@@ -1,0 +1,59 @@
+[gd_scene load_steps=4 format=3 uid="uid://bmfkhl38jkdfi"]
+
+[ext_resource type="PackedScene" uid="uid://d3drybijghy8y" path="res://sources/KuroTiles/ControlButtonRule.tscn" id="1_3iv08"]
+[ext_resource type="Script" uid="uid://c0bhlq4wx2hhw" path="res://sources/KuroTiles/ControlKuroRuleItem.cs" id="1_6q50w"]
+[ext_resource type="Texture2D" uid="uid://5odtas1fkkco" path="res://resources/Textures/iconos/Dice.png" id="3_80byu"]
+
+[node name="ControlKuroTile" type="MarginContainer"]
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 5
+script = ExtResource("1_6q50w")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GridContainerItems" type="GridContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+columns = 3
+
+[node name="CBArribaIzquierda" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBArriba" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBArribaDerecha" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBIzquierda" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBCenter" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBDerecha" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBAbajoIzquierda" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBAbajo" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBAbajoDerecha" parent="VBoxContainer/GridContainerItems" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CBCentralDebajo" parent="VBoxContainer" instance=ExtResource("1_3iv08")]
+layout_mode = 2
+
+[node name="CheckButtonRandom" type="CheckButton" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Tiles Aleatorios"
+icon = ExtResource("3_80byu")

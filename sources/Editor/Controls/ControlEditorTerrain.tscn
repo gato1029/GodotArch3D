@@ -107,8 +107,36 @@ layout_mode = 2
 layout_mode = 2
 text = "Refrescar Reglas"
 
-[node name="ItemListRules" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
+[node name="TabContainer" type="TabContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño"]
 layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Automatico" type="TabBar" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="ItemListRules" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer/Automatico"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="Individual" type="TabBar" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ItemListIndividual" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainer/Individual"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_vertical = 3
 
 [node name="CapasDiseño" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainer"]

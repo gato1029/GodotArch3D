@@ -393,29 +393,29 @@ internal class DebugerSystem : BaseSystem<World, float>
     }
     private void DebugResourceSource()
     {
-        foreach (var item in CollisionManager.Instance.ResourceSourceColliders.CellMap)
-        {
-            foreach (var itemCollider in item.Value)
-            {
-                for (int i = 0; i < itemCollider.Shapes.Count; i++)
-                {
-                    GeometricShape2D itemShape = itemCollider.Shapes[i];
-                    Vector2 position = itemCollider.Position+ itemShape.OriginCurrent;
-                    switch (itemShape)
-                    {
-                        case Rectangle rect:
-                            Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
-                            transform3DShape = transform3DShape.Scaled(new Vector3(rect.Width , rect.Height , 1));
-                            transform3DShape.Origin = new Vector3(position.X, position.Y, 30);
+        //foreach (var item in CollisionManager.Instance.ResourceSourceColliders.CellMap)
+        //{
+        //    foreach (var itemCollider in item.Value)
+        //    {
+        //        for (int i = 0; i < itemCollider.Shapes.Count; i++)
+        //        {
+        //            GeometricShape2D itemShape = itemCollider.Shapes[i];
+        //            Vector2 position = itemCollider.Position+ itemShape.OriginCurrent;
+        //            switch (itemShape)
+        //            {
+        //                case Rectangle rect:
+        //                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+        //                    transform3DShape = transform3DShape.Scaled(new Vector3(rect.Width , rect.Height , 1));
+        //                    transform3DShape.Origin = new Vector3(position.X, position.Y, 30);
 
-                            DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 10);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
+        //                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 10);
+        //                    break;
+        //                default:
+        //                    break;
+        //            }
+        //        }
+        //    }
+        //}
     }
     private void DebugTerrain()
     {
@@ -471,20 +471,20 @@ internal class DebugerSystem : BaseSystem<World, float>
             foreach (var item2 in item.Value)
             {
 
-                var tileInfo = item2.Value.GetSpriteData();
+                //var tileInfo = item2.Value.GetSpriteData();
 
-                GeometricShape2D collisionB = tileInfo.collisionBody;
-                //GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
-                if (collisionB is Rectangle)
-                {
-                    float scale = tileInfo.scale;
-                    Rectangle shape = (Rectangle)collisionB;
-                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
-                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
-                    transform3DShape.Origin = new Vector3(item2.Value.positionCollider.X, item2.Value.positionCollider.Y, 1);
+                //GeometricShape2D collisionB = tileInfo.collisionBody;
+                ////GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
+                //if (collisionB is Rectangle)
+                //{
+                //    float scale = tileInfo.scale;
+                //    Rectangle shape = (Rectangle)collisionB;
+                //    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+                //    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
+                //    transform3DShape.Origin = new Vector3(item2.Value.positionCollider.X, item2.Value.positionCollider.Y, 1);
 
-                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
-                }
+                //    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
+                //}
             }
         }
     }

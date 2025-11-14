@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.CustomWidgets.Internals;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
@@ -7,12 +8,14 @@ using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
+using GodotEcsArch.sources.WindowsDataBase.Group;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Weapons;
+using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using System;
 using System.Collections.Generic;
 
@@ -127,7 +130,7 @@ public partial class HerramientaMenuBar : MenuBar
                 FacadeWindowDataSearch<ResourceData> winResources = new FacadeWindowDataSearch<ResourceData>("res://sources/WindowsDataBase/Resources/WindowResources.tscn", this);
                 break;
             case 1:
-                FacadeWindowDataSearch<TerrainData> winTerrain = new FacadeWindowDataSearch<TerrainData>("res://sources/WindowsDataBase/Terrain/WindowTerrainDetail.tscn", this);            
+                FacadeWindowDataSearch<TerrainData> winTerrain = new FacadeWindowDataSearch<TerrainData>("res://sources/WindowsDataBase/Terrain/windowTerrain.tscn", this);            
                 break;
             case 2:
                 FacadeWindowDataSearch<BuildingData> winBuilding = new FacadeWindowDataSearch<BuildingData>("res://sources/WindowsDataBase/Building/WindowBuilding.tscn", this);
@@ -141,6 +144,10 @@ public partial class HerramientaMenuBar : MenuBar
             case 5:
                 FacadeWindowDataSearch<ResourceSourceData> windowResourcesSource = new FacadeWindowDataSearch<ResourceSourceData>("res://sources/WindowsDataBase/ResourceSource/WindowResourcesSource.tscn", this);
                 break;
+            case 6:
+                FacadeWindowDataSearch<BulletData> windowprojectile = new FacadeWindowDataSearch<BulletData>("res://sources/WindowsDataBase/Projectile/WindowProjectile.tscn", this);
+                break;
+
         }
     }
 
@@ -149,8 +156,13 @@ public partial class HerramientaMenuBar : MenuBar
         switch (id)
         {
             case 0:
-                FacadeWindowDataSearch<MaterialData> windowQuery = new FacadeWindowDataSearch<MaterialData>("res://sources/WindowsDataBase/Materials/windowNewMaterial.tscn", this);
-             
+                FacadeWindowDataSearch<MaterialData> windowQuery = new FacadeWindowDataSearch<MaterialData>("res://sources/WindowsDataBase/Materials/windowNewMaterial.tscn", this);             
+                break;
+            case 1:
+                FacadeWindowDataSearch<GroupData> windowGroup = new FacadeWindowDataSearch<GroupData>("res://sources/WindowsDataBase/Group/WindowGroup.tscn", this);
+                break;
+            case 2:
+                FacadeWindowDataSearch<GroupingData> windowGrouping = new FacadeWindowDataSearch<GroupingData>("res://sources/WindowsDataBase/Group/WindowGrouping.tscn", this);
                 break;
             default:
                 break;
@@ -163,13 +175,13 @@ public partial class HerramientaMenuBar : MenuBar
         switch (id)
         {
             case 0:
-                FacadeWindowDataSearch<TileDynamicData> windowDinamic = new FacadeWindowDataSearch<TileDynamicData>("res://sources/WindowsDataBase/TileCreator/WindowTiles.tscn", this);
-                break;
+                FacadeWindowDataSearch<TileSpriteData> windowTile = new FacadeWindowDataSearch<TileSpriteData>("res://sources/WindowsDataBase/TileSprite/WindowTileSprite.tscn", this
+                    , WindowType.CREATOR,false,true);
+
+                windowTile.EnableFilterGrouping(true);
+                break;            
             case 1:
-                FacadeWindowDataSearch<TileAnimateData> windowQueryModelData = new FacadeWindowDataSearch<TileAnimateData>("res://sources/WindowsDataBase/TileCreator/WindowAnimatedTiles.tscn", this);
-                break;
-            case 2:
-                FacadeWindowDataSearch<AutoTileData> windowAutoTile = new FacadeWindowDataSearch<AutoTileData>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn", this);            
+                FacadeWindowDataSearch<AutoTileSpriteData> wa = new FacadeWindowDataSearch<AutoTileSpriteData>(KuroWindowFactory.GetPath<WindowAutoTileSprite>(), this);
                 break;
             default:
                 break;

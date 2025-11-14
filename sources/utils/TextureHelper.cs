@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using System;
 using System.Collections.Generic;
@@ -242,7 +243,90 @@ namespace GodotEcsArch.sources.utils
             spriteData.widhtFormat = spriteData.mirrorX ? -newWidth : newWidth;
             spriteData.heightFormat = spriteData.mirrorY ? -newHeight : newHeight;
         }
+        public static Color GetUvFormatFromSprite(SpriteData spriteData)
+        {
+            var material = MaterialManager.Instance.GetMaterial(spriteData.idMaterial);
+            var offset = new Vector2(material.originXTextureMaster, material.originYTextureMaster);
 
+            // Calcular nueva posición y tamaño
+            float newX = offset.X + spriteData.x;
+            float newY = offset.Y + spriteData.y;
+
+            Color uvColor = new Color();
+            uvColor.R = newX;
+            uvColor.G = newY;
+            uvColor.B = spriteData.mirrorX ? -spriteData.widht : spriteData.widht;
+            uvColor.A = spriteData.mirrorY ?  -spriteData.height: spriteData.height;
+            return uvColor;
+        }
+        public static List<Color> GetUvAllFormatFromFrames(int idMaterial, bool mirrorX, bool mirrorY, FrameData[] frames )
+        {
+            var material = MaterialManager.Instance.GetMaterial(idMaterial);
+            var offset = new Vector2(material.originXTextureMaster, material.originYTextureMaster);
+
+            List<Color> uvList = new List<Color>();
+            foreach (var spriteData in frames)
+            {
+                // Calcular nueva posición y tamaño
+                float newX = offset.X + spriteData.x;
+                float newY = offset.Y + spriteData.y;
+
+                Color uvColor = new Color();
+                uvColor.R = newX;
+                uvColor.G = newY;
+                uvColor.B = mirrorX ? -spriteData.widht : spriteData.widht;
+                uvColor.A = mirrorY ? -spriteData.height : spriteData.height;
+
+                uvList.Add(uvColor);
+            }
+            return uvList;
+        }
+        public static Color GetUvFormatFromSpriteAnimation(SpriteAnimationData spriteAnimationData, int indexArray)
+        {
+            var material = MaterialManager.Instance.GetMaterial(spriteAnimationData.idMaterial);
+            var offset = new Vector2(material.originXTextureMaster, material.originYTextureMaster);
+
+            var frameData = spriteAnimationData.framesArray[indexArray];
+            // Calcular nueva posición y tamaño
+            float newX = offset.X + frameData.x;
+            float newY = offset.Y + frameData.y;
+
+            Color uvColor = new Color();
+            uvColor.R = newX;
+            uvColor.G = newY;
+            uvColor.B = spriteAnimationData.mirrorX ? -frameData.widht : frameData.widht;
+            uvColor.A = spriteAnimationData.mirrorY ? -frameData.height : frameData.height;
+            return uvColor;
+        }
+        public static List<Color> GetUvAllFormatFromSpriteAnimations(SpriteAnimationData spriteAnimationData)
+        {
+            List<Color> uvList = new List<Color>(); 
+            for (int i = 0; i < spriteAnimationData.framesArray.Length; i++)
+            {
+                uvList.Add(GetUvFormatFromSpriteAnimation( spriteAnimationData, i));
+            }
+            return uvList;
+        }
+
+        public static void RecalulateUVFormat(FrameData frameData, int idMaterial, AnimationData itemAni)
+        {
+            var material = MaterialManager.Instance.GetMaterial(idMaterial);
+            var offset = new Vector2(material.originXTextureMaster, material.originYTextureMaster);
+
+            // Calcular nueva posición y tamaño
+            float newX = offset.X + frameData.x;
+            float newY = offset.Y + frameData.y;
+            float newWidth = frameData.widht;
+            float newHeight = frameData.height;
+
+            // Aplicar posición formateada
+            frameData.xFormat = newX;
+            frameData.yFormat = newY;
+
+            // Aplicar formato con espejo si corresponde
+            frameData.widhtFormat = itemAni.mirrorHorizontal ? -newWidth : newWidth;
+            frameData.heightFormat = itemAni.mirrorVertical ? -newHeight : newHeight;
+        }
         public static bool AreAtlasTexturesFullyEqual(AtlasTexture texA, AtlasTexture texB)
         {
             if (texA == null || texB == null)

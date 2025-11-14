@@ -1,3 +1,4 @@
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
@@ -10,36 +11,43 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
+public enum ResourceType
+{
+    Recurso,   // Ej: oro, comida, energía
+    Material    // Ej: lingote, tablón, ladrillo
+}
+
 public enum ResourceSourceType
 {
-    Arboles = 0,
+    Arbol = 0,
     MinaOro = 1,
     Piedras = 2,
     CespedVisual = 3,
     FloresVisual = 4,
 }
-public class ResourceSourceData:IdData
+
+
+public class ResourceSourceData:IdDataLong
 {
     public string description { get; set; }
     public ResourceSourceType resourceSourceType { get; set; }
-    public int amount { get; set; }             // Cuánto puede dar en total (ej. 3 de madera)        
-    public int idResourceProduce { get; set; }
-    public bool isAnimated { get; set; }    
-    public bool isOnlyVisual { get; set; } = false;
-    public BuildingPosition buildingPosition { get; set; } // posicion de construccion
-    public SpriteData spriteData { get; set; }    
-    public List<AnimationStateData> animationData { get; set; } = null; // Datos de la animación, si aplica
+    public int amount { get; set; }  // Cuánto puede dar en total (ej. 3 de madera)        
+    public int health { get; set; } // Salud de la fuente de recurso (ej. 100 de salud)
+    public bool isExploitable { get; set; } = false; // Indica si la fuente de recurso se puede explotar o no
+    public int idMaterialResourceProduce { get; set; } // ID del material que produce (ej. ID del material madera)
+    public List<long> listIdTileSpriteData { get; set; } = new List<long>(); // Datos de los sprites asociados a la fuente de recurso
+
     public ResourceSourceData()
     {
-
+        id = EpochIdGenerator.NewId();
     }
 
     [BsonCtor]
-    public ResourceSourceData(SpriteData spriteData)
+    public ResourceSourceData(List<long> listIdTileSpriteData)
     {
-        if (spriteData != null)
+        if (listIdTileSpriteData != null && listIdTileSpriteData.Count>0)
         {
-            textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(spriteData.idMaterial, spriteData.x, spriteData.y, spriteData.widht, spriteData.height);
+            textureVisual = MasterDataManager.GetData<TileSpriteData>(listIdTileSpriteData[0]).textureVisual;
         }
     }
 }

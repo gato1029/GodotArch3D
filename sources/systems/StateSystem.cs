@@ -34,12 +34,14 @@ namespace GodotEcsArch.sources.systems
     internal class StateSystem : BaseSystem<World, float>
     {
         private CommandBuffer commandBuffer;
+        private World sharedWorld;
         private QueryDescription query = new QueryDescription().WithAll<StateComponent, Animation, BehaviorCharacter>();
 
 
-        public StateSystem(World world) : base(world)
+        public StateSystem(World world, CommandBuffer sharedCommandBuffer) : base(world)
         {
-            commandBuffer = new CommandBuffer();
+            sharedWorld = world;
+            commandBuffer = sharedCommandBuffer;
         }
         private struct JobQuery : IChunkJob
         {
@@ -76,8 +78,8 @@ namespace GodotEcsArch.sources.systems
         }
         public override void Update(in float t)
         {
-            World.InlineParallelChunkQuery(in query, new JobQuery(commandBuffer, t));
-            commandBuffer.Playback(World);
+            sharedWorld.InlineParallelChunkQuery(in query, new JobQuery(commandBuffer, t));
+            //commandBuffer.Playback(World);
         }
     }
 }

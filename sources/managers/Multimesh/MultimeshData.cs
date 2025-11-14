@@ -8,7 +8,7 @@ public class MultimeshData
     public Rid rid;
     public MultiMesh multiMesh;
     public Stack<int> freePositions;
-    public int currentPosition;
+    public int currentPosition = 0;
     public int maxInstances;
     public MultimeshData(Mesh meshBase, int pMaxInstances = 65500)
     {
@@ -57,7 +57,8 @@ public class MultimeshData
         }        
     }
     public void FreeInstance(int idInstance)
-    { 
+    {
+        RenderingServer.MultimeshInstanceSetCustomData(rid, idInstance, new Color(-1, -1, -1, -1));
         freePositions.Push(idInstance); 
     }
 }

@@ -16,200 +16,167 @@ using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileD
 public partial class WindowTerrain : Window, IFacadeWindow<TerrainData>
 {
     TerrainData terrainData;
-                          
-    int currentTile;
-    int currentRule;
-
-    bool isRule = false;
-
-    
-    
+                                     
     public event IFacadeWindow<TerrainData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
+
+    public void SetData(TerrainData data)
+    {
+        terrainData = data;
+
+        //recursos 
+
+        if (terrainData.idsResources.ContainsKey(TerrainTileType.TierraNivel1))
+        {
+            RecursosTierraNivel1.SetData(terrainData.idsResources[TerrainTileType.TierraNivel1]);
+        }
+        if (terrainData.idsResources.ContainsKey(TerrainTileType.CespedNivel1))
+        {
+            RecursosCespedNivel1.SetData(terrainData.idsResources[TerrainTileType.CespedNivel1]);
+        }
+        if (terrainData.idsResources.ContainsKey(TerrainTileType.TierraNivel2))
+        {
+            RecursosTierraNivel2.SetData(terrainData.idsResources[TerrainTileType.TierraNivel2]);
+        }
+        if (terrainData.idsResources.ContainsKey(TerrainTileType.CespedNivel2))
+        {
+            RecursosCespedNivel2.SetData(terrainData.idsResources[TerrainTileType.CespedNivel2]);
+        }
+
+        foreach (var item in terrainData.idsAutoTileSprite)
+        {
+            switch (item.Type)
+            {
+                case TerrainTileType.Agua:
+                    ControlAutoAgua.SetData(item.TileId);
+                    break;
+                case TerrainTileType.TierraNivel1:
+                    ControlAutoTierra1.SetData(item.TileId);
+                    break;
+                case TerrainTileType.CespedNivel1:
+                    ControlAutoCesped1.SetData(item.TileId);
+                    break;
+                case TerrainTileType.TierraNivel2:
+                    ControlAutoTierra2.SetData(item.TileId);
+                    break;
+                case TerrainTileType.CespedNivel2:
+                    ControlAutoCesped2.SetData(item.TileId);
+                    break;
+                case TerrainTileType.AdornosTierra:
+                    ControlAutoAdornosTierra.SetData(item.TileId);
+                    break;
+                case TerrainTileType.AdornosCesped:
+                    ControlAutoAdornoCesped.SetData(item.TileId);
+                    break;
+                case TerrainTileType.AdornosAgua:
+                    ControlAutoAdornoAgua.SetData(item.TileId);
+                    break;
+                case TerrainTileType.AguaCamino:
+                    break;
+                case TerrainTileType.TierraCamino:
+                    break;
+                case TerrainTileType.TierraElevacionNivel2:
+                    ControlAutoElevacionTierraNivel2.SetData(item.TileId);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        LineEditName.Text = terrainData.name;
+
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
-        InitializeUI(); // Insertado por el generador de UI                                             
-        ButtonSave.Pressed += button_Save;
-        ButtonSearchAnimate.Pressed += button_SearchAnimated;
-        ButtonSearchAuto.Pressed+= button_SearchRule;
-        ButtonSearchTile.Pressed += button_Dinamic;         
-        terrainData = new TerrainData();        
-
-        foreach (TerrainType tipo in Enum.GetValues(typeof(TerrainType)))
-        {
-            OptionButtonType.AddItem(tipo.ToString());
-        }
-    }
-
-    private void button_Dinamic()
-    {
-        FacadeWindowDataSearch<TileDynamicData> windowDinamic = new FacadeWindowDataSearch<TileDynamicData>("res://sources/WindowsDataBase/TileCreator/WindowTiles.tscn", this, WindowType.SELECTED);     
-        windowDinamic.OnNotifySelected += WindowDinamic_OnNotifySelected;
-    }
-
-    private void WindowDinamic_OnNotifySelected(TileDynamicData objectSelected)
-    {
-        isRule = false;
-        var data = objectSelected;
-        Sprite2DImage.Texture = data.textureVisual;
-        currentTile = objectSelected.id;
-        if (data.haveCollider)
-        {
-            Rectangle rect = (Rectangle)data.collisionBody;
-            CollisionBodyCollider.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
-            var shape = (RectangleShape2D)CollisionBodyCollider.Shape;
-            shape.Size = new Vector2((float)rect.widthPixel, (float)rect.heightPixel);
-        }
-    }
-
-
-
-    private void button_SearchRule()
-    {
-        FacadeWindowDataSearch<AutoTileData> windowRule = new FacadeWindowDataSearch<AutoTileData>("res://sources/WindowsDataBase/TileCreator/windowAutoTile.tscn", this, WindowType.SELECTED);
- 
-        windowRule.OnNotifySelected += WindowRule_OnNotifySelected;
-    }
-
-    private void WindowRule_OnNotifySelected(AutoTileData objectSelected)
-    {
-        isRule = true;
-        var data = objectSelected;
-        Sprite2DImage.Texture = data.textureVisual;
-
-        currentRule = objectSelected.id ;
-    }
-
-    private void Win_OnRequestSelectedItemRule(int id)
-    {
-        isRule = true;
-        var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.AutoTileData>(id);
-        Sprite2DImage.Texture = data.textureVisual;
-        
-        currentRule = id;
-    }
-     private void button_SearchAnimated()
-    {
-
-        FacadeWindowDataSearch<TileAnimateData> windowTileAnimateData = new FacadeWindowDataSearch<TileAnimateData>("res://sources/WindowsDataBase/TileCreator/WindowAnimatedTiles.tscn", this, WindowType.SELECTED);
-        windowTileAnimateData.OnNotifySelected += WindowTileAnimateData_OnNotifySelected;
-    }
-
-    private void WindowTileAnimateData_OnNotifySelected(TileAnimateData objectSelected)
-    {
-        isRule = false;
-        var data = objectSelected;
-        Sprite2DImage.Texture = data.textureVisual;
-        currentTile = objectSelected.id;
-        if (data.haveCollider)
-        {
-            Rectangle rect = (Rectangle)data.collisionBody;
-
-            CollisionBodyCollider.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
-            var shape = (RectangleShape2D)CollisionBodyCollider.Shape;
-            shape.Size = new Vector2((float)rect.widthPixel, (float)rect.heightPixel);
-        }
-    }
-
-
-
-    private void WindowTerrain_CloseRequested()
-    {
-        QueueFree();
-    }
-
-   
-
-    
-    private void Win_OnRequestSelectedItem(int id)
-    {
-        isRule = false;
-        var data = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileSimpleData>(id);
-        Sprite2DImage.Texture = data.textureVisual;
-        currentTile = id;
-        if (data.haveCollider)
-        {
-            Rectangle rect = (Rectangle)data.collisionBody;
-            CollisionBodyCollider.Position = new Vector2((float)rect.originPixelX, (float)rect.originPixelY * (-1));
-            var shape = (RectangleShape2D)CollisionBodyCollider.Shape;
-            shape.Size = new Vector2((float)rect.widthPixel, (float)rect.heightPixel);
-        }
-        
+        InitializeUI(); // Insertado por el generador de UI
+        terrainData = new TerrainData();
+        ButtonSave.Pressed += ButtonSave_Pressed;
+        ButtonDelete.Pressed += ButtonDelete_Pressed;
 
     }
-    private void button_Copy()
-    {
-        terrainData.id = 0;
-        terrainData.name = LineEditName.Text + "_Copy";
-        terrainData.category = LineEditCategory.Text;
-        terrainData.terrainType = (TerrainType)OptionButtonType.Selected;
-        DataBaseManager.Instance.InsertUpdate(terrainData);
+
+    private void ButtonDelete_Pressed()
+    {        
+        DataBaseManager.Instance.RemoveDirectById<TerrainData>(terrainData.id);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }
-    private void button_Save()
+
+    private void ButtonSave_Pressed()
     {
-        terrainData.id = (int)SpinBoxId.Value;
+        terrainData.idsAutoTileSprite.Clear();
+        // Agua
+        if (ControlAutoAgua?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.Agua, ControlAutoAgua.objectData.id));
+        }
+        // Tierra nivel 1
+        if (ControlAutoTierra1?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.TierraNivel1, ControlAutoTierra1.objectData.id));
+        }
+        // Cesped nivel 1
+        if (ControlAutoCesped1?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.CespedNivel1, ControlAutoCesped1.objectData.id));
+        }
+        // Tierra nivel 2
+        if (ControlAutoTierra2?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.TierraNivel2, ControlAutoTierra2.objectData.id));
+        }
+        // Cesped nivel 2
+        if (ControlAutoCesped2?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.CespedNivel2, ControlAutoCesped2.objectData.id));
+        }
+        // Adornos tierra
+        if (ControlAutoAdornosTierra?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.AdornosTierra, ControlAutoAdornosTierra.objectData.id));
+        }
+        // Adornos cesped
+        if (ControlAutoAdornoCesped?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.AdornosCesped, ControlAutoAdornoCesped.objectData.id));
+        }
+        // Adornos agua
+        if (ControlAutoAdornoAgua?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.AdornosAgua, ControlAutoAdornoAgua.objectData.id));
+        }
+        // Elevacion tierra nivel 2
+        if (ControlAutoElevacionTierraNivel2?.objectData != null)
+        {
+            terrainData.idsAutoTileSprite.Add(new TerrainTileEntry(TerrainTileType.TierraElevacionNivel2, ControlAutoElevacionTierraNivel2.objectData.id));
+        }
+
+        terrainData.idsResources.Clear();
+        // Aqui inicia el guardado de Recursos
+        if (RecursosTierraNivel1.GetData().Count>0)
+        {
+            terrainData.idsResources.Add(TerrainTileType.TierraNivel1, RecursosTierraNivel1.GetData());
+        }
+        if (RecursosCespedNivel1.GetData().Count > 0)
+        {
+            terrainData.idsResources.Add(TerrainTileType.CespedNivel1, RecursosCespedNivel1.GetData());
+        }
+        if (RecursosTierraNivel2.GetData().Count > 0)
+        {
+            terrainData.idsResources.Add(TerrainTileType.TierraNivel2, RecursosTierraNivel2.GetData());
+        }   
+        if (RecursosCespedNivel2.GetData().Count > 0)
+        {
+            terrainData.idsResources.Add(TerrainTileType.CespedNivel2, RecursosCespedNivel2.GetData());
+        }
+
         terrainData.name = LineEditName.Text;
-
         
-        terrainData.isRule = isRule;
-        terrainData.category = LineEditCategory.Text;
-        terrainData.terrainType = (TerrainType)OptionButtonType.Selected;
-        DataBaseManager.Instance.InsertUpdate(terrainData);
+        DataBaseManager.Instance.InsertUpdate<TerrainData>(terrainData);
+        MasterDataManager.UpdateRegisterData(terrainData.id, terrainData);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }
-
-    private void bodyValueChanged(double value)
-    {
-  
-        
-    }
-
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
-	{
-	}
-    public void SetData(TerrainData data)
-    {
-        //terrainData = data;
-
-        //SpinBoxId.Value = terrainData.id;
-        //LineEditName.Text = terrainData.name;
-        //LineEditCategory.Text = terrainData.category;
-        //OptionButtonType.Selected = (int)terrainData.terrainType;
-        //if (terrainData.isRule)
-        //{
-        //    var tileData = DataBaseManager.Instance.FindById<AutoTileData>(terrainData.idRule);
-        //    WindowRule_OnNotifySelected(tileData);
-            
-        //}
-        //else
-        //{
-        //    var tileData = DataBaseManager.Instance.FindById<TileData>(terrainData.idTile);
-            
-         
-        //    if (tileData.type == "TileDynamicData")
-        //    {
-        //        var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileDynamicData>(terrainData.idTile);
-        //        WindowDinamic_OnNotifySelected(dataInternal);
-        //    }
-        //    if (tileData.type == "TileAnimateData")
-        //    {
-        //        var dataInternal = DataBaseManager.Instance.FindById<GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileAnimateData>(terrainData.idTile);
-        //        WindowTileAnimateData_OnNotifySelected(dataInternal);
-                
-        //    }
-
-
-        //}        
-    }
-    public void LoadData(int id)
-    {
-                    
-    }
-
- 
 }

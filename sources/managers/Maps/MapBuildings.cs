@@ -1,5 +1,7 @@
-using Arch.Core;
+
+using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.Flecs.Creators;
 using GodotEcsArch.sources.managers.Buildings;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Resources;
@@ -21,7 +23,7 @@ namespace GodotEcsArch.sources.managers.Maps;
 [ProtoContract]
 public class BuildingDataGame : DataItem
 {
-    public Entity entity;
+    public  Entity entity;
     private bool existEntity = false;
     public override void SetDataGame()
     {
@@ -55,34 +57,30 @@ public class BuildingDataGame : DataItem
     private void CreateEntity()
     {
         existEntity = true;
-        entity = BuildingCreator.Instance.CreateBuilding(idData, positionReal, positionCollider);
+        entity = Flecs.Creators.BuildingCreator.Instance.Create(idDataTileSprite, positionReal,positionTileWorld);
     }
     public override void ClearDataGame()
     {
-        if (idUnique != 0)
-        {            
-            idUnique = 0;
-            BuildingCreator.Instance.Destroy(entity);            
-        }
+       //BuildingCreator.Instance.Destroy(entity);                    
     }
-    public override SpriteData GetSpriteData()
+    public override TileSpriteData GetSpriteData()
     {
-        return BuildingManager.Instance.GetData(idData).spriteData;
+        return null;// return BuildingManager.Instance.GetData(idDataTileSprite).spriteData;
     }
 
     public override bool IsAnimation()
     {
-        return BuildingManager.Instance.GetData(idData).isAnimated;
+        return false; // return BuildingManager.Instance.GetData(idDataTileSprite).isAnimated;
     }
 
     public override AnimationStateData GetAnimationStateData()
     {
-        return BuildingManager.Instance.GetData(idData).animationData[0];
+        return null; // BuildingManager.Instance.GetData(idDataTileSprite).animationData[0];
     }
 
     public override int GetTypeData()
     {
-        return (int)BuildingManager.Instance.GetData(idData).buildingType;
+        return 0; // (int)BuildingManager.Instance.GetData(idDataTileSprite).buildingType;
     }
 }
 public class MapBuildings
@@ -122,7 +120,7 @@ public class MapBuildings
     public void LoadMapData()
     {
         var pathFull = pathCurrentCarpet + "/" + name + ".json";
-        mapData.SetRenderEnabled(false);
+        mapData.SetRenderEnabledGlobal(false);
         mapData.LoadAll();
 
     }
@@ -136,17 +134,17 @@ public class MapBuildings
     }
     public void EnableLayer(bool enable)
     {
-        mapData.SetRenderEnabled(enable);
+        mapData.SetRenderEnabledGlobal(enable);
     }
     public void AddUpdateTile(Vector2I tilePositionGlobal, int idData, int forceDataRuleNro = -1)
     {
-        var data = ResourceSourceManager.Instance.GetData(idData);
-        mapData.AddUpdatedTile(tilePositionGlobal, data.id);
+       
+        //mapData.AddUpdatedTile(tilePositionGlobal, idData);
     }
 
-    public void RemoveTile(Vector2I tilePositionGlobal, int idData)
+    public void RemoveTile(Vector2I tilePositionGlobal, int idData = 0)
     {
-        var data = ResourceSourceManager.Instance.GetData(idData);
-        mapData.Remove(tilePositionGlobal);
+        //var data = BuildingManager.Instance.GetData(idData);
+        //mapData.Remove(tilePositionGlobal);
     }
 }

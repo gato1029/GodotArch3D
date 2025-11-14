@@ -81,7 +81,7 @@ public class MultimeshArrayMaterial
     {
         if (materialToGroup.TryGetValue(materialId, out int groupId))
             return groupId;
-        return 0;
+        return -1;
     }
     void AddToGroup(int groupId, int materialId)
     {
@@ -95,7 +95,8 @@ public class MultimeshArrayMaterial
         int grupo = FindGroupId(idMaterial);
         multimeshDataDict[grupo][rid].FreeInstance(instance);
     }
-    public (Rid rid, int instance,  int materialBatchPosition) CreateInstance(int idMaterial)
+
+    public (Rid rid, int instance, int material, int layerTexture) CreateInstance(int idMaterial)
     {
         int grupo = FindGroupId(idMaterial);
         MultimeshData multimeshData = null;
@@ -124,6 +125,11 @@ public class MultimeshArrayMaterial
 
         }
 
-        return (multimeshData.rid, multimeshData.CreateInstance(), MaterialManager.Instance.GetMaterial(idMaterial).idMaterialPositionBatch);
-    }  
+        return (multimeshData.rid, multimeshData.CreateInstance(), idMaterial, GetMaterialBatch(idMaterial) );
+    }
+
+    public int GetMaterialBatch(int idMaterial)
+    {
+        return MaterialManager.Instance.GetMaterial(idMaterial).idMaterialPositionBatch;
+    }
 }
