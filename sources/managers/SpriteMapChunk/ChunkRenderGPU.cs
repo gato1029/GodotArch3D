@@ -24,21 +24,21 @@ public class ChunkRenderGPU
         tiles = new SpriteRender[size.X, size.Y];
     }
 
-    public void CreateUpdate(long id,int x, int y, Rid rid, int instance, int TextureBatchPosition, Vector3 worldPosition, int layer, SpriteData dataBase)
+    public void CreateUpdate(long id,int x, int y, Vector3 worldPosition, int layer, SpriteData dataBase)
     {
         if (tiles[x, y] == null)
         {
             tiles[x, y] = new SpriteRender();
         }
-        tiles[x, y].UpdateTile(id,rid, instance, TextureBatchPosition, worldPosition, layer, dataBase);      
+        tiles[x, y].UpdateTile(id, worldPosition, layer, dataBase);      
     }
-    public void CreateUpdate(long id,int x, int y, Rid rid, int instance, int TextureBatchPosition, Vector3 worldPosition, int layer, SpriteAnimationData dataBase)
+    public void CreateUpdate(long id,int x, int y, Vector3 worldPosition, int layer, SpriteAnimationData dataBase)
     {
         if (tiles[x, y] == null)
         {
             tiles[x, y] = new SpriteRender();
         }
-        tiles[x, y].UpdateTile(x,y,id,rid, instance, TextureBatchPosition,worldPosition,layer, dataBase);
+        tiles[x, y].UpdateTile(x,y,id,worldPosition,layer, dataBase);
     }
     public void CreateTile(Vector2I position, SpriteRender renderData)
     {

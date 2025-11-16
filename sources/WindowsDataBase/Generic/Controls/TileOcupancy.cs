@@ -3,11 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public struct KuroTile : IEquatable<KuroTile>
+public class KuroTile : IEquatable<KuroTile>
 {
-    public int x;
-    public int y;
+    public int x { get; set; }
+    public int y { get; set; }
 
+    public KuroTile()
+    {
+     
+    }
     public KuroTile(int x, int y)
     {
         this.x = x;

@@ -51,6 +51,14 @@ public class ChunkManagerBase
 
         return new Vector2I(x, y);
     }
+    public Vector2I TilePositionGlobal(Vector2I chunkPosition, Vector2I tilePositionLocal)
+    {
+        // La posición base del chunk en coordenadas globales
+        Vector2I basePosition = chunkPosition * chunkDimencion;
+
+        // La posición global es simplemente la base más el offset local
+        return basePosition + tilePositionLocal;
+    }
     private int FloorDiv(int a, int b)
     {
         return (a >= 0) ? (a / b) : ((a - b + 1) / b);

@@ -348,6 +348,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 Message.ShowConfirmation(this, "Duplicidad Detectada, Deseas Continuar?").Confirmed += () =>
                 {
                     DataBaseManager.Instance.InsertUpdate(objectData);
+                    MasterDataManager.UpdateRegisterData(objectData.id,objectData);
                     OnNotifyChanguedSimple?.Invoke();
                     QueueFree();
                 };
@@ -355,6 +356,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
             else
             {
                 DataBaseManager.Instance.InsertUpdate(objectData);
+                MasterDataManager.UpdateRegisterData(objectData.id, objectData);
                 OnNotifyChanguedSimple?.Invoke();
                 QueueFree();
             }
@@ -362,6 +364,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         else
         {
             DataBaseManager.Instance.InsertUpdate(objectData);
+            MasterDataManager.UpdateRegisterData(objectData.id, objectData);
             OnNotifyChanguedSimple?.Invoke();
             QueueFree();
         }

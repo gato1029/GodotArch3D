@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 public class SingletonBase<T> where T : class, new()
 {

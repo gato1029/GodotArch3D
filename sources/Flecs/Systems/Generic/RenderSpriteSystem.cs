@@ -21,7 +21,8 @@ internal class RenderSpriteSystem : FlecsSystemBase
     {
         qb.With<RenderGPUComponent>()
            .With<RenderFrameDataComponent>()
-           .With<RenderTransformComponent>();
+           .With<RenderTransformComponent>()
+           .Without<TileSpriteAnimationTag>();
     }
 
     protected override void OnIter(Iter it)
@@ -37,6 +38,32 @@ internal class RenderSpriteSystem : FlecsSystemBase
             RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform);
             RenderingServer.MultimeshInstanceSetCustomData(r.rid, r.instance, f.uvMap);
             RenderingServer.MultimeshInstanceSetColor(r.rid, r.instance, new Color(0, 0, 0, r.layerTextureMaterial));
+        }
+    }
+}
+internal class RenderSpriteTileSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override bool MultiThreaded => false;
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+        qb.With<RenderGPUComponent>()
+           .With<RenderFrameDataComponent>()           
+           .With<TileSpriteAnimationTag>();
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var gpu = it.Field<RenderGPUComponent>(0);
+        var frame = it.Field<RenderFrameDataComponent>(1);
+        
+        for (int i = 0; i < it.Count(); i++)
+        {
+            ref var r = ref gpu[i];
+            ref var f = ref frame[i];            
+            //RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform);
+            RenderingServer.MultimeshInstanceSetCustomData(r.rid, r.instance, f.uvMap);
+            //RenderingServer.MultimeshInstanceSetColor(r.rid, r.instance, new Color(0, 0, 0, r.layerTextureMaterial));
         }
     }
 }

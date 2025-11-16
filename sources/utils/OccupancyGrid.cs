@@ -1,5 +1,7 @@
+using Arch.Core;
 using Godot;
 using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
 
@@ -9,10 +11,66 @@ public class OccupancyGrid
 
     // Diccionario principal: chunk → celdas
     private readonly Dictionary<Vector2I, bool[,]> chunkCells = new();
+    
+    private Dictionary<Vector2I, Dictionary<Vector2I, int>> chunksLoad = new();
 
     public OccupancyGrid(ChunkManagerBase chunkManager)
     {
         this.chunkManager = chunkManager;
+        chunkManager.OnChunkLoad += ChunkManager_OnChunkLoad;
+        chunkManager.OnChunkUnload += ChunkManager_OnChunkUnload;
+    }
+
+    private void ChunkManager_OnChunkUnload(Vector2 obj)
+    {
+        Vector2I chunkPosition = (Vector2I)obj;
+
+        if (chunksLoad.TryGetValue(chunkPosition, out var chunk))
+        {
+            foreach (var item in chunk)
+                WireShape.Instance.FreeShape(item.Value);
+
+            chunksLoad.Remove(chunkPosition);
+        }
+    }
+
+    private void ChunkManager_OnChunkLoad(Vector2 obj)
+    {
+        Vector2I chunkPosition = (Vector2I)obj;
+
+        // Ya está cargado → no repetir shapes
+        if (chunksLoad.ContainsKey(chunkPosition))
+            return;
+
+        if (!chunkCells.TryGetValue(chunkPosition, out var data))
+            return;
+
+        Dictionary<Vector2I, int> idsSquare = new();
+
+        int width = data.GetLength(0);
+        int height = data.GetLength(1);
+
+        for (var x = 0; x < width; x++)
+        {
+            for (var y = 0; y < height; y++)
+            {
+                if (data[x, y])
+                {
+                    Vector2I posTile = new(x, y);
+                    Vector2I posGlobal = chunkManager.TilePositionGlobal(chunkPosition, posTile);
+                    Vector2 posWorld = TilesHelper.WorldPositionTile(posGlobal);
+
+                    int id = WireShape.Instance.DrawFilledSquare(
+                        new Vector2(16, 16), posWorld, -100, Godot.Colors.Red, .5f
+                    );
+
+                    idsSquare[posGlobal] = id;
+                }
+            }
+        }
+
+        chunksLoad.Add(chunkPosition, idsSquare);
+
     }
 
     // ---------------------------------------------------------
@@ -46,6 +104,77 @@ public class OccupancyGrid
         EnsureChunk(chunkPos);
 
         chunkCells[chunkPos][localPos.X, localPos.Y] = occupied;
+
+
+        // --------------------------------------
+        // SI NO EXISTE EL CHUNK EN chunksLoad,
+        // SE GENERA AHORA MISMO (con shapes)
+        // --------------------------------------
+        if (!chunksLoad.TryGetValue(chunkPos, out var chunkShapes))
+        {
+            // Construir shapes de todo el chunk igual que OnChunkLoad
+            chunkShapes = new Dictionary<Vector2I, int>();
+
+            var data = chunkCells[chunkPos];
+            int width = data.GetLength(0);
+            int height = data.GetLength(1);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (data[x, y])
+                    {
+                        Vector2I local = new Vector2I(x, y);
+                        Vector2I global = chunkManager.TilePositionGlobal(chunkPos, local);
+                        Vector2 worldPos = TilesHelper.WorldPositionTile(global);
+
+                        int id = WireShape.Instance.DrawFilledSquare(
+                            new Vector2(16, 16),
+                            worldPos,
+                            -100,
+                            Godot.Colors.Red,
+                            .5f
+                        );
+                        chunkShapes.Add(global, id);
+                    }
+                }
+            }
+
+            // Registrar el chunk ya cargado con shapes
+            chunksLoad.Add(chunkPos, chunkShapes);
+        }
+
+        // -------------------------------------------------
+        // A partir de aquí el chunk SI está cargado (shape)
+        // -------------------------------------------------
+
+        if (occupied)
+        {
+            // Dibujar solo el tile afectado si no estaba dibujado
+            if (!chunkShapes.ContainsKey(tilePositionGlobal))
+            {
+                Vector2 worldPos = TilesHelper.WorldPositionTile(tilePositionGlobal);
+                int id = WireShape.Instance.DrawFilledSquare(
+                    new Vector2(16, 16),
+                    worldPos,
+                    -100,
+                    Godot.Colors.Red,
+                    .5f
+                );
+
+                chunkShapes.Add(tilePositionGlobal, id);
+            }
+        }
+        else
+        {
+            // Liberar tile si estaba dibujado
+            if (chunkShapes.TryGetValue(tilePositionGlobal, out int id))
+            {
+                WireShape.Instance.FreeShape(id);
+                chunkShapes.Remove(tilePositionGlobal);
+            }
+        }
     }
 
     /// <summary>
@@ -66,6 +195,22 @@ public class OccupancyGrid
 
         return true;
     }
+
+    /// <summary>
+    /// Verifica si todas las celdas de un área global están libres.
+    /// sizeX, sizeY → dimensiones del objeto.
+    /// </summary>
+    public bool CanPlace(Vector2I startGlobal,List<KuroTile> tiles)
+    {
+        foreach (var item in tiles)
+        {
+            Vector2I pos = new(startGlobal.X + item.x, startGlobal.Y +item.y);
+            if (IsOccupied(pos))
+                return false;
+        }                
+        return true;
+    }
+
 
     /// <summary>
     /// Marca un área global como ocupada.

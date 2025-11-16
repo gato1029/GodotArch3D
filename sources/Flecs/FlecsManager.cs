@@ -171,6 +171,7 @@ internal class FlecsManager : SingletonBase<FlecsManager>
         RegisterSystem<AnimationTileSpriteSystem>();
 
         // render
+        RegisterSystem<RenderSpriteTileSystem>();
         RegisterSystem<RenderSpriteSystem>();
         RegisterSystem<LayeredSpriteRenderSystem>();
         //RegisterSystem<RvoDebugSystem>();

@@ -255,8 +255,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                 {
                     SpriteRender renderTile = chunkRender.tiles[i, j];
                     if (renderTile != null && renderTile.instance != -1)
-                    {
-                        MultimeshManager.Instance.FreeInstance(renderTile.rid, renderTile.instance, renderTile.idMaterial);
+                    {                        
                         renderTile.FreeRidRender();
                     }
                 }
@@ -378,8 +377,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                         // liberar el tile Renderizado     
                         SpriteRender tileRender = chunk.GetTileAt(tilePositionChunk);
                         if (tileRender != null && tileRender.instance != -1)
-                        {
-                            MultimeshManager.Instance.FreeInstance(tileRender.rid, tileRender.instance, tileRender.idMaterial);
+                        {                            
                             tileRender.FreeRidRenderForced();
                         }
                     }
@@ -475,7 +473,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     var datatile = tileMapChunkRender.tiles[tilePositionChunk.X, tilePositionChunk.Y];
                     if (datatile != null && datatile.instance != -1)
                     {                    
-                        MultimeshManager.Instance.FreeInstance(datatile.rid, datatile.instance, datatile.idMaterial);
+                        
                         if (forced)
                         {
                             datatile.FreeRidRenderForced();
@@ -594,25 +592,11 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
         // liberar el tile Renderizado     
         SpriteRender tileRender = chunk.GetTileAt(tilePositionChunk);
         if (tileRender != null && tileRender.instance != -1)
-        {
-            MultimeshManager.Instance.FreeInstance(tileRender.rid, tileRender.instance, tileRender.idMaterial);
+        {            
             tileRender.FreeRidRender();
         }
 
-        //   var tileInfo = TilesManager.Instance.GetTileData(tileData.idData);
-        (Rid rid, int instance, int material, int layerTexture) instance = default;
-        switch (spriteData.GetSpriteData().tileSpriteType)
-        {
-            case TileSpriteType.Static:
-                 instance = MultimeshManager.Instance.CreateInstance(spriteData.GetSpriteData().spriteData.idMaterial);
-                break;
-            case TileSpriteType.Animated:
-                instance = MultimeshManager.Instance.CreateInstance(spriteData.GetSpriteData().animationData.idMaterial);
-                break;
-            default:
-                break;
-        }
-        
+   
 
         if (spriteData.IsAnimation())
         {
@@ -621,9 +605,6 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
             spriteData.idDataTileSprite,
             tilePositionChunk.X,
             tilePositionChunk.Y,
-            instance.rid,
-            instance.instance,
-            instance.layerTexture,
             spriteData.positionWorld,
             spriteData.layer,
             spriteData.GetSpriteData().animationData
@@ -636,9 +617,6 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
           spriteData.idDataTileSprite,
           tilePositionChunk.X,
           tilePositionChunk.Y,
-          instance.rid,
-          instance.instance,
-          instance.layerTexture,
           spriteData.positionWorld,
           spriteData.layer,
           spriteData.GetSpriteData().spriteData
@@ -1028,7 +1006,8 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
     }
 
     private void Instance_OnChunkLoad(Godot.Vector2 chunkPos)
-    {        
+    {
+        
         if (!renderEnabled) return; // 🚫 No cargar render si está deshabilitado
         // Si ya esta cargado, no hagas nada
         if (loadedChunksRender.ContainsKey(chunkPos))
@@ -1056,27 +1035,16 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     TData dataGame = tileMapChunkData.tiles[i, j];
                     if (dataGame != null && dataGame.render)
                     {
-                        int idMaterial = 0;
-                        switch (dataGame.GetSpriteData().tileSpriteType)
-                        {
-                            case TileSpriteType.Static:
-                                idMaterial = dataGame.GetSpriteData().spriteData.idMaterial;
-                                break;
-                            case TileSpriteType.Animated:
-                                idMaterial = dataGame.GetSpriteData().animationData.idMaterial;
-                                break;
-                            default:
-                                break;
-                        }
-                        var instanceComplex = MultimeshManager.Instance.CreateInstance(idMaterial); // multimeshMaterialDict[idMaterial].CreateInstance();
+                    
+                      
                         if (dataGame.IsAnimation())
                         {
                         
-                            chunkRender.CreateUpdate(dataGame.idDataTileSprite, i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.layerTexture, dataGame.positionWorld, dataGame.layer, dataGame.GetSpriteData().animationData);
+                            chunkRender.CreateUpdate(dataGame.idDataTileSprite, i, j,  dataGame.positionWorld, dataGame.layer, dataGame.GetSpriteData().animationData);
                         }
                         else
                         {
-                            chunkRender.CreateUpdate(dataGame.idDataTileSprite, i, j, instanceComplex.rid, instanceComplex.instance, instanceComplex.layerTexture, dataGame.positionWorld, dataGame.layer, dataGame.GetSpriteData().spriteData);
+                            chunkRender.CreateUpdate(dataGame.idDataTileSprite, i, j,  dataGame.positionWorld, dataGame.layer, dataGame.GetSpriteData().spriteData);
                         }
                         renderingInstanceCount++;                      
                     }
@@ -1088,6 +1056,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
 
     private void Instance_OnChunkUnload(Godot.Vector2 chunkPos)
     {
+        
         if (loadedChunksRender.ContainsKey(chunkPos))
         {
             ChunkRenderGPU tileMapChunkRender = loadedChunksRender[chunkPos];
@@ -1099,8 +1068,7 @@ public class SpriteMapChunk<TData>: ISpriteMapChunk where TData: DataItem, new()
                     SpriteRender datatile = tileMapChunkRender.tiles[i, j];
 
                     if (datatile != null && datatile.instance != -1) 
-                    {
-                        MultimeshManager.Instance.FreeInstance(datatile.rid, datatile.instance, datatile.idMaterial);                        
+                    {                                            
                         datatile.FreeRidRender();
                         renderingInstanceCount--;
                        // OnRenderingInstanceCountChanged?.Invoke(renderingInstanceCount);

@@ -76,7 +76,7 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
 
                 Vector2 positionNormalize = newTilePos * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
                 Vector2 positionCenter = positionNormalize + new Vector2(xx, yy);
-                Vector2 positionReal = positionNormalize + new Vector2(xx, yy) + new Vector2(spriteData.originOffset.X * spriteData.scale, spriteData.originOffset.Y * spriteData.scale);
+                Vector2 positionReal = positionNormalize + new Vector2(xx, yy) ;
 
 
                 ref var position = ref entity.GetMut<PositionComponent>();

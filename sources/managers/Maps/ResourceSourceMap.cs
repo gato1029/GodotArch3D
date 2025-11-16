@@ -26,10 +26,8 @@ namespace GodotEcsArch.sources.managers.Maps;
 
 
 public class ResourceSourceMap
-{
-    
+{    
     private Vector2I chunkDimencion;
-    private EntityChunkRender entityChunkRender { get; set; }
 
     private string carpet = "ResourceSource";
 
@@ -44,54 +42,72 @@ public class ResourceSourceMap
 
     public ResourceSourceMap(string pathMapParent, int Layer)
     {      
-        layer = 20;
-        entityChunkRender = new EntityChunkRender(ChunkManager.Instance.tiles16X16);
+        layer = 20;      
     }
 
   
-    public void AddUpdateResource(Vector2I tilePositionGlobal,long idResource)
+    public void AddUpdateResource(Vector2I tilePositionGlobal,long idResource, int indexTileSpriteSelected)
     {
-        bool isPosible =EntityChunkMap.Instance.IsPosibleAddEntity(tilePositionGlobal, layer);
+        Vector2 positionCenter = TilesHelper.WorldPositionTile(tilePositionGlobal);
+
+        var data = MasterDataManager.GetData<ResourceSourceData>(idResource);
+        long idTileSpriteData = data.listIdTileSpriteData[indexTileSpriteSelected];
+        var dataTileSprite = MasterDataManager.GetData<TileSpriteData>(idTileSpriteData);
+                
+        bool isPosible =EntityChunkMap.Instance.IsPosibleAddEntity(tilePositionGlobal, dataTileSprite.tilesOcupancy, layer);
         if (!isPosible)
         {
             return;
         }
+                
 
-        var data = MasterDataManager.GetData<ResourceSourceData>(idResource);
-        int randomIndex = GD.RandRange(0, data.listIdTileSpriteData.Count - 1);
-
-        long idTileSpriteData = data.listIdTileSpriteData[randomIndex];
-
-        var dataTileSprite = MasterDataManager.GetData<TileSpriteData>(idTileSpriteData);
-
-        Vector2I tileSize =ChunkManager.Instance.tiles16X16.chunkDimencion;
-        float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
-        float y = MeshCreator.PixelsToUnits(tileSize.Y) / 2f;
-
-
-        Vector2 positionNormalize = tilePositionGlobal * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
-        Vector2 positionCenter = positionNormalize + new Vector2(x, y);
-
-        var colliderBody = dataTileSprite.spriteData.collisionBody;
-
-        Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
-        var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
-
+      
         Entity entityResource = FlecsManager.Instance.WorldFlecs.Entity();
-        int idCollider = CollisionManager.Instance.BuildingsCollidersFlecs.AddColliderObject(entityResource, colliderBody, positionCenter, colliderBody);
 
         entityResource.Set(new PositionComponent { position = positionCenter, tilePosition = tilePositionGlobal });
         entityResource.Set(new IdGenericComponent(idResource, EntityType.RECURSO));
-        entityResource.Set(new TileSpriteComponent(idTileSpriteData));        
-        entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero));
+        entityResource.Set(new TileSpriteComponent(idTileSpriteData));
 
-        EntityChunkMap.Instance.AddEntityToChunk(entityResource, tilePositionGlobal, layer);
+        switch (dataTileSprite.tileSpriteType)
+        {
+            case TileSpriteType.Static:
+                if (dataTileSprite.spriteData.listCollisionBody != null && dataTileSprite.spriteData.listCollisionBody.Length > 0)
+                {
+                    var colliderBody = dataTileSprite.spriteData.listCollisionBody[0];
+                    Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
+                    var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
+                    int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entityResource, colliderBody, positionCenter, colliderBody);
+                    entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero));
+                }
+                break;
+            case TileSpriteType.Animated:
+                if (dataTileSprite.animationData.collisionBodyArray != null && dataTileSprite.animationData.collisionBodyArray.Count > 0)
+                {
+                    var colliderBody = dataTileSprite.animationData.collisionBodyArray[0];
+                    Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
+                    var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
+                    int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entityResource, colliderBody, positionCenter, colliderBody);
+                    entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero));
+                }
+                break;
+            default:
+                break;
+        }
+       
+       
+        
+
+        EntityChunkMap.Instance.AddEntityToChunk(entityResource, tilePositionGlobal, dataTileSprite.tilesOcupancy, layer);
     }
 
     public void RemoveTile(Vector2I tilePositionGlobal)
     {
         var entity= EntityChunkMap.Instance.GetEntityInChunk(tilePositionGlobal, EntityType.RECURSO, layer);
-        EntityChunkMap.Instance.RemoveEntityFromChunk(entity,tilePositionGlobal);          
+        if (entity!=Entity.Null())
+        {
+            EntityChunkMap.Instance.RemoveEntityFromChunk(entity, tilePositionGlobal);
+        }
+        
     }
 }
 

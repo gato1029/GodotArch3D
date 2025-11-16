@@ -7,6 +7,7 @@ using Arch.System;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Buildings;
 using GodotEcsArch.sources.managers.Characters;
@@ -37,12 +38,12 @@ public partial class Main3D : Node3D
 
     int squareId;
     public override void _Ready()
-    {
-
+    {        
         PerformanceTimer.Instance.Enabled = true;
         EcsManager.Instance.SetNode3DMain(this);
         FlecsManager.Instance.SetNode3DMain(this);
 
+        MultimeshManager.Instance.Init();
         ChunkManager.Initialize();
 
         //var w = EcsManager.Instance.World;
@@ -51,13 +52,13 @@ public partial class Main3D : Node3D
         //ProjectilePool.Instance._commandBuffer.Playback(w);
 
 
-        WireShape.Instance.DrawGrid(1024, 1024, 16, new Vector2(0, 0), 0, Colors.DarkCyan);
+        WireShape.Instance.DrawGrid(1024, 1024, 16, new Vector2(0, 0), -50, Colors.DarkCyan);
         //int idg=WireShape.Instance.DrawIsometricGrid(10, 10, 32, new Vector2(0, 0), 20, Colors.ForestGreen,true);
         //float tt = (10 * 16)/2;
         //WireShape.Instance.UpdateShapePositionPixel(idg, new Vector2(-tt,-tt));
 
         int id = WireShape.Instance.DrawFilledSquare(new Vector2(16, 16), new Vector2(0, 0), 30, Colors.SeaGreen, .5f);
-        WireShape.Instance.UpdateShapePositionPixel(id, new Vector2(24, 24));
+       // WireShape.Instance.UpdateShapePositionPixel(id, new Vector2(24, 24));
         //MapLevelData mapLevelData = new MapLevelData("Demo", new Vector2I(100, 100), MapType.Mapa, 10, "Demo");
         //MapManagerEditor.Instance.currentMapLevelData = mapLevelData;
         //var dd =MultimeshManager.Instance;
@@ -104,8 +105,8 @@ public partial class Main3D : Node3D
 
 
 
-        Vector2 wdd = new Vector2(5, 5);
-        //CharacterCreatorManager.Instance.CreateNewCharacter(2, wdd);
+     //   Vector2 wdd = new Vector2(5, 5);
+//        CharacterCreatorManager.Instance.CreateNewCharacter(2, wdd);
         // Dibujar un cuadrado
         //squareId = WireShape.Instance.DrawSquare(
         //    new Vector2(32, 32),
@@ -221,11 +222,17 @@ public partial class Main3D : Node3D
 
         //Vector2I screenSize = DisplayServer.ScreenGetSize();
         //GD.Print("Resolución máxima del monitor: " + screenSize);        
+        
+
         ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
         //terrainMap.UpdatePositionChunk(PositionsManager.Instance.positionCamera);
         //EcsManager.Instance.UpdateSystems((float)delta, 0);
+        
+        MultimeshManager.Instance.ProcessPendingRemove();
+        EntityChunkMap.Instance.ProcessPendingRemoveInstaces();
+        EntityChunkMap.Instance.ProcessPendingInstaces();
+
         FlecsManager.Instance.Update((float)delta);
- 
     }
 
     public override void _PhysicsProcess(double delta)

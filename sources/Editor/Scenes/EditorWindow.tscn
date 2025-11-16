@@ -58,10 +58,9 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-current_tab = 3
+current_tab = 0
 
 [node name="Terreno" type="TabBar" parent="VBoxContainer/TabContainerItems"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -93,6 +92,7 @@ offset_right = 0.0
 grow_horizontal = 2
 
 [node name="Unidades" type="TabBar" parent="VBoxContainer/TabContainerItems"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 

@@ -37,18 +37,18 @@ public class MultimeshMaterial
         if (multimeshData==null)
         {
             multimeshData = new MultimeshData(materialData.mesh, sizeMax);
-            multimeshDataDict.Add(multimeshData.rid,multimeshData);
+            multimeshDataDict.Add(multimeshData.multimeshRid,multimeshData);
         }
         else
         {
             if (!multimeshData.AvailbleSpace())
             {
                 multimeshData = new MultimeshData(materialData.mesh, sizeMax);
-                multimeshDataDict.Add(multimeshData.rid, multimeshData);
+                multimeshDataDict.Add(multimeshData.multimeshRid, multimeshData);
             }
             
         }
 
-        return (multimeshData.rid, multimeshData.CreateInstance());
+        return (multimeshData.multimeshRid, multimeshData.CreateInstance());
     }
 }

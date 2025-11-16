@@ -8,6 +8,7 @@ using GodotEcsArch.sources.managers.SpriteMapChunk;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.KuroTiles;
 using System;
@@ -27,6 +28,14 @@ public class ChunkEntityContainer
     private Dictionary<Vector2I, List<Entity>> tiles = new();
     public List<Entity> flat = new();
 
+    public  List<Entity> GetEntitiesChunk(Vector2I TilePos)
+    {
+        if (tiles.TryGetValue(TilePos, out var list))
+        {
+            return list;
+        }
+        return new List<Entity>();
+    }
     public void AddEntity(Vector2I tilePos, Entity e)
     {
         if (!tiles.TryGetValue(tilePos, out var list))
@@ -105,66 +114,38 @@ public class ChunkEntityRender
         int renderLayer = entity.Get<LayerRenderComponent>().layerRender;
         float z = ((position.position.Y + data.animationData.yDepthRender) * CommonAtributes.LAYER_MULTIPLICATOR) + renderLayer;
         Transform3D transform3D = new Transform3D(Basis.Identity, new Vector3(positionTexture.X, positionTexture.Y, z));
-        transform3D = transform3D.ScaledLocal(new Vector3(data.spriteData.scale, data.spriteData.scale, 1));
-        if (entity.IsAlive())
+        transform3D = transform3D.ScaledLocal(new Vector3(data.animationData.scale, data.animationData.scale, 1));
+
+        EntityChunkMap.Instance.AddPendingInstance(new PendingInstance
         {
-            var instanceComplex = MultimeshManager.Instance.CreateInstance(data.spriteData.idMaterial);
-            entity.Set(new RenderTransformComponent(transform3D));
-            entity.Set(new RenderGPUComponent(
-                instanceComplex.rid,
-                instanceComplex.instance,
-                instanceComplex.material,
-                instanceComplex.layerTexture,
-                renderLayer,
-                data.animationData.yDepthRender,
-                data.animationData.scale,
-                data.animationData.offsetInternal));
-
-            entity.Set(new AnimationComponent(data.id, EntityType.TILESPRITE, 1,
-                -1,
-                1,
-                0,
-                data.animationData.frameDuration,
-                false,
-                true,
-                true));
-
-            var uv = data.animationData.uvFramesArray[0];
-            entity.Set(new RenderFrameDataComponent { uvMap = uv });
-            entity.Add<TileSpriteAnimationTag>();
-        }
+            entity = entity,
+            layer = renderLayer,
+            tileId = data.id,
+            transform = transform3D
+        });
     }
 
     private void CreateRenderStatic(Entity entity, TileSpriteData data, PositionComponent position)
-    {
-        Vector2 positionTexture = position.position + new Vector2(data.spriteData.offsetInternal.X * data.animationData.scale, data.spriteData.offsetInternal.Y * data.animationData.scale);
+    {      
+        Vector2 positionTexture = position.position + new Vector2(data.spriteData.offsetInternal.X * data.spriteData.scale, data.spriteData.offsetInternal.Y * data.spriteData.scale);
         int renderLayer = entity.Get<LayerRenderComponent>().layerRender;
         float z = ((position.position.Y + data.spriteData.yDepthRender) * CommonAtributes.LAYER_MULTIPLICATOR) + renderLayer;
-        Transform3D transform3D = new Transform3D(Basis.Identity, new Vector3(position.position.X, position.position.Y, z));
+        Transform3D transform3D = new Transform3D(Basis.Identity, new Vector3(positionTexture.X, positionTexture.Y, z));
         transform3D = transform3D.ScaledLocal(new Vector3(data.spriteData.scale, data.spriteData.scale, 1));
 
-        var instanceComplex = MultimeshManager.Instance.CreateInstance(data.spriteData.idMaterial);
-
-        entity.Set(new RenderGPUComponent(
-              instanceComplex.rid,
-              instanceComplex.instance,
-              instanceComplex.material,
-              instanceComplex.layerTexture,
-              renderLayer,
-              data.animationData.yDepthRender,
-              data.animationData.scale,
-              data.animationData.offsetInternal));
-
-        RenderingServer.MultimeshInstanceSetTransform(instanceComplex.rid, instanceComplex.instance, transform3D);
-        RenderingServer.MultimeshInstanceSetCustomData(instanceComplex.rid, instanceComplex.instance, data.spriteData.GetUv());
-        RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Godot.Color(0, 0, 0, instanceComplex.layerTexture));
+        EntityChunkMap.Instance.AddPendingInstance(new PendingInstance { entity = entity, 
+            layer = renderLayer, 
+            tileId =data.id, 
+            transform = transform3D});
+             
+        
     }
 
     public void Release(List<Entity> entities)
     {
         foreach (var e in entities)
         {
-           RenderEntityForced(e);
+            RenderReleaseForced(e);
         }
         
 
@@ -172,25 +153,17 @@ public class ChunkEntityRender
 
     internal void RenderReleaseForced(Entity entity)
     {
-        RenderGPUComponent rgp = entity.Get<RenderGPUComponent>();
-        MultimeshManager.Instance.FreeInstance(
-        rgp.rid,
-        rgp.instance,
-        rgp.idMaterial);
-
-        IdGenericComponent ig = entity.Get<IdGenericComponent>();
-        PositionComponent pc = entity.Get<PositionComponent>();
-        var typeSprite = MasterDataManager.GetData<TileSpriteData>(ig.id);
-        switch (typeSprite.tileSpriteType)
+        if (!entity.IsAlive())
         {
-            case TileSpriteType.Static:
-                break;
-            case TileSpriteType.Animated:
-                entity.Remove<AnimationComponent>();
-                break;
-            default:
-                break;
+            return;
         }
+
+        EntityChunkMap.Instance.AddPendingRemoveInstance(new PendingInstance
+        {
+            entity = entity
+        });
+
+       
     }
 }
 // Gestor de renderizado de entidades por chunks
@@ -265,7 +238,7 @@ public class EntityChunkRender
             return;
 
         // liberar el tile Renderizado     
-        chunk.RenderReleaseForced(entity);
+      //  chunk.RenderReleaseForced(entity);
         // Forzar la actualización del render para la entidad específica
         chunk.RenderEntityForced(entity);
 
@@ -281,7 +254,7 @@ public class EntityChunkRender
             dataChunks.Add(chunkPos, container);
         }
 
-        container.AddEntity(tilePos, entity);
+            container.AddEntity(tilePos, entity);
         Refresh(global, entity);
     }
     public void RemoveEntity(Vector2I tileGlobalPosition, Entity entity)
@@ -291,8 +264,15 @@ public class EntityChunkRender
 
         if (dataChunks.TryGetValue(chunkPos, out var container))
         {
+            
+            if (loadedChunksRender.TryGetValue(chunkPos, out var chunk))
+            {
+                chunk.RenderReleaseForced(entity);
+            }
+
             container.RemoveEntity(tilePos, entity);
         }
+
     }
 
     public List<Entity> GetEntities(Vector2I tileGlobalPosition)
@@ -301,9 +281,10 @@ public class EntityChunkRender
         Vector2I tilePos = chunkManager.TilePositionInChunk(chunkPos, tileGlobalPosition);
         if (dataChunks.TryGetValue(chunkPos, out var container))
         {
+            
             if (container != null && container.flat != null)
             {
-                return container.flat;                
+                return container.GetEntitiesChunk(tilePos);                
             }
         }
         return new List<Entity>();
@@ -316,11 +297,12 @@ public class EntityChunkRender
 
     private void ChunkManager_OnChunkProcessingCompleted()
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 
     private void Instance_OnChunkUnload(Vector2 chunkPos)
     {
+      
         if (loadedChunksRender.ContainsKey(chunkPos))
         {
             ChunkEntityRender tileMapChunkRender = loadedChunksRender[chunkPos];
@@ -338,6 +320,7 @@ public class EntityChunkRender
 
     private void Instance_OnChunkLoad(Vector2 chunkPos)
     {
+      
         if (!renderEnabled) return; // 🚫 No cargar render si está deshabilitado
         // Si ya esta cargado, no hagas nada
         if (loadedChunksRender.ContainsKey(chunkPos))

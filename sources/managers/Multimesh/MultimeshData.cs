@@ -5,7 +5,8 @@ namespace GodotEcsArch.sources.managers.Multimesh;
 
 public class MultimeshData
 {
-    public Rid rid;
+    public Rid multimeshRid;
+    public Rid instanceRid;
     public MultiMesh multiMesh;
     public Stack<int> freePositions;
     public int currentPosition = 0;
@@ -24,12 +25,11 @@ public class MultimeshData
         multiMesh.VisibleInstanceCount = maxInstances;
         
 
-        Rid instanceRid = RenderingServer.InstanceCreate();
+        instanceRid = RenderingServer.InstanceCreate();
+        multimeshRid = multiMesh.GetRid();
         RenderingServer.InstanceSetBase(instanceRid, multiMesh.GetRid());
         RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
-        rid =multiMesh.GetRid();
-        //rid = instanceRid;
-
+                     
     }
 
     public bool AvailbleSpace()
@@ -46,7 +46,7 @@ public class MultimeshData
     }
     public int CreateInstance()
     {
-        if (freePositions.Count>0)
+        if (freePositions.Count > 0)
         {
             return freePositions.Pop();
         }
@@ -58,7 +58,12 @@ public class MultimeshData
     }
     public void FreeInstance(int idInstance)
     {
-        RenderingServer.MultimeshInstanceSetCustomData(rid, idInstance, new Color(-1, -1, -1, -1));
+        // Limpia el slot por completo
+        RenderingServer.MultimeshInstanceSetTransform(multimeshRid, idInstance, Transform3D.Identity);
+        RenderingServer.MultimeshInstanceSetCustomData(multimeshRid, idInstance, new Color(0, 0, 0, 0));
+        RenderingServer.MultimeshInstanceSetColor(multimeshRid, idInstance, new Color(0, 0, 0, 0));
+        
+        //RenderingServer.MultimeshInstanceSetCustomData(rid, idInstance, new Color(-1, -1, -1, -1));
         freePositions.Push(idInstance); 
     }
 }
