@@ -1,0 +1,205 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\GitKraken\\GodotFlecs3D\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\blackyworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\blackyworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\flecs\\systems\\collisions\\movementresolutionsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\flecs\\systems\\collisions\\movementresolutionsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlasmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\atlasmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlastexturesmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\atlastexturesmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlasmodsgeneric.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\atlasmodsgeneric.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\blackycharactercreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\blackycharactercreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\flecs\\systems\\animation\\animationsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\flecs\\systems\\animation\\animationsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\materialmoddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\materialmoddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\modinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\modinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\materials\\windownewmaterial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\materials\\windownewmaterial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 822,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BlackyWorld.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyWorld.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\BlackyWorld.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyWorld.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\BlackyWorld.cs",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAuwGAAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-15T22:55:25.796Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Main3D.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\Main3D.cs",
+              "RelativeDocumentMoniker": "Main3D.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\Main3D.cs",
+              "RelativeToolTip": "Main3D.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAuwDIAAABfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-15T22:55:25.61Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AtlasTexturesModsManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "RelativeToolTip": "sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "ViewState": "AgIAAHQAAAAAAAAAAAAowI4AAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T16:55:02.15Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "WindowNewMaterial.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\Materials\\WindowNewMaterial.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Materials\\WindowNewMaterial.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\Materials\\WindowNewMaterial.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\Materials\\WindowNewMaterial.cs",
+              "ViewState": "AgIAABcBAAAAAAAAAAAkwCMBAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T19:53:18.078Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MovementResolutionSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\Systems\\Collisions\\MovementResolutionSystem.cs",
+              "RelativeDocumentMoniker": "sources\\Flecs\\Systems\\Collisions\\MovementResolutionSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\Systems\\Collisions\\MovementResolutionSystem.cs",
+              "RelativeToolTip": "sources\\Flecs\\Systems\\Collisions\\MovementResolutionSystem.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAIwD4AAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T20:38:27.837Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AtlasModsManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasModsManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Mods\\AtlasModsManager.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasModsManager.cs",
+              "RelativeToolTip": "sources\\managers\\Mods\\AtlasModsManager.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAkwDcAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T19:58:22.215Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ModInfo.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\ModInfo.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Mods\\ModInfo.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\ModInfo.cs",
+              "RelativeToolTip": "sources\\managers\\Mods\\ModInfo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T19:41:39.273Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "MaterialModData.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\MaterialModData.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Mods\\MaterialModData.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\MaterialModData.cs",
+              "RelativeToolTip": "sources\\managers\\Mods\\MaterialModData.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T19:41:24.11Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AtlasModsGeneric.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasModsGeneric.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Mods\\AtlasModsGeneric.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasModsGeneric.cs",
+              "RelativeToolTip": "sources\\managers\\Mods\\AtlasModsGeneric.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAmwE8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T19:41:02.298Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "BlackyCharacterCreator.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyCharacterCreator.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\BlackyCharacterCreator.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyCharacterCreator.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\BlackyCharacterCreator.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAYwCYAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T18:59:47.019Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AnimationSystem.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\Systems\\Animation\\AnimationSystem.cs",
+              "RelativeDocumentMoniker": "sources\\Flecs\\Systems\\Animation\\AnimationSystem.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\Systems\\Animation\\AnimationSystem.cs",
+              "RelativeToolTip": "sources\\Flecs\\Systems\\Animation\\AnimationSystem.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwC0AAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T18:53:35.205Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

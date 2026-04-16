@@ -198,7 +198,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
         objectData.zOrderingOrigin = (float)value;
     }
 
-    private void PanelCuerpo_OnNotifyPreview(GeometricShape2D geometricShape2D)
+    private void PanelCuerpo_OnNotifyPreview(GeometricShape2D geometricShape2D, ColliderScene colliderScene)
     {
         
         objectData.collisionBody = geometricShape2D;
@@ -220,7 +220,7 @@ public partial class ContainerAnimationCharacter : Window, IFacadeWindow<Animati
         }
     }
 
-    private void PanelMovimiento_OnNotifyPreview(GeometricShape2D geometricShape2D)
+    private void PanelMovimiento_OnNotifyPreview(GeometricShape2D geometricShape2D, ColliderScene colliderScene)
     {        
         objectData.collisionMove = geometricShape2D;
         CollisionShapeView.Position = new Vector2((float)geometricShape2D.originPixelX, (float)geometricShape2D.originPixelY * (-1));

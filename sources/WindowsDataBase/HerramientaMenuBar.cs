@@ -147,7 +147,9 @@ public partial class HerramientaMenuBar : MenuBar
             case 6:
                 FacadeWindowDataSearch<BulletData> windowprojectile = new FacadeWindowDataSearch<BulletData>("res://sources/WindowsDataBase/Projectile/WindowProjectile.tscn", this);
                 break;
-
+            case 7:
+                FacadeWindowDataSearch<TerrainDataTransition> windowTerrainDataTransition = new FacadeWindowDataSearch<TerrainDataTransition>(KuroWindowFactory.GetPath<WindowTerrainTransition>(), this);
+                break;
         }
     }
 

@@ -109,7 +109,7 @@ public partial class WindowWeapons : Window, IDetailWindow
         DataBaseManager.Instance.InsertUpdate(weaponBaseData);
     }
 
-    private void ColliderPanel_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData)
+    private void ColliderPanel_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData, ColliderScene colliderScene)
     {
         collisionShape2DCollider.Position = new Vector2((float)itemData.originPixelX, (float)itemData.originPixelY * (-1));     
         switch (itemData)

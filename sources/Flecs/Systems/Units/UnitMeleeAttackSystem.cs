@@ -100,10 +100,10 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                     }
                 }
             }
-
+            // para buscar estructuras cercanas
             if (existTarget) continue;
-            nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryAABBBInCirclePoints(pos.position, melle.Range, 0, 1);
-
+            nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryBruteShape( melle.Range, pos.position, 0);
+            
             foreach (var target in nearby)
             {
                 if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)

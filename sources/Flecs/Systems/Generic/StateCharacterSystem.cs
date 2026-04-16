@@ -37,7 +37,7 @@ internal class StateCharacterSystem : FlecsSystemBase
 
             CharacterStateRules rules = CharacterStateConfig.GetRules(cha.characterBehaviorType);
         
-            if (rules.StateToAnimation.TryGetValue(cha.characterStateType, out int newAnim))
+            if (rules.StateToAnimation.TryGetValue(cha.characterStateType, out AnimationType newAnim))
             {
             
                 if (newAnim != ani.stateAnimation)
@@ -93,7 +93,7 @@ internal class CharacterStateLayerSystem : FlecsSystemBase
             CharacterStateRules rules = CharacterStateConfig.GetRules(cha.characterBehaviorType);
 
             // 2️⃣ Determinar animación base (cuerpo) según el estado
-            if (rules.StateToAnimation.TryGetValue(cha.characterStateType, out int newAnim))
+            if (rules.StateToAnimation.TryGetValue(cha.characterStateType, out AnimationType newAnim))
             {
                 ref var mainAnim = ref layers.Animations[0]; // capa 0 = cuerpo principal
 

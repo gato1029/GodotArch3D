@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://bhekhb5b1y4ut"]
+
+[ext_resource type="Script" uid="uid://dc7w5rd8xjmcn" path="res://sources/WindowsDataBase/Terrain/WindowTerrainTransition.cs" id="1_i0bpx"]
+[ext_resource type="PackedScene" uid="uid://bd53akp4by76q" path="res://sources/WindowsDataBase/Terrain/ControlTerrain.tscn" id="1_utu6s"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="3_ibjv0"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="4_saio0"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="5_im8k7"]
+
+[node name="WindowTerrainTransition" type="Window" unique_id=470609057]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(800, 320)
+script = ExtResource("1_i0bpx")
+
+[node name="Panel" type="Panel" parent="." unique_id=363747343]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=1934101559]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer" unique_id=1305819145]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer" unique_id=1358259820]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer4" unique_id=70027264]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="TextEditName" type="TextEdit" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer4" unique_id=1151789373]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer" unique_id=882489674]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer5" unique_id=1789205690]
+layout_mode = 2
+text = "Ancho de la transicion:"
+
+[node name="SpinBoxAncho" type="SpinBox" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer5" unique_id=425879592]
+layout_mode = 2
+max_value = 1000.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer" unique_id=305318223]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1911825862]
+layout_mode = 2
+text = "Bioma Base:"
+
+[node name="ControlTerrainOrigin" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=728176186 instance=ExtResource("1_utu6s")]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1933152765]
+layout_mode = 2
+text = "Bioma Destino:"
+
+[node name="ControlTerrainDestin" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1779605615 instance=ExtResource("1_utu6s")]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer" unique_id=1159205329]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=57774003]
+layout_mode = 2
+text = "Bioma Resultante:"
+
+[node name="ControlTerrainResult" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=387343977 instance=ExtResource("1_utu6s")]
+layout_mode = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer" unique_id=1298258870]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonSave" type="TextureButton" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer3" unique_id=1306949607]
+layout_mode = 2
+texture_normal = ExtResource("3_ibjv0")
+script = ExtResource("4_saio0")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDelete" type="TextureButton" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer3" unique_id=971987742]
+layout_mode = 2
+texture_normal = ExtResource("5_im8k7")
+script = ExtResource("4_saio0")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"

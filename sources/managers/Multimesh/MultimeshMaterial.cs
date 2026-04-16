@@ -41,7 +41,7 @@ public class MultimeshMaterial
         }
         else
         {
-            if (!multimeshData.AvailbleSpace())
+            if (!multimeshData.AvailableSpace())
             {
                 multimeshData = new MultimeshData(materialData.mesh, sizeMax);
                 multimeshDataDict.Add(multimeshData.multimeshRid, multimeshData);

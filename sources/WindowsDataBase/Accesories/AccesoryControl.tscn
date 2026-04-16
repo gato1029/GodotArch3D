@@ -1,12 +1,14 @@
-[gd_scene load_steps=6 format=3 uid="uid://dp2ttehohacx3"]
+[gd_scene load_steps=7 format=3 uid="uid://dp2ttehohacx3"]
 
 [ext_resource type="Script" uid="uid://bk6crwlxmt8q7" path="res://sources/WindowsDataBase/Accesories/AccessoryControl.cs" id="1_33k0g"]
 [ext_resource type="PackedScene" uid="uid://dbvmmc5uyo82x" path="res://sources/WindowsDataBase/Accesories/ContainerBonus.tscn" id="1_d3m74"]
-[ext_resource type="PackedScene" uid="uid://bkh861ecemyee" path="res://sources/WindowsDataBase/Accesories/ControlMiniature.tscn" id="2_f1rau"]
 [ext_resource type="PackedScene" uid="uid://kma1fph6dbb6" path="res://sources/WindowsDataBase/Accesories/ContainerStats.tscn" id="2_pi4ds"]
+[ext_resource type="PackedScene" uid="uid://omg22kdm131a" path="res://sources/KuroTiles/ControlKuroTile.tscn" id="2_qbhlf"]
 [ext_resource type="PackedScene" uid="uid://c5l0xhw6ebiwl" path="res://sources/WindowsDataBase/Accesories/ContainerElements.tscn" id="3_d3m74"]
+[ext_resource type="PackedScene" uid="uid://c3ttigs8l4153" path="res://sources/KuroTiles/ControlListTileSprite.tscn" id="3_lmkj7"]
 
 [node name="AccesoryControl" type="Window"]
+oversampling_override = 1.0
 title = "Accesorios"
 initial_position = 3
 size = Vector2i(1000, 800)
@@ -35,8 +37,17 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="ControlMiniatura" parent="MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("2_f1rau")]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
+
+[node name="ControlTile" parent="MarginContainer/HBoxContainer/VBoxContainer2/VBoxContainer" instance=ExtResource("2_qbhlf")]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Miniatura"
 
 [node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
@@ -47,17 +58,16 @@ columns = 2
 layout_mode = 2
 text = "Animacion Cuerpo:"
 
-[node name="CheckBoxAnimationBody" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="CheckBoxAnimationBody" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer/HBoxContainer"]
 layout_mode = 2
 text = "Disponible"
 
-[node name="Label8" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
+[node name="ControlTileSpriteData" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer/HBoxContainer" instance=ExtResource("3_lmkj7")]
 layout_mode = 2
-text = "Animacion Tiles:"
-
-[node name="CheckBoxAnimationTiles" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Disponible"
+onlyOneTile = true
 
 [node name="Label9" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/GridContainer"]
 layout_mode = 2

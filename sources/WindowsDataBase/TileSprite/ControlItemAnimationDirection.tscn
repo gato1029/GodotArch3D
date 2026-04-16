@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://b3dgrd3xvsjuh"]
+
+[ext_resource type="Script" uid="uid://benm6r6e8xj2n" path="res://sources/WindowsDataBase/TileSprite/ControlItemAnimationDirection.cs" id="1_0p6th"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="2_0p6th"]
+[ext_resource type="PackedScene" uid="uid://cinkv05bue1lv" path="res://sources/KuroTiles/ControlListTextures.tscn" id="2_c2mo6"]
+[ext_resource type="Texture2D" uid="uid://diyq2a0bn851i" path="res://resources/Textures/iconos/ItemPoint.png" id="2_uap60"]
+
+[node name="ControlItemAnimationDirection" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 25)
+offset_right = 104.0
+offset_bottom = 32.0
+size_flags_horizontal = 3
+size_flags_vertical = 2
+script = ExtResource("1_0p6th")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 6
+
+[node name="LineEditName" type="LineEdit" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+editable = false
+
+[node name="ControlListTexturesAnimated" parent="HBoxContainer" instance=ExtResource("2_c2mo6")]
+layout_mode = 2
+
+[node name="ButtonVisualizar" type="TextureButton" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+texture_normal = ExtResource("2_uap60")
+script = ExtResource("2_0p6th")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"

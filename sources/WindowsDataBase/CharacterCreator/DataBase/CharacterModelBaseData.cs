@@ -1,5 +1,6 @@
 using GodotEcsArch.sources.managers.Animations;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
@@ -15,6 +16,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
     public class CharacterModelBaseData : IdData
     {
         public int idAnimationCharacterBaseData { get; set; }
+        public long idTileSpriteData { get; set; }
         public CharacterBehaviorType characterBehaviorType { get; set; }
         public CharacterType characterType { get; set; }
         public UnitDirectionType unitDirectionType { get; set; }
@@ -38,24 +40,31 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         }
 
         [BsonCtor]
-        public CharacterModelBaseData( int idAnimationCharacterBaseData) : base()
+        public CharacterModelBaseData( int idAnimationCharacterBaseData, long idTileSpriteData) : base()
         {
-            animationCharacterBaseData = AnimationCharacterManager.Instance.GetCharacterBaseData(idAnimationCharacterBaseData); 
-
-            AnimationStateData[] animationDataArray = animationCharacterBaseData.animationDataArray;
-            if (animationDataArray != null && animationDataArray.Length > 0)
+            if (idTileSpriteData!=0)
             {
-                if (animationDataArray != null)
-                {
-                    AnimationStateData dataAnim = animationDataArray[0];
-                    if (dataAnim.animationData[0].frameDataArray != null)
-                    {
-                        FrameData iFrame = dataAnim.animationData[0].frameDataArray[0];
-                        textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
-                    }
-
-                }
+                var data = MasterDataManager.GetData<TileSpriteData>(idTileSpriteData);
+                textureVisual = data.textureVisual;
             }
+            
+
+            //animationCharacterBaseData = AnimationCharacterManager.Instance.GetCharacterBaseData(idAnimationCharacterBaseData); 
+
+            //AnimationStateData[] animationDataArray = animationCharacterBaseData.animationDataArray;
+            //if (animationDataArray != null && animationDataArray.Length > 0)
+            //{
+            //    if (animationDataArray != null)
+            //    {
+            //        AnimationStateData dataAnim = animationDataArray[0];
+            //        if (dataAnim.animationData[0].frameDataArray != null)
+            //        {
+            //            FrameData iFrame = dataAnim.animationData[0].frameDataArray[0];
+            //            textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+            //        }
+
+            //    }
+            //}
 
 
         }

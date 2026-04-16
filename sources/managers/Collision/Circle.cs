@@ -27,11 +27,28 @@ namespace GodotEcsArch.sources.managers.Collision
 
         }
         public override Circle Multiplicity(float value)
-        {
-            var nc = new Circle(Radius * value, OriginCurrent * value);
-            nc.scale = value;
+        { 
+            // Escalamos tanto ancho como alto en base a los originales
+            float newWidth = Radius * value;
+            
+
+            // Escalamos también el origen relativo
+            var newOriginRelative = OriginRelative * value;
+
+            var nc = new Circle(newWidth)
+            {
+                OriginRelative = newOriginRelative,
+                OriginCurrent = newOriginRelative,
+                scale = this.scale * value,
+                Radius = this.Radius * value,
+                widthPixel = widthPixel * value,
+                heightPixel = heightPixel * value,
+                originPixelX = originPixelX * value,
+                originPixelY = originPixelY * value,
+            };            
             return nc;
         }
+        [BsonCtor]
         public Circle(float widthPixel, float originPixelX, float originPixelY) : base()
         {
             this.originPixelX = originPixelX;
@@ -45,7 +62,7 @@ namespace GodotEcsArch.sources.managers.Collision
         }
         public override Vector2 GetSizeQuad()
         {
-            return new Vector2(Radius, Radius);
+            return new Vector2(Radius*2, Radius * 2);
         }
 
         public override Circle MultiplicityInternal(float value)

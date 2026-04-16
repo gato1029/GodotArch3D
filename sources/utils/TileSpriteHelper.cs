@@ -50,4 +50,19 @@ internal class TileSpriteHelper
 
         return borderNeighbors.ToList();
     }
+
+    public static List<Vector2I> GetBorderNeighbors(Vector2I tile)
+    {
+        return new List<Vector2I>
+    {
+        new Vector2I(tile.X + 1, tile.Y),      // Este
+        new Vector2I(tile.X - 1, tile.Y),      // Oeste
+        new Vector2I(tile.X, tile.Y + 1),      // Norte
+        new Vector2I(tile.X, tile.Y - 1),      // Sur
+        new Vector2I(tile.X + 1, tile.Y + 1),  // Noreste
+        new Vector2I(tile.X - 1, tile.Y + 1),  // Noroeste
+        new Vector2I(tile.X + 1, tile.Y - 1),  // Sureste
+        new Vector2I(tile.X - 1, tile.Y - 1),  // Suroeste
+    };
+    }
 }

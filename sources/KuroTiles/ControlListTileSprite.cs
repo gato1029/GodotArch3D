@@ -4,15 +4,31 @@ using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
 using GodotFlecs.sources.KuroTiles;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static CustomButtonRule;
 
 public partial class ControlListTileSprite : MarginContainer
 {
+    [Export] bool onlyOneTile = false;
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
         PanelContainerTile.GuiInput += HBoxContainerTiles_GuiInput;
+        if (onlyOneTile)
+        {
+            ScrollContainerUI.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        }
+    }
+
+    public long GetidTile()
+    {
+        return GetIdTiles().First(); 
+    }
+    public void SetIdTile(long id)
+    {
+        var dataTile = TileSpriteManager.Instance.GetData(id);
+        WindowTile_OnNotifySelected(dataTile);
     }
     public List<long> GetIdTiles()
     {
@@ -32,8 +48,13 @@ public partial class ControlListTileSprite : MarginContainer
             WindowTile_OnNotifySelected(dataTile);
         }
     }
+
     private void HBoxContainerTiles_GuiInput(InputEvent @event)
     {
+        if (onlyOneTile && HBoxContainerTiles.GetChildCount()>=1)
+        {
+            return;
+        }
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
         {
             switch (mouseEvent.ButtonIndex)
@@ -50,22 +71,31 @@ public partial class ControlListTileSprite : MarginContainer
 
     private void WindowTile_OnNotifySelected(TileSpriteData objectSelected)
     {
+        if (objectSelected==null)
+        {
+            return;
+        }
         TextureRect textureRect = new TextureRect();
         textureRect.SetMeta("id", objectSelected.id);
         textureRect.ExpandMode = TextureRect.ExpandModeEnum.FitWidth;
+
         switch (objectSelected.tileSpriteType)
         {
             case TileSpriteType.Static:
-                textureRect.Texture = MaterialManager.Instance.GetAtlasTextureInternal(objectSelected.spriteData.idMaterial,
-            objectSelected.spriteData.x, objectSelected.spriteData.y, objectSelected.spriteData.widht, objectSelected.spriteData.height);
+                textureRect.Texture = objectSelected.textureVisual;
                 break;
             case TileSpriteType.Animated:
                 textureRect.Texture = objectSelected.textureVisual;
                 break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                textureRect.Texture = objectSelected.textureVisual;
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
             default:
                 break;
         }
-        
+
         // Aseguramos que pueda recibir eventos
         textureRect.MouseFilter = Control.MouseFilterEnum.Stop;
 

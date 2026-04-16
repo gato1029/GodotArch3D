@@ -18,6 +18,7 @@ internal class SpatialHashMap<TItem>
     private readonly float cellSize;   
     public readonly Dictionary<int, Dictionary<int, TItem>> cellMap;
     private readonly Dictionary<int, int> mapItems;
+    private readonly Dictionary<int, int> mapItemsTeam;
     private readonly Dictionary<Vector2, Transform3D> gridPositions; // draw grid
     private readonly Dictionary<int, List<(GeometricShape2D shape, Vector2 position)>> shapesByItem;
 

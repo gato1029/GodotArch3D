@@ -7,6 +7,7 @@ using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Group;
+using GodotEcsArch.sources.WindowsDataBase.Info;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
@@ -16,6 +17,7 @@ using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
 using LiteDB;
+using RVO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,16 +36,54 @@ namespace GodotEcsArch.sources.WindowsDataBase
         public string id { get; set; }
         public List<int> freeIds { get; set; }
     }
-    internal class DataBaseManager: SingletonBase<DataBaseManager>
+    internal class DataBaseManager : SingletonBase<DataBaseManager>
     {
         LiteDatabase db;
         string dataBasePath = FileHelper.GetPathGameDB("AssetExternals/db/MiBaseDeDatos2.db");
         private Dictionary<Type, string> collectionNameMap = new Dictionary<Type, string>();
 
+
+        public BsonMapper ConfigMapper()
+        {
+            BsonMapper mapper = BsonMapper.Global;
+
+            mapper.RegisterType<Godot.Vector2>
+            (
+                serialize: v => new BsonDocument
+                {
+                    ["x"] = v.X,
+                    ["y"] = v.Y
+                },
+
+                 deserialize: doc => new Vector2(
+                    (float)doc["x"].AsDouble,   // double → float
+                    (float)doc["y"].AsDouble
+                )
+            );
+            return mapper;
+        }
+        public void LoadCurrentDataBase()
+        {
+            if (db != null)
+            {
+                db.Dispose();
+            }
+            dataBasePath = FileHelper.GetPathGameDB("AssetExternals/db/MiBaseDeDatos2.db");
+            Initialize();
+        }
+        public void LoadCustomDataBase(string path)
+        {
+            if (db != null)
+            {
+                db.Dispose();
+            }
+            dataBasePath = path;
+            Initialize();
+        }
         protected override void Initialize()
         {
-            db = new LiteDatabase(dataBasePath);
-            var mapper = BsonMapper.Global;
+            var mapper = ConfigMapper();
+            db = new LiteDatabase(dataBasePath, mapper);
 
             collectionNameMap[typeof(MaterialSimpleData)] = "Materiales";
 
@@ -67,7 +107,9 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<TileSpriteData>("TileSpriteData");
             RegisterCollection<GroupingData>("GroupingData");
             RegisterCollection<AutoTileSpriteData>("AutoTileSpriteData");
-            // RegisterCollection<BuildingData>("DataBaseFree");
+            RegisterCollection<TerrainDataTransition>("TerrainDataTransition");
+            RegisterCollection<InfoModData>("InfoModData");
+            
 
             ILiteCollection<TextureMasterData> TextureMasterDataCollection = db.GetCollection<TextureMasterData>("TextureMasterData");
             TextureMasterDataCollection.EnsureIndex(x => x.id, unique: true);
@@ -75,7 +117,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             ILiteCollection<DataBaseFree> DataBaseFreeCollection = db.GetCollection<DataBaseFree>("DataBaseFree");
             DataBaseFreeCollection.EnsureIndex(x => x.id, unique: true);
 
-            ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");            
+            ILiteCollection<MaterialData> MaterialDataCollection = db.GetCollection<MaterialData>("Materiales");
             MaterialDataCollection.EnsureIndex(x => x.id, unique: true);
 
             ILiteCollection<ResourceSourceData> ResourceSourceDataCollection = db.GetCollection<ResourceSourceData>("ResourceSourceData");
@@ -115,6 +157,9 @@ namespace GodotEcsArch.sources.WindowsDataBase
             BulletDataCollection.EnsureIndex(x => x.id, unique: true);
         }
 
+
+
+
         public void RegisterCollection<T>(string collectionName) where T : class
         {
             if (!collectionNameMap.ContainsKey(typeof(T)))
@@ -122,6 +167,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 collectionNameMap.Add(typeof(T), collectionName);
                 ILiteCollection<T> BuildingDataCollection = db.GetCollection<T>(collectionName);
                 BuildingDataCollection.EnsureIndex("_id", unique: true);
+                //BuildingDataCollection.EnsureIndex("idSave",true);
             }
             else
             {
@@ -132,7 +178,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType !=typeof(IdData) && baseType != typeof(IdDataLong))
+            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
@@ -155,13 +201,13 @@ namespace GodotEcsArch.sources.WindowsDataBase
             {
                 if (FreeData.freeIds.Count > 0)
                 {
-                    var freeid = FreeData.freeIds.Min();             
+                    var freeid = FreeData.freeIds.Min();
                     id = freeid;
                     return id;
                 }
 
             }
-            
+
             // Obtener el último ID de la colección
             var lastItem = collection.FindAll().OrderByDescending(item => item["_id"]).FirstOrDefault();
             if (lastItem == default)
@@ -173,7 +219,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 int aa = lastItem["_id"].AsInt32;
                 return aa + 1;
             }
-            
+
 
         }
         /// <summary>
@@ -191,7 +237,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
                     throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
-                }                               
+                }
             }
             else
             {
@@ -200,12 +246,12 @@ namespace GodotEcsArch.sources.WindowsDataBase
                     throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
                 }
             }
-            
-            var collection = db.GetCollection<T>(collectionName);           
+
+            var collection = db.GetCollection<T>(collectionName);
             collection.Insert(data);
         }
 
-        public bool InsertUpdateGeneric<T>(T data, int id = -1) 
+        public bool InsertUpdateGeneric<T>(T data, int id = -1)
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
@@ -223,7 +269,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
                     throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
                 }
             }
-         
+
 
 
             var collection = db.GetCollection<T>(collectionName);
@@ -239,7 +285,8 @@ namespace GodotEcsArch.sources.WindowsDataBase
             return resultado;
         }
 
-        public bool InsertUpdate<T>(T data, long id = -1) 
+       
+        public bool InsertUpdate<T>(T data, long id = -1)
         {
             var baseType = typeof(T).BaseType;
             string collectionName;
@@ -257,19 +304,93 @@ namespace GodotEcsArch.sources.WindowsDataBase
                     throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
                 }
             }
-         
+
             var collection = db.GetCollection<T>(collectionName);
+
+            long idlongTemp = 0;
+            // 🔥 Generación automática de idSave
+            if (data is IdDataLong entity)
+            {
+                idlongTemp = entity.id;
+                // 1️⃣ Resolver grouping primero
+                if (entity.idGrouping != 0 && entity.idGroupingSave == 0)
+                {
+                    var parent = MasterDataManager.GetData<GroupingData>(entity.idGrouping);
+
+                    if (parent == null)
+                        throw new InvalidOperationException(
+                            $"No se encontró GroupingData con id {entity.idGrouping}");
+
+                    entity.idGroupingSave = parent.idSave;
+                }
+
+                // 2️⃣ Generar idSave por grupo
+                if (entity.idSave == 0)
+                {
+                    entity.idSave = GenerateIdSave(collectionName, entity.idGroupingSave);
+                }
+            }
+
+
             bool resultado = false;
             if (id == -1)
             {
-                resultado = collection.Upsert( data);
+                resultado = collection.Upsert(data);
             }
             else
             {
-                resultado = collection.Upsert(id,data);
+                resultado = collection.Upsert(id, data);
             }
             
             return resultado;
+        }
+        private string GetBucketId(string collectionName, ushort groupingSave)
+        {
+            return $"{collectionName}_{groupingSave}";
+        }
+        private ushort GenerateIdSave(string collectionName, ushort groupingSave)
+        {
+            var bucketCollection = db.GetCollection<FreeIdBucket>("free_id_buckets");
+            var mainCollection = db.GetCollection<BsonDocument>(collectionName);
+
+            db.BeginTrans();
+
+            try
+            {
+                var bucketId = GetBucketId(collectionName, groupingSave);
+                var bucket = bucketCollection.FindById(bucketId);
+
+                // 🔥 1️⃣ Reutilizar libre por grupo
+                if (bucket != null && bucket.FreeValues.Count > 0)
+                {
+                    var value = bucket.FreeValues[0];
+                    bucket.FreeValues.RemoveAt(0);
+
+                    bucketCollection.Update(bucket);
+                    db.Commit();
+
+                    return value;
+                }
+
+                // 🔥 2️⃣ Generar incremental SOLO dentro del grupo
+                var last = mainCollection
+                    .Query()
+                    .Where(x => x["idGroupingSave"] == (int)groupingSave)
+                    .OrderByDescending("idSave")
+                    .FirstOrDefault();
+
+                ushort newValue = last == null
+                    ? (ushort)1
+                    : (ushort)(last["idSave"].AsInt32 + 1);
+
+                db.Commit();
+                return newValue;
+            }
+            catch
+            {
+                db.Rollback();
+                throw;
+            }
         }
 
         public bool InsertUpdateLog<T>(T data, int id = -1)
@@ -345,7 +466,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 {
                     // Obtén la colección correspondiente
                     var collectionBson = db.GetCollection<BsonDocument>(collectionName);
-                    var filteredDocuments = collectionBson.Query() .Where(x => x["_id"] == id && x["type"] == currentType.Name).ToList();
+                    var filteredDocuments = collectionBson.Query().Where(x => x["_id"] == id && x["type"] == currentType.Name).ToList();
 
                     var result = filteredDocuments.Select(BsonMapper.Global.ToObject<T>).FirstOrDefault();
                     // Busca el documento por ID
@@ -402,6 +523,54 @@ namespace GodotEcsArch.sources.WindowsDataBase
             // Busca el documento por ID
             return collection.FindById(id); // Devuelve el documento o null si no se encuentra
 
+        }
+        public T FindBySaveIds<T>(int idGroupingSave, int idSave) where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = currentType.BaseType;
+
+            string collectionName;
+
+            if (baseType != null &&
+                baseType != typeof(object) &&
+                baseType != typeof(IdData) &&
+                baseType != typeof(IdDataLong))
+            {
+                if (!collectionNameMap.TryGetValue(baseType, out collectionName))
+                    throw new InvalidOperationException(
+                        $"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
+
+                // 🔥 Buscar en colección base usando BsonDocument
+                var collectionBson = db.GetCollection<BsonDocument>(collectionName);
+
+                var filteredDocuments = collectionBson.Query()
+                    .Where(x =>
+                        x["idGroupingSave"] == idGroupingSave &&
+                        x["idSave"] == idSave &&
+                        x["type"] == currentType.Name)
+                    .ToList();
+
+                return filteredDocuments
+                    .Select(BsonMapper.Global.ToObject<T>)
+                    .FirstOrDefault();
+            }
+            else
+            {
+                if (!collectionNameMap.TryGetValue(currentType, out collectionName))
+                    throw new InvalidOperationException(
+                        $"No se ha configurado un nombre de colección para el tipo {currentType.Name}");
+            }
+
+            // 🔥 Caso sin herencia
+            var collection = db.GetCollection<BsonDocument>(collectionName);
+
+            var doc = collection.Query()
+              .Where(x =>
+                  x["idGroupingSave"] == idGroupingSave &&
+                  x["idSave"] == idSave)
+              .FirstOrDefault();
+
+            return doc == null ? null : BsonMapper.Global.ToObject<T>(doc);
         }
         public T FindByIdGlobal<T>(object id) where T : class
         {
@@ -470,7 +639,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
 
             var collectionBson = db.GetCollection<BsonDocument>(collectionName);
             var filteredDocuments = collectionBson.Query().Where(x => x["idMaterial"] == idMaterial && x["idInternalPosition"] == idInternal);
-            bool result= filteredDocuments.ToArray().Any();            
+            bool result = filteredDocuments.ToArray().Any();
             return result; // Devuelve el documento o null si no se encuentra
 
         }
@@ -646,7 +815,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             var filteredDocuments2 = collection.Query().Where(x => x["name"].AsString.Contains(name)).ToList();
             var result = filteredDocuments2.Select(BsonMapper.Global.ToObject<T>);
             // Busca el documento por ID
-            return result.Count()>0; // Devuelve el documento o null si no se encuentra
+            return result.Count() > 0; // Devuelve el documento o null si no se encuentra
         }
         public List<T> FindAll<T>() where T : class
         {
@@ -693,7 +862,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
                 {
                     throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
-                }        
+                }
             }
             else
             {
@@ -743,33 +912,146 @@ namespace GodotEcsArch.sources.WindowsDataBase
             FreeData.freeIds.Add(id);
             InsertUpdateGeneric(FreeData);
             return collection.Delete(id);
-  
+
         }
         public bool RemoveDirectById<T>(long id) where T : class
         {
             var currentType = typeof(T);
             var baseType = typeof(T).BaseType;
             string collectionName;
-            if (baseType != null && baseType != typeof(object) && baseType != typeof(IdData) && baseType != typeof(IdDataLong))
+
+            if (baseType != null && baseType != typeof(object) &&
+                baseType != typeof(IdData) && baseType != typeof(IdDataLong))
             {
                 if (!collectionNameMap.TryGetValue(baseType, out collectionName))
-                {
-                    throw new InvalidOperationException($"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
-                }
+                    throw new InvalidOperationException(
+                        $"No se ha configurado un nombre de colección Padre para el tipo {baseType.Name}");
             }
             else
             {
                 if (!collectionNameMap.TryGetValue(typeof(T), out collectionName))
-                {
-                    throw new InvalidOperationException($"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
-                }
+                    throw new InvalidOperationException(
+                        $"No se ha configurado un nombre de colección para el tipo {typeof(T).Name}");
             }
 
             var collection = db.GetCollection<BsonDocument>(collectionName);
-            return collection.Delete(id);
+            var bucketCollection = db.GetCollection<FreeIdBucket>("free_id_buckets");
 
+            db.BeginTrans();
+
+            try
+            {
+                var doc = collection.FindById(id);
+
+                if (doc == null)
+                {
+                    db.Rollback();
+                    return false;
+                }
+
+                // 🔥 Solo si tiene idSave e idGroupingSave
+                if (doc.ContainsKey("idSave") && doc.ContainsKey("idGroupingSave"))
+                {
+                    ushort idSave = (ushort)doc["idSave"].AsInt32;
+                    ushort groupingSave = (ushort)doc["idGroupingSave"].AsInt32;
+
+                    string bucketId = $"{collectionName}_{groupingSave}";
+
+                    var bucket = bucketCollection.FindById(bucketId);
+
+                    if (bucket == null)
+                    {
+                        bucket = new FreeIdBucket
+                        {
+                            Id = bucketId,
+                            CollectionName = collectionName,
+                            GroupingSave = groupingSave
+                        };
+                    }
+
+                    // evitar duplicados
+                    if (!bucket.FreeValues.Contains(idSave))
+                    {
+                        bucket.FreeValues.Add(idSave);
+
+                        // 🔥 AQUÍ VA
+                        bucket.FreeValues.Sort();
+                    }
+                    bucketCollection.Upsert(bucket);
+                }
+
+                bool result = collection.Delete(id);
+
+                db.Commit();
+                return result;
+            }
+            catch
+            {
+                db.Rollback();
+                throw;
+            }
         }
+        public void MigrateRegenerateIdSavePerGroup<T>() where T : IdDataLong
+        {
+            if (!collectionNameMap.TryGetValue(typeof(T), out string collectionName))
+                throw new InvalidOperationException(
+                    $"Colección no configurada para {typeof(T).Name}");
 
- 
+            var collection = db.GetCollection<T>(collectionName);
+
+            db.BeginTrans();
+
+            try
+            {
+                var all = collection.FindAll().ToList();
+
+                // 🔥 1️⃣ Nivelar idGroupingSave primero
+                var groupingCollection = db.GetCollection<GroupingData>(
+                    collectionNameMap[typeof(GroupingData)]);
+
+                var groupingLookup = groupingCollection
+                    .FindAll()
+                    .ToDictionary(x => x.id, x => x.idSave);
+
+                foreach (var item in all)
+                {
+                    if (item.idGrouping != 0)
+                    {
+                        if (!groupingLookup.TryGetValue(item.idGrouping, out var parentIdSave))
+                            throw new InvalidOperationException(
+                                $"No se encontró GroupingData con id {item.idGrouping}");
+
+                        item.idGroupingSave = parentIdSave;
+                    }
+                }
+
+                // 🔥 2️⃣ Agrupar por idGroupingSave
+                var grouped = all
+                    .GroupBy(x => x.idGroupingSave);
+
+                foreach (var group in grouped)
+                {
+                    ushort newId = 1;
+
+                    // ⚠️ Orden opcional para estabilidad
+                    foreach (var item in group.OrderBy(x => x.id))
+                    {
+                        item.idSave = newId;
+                        newId++;
+                    }
+                }
+
+                // 🔥 3️⃣ Guardar todos de una vez
+                collection.Update(all);
+
+                db.Commit();
+            }
+            catch
+            {
+                db.Rollback();
+                throw;
+            }
+        }
     }
-}
+
+    }

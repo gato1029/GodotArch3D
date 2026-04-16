@@ -1,15 +1,16 @@
 [gd_scene load_steps=5 format=3 uid="uid://ccc5rauc6x5d7"]
 
 [ext_resource type="Script" uid="uid://ibbx7qcrv5eq" path="res://sources/WindowsDataBase/Building/WindowBuilding.cs" id="1_gi2u8"]
+[ext_resource type="PackedScene" uid="uid://c3ttigs8l4153" path="res://sources/KuroTiles/ControlListTileSprite.tscn" id="2_tobwh"]
 [ext_resource type="PackedScene" uid="uid://c5l0xhw6ebiwl" path="res://sources/WindowsDataBase/Accesories/ContainerElements.tscn" id="2_ye5v3"]
-[ext_resource type="PackedScene" uid="uid://b6egvt5e1uled" path="res://sources/WindowsDataBase/Accesories/ControlSprite.tscn" id="3_suwua"]
-[ext_resource type="PackedScene" uid="uid://diki24d60o2xo" path="res://sources/WindowsDataBase/TileCreator/ControlBuildingGrid.tscn" id="5_ye5v3"]
+[ext_resource type="PackedScene" uid="uid://c7gcxynrth6ak" path="res://sources/KuroTiles/ControlProyectile.tscn" id="3_gi2u8"]
 
 [node name="WindowBuilding" type="Window"]
 oversampling_override = 1.0
 title = "Construcciones"
 initial_position = 2
-size = Vector2i(1200, 800)
+size = Vector2i(896, 459)
+wrap_controls = true
 script = ExtResource("1_gi2u8")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -23,149 +24,150 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="TabContainerBase" type="TabContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-current_tab = 0
 
-[node name="Informacion Basica" type="TabBar" parent="MarginContainer/TabContainerBase"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-metadata/_tab_index = 0
+size_flags_vertical = 3
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/TabContainerBase/Informacion Basica"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-columns = 2
-
-[node name="GridContainer2" type="GridContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer"]
+[node name="GridContainer2" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 3
+size_flags_horizontal = 6
+size_flags_vertical = 0
 columns = 2
 
-[node name="Label" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/GridContainer2"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
+layout_mode = 2
+text = "Tipo de Edificio:"
+
+[node name="OptionButtonTypeBuilding" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 layout_mode = 2
 text = "Nombre:"
 
-[node name="LineEditName" type="LineEdit" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/GridContainer2"]
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label3" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/GridContainer2"]
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Descripcion:"
 
-[node name="TextEditDescription" type="TextEdit" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/GridContainer2"]
+[node name="TextEditDescription" type="TextEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 custom_minimum_size = Vector2(400, 200)
 layout_mode = 2
 wrap_mode = 1
 
-[node name="Label4" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/GridContainer2"]
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 layout_mode = 2
 size_flags_vertical = 0
-text = "Es Animado:"
+text = "TileSprite:"
 
-[node name="CheckBoxIsAnimated" type="CheckBox" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/GridContainer2"]
+[node name="ControlTileSpriteItem" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2_tobwh")]
 layout_mode = 2
+size_flags_horizontal = 0
+onlyOneTile = true
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer"]
-layout_mode = 2
-
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2"]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 3
-columns = 2
-
-[node name="Label2" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Tipo de Edificio:"
-
-[node name="OptionButtonTypeBuilding" type="OptionButton" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-
-[node name="Label4" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Salud Maxima:"
-
-[node name="SpinBoxMaxHealth" type="SpinBox" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-
-[node name="Label5" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Rango de Ataque:"
-
-[node name="SpinBoxRangeAttack" type="SpinBox" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-
-[node name="Label7" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Recarga de Ataque:"
-
-[node name="SpinBoxChargueAttack" type="SpinBox" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-step = 0.1
-
-[node name="Label6" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
+[node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 layout_mode = 2
 text = "Tiempo Construccion:"
 
-[node name="SpinBoxTimeBuild" type="SpinBox" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2/GridContainer"]
+[node name="SpinBoxTimeBuild" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 layout_mode = 2
+size_flags_horizontal = 0
 
-[node name="ButtonSave" type="Button" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2"]
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 2
-text = "Guardar"
+text = "Salud Maxima:"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer"]
+[node name="SpinBoxMaxHealth" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="ContainerAtaque" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Informacion Ataque"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 4
+columns = 2
+
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Rango de Ataque:"
+
+[node name="SpinBoxRangeAttack" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label7" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Recarga de Ataque:"
+
+[node name="SpinBoxChargueAttack" type="SpinBox" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/GridContainer"]
+layout_mode = 2
+step = 0.1
+
+[node name="Label8" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Proyectil:"
+
+[node name="ControlProyectileItem" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/GridContainer" instance=ExtResource("3_gi2u8")]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/VBoxContainer2/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Ataque"
 
-[node name="ControlAtaque" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer" instance=ExtResource("2_ye5v3")]
+[node name="ControlAtaque" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/VBoxContainer2/VBoxContainer" instance=ExtResource("2_ye5v3")]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer2f" type="VBoxContainer" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer"]
+[node name="VBoxContainer2f" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2f"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/VBoxContainer2/VBoxContainer2f"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Defensa"
 
-[node name="ControlDefensa" parent="MarginContainer/TabContainerBase/Informacion Basica/GridContainer/VBoxContainer2f" instance=ExtResource("2_ye5v3")]
+[node name="ControlDefensa" parent="MarginContainer/VBoxContainer/HBoxContainer/ContainerAtaque/VBoxContainer/VBoxContainer2/VBoxContainer2f" instance=ExtResource("2_ye5v3")]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SpriteBasico" type="TabBar" parent="MarginContainer/TabContainerBase"]
-visible = false
+[node name="ButtonSave" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-metadata/_tab_index = 1
-
-[node name="ControlSpriteBasico" parent="MarginContainer/TabContainerBase/SpriteBasico" instance=ExtResource("3_suwua")]
-layout_mode = 1
-
-[node name="Disposicion" type="TabBar" parent="MarginContainer/TabContainerBase"]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 2
-
-[node name="ControlBuildingGridBasic" parent="MarginContainer/TabContainerBase/Disposicion" instance=ExtResource("5_ye5v3")]
-layout_mode = 1
-gridSize = Vector2i(1, 1)
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Guardar"

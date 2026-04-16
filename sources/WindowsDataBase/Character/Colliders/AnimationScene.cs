@@ -270,7 +270,7 @@ public partial class AnimationScene : VBoxContainer
                                   
     }
 
-    private void ColliderScene_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData)
+    private void ColliderScene_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData, ColliderScene colliderScene)
     {
         data.animationData[currentIdState].collider = itemData;
     }

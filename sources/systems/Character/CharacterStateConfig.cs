@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class CharacterStateRules
 {
     public Func<GodotFlecs.sources.Flecs.Components.CharacterComponent, GodotFlecs.sources.Flecs.Components.AnimationComponent, CharacterStateType>? OnAnimationComplete;
-    public Dictionary<CharacterStateType, int> StateToAnimation = new();
+    public Dictionary<CharacterStateType, AnimationType> StateToAnimation = new();
 }
 
 // Configuración centralizada
@@ -39,14 +39,14 @@ public static class CharacterStateConfig
                     _ => character.characterStateType
                 };
             },
-            StateToAnimation = new Dictionary<CharacterStateType, int>
+            StateToAnimation = new Dictionary<CharacterStateType, AnimationType>
                 {
-                    { CharacterStateType.IDLE, 0 },
-                    { CharacterStateType.MOVING, 1 },
-                    { CharacterStateType.ATTACK, 2 },               
-                    { CharacterStateType.TAKE_HIT, 4 },
-                    { CharacterStateType.TAKE_STUN, 5 },
-                    { CharacterStateType.DIE, 3 },
+                    { CharacterStateType.IDLE,  AnimationType.PARADO  },
+                    { CharacterStateType.MOVING, AnimationType.CAMINANDO },
+                    { CharacterStateType.ATTACK, AnimationType.ATACANDO },               
+                    { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
+                    { CharacterStateType.TAKE_STUN, AnimationType.STUNEADO },
+                    { CharacterStateType.DIE, AnimationType.MUERTO },
                 }
         };
     }
@@ -65,14 +65,14 @@ public static class CharacterStateConfig
                     _ => character.characterStateType
                 };
             },
-            StateToAnimation = new Dictionary<CharacterStateType, int>
+            StateToAnimation = new Dictionary<CharacterStateType, AnimationType>
                 {
-                    { CharacterStateType.IDLE, 0 },
-                    { CharacterStateType.MOVING, 1 },
-                    { CharacterStateType.ATTACK, 2 },
-                    { CharacterStateType.EXECUTE_ATTACK, 2 }, // opcional: animación especial
-                    { CharacterStateType.TAKE_HIT, 4 },
-                    { CharacterStateType.DIE, 3 },
+                    { CharacterStateType.IDLE,  AnimationType.PARADO  },
+                    { CharacterStateType.MOVING, AnimationType.CAMINANDO },
+                    { CharacterStateType.ATTACK, AnimationType.ATACANDO },
+                    { CharacterStateType.EXECUTE_ATTACK, AnimationType.ATACANDO }, // opcional: animación especial // revisar luego para quitarlo
+                    { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
+                    { CharacterStateType.DIE, AnimationType.MUERTO },
                 }
         };
     }
@@ -86,9 +86,9 @@ public static class CharacterStateConfig
         return new CharacterStateRules
         {
             OnAnimationComplete = (c, a) => c.characterStateType,
-            StateToAnimation = new Dictionary<CharacterStateType, int>
+            StateToAnimation = new Dictionary<CharacterStateType, AnimationType>
                 {
-                    { CharacterStateType.IDLE, 0 }
+                    { CharacterStateType.IDLE, AnimationType.PARADO  }
                 }
         };
     }

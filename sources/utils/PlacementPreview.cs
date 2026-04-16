@@ -14,7 +14,7 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
     private Entity[,] previewEntities;
     private long previewTileId;
     private int renderLayer;
-
+    private FlecsManager flecsManager;
     public Vector2I Size { get; private set; }
 
     protected override void Initialize() { }
@@ -25,6 +25,11 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
         previewTileId = tileId;
         renderLayer = layer;
         Size = new Vector2I(0, 0);
+       
+    }
+    public void ConfigureFlecs(FlecsManager flecsManager)
+    {
+        this.flecsManager = flecsManager;
     }
 
     public void Create(Vector2I size, Vector2I centerTile, TileSpriteData tileSpriteData)
@@ -44,7 +49,7 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
 
                 Vector2 worldPos = TilesHelper.WorldPositionTile(tilePos);
 
-                var entity = TileSpriteCreator.Instance.CreateSingleSprite(tileSpriteData, worldPos,tilePos,renderLayer);
+                var entity = TileSpriteCreator.Instance.CreateSingleSprite(flecsManager,tileSpriteData, worldPos,tilePos,renderLayer);
                 // Crear la entidad del preview usando SpriteData
 
                 previewEntities[i, j] = entity;

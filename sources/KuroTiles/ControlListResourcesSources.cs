@@ -36,8 +36,8 @@ public partial class ControlListResourcesSources : MarginContainer
 
                 long id = (long)texture.GetMeta("id");
                 float probability = (float)spin.Value;
-
-                entries.Add(new ResourceEntry(id, probability));
+                var template = MasterDataManager.GetData<ResourceSourceData>(id);
+                entries.Add(new ResourceEntry(id, probability,template.idSave,template.resourceSourceType));
             }
         }
 
@@ -116,7 +116,7 @@ public partial class ControlListResourcesSources : MarginContainer
         {
             MinValue = 0,
             MaxValue = 100,
-            Step = 1,
+            Step = 0.1f,
             Value = probability,
             Suffix = " %",
             TooltipText = "Probabilidad de aparición del recurso"

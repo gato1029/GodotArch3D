@@ -1,5 +1,6 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.Resources;
@@ -51,10 +52,13 @@ public partial class ControlEditorResourceSources : MarginContainer
     {
         throw new NotImplementedException();
     }
-
+    BlackyWorld blackyWorldMap;
     private void Instance_OnMapLevelDataChanged(MapLevelData data)
     {
         mapBase = data.resourceSourceMap;
+        blackyWorldMap = data.blackyWorldMap;
+        PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
     }
 
     private void LoadItems()
@@ -80,8 +84,8 @@ public partial class ControlEditorResourceSources : MarginContainer
 
     private void ButtonAutomatic_Pressed()
     {
-        ResourceSourceGenerator resourceSourceGenerator = new ResourceSourceGenerator(MapManagerEditor.Instance.CurrentMapLevelData);
-        resourceSourceGenerator.Create();
+        //ResourceSourceGenerator resourceSourceGenerator = new ResourceSourceGenerator(MapManagerEditor.Instance.CurrentMapLevelData);
+        //resourceSourceGenerator.Create();
     }
 
     private void ItemListData_ItemSelected(long index)
@@ -166,8 +170,11 @@ public partial class ControlEditorResourceSources : MarginContainer
         if (objectSelected != null && objectSelected.id != 0)
         {
             Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-            mapBase.AddUpdateResource(mouseTile, objectSelected.id, indexTileSpriteSelected);
-          
+
+            blackyWorldMap.Resources.Create(objectSelected.idSave, mouseTile, true);
+
+            //mapBase.AddUpdateResource(mouseTile, objectSelected.id, indexTileSpriteSelected);
+
         }        
     }
 
@@ -176,8 +183,8 @@ public partial class ControlEditorResourceSources : MarginContainer
         if (objectSelected != null && objectSelected.id != 0)
         {
             Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-            mapBase.RemoveTile(mouseTile);
-         
+           blackyWorldMap.Resources.remove(mouseTile);
+            //mapBase.RemoveResource(mouseTile);
         }
     }
     // Called every frame. 'delta' is the elapsed time since the previous frame.

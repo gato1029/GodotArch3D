@@ -1,111 +1,145 @@
-[gd_scene load_steps=2 format=3 uid="uid://eouyrgdv2i88"]
+[gd_scene format=3 uid="uid://eouyrgdv2i88"]
 
 [ext_resource type="Script" uid="uid://ug7eoe7pq4gn" path="res://sources/WindowsDataBase/Character/Colliders/ColliderScene.cs" id="1_dajyo"]
+[ext_resource type="Texture2D" uid="uid://cvyv7b7e0avlu" path="res://resources/Textures/iconos/Eye.png" id="2_48phy"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="2_ib582"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_ib582"]
 
-[node name="Panel" type="VBoxContainer" node_paths=PackedStringArray("buttonRemove", "buttonPreview", "spinBoxWidth", "spinBoxHeight", "spinBoxOffsetX", "spinBoxOffsetY", "optionButtonType", "spinBoxRotation")]
+[node name="Panel" type="VBoxContainer" unique_id=1797296521 node_paths=PackedStringArray("buttonRemove", "buttonPreview", "spinBoxWidth", "spinBoxHeight", "spinBoxOffsetX", "spinBoxOffsetY", "optionButtonType", "spinBoxRotation", "hBoxContainerShapeNormal", "lineEditName")]
 offset_right = 356.0
 offset_bottom = 93.0
 size_flags_horizontal = 2
 size_flags_vertical = 4
 script = ExtResource("1_dajyo")
-buttonRemove = NodePath("HBoxContainer/Button")
-buttonPreview = NodePath("HBoxContainer/Button2")
+buttonRemove = NodePath("HBoxContainer/ButtonDelete")
+buttonPreview = NodePath("HBoxContainer/ButtonPreview")
 spinBoxWidth = NodePath("HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox")
 spinBoxHeight = NodePath("HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer/SpinBox2")
 spinBoxOffsetX = NodePath("HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer/SpinBox")
 spinBoxOffsetY = NodePath("HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer/SpinBox2")
 optionButtonType = NodePath("HBoxContainer/OptionButton")
 spinBoxRotation = NodePath("HBoxContainer2/SpinBoxRotation")
+hBoxContainerShapeNormal = NodePath("HBoxContainer3")
+lineEditName = NodePath("HBoxContainer4/LineEditName")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1814244839]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=902384415]
 layout_mode = 2
 text = "Forma:"
 
-[node name="OptionButton" type="OptionButton" parent="HBoxContainer"]
+[node name="OptionButton" type="OptionButton" parent="HBoxContainer" unique_id=938398342]
 layout_mode = 2
 selected = 0
-item_count = 2
+item_count = 3
 popup/item_0/text = "Rectangle"
 popup/item_0/id = 0
 popup/item_1/text = "Circle"
 popup/item_1/id = 1
+popup/item_2/text = "Poligono"
+popup/item_2/id = 2
 
-[node name="Button" type="Button" parent="HBoxContainer"]
+[node name="Button" type="Button" parent="HBoxContainer" unique_id=37476459]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
 text = "Remove"
 
-[node name="Button2" type="Button" parent="HBoxContainer"]
+[node name="Button2" type="Button" parent="HBoxContainer" unique_id=2116199591]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
 text = "Previsualizar"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+[node name="ButtonPreview" type="TextureButton" parent="HBoxContainer" unique_id=1842211139]
+layout_mode = 2
+size_flags_horizontal = 8
+texture_normal = ExtResource("2_48phy")
+script = ExtResource("3_ib582")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDelete" type="TextureButton" parent="HBoxContainer" unique_id=889057838]
+layout_mode = 2
+texture_normal = ExtResource("2_ib582")
+script = ExtResource("3_ib582")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="." unique_id=1742037802]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer4" unique_id=219273312]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="HBoxContainer4" unique_id=1334783728]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=320807625]
 visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer2"]
+[node name="Label" type="Label" parent="HBoxContainer2" unique_id=757122740]
 layout_mode = 2
 text = "Rotacion:"
 
-[node name="SpinBoxRotation" type="SpinBox" parent="HBoxContainer2"]
+[node name="SpinBoxRotation" type="SpinBox" parent="HBoxContainer2" unique_id=1304215031]
 layout_mode = 2
 min_value = -360.0
 max_value = 360.0
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="."]
+[node name="HBoxContainer3" type="HBoxContainer" parent="." unique_id=1354017741]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3" unique_id=1392066107]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer3/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer3/HBoxContainer" unique_id=324524613]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer3/HBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer3/HBoxContainer/VBoxContainer" unique_id=324783972]
 layout_mode = 2
 text = "Tamaño:"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3/HBoxContainer/VBoxContainer" unique_id=1007748392]
 layout_mode = 2
 
-[node name="SpinBox" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=1082663427]
 layout_mode = 2
 max_value = 1000.0
 prefix = "W:"
 
-[node name="SpinBox2" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="SpinBox2" type="SpinBox" parent="HBoxContainer3/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=763828377]
 layout_mode = 2
 max_value = 1000.0
 prefix = "H:"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer3"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer3" unique_id=1693705235]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer3/HBoxContainer2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer3/HBoxContainer2" unique_id=1495360408]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer3/HBoxContainer2/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer3/HBoxContainer2/VBoxContainer" unique_id=1585900391]
 layout_mode = 2
 text = "Offset:"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3/HBoxContainer2/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer3/HBoxContainer2/VBoxContainer" unique_id=1980232922]
 layout_mode = 2
 
-[node name="SpinBox" type="SpinBox" parent="HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer" unique_id=441581390]
 layout_mode = 2
-min_value = -100.0
+min_value = -1000.0
+max_value = 1000.0
 step = 0.1
 prefix = "X:"
 
-[node name="SpinBox2" type="SpinBox" parent="HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer"]
+[node name="SpinBox2" type="SpinBox" parent="HBoxContainer3/HBoxContainer2/VBoxContainer/HBoxContainer" unique_id=1476103195]
 layout_mode = 2
-min_value = -100.0
+min_value = -1000.0
 max_value = 1000.0
 step = 0.1
 prefix = "Y:"

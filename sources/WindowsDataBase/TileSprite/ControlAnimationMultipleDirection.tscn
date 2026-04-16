@@ -1,0 +1,66 @@
+[gd_scene load_steps=5 format=3 uid="uid://vtluekg6hu8r"]
+
+[ext_resource type="Script" uid="uid://i68ngwq464ms" path="res://sources/WindowsDataBase/TileSprite/ControlAnimationMultipleDirection.cs" id="1_820rx"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="1_p7yoy"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="2_12u34"]
+[ext_resource type="PackedScene" uid="uid://bkn3uc0ri1i34" path="res://sources/WindowsDataBase/TileSprite/ControlAnimatedDirection.tscn" id="4_p7yoy"]
+
+[node name="ControlAnimationMultipleDirection" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_820rx")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Tipo Direccion:"
+
+[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Animaciones:"
+
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonAdd" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("1_p7yoy")
+script = ExtResource("2_12u34")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainerItems" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 2
+
+[node name="ControlAnimatedDirectionItem" parent="MarginContainer/VBoxContainer" instance=ExtResource("4_p7yoy")]
+clip_contents = true
+layout_mode = 2

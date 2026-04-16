@@ -16,7 +16,7 @@ namespace GodotEcsArch.sources.managers.Behaviors.Attack
             ref MelleCollider melleAtack = ref entity.TryGetRef<MelleCollider>(out bool exist);
             Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
             rectangle.DirectionTo(directionLeftRight.X, directionLeftRight.Y);
-            Vector2 vector2 = Collision2D.RotatePosition(rectangle.OriginRelative, direction.normalized);
+            Vector2 vector2 = Vector2.Zero;
             rectangle.OriginCurrent = vector2;
         }
         public bool AttackPosible(Entity entity, ref Position position, ref Direction direction)

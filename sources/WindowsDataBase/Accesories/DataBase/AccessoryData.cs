@@ -7,17 +7,18 @@ namespace GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 
 public class AccessoryData : IdData
 {
+    public long idTileSpriteData {  get; set; }
     public string description {  get; set; }
     public string colorBase { set; get; }
-    public bool hasBodyAnimation { set; get; }
-    public bool hasAnimationTile { set; get; }
+    public bool hasBodyAnimation { set; get; } 
+  //  public bool hasAnimationTile { set; get; } // quitar
     public bool hasRequirements { set; get; }
-    public SpriteData miniatureData { set; get; }
+    public SpriteData miniatureData { set; get; } 
     public AccesoryClassType accesoryClassType { set; get; }
     public AccesoryType accesoryType { set; get; }
     public AccesoryBodyPartType accesoryBodyPartType { set; get; }
-    public int idBodyAnimationBaseData { set; get; }    
-    public SpriteAnimationData animationTilesData { set; get; }
+    //public int idBodyAnimationBaseData { set; get; }    // quitar
+  //  public SpriteAnimationData animationTilesData { set; get; } // quitar
     
     public BonusData[] bonusDataArray { get; set; }
     public ElementsData[] damageDataArray { get; set; }
@@ -26,7 +27,7 @@ public class AccessoryData : IdData
     public RequirementsData requirementsData { get; set; }
 
     [BsonIgnore]
-    public AccesoryAnimationBodyData accesoryAnimationBodyData { set; get; }
+    public AccesoryAnimationBodyData accesoryAnimationBodyData { set; get; } // quitar
 
     public AccessoryData() 
     {
@@ -34,15 +35,14 @@ public class AccessoryData : IdData
     }
 
     [BsonCtor]
-    public AccessoryData(SpriteData miniatureData, int idBodyAnimationBaseData) : base()
+    public AccessoryData(SpriteData miniatureData) : base()
     {
         if (miniatureData!=null && miniatureData.idMaterial>0 )
-        {
-            
-            var atlas = MaterialManager.Instance.GetAtlasTexture(miniatureData.idMaterial, miniatureData.x, miniatureData.y, miniatureData.widht, miniatureData.height);            
+        {            
+            var atlas = MaterialManager.Instance.GetAtlasTextureInternal(miniatureData.idMaterial, miniatureData.x, miniatureData.y, miniatureData.widht, miniatureData.height);            
             textureVisual = atlas;
         }
-        accesoryAnimationBodyData = DataBaseManager.Instance.FindById<AccesoryAnimationBodyData>(idBodyAnimationBaseData);
+       // accesoryAnimationBodyData = DataBaseManager.Instance.FindById<AccesoryAnimationBodyData>(idBodyAnimationBaseData);
     }
 }
 public class RequirementsData

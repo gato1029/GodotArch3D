@@ -69,25 +69,25 @@ internal class BuildingCreator:SingletonBase<BuildingCreator>
         //WireShape.Instance.DrawCircle(data.attackRange, positionReal, 30, Colors.Red);
         //WireShape.Instance.DrawCircle(5, positionReal, 30, Colors.Green);
 
-        entity.Add(new HealthComponent { current = data.maxHealth });
-        entity.Add(new AttackRangeComponent { attackRange = MeshCreator.PixelsToUnits( data.attackRange) });
-        entity.Add(new AttackCooldownComponent { maxCooldown = data.attackCooldown });
-        entity.Add(new AttackDamageComponent { damage = 10 });
-        entity.Add(new BuildingComponent { id = data.id });
-        entity.Add(new TeamComponent { team = 1 });
-        entity.Add(new TilePositionComponent { x = positionTileWorld.X, y = positionTileWorld.Y });
-        entity.Add(new PositionComponent { position = positionReal });
-        entity.Add(new TargetingRangeComponent { targetEntity = Entity.Null });
-        entity.Add(new AttackEffectComponent { effectType = AttackEffectType.Stun, duration = 0.25f });
-        if (data.spriteData.haveCollider)
-        {
-            int idCollider = CollisionManager.Instance.BuildingsColliders.AddColliderObject(entity, data.spriteData.collisionBody, positionCollider);
+        //entity.Add(new HealthComponent { current = data.maxHealth });
+        //entity.Add(new AttackRangeComponent { attackRange = MeshCreator.PixelsToUnits( data.attackRange) });
+        //entity.Add(new AttackCooldownComponent { maxCooldown = data.attackCooldown });
+        //entity.Add(new AttackDamageComponent { damage = 10 });
+        //entity.Add(new BuildingComponent { id = data.id });
+        //entity.Add(new TeamComponent { team = 1 });
+        //entity.Add(new TilePositionComponent { x = positionTileWorld.X, y = positionTileWorld.Y });
+        //entity.Add(new PositionComponent { position = positionReal });
+        //entity.Add(new TargetingRangeComponent { targetEntity = Entity.Null });
+        //entity.Add(new AttackEffectComponent { effectType = AttackEffectType.Stun, duration = 0.25f });
+        //if (data.spriteData.haveCollider)
+        //{
+        //    int idCollider = CollisionManager.Instance.BuildingsColliders.AddColliderObject(entity, data.spriteData.collisionBody, positionCollider);
            
-            Godot.Vector2 pos = positionCollider  - (data.spriteData.collisionBody.GetSizeQuad() / 2) + data.spriteData.collisionBody.OriginCurrent;
-            Rect2 aabb = new Rect2(pos, data.spriteData.collisionBody.GetSizeQuad());
+        //    Godot.Vector2 pos = positionCollider  - (data.spriteData.collisionBody.GetSizeQuad() / 2) + data.spriteData.collisionBody.OriginCurrent;
+        //    Rect2 aabb = new Rect2(pos, data.spriteData.collisionBody.GetSizeQuad());
                       
-            entity.Add(new ColliderComponent { idCollider = idCollider, aabb = aabb, position = positionCollider});
-        }
+        //    entity.Add(new ColliderComponent { idCollider = idCollider, aabb = aabb, position = positionCollider});
+        //}
 
     }
 

@@ -37,9 +37,18 @@ public enum UnderNeighborType
 }
 public class TileTemplate
 {
-    public int idGroup { get; set; }    
+    public int idGroup { get; set; }
     public long idTileSprite { get; set; }
 
+    public TileTemplate(int idGroup, long idTileSprite)
+    {
+        this.idGroup = idGroup;
+        this.idTileSprite = idTileSprite;
+    }
+
+    public TileTemplate()
+    {
+    }
 }
 
 public class TileRuleTemplate
@@ -85,16 +94,20 @@ public class TileRuleTemplate
 
     public bool MatchesEnvironment(TileEnvironment environment)
     {
-        foreach (var cond in neighborConditionTemplate)
+        if (neighborConditionTemplateCenter.Match(environment.GetUnderCenter().TileId, environment.GetUnderCenter().GroupId))
         {
-            var neighbor = environment.Get(cond.position);
-            //if (neighbor == null)
-            //    continue; // si el entorno no tiene dato, se ignora (opcional)
+            foreach (var cond in neighborConditionTemplate)
+            {
+                var neighbor = environment.Get(cond.position);
+                //if (neighbor == null)
+                //    continue; // si el entorno no tiene dato, se ignora (opcional)
 
-            if (!cond.Match(neighbor.Value.TileId, neighbor.Value.GroupId))
-                return false;
+                if (!cond.Match(neighbor.Value.TileId, neighbor.Value.GroupId))
+                    return false;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 }
 public class NeighborConditionTemplate

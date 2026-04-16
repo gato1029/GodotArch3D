@@ -17,6 +17,11 @@ public enum AnimationDirection
     RIGHT,
     UP,
     DOWN,
+    LEFTUP,
+    RIGHTUP,
+    LEFTDOWN,
+    RIGHTDOWN,
+
 }
 public enum CardinalDirection
 {

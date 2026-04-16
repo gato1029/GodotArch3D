@@ -10,6 +10,7 @@ namespace GodotEcsArch.sources.managers.Collision
 {
     public abstract class GeometricShape2D
     {
+        public string name {  get; set; }
         public float originPixelX { get; set; }
         public float originPixelY { get; set; }
         public float scale { get; set; }

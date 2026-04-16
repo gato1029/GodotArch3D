@@ -93,7 +93,7 @@ public class InfoArrayMultimesh
         foreach (var item in multimeshInfo)
         {
             multimeshData = item.Value;
-            if (multimeshData.AvailbleSpace())
+            if (multimeshData.AvailableSpace())
             {
                 multimeshData = item.Value;
                 instance =  multimeshData.CreateInstance();
@@ -153,8 +153,8 @@ public class MultimeshArrayMaterial
     public MaterialType typeMaterial;
     
 
-    private Dictionary<int, Dictionary<Rid, MultimeshData>> multimeshDataDict;
-    private Dictionary<int, TextureArrayBuilder> groupArrayBuilder;
+    //private Dictionary<int, Dictionary<Rid, MultimeshData>> multimeshDataDict;
+    //private Dictionary<int, TextureArrayBuilder> groupArrayBuilder;
 
     int INSTANCE_CAPACITY = 1000; // instanciasMaximas
     private const int MAX_LAYERS = 256; // capas maximas por array

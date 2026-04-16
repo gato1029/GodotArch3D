@@ -1,0 +1,74 @@
+[gd_scene format=3 uid="uid://d333wihp45up1"]
+
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="1_3c6j0"]
+[ext_resource type="Script" uid="uid://cjrptgok1ts0v" path="res://sources/WindowsDataBase/Info/WindowInfoMod.cs" id="1_22ubo"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="2_22ubo"]
+
+[node name="WindowInfoMod" type="Window" unique_id=443077432]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(500, 300)
+script = ExtResource("1_22ubo")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1417298478]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=410887477]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer" unique_id=1627013593]
+layout_mode = 2
+size_flags_vertical = 0
+columns = 2
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1886885835]
+layout_mode = 2
+text = "Nombre Mod:"
+
+[node name="TextEditName" type="TextEdit" parent="PanelContainer/MarginContainer/GridContainer" unique_id=536442842]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="PanelContainer/MarginContainer/GridContainer" unique_id=856670706]
+layout_mode = 2
+text = "Descripcion:"
+
+[node name="TextEditDescription" type="TextEdit" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1802505918]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label3" type="Label" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1843777361]
+layout_mode = 2
+text = "Version:"
+
+[node name="TextEditVersion" type="TextEdit" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1299347189]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1847241732]
+layout_mode = 2
+text = "Autor:"
+
+[node name="TextEditAutor" type="TextEdit" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1537194868]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer" unique_id=936938037]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="ButtonSave" type="TextureButton" parent="PanelContainer/MarginContainer/HBoxContainer" unique_id=1507515627]
+layout_mode = 2
+texture_normal = ExtResource("1_3c6j0")
+script = ExtResource("2_22ubo")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"

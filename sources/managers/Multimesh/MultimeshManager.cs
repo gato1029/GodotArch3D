@@ -16,24 +16,10 @@ using static Godot.HttpRequest;
 
 namespace GodotEcsArch.sources.managers.Multimesh;
 
-public struct PendingRemoveInstance
-{
-    public PendingRemoveInstance(Rid rid, int instance, int materialId)
-    {
-        Rid = rid;
-        this.instance = instance;
-        this.materialId = materialId;
-    }
 
-    public Rid Rid { get; set; }
-    public int instance {  get; set; }
-    public int materialId { get; set; }
-}
 public class MultimeshManager:SingletonBase<MultimeshManager>
 {
-    private readonly ConcurrentQueue<PendingRemoveInstance> pendingRemoveInstances
-          = new ConcurrentQueue<PendingRemoveInstance>();
-
+ 
     private Dictionary<MaterialType, MultimeshArrayMaterial> multiMeshArrayShaders;
     protected override void Initialize()
     {
@@ -46,25 +32,18 @@ public class MultimeshManager:SingletonBase<MultimeshManager>
             }
         }
     }
-    public void Init()
+    public void Init(bool show=false)
     {
+        if (!show)
+        {
+            return;
+        }
         foreach (var item in multiMeshArrayShaders)
         {
             item.Value.ShowInfo();
         }
     }
-    public void AddPendingRemove(PendingRemoveInstance pendingRemove)
-    {
-        pendingRemoveInstances.Enqueue(pendingRemove);
-    }
-
-    public void ProcessPendingRemove()
-    {
-        while (pendingRemoveInstances.TryDequeue(out var item))
-        {
-            FreeInstance(item.Rid, item.instance, item.materialId);
-        }
-    }
+  
 
     private void AddMaterial(MaterialType materialType)
     {
@@ -84,8 +63,7 @@ public class MultimeshManager:SingletonBase<MultimeshManager>
     }
     public (Rid rid, int instance, int material, int layerTexture) CreateInstance( int idMaterial)
     {
-        MaterialType typeShader = (MaterialType)MaterialManager.Instance.GetMaterial(idMaterial).type;
-       // GD.Print("Tipo Material Usado:"+typeShader.ToString()+" ->" +idMaterial);
+        MaterialType typeShader = (MaterialType)MaterialManager.Instance.GetMaterial(idMaterial).type;       
         return multiMeshArrayShaders[typeShader].CreateInstance(idMaterial);
     }
 

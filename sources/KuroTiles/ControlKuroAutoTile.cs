@@ -68,6 +68,10 @@ public partial class ControlKuroAutoTile : MarginContainer
         TextureImage.Texture = objectSelected.textureVisual;
         OnNotifyChangued?.Invoke(this);
     }
+    public AutoTileSpriteData GetData()
+    {
+        return objectData;
+    }
     internal void SetData(AutoTileSpriteData data)
     {
         objectData = data;
@@ -76,6 +80,10 @@ public partial class ControlKuroAutoTile : MarginContainer
     }
     internal void SetData(long iddata)
     {
+        if (iddata==0)
+        {
+            return;
+        }
         objectData =MasterDataManager.GetData<AutoTileSpriteData>(iddata);           
         TextEditSearch.Text = objectData.name;
         TextureImage.Texture = objectData.textureVisual;

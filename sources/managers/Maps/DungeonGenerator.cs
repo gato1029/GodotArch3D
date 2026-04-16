@@ -462,7 +462,7 @@ public class DungeonGenerator
             }
         }
     }
-    public void ExportInGame(TerrainMap terrainMap, TerrainCategoryType terrainCategoryType)
+    public void ExportInGame(MapTerrain terrainMap, TerrainCategoryType terrainCategoryType)
     {
         //Random rand = new Random();
         

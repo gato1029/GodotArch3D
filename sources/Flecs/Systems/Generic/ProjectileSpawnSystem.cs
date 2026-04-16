@@ -1,6 +1,7 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.Flecs.Components;
 using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers.Multimesh;
@@ -51,10 +52,11 @@ namespace GodotFlecs.sources.Flecs.Systems.Generic
 
                 var targetPos = atp.Target.Get<PositionComponent>().position;
                 var direction = (targetPos - pos.position).Normalized();
-       
+
                 // Crear el proyectil como nueva entidad Flecs
-                var projectile = FlecsManager.Instance.WorldFlecs.Entity();
-                projectile.Set(new PositionComponent { position = pos.position });
+                var blackyWorld = it.World().GetCtx<BlackyWorld>();
+                var projectile = blackyWorld.flecsManager.WorldFlecs.Entity();
+                projectile.Set(new PositionComponent { position = pos.position , height = 4});
                     projectile.Set(new ProjectileComponent
                     {
                         Owner = it.Entity(i),
@@ -69,7 +71,9 @@ namespace GodotFlecs.sources.Flecs.Systems.Generic
                     });
                     projectile.Set(new TeamComponent { TeamId = team.TeamId });
 
-                var spriteData = ProjectileManager.Instance.GetData(ranged.idProjectile).spriteData;
+                var tileSprite = ProjectileManager.Instance.GetData(ranged.idProjectile);
+                var spriteData = MasterDataManager.GetData<TileSpriteData>(tileSprite.idTileSprite).spriteData;
+                
                 var instance = MultimeshManager.Instance.CreateInstance(spriteData.idMaterial);
 
                 Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
@@ -77,7 +81,7 @@ namespace GodotFlecs.sources.Flecs.Systems.Generic
                 transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
                 projectile.Set(new RenderGPUComponent(instance.rid, instance.instance,  instance.material,instance.layerTexture, 20 , 0, 1, spriteData.offsetInternal));
                 projectile.Set(new RenderTransformComponent { transform = transform });
-                projectile.Set(new RenderFrameDataComponent { uvMap = new Color(spriteData.xFormat, spriteData.yFormat, spriteData.widhtFormat, spriteData.heightFormat) });
+                projectile.Set(new RenderFrameDataComponent { uvMap = spriteData.GetUv() });
 
                 // Resetear el ataque pendiente
                 atp.Active = false;

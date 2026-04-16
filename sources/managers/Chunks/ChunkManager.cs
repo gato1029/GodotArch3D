@@ -26,8 +26,8 @@ public class ChunkManager
     {
         Vector2I screenSize = DisplayServer.ScreenGetSize();
         var dataViewDistance = GetChunksVisible(screenSize);
-        maxTileView = GetVisibleTileCount(dataViewDistance);
-        tiles16X16 = new ChunkManagerBase(dataViewDistance, new Vector2I(8,8), new Vector2I(16,16));
+        maxTileView = GetVisibleTileCount(dataViewDistance,32);
+        tiles16X16 = new ChunkManagerBase(dataViewDistance, new Vector2I(32,32), new Vector2I(16,16));
         //tiles32X32 = new ChunkManagerBase(CommonAtributes.VIEW_DISTANCE_CHUNK_32, new Vector2I(8, 8), new Vector2I(32,32));
         //chunkDimencion = PositionsManager.Instance.chunkDimencion;
         //ViewDistance = viewDistance;
@@ -51,7 +51,7 @@ public class ChunkManager
         float visibleHeight = maxZoom * 2;
         float visibleWidth = visibleHeight * aspectRatio;
 
-        float chunkSizeUnits = 8f; // 8 tiles de 1 unidad cada uno
+        float chunkSizeUnits = 32f; // 8 tiles de 1 unidad cada uno
 
         int chunksX = (int)MathF.Ceiling(visibleWidth / chunkSizeUnits) + bufferChunks * 2;
         int chunksY = (int)MathF.Ceiling(visibleHeight / chunkSizeUnits) + bufferChunks * 2;
@@ -60,13 +60,13 @@ public class ChunkManager
     }
     public void ForcedUpdate()
     {
-        tiles16X16.ForcedUpdateChunks(new Vector2(0, 0));
+        tiles16X16.ForcedUpdateChunks(new Vector2I(0, 0));
         //tiles32X32.ForcedUpdateChunks(new Vector2(0, 0));
     }
 
     internal void UpdatePlayerPosition(Vector2 positionCamera)
     {
         tiles16X16.UpdatePlayerPosition(positionCamera);
-        //tiles32X32.UpdatePlayerPosition(positionCamera);
-    }
+      
+    }    
 }

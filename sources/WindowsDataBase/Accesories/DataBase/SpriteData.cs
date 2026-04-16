@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.utils;
 using LiteDB;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
@@ -25,24 +26,33 @@ public class SpriteData {
     public float offsetY { get; set; }
     public bool mirrorX { get; set; }
     public bool mirrorY { get; set; }
+    public float yDepthRender { get; set; } // Valor para ajustar la profundidad de renderizado en el eje Y
     public string colorString { get; set; } // Color en formato hexadecimal, por ejemplo: "#FF0000" para rojo
+    
+    public string idModMaterial { get; set; }
     [BsonIgnore]
     public Vector2 offsetInternal { get; set; }
     [BsonIgnore]
     public Color color { get; set; }
-    public float yDepthRender { get; set; } // Valor para ajustar la profundidad de renderizado en el eje Y
-    
+
+    [BsonIgnore]
+    public float yDepthRenderFormat { get; set; }
+
     [BsonIgnore]
     public Color uv { get; set; }
+
+    [BsonIgnore]
+    public Dictionary<string, GeometricShape2D> collisionBodyDictionary { get; set; } = new Dictionary<string, GeometricShape2D>(); // esto es para darle un tag a la animacion
     public SpriteData()
     {
 
     }
 
     [BsonCtor]
-    public SpriteData(string colorString, float offsetX, float offsetY)
+    public SpriteData(string colorString, float offsetX, float offsetY,float yDepthRender, GeometricShape2D[] listCollisionBody)
     {
         offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
+        yDepthRenderFormat = MeshCreator.PixelsToUnits(yDepthRender);
         if (colorString != null)
         {
             var components = colorString.Trim('(', ')')
@@ -51,6 +61,18 @@ public class SpriteData {
                        .ToArray();
             color = new Color(components[0], components[1], components[2], components[3]);
         }
+        if (listCollisionBody!=null)
+        {
+            foreach (var item in listCollisionBody)
+            {
+                if (item.name!=null)
+                {
+                    collisionBodyDictionary.Add(item.name, item);
+                }
+                
+            }
+        }
+        
     }
 
     public Color GetUv()

@@ -15,7 +15,7 @@ public partial class ElementsContainer : PanelContainer
 
 
 
-    public List<ElementsData> GetAllStats()
+    public List<ElementsData> GetAllData()
     {
         List<ElementsData> stats = new List<ElementsData>();
         foreach (var item in boxContainer.GetChildren())
@@ -45,7 +45,7 @@ public partial class ElementsContainer : PanelContainer
     {
     }
 
-    internal void SetAllData(ElementsData[] elementsDatas)
+    public void SetAllData(ElementsData[] elementsDatas)
     {
         if (elementsDatas!=null)
         {

@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Terrain;
 using GodotEcsArch.sources.managers.Tilemap;
@@ -7,6 +8,7 @@ using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Generic;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using LiteDB;
@@ -63,59 +65,232 @@ public class Biome: IdDataLong
 }
 public enum TerrainTileType
 {
-    Agua = 0,
-    TierraNivel1 = 1,
-    CespedNivel1 = 2,
-    TierraNivel2 = 3,
-    CespedNivel2 = 4,
-    AdornosAgua = 5,    
-    AdornosTierra = 6,
-    AdornosCesped = 7,
-    AguaCamino = 8,
-    TierraCamino = 9,
-    TierraElevacionNivel2 = 10,
+    TierraNivel0 = 5, // bajo Agua
+    Agua = 6,
+    TierraNivel1 = 7,
+    CespedNivel1 = 8,
+    TierraNivel2 = 9,
+    CespedNivel2 = 10,
+    AdornosAgua = 11,    
+    AdornosTierra = 12,
+    AdornosCesped = 13,
+    AguaCamino = 14,
+    TierraCamino = 15,
+
+     
+}
+
+public enum TerrinLayerType
+{
+    Base = 0,
+    Superficie = 1,
+    DecoracionBase = 2,
+    DecoracionSuperficie = 3
+}
+public partial class TerrainLayer : GodotObject
+{    
+    public TerrinLayerType layerType { get; set; }
+    public int layer { get; set; }
+    public long idAutoTile { get; set; }
+
+    
+
+    public TerrainLayer(TerrinLayerType layerType, int layer, long idAutoTile)
+    {
+        this.layerType = layerType;
+        this.layer = layer;
+        this.idAutoTile = idAutoTile;
+    }
+
+    public TerrainLayer()
+    {
+    }
 }
 public partial class TerrainTileEntry:GodotObject
 {
-    public TerrainTileType Type { get; set; }
-    public long TileId { get; set; }
-
-    public TerrainTileEntry(TerrainTileType type, long tileId)
+    public int height { get; set; }
+    public int heightReal { get; set; }
+    public List<TerrainLayer> layersRelative { get; set; } = new List<TerrainLayer>();
+    public TerrainTileEntry()
     {
-        Type = type;
-        TileId = tileId;
-    }
+
+    }    
 }
 public partial class ResourceEntry: GodotObject
 {
+    public ushort idResourceSave { get; set;  }
     public long ResourceSourceId { get; set; }
     public float Probability { get; set; }
-    public ResourceEntry(long resourceSourceId, float probability)
+    public ResourceSourceType ResourceType { get; set;  }
+    public ResourceEntry(long resourceSourceId, float probability, ushort idResourceSave, ResourceSourceType resourceType)
     {
         ResourceSourceId = resourceSourceId;
         Probability = probability;
+        this.idResourceSave = idResourceSave;
+        ResourceType = resourceType;
     }
+}
+
+public class TerrainDataTransition:IdDataLong
+{
+    public ushort idTerrainBeginId { get; set; }
+    public ushort idTerrainEndId { get; set; }
+    public ushort idTerrainResoluteId { get; set; }
+    public int thickness { get; set; } // 🔥 clave
 }
 public class TerrainData :IdDataLong
 {
-    public List<TerrainTileEntry> idsAutoTileSprite { get; set; } = new();
-    public Dictionary<TerrainTileType, List<ResourceEntry>> idsResources { get; set; } = new();
+    public Dictionary<int, TerrainTileEntry> terrains { get; set; } = new Dictionary<int, TerrainTileEntry>();
+  
+    public Dictionary<int, List<ResourceEntry>> idsElevacionResources { get; set; } = new Dictionary<int, List<ResourceEntry>>();
+    public float minTemperature { get; set; }
+    public float maxTemperature { get; set; }
+
+    public float minHumidity { get; set; }
+    public float maxHumidity { get; set; }    
+    public bool isTransition { get; set; } // determinar si es un bioma de transcion, aqui no importa la humedad y temperatura    
+    public int heightBegin { get; set; } 
+ 
+    public bool isWater { get; set; }
+
+    public int paddingBorder { get; set; }
+
     public TerrainData()
     {
         id = EpochIdGenerator.NewId();
     }
    
     [BsonCtor]
-    public TerrainData(List<TerrainTileEntry> idsAutoTileSprite)
+    public TerrainData(Dictionary<int, TerrainTileEntry> terrains)
     {
-        foreach (var item in idsAutoTileSprite)
+        foreach (var item in terrains)
         {
-            if (item.Type == TerrainTileType.Agua)
-            {
-                var auto = MasterDataManager.GetData<AutoTileSpriteData>(item.TileId);
-                textureVisual = auto.textureVisual;
-            }
+            var temp =item.Value;            
+            var id = temp.layersRelative.First().idAutoTile;
+            var auto = MasterDataManager.GetData<AutoTileSpriteData>(id);
+            textureVisual = auto.textureVisual;                        
         }
-        
+
     }
 }
+
+
+/*
+=========================================
+🌍 SISTEMA DE BIOMAS (TEMPERATURA / HUMEDAD)
+=========================================
+
+Cada bioma se define por un rango de:
+
+- temperatura (0 → 1)
+- humedad    (0 → 1)
+
+El sistema NO usa rangos directamente,
+usa el CENTRO del bioma:
+
+    centerTemp     = (minTemperature + maxTemperature) * 0.5
+    centerHumidity = (minHumidity + maxHumidity) * 0.5
+
+Luego elige el bioma MÁS CERCANO usando distancia:
+
+    dist = (temp - centerTemp)^2 + (humidity - centerHumidity)^2
+
+-----------------------------------------
+🎯 ¿Qué significa esto?
+
+- Cada bioma es un "punto" en un mapa 2D
+- temperatura = eje X
+- humedad    = eje Y
+
+-----------------------------------------
+📊 REFERENCIA DEL ESPACIO
+
+Temperatura:
+0.0 → frío (nieve)
+0.5 → templado
+1.0 → caliente (desierto)
+
+Humedad:
+0.0 → seco
+0.5 → medio
+1.0 → húmedo (selva/bosque)
+
+-----------------------------------------
+🌊 AGUA (especial)
+
+El agua NO depende de temperatura/humedad,
+se define por el ruido continental (IsLand).
+
+Configuración recomendada:
+minTemperature = 0
+maxTemperature = 1
+minHumidity    = 0
+maxHumidity    = 1
+
+-----------------------------------------
+🌲 EJEMPLO: BOSQUE
+
+Bosque = temperatura media + humedad alta
+
+minTemperature = 0.4
+maxTemperature = 0.7
+
+minHumidity = 0.5
+maxHumidity = 1.0
+
+Centro aproximado:
+temp ≈ 0.55
+humidity ≈ 0.75
+
+-----------------------------------------
+🏜️ EJEMPLO: DESIERTO
+
+Desierto = caliente + seco
+
+minTemperature = 0.7
+maxTemperature = 1.0
+
+minHumidity = 0.0
+maxHumidity = 0.3
+
+-----------------------------------------
+🌿 EJEMPLO: PRADERA
+
+Pradera = templado + humedad media
+
+minTemperature = 0.4
+maxTemperature = 0.7
+
+minHumidity = 0.3
+maxHumidity = 0.6
+
+-----------------------------------------
+⚠️ REGLAS IMPORTANTES
+
+1. NO solapar demasiado biomas
+   → causa cambios bruscos o incorrectos
+
+2. Mantener separación entre centros
+   → cada bioma debe tener su "espacio"
+
+3. Pensar en centros, NO en rangos
+   → el sistema usa distancia, no límites
+
+4. Agua NO participa en este sistema
+
+-----------------------------------------
+🧠 CONSEJO PRO
+
+Diseña los biomas como puntos en este plano:
+
+        HUMEDAD ↑
+        1.0 |    🌲 bosque
+            |
+        0.5 |    🌿 pradera
+            |
+        0.0 |    🏜️ desierto
+            +----------------→ temperatura
+             0.0   0.5   1.0
+
+-----------------------------------------
+*/

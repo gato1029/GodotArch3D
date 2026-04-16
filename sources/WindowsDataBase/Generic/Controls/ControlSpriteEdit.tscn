@@ -127,10 +127,11 @@ grow_vertical = 2
 texture = ExtResource("2_ewqsh")
 stretch_mode = 5
 
-[node name="TileOcupancy" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel"]
+[node name="TileOcupancy" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" node_paths=PackedStringArray("checkEnable")]
 script = ExtResource("6_7gh1m")
 tileColor = Color(0.72156864, 0.1254902, 0.43529412, 0.3882353)
 outlineColor = Color(0.5882353, 0.35686275, 0.4745098, 1)
+checkEnable = NodePath("../../../../MarginContainer/HBoxContainer/CheckButtonModeGrid")
 
 [node name="GridGeneric" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" node_paths=PackedStringArray("spinBoxX", "spinBoxY", "subViewport")]
 script = ExtResource("3_ewqsh")
@@ -139,6 +140,7 @@ spinBoxX = NodePath("../../../../MarginContainer/HBoxContainer/SpinBoxX")
 spinBoxY = NodePath("../../../../MarginContainer/HBoxContainer/SpinBoxY")
 subViewport = NodePath("../..")
 
-[node name="ShapesForm" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel"]
+[node name="ShapesForm" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" node_paths=PackedStringArray("checkEnableTileOcupancy")]
 script = ExtResource("6_0fhse")
 shapeColor = Color(0.35686275, 0.54901963, 0.827451, 0.61960787)
+checkEnableTileOcupancy = NodePath("../../../../MarginContainer/HBoxContainer/CheckButtonModeGrid")

@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
 
@@ -40,7 +41,7 @@ public class WireShape : SingletonBase<WireShape>
 
         // Asignar al mundo
         RenderingServer.InstanceSetBase(instanceRid, meshRid);
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         // Posicionar en XY con layer como Z
         Transform3D xform = Transform3D.Identity;
@@ -80,7 +81,7 @@ public class WireShape : SingletonBase<WireShape>
         var meshRid = mesh.GetRid();
 
         RenderingServer.InstanceSetBase(instanceRid, meshRid);
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         Transform3D xform = new Transform3D(Basis.Identity, Vector3.Zero);
         xform.Origin = new Vector3(position.X, position.Y, layer);
@@ -102,6 +103,63 @@ public class WireShape : SingletonBase<WireShape>
         return idUnico;
     }
     // ===========================
+    // Crear un Poligono
+    // ===========================
+    public int DrawPolygon(
+    List<Vector2> points,
+    Vector2 position,
+    float layer,
+    Color color,
+    TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        return DrawPolygon(points.ToArray(), position, layer, color, typeDraw);
+    }
+
+    public int DrawPolygon(
+    Vector2[] points,
+    Vector2 position,
+    float layer,
+    Color color,
+    TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        int idUnico = UniqueIdGenerator.GetNextId<WireShape>();
+
+        // Crear instancia
+        var instanceRid = RenderingServer.InstanceCreate();
+
+        // Crear mesh del polígono
+        Mesh mesh = CreateWirePolygonMesh(points, typeDraw);
+
+        // Material
+        var mat = GetOrCreateMaterial(color);
+        mesh.SurfaceSetMaterial(0, mat);
+
+        var meshRid = mesh.GetRid();
+
+        // Asignar al mundo
+        RenderingServer.InstanceSetBase(instanceRid, meshRid);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
+
+        // Transform (posición + layer como Z)
+        Transform3D xform = Transform3D.Identity;
+        xform.Origin = new Vector3(position.X, position.Y, layer);
+        RenderingServer.InstanceSetTransform(instanceRid, xform);
+
+        // Guardar referencia (evita GC)
+        _shapes[idUnico] = new ShapeData
+        {
+            MeshRid = meshRid,
+            InstanceRid = instanceRid,
+            Transform = xform,
+            Color = color,
+            Mesh = mesh, // 🔥 importante
+            layer = layer
+        };
+
+        return idUnico;
+    }
+
+    // ===========================
     // Crear un cuadrado
     // ===========================
     public int DrawSquare(Vector2 size, Vector2 position, float layer, Color color, TypeDraw typeDraw = TypeDraw.PIXEL)
@@ -118,7 +176,41 @@ public class WireShape : SingletonBase<WireShape>
 
         // Asignar al mundo
         RenderingServer.InstanceSetBase(instanceRid, meshRid);
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
+
+        // Posicionar en XY con layer como Z
+        Transform3D xform = Transform3D.Identity;
+        xform.Origin = new Vector3(position.X, position.Y, layer);
+        RenderingServer.InstanceSetTransform(instanceRid, xform);
+
+        // Guardamos en el diccionario
+        _shapes[idUnico] = new ShapeData
+        {
+            MeshRid = meshRid,
+            InstanceRid = instanceRid,
+            Transform = xform,
+            Color = color,
+            Mesh = mesh, // 🔥 evita que el GC lo libere
+            layer = layer
+        };
+
+        return idUnico;
+    }
+    public int DrawSquare(float widht, float height, Vector2 position, float layer, Color color, TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        int idUnico = UniqueIdGenerator.GetNextId<WireShape>();
+
+        var instanceRid = RenderingServer.InstanceCreate();
+        Mesh mesh = CreateWireSquareMesh(widht, height, typeDraw);
+
+        var mat = GetOrCreateMaterial(color);
+        mesh.SurfaceSetMaterial(0, mat);
+
+        var meshRid = mesh.GetRid();
+
+        // Asignar al mundo
+        RenderingServer.InstanceSetBase(instanceRid, meshRid);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         // Posicionar en XY con layer como Z
         Transform3D xform = Transform3D.Identity;
@@ -287,6 +379,59 @@ public class WireShape : SingletonBase<WireShape>
         return arrayMesh;
     }
 
+
+    // ===========================
+    // Crear malla Poligono
+    // ===========================
+    public static ArrayMesh CreateWirePolygonMesh(
+    Vector2[] points,
+    WireShape.TypeDraw typeDraw = WireShape.TypeDraw.PIXEL)
+    {
+        ArrayMesh arrayMesh = new ArrayMesh();
+
+        if (points == null || points.Length < 2)
+            return arrayMesh;
+
+        int pointCount = points.Length;
+
+        // Vértices en 3D
+        Vector3[] vertices = new Vector3[pointCount];
+
+        for (int i = 0; i < pointCount; i++)
+        {
+            if (typeDraw == WireShape.TypeDraw.PIXEL)
+            {
+                vertices[i] = new Vector3(
+                    MeshCreator.PixelsToUnits(points[i].X),
+                    MeshCreator.PixelsToUnits(points[i].Y),
+                    0);
+            }
+            else
+            {
+                vertices[i] = new Vector3(points[i].X, points[i].Y, 0);
+            }
+        }
+
+        // Índices para líneas (cada par es un segmento)
+        int[] indices = new int[pointCount * 2];
+
+        int idx = 0;
+        for (int i = 0; i < pointCount; i++)
+        {
+            indices[idx++] = i;
+            indices[idx++] = (i + 1) % pointCount; // Cierra el polígono
+        }
+
+        Godot.Collections.Array arrays = new Godot.Collections.Array();
+        arrays.Resize((int)ArrayMesh.ArrayType.Max);
+        arrays[(int)ArrayMesh.ArrayType.Vertex] = vertices;
+        arrays[(int)ArrayMesh.ArrayType.Index] = indices;
+
+        arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Lines, arrays);
+
+        return arrayMesh;
+    }
+
     // ===========================
     // Crear malla de la flecha
     // ===========================
@@ -370,7 +515,7 @@ public class WireShape : SingletonBase<WireShape>
 
         // Asignar al mundo
         RenderingServer.InstanceSetBase(instanceRid, meshRid);
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         // Posicionar en XY con layer como Z
         Transform3D xform = Transform3D.Identity;
@@ -456,7 +601,7 @@ public class WireShape : SingletonBase<WireShape>
 
         // Asignar al mundo
         RenderingServer.InstanceSetBase(instanceRid, meshRid);
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         // Posicionar en XY con layer como Z
         Transform3D xform = Transform3D.Identity;
@@ -608,7 +753,7 @@ public class WireShape : SingletonBase<WireShape>
 
         // Asignar al mundo
         RenderingServer.InstanceSetBase(instanceRid, meshRid);
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         // Posicionar en XY con layer como Z
         Transform3D xform = Transform3D.Identity;

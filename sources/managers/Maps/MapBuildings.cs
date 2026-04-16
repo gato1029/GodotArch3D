@@ -23,11 +23,11 @@ namespace GodotEcsArch.sources.managers.Maps;
 [ProtoContract]
 public class BuildingDataGame : DataItem
 {
-    public  Entity entity;
+    public Entity entity;
     private bool existEntity = false;
-    public override void SetDataGame()
+    public override void SetDataGame(DataRender render)
     {
-        
+
         //if (GetSpriteData().haveCollider)
         //{
         //    if (idUnique != 0)
@@ -38,7 +38,7 @@ public class BuildingDataGame : DataItem
         //    if (GetSpriteData().listCollisionBody != null)
         //    {
         //        idUnique = CollisionManager.Instance.BuildingsColliders.AddColliderObject(this, GetSpriteData().listCollisionBody.ToList(), positionCollider);
-       
+
         //    }
         //}
         //else
@@ -57,30 +57,11 @@ public class BuildingDataGame : DataItem
     private void CreateEntity()
     {
         existEntity = true;
-        entity = Flecs.Creators.BuildingCreator.Instance.Create(idDataTileSprite, positionReal,positionTileWorld);
+        //entity = Flecs.Creators.BuildingCreator.Instance.Create(idDataTileSprite, positionReal, positionTileWorld);
     }
     public override void ClearDataGame()
     {
-       //BuildingCreator.Instance.Destroy(entity);                    
-    }
-    public override TileSpriteData GetSpriteData()
-    {
-        return null;// return BuildingManager.Instance.GetData(idDataTileSprite).spriteData;
-    }
-
-    public override bool IsAnimation()
-    {
-        return false; // return BuildingManager.Instance.GetData(idDataTileSprite).isAnimated;
-    }
-
-    public override AnimationStateData GetAnimationStateData()
-    {
-        return null; // BuildingManager.Instance.GetData(idDataTileSprite).animationData[0];
-    }
-
-    public override int GetTypeData()
-    {
-        return 0; // (int)BuildingManager.Instance.GetData(idDataTileSprite).buildingType;
+        //BuildingCreator.Instance.Destroy(entity);                    
     }
 }
 public class MapBuildings

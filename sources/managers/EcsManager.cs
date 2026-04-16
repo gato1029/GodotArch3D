@@ -37,8 +37,8 @@ public class EcsManager : SingletonBase<EcsManager>
     public JobScheduler JobScheduler { get => jobScheduler; set => jobScheduler = value; }
     public Rid CanvasItem { get => canvasItem; set => canvasItem = value; }
     public Node2D Main2D { get => main2D; set => main2D = value; }
-    public Node3D Main3D { get => main3D; set => main3D = value; }
-    public Rid RidWorld3D { get => ridWorld3D; set => ridWorld3D = value; }
+   // public Node3D Main3D { get => main3D; set => main3D = value; }
+    //public Rid RidWorld3D { get => ridWorld3D; set => ridWorld3D = value; }
 
     private Group<float> groupColliderPhysics;
     private Group<float> groupCollider;

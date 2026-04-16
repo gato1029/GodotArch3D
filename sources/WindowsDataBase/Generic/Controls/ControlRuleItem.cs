@@ -146,15 +146,15 @@ public partial class ControlRuleItem : PanelContainer
                                 tileRuleData.idDataCentral = objectSelected.id;
                             };
                             break;
-                        case TypeRule.Edificios:
-                            FacadeWindowDataSearch<BuildingData> winBuilding = new FacadeWindowDataSearch<BuildingData>("res://sources/WindowsDataBase/Building/WindowBuilding.tscn", this, WindowType.SELECTED);
-                            winBuilding.OnNotifySelected += (BuildingData objectSelected) =>
-                            {
-                                ButtonCentral.Icon = objectSelected.textureVisual;
-                                tileRuleData.dataCentral = objectSelected.spriteData;
-                                tileRuleData.idDataCentral = objectSelected.id;
-                            };
-                            break;
+                        //case TypeRule.Edificios:
+                        //    FacadeWindowDataSearch<BuildingData> winBuilding = new FacadeWindowDataSearch<BuildingData>("res://sources/WindowsDataBase/Building/WindowBuilding.tscn", this, WindowType.SELECTED);
+                        //    winBuilding.OnNotifySelected += (BuildingData objectSelected) =>
+                        //    {
+                        //        ButtonCentral.Icon = objectSelected.textureVisual;
+                        //        tileRuleData.dataCentral = objectSelected.spriteData;
+                        //        tileRuleData.idDataCentral = objectSelected.id;
+                        //    };
+                        //    break;
                         default:
                             break;
                     }

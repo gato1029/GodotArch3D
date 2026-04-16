@@ -28,6 +28,11 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         [BsonIgnore]
         public AtlasTexture textureVisual { get; set; }
 
+        public virtual void RefreshTextureVisual()
+        {
+            // implementación por defecto
+        }
+
     }
 
     public class TextureMasterData:IdData
@@ -78,6 +83,13 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         public int divisionPixelX { get; set; }
         public int divisionPixelY { get; set; }
 
+        public long timeStamp { get; set; } = 0;
+
+        public void UpdateTimeStamp()
+        {
+            timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        }
+
         [BsonIgnore]
         public ShaderMaterial shaderMaterial { get; set; }
         [BsonIgnore]
@@ -87,6 +99,9 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
 
         [BsonIgnore]
         public int idMaterialPositionBatch { get; set; }
+
+        [BsonIgnore]
+        public string idNameMod { get; set; }
         public MaterialData()
         {
             MaterialManager.Instance.RegisterMaterial(-1, this);            

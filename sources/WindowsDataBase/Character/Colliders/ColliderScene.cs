@@ -7,8 +7,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public partial class ColliderScene : VBoxContainer
 {
-	[Export] Button buttonRemove;
-    [Export] Button buttonPreview;
+	[Export] KuroTextureButton buttonRemove;
+    [Export] KuroTextureButton buttonPreview;
 
     [Export] SpinBox spinBoxWidth;
     [Export] SpinBox spinBoxHeight;
@@ -16,19 +16,26 @@ public partial class ColliderScene : VBoxContainer
     [Export] SpinBox spinBoxOffsetY;
     [Export] OptionButton optionButtonType;
     [Export] SpinBox spinBoxRotation;
+    [Export] HBoxContainer hBoxContainerShapeNormal;
+    [Export] LineEdit lineEditName;
     public GeometricShape2D data { get; set; }
 
     ColliderType type = ColliderType.RECTANGLE;
-    public delegate void RequestNotifyPreview(GeometricShape2D itemData);
+    public delegate void RequestNotifyPreview(GeometricShape2D itemData, ColliderScene colliderScene);
     public event RequestNotifyPreview OnNotifyPreview;
 
     // Called when the node enters the scene tree for the first time.
     bool flag = false;
     public void SetData(GeometricShape2D Data)
     {
+     
         flag = false;
+        
         this.data = Data;
-    //    spinBoxRotation.Value = data.rotation;
+        if (data.name != null)
+        {
+            lineEditName.Text = data.name;
+        }
         switch (data)
         {
             case Rectangle rect1:
@@ -39,7 +46,7 @@ public partial class ColliderScene : VBoxContainer
                 spinBoxWidth.Value = data.widthPixel;
                 spinBoxOffsetX.Value = data.originPixelX;
                 spinBoxOffsetY.Value = data.originPixelY;
-                
+                hBoxContainerShapeNormal.Visible = true;
                 break;
             case Circle circle1:
                 type = ColliderType.CIRCLE;
@@ -47,7 +54,14 @@ public partial class ColliderScene : VBoxContainer
                 spinBoxHeight.Visible = false;               
                 spinBoxWidth.Value = data.widthPixel;
                 spinBoxOffsetX.Value = data.originPixelX;
-                spinBoxOffsetY.Value = data.originPixelY;                
+                spinBoxOffsetY.Value = data.originPixelY;
+                hBoxContainerShapeNormal.Visible = true;
+                break;
+
+            case Polygon polygon1:
+                type = ColliderType.POLYGON;
+                optionButtonType.Select(2);
+                hBoxContainerShapeNormal.Visible = false;
                 break;
             default:
                 break;
@@ -75,13 +89,21 @@ public partial class ColliderScene : VBoxContainer
         spinBoxOffsetX.ValueChanged += SpinBox_ValueChanged;
         spinBoxOffsetY.ValueChanged += SpinBox_ValueChanged;
         spinBoxRotation.ValueChanged += SpinBoxRotation_ValueChanged;
+        lineEditName.TextChanged += LineEditName_TextChanged;
+        
         flag = true;
+        createCollider();
+    }
+
+    private void LineEditName_TextChanged(string newText)
+    {
+        data.name = newText;
     }
 
     private void SpinBoxRotation_ValueChanged(double value)
     {
         createCollider();
-        OnNotifyPreview?.Invoke(data);
+        OnNotifyPreview?.Invoke(data,this);
     }
 
     private void OptionButtonType_ItemSelected(long index)
@@ -90,23 +112,31 @@ public partial class ColliderScene : VBoxContainer
         {
             case 0:
                 type = ColliderType.RECTANGLE; 
-                spinBoxHeight.Visible = true; 
+                spinBoxHeight.Visible = true;
+                hBoxContainerShapeNormal.Visible = true;
                 break;
             case 1:
                 type = ColliderType.CIRCLE; 
                 spinBoxHeight.Visible = false;
+                hBoxContainerShapeNormal.Visible = true;
+                break;
+            case 2:
+                type = ColliderType.POLYGON;
+                hBoxContainerShapeNormal.Visible = false;
+
+
                 break;
             default:
                 break;
         }
         createCollider();
-        OnNotifyPreview?.Invoke(data);
+        OnNotifyPreview?.Invoke(data,this);
     }
 
     private void SpinBox_ValueChanged(double value)
     {
         createCollider();
-        OnNotifyPreview?.Invoke(data);
+        OnNotifyPreview?.Invoke(data, this);
     }
 
     void createCollider()
@@ -118,10 +148,17 @@ public partial class ColliderScene : VBoxContainer
                 case ColliderType.RECTANGLE:
                     data = new Rectangle((float)spinBoxWidth.Value, (float)spinBoxHeight.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
                     data.scale = 1;
+                    data.name = lineEditName.Text;
                     break;
                 case ColliderType.CIRCLE:
                     data = new Circle((float)spinBoxWidth.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
                     data.scale = 1;
+                    data.name = lineEditName.Text;
+                    break;
+                case ColliderType.POLYGON:
+                    data = new Polygon();
+                    data.scale = 1;
+                    data.name = lineEditName.Text;
                     break;
                 default:
                     break;
@@ -132,7 +169,7 @@ public partial class ColliderScene : VBoxContainer
     }
     private void ButtonPreview_Pressed()
     {
-        OnNotifyPreview?.Invoke(data);
+        OnNotifyPreview?.Invoke(data, this);
     }
 
     private void ButtonRemove_Pressed()
@@ -144,4 +181,12 @@ public partial class ColliderScene : VBoxContainer
     public override void _Process(double delta)
 	{
 	}
+
+    internal void SetPositionShape(Vector2 positionShape, Vector2 size)
+    {
+        spinBoxOffsetX.Value = positionShape.X;
+        spinBoxOffsetY.Value = positionShape.Y *(-1);
+        spinBoxHeight.Value = size.Y;
+        spinBoxWidth.Value = size.X;
+    }
 }

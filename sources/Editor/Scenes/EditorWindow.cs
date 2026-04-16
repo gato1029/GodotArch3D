@@ -9,7 +9,7 @@ public partial class EditorWindow : PanelContainer
     private EditorMode selectedTabMode;
     private SelectionBlueprint blueprint;
     private int idTileSquare = 1;
-    private int maxZoomGridValue = 10;    
+    private int maxZoomGridValue = 1000;    
     private int minZoomGridValue = 1;
     private int currentZoomGridValue = 1;
     // Called when the node enters the scene tree for the first time.

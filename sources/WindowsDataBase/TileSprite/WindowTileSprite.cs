@@ -6,6 +6,7 @@ using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Generic;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
+using GodotEcsArch.sources.WindowsDataBase.Info;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using Newtonsoft.Json.Linq;
 using System;
@@ -19,9 +20,10 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
 
     public event IFacadeWindow<TileSpriteData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
 
-    // Called when the node enters the scene tree for the first time.
+    Vector2I sizeBase;
     public override void _Ready()
 	{
+
         InitializeUI(); // Insertado por el generador de UI
 		ControlTile.OnNotifyChangued += ControlTile_OnNotifyChangued;
         ControlSpriteEdit.ClearDraw();
@@ -41,7 +43,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         ButtonDelete.Pressed += ButtonDelete_Pressed;
         SpinBoxFps.ValueChanged += SpinBoxFps_ValueChanged;
         CheckBoxLoop.Pressed += CheckBoxLoop_Pressed;
-
+        sizeBase = Size;
 
         foreach (TileSpriteType item in Enum.GetValues(typeof(TileSpriteType)))
         {
@@ -53,34 +55,191 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
 
         ControlSpriteEdit.SetSelectedTile(0,0);
         ControlSpriteEdit.SetBlockedTile(0, 0);
+
+        ControlSpriteEdit.OnNotifyPreviewShape += ControlSpriteEdit_OnNotifyPreviewShape;
+        ControlSpriteEdit.OnNotifyPositionShape += ControlSpriteEdit_OnNotifyPositionShape;
+        ButtonHideConfigBase.Pressed += ButtonHideConfigBase_Pressed;
+        ControlMultiple.OnNotifyChanguedAnimatedDirection += ControlMultiple_OnNotifyChanguedAnimatedDirection;
     }
 
-   
+
+
+    ControlItemAnimationDirection selectionControlItemAnimation = null;
+    SpriteAnimationDirection selectionSpriteAnimationDirection = null;
+    private void ControlMultiple_OnNotifyChanguedAnimatedDirection(ControlItemAnimationDirection objectControl, SpriteAnimationDirection spriteAnimationDirection)
+    {
+        selectionControlItemAnimation = objectControl;
+        selectionSpriteAnimationDirection =spriteAnimationDirection;
+        var data = objectControl.GetData().sprite;
+        if (data!=null && data.framesArray!=null)
+        {
+            List<TileInfoKuro> framesKuro = new();
+
+            foreach (FrameData frameData in data.framesArray)
+            {
+                TileInfoKuro tile = new TileInfoKuro();
+                tile.x = (int)frameData.x;
+                tile.y = (int)frameData.y;
+                tile.width = (int)frameData.widht;
+                tile.height = (int)frameData.height;
+                tile.idMaterial = data.idMaterial;
+                tile.texture = MaterialManager.Instance.GetAtlasTextureInternal(data.idMaterial, frameData.x, frameData.y, frameData.widht, frameData.height);
+                framesKuro.Add(tile);
+            }
+
+
+            SpinBoxFps.Value = data.frameDuration;
+            CheckBoxHasCollider.ButtonPressed = data.haveCollider;
+            CheckBoxLoop.ButtonPressed = data.loop;
+            CheckBoxMirrorHorizontal.ButtonPressed = data.mirrorX;
+            CheckBoxMirrorVertical.ButtonPressed = data.mirrorY;
+
+            ControlSpriteEdit.UnsetBlockedTile(0, 0);
+            ControlSpriteEdit.UnsetSelectedTile(0,0);
+            ControlSpriteEdit.SetTextureAnimation(framesKuro);
+            ControlSpriteEdit.SetScaleTexture((float)SpinBoxScale.Value);
+            ControlSpriteEdit.SetCellSize(16, 16);
+            ControlSpriteEdit.SetLoopAnimation(data.loop);
+            ControlSpriteEdit.SetFlipX(data.mirrorX);
+            ControlSpriteEdit.SetFlipY(data.mirrorY);
+            ControlSpriteEdit.ClearDraw(); 
+            //ControlListTexturesAnimated.SetData(framesKuro);
+
+            if (data.haveCollider)
+            {
+                ControlCollider.Visible = true;
+
+                if (data.collisionBodyArray != null && data.collisionBodyArray.Count > 0)
+                {
+                    ControlCollider.SetData(data.collisionBodyArray.ToList());
+
+                    if (data.collisionBodyArray[0] is Polygon)
+                    {
+                        var shp = (Polygon)data.collisionBodyArray[0];
+                        ControlSpriteEdit.PaintDrawPolygon(shp.VerticesPixels, true);
+                    }
+
+                }
+
+            }
+            else
+            {
+                ControlSpriteEdit.ClearDraw();
+                ControlCollider.Visible = false;
+                ControlCollider.ClearAll();
+            }
+
+        }
+        else
+        {
+            ControlSpriteEdit.ClearDraw();
+            ControlSpriteEdit.Clear();
+            ControlListTexturesAnimated.SetData(new List<TileInfoKuro>());
+            SpinBoxFps.Value = 0.0f;
+            CheckBoxHasCollider.ButtonPressed =false;
+            CheckBoxLoop.ButtonPressed = false;
+            CheckBoxMirrorHorizontal.ButtonPressed = false;
+            CheckBoxMirrorVertical.ButtonPressed = false;
+            ControlCollider.Visible = false;
+        }
+        
+    }
+
+    private void ButtonHideConfigBase_Pressed()
+    {
+        if (ButtonHideConfigBase.ButtonPressed)
+        {
+            AnimatedPanelContainerConfigBase.Hide();
+        }
+        else
+        {
+            AnimatedPanelContainerConfigBase.Show();
+        }
+    }
+
+  
 
     private void CheckBoxLoop_Pressed()
     {
         ControlSpriteEdit.SetLoopAnimation(CheckBoxLoop.ButtonPressed);
+        var tipe = (TileSpriteType)OptionButtonType.Selected;
+        switch (tipe)
+        {
+            case TileSpriteType.Static:
+                break;
+            case TileSpriteType.Animated:
+
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                selectionControlItemAnimation.GetData().sprite.loop = CheckBoxLoop.ButtonPressed;
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
+            default:
+                break;
+        }
     }
 
     private void SpinBoxFps_ValueChanged(double value)
     {
         ControlSpriteEdit.SetFpsAnimation((float)value);
+        var tipe = (TileSpriteType)OptionButtonType.Selected;
+        switch (tipe)
+        {
+            case TileSpriteType.Static:
+                break;
+            case TileSpriteType.Animated:
+          
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                selectionControlItemAnimation.GetData().sprite.frameDuration = (float)value;
+
+                foreach (var item in selectionSpriteAnimationDirection.animations)
+                {
+                    item.Value.frameDuration = (float)value;
+                }
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
+            default:
+                break;
+        }
     }
 
     private void ControlListTexturesAnimated_OnNotifyChangued(ControlListTextures objectControl)
     {
+        var tipe = (TileSpriteType)OptionButtonType.Selected;
+
         var datalist=objectControl.GetData();
         List<FrameData> framesArray = new();
         foreach (var item in datalist)
         {
             framesArray.Add(new FrameData() { x= item.x, y= item.y, widht= item.width, height= item.height });
         }
-        objectData.animationData.idMaterial = datalist[0].idMaterial;
-        objectData.animationData.framesArray = framesArray.ToArray();
+
+        switch (tipe)
+        {
+            case TileSpriteType.Static:
+                break;
+            case TileSpriteType.Animated:
+                objectData.animationData.idMaterial = datalist[0].idMaterial;
+                objectData.animationData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + datalist[0].idMaterial;
+                objectData.animationData.framesArray = framesArray.ToArray();
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                //selectionControlItemAnimation.GetData().sprite.idMaterial = datalist[0].idMaterial;
+                //selectionControlItemAnimation.GetData().sprite.framesArray = framesArray.ToArray();
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
+            default:
+                break;
+        }
+        
 
         ControlSpriteEdit.SetTextureAnimation(datalist);
         ControlSpriteEdit.SetScaleTexture((float)SpinBoxScale.Value);        
-        ControlSpriteEdit.SetCellSize(datalist[0].width, datalist[0].height);
+        ControlSpriteEdit.SetCellSize(16, 16);
     }
 
     private void OptionButtonType_ItemSelected(long index)
@@ -93,7 +252,9 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 ControlListTexturesAnimated.Visible = false;
                 objectData.animationData = null;
                 objectData.spriteData = new SpriteData();
-                GridContainerAnimated.Visible=false;
+                GridContainerAnimated.Visible = false;
+                ControlMultiple.Visible = false;
+                GridContainerTile.Visible = true;
                 break;
             case TileSpriteType.Animated:
                 ControlTile.Visible = false;
@@ -101,6 +262,26 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 objectData.animationData = new SpriteAnimationData();
                 objectData.spriteData = null;
                 GridContainerAnimated.Visible = true;
+                ControlMultiple.Visible = false;
+                GridContainerTile.Visible = true;
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                ControlTile.Visible = false;
+                ControlListTexturesAnimated.Visible = false;
+                objectData.animationData = null;
+                objectData.spriteData = null;
+                GridContainerAnimated.Visible = true;
+                ControlMultiple.Visible = true;
+                GridContainerTile.Visible = false;
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                ControlTile.Visible = false;
+                ControlListTexturesAnimated.Visible = true;
+                objectData.animationData = null;
+                objectData.spriteData = null;
+                GridContainerAnimated.Visible = false;
+                ControlMultiple.Visible = false;
+                GridContainerTile.Visible = false;
                 break;
             default:
                 break;
@@ -123,7 +304,8 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.animationData.offsetY = (float)SpinBoxOffsetY.Value;
         objectData.animationData.yDepthRender = (float)SpinBoxDepht.Value;
         objectData.animationData.frameDuration =  (float)SpinBoxFps.Value;
-        objectData.animationData.loop = CheckBoxLoop.ButtonPressed;        
+        objectData.animationData.loop = CheckBoxLoop.ButtonPressed;      
+        objectData.animationData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + objectData.animationData.idMaterial;
     }
     private void SaveSprite()
     {
@@ -133,7 +315,15 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.spriteData.mirrorX = CheckBoxMirrorVertical.ButtonPressed;
         objectData.spriteData.offsetX = (float)SpinBoxOffsetX.Value;
         objectData.spriteData.offsetY = (float)SpinBoxOffsetY.Value;
-        objectData.spriteData.yDepthRender = (float)SpinBoxDepht.Value;
+        objectData.spriteData.yDepthRender = (float)SpinBoxDepht.Value;       
+        objectData.spriteData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + objectData.spriteData.idMaterial;
+
+    }
+
+    private void SaveMultiDirectionAnimation()
+    {
+        ControlMultiple.SetNormalizeData((float)SpinBoxOffsetX.Value, (float)SpinBoxOffsetY.Value, (float)SpinBoxDepht.Value, (float)SpinBoxScale.Value);
+        objectData.spriteMultipleAnimationDirection = ControlMultiple.GetData();
         
     }
     private void ButtonSaveSimilar_Pressed()
@@ -190,7 +380,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
 
     private void WindowGrouping_OnNotifySelected(GroupingData objectSelected)
     {
-        objectData.idGrouping = objectSelected.id;
+        objectData.idGrouping =objectSelected.id;
         LineEditGrouping.Text = objectSelected.name;
     }
 
@@ -202,7 +392,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         ControlSpriteEdit.SetTexture(ControlTile.GetTileData().texture);
         ControlSpriteEdit.SetScaleTexture(objectData.spriteData.scale);
         ControlSpriteEdit.SetOffsetPositionTexture(new Vector2(objectData.spriteData.offsetX, objectData.spriteData.offsetY));
-        ControlSpriteEdit.SetOffsetCenterY(-objectData.spriteData.yDepthRender);
+        ControlSpriteEdit.SetOffsetCenterY(objectData.spriteData.yDepthRender);
         ControlSpriteEdit.SetFlipX(objectData.spriteData.mirrorX);
         ControlSpriteEdit.SetFlipY(objectData.spriteData.mirrorY);
         ControlSpriteEdit.SetCellSize((int)objectData.spriteData.widht, (int)objectData.spriteData.height);
@@ -217,17 +407,26 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         if (objectData.spriteData.haveCollider)
         {
             ControlCollider.Visible = true;
-            Size = new Vector2I((int)(820 + ControlCollider.Size.X), 600);
-            if (objectData.spriteData.listCollisionBody!=null)
+           
+            if (objectData.spriteData.listCollisionBody!=null && objectData.spriteData.listCollisionBody.Length>0)
             {
                 ControlCollider.SetData(objectData.spriteData.listCollisionBody.ToList());
+
+                if (objectData.spriteData.listCollisionBody[0] is Polygon)
+                {
+                    var shp = (Polygon)objectData.spriteData.listCollisionBody[0];
+                    ControlSpriteEdit.PaintDrawPolygon(shp.VerticesPixels,true);
+                }
+
+
+
             }
             
         }
         else
         {
             ControlCollider.Visible = false;
-            Size = new Vector2I(820, 600);
+         
         }
     }
     private void SetDataSpriteAnimated()
@@ -250,7 +449,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         ControlSpriteEdit.SetTextureAnimation(dataInfo);
         ControlSpriteEdit.SetScaleTexture(objectData.animationData.scale);
         ControlSpriteEdit.SetOffsetPositionTexture(new Vector2(objectData.animationData.offsetX, objectData.animationData.offsetY));
-        ControlSpriteEdit.SetOffsetCenterY(-objectData.animationData.yDepthRender);
+        ControlSpriteEdit.SetOffsetCenterY(objectData.animationData.yDepthRender);
         ControlSpriteEdit.SetFlipX(objectData.animationData.mirrorX);
         ControlSpriteEdit.SetFlipY(objectData.animationData.mirrorY);
         ControlSpriteEdit.SetCellSize(dataInfo[0].width, dataInfo[0].height);
@@ -270,18 +469,43 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         if (objectData.animationData.haveCollider)
         {
             ControlCollider.Visible = true;
-            Size = new Vector2I((int)(820 + ControlCollider.Size.X), 600);
-            if (objectData.animationData.collisionBodyArray!=null)  
+           
+            if (objectData.animationData.collisionBodyArray!=null && objectData.animationData.collisionBodyArray.Count>0)  
             {
                 ControlCollider.SetData(objectData.animationData.collisionBodyArray.ToList());
+
+
+                if (objectData.animationData.collisionBodyArray[0] is Polygon)
+                {
+                    var shp = (Polygon)objectData.animationData.collisionBodyArray[0];
+                    ControlSpriteEdit.PaintDrawPolygon(shp.VerticesPixels,true);
+                }
+
             }
-            
+
         }
         else
         {
             ControlCollider.Visible = false;
-            Size = new Vector2I(820, 600);
+           
         }
+    }
+    private void SetDataMultiDirectionAnimation()
+    {
+        SpriteAnimationData spriteAnimation = null;
+        foreach (var item in objectData.spriteMultipleAnimationDirection.animations)
+        {
+            spriteAnimation =item.Value.animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+        }
+        ControlMultiple.SetData(objectData.spriteMultipleAnimationDirection);
+        ControlSpriteEdit.SetScaleTexture(spriteAnimation.scale);
+        ControlSpriteEdit.SetOffsetPositionTexture(new Vector2(spriteAnimation.offsetX, spriteAnimation.offsetY));
+        ControlSpriteEdit.SetOffsetCenterY(spriteAnimation.yDepthRender);
+
+        SpinBoxOffsetX.Value = spriteAnimation.offsetX;
+        SpinBoxOffsetY.Value = spriteAnimation.offsetY;
+        SpinBoxScale.Value = spriteAnimation.scale;
+        SpinBoxDepht.Value = spriteAnimation.yDepthRender;
     }
     public void SetData(TileSpriteData data)
     {
@@ -295,8 +519,9 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
             LineEditGrouping.Text= temp.name;
         }       
         LineEditCode.Text = objectData.id.ToString();
+        LineEditCodeSave.Text = objectData.idSave.ToString();
         OptionButtonType.Selected = (int)objectData.tileSpriteType;
-                
+
         switch (objectData.tileSpriteType)
         {
             case TileSpriteType.Static:
@@ -304,12 +529,26 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 ControlTile.Visible = true;
                 ControlListTexturesAnimated.Visible = false;
                 GridContainerAnimated.Visible = false;
+                ControlMultiple.Visible = false;
+                GridContainerTile.Visible = true;
                 break;
             case TileSpriteType.Animated:
                 SetDataSpriteAnimated();
                 ControlTile.Visible = false;
                 ControlListTexturesAnimated.Visible = true;
                 GridContainerAnimated.Visible = true;
+                ControlMultiple.Visible = false;
+                GridContainerTile.Visible = true;
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                SetDataMultiDirectionAnimation();
+                ControlTile.Visible = false;
+                ControlListTexturesAnimated.Visible = true;
+                GridContainerAnimated.Visible = true;
+                ControlMultiple.Visible = true;
+                GridContainerTile.Visible = false;
+                break;
+            case TileSpriteType.AnimatedMultiple:
                 break;
             default:
                 break;
@@ -327,11 +566,16 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
             case TileSpriteType.Animated:
                 SaveAnimation();
                 break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                SaveMultiDirectionAnimation();
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
             default:
                 break;
         }
-        
-       
+
+
 
         if (objectData.idGrouping==0)
         {
@@ -373,14 +617,49 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
     private void SpinBoxDepht_ValueChanged(double value)
     {
         ControlSpriteEdit.SetOffsetCenterY(-(float)value);
-        objectData.spriteData.yDepthRender = (float)value;
+     
+    }
+    private void ControlSpriteEdit_OnNotifyPreviewShape(List<Vector2> PointsPoligon)
+    {
+        Polygon geometricShape2D = new Polygon(PointsPoligon,true);
+
+        GeometricShape2D[] geometricShape2Ds = new GeometricShape2D [1];
+        geometricShape2Ds[0] = geometricShape2D;
+        switch ((TileSpriteType)OptionButtonType.Selected)
+        {
+            case TileSpriteType.Static:
+                objectData.spriteData.listCollisionBody = geometricShape2Ds;
+                break;
+            case TileSpriteType.Animated:
+                objectData.animationData.collisionBodyArray = geometricShape2Ds.ToList();
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                selectionControlItemAnimation.GetData().sprite.collisionBodyArray = geometricShape2Ds.ToList();
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
+            default:
+                break;
+        }
     }
 
-    private void ControlCollider_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData)
+    private void ControlSpriteEdit_OnNotifyPositionShape(Vector2 PositionShape, Vector2 size)
+    {
+        //ControlCollider.SetShapePosition(PositionShape);
+        if (colliderSceneCurrent !=null)
+        {
+            colliderSceneCurrent.SetPositionShape(PositionShape,size);
+        }
+    }
+
+    ColliderScene colliderSceneCurrent =null;
+    private void ControlCollider_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData, ColliderScene colliderScene )
     {
         if (itemData != null)
         {
-           // objectData.spriteData.collisionBody = itemData;
+            colliderSceneCurrent = colliderScene;
+            ControlSpriteEdit.ClearDraw();
+            // objectData.spriteData.collisionBody = itemData;
             Vector2 position = new Vector2((float)itemData.originPixelX, (float)(-itemData.originPixelY));
             ControlSpriteEdit.SetPositionShape(new Vector2((float)itemData.originPixelX, (float)(-itemData.originPixelY)) * new Vector2 ((float)SpinBoxScale.Value, (float)SpinBoxScale.Value));
           
@@ -391,6 +670,9 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                     break;
                 case Circle:
                     ControlSpriteEdit.DrawCircle(position, (float)itemData.widthPixel);
+                    break;
+                case Polygon:
+                    ControlSpriteEdit.EnablePaintDrawPolygon();
                     break;
                 default:
                     break;
@@ -405,9 +687,14 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 case TileSpriteType.Animated:
                     objectData.animationData.collisionBodyArray = data;
                     break;
+                case TileSpriteType.AnimatedDirectionMultiple:
+                    selectionControlItemAnimation.GetData().sprite.collisionBodyArray = data;
+                    break;
+                case TileSpriteType.AnimatedMultiple:
+                    break;
                 default:
                     break;
-            }                      
+            }
         }
         else
         {
@@ -417,30 +704,35 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
 
     private void CheckBoxHasCollider_Pressed()
     {
+        //var sizeControl = new Vector2I((int)ControlCollider.Size.X, 0);
         if (CheckBoxHasCollider.ButtonPressed)
         {
             ControlCollider.Visible = true;
-            Size = new Vector2I((int)(820 +ControlCollider.Size.X), 600);            
+           // Size = sizeBase + sizeControl;
         }
         else
         {
             ControlSpriteEdit.ClearDraw();
             ControlCollider.Visible = false;
-            Size = new Vector2I(820 , 600);
-            switch ((TileSpriteType)OptionButtonType.Selected)
-            {
-                case TileSpriteType.Static:
-                    objectData.spriteData.listCollisionBody = null;
-                    break;
-                case TileSpriteType.Animated:
-                    objectData.animationData.collisionBodyArray = null;
-                    break;
-                default:
-                    break;
-            }
-            
+           // Size = sizeBase;           
         }
-        
+        switch ((TileSpriteType)OptionButtonType.Selected)
+        {
+            case TileSpriteType.Static:
+              //  objectData.spriteData.listCollisionBody = null;
+                break;
+            case TileSpriteType.Animated:
+            //    objectData.animationData.collisionBodyArray = null;
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+     
+                selectionControlItemAnimation.GetData().sprite.haveCollider = CheckBoxHasCollider.ButtonPressed;
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
+            default:
+                break;
+        }
     }
 
     private void CheckBoxMirrorVertical_Pressed()
@@ -453,7 +745,23 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         {
             ControlSpriteEdit.SetFlipY(false);
         }
-
+        switch ((TileSpriteType)OptionButtonType.Selected)
+        {
+            case TileSpriteType.Static:
+              
+                break;
+            case TileSpriteType.Animated:
+              
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+               
+                selectionControlItemAnimation.GetData().sprite.mirrorY = CheckBoxMirrorVertical.ButtonPressed;
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
+            default:
+                break;
+        }
     }
 
     private void CheckBoxMirrorHorizontal_Pressed()
@@ -466,7 +774,23 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         {
             ControlSpriteEdit.SetFlipX(false);
         }
+        switch ((TileSpriteType)OptionButtonType.Selected)
+        {
+            case TileSpriteType.Static:
+            
+                break;
+            case TileSpriteType.Animated:
+             
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                selectionControlItemAnimation.GetData().sprite.mirrorX = CheckBoxMirrorHorizontal.ButtonPressed;
 
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
+            default:
+                break;
+        }
     }
 
     private void SpinBoxScale_ValueChanged(double value)
@@ -497,6 +821,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.spriteData.widht = tileData.width;
         objectData.spriteData.height = tileData.height;
         objectData.spriteData.idMaterial = tileData.idMaterial;
+        objectData.spriteData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + tileData.idMaterial;
 
         ControlSpriteEdit.SetCellSize(tileData.width, tileData.height);
     }

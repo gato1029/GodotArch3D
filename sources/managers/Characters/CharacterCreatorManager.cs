@@ -31,7 +31,8 @@ public enum CharacterStateType
     TAKE_STUN,
     DIE,
     BLOCKED,
-    ATTACKING
+    ATTACKING,
+    ARMA
 }
 
 
@@ -182,11 +183,11 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         if (characterBaseData.animationCharacterBaseData.hasCompositeAnimation)
         {
             GpuInstance[] instancedLinked = new GpuInstance[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
-            instancedLinked[(int)AccesoryAvatarType.WEAPON] = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, 2);
-            for (int i = 1; i < instancedLinked.Length; i++)
-            {
-                instancedLinked[i] = default;
-            }
+            //instancedLinked[(int)AccesoryAvatarType.WEAPON] = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, 2);
+            //for (int i = 1; i < instancedLinked.Length; i++)
+            //{
+            //    instancedLinked[i] = default;
+            //}
 
             //crear cada rid
             entity.Add(new RenderGPULinkedComponent { instancedLinked = instancedLinked });
@@ -359,9 +360,9 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
 
     private void AddColliderBody(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
     {
-        int idCollider = CollisionManager.Instance.characterCollidersEntities.AddColliderObject(entity, characterBaseData.collisionMove, positionInitial);
+        //int idCollider = CollisionManager.Instance.characterCollidersEntities.AddColliderObject(entity, characterBaseData.collisionMove, positionInitial);
 
-        entity.Add<ColliderComponent>(new ColliderComponent { idCollider = idCollider });
+        //entity.Add<ColliderComponent>(new ColliderComponent { idCollider = idCollider });
     }
 
     public void RemoveCharacter(Entity entity, CharacterComponent characterComponent, Rid rid, int instance)

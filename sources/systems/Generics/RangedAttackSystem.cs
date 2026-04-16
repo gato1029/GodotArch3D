@@ -104,72 +104,72 @@ namespace GodotEcsArch.sources.systems.Combat
 
             private void PerformAttack(Entity self, Entity target, AttackDamageComponent damage)
             {
-                if (!target.IsAlive() || target.Has<DeadComponent>())
-                    return;
+                //    if (!target.IsAlive() || target.Has<DeadComponent>())
+                //        return;
 
-                if (target.Has<BuildingComponent>())
-                {
-                    GameLog.LogCat("atacando a un edificio");
-                }
-                var selfPos = self.Get<PositionComponent>().position;
-                var targetPos = target.Get<PositionComponent>().position;
+                //    if (target.Has<BuildingComponent>())
+                //    {
+                //        GameLog.LogCat("atacando a un edificio");
+                //    }
+                //    var selfPos = self.Get<PositionComponent>().position;
+                //    var targetPos = target.Get<PositionComponent>().position;
 
-                if (self.Has<BuildingComponent>())
-                {
-                    var id = self.Get<BuildingComponent>().id;
-                    var spriteBase = BuildingManager.Instance.GetData(id).spriteBullet;
+                //    if (self.Has<BuildingComponent>())
+                //    {
+                //        var id = self.Get<BuildingComponent>().id;
+                //        var spriteBase = BuildingManager.Instance.GetData(id).spriteBullet;
 
-                    Entity projectile = _commandBuffer.Create(
-                    [
-                        typeof(ProjectileComponent),
-                typeof(PositionComponent),
-                typeof(DamageOnHitComponent),
-                typeof(TakeHitComponent),
-                typeof(ActiveProjectileComponent),
-            ]);
+                //        Entity projectile = _commandBuffer.Create(
+                //        [
+                //            typeof(ProjectileComponent),
+                //    typeof(PositionComponent),
+                //    typeof(DamageOnHitComponent),
+                //    typeof(TakeHitComponent),
+                //    typeof(ActiveProjectileComponent),
+                //]);
 
-                    _commandBuffer.Add(projectile, new PendingSpriteComponent
-                    {
-                        spriteData = spriteBase,
-                        position = selfPos,
-                        zIndex = 30
-                    });
+                //        _commandBuffer.Add(projectile, new PendingSpriteComponent
+                //        {
+                //            spriteData = spriteBase,
+                //            position = selfPos,
+                //            zIndex = 30
+                //        });
 
-                    _commandBuffer.Set(projectile, new PositionComponent
-                    {
-                        position = selfPos,
-                        lastPosition = selfPos
-                    });
+                //        _commandBuffer.Set(projectile, new PositionComponent
+                //        {
+                //            position = selfPos,
+                //            lastPosition = selfPos
+                //        });
 
-                    Vector2 direction = (targetPos - selfPos).Normalized();
+                //        Vector2 direction = (targetPos - selfPos).Normalized();
 
-                    _commandBuffer.Set(projectile, new ProjectileComponent
-                    {
-                        source = self,
-                        target = target,
-                        speed = 7f,
-                        type = ProjectileTypeShoot.Direct,
-                        direction = direction,
-                        initialTargetPos = targetPos
-                    });
+                //        _commandBuffer.Set(projectile, new ProjectileComponent
+                //        {
+                //            source = self,
+                //            target = target,
+                //            speed = 7f,
+                //            type = ProjectileTypeShoot.Direct,
+                //            direction = direction,
+                //            initialTargetPos = targetPos
+                //        });
 
-                    _commandBuffer.Set(projectile, new DamageOnHitComponent
-                    {
-                        damage = damage.damage
-                    });
+                //        _commandBuffer.Set(projectile, new DamageOnHitComponent
+                //        {
+                //            damage = damage.damage
+                //        });
 
-                    if (self.Has<AttackEffectComponent>())
-                    {
-                        ref var effect = ref self.Get<AttackEffectComponent>();
-                        if (effect.effectType == AttackEffectType.Stun)
-                        {
-                            _commandBuffer.Set(projectile, new TakeHitComponent
-                            {
-                                stunTime = effect.duration
-                            });
-                        }
-                    }
-                }
+                //        if (self.Has<AttackEffectComponent>())
+                //        {
+                //            ref var effect = ref self.Get<AttackEffectComponent>();
+                //            if (effect.effectType == AttackEffectType.Stun)
+                //            {
+                //                _commandBuffer.Set(projectile, new TakeHitComponent
+                //                {
+                //                    stunTime = effect.duration
+                //                });
+                //            }
+                //        }
+                //    }
             }
         }
 

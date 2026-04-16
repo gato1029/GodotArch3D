@@ -28,26 +28,7 @@ public class ResourceDataGame : DataItem
 {
     [ProtoMember(6)]
     public int amount { get; set; }
-    public override AnimationStateData GetAnimationStateData()
-    {
-        return null; // ResourcesGameManager.Instance.GetData(idDataTileSprite).animationData[0];
-    }
 
-    public override TileSpriteData GetSpriteData()
-    {
-        return null; // ResourcesGameManager.Instance.GetData(idDataTileSprite).spriteData;
-    }
-
-    public override bool IsAnimation()
-    {
-        return false; // ResourcesGameManager.Instance.GetData(idDataTileSprite).isAnimated;
-    }
-
-    public override void SetDataGame()
-    {
-        //var data = ResourcesGameManager.Instance.GetData(idDataTileSprite);
-        //amount = data.amount;
-    }
 }
 
 public class MapResources

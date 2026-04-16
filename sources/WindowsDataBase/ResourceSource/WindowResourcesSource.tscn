@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://bd6jffokvlvnb"]
+[gd_scene format=3 uid="uid://bd6jffokvlvnb"]
 
 [ext_resource type="Script" uid="uid://crvukfcba0ycw" path="res://sources/WindowsDataBase/ResourceSource/WindowResourcesSource.cs" id="1_iygqm"]
 [ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="2_iygqm"]
@@ -6,14 +6,14 @@
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_2rugs"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="4_2rugs"]
 
-[node name="WindowResourcesSource" type="Window"]
+[node name="WindowResourcesSource" type="Window" unique_id=139550103]
 oversampling_override = 1.0
 title = "Recursos"
 initial_position = 2
 size = Vector2i(450, 600)
 script = ExtResource("1_iygqm")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=243870725]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -24,85 +24,86 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=552390556]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=685180755]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainer" unique_id=1273688052]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 4
 columns = 2
 
-[node name="Label5" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label5" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1444135307]
 layout_mode = 2
 text = "Tipo:"
 
-[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=131530158]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1388893095]
 layout_mode = 2
 text = "Nombre:"
 
-[node name="LineEditName" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="LineEditName" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1075926508]
 layout_mode = 2
 
-[node name="Label7" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label7" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=198356892]
 layout_mode = 2
 text = "Tile:"
 
-[node name="ControlTileSprite" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" instance=ExtResource("2_txpe7")]
+[node name="ControlTileSprite" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1954620607 instance=ExtResource("2_txpe7")]
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1277890848]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Descripcion:"
 
-[node name="TextEditDescription" type="TextEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="TextEditDescription" type="TextEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=2102409659]
 custom_minimum_size = Vector2(300, 300)
 layout_mode = 2
 size_flags_horizontal = 2
 size_flags_vertical = 0
 wrap_mode = 1
 
-[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=234436309]
 layout_mode = 2
 text = "Cantidad:"
 
-[node name="SpinBoxAmount" type="SpinBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="SpinBoxAmount" type="SpinBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1290958271]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label4" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=550871645]
 layout_mode = 2
 text = "Puntos Salud:"
 
-[node name="SpinBoxHealthPoints" type="SpinBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="SpinBoxHealthPoints" type="SpinBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1922724772]
 layout_mode = 2
 
-[node name="Label6" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="Label6" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1424338289]
 layout_mode = 2
 text = "Explotable:"
 
-[node name="CheckBoxIsExploitable" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer"]
+[node name="CheckBoxIsExploitable" type="CheckBox" parent="MarginContainer/HBoxContainer/VBoxContainer/GridContainer" unique_id=1535941842]
 layout_mode = 2
 tooltip_text = "Cuando el recurso debe permanecer disponible por que da muchos recursos, ejemplo una mina"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer" unique_id=796505507]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="ButtonSave" type="TextureButton" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonSave" type="TextureButton" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=1520235587]
 layout_mode = 2
 texture_normal = ExtResource("2_iygqm")
 script = ExtResource("3_2rugs")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="ButtonDelete" type="TextureButton" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonDelete" type="TextureButton" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=307214167]
 layout_mode = 2
 texture_normal = ExtResource("4_2rugs")
 script = ExtResource("3_2rugs")

@@ -261,6 +261,10 @@ namespace GodotEcsArch.sources.utils
         }
         public static List<Color> GetUvAllFormatFromFrames(int idMaterial, bool mirrorX, bool mirrorY, FrameData[] frames )
         {
+            if (frames ==null)
+            {
+                return new List<Color>(); 
+            }
             var material = MaterialManager.Instance.GetMaterial(idMaterial);
             var offset = new Vector2(material.originXTextureMaster, material.originYTextureMaster);
 

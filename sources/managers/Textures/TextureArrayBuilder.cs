@@ -6,9 +6,134 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.managers.Textures;
+
+public struct TextureLocation
+{
+    public int ArrayIndex;
+    public int LayerIndex;
+
+    public TextureLocation(int arrayIndex, int layerIndex)
+    {
+        ArrayIndex = arrayIndex;
+        LayerIndex = layerIndex;
+    }
+    public bool IsValid()
+    {
+        return ArrayIndex >= 0 && LayerIndex >= 0;
+    }
+}
+public class TextureArrayManager
+{
+    public int MaxLayersPerArray = 256;
+
+    private List<TextureArrayBuilder> _builders = new();
+    private Dictionary<string, int> _nameToIndex = new();
+    private Dictionary<int, TextureLocation> _globalMap = new();
+    private int _nextIndex = 0;
+
+    public void SetTexture(string idName, int id, string path)
+    {
+        if (_nameToIndex.TryGetValue(idName, out int existingIndex))
+        {
+            if (existingIndex != id)
+            {
+                GD.PrintErr($"❌ ID inconsistente para {idName}: {existingIndex} vs {id}");
+                return;
+            }
+        }
+        else
+        {
+            _nameToIndex[idName] = id;
+        }
+
+        SetTexture(id, path);
+    }
+
+    public void SetTexture(string id, string path)
+    {
+        if (!_nameToIndex.TryGetValue(id, out int index))
+        {
+            index = _nextIndex++;
+            _nameToIndex[id] = index;
+        }
+
+        SetTexture(index, path);
+    }
+    public void SetTexture(int globalIndex, string path)
+    {
+        int builderIndex = globalIndex / MaxLayersPerArray;
+        int layerIndex = globalIndex % MaxLayersPerArray;
+
+        // Asegurar que exista el builder
+        while (_builders.Count <= builderIndex)
+        {
+            _builders.Add(new TextureArrayBuilder()
+            {
+                MaxLayers = MaxLayersPerArray
+            });
+        }
+
+        _builders[builderIndex].SetTextureAt(layerIndex, path);
+
+        _globalMap[globalIndex] = new TextureLocation(builderIndex, layerIndex);
+    }
+
+    public void BuildAll()
+    {
+        foreach (var builder in _builders)
+        {
+            builder.BuildAndApply();
+        }
+    }
+    public TextureArrayBuilder GetBuilder(string textureId)
+    {
+        if (!_nameToIndex.TryGetValue(textureId, out int index))
+            return null;
+
+        if (_globalMap.TryGetValue(index, out var location))
+        {
+            int builderIndex = location.ArrayIndex;
+
+            if (builderIndex >= 0 && builderIndex < _builders.Count)
+                return _builders[builderIndex];
+        }
+
+        return null;
+    }
+    public TextureLocation GetLocation(string textureId)
+    {
+        if (!_nameToIndex.TryGetValue(textureId, out int index))
+            return new TextureLocation(-1, -1);
+
+        if (_globalMap.TryGetValue(index, out var location))
+            return location;
+
+        return new TextureLocation(-1, -1);
+    }
+    public TextureLocation GetLocation(int globalIndex)
+    {
+        if (_globalMap.TryGetValue(globalIndex, out var location))
+            return location;
+
+        return new TextureLocation(-1, -1);
+    }
+
+    public TextureArrayBuilder GetBuilder(int index)
+    {
+        if (index < 0 || index >= _builders.Count)
+            return null;
+
+        return _builders[index];
+    }
+    public IReadOnlyList<TextureArrayBuilder> GetBuilders()
+    {
+        return _builders;
+    }
+}
 public class TextureArrayBuilder
 {
     public ShaderMaterial TargetMaterial;
+    public int MaxLayers = 256;
     public Mesh mesh { get; set; }
     public string ShaderUniformName = "mtexture_array";
     public Vector2I TargetSize = new Vector2I(4096, 4096);
@@ -77,7 +202,7 @@ public class TextureArrayBuilder
         if (TargetMaterial != null)
         {
             TargetMaterial.SetShaderParameter(ShaderUniformName, textureArray);
-            mesh = MeshCreator.CreateSquareMesh(16, 16, new Vector2(0, 0), new Vector3(0, 0, 0));
+            mesh = (Mesh)MeshCreator.GetBaseMesh().Duplicate();
             mesh.SurfaceSetMaterial(0, TargetMaterial);
 
             GD.Print($"✅ Texture2DArray aplicado a '{ShaderUniformName}' con {maxIndex + 1} capas.");

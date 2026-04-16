@@ -24,14 +24,15 @@ public partial class WindowProjectile : Window, IFacadeWindow<BulletData>
     {
         objectData = data;
         LineEditName.Text = objectData.name;
-       ControlSpriteBasico.SetData(objectData.spriteData);       
+
+        ControlTileSpriteItem.SetIdTile(objectData.idTileSprite);
     }
     private void ButtonSave_Pressed()
     {
         objectData.name = LineEditName.Text;
-        objectData.spriteData = ControlSpriteBasico.ObjectData;   
-        TextureHelper.RecalulateUVFormat(objectData.spriteData);
+        objectData.idTileSprite = ControlTileSpriteItem.GetidTile();        
         DataBaseManager.Instance.InsertUpdate(objectData);
+        MasterDataManager.UpdateRegisterData(objectData.id, objectData);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }

@@ -163,5 +163,19 @@ namespace GodotEcsArch.sources.managers.Collision
                 position + new Godot.Vector2( half.X,  half.Y)
             };
         }
+
+        public List<Godot.Vector2> GetVerticesList(Godot.Vector2 position)
+        {
+            Godot.Vector2 size = new Godot.Vector2(widthPixel, heightPixel);
+            Godot.Vector2 half = size / 2f;
+            return new List<Godot.Vector2>
+            {
+                position +OriginCurrent  + new Godot.Vector2(-half.X, -half.Y),
+                position +OriginCurrent+ new Godot.Vector2( half.X, -half.Y),                
+                position +OriginCurrent+ new Godot.Vector2( half.X,  half.Y),
+                position +OriginCurrent+ new Godot.Vector2(-half.X,  half.Y)
+            };
+
+        }
     }
 }

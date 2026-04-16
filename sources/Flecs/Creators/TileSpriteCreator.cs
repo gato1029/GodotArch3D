@@ -15,9 +15,12 @@ namespace GodotEcsArch.sources.Flecs.Creators;
 public class TileSpriteCreator:SingletonBase<TileSpriteCreator>
 {
 
-    public Entity CreateSingleSprite(SpriteData spriteData, Vector2 WorldPosition, Vector2I tilePosition, int renderLayer = 0)
+    public Entity CreateSingleSprite(FlecsManager flecsManager, SpriteData spriteData, Vector2 WorldPosition, Vector2I tilePosition, int renderLayer = 0)
     {
-
+        if (flecsManager==null)
+        {
+            return default;
+        }
         var instance = MultimeshManager.Instance.CreateInstance(spriteData.idMaterial);
 
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
@@ -26,18 +29,22 @@ public class TileSpriteCreator:SingletonBase<TileSpriteCreator>
 
         Godot.Vector2 originOffset = spriteData.offsetInternal;
 
-        var entity = FlecsManager.Instance.WorldFlecs.Entity();
+        var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
         entity.Set(new RenderGPUComponent(instance.rid, instance.instance, instance.material, instance.layerTexture, renderLayer, spriteData.yDepthRender, 1, originOffset));
         var uv = spriteData.GetUv();
         entity.Set(new RenderFrameDataComponent { uvMap = uv});
-        entity.Set(new PositionComponent { position = WorldPosition, tilePosition = tilePosition });
+        entity.Set(new PositionComponent { position = WorldPosition, tilePosition = tilePosition, height=10 });
 
         return entity;
     }
 
-    internal Entity CreateSingleSprite(TileSpriteData tileSpriteData, Vector2 WorldPosition, Vector2I tilePosition, int renderLayer)
+    internal Entity CreateSingleSprite(FlecsManager flecsManager, TileSpriteData tileSpriteData, Vector2 WorldPosition, Vector2I tilePosition, int renderLayer)
     {
+        if (flecsManager == null)
+        {
+            return default;
+        }
         (Rid rid, int instance, int material, int layerTexture) instance = default;
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
         Godot.Vector2 originOffset = Vector2.Zero;
@@ -74,11 +81,11 @@ public class TileSpriteCreator:SingletonBase<TileSpriteCreator>
                 break;
         }
 
-        var entity = FlecsManager.Instance.WorldFlecs.Entity();
+        var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
         entity.Set(new RenderGPUComponent(instance.rid, instance.instance, instance.material, instance.layerTexture, renderLayer, yDepthRender, 1, originOffset));
         entity.Set(new RenderFrameDataComponent { uvMap = uv });
-        entity.Set(new PositionComponent { position = WorldPosition, tilePosition = tilePosition });
+        entity.Set(new PositionComponent { position = WorldPosition, tilePosition = tilePosition, height = 10 });
         return entity;
        
 

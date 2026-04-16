@@ -446,47 +446,47 @@ internal class DebugerSystem : BaseSystem<World, float>
 
     private void DebugTiles()
     {
-        foreach (var item in CollisionManager.Instance.tileColliders.cellMap)
-        {
-            foreach (var item2 in item.Value)
-            {
-                var tileInfo = TilesManager.Instance.GetTileData(item2.Value.IdTile);
+        //foreach (var item in CollisionManager.Instance.tileColliders.cellMap)
+        //{
+        //    foreach (var item2 in item.Value)
+        //    {
+        //        var tileInfo = TilesManager.Instance.GetTileData(item2.Value.IdTile);
 
-                GeometricShape2D collisionB = tileInfo.collisionBody;
-                //GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
-                if (collisionB is Rectangle)
-                {
-                    float scale = tileInfo.scale;
-                    Rectangle shape = (Rectangle)collisionB;
-                    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
-                    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
-                    transform3DShape.Origin = new Vector3(item2.Value.PositionCollider.X, item2.Value.PositionCollider.Y , 1);
+        //        GeometricShape2D collisionB = tileInfo.collisionBody;
+        //        //GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
+        //        if (collisionB is Rectangle)
+        //        {
+        //            float scale = tileInfo.scale;
+        //            Rectangle shape = (Rectangle)collisionB;
+        //            Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+        //            transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
+        //            transform3DShape.Origin = new Vector3(item2.Value.PositionCollider.X, item2.Value.PositionCollider.Y , 1);
 
-                    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
-                }
-            }            
-        }
-        foreach (var item in CollisionManager.Instance.spriteColliders.cellMap)
-        {
-            foreach (var item2 in item.Value)
-            {
+        //            DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
+        //        }
+        //    }            
+        //}
+        //foreach (var item in CollisionManager.Instance.spriteColliders.cellMap)
+        //{
+        //    foreach (var item2 in item.Value)
+        //    {
 
-                //var tileInfo = item2.Value.GetSpriteData();
+        //        //var tileInfo = item2.Value.GetSpriteData();
 
-                //GeometricShape2D collisionB = tileInfo.collisionBody;
-                ////GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
-                //if (collisionB is Rectangle)
-                //{
-                //    float scale = tileInfo.scale;
-                //    Rectangle shape = (Rectangle)collisionB;
-                //    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
-                //    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
-                //    transform3DShape.Origin = new Vector3(item2.Value.positionCollider.X, item2.Value.positionCollider.Y, 1);
+        //        //GeometricShape2D collisionB = tileInfo.collisionBody;
+        //        ////GeometricShape2D collision = tileInfo.collisionBody;// itemInternal.Value.collisionBody;
+        //        //if (collisionB is Rectangle)
+        //        //{
+        //        //    float scale = tileInfo.scale;
+        //        //    Rectangle shape = (Rectangle)collisionB;
+        //        //    Transform3D transform3DShape = new Transform3D(Basis.Identity, Vector3.Zero);
+        //        //    transform3DShape = transform3DShape.Scaled(new Vector3(shape.Width * scale, shape.Height * scale, 1));
+        //        //    transform3DShape.Origin = new Vector3(item2.Value.positionCollider.X, item2.Value.positionCollider.Y, 1);
 
-                //    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
-                //}
-            }
-        }
+        //        //    DebugDraw.Quad(transform3DShape, 1, Colors.DarkRed, 100.0f);
+        //        //}
+        //    }
+        //}
     }
 }
 

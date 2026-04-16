@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.managers.serializer;
@@ -93,7 +94,7 @@ public class MapLevelData
     // luego agregar tiles para miniatura y posiciones de entrada
     
     [ProtoIgnore, JsonIgnore]
-    public TerrainMap terrainMap { get; set; }
+    public MapTerrain terrainMap { get; set; }
 
     [ProtoIgnore, JsonIgnore]
     public ResourceSourceMap resourceSourceMap { get; set; }
@@ -104,6 +105,8 @@ public class MapLevelData
     [ProtoIgnore, JsonIgnore]
     public MapBuildings mapBuildings { get; set; }
     // buildsMap buildsMap;
+
+    public BlackyWorld blackyWorldMap;
 
     public MapLevelData(string name, Vector2I size, MapType mapType, int layer, string description, bool unlimit =false)
     {
@@ -118,7 +121,7 @@ public class MapLevelData
         string pathCarpet = FileHelper.GetPathGameDB(path);
         pathCurrentCarpet = pathCarpet;
         
-        terrainMap = new TerrainMap(pathCurrentCarpet + "/InternalData", layer);
+        terrainMap = new MapTerrain(pathCurrentCarpet , layer);
         resourceSourceMap = new ResourceSourceMap(pathCurrentCarpet + "/InternalData", layer);
         mapBuildings = new MapBuildings(pathCurrentCarpet + "/InternalData", layer);
         //----
@@ -128,15 +131,14 @@ public class MapLevelData
         
         //mapResources = new MapResources(pathCurrentCarpet+"/InternalData", layer + 1);      
 
-
+        blackyWorldMap = new BlackyWorld(32, 4,797864 , size, new BlackyChunkOccupancyMap(3,32),ChunkManager.Instance.tiles16X16);
     }
     public void SaveAll()
     {
-        SerializerManager.SaveToFileJson(this, pathCurrentCarpet, "Data");
-        
+        SerializerManager.SaveToFileJson(this, pathCurrentCarpet, "Data");        
         terrainMap.SaveAllMap();
         //resourceSourceMap.SaveAllMap();
-        mapBuildings.SaveAllMap();
+    //    mapBuildings.SaveAllMap();
        // mapResources.SaveAllMap();
     }
     public void AddMap(Vector2 positionIn, string pathNewMap)

@@ -218,50 +218,94 @@ public partial class TileGridNode2d : Node2D
         return localPos.X >= 0 && localPos.X <= imageSize.X &&
                localPos.Y >= 0 && localPos.Y <= imageSize.Y;
     }
+    private List<Vector2I> GetCellsInsideArea(Vector2I start, Vector2I end)
+    {
+        List<Vector2I> cells = new List<Vector2I>();
 
+        int startX = Mathf.Min(start.X, end.X);
+        int startY = Mathf.Min(start.Y, end.Y);
+        int endX = Mathf.Max(start.X, end.X);
+        int endY = Mathf.Max(start.Y, end.Y);
+
+        for (int x = startX; x <= endX; x++)
+            for (int y = startY; y <= endY; y++)
+                cells.Add(new Vector2I(x, y));
+
+        return cells;
+    }
+
+    private bool clickJustPressed = false;
+    private Vector2 clickStartMousePos;
+    private const float dragThreshold = 4f; // píxeles de movimiento para considerar drag
     public override void _Input(InputEvent @event)
     {
-        if (@event is InputEventMouseButton mouseEvent2 && mouseEvent2.ButtonIndex == MouseButton.Right)
+        // CLICK DERECHO limpia selección (MultiTile)
+        if (@event is InputEventMouseButton right && right.ButtonIndex == MouseButton.Right && right.Pressed)
         {
-            if (mouseEvent2.Pressed)
-            {
-                if (selectionMode == SelectionMode.MultiTile)
-                {
-                    ClearMultiSelection();
-                }
-            }
+            if (selectionMode == SelectionMode.MultiTile)
+                ClearMultiSelection();
         }
 
-        if (@event is InputEventMouseButton mouseEvent && mouseEvent.ButtonIndex == MouseButton.Left)
+        // CLICK IZQUIERDO
+        if (@event is InputEventMouseButton mouse && mouse.ButtonIndex == MouseButton.Left)
         {
-            if (mouseEvent.Pressed)
+            if (mouse.Pressed)
             {
                 Vector2 localMouse = GetMouseLocalToTexture();
                 if (!IsMouseInsideTexture(localMouse)) return;
 
+                clickJustPressed = true;
+                clickStartMousePos = localMouse;
+
+                Vector2I cell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
+
                 if (selectionMode == SelectionMode.SingleArea)
                 {
-                    dragStartCell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
-                    dragEndCell = dragStartCell;
+                    dragStartCell = dragEndCell = cell;
                     isDragging = true;
-                    QueueRedraw();
                 }
                 else if (selectionMode == SelectionMode.MultiTile)
                 {
-                    Vector2I cell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
-                    if (!multiSelectedTiles.Contains(cell))
-                        multiSelectedTiles.Add(cell);
-                    else
-                        multiSelectedTiles.Remove(cell); // toggle
-                    QueueRedraw();
-                    // 🔔 Notificar cada cambio en selección múltiple
+                    // Prepararnos para posible drag; no asumimos drag hasta que se mueva suficiente
+                    dragStartCell = dragEndCell = cell;
+                    isDragging = false;
+                }
+
+                QueueRedraw();
+            }
+            else // MOUSE UP
+            {
+                // Si estábamos haciendo drag en MultiTile, notificamos lista final
+                if (isDragging && selectionMode == SelectionMode.MultiTile)
+                {
                     OnNotifyMultiSelection?.Invoke(GetSelectedFrames());
                 }
-            }
-            else
-            {
-                isDragging = false;
-                // 🔔 Solo notificar al soltar en modo SingleArea
+                else if (clickJustPressed && selectionMode == SelectionMode.MultiTile)
+                {
+                    // CLICK SIMPLE en MultiTile -> toggle o añadir si Ctrl
+                    Vector2 localMouse = GetMouseLocalToTexture();
+                    Vector2I cell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
+
+                    bool isCtrl = Input.IsKeyPressed(Key.Ctrl);
+                    if (isCtrl)
+                    {
+                        // CTRL + CLICK -> siempre agregar (permitir duplicados)
+                        multiSelectedTiles.Add(cell);
+                    }
+                    else
+                    {
+                        // Click normal -> toggle
+                        if (!multiSelectedTiles.Contains(cell))
+                            multiSelectedTiles.Add(cell);
+                        else
+                            multiSelectedTiles.Remove(cell);
+                    }
+
+                    OnNotifyMultiSelection?.Invoke(GetSelectedFrames());
+                    QueueRedraw();
+                }
+
+                // IMPORTANTE: SingleArea notifica siempre al soltar (mantener comportamiento original)
                 if (selectionMode == SelectionMode.SingleArea)
                 {
                     int startX = Mathf.Min(dragStartCell.X, dragEndCell.X);
@@ -276,22 +320,52 @@ public partial class TileGridNode2d : Node2D
 
                     OnNotifySelection?.Invoke(px, py, w, h);
                 }
+
+                clickJustPressed = false;
+                isDragging = false;
             }
         }
-        else if (@event is InputEventMouseMotion motionEvent)
+        // MOUSE MOTION
+        else if (@event is InputEventMouseMotion motion)
         {
-            if (selectionMode == SelectionMode.SingleArea && isDragging)
+            if (selectionMode == SelectionMode.MultiTile)
+            {
+                if (clickJustPressed)
+                {
+                    Vector2 localMouse = GetMouseLocalToTexture();
+                    if (localMouse.DistanceTo(clickStartMousePos) > dragThreshold)
+                    {
+                        isDragging = true;
+                        clickJustPressed = false;
+                    }
+                }
+
+                if (isDragging)
+                {
+                    Vector2 localMouse = GetMouseLocalToTexture();
+                    if (IsMouseInsideTexture(localMouse))
+                    {
+                        dragEndCell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
+
+                        // Obtener todas las celdas en el rectángulo y reemplazar selección
+                        multiSelectedTiles = GetCellsInsideArea(dragStartCell, dragEndCell);
+
+                        QueueRedraw();
+                    }
+                }
+            }
+            else if (selectionMode == SelectionMode.SingleArea && isDragging)
             {
                 Vector2 localMouse = GetMouseLocalToTexture();
                 if (IsMouseInsideTexture(localMouse))
                 {
                     dragEndCell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
                     QueueRedraw();
-
                 }
             }
         }
     }
+
 
     internal void SetSizeLineGrid(float zoom)
     {

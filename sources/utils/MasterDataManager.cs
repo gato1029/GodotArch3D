@@ -22,6 +22,12 @@ public sealed class MasterDataManager
     // 🧱 Constructor privado: evita instanciación externa
     private MasterDataManager() { }
 
+    public static void RegisterAllData<TKey, TValue>()
+    where TValue : class
+    {
+        Instance.GetManager<TKey, TValue>().RegisterAllData();
+    }
+
     // 🔧 Obtiene o crea el DataManager correcto
     private DataManager<TKey, TValue> GetManager<TKey, TValue>() where TValue : class
     {
@@ -65,5 +71,30 @@ public sealed class MasterDataManager
         else
             throw new ArgumentException($"Tipo de clave no soportado: {id.GetType()}");
     }
+
+    public static TValue GetBySaveIds<TValue>( ushort idSave, ushort groupingSave = 0)
+    where TValue : class
+    {
+        return Instance
+            .GetManager<long, TValue>()
+            .GetBySaveIds(groupingSave, idSave);
+    }
+    public static DataManager<TKey, TValue> GetDataManager<TKey, TValue>()
+    where TValue : class
+    {
+        return Instance.GetManager<TKey, TValue>();
+    }
+
+    public static IEnumerable<TKey> GetAllIds<TKey, TValue>()
+        where TValue : class
+    {
+        return Instance.GetManager<TKey, TValue>().GetAllIds();
+    }
+    public static IEnumerable<TValue> GetAllData<TKey, TValue>()
+    where TValue : class
+    {
+        return Instance.GetManager<TKey, TValue>().GetAllData();
+    }
+
     public static void ClearAll() => Instance._managers.Clear();
 }

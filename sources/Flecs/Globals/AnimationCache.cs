@@ -1,5 +1,7 @@
 using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotFlecs.sources.Flecs.Components;
 using System;
@@ -11,29 +13,29 @@ using System.Threading.Tasks;
 namespace GodotFlecs.sources.Flecs.Globals;
 internal static class AnimationCache
 {
-    public static  AnimationData GetAnimation( long idLong, EntityType entityType,
-        int state,
+    public static  SpriteAnimationData GetAnimation( long idLong, EntityType entityType,
+        AnimationType animationType,
         DirectionComponent dir)
-    {
-        int id = (int)idLong;
+    {           
         switch (entityType)
         {
             case EntityType.PERSONAJE:
                 {
-                    var model = CharacterModelManager.Instance.GetCharacterModel(id);
-                    var animState = model.animationCharacterBaseData.animationDataArray[state];
-                    var animData = animState.animationData[(int)dir.animationDirection];
+                    var model = MasterDataManager.GetData<TileSpriteData>(idLong).spriteMultipleAnimationDirection;
+                    var animState = model.animationsTypes[animationType];  // model.animationCharacterBaseData.animationDataArray[stateAnimation];
+                    var animData = animState.animations[dir.animationDirection];
                     return animData;
-                }            
+                }
             case EntityType.ACCESORIO:
-                {                    
-                    var model = AccesoryManager.Instance.GetAccesory(id);
-                    var animState = model.accesoryAnimationBodyData.animationStateData;
-                    var animData = animState.animationData[(int)dir.animationDirection];
+                {
+                    var model = MasterDataManager.GetData<TileSpriteData>(idLong).spriteMultipleAnimationDirection;
+                    var animState = model.animationsTypes[ AnimationType.ARMA_ATACANDO];  // model.animationCharacterBaseData.animationDataArray[stateAnimation];
+                    var animData = animState.animations[dir.animationDirection];
                     return animData;
-                }                
+
+                }
             default:
-                throw new InvalidOperationException($"EntityType {id} no soportado para animación.");
+                throw new InvalidOperationException($"EntityType {idLong} no soportado para animación.");
         }
     }
 }

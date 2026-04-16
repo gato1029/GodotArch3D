@@ -17,7 +17,7 @@ public partial class ControlElements : HBoxContainer
 
     public ElementsData GetData()
     {
-        elementData.type = (ElementType)optionButtonCombo.GetSelectableItem();
+        elementData.type = (ElementType)optionButtonCombo.GetSelectedId();
         elementData.value = (float) spinBoxValue.Value;
         return elementData;
     }
@@ -41,7 +41,8 @@ public partial class ControlElements : HBoxContainer
 
     private void OptionButtonCombo_ItemSelected(long index)
     {
-        optionButtonCombo.GetItemIndex((int)index);
+        elementData.type = (ElementType)optionButtonCombo.GetItemIndex((int)index);
+
     }
 
     private void SpinBoxValue_ValueChanged(double value)

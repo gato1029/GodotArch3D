@@ -53,7 +53,7 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
         }
 
        CheckBoxAnimationBody.Pressed += CheckBoxAnimationBody_Pressed;
-       CheckBoxAnimationTiles.Pressed += CheckBoxAnimationTiles_Pressed;
+       
         CheckBoxRequeriment.Pressed += CheckBoxRequeriment_Pressed;
 
         objectData = new AccessoryData();
@@ -74,7 +74,10 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
         TextEditDescription.Text = p_ObjectData.description ?? "";
 
         // Miniatura
-        ControlMiniatura.SetData(p_ObjectData.miniatureData);
+        ControlTile.SetData(objectData.miniatureData.idMaterial, objectData.miniatureData.x,
+        objectData.miniatureData.y, objectData.miniatureData.widht, objectData.miniatureData.height);
+
+        //ControlMiniatura.SetData(p_ObjectData.miniatureData);
         
         // Enums
         OptionButtonClassAccesory.Select((int)p_ObjectData.accesoryClassType);
@@ -82,28 +85,14 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
         OptionButtonTypeAccesory.Select((int)p_ObjectData.accesoryType);
 
         // Checkboxes
-        CheckBoxAnimationTiles.ButtonPressed = p_ObjectData.hasAnimationTile;
+        
         CheckBoxAnimationBody.ButtonPressed = p_ObjectData.hasBodyAnimation;
         CheckBoxRequeriment.ButtonPressed = p_ObjectData.hasRequirements;
 
-        // Animaciones
-        if (p_ObjectData.hasAnimationTile && p_ObjectData.animationTilesData != null)
-        {
-            controlAnimationTiles = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAnimationAccesory.tscn").Instantiate<ControlAnimationAccesory>();
-            controlAnimationTiles.Name = "Control Animacion Tiles";
-            TabContainerControl.AddChild(controlAnimationTiles);
-            controlAnimationTiles.SetData( p_ObjectData.animationTilesData);
-        }
+        ControlTileSpriteData.SetIdTile(objectData.idTileSpriteData);        
 
-        if (p_ObjectData.hasBodyAnimation && p_ObjectData.idBodyAnimationBaseData > 0)
-        {
-            controlAnimationBody = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAccesoryAnimationBodyView.tscn").Instantiate<ControlAccesoryAnimationBodyView>();
-            controlAnimationBody.Name = "Control Animacion Body";
-            TabContainerControl.AddChild(controlAnimationBody);
 
-            controlAnimationBody.LoadById(p_ObjectData.idBodyAnimationBaseData);
-        }
-
+  
         // Requerimientos
         if (p_ObjectData.hasRequirements && p_ObjectData.requirementsData != null)
         {
@@ -130,35 +119,29 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
     {
 
         
+
         objectData.colorBase = ColorPickerButtonColorBase.Color.ToString();
         objectData.name = LineEditName.Text;
         objectData.description = TextEditDescription.Text;
-
-        objectData.miniatureData =   ControlMiniatura.ObjectData;
+     
         objectData.accesoryClassType = (AccesoryClassType)OptionButtonClassAccesory.GetSelectedId();
         objectData.accesoryBodyPartType = (AccesoryBodyPartType)OptionButtonBodyAccesory.GetSelectedId();
         objectData.accesoryType = (AccesoryType)OptionButtonTypeAccesory.GetSelectedId();
    
-        objectData.hasAnimationTile = CheckBoxAnimationTiles.ButtonPressed;
+        //objectData.hasAnimationTile = CheckBoxAnimationTiles.ButtonPressed;
         objectData.hasBodyAnimation = CheckBoxAnimationBody.ButtonPressed;
         objectData.hasRequirements = CheckBoxRequeriment.ButtonPressed;
+        objectData.idTileSpriteData = ControlTileSpriteData.GetidTile();
 
-        if (objectData.hasAnimationTile)
-        {
-            objectData.animationTilesData = controlAnimationTiles.ObjectData;
-        }
-        else 
-        {
-            objectData.animationTilesData = null;
-        }
-        if (objectData.hasBodyAnimation)
-        {
-            objectData.idBodyAnimationBaseData = controlAnimationBody.ObjectData.id;
-        }
-        else
-        {
-            objectData.idBodyAnimationBaseData = 0;
-        }
+        var tileData = ControlTile.GetTileData();
+        
+        objectData.miniatureData.x = tileData.x;
+        objectData.miniatureData.y = tileData.y;
+        objectData.miniatureData.widht = tileData.width;
+        objectData.miniatureData.height = tileData.height;
+        objectData.miniatureData.idMaterial = tileData.idMaterial;
+
+ 
 
         if (objectData.hasRequirements)
         {
@@ -169,18 +152,18 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
             objectData.requirementsData = null;
         }
 
-        if (ControlDefensa.GetAllStats().Count>0)
+        if (ControlDefensa.GetAllData().Count>0)
         {
-            objectData.defenseDataArray = ControlDefensa.GetAllStats().ToArray();
+            objectData.defenseDataArray = ControlDefensa.GetAllData().ToArray();
         }
         else
         {
             objectData.defenseDataArray = null;
         }
 
-        if (ControlAtaque.GetAllStats().Count > 0)
+        if (ControlAtaque.GetAllData().Count > 0)
         {
-            objectData.damageDataArray = ControlAtaque.GetAllStats().ToArray();
+            objectData.damageDataArray = ControlAtaque.GetAllData().ToArray();
         }
         else
         {
@@ -226,31 +209,15 @@ public partial class AccessoryControl : Window, IFacadeWindow<AccessoryData>
     {
         if (CheckBoxAnimationBody.ButtonPressed)
         {
-
-            controlAnimationBody = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAccesoryAnimationBodyView.tscn").Instantiate<ControlAccesoryAnimationBodyView>();
-            controlAnimationBody.Name = "Control Animacion Body";
-            TabContainerControl.AddChild(controlAnimationBody);
+            ControlTileSpriteData.Visible = true;
         }
         else
         {
-            TabContainerControl.RemoveChild(controlAnimationBody);
+            ControlTileSpriteData.Visible = false;
         }
     }
 
-    private void CheckBoxAnimationTiles_Pressed()
-    {
-        if (CheckBoxAnimationTiles.ButtonPressed)
-        {
 
-            controlAnimationTiles = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlAnimationAccesory.tscn").Instantiate<ControlAnimationAccesory>();
-            controlAnimationTiles.Name = "Control Animacion Tiles";
-            TabContainerControl.AddChild(controlAnimationTiles);
-        }
-        else
-        {
-            TabContainerControl.RemoveChild(controlAnimationTiles);
-        }
-    }
 
     private void CheckBoxRequeriment_Pressed()
     {

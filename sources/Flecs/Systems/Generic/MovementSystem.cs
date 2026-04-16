@@ -31,8 +31,8 @@ public class MovementSystem : FlecsSystemBase
         {
             ref var pos = ref posArray[i];            
             ref var movExtra = ref moveExtraArray[i];
-            pos.position = movExtra.positionFuture;
-
+            //pos.position = movExtra.DesiredPosition;
+            pos.height = 4;
         }
     }
 }

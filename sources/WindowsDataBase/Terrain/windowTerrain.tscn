@@ -1,177 +1,141 @@
-[gd_scene load_steps=7 format=3 uid="uid://mjs3rteaolnp"]
+[gd_scene format=3 uid="uid://mjs3rteaolnp"]
 
 [ext_resource type="Script" uid="uid://bk23pa7h166gm" path="res://sources/WindowsDataBase/Terrain/WindowTerrain.cs" id="1_8ya2h"]
-[ext_resource type="PackedScene" uid="uid://ejurkjhryff8" path="res://sources/KuroTiles/ControlKuroAutoTile.tscn" id="2_8ya2h"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="2_xkaxx"]
 [ext_resource type="PackedScene" uid="uid://60m1n5h6qfwg" path="res://sources/KuroTiles/ControlListResourcesSources.tscn" id="3_4bkel"]
 [ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="3_amjs8"]
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="4_mu4o6"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="5_4bkel"]
 
-[node name="WindowTerrain" type="Window"]
+[node name="WindowTerrain" type="Window" unique_id=214238335]
 oversampling_override = 1.0
 title = "Terrain"
 initial_position = 2
-size = Vector2i(800, 580)
+size = Vector2i(800, 600)
 script = ExtResource("1_8ya2h")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1027816746]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
+[node name="TabContainer" type="TabContainer" parent="VBoxContainer" unique_id=1141672751]
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 1
+current_tab = 0
 
-[node name="Terreno" type="TabBar" parent="VBoxContainer/TabContainer"]
-visible = false
+[node name="Niveles" type="TabBar" parent="VBoxContainer/TabContainer" unique_id=2004089233]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="Panel" type="Panel" parent="VBoxContainer/TabContainer/Terreno"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/TabContainer/Niveles" unique_id=1302572557]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer" unique_id=131632288]
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-metadata/_edit_use_anchors_ = true
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TabContainer/Terreno/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-metadata/_edit_use_anchors_ = true
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer" unique_id=1975337598]
 layout_mode = 2
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer3"]
+[node name="Label" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer3" unique_id=1362885023]
 layout_mode = 2
 text = "Nombre:"
 
-[node name="LineEditName" type="LineEdit" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer3"]
+[node name="LineEditName" type="LineEdit" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer3" unique_id=1155144439]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer4" type="GridContainer" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer" unique_id=468041129]
+layout_mode = 2
+columns = 4
+
+[node name="Label" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=77366690]
+layout_mode = 2
+text = "Temperatura Minima:"
+
+[node name="SpinBoxTempMin" type="SpinBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1724728292]
+layout_mode = 2
+step = 0.1
+
+[node name="Label2" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=60366458]
+layout_mode = 2
+text = "Temperatura Maxima"
+
+[node name="SpinBoxTempMax" type="SpinBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1459523503]
+layout_mode = 2
+step = 0.1
+
+[node name="Label3" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1918438539]
+layout_mode = 2
+text = "Humedad Minima:"
+
+[node name="SpinBoxHumetyMin" type="SpinBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1205495654]
+layout_mode = 2
+step = 0.1
+
+[node name="Label4" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1092776236]
+layout_mode = 2
+text = "Humedad Maxima:"
+
+[node name="SpinBoxHumetyMax" type="SpinBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1478392474]
+layout_mode = 2
+step = 0.1
+
+[node name="Label5" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=511829648]
+layout_mode = 2
+text = "Bioma de Transicion:"
+
+[node name="CheckBoxTransicion" type="CheckBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=408274003]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Label6" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=681250615]
 layout_mode = 2
-columns = 2
+text = "Altura Inicial:"
 
-[node name="Label2" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="SpinBoxAltura" type="SpinBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=250077260]
 layout_mode = 2
-text = "Agua:"
+max_value = 3.0
 
-[node name="ControlAutoAgua" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("2_8ya2h")]
+[node name="Label7" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1735424353]
 layout_mode = 2
+text = "Es Agua:"
 
-[node name="Label3" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(85, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Tierra Nivel 1:"
-autowrap_mode = 2
-
-[node name="ControlAutoTierra1" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("2_8ya2h")]
+[node name="CheckBoxisWater" type="CheckBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=951252939]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(85, 0)
+[node name="Label8" type="Label" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=411266246]
 layout_mode = 2
-size_flags_horizontal = 0
-text = "Cesped Nivel 1:"
-autowrap_mode = 2
+text = "Extencion Borde:"
 
-[node name="ControlAutoCesped1" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("2_8ya2h")]
+[node name="SpinBoxBorde" type="SpinBox" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer/HBoxContainer4" unique_id=320326029]
 layout_mode = 2
+max_value = 3.0
 
-[node name="Label6" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(85, 0)
+[node name="ButtonAdd" type="TextureButton" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer" unique_id=1394739477]
 layout_mode = 2
-size_flags_horizontal = 0
-text = "Tierra Nivel 2:"
-autowrap_mode = 2
+texture_normal = ExtResource("2_xkaxx")
+script = ExtResource("4_mu4o6")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="ControlAutoTierra2" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("2_8ya2h")]
+[node name="VBoxContainerTerrain" type="VBoxContainer" parent="VBoxContainer/TabContainer/Niveles/ScrollContainer/VBoxContainer" unique_id=1160803149]
 layout_mode = 2
+size_flags_horizontal = 4
 
-[node name="Label5" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(85, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Cesped Nivel 2:"
-autowrap_mode = 2
-
-[node name="ControlAutoCesped2" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("2_8ya2h")]
-layout_mode = 2
-
-[node name="GridContainer2" type="GridContainer" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-columns = 2
-
-[node name="Label3" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
-custom_minimum_size = Vector2(85, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Adornos Cesped:"
-autowrap_mode = 2
-
-[node name="ControlAutoAdornoCesped" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2_8ya2h")]
-layout_mode = 2
-
-[node name="Label4" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
-custom_minimum_size = Vector2(85, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Adornos Tierra:"
-autowrap_mode = 2
-
-[node name="ControlAutoAdornosTierra" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2_8ya2h")]
-layout_mode = 2
-
-[node name="Label5" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
-custom_minimum_size = Vector2(85, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Adorno Agua:"
-autowrap_mode = 2
-
-[node name="ControlAutoAdornoAgua" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2_8ya2h")]
-layout_mode = 2
-
-[node name="Label6" type="Label" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2"]
-custom_minimum_size = Vector2(85, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Elevacion Tierra Nivel2:"
-autowrap_mode = 2
-
-[node name="ControlAutoElevacionTierraNivel2" parent="VBoxContainer/TabContainer/Terreno/Panel/MarginContainer/VBoxContainer/HBoxContainer/GridContainer2" instance=ExtResource("2_8ya2h")]
-layout_mode = 2
-
-[node name="Fuente Recursos" type="TabBar" parent="VBoxContainer/TabContainer"]
+[node name="Fuente Recursos" type="TabBar" parent="VBoxContainer/TabContainer" unique_id=780823017]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TabContainer/Fuente Recursos"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TabContainer/Fuente Recursos" unique_id=113797591]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -184,69 +148,69 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 metadata/_edit_use_anchors_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer" unique_id=1864910758]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer" unique_id=251793433]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1233126287]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="Label3" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="Label3" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1835146287]
 custom_minimum_size = Vector2(85, 0)
 layout_mode = 2
 size_flags_horizontal = 0
-text = "Tierra Nivel 1:"
+text = "Nivel 0:"
 autowrap_mode = 2
 
-[node name="RecursosTierraNivel1" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("3_4bkel")]
+[node name="RecursosNivel0" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1522269323 instance=ExtResource("3_4bkel")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label4" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="Label4" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=827857544]
 custom_minimum_size = Vector2(85, 0)
 layout_mode = 2
 size_flags_horizontal = 0
-text = "Cesped Nivel 1:"
+text = "Nivel 1:"
 autowrap_mode = 2
 
-[node name="RecursosCespedNivel1" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("3_4bkel")]
+[node name="RecursosNivel1" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1075412465 instance=ExtResource("3_4bkel")]
 layout_mode = 2
 
-[node name="Label6" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="Label6" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=170686162]
 custom_minimum_size = Vector2(85, 0)
 layout_mode = 2
 size_flags_horizontal = 0
-text = "Tierra Nivel 2:"
+text = "Nivel 2:"
 autowrap_mode = 2
 
-[node name="RecursosTierraNivel2" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("3_4bkel")]
+[node name="RecursosNivel2" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=122726668 instance=ExtResource("3_4bkel")]
 layout_mode = 2
 
-[node name="Label5" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="Label7" type="Label" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=168041071]
 custom_minimum_size = Vector2(85, 0)
 layout_mode = 2
 size_flags_horizontal = 0
-text = "Cesped Nivel 2:"
+text = "Nivel 3:"
 autowrap_mode = 2
 
-[node name="RecursosCespedNivel2" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" instance=ExtResource("3_4bkel")]
+[node name="RecursosNivel3" parent="VBoxContainer/TabContainer/Fuente Recursos/MarginContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1906146476 instance=ExtResource("3_4bkel")]
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=1913562206]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="ButtonSave" type="TextureButton" parent="VBoxContainer/HBoxContainer2"]
+[node name="ButtonSave" type="TextureButton" parent="VBoxContainer/HBoxContainer2" unique_id=256921966]
 layout_mode = 2
 texture_normal = ExtResource("3_amjs8")
 script = ExtResource("4_mu4o6")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="ButtonDelete" type="TextureButton" parent="VBoxContainer/HBoxContainer2"]
+[node name="ButtonDelete" type="TextureButton" parent="VBoxContainer/HBoxContainer2" unique_id=814223302]
 layout_mode = 2
 texture_normal = ExtResource("5_4bkel")
 script = ExtResource("4_mu4o6")

@@ -277,7 +277,7 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
             mat.originYTextureMaster = placement.Y;
             DataBaseManager.Instance.InsertUpdateLog(mat, mat.id);
 
-            NormalizeSpriteTiles(mat, placement);
+            //NormalizeSpriteTiles(mat, placement);
         }
 
         TextureMasterData textureMasterData = new TextureMasterData();
@@ -461,42 +461,42 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
 
     private void NormalizeSpriteAnimation(MaterialData idMaterial, InsertResult placement) 
     {
-        var expression = BsonExpression.Create("animationTilesData.idMaterial = @0", idMaterial.id);
-        var listData = DataBaseManager.Instance.FindAllFilter<AccessoryData>(expression);
+        //var expression = BsonExpression.Create("animationTilesData.idMaterial = @0", idMaterial.id);
+        //var listData = DataBaseManager.Instance.FindAllFilter<AccessoryData>(expression);
 
-        foreach (var item in listData)
-        {
+        //foreach (var item in listData)
+        //{
             
-            bool updated = false;
+        //    bool updated = false;
 
 
-            if (item.animationTilesData.idMaterial != idMaterial.id)
-                continue;
+        //    if (item.animationTilesData.idMaterial != idMaterial.id)
+        //        continue;
 
-            foreach (var frame in item.animationTilesData.framesArray)
-            {
-                var newRect = CalculatePixelUVInAtlas(
-                    new Rect2(frame.x, frame.y, frame.widht, frame.height),
-                    placement
-                );
+        //    foreach (var frame in item.animationTilesData.framesArray)
+        //    {
+        //        var newRect = CalculatePixelUVInAtlas(
+        //            new Rect2(frame.x, frame.y, frame.widht, frame.height),
+        //            placement
+        //        );
 
-                float newWidth = frame.widhtFormat < 0 ? -newRect.Size.X : newRect.Size.X;
-                float newHeight = frame.heightFormat < 0 ? -newRect.Size.Y : newRect.Size.Y;
+        //        float newWidth = frame.widhtFormat < 0 ? -newRect.Size.X : newRect.Size.X;
+        //        float newHeight = frame.heightFormat < 0 ? -newRect.Size.Y : newRect.Size.Y;
 
-                frame.xFormat = newRect.Position.X;
-                frame.yFormat = newRect.Position.Y;
-                frame.widhtFormat = newWidth;
-                frame.heightFormat = newHeight;
+        //        frame.xFormat = newRect.Position.X;
+        //        frame.yFormat = newRect.Position.Y;
+        //        frame.widhtFormat = newWidth;
+        //        frame.heightFormat = newHeight;
 
-                updated = true;
-            }
+        //        updated = true;
+        //    }
 
 
-            if (updated)
-            {
-                DataBaseManager.Instance.InsertUpdate(item);
-            }
-        }
+        //    if (updated)
+        //    {
+        //        DataBaseManager.Instance.InsertUpdate(item);
+        //    }
+        //}
     }
     private void NormalizeTiles(MaterialData idMaterial, InsertResult placement)
     {        

@@ -32,7 +32,7 @@ namespace GodotEcsArch.sources.managers
         }
         protected override void Initialize()
         {         
-            chunkDimencion = new Vector2I(8,8);
+            chunkDimencion = new Vector2I(32,32);
         }
 
         protected override void Destroy()

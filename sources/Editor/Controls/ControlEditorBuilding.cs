@@ -1,5 +1,6 @@
 using Godot;
-using GodotEcsArch.sources.Flecs.Globals;
+using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.Flecs.Creators;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Buildings;
 using GodotEcsArch.sources.managers.Maps;
@@ -41,10 +42,13 @@ public partial class ControlEditorBuilding : MarginContainer
 
     }
 
-
+    BlackyWorld blackyWorldMap;
     private void Instance_OnMapLevelDataChanged(MapLevelData data)
     {
         mapBase = data.mapBuildings;
+        blackyWorldMap = data.blackyWorldMap;
+        PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
     }
 
     private void LoadItems()
@@ -61,17 +65,24 @@ public partial class ControlEditorBuilding : MarginContainer
         for (int i = 0; i < result.Count; i++)
         {
             BuildingData item = result[i];
-            AtlasTexture atlasTexture = MaterialManager.Instance.GetAtlasTextureInternal(item.spriteData);
+            AtlasTexture atlasTexture = item.textureVisual;
             ItemListData.AddItem(item.name, atlasTexture);
             ItemListData.SetItemMetadata(i, item.id);
-        
+
         }
-        
+
     }
 
     private void ButtonRefresh_Pressed()
     {
         LoadItems();
+        if (objectSelected!=null)
+        {
+            var tileSprite = MasterDataManager.GetData<TileSpriteData>(objectSelected.idTileSpriteNormal);
+            Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
+            PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, tileSprite);
+        }
+        
     }
 
 
@@ -79,11 +90,15 @@ public partial class ControlEditorBuilding : MarginContainer
     private void ItemListData_ItemSelected(long index)
     {
         int idData = (int)ItemListData.GetItemMetadata((int)index);
-        this.objectSelected = BuildingManager.Instance.GetData(idData);
+        this.objectSelected = MasterDataManager.GetData<BuildingData>(idData);
 
         TextureRectImage.Texture = objectSelected.textureVisual;
+
         Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-       // PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
+        var tileSprite = MasterDataManager.GetData<TileSpriteData>( objectSelected.idTileSpriteNormal);
+
+        PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, tileSprite);
+        // PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, objectSelected.spriteData);
     }
 
     public override void _Input(InputEvent @event)
@@ -119,11 +134,16 @@ public partial class ControlEditorBuilding : MarginContainer
     {
         if (objectSelected != null && objectSelected.id != 0)
         {
-            foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
-            {
-                GlobalData.PendingBuildingQueue.Enqueue((tilePos, objectSelected.id));
-                //mapBase.AddUpdateTile(tilePos, objectSelected.id);
-            }
+            Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
+       
+            blackyWorldMap.Building.Create(objectSelected.id, mouseTile,true);
+
+            //GodotFlecs.sources.Flecs.Creators.BuildingCreator.Instance.Create(objectSelected.id,  mouseTile);
+            //foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
+            //{
+            //  //  GlobalData.PendingBuildingQueue.Enqueue((tilePos, objectSelected.id));
+            //    mapBase.AddUpdateTile(tilePos, objectSelected.id);
+            //}
         }
     }
 
@@ -131,11 +151,9 @@ public partial class ControlEditorBuilding : MarginContainer
     {
         if (objectSelected != null && objectSelected.id != 0)
         {
-            foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
-            {
-                mapBase.RemoveTile(tilePos, objectSelected.id);
-                
-            }
+            Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
+            blackyWorldMap.Building.Remove(mouseTile);
+            //GodotFlecs.sources.Flecs.Creators.BuildingCreator.Instance.RemoveTile(mouseTile);
         }
     }
 }

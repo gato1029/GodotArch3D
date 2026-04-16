@@ -1,6 +1,6 @@
 shader_type spatial;
 
-//render_mode unshaded;
+render_mode unshaded;
 //render_mode cull_back, depth_draw_opaque;
 
 render_mode cull_back, depth_draw_opaque, diffuse_burley, specular_schlick_ggx;
@@ -42,7 +42,7 @@ void vertex() {
 	// visible flag (1 = visible, 0 = invisible)
 	visible_flag = INSTANCE_CUSTOM.b; // PUEDES CAMBIARLO A .w SI USAS 4 CANALES
 	visible_flag2 = INSTANCE_CUSTOM.a;
-	
+
 	mirrorX = 0.0;
 	mirrorY = 0.0;
 
@@ -62,7 +62,7 @@ void vertex() {
 }
 
 void fragment() {
-	
+
 	// --------------------------------------
 	// 🔴 DEBUG 1: INSTANCIA INVISIBLE (visible_flag == 0)
 	// --------------------------------------
@@ -70,17 +70,17 @@ void fragment() {
 		// Color rojo intenso para detectar corrupción
 		ALBEDO = vec3(1.0, 0.1, 0.1);
 		ALPHA = 0.8;
-		
+
 	}
-	
+
 	if (anchoSubTexture == 0.0) {
 		if (debug_mode) {
 			ALBEDO = vec3(1.0, 0.0, 1.0); // magenta: ancho=0 → inconsistencia
-			ALPHA = 1.0;		
+			ALPHA = 1.0;
 		}else
 		{
-		discard; // Invisible marker	
-		}		
+		discard; // Invisible marker
+		}
 	}
 
 	// Adjust UV if mirrored

@@ -1,94 +1,75 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using RVO;
+using SadRogue.Primitives;
 using System;
 
-namespace GodotFlecs.sources.Flecs.Systems.Units
+namespace GodotFlecs.sources.Flecs.Systems.Units;
+
+public class MoveTargetSystem : FlecsSystemBase
 {
-    public class MoveTargetSystem : FlecsSystemBase
+    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override bool MultiThreaded => true;
+
+    protected override void BuildQuery(ref QueryBuilder qb)
     {
-        protected override ulong Phase => flecs.EcsOnUpdate;
-        protected override bool MultiThreaded => true;
-        protected override void BuildQuery(ref QueryBuilder qb)
-        {
-            qb.With<PositionComponent>()              
-              .With<VelocityComponent>()
-              .With<DirectionComponent>()
-              .With<MoveTargetComponent>()
-              .With<CharacterComponent>()
-              .With<MoveResolutorComponent>()
-              .Without<DeadTag>();
-        }
+        qb.With<PositionComponent>()          
+          .With<MoveTargetComponent>()
+          .With<Components.CharacterComponent>()
+          .With<SteeringComponent>() // <-- Añadido
+          .With<MoveResolutorComponent>()
+          .Without<DeadTag>();
+    }
 
-        protected override void OnIter(Iter it)
-        {
-            var posArray = it.Field<PositionComponent>(0);            
-            var velArray = it.Field<VelocityComponent>(1);            
-            var DirArray = it.Field<DirectionComponent>(2);
-            var targetArray = it.Field<MoveTargetComponent>(3);            
-            var chaArray = it.Field<CharacterComponent>(4);
-            var moveExtraArray = it.Field<MoveResolutorComponent>(5);
-            // 1️⃣ Sincronizar estado con el simulador
+    protected override void OnIter(Iter it)
+    {
+        var posArray = it.Field<PositionComponent>(0);
+        var targetArray = it.Field<MoveTargetComponent>(1);
+        var chaArray = it.Field<Components.CharacterComponent>(2);
+        var steeringArray = it.Field<SteeringComponent>(3); // <-- Añadido
+        var resolutorArray = it.Field<MoveResolutorComponent>(4);
 
-            for (int i = 0; i < it.Count(); i++)
+        for (int i = 0; i < it.Count(); i++)
+        {
+            ref var pos = ref posArray[i];
+            ref var target = ref targetArray[i];
+            ref var cha = ref chaArray[i];
+            ref var steering = ref steeringArray[i];
+            ref var resolutor = ref resolutorArray[i];
+
+            if (resolutor.BlockedTimer>1)
             {
-                var e = it.Entity(i);
-                ref var pos = ref posArray[i];
-                ref var target = ref targetArray[i];
-                ref var vel = ref velArray[i];          
-                ref var direc = ref DirArray[i];
+                steering.DesiredDir = Vector2.Zero;
+                resolutor.BlockedTimer = 0;
+                resolutor.Blocked = true;
+                cha.characterStateType = CharacterStateType.IDLE;
+                it.Entity(i).Remove<MoveTargetComponent>();
+                it.Entity(i).Add<SleepTag>();
+                continue;
+            }
+            Vector2 toTarget = target.Value - pos.position;
+            float distSq = toTarget.LengthSquared();
 
-                ref var cha = ref chaArray[i];
-                ref var moveExtra = ref moveExtraArray[i];
-                //if (cha.characterStateType != GodotEcsArch.sources.managers.Characters.CharacterStateType.MOVING)
-                //{
-                //    continue;
-                //}
-                // Si está bloqueado, no moverse
-                if (moveExtra.Blocked)
-                {
-                    target.Value = pos.position;
-                    vel.prefVel = Vector2.Zero;
-                    e.Remove<MoveTargetComponent>();
-                    
-                    //Simulator.Instance.setAgentMaxSpeed(id.Id, 0);
-                    //cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.IDLE;
-                    continue;
-                }
-
-                // Dirección hacia el objetivo
-                Vector2 dir = target.Value - pos.position;//  Simulator.Instance.getAgentPosition(id.Id);
-                // pos.position;
-                float distance = dir.Length();
-
-                direc.value = dir.Normalized();
-                direc.normalized = new Vector2(Math.Sign(dir.X), Math.Sign(dir.Y));
-                direc.animationDirection = CommonOperations.GetDirectionAnimationLeftRight(direc.normalized);
-
-                if (dir.Length() > 0.1f)
-                {
-                    vel.prefVel = dir.Normalized()* vel.MaxSpeed;
-                   // moveExtra.positionFuture += pos.position*vel.prefVel;
-                    //Simulator.Instance.setAgentPrefVelocity(id.Id, vel.prefVel);
-                    cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.MOVING;
-                 
-                }
-                else
-                {
-                    e.Remove<MoveTargetComponent>();
-                    //e.Remove<MoveResolutorComponent>();
-                    moveExtra.Blocked = true;
-                    vel.prefVel = Vector2.Zero;
-                    //Simulator.Instance.setAgentMaxSpeed(id.Id, 0);
-                    cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.IDLE;
-                }
-                           
+            if (distSq < 0.05f) // Umbral de llegada
+            {
+                resolutor.BlockedTimer = 0;
+                steering.DesiredDir = Vector2.Zero;
+                resolutor.Blocked = true;
+                cha.characterStateType = CharacterStateType.IDLE;
+                it.Entity(i).Remove<MoveTargetComponent>();
+                it.Entity(i).Add<SleepTag>();
+                continue;
             }
 
+            // Solo enviamos la DIRECCIÓN deseada al Steering
+            steering.DesiredDir = (toTarget).Normalized();
+            cha.characterStateType = CharacterStateType.MOVING;
         }
     }
 }

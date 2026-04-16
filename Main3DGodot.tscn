@@ -1,10 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://cmwumcvxxgnjl"]
+[gd_scene format=3 uid="uid://cmwumcvxxgnjl"]
 
 [ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_a2usr"]
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="2_xh56v"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_e6381"]
 [ext_resource type="Script" uid="uid://xfxpirr8k7b" path="res://sources/WindowsDataBase/HerramientaMenuBar.cs" id="3_kc28b"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="4_tksb4"]
+[ext_resource type="Texture2D" uid="uid://c5brcvag3uklm" path="res://resources/Textures/iconos/Image.png" id="5_kc28b"]
 [ext_resource type="PackedScene" uid="uid://ckwoyhgb501je" path="res://sources/Editor/Controls/EditorPanel.tscn" id="5_namcl"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
 [ext_resource type="Script" uid="uid://bnwmpmtuqvith" path="res://sources/Editor/ViewPortContainerEditor.cs" id="6_yxrc8"]
@@ -23,41 +24,40 @@ albedo_color = Color(0.8732984, 0.8732984, 0.8732984, 0.5019608)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yxrc8"]
 
-[node name="Main3dGodot" type="Node"]
+[node name="Main3dGodot" type="Node" unique_id=2058894889]
 
-[node name="Base" type="Node" parent="."]
+[node name="Base" type="Node" parent="." unique_id=656869099]
 
-[node name="mainArch" type="Node3D" parent="Base"]
+[node name="mainArch" type="Node3D" parent="Base" unique_id=1157692729]
 script = ExtResource("1_a2usr")
 
-[node name="Game" type="Node" parent="."]
+[node name="Game" type="Node" parent="." unique_id=809468821]
 
-[node name="Components" type="Node" parent="Game"]
+[node name="Components" type="Node" parent="Game" unique_id=2116661674]
 
-[node name="Grid" type="Node" parent="Game/Components"]
+[node name="Grid" type="Node" parent="Game/Components" unique_id=1787621564]
 
-[node name="grid" type="MeshInstance3D" parent="Game/Components/Grid"]
+[node name="grid" type="MeshInstance3D" parent="Game/Components/Grid" unique_id=1557273531]
 transform = Transform3D(1024, 0, 0, 0, 1024, 0, 0, 0, 1, 0, 0, -50)
 visible = false
 mesh = SubResource("QuadMesh_namcl")
 skeleton = NodePath("../../../../Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D")
 surface_material_override/0 = ExtResource("2_xh56v")
 
-[node name="center" type="MeshInstance3D" parent="Game/Components/Grid"]
-transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.198, 0.082, 2.474)
-visible = false
+[node name="center" type="MeshInstance3D" parent="Game/Components/Grid" unique_id=1771001052]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
 mesh = SubResource("SphereMesh_yxrc8")
 skeleton = NodePath("../../..")
 surface_material_override/0 = ExtResource("5_ong74")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="Game"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Game" unique_id=1550609064]
 environment = SubResource("Environment_xh56v")
 
-[node name="Editor" type="Node" parent="."]
+[node name="Editor" type="Node" parent="." unique_id=583536065]
 
-[node name="MainWindows" type="Node" parent="Editor"]
+[node name="MainWindows" type="Node" parent="Editor" unique_id=927104565]
 
-[node name="Control" type="Control" parent="Editor/MainWindows"]
+[node name="Control" type="Control" parent="Editor/MainWindows" unique_id=1540165402]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,7 +65,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="Editor/MainWindows/Control"]
+[node name="Panel" type="Panel" parent="Editor/MainWindows/Control" unique_id=2015671267]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -73,7 +73,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Editor/MainWindows/Control/Panel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Editor/MainWindows/Control/Panel" unique_id=1566321108]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -82,7 +82,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="Menu" type="MarginContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer"]
+[node name="Menu" type="MarginContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer" unique_id=1541769514]
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_constants/margin_left = 10
@@ -90,13 +90,13 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
 
-[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu" node_paths=PackedStringArray("viewportMainEditor")]
+[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu" unique_id=2052876277 node_paths=PackedStringArray("viewportMainEditor")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3_kc28b")
 viewportMainEditor = NodePath("../../HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport")
 
-[node name="Atlas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Atlas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1703351011]
 auto_translate_mode = 1
 item_count = 3
 item_0/text = "Materiales"
@@ -106,7 +106,7 @@ item_1/id = 1
 item_2/text = "Agrupadores"
 item_2/id = 2
 
-[node name="Creador Tiles" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Creador Tiles" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1018385119]
 auto_translate_mode = 2
 oversampling_override = 1.0
 title = "Menu Tiles"
@@ -117,7 +117,7 @@ item_0/id = 0
 item_1/text = "AutoTileSprite"
 item_1/id = 1
 
-[node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1127058186]
 auto_translate_mode = 1
 oversampling_override = 1.0
 size = Vector2i(200, 100)
@@ -129,11 +129,11 @@ item_1/text = "Visualizar Editor"
 item_1/checkable = 1
 item_1/id = 1
 
-[node name="Componentes" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Componentes" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=90285667]
 auto_translate_mode = 1
 oversampling_override = 1.0
 size = Vector2i(191, 143)
-item_count = 7
+item_count = 8
 item_0/text = "Recursos"
 item_0/id = 0
 item_1/text = "Terreno"
@@ -148,8 +148,11 @@ item_5/text = "Fuente Recursos"
 item_5/id = 5
 item_6/text = "Proyectiles"
 item_6/id = 6
+item_7/text = "Transicion Terreno"
+item_7/icon = ExtResource("5_kc28b")
+item_7/id = 7
 
-[node name="Armamento" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Armamento" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1905487791]
 auto_translate_mode = 1
 item_count = 2
 item_0/text = "Animacion Accesorios"
@@ -157,7 +160,7 @@ item_0/id = 0
 item_1/text = "Creacion Accesorios"
 item_1/id = 1
 
-[node name="Mapas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar"]
+[node name="Mapas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=604479288]
 auto_translate_mode = 1
 item_count = 2
 item_0/text = "Nuevo Mapa"
@@ -165,30 +168,30 @@ item_0/id = 0
 item_1/text = "Cargar Mapa"
 item_1/id = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer" unique_id=1751649261]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HSplitContainer" type="HSplitContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer" unique_id=705417108]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainerRidht" type="VBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer"]
+[node name="VBoxContainerRidht" type="VBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer" unique_id=322278580]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht" unique_id=1121266236]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="AnimatedPanelContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer" instance=ExtResource("5_namcl")]
+[node name="AnimatedPanelContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer" unique_id=1502952452 instance=ExtResource("5_namcl")]
 layout_mode = 2
 
-[node name="PanelContainer" type="Panel" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer"]
+[node name="PanelContainer" type="Panel" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer" unique_id=141419533]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer" unique_id=496205027]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -199,14 +202,14 @@ size_flags_horizontal = 3
 stretch = true
 script = ExtResource("6_yxrc8")
 
-[node name="SubViewport" type="SubViewport" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer" unique_id=1243047204]
 handle_input_locally = false
 size = Vector2i(817, 855)
 render_target_update_mode = 4
 
-[node name="Render" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport"]
+[node name="Render" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport" unique_id=1916277622]
 
-[node name="Sprite3D" type="Sprite3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+[node name="Sprite3D" type="Sprite3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=1143637456]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 20)
 visible = false
 cast_shadow = 2
@@ -214,27 +217,27 @@ alpha_cut = 2
 texture = ExtResource("7_yxrc8")
 region_rect = Rect2(16, 16, 128, 144)
 
-[node name="Camera3D" type="Camera3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+[node name="Camera3D" type="Camera3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=667132760]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 50)
 projection = 1
 current = true
 size = 10.0
 script = ExtResource("4_tksb4")
 MouseEdgeMargin = 5.0
-MinZoomSize = 10.0
+MinZoomSize = 5.0
 MaxZoomSize = 30.0
 
-[node name="center" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D"]
+[node name="center" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D" unique_id=330099772]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, -10)
 visible = false
 mesh = SubResource("SphereMesh_yxrc8")
 skeleton = NodePath("../../../../../../../../../../../../../../../Game")
 surface_material_override/0 = ExtResource("5_ong74")
 
-[node name="InputHandlerGame" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+[node name="InputHandlerGame" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=815912482]
 script = ExtResource("3_e6381")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=6226652]
 transform = Transform3D(0.98927236, 0.005098224, 0.14599404, 0, 0.99939084, -0.034899496, -0.14608303, 0.034525108, 0.98866975, 0, 0, 21)
 visible = false
 shadow_enabled = true
@@ -243,20 +246,20 @@ directional_shadow_split_2 = 0.001
 directional_shadow_split_3 = 0.001
 sky_mode = 1
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=1256161025]
 transform = Transform3D(40, 0, 0, 0, -4.371139e-08, -30, 0, 1, -1.3113416e-06, 0, 0, 19)
 visible = false
 material_override = SubResource("StandardMaterial3D_yxrc8")
 cast_shadow = 0
 mesh = SubResource("PlaneMesh_yxrc8")
 
-[node name="SpotLight3D" type="SpotLight3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+[node name="SpotLight3D" type="SpotLight3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=500058495]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 21)
 visible = false
 shadow_enabled = true
 spot_range = 83.952
 
-[node name="OmniLight3D" type="OmniLight3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render"]
+[node name="OmniLight3D" type="OmniLight3D" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=786566838]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 22)
 visible = false
 layers = 63

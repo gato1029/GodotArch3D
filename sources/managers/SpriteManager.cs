@@ -1,4 +1,6 @@
+using Arch.AOT.SourceGenerator;
 using Godot;
+using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,10 +8,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Arch.AOT.SourceGenerator;
-using static SpriteSimple;
-using static SpriteMultimesh;
 using System.Xml.Linq;
+using static SpriteMultimesh;
+using static SpriteSimple;
 
 
 [Component]
@@ -277,7 +278,7 @@ internal class SpriteAnimation
 
         Rid instanceRid = RenderingServer.InstanceCreate();
         RenderingServer.InstanceSetBase(instanceRid, multiMesh.GetRid());
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         atlasMultimesh.idMultimeshInstance = instanceRid;
 
@@ -383,7 +384,7 @@ internal class SpriteMultimesh
 
         Rid instanceRid = RenderingServer.InstanceCreate();
         RenderingServer.InstanceSetBase(instanceRid, multiMesh.GetRid());
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
 
         atlasMultimesh.idMultimeshInstance = instanceRid;
 
@@ -685,7 +686,7 @@ internal class SpriteManager:SingletonBase<SpriteManager>
         Rid materialRid = shaderMaterial.GetRid();
          
         RenderingServer.InstanceSetBase(instanceRid, meshRid);
-        RenderingServer.InstanceSetScenario(instanceRid, EcsManager.Instance.RidWorld3D);      
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);      
         //RenderingServer.MeshAddSurfaceFromArrays(meshRid, RenderingServer.PrimitiveType.Triangles, quad);        
         RenderingServer.MeshSurfaceSetMaterial(meshRid, 0, materialRid);
         //RenderingServer.InstanceGeometrySetShaderParameter(instanceRid, "index", textureInternal.idTexture);

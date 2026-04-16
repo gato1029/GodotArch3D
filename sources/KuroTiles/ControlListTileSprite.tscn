@@ -3,29 +3,33 @@
 [ext_resource type="Script" uid="uid://k7dnkrcoe4gy" path="res://sources/KuroTiles/ControlListTileSprite.cs" id="1_ysyma"]
 
 [node name="ControlListTileSprite" type="MarginContainer"]
-custom_minimum_size = Vector2(100, 50)
+custom_minimum_size = Vector2(60, 60)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 script = ExtResource("1_ysyma")
 
 [node name="PanelContainerTile" type="PanelContainer" parent="."]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerTile"]
+[node name="ScrollContainerUI" type="ScrollContainer" parent="PanelContainerTile"]
 layout_mode = 2
 vertical_scroll_mode = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainerTile/ScrollContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainerTile/ScrollContainerUI"]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="HBoxContainerTiles" type="HBoxContainer" parent="PanelContainerTile/ScrollContainer/MarginContainer"]
-custom_minimum_size = Vector2(80, 50)
+[node name="HBoxContainerTiles" type="HBoxContainer" parent="PanelContainerTile/ScrollContainerUI/MarginContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
+size_flags_horizontal = 0
 theme_override_constants/separation = 5

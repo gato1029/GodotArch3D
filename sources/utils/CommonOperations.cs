@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 internal class CommonOperations
 {
     static RandomNumberGenerator rngInternal = new RandomNumberGenerator();
@@ -151,33 +152,5 @@ internal class CommonOperations
         return pointDirection;
     }
 
-        
-
-    public static Rect2 CalculateTransformedRect(Rect2 originalRect, float rotation)
-    {
-        Transform2D transformMatrix = new Transform2D(rotation, Vector2.Zero);
-
-        Vector2 topLeft = originalRect.Position;
-        Vector2 topRight = originalRect.Position + new Vector2(originalRect.Size.X, 0);
-        Vector2 bottomLeft = originalRect.Position + new Vector2(0, originalRect.Size.Y);
-        Vector2 bottomRight = originalRect.Position + originalRect.Size;
-
-
-        Vector2 rotatedTopLeft = transformMatrix.BasisXform(topLeft);
-        Vector2 rotatedTopRight = transformMatrix.BasisXform(topRight);
-        Vector2 rotatedBottomLeft = transformMatrix.BasisXform(bottomLeft);
-        Vector2 rotatedBottomRight = transformMatrix.BasisXform(bottomRight);
-
-
-        float minX = Math.Min(Math.Min(rotatedTopLeft.X, rotatedTopRight.X), Math.Min(rotatedBottomLeft.X, rotatedBottomRight.X));
-        float maxX = Math.Max(Math.Max(rotatedTopLeft.X, rotatedTopRight.X), Math.Max(rotatedBottomLeft.X, rotatedBottomRight.X));
-        float minY = Math.Min(Math.Min(rotatedTopLeft.Y, rotatedTopRight.Y), Math.Min(rotatedBottomLeft.Y, rotatedBottomRight.Y));
-        float maxY = Math.Max(Math.Max(rotatedTopLeft.Y, rotatedTopRight.Y), Math.Max(rotatedBottomLeft.Y, rotatedBottomRight.Y));
-
-
-        Vector2 newSize = new Vector2((int)(maxX - minX), (int)(maxY - minY));
-        Vector2 newPosition = new Vector2((int)minX, (int)minY);
-
-        return new Rect2(newPosition, newSize);
-    }
+    
 }

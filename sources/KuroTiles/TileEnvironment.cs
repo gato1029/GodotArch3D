@@ -25,8 +25,17 @@ public class TileEnvironment
     // Array fijo de 8 posiciones, alineado con NeighborPosition (0..7)
     private readonly NeighborState[] _neighbors = new NeighborState[8];
 
+    private NeighborState _underCenter = new NeighborState(0,0); // Estado fijo para la posición "under"
     public TileEnvironment() { }
 
+    public void SetUnderCenter(long tileId, int groupId)
+    {
+       _underCenter = new NeighborState(tileId, groupId);
+    }
+    public NeighborState GetUnderCenter()
+    {
+        return _underCenter;
+    }
     /// <summary>
     /// Asigna el estado de un vecino en una posición específica.
     /// </summary>

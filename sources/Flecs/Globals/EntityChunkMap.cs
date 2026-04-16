@@ -90,10 +90,10 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
 
             
             }
-            else
-            {
-                GD.Print("Huerfano");
-            }
+            //else
+            //{
+            //    GD.Print("Huerfano eliminar");
+            //}
         }
     }
     public void ProcessPendingInstaces()
@@ -115,10 +115,10 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
                         break;
                 }
             }
-            else
-            {
-                GD.Print("Huerfano");
-            }
+            //else
+            //{
+            //    GD.Print("Huerfano creacion" );
+            //}
         }
     }
 
@@ -126,7 +126,7 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
     {
         if (!item.entity.IsAlive())
         {
-            item.entity = FlecsManager.Instance.WorldFlecs.Entity();
+            //item.entity = FlecsManager.Instance.WorldFlecs.Entity();
         }
         var instanceComplex = MultimeshManager.Instance.CreateInstance(data.animationData.idMaterial);
 
@@ -152,8 +152,7 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
             data.animationData.scale,
             data.animationData.offsetInternal));
 
-        item.entity.Set(new AnimationComponent(data.id, EntityType.TILESPRITE, 1,
-            -1,
+        item.entity.Set(new AnimationComponent(data.id, EntityType.TILESPRITE, AnimationType.PARADO, AnimationType.NINGUNA,
             1,
             0,
             data.animationData.frameDuration,
@@ -311,6 +310,8 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
         var render = GetRender(layer);
         render.RemoveEntity(positionTileWorld, entity);
 
+        RenderGPUComponent rgp = entity.Get<RenderGPUComponent>();        
+        MultimeshManager.Instance.FreeInstance(rgp.rid, rgp.instance, rgp.idMaterial);
         entity.Destruct();
     }
     public Entity GetEntityInChunk(Vector2I positionTileWorld, EntityType entityType, int layer)

@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://60m1n5h6qfwg"]
+[gd_scene format=3 uid="uid://60m1n5h6qfwg"]
 
 [ext_resource type="Script" uid="uid://dnmw50xnwsf5y" path="res://sources/KuroTiles/ControlListResourcesSources.cs" id="1_m5y3r"]
 
-[node name="ControlListResourcesSources" type="MarginContainer"]
+[node name="ControlListResourcesSources" type="MarginContainer" unique_id=1906146476]
 custom_minimum_size = Vector2(100, 50)
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,23 +11,23 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_m5y3r")
 
-[node name="PanelContainerTile" type="PanelContainer" parent="."]
+[node name="PanelContainerTile" type="PanelContainer" parent="." unique_id=1415807387]
 layout_mode = 2
 tooltip_text = "Has Click para Agregar"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerTile"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerTile" unique_id=1296119688]
 layout_mode = 2
 size_flags_horizontal = 3
 vertical_scroll_mode = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainerTile/ScrollContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainerTile/ScrollContainer" unique_id=332323190]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="HBoxContainerTiles" type="HBoxContainer" parent="PanelContainerTile/ScrollContainer/MarginContainer"]
+[node name="HBoxContainerTiles" type="HBoxContainer" parent="PanelContainerTile/ScrollContainer/MarginContainer" unique_id=252499373]
 custom_minimum_size = Vector2(80, 50)
 layout_mode = 2
 theme_override_constants/separation = 5

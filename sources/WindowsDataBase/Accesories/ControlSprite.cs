@@ -58,7 +58,7 @@ public partial class ControlSprite : ScrollContainer
         OnNotifyChangued?.Invoke(this);
     }
     GeometricShape2D geometricTemp;
-    private void ControlCollider_OnNotifyPreview(GeometricShape2D itemData)
+    private void ControlCollider_OnNotifyPreview(GeometricShape2D itemData, ColliderScene colliderScene)
     {
         if (itemData!=null)
         {
@@ -245,7 +245,7 @@ public partial class ControlSprite : ScrollContainer
             if (objectData.listCollisionBody!=null&& objectData.listCollisionBody.Length>0)
             {
                 ControlCollider.SetData(objectData.listCollisionBody.ToList());
-                ControlCollider_OnNotifyPreview(objectData.listCollisionBody[0]);
+                ControlCollider_OnNotifyPreview(objectData.listCollisionBody[0],null);
             }
             
             //ColliderContainer.SetData(objectData.collisionBody);

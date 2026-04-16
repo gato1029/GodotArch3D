@@ -22,8 +22,6 @@ public enum ResourceSourceType
     Arbol = 0,
     MinaOro = 1,
     Piedras = 2,
-    CespedVisual = 3,
-    FloresVisual = 4,
 }
 
 

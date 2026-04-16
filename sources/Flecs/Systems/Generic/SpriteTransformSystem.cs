@@ -1,7 +1,7 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.utils;
+
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
@@ -40,8 +40,15 @@ internal class SpriteTransformSystem : FlecsSystemBase
             ref var r = ref ren[i];
             ref var t = ref trans[i];
 
+            float depthOffset = (r.zOrdering);
+            float depthValue = p.position.Y 
+                   + depthOffset
+                    - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
+
+            float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
+            
             //r.originOffset.Y 
-            float renderZ = ((p.position.Y + r.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + r.layerRender;
+            //float renderZ = ((p.position.Y + r.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + r.layerRender;
             var tt = t.transform;
             tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, renderZ);
             t.transform = tt; 
@@ -78,8 +85,15 @@ internal class SpriteTransformLayerSystem : FlecsSystemBase
                 ref var gpu = ref l.GPUData[j];
                 ref var t = ref l.Transforms[j];
 
-                float renderZ = (p.position.Y + gpu.zOrdering)
-                    * CommonAtributes.LAYER_MULTIPLICATOR + gpu.layerRender;
+                float depthOffset = (gpu.zOrdering);
+                float depthValue = p.position.Y 
+                        + depthOffset
+                        - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
+
+                float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + gpu.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
+                //GD.Print("character:"+renderZ);
+                //float renderZ = (p.position.Y + gpu.zOrdering)
+                //    * CommonAtributes.LAYER_MULTIPLICATOR + gpu.layerRender;
 
                 var tt = t.transform;
                 tt.Origin = new Vector3(
@@ -118,7 +132,16 @@ internal class SpriteTransformStaticSystem : FlecsSystemBase
             ref var p = ref pos[i];
             ref var r = ref ren[i];
             ref var t = ref trans[i];
-            float renderZ = (p.position.Y  + r.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender;
+
+            float depthOffset = (r.zOrdering);
+            float depthValue = p.position.Y
+                    + depthOffset
+                    - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
+
+            float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
+            //float renderZ = (p.position.Y  + r.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender;
+
+
             var tt = t.transform;
             tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, renderZ);
             t.transform = tt;           

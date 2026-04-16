@@ -149,11 +149,11 @@ namespace GodotEcsArch.sources.systems
                         melleAtack.shapeCollider = characterWeapon.shapeColliderTopDown; 
                     }
                     
-                    Rectangle rectangle = (Rectangle)melleAtack.shapeCollider; 
+                    Rectangle rectangle = (Rectangle)melleAtack.shapeCollider;
 
                     //rectangle.DirectionTo(moveDirection.X, moveDirection.Y);
-                    
-                    Vector2 vector2 = Collision2D.RotatePosition(rectangle.OriginRelative, d.normalized);
+
+                    Vector2 vector2 = Vector2.Zero;
                     rectangle.OriginCurrent = vector2;
 
                     ref Direction directionCharacter = ref entityCharacter.Get<Direction>();
@@ -197,29 +197,29 @@ namespace GodotEcsArch.sources.systems
 
                 if (!existCollision)
                 {
-                    Dictionary<int, Dictionary<int, IDataTile>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
-                    if (dataTile != null)
-                    {
-                        foreach (var item in dataTile.Values)
-                        {
-                            foreach (var itemInternal in item)
-                            {
+                    //Dictionary<int, Dictionary<int, IDataTile>> dataTile = CollisionManager.Instance.tileColliders.QueryAABB(aabb);
+                    //if (dataTile != null)
+                    //{
+                    //    foreach (var item in dataTile.Values)
+                    //    {
+                    //        foreach (var itemInternal in item)
+                    //        {
 
-                                //GeometricShape2D colliderB = itemInternal.Value.collisionBody;
-                                //var positionB = itemInternal.Value.positionCollider + itemInternal.Value.collisionBody.OriginCurrent;
-                                //if (Collision2D.Collides(c.shapeMove, colliderB, movementNext, positionB))
-                                //{
-                                //    existCollision = true;
-                                //    break;
-                                //}
+                    //            //GeometricShape2D colliderB = itemInternal.Value.collisionBody;
+                    //            //var positionB = itemInternal.Value.positionCollider + itemInternal.Value.collisionBody.OriginCurrent;
+                    //            //if (Collision2D.Collides(c.shapeMove, colliderB, movementNext, positionB))
+                    //            //{
+                    //            //    existCollision = true;
+                    //            //    break;
+                    //            //}
 
-                            }
-                            if (existCollision)
-                            {
-                                break;
-                            }
-                        }
-                    }
+                    //        }
+                    //        if (existCollision)
+                    //        {
+                    //            break;
+                    //        }
+                    //    }
+                    //}
                 }
 
                 if (!existCollision)

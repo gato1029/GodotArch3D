@@ -8,11 +8,13 @@ public partial class ControlListTileSprite : MarginContainer
     public event EventNotifyChangued OnNotifyChangued;
 
     private PanelContainer PanelContainerTile;
+    private ScrollContainer ScrollContainerUI;
     private HBoxContainer HBoxContainerTiles;
 
     public void InitializeUI()
     {
         PanelContainerTile = GetNode<PanelContainer>("PanelContainerTile");
-        HBoxContainerTiles = GetNode<HBoxContainer>("PanelContainerTile/ScrollContainer/MarginContainer/HBoxContainerTiles");
+        ScrollContainerUI = GetNode<ScrollContainer>("PanelContainerTile/ScrollContainerUI");
+        HBoxContainerTiles = GetNode<HBoxContainer>("PanelContainerTile/ScrollContainerUI/MarginContainer/HBoxContainerTiles");
     }
 }

@@ -110,9 +110,9 @@ public class ChunkEntityRender
 
     private void CreateRenderAnimate(Entity entity, TileSpriteData data, PositionComponent position)
     {
-        Vector2 positionTexture = position.position + new Vector2(data.animationData.offsetInternal.X * data.animationData.scale, data.animationData.offsetInternal.Y * data.animationData.scale);
+        Vector2 positionTexture = position.position + new Vector2(data.animationData.offsetInternal.X , data.animationData.offsetInternal.Y);
         int renderLayer = entity.Get<LayerRenderComponent>().layerRender;
-        float z = ((position.position.Y + data.animationData.yDepthRender) * CommonAtributes.LAYER_MULTIPLICATOR) + renderLayer;
+        float z = ((position.position.Y + data.animationData.yDepthRenderFormat) * CommonAtributes.LAYER_MULTIPLICATOR) + renderLayer;
         Transform3D transform3D = new Transform3D(Basis.Identity, new Vector3(positionTexture.X, positionTexture.Y, z));
         transform3D = transform3D.ScaledLocal(new Vector3(data.animationData.scale, data.animationData.scale, 1));
 
@@ -127,9 +127,9 @@ public class ChunkEntityRender
 
     private void CreateRenderStatic(Entity entity, TileSpriteData data, PositionComponent position)
     {      
-        Vector2 positionTexture = position.position + new Vector2(data.spriteData.offsetInternal.X * data.spriteData.scale, data.spriteData.offsetInternal.Y * data.spriteData.scale);
+        Vector2 positionTexture = position.position + new Vector2(data.spriteData.offsetInternal.X, data.spriteData.offsetInternal.Y );
         int renderLayer = entity.Get<LayerRenderComponent>().layerRender;
-        float z = ((position.position.Y + data.spriteData.yDepthRender) * CommonAtributes.LAYER_MULTIPLICATOR) + renderLayer;
+        float z = ((position.position.Y + data.spriteData.yDepthRenderFormat) * CommonAtributes.LAYER_MULTIPLICATOR) + renderLayer;
         Transform3D transform3D = new Transform3D(Basis.Identity, new Vector3(positionTexture.X, positionTexture.Y, z));
         transform3D = transform3D.ScaledLocal(new Vector3(data.spriteData.scale, data.spriteData.scale, 1));
 
@@ -300,7 +300,7 @@ public class EntityChunkRender
         //throw new NotImplementedException();
     }
 
-    private void Instance_OnChunkUnload(Vector2 chunkPos)
+    private void Instance_OnChunkUnload(Vector2I chunkPos)
     {
       
         if (loadedChunksRender.ContainsKey(chunkPos))
@@ -318,7 +318,7 @@ public class EntityChunkRender
         }
     }
 
-    private void Instance_OnChunkLoad(Vector2 chunkPos)
+    private void Instance_OnChunkLoad(Vector2I chunkPos)
     {
       
         if (!renderEnabled) return; // 🚫 No cargar render si está deshabilitado

@@ -17,6 +17,7 @@ using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using ProtoBuf;
+using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,43 +63,52 @@ public class ResourceSourceMap
                 
 
       
-        Entity entityResource = FlecsManager.Instance.WorldFlecs.Entity();
+        //Entity entityResource = FlecsManager.Instance.WorldFlecs.Entity();
 
-        entityResource.Set(new PositionComponent { position = positionCenter, tilePosition = tilePositionGlobal });
-        entityResource.Set(new IdGenericComponent(idResource, EntityType.RECURSO));
-        entityResource.Set(new TileSpriteComponent(idTileSpriteData));
+        //entityResource.Set(new PositionComponent { position = positionCenter, tilePosition = tilePositionGlobal });
+        //entityResource.Set(new IdGenericComponent(idResource, EntityType.RECURSO));
+        //entityResource.Set(new TileSpriteComponent(idTileSpriteData));
 
-        switch (dataTileSprite.tileSpriteType)
-        {
-            case TileSpriteType.Static:
-                if (dataTileSprite.spriteData.listCollisionBody != null && dataTileSprite.spriteData.listCollisionBody.Length > 0)
-                {
-                    var colliderBody = dataTileSprite.spriteData.listCollisionBody[0];
-                    Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
-                    var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
-                    int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entityResource, colliderBody, positionCenter, colliderBody);
-                    entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero));
-                }
-                break;
-            case TileSpriteType.Animated:
-                if (dataTileSprite.animationData.collisionBodyArray != null && dataTileSprite.animationData.collisionBodyArray.Count > 0)
-                {
-                    var colliderBody = dataTileSprite.animationData.collisionBodyArray[0];
-                    Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
-                    var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
-                    int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entityResource, colliderBody, positionCenter, colliderBody);
-                    entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero));
-                }
-                break;
-            default:
-                break;
-        }
+        //switch (dataTileSprite.tileSpriteType)
+        //{
+        //    case TileSpriteType.Static:
+        //        if (dataTileSprite.spriteData.listCollisionBody != null && dataTileSprite.spriteData.listCollisionBody.Length > 0)
+        //        {
+        //            var colliderBody = dataTileSprite.spriteData.listCollisionBody[0];
+        //            //if (colliderBody is Polygon)
+        //            //{
+        //            //    var temp = (Polygon)colliderBody;
+        //            //    temp.UpdatePosition(positionCenter);
+        //            //}
+        //            Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
+        //            var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
+        //            int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entityResource, dataTileSprite.spriteData.listCollisionBody.ToList(), positionCenter,0, colliderBody);
+        //            entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero,0));
+        //            CollisionShapeDraw.Instance.DrawCollisionShapes(colliderBody, positionCenter);
+        //        }
+        //        break;
+        //    case TileSpriteType.Animated:
+        //        if (dataTileSprite.animationData.collisionBodyArray != null && dataTileSprite.animationData.collisionBodyArray.Count > 0)
+        //        {
+        //            var colliderBody = dataTileSprite.animationData.collisionBodyArray[0];
+        //            Godot.Vector2 pos = positionCenter - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
+        //            var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
+        //            int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entityResource, colliderBody, positionCenter,0, colliderBody);
+        //            entityResource.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero, 0));
+        //            CollisionShapeDraw.Instance.DrawCollisionShapes(colliderBody, positionCenter);
+        //        }
+        //        break;
+        //    default:
+        //        break;
+        //}
        
        
         
 
-        EntityChunkMap.Instance.AddEntityToChunk(entityResource, tilePositionGlobal, dataTileSprite.tilesOcupancy, layer);
+        //EntityChunkMap.Instance.AddEntityToChunk(entityResource, tilePositionGlobal, dataTileSprite.tilesOcupancy, layer);
     }
+
+  
 
     public void RemoveTile(Vector2I tilePositionGlobal)
     {

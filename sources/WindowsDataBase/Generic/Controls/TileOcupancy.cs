@@ -54,6 +54,7 @@ public partial class TileOcupancy : Node2D
 
     [Export] public Color tileColor = Colors.LawnGreen;
     [Export] public Color outlineColor = Colors.Gray;
+    [Export] CheckButton checkEnable;
 
     private HashSet<KuroTile> selectedTiles = new HashSet<KuroTile>();
     private HashSet<KuroTile> blockedTiles = new HashSet<KuroTile>();
@@ -64,6 +65,11 @@ public partial class TileOcupancy : Node2D
 
     public override void _Input(InputEvent @event)
     {
+        if (!checkEnable.ButtonPressed)
+        {
+            return;
+        }
+        
         if (@event is InputEventMouseButton mb && mb.Pressed)
         {
             Vector2 svMouse = GetViewport().GetMousePosition();

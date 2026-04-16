@@ -1,7 +1,10 @@
 using Arch.AOT.SourceGenerator;
 using Arch.Core;
 using Arch.Core.Extensions;
+using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Chunks;
@@ -21,6 +24,7 @@ using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using LiteDB;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection.Emit;
 using static Flecs.NET.Core.Ecs.Units;
 using static Godot.ClassDB;
@@ -29,30 +33,25 @@ using static Godot.ClassDB;
 public partial class ControlEditorTerrain : MarginContainer
 {
     private TerrainData objectSelected;
-    private TerrainMap terrainMap;
+    private MapTerrain terrainMap;
     private MapType mapType;
     Vector2I sizeMap = Vector2I.Zero;
     private AutoTileSpriteData currentAutoTileSpriteData=null;
+    List<ItemList> itemListsArray = new List<ItemList>();
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI    
         // Configuración inicial del preview
-        PlacementPreview.Instance.Configure(tileId: 1, layer: 20);
-        SelectionBlueprint.Instance.Configure(1762385049549000, 30);
-        // Configuración inicial del blueprint
-        SelectionBlueprint.Instance.Create(
-            size: new Vector2I(1, 1),
-            centerTile: Vector2I.Zero
-        );
+   
 
         ButtonSearch.Pressed += ButtonSearch_Pressed;
         ButtonAutomaticTerrain.Pressed += ButtonAutomaticTerrain_Pressed;
 
         MapManagerEditor.Instance.editorMode = EditorMode.TERRENO;
-        ItemListRules.ItemSelected += ItemListRules_ItemSelected;
+      
         ButtonRefresh.Pressed += ButtonRefresh_Pressed;
 
-        
+        TabContainerLevels.TabChanged += TabContainerLevels_TabChanged;
 
         MapManagerEditor.Instance.OnMapLevelDataChanged += Instance_OnMapLevelDataChanged;
         ButtonSeedRandom.Pressed += ButtonSeedRandom_Pressed;
@@ -60,15 +59,18 @@ public partial class ControlEditorTerrain : MarginContainer
 
     }
 
-    TerrainTileEntry currentTerrain=null;
-    
-    private void ItemListRules_ItemSelected(long index)
+    private void TabContainerLevels_TabChanged(long tab)
     {
-        currentTerrain = (TerrainTileEntry)ItemListRules.GetItemMetadata((int)index);
-
-        var data = MasterDataManager.GetData<AutoTileSpriteData>(currentTerrain.TileId);
-        SetAutoTileSpriteData(data);
+        foreach (var item in itemListsArray)
+        {
+            item.DeselectAll();
+        }
     }
+
+    TerrainTileEntry currentTerrain = null;
+    long currentRuleId = 0;
+    BlackyTerrainLayer currentLayer = BlackyTerrainLayer.Terrain;
+    int currentAltura = 0;
 
     private void SetAutoTileSpriteData(AutoTileSpriteData data)
     {
@@ -84,11 +86,7 @@ public partial class ControlEditorTerrain : MarginContainer
     {
         this.objectSelected = objectSelected;
         TextureRectImage.Texture = objectSelected.textureVisual;
-        //Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
 
-        //var tempo = MasterDataManager.GetData<AutoTileSpriteData>(objectSelected.idSurface);
-        //var sprite = MasterDataManager.GetData<TileSpriteData>(tempo.tileRuleTemplates[0].TileCentral.idTileSprite);
-        //PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, sprite.spriteData);
 
         LoadItemsRules();
     }
@@ -100,7 +98,7 @@ public partial class ControlEditorTerrain : MarginContainer
         }
         ControlLayerChunk controlLayerBasic = GD.Load<PackedScene>("res://sources/Editor/Controls/ControlLayerChunk.tscn").Instantiate<ControlLayerChunk>();
         ContainerLayers.AddChild(controlLayerBasic);
-        controlLayerBasic.SetSpriteMapChunk(terrainMap.MapTerrainBasic);
+        
         foreach (var item in terrainMap.MapLayerDesign)
         {
             ControlLayerChunk controlLayer = GD.Load<PackedScene>("res://sources/Editor/Controls/ControlLayerChunk.tscn").Instantiate<ControlLayerChunk>();
@@ -111,21 +109,68 @@ public partial class ControlEditorTerrain : MarginContainer
     }
     private void LoadItemsRules()
     {
-        ItemListRules.Clear();
-        
-        foreach (var item in objectSelected.idsAutoTileSprite)
+        foreach (var item in TabContainerLevels.GetChildren())
         {
-            var dataAuto = MasterDataManager.GetData<AutoTileSpriteData>(item.TileId);
-            int index =ItemListRules.AddItem(dataAuto.name, dataAuto.textureVisual);
-            ItemListRules.SetItemMetadata(index, item);
+            item.QueueFree();
+        }
+
+        foreach (var item in objectSelected.terrains)
+        {
+            AddTab(item.Value);
         }
     }
+  
+    public void AddTab(TerrainTileEntry terrainTileEntry)
+    {
+        Control tab = new Control();
+        tab.Name = "Altura:" + terrainTileEntry.heightReal.ToString();
+        tab.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        tab.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+        ItemList itemList = new ItemList();
+        itemList.CustomMinimumSize = new Vector2(200, 200);
+        itemList.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        itemList.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+        tab.AddChild(itemList);
+        TabContainerLevels.AddChild(tab);
+
+        foreach (var item in terrainTileEntry.layersRelative)
+        {
+            var dataAuto = MasterDataManager.GetData<AutoTileSpriteData>(item.idAutoTile);
+            int index = itemList.AddItem(dataAuto.name + "-" + item.layerType, dataAuto.textureVisual);
+            itemList.SetItemMetadata(index, item);
+        }
+        
+        itemList.ItemSelected += (long index) =>
+        {
+            currentAltura = terrainTileEntry.heightReal;
+            var item = (TerrainLayer)itemList.GetItemMetadata((int)index);
+            currentRuleId = item.idAutoTile;
+            currentLayer = (BlackyTerrainLayer)item.layer;
+            
+            var data = MasterDataManager.GetData<AutoTileSpriteData>(item.idAutoTile);
+            SetAutoTileSpriteData(data);
+        };
+        itemListsArray.Add(itemList);
+    }
+   
+    BlackyWorld blackyWorldMap;
     private void Instance_OnMapLevelDataChanged(MapLevelData obj)
     {
         terrainMap = obj.terrainMap;
         mapType = obj.maptype;
         sizeMap = obj.size;
-        SpinBoxSeed.Value = terrainMap.seed;
+        blackyWorldMap = obj.blackyWorldMap;
+        PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+
+        PlacementPreview.Instance.Configure(tileId: 1, layer: 20);
+        SelectionBlueprint.Instance.Configure(1762385049549000, 30);
+        // Configuración inicial del blueprint
+        SelectionBlueprint.Instance.Create(
+            size: new Vector2I(1, 1),
+            centerTile: Vector2I.Zero
+        );
+        //SpinBoxSeed.Value = terrainMap.seed;
         LoadItemsLayers();
     }
 
@@ -192,32 +237,21 @@ public partial class ControlEditorTerrain : MarginContainer
     }
     private void GenerateTerrainMap()
     {
-        foreach (var item in terrainMap.MapLayerDesign)
+        Dictionary<TerrainTileType, float> layersProbabilitys= new Dictionary<TerrainTileType, float>
         {
-            item.Value.SetRenderEnabledGlobal(false);
-        }
-        TerrainGenerator terrainGenerator = new TerrainGenerator(terrainMap.MapTerrainBasic, (int)SpinBoxSeed.Value, true, false);
-        using (new ProfileScope("Terrain Generator"))
-        {
-            terrainMap.ClearMap();
-            terrainMap.ClearFilesChunks();
+            { TerrainTileType.Agua, 100 },
+            { TerrainTileType.TierraNivel1, 90 },
+            { TerrainTileType.CespedNivel1, 70 },
+            { TerrainTileType.TierraNivel2, 60 }, // 60
+            { TerrainTileType.CespedNivel2, 60 },
+            { TerrainTileType.AdornosCesped, 30 },
 
-            terrainGenerator.SetTerrainDistribution(0.1f, 0.8f, 0.1f);
-            Vector2I chunk = new Vector2I((int)SpinBoxChunkX.Value, (int)SpinBoxChunkY.Value);
-            // var data = terrainGenerator.GenerateTerrain(chunk, GenerateMode.RadiusAroundChunk, new Vector2I(2,2));
-            terrainGenerator.GenerateTerrainOptimized(new Vector2I(0, 0), GenerateMode.CenteredByTileDimensions, sizeMap);
+        };
+        int seed = (int)SpinBoxSeed.Value;
+        GeneratorTerrain.Instance.ConfigGenerator(sizeMap, terrainMap, layersProbabilitys, objectSelected.id);
+        GeneratorTerrain.Instance.Generate(seed);
 
-        }
-        using (new ProfileScope("Terrain Generator Plot"))
-        {
-            terrainGenerator.AplicarMapaDisenioOptimized(new Vector2I(0, 0), GenerateMode.CenteredByTileDimensions, sizeMap, TerrainCategoryType.Bosque);
-            terrainMap.seed = (int)SpinBoxSeed.Value;
-        }
-        foreach (var item in terrainMap.MapLayerDesign)
-        {
-            item.Value.SetRenderEnabledGlobal(true);
-        }
-        PerformanceTimer.Instance.PrintAll(1, 1);
+    
     }
 
     private void ButtonRefresh_Pressed()
@@ -228,13 +262,15 @@ public partial class ControlEditorTerrain : MarginContainer
         LoadItemsRules();
 
     }
+    Vector2I lastMouseTile = Vector2I.Zero;
+    Vector2I CurrentMouseTile = Vector2I.Zero;
     public override void _Input(InputEvent @event)
     {
         if (terrainMap == null || !MapManagerEditor.Instance.enableEditor)
             return;
 
         Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-
+        CurrentMouseTile    = mouseTile;
         // Mueve blueprint y preview
         SelectionBlueprint.Instance.Move(mouseTile);
         PlacementPreview.Instance.Move(mouseTile);
@@ -271,8 +307,11 @@ public partial class ControlEditorTerrain : MarginContainer
             {
                 tilesToUpdate.Add(tilePos);                
             }
-            
-            terrainMap.AddUpdateTileSprite(tilesToUpdate, objectSelected.id, currentTerrain);
+
+            {
+                blackyWorldMap.Terrain.SetTerrainList(tilesToUpdate, objectSelected.idSave,currentRuleId, currentAltura, (int)currentLayer);
+            }            
+            lastMouseTile = CurrentMouseTile;
         }
         
     }
@@ -286,7 +325,13 @@ public partial class ControlEditorTerrain : MarginContainer
             {
                 tilesToUpdate.Add(tilePos);                
             }
-            terrainMap.RemoveTileSprite(tilesToUpdate, objectSelected.id, currentTerrain);
+
+            bool autotileErase = true; 
+            if (currentLayer == BlackyTerrainLayer.Decor )
+            {
+                autotileErase = false;
+            }
+            blackyWorldMap.Terrain.RemoveTerrainList(tilesToUpdate,currentAltura, (int)currentLayer, currentRuleId,autotileErase);
         }
     }
 }

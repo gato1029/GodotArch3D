@@ -2,10 +2,13 @@ using Arch.System;
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.Flecs.Systems.Animation;
 using GodotEcsArch.sources.Flecs.Systems.Building;
+using GodotEcsArch.sources.Flecs.Systems.Collisions;
 using GodotEcsArch.sources.Flecs.Systems.Debug;
+using GodotEcsArch.sources.Flecs.Systems.Generic;
 using GodotEcsArch.sources.Flecs.Systems.Human;
-
+using GodotEcsArch.sources.Flecs.Systems.Rendering;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -31,7 +34,7 @@ public class RegisterComponentFlecsAttribute : Attribute
 {
 }
 
-internal class FlecsManager : SingletonBase<FlecsManager>
+public class FlecsManager 
 {
     private World worldFlecs;
     private Rid ridWorld3D;    
@@ -42,32 +45,50 @@ internal class FlecsManager : SingletonBase<FlecsManager>
     // Cola thread-safe para ejecutar acciones en el hilo principal
     private readonly ConcurrentQueue<Action> _mainThreadQueue = new();
 
-    protected override void Initialize()
-    {  // 🔹 Si ya había un mundo, lo destruimos correctamente
-        if (WorldFlecs != null )
-        {
-            WorldFlecs.Dispose();
-            GameLog.LogCat("[Flecs] Destruyendo mundo anterior...");            
-            WorldFlecs = null;
-        }
-
+    public FlecsManager(Node3D node3D)
+    {
         WorldFlecs = World.Create();
         WorldFlecs.SetThreads(15);
-        RegisterComponentsAssemblies();        
+        WorldFlecs.App();
+
+       FlecsComponentRegistry.RegisterAll(this);
+      //RegisterComponentsAssemblies();
         RegisterSystems();
 
         WorldFlecs.Import<Ecs.Stats>();
         WorldFlecs.Set<flecs.EcsRest>(default);
+        
+        SetNode3DMain(node3D);
     }
-    protected override void Destroy()
+
+    //protected override void Initialize()
+    //{  // 🔹 Si ya había un mundo, lo destruimos correctamente
+    //    if (WorldFlecs != null )
+    //    {
+    //        WorldFlecs.Dispose();
+    //        GameLog.LogCat("[Flecs] Destruyendo mundo anterior...");            
+    //        WorldFlecs = null;
+    //    }
+
+    //    WorldFlecs = World.Create();
+    //    WorldFlecs.SetThreads(15);
+    //    WorldFlecs.App();
+
+    //    RegisterComponentsAssemblies();        
+    //    RegisterSystems();
+
+    //    WorldFlecs.Import<Ecs.Stats>();
+    //    WorldFlecs.Set<flecs.EcsRest>(default);
+    //}
+    public void Destroy()
     {
         WorldFlecs.Dispose();
         //WorldFlecs.DeleteWith();
     }
     public void SetNode3DMain(Node3D node3D)
     {
-        this.main3D = node3D;
-        this.ridWorld3D = node3D.GetWorld3D().Scenario;
+        main3D = node3D;
+        ridWorld3D = node3D.GetWorld3D().Scenario;
     }    
     /// <summary>
     /// Encola una acción para ejecutarse en el hilo principal.
@@ -121,6 +142,7 @@ internal class FlecsManager : SingletonBase<FlecsManager>
     private void RegisterSystems()
     {
         //pre
+        RegisterSystem<SimulationTickSystem>();
         RegisterSystem<BatchPrecalSystem>();
         RegisterSystem<BuildingSpawnSystem>();
 
@@ -129,30 +151,29 @@ internal class FlecsManager : SingletonBase<FlecsManager>
         RegisterSystem<HumanCharacterSystem>();
         RegisterSystem<UnitEnemySearchSystem>();
         RegisterSystem<MoveTargetSystem>(); 
+                                                                             
+        RegisterSystem<RegisterFastHashSystem>();
+        
+        RegisterSystem<ResolveTerrainCollisionSystem>(); // resuelve colisiones con el terreno, debe ir antes de movimiento para ajustar la posición       
+        
+        RegisterSystem<SteeringSystem>();
+        RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición                                                        
 
-        //RegisterSystem<RvoDeltaSystem>(); // aplica direccion a rvo
-        //RegisterSystem<RvoDeltaSimpleSystem>(); // resuelve el delta de los rvo
-        //RegisterSystem<RvoSimulateSystem>();  // resuelve los agentes de movimiento AI
-        //RegisterSystem<RvoSimulateMainCharacterSystem>();
+        RegisterSystem<MovementResolutionSystem>();
+        //RegisterSystem<MovementFreeUnitTargetSytem>(); // libera el target de movimiento si la unidad está bloqueada o no puede llegar al target
 
-        RegisterSystem<LocalAvoidanceMainCharacterSystem>();
-        RegisterSystem<LocalAvoidanceSystem>();
+        RegisterSystem<DirectionSystem>();
+        //RegisterSystem<UnitMeleeAttackSystem>();
+        //RegisterSystem<UnitRangedAttackSystem>();
 
-        RegisterSystem<MovementSystem>();   //coloca en la posicion correcta
-        RegisterSystem<DeltaCollisionCharacterSystem>();
+        //RegisterSystem<BuildRangedAttackSystem>();
 
+        //RegisterSystem<AttackHitSystem>();
+        //RegisterSystem<ProjectileMoveSystem>(); 
 
-        RegisterSystem<UnitMeleeAttackSystem>();
-        RegisterSystem<UnitRangedAttackSystem>();
-
-        RegisterSystem<BuildRangedAttackSystem>();
-
-        RegisterSystem<AttackHitSystem>();
-        RegisterSystem<ProjectileMoveSystem>(); 
-
-        RegisterSystem<ApplyDamageSystem>(); // aplica el daño a las unidades/buildings single thread
-        RegisterSystem<UnitDamageApplySystem>(); // aplica efectos de daño a las unidades
-        RegisterSystem<BuildDamageApplySystem>(); // aplica efectos de daño a los edificios
+        //RegisterSystem<ApplyDamageSystem>(); // aplica el daño a las unidades/buildings single thread
+        //RegisterSystem<UnitDamageApplySystem>(); // aplica efectos de daño a las unidades
+        //RegisterSystem<BuildDamageApplySystem>(); // aplica efectos de daño a los edificios
 
 
 
@@ -167,13 +188,15 @@ internal class FlecsManager : SingletonBase<FlecsManager>
 
         // animaciones
         RegisterSystem<AnimationLayerUpdateSystem>();
-        RegisterSystem<Systems.Generic.AnimationSystem>();
+        RegisterSystem<GodotEcsArch.sources.Flecs.Systems.Animation.AnimationSystem>();
         RegisterSystem<AnimationTileSpriteSystem>();
 
         // render
         RegisterSystem<RenderSpriteTileSystem>();
         RegisterSystem<RenderSpriteSystem>();
         RegisterSystem<LayeredSpriteRenderSystem>();
+        RegisterSystem<HumanCameraMoveSystem>();
+        
         //RegisterSystem<RvoDebugSystem>();
 
         //post
@@ -198,7 +221,7 @@ internal class FlecsManager : SingletonBase<FlecsManager>
                 if (type.IsValueType && type.IsPublic &&
                     type.GetCustomAttribute<RegisterComponentFlecsAttribute>() != null)
                 {
-                    var method = typeof(FlecsManager)
+                    MethodInfo method = typeof(FlecsManager)
                         .GetMethod(nameof(RegisterComponentWithMembersSimple), BindingFlags.NonPublic | BindingFlags.Instance)
                         ?.MakeGenericMethod(type);
 
@@ -210,14 +233,6 @@ internal class FlecsManager : SingletonBase<FlecsManager>
         }
     }
 
-
-    private void RegisterComponents()
-    {
-        RegisterComponentWithMembersSimple<PositionComponent>();
-        RegisterComponentWithMembersSimple<ColliderComponent>();
-        RegisterComponentWithMembersSimple<DirectionComponent>();
-        RegisterComponentWithMembersSimple<RenderGPUComponent>();        
-    }
     // 🔹 Método genérico para registrar cualquier sistema que herede FlecsSystemBase
     public T RegisterSystem<T>() where T : FlecsSystemBase, new()
     {
@@ -247,6 +262,14 @@ internal class FlecsManager : SingletonBase<FlecsManager>
                 compBuilder.Member<bool>(name);
             else if (type == typeof(double))
                 compBuilder.Member<double>(name);
+            else if (type == typeof(uint))
+                compBuilder.Member<uint>(name);
+            else if (type == typeof(Int64))
+                compBuilder.Member<Int64>(name);
+            else if (type == typeof(Array))
+                compBuilder.Member<Array>(name);
+
+        
             else if (type == typeof(Vector2))
             {
                 // Registrar Vector2 si no está
@@ -254,6 +277,16 @@ internal class FlecsManager : SingletonBase<FlecsManager>
                     WorldFlecs.Component<Vector2>().SetName(nameof(Vector2))
                         .Member<float>("X")
                         .Member<float>("Y");
+
+                compBuilder.Member<Vector2>(name);
+            }
+            else if (type == typeof(Vector2I))
+            {
+                // Registrar Vector2 si no está
+                if (WorldFlecs.Lookup(nameof(Vector2I)) == 0)
+                    WorldFlecs.Component<Vector2I>().SetName(nameof(Vector2I))
+                        .Member<int>("X")
+                        .Member<int>("Y");
 
                 compBuilder.Member<Vector2>(name);
             }
@@ -267,6 +300,15 @@ internal class FlecsManager : SingletonBase<FlecsManager>
 
                 compBuilder.Member<Vector3>(name);
             }
+            else if (type == typeof(Transform3D))
+            {
+                // Registrar Vector2 si no está
+                if (WorldFlecs.Lookup(nameof(Transform3D)) == 0)
+                    WorldFlecs.Component<Transform3D>().SetName(nameof(Transform3D))
+                        .Member<Vector3>("Origin");
+
+                compBuilder.Member<Transform3D>(name);
+            }
             else if (type == typeof(Rect2))
             {
                 if (WorldFlecs.Lookup(nameof(Rect2)) == 0)
@@ -274,6 +316,13 @@ internal class FlecsManager : SingletonBase<FlecsManager>
                         .Member<Vector2>("Position")
                         .Member<Vector2>("Size");                        
                 compBuilder.Member<Rect2>(name);
+            }
+            else if (type == typeof(Entity))
+            {
+                if (WorldFlecs.Lookup(nameof(Entity)) == 0)
+                    WorldFlecs.Component<Entity>().SetName(nameof(Entity))
+                        .Member<ulong>("Id");
+                compBuilder.Member<Entity>(name);
             }
             else if (type == typeof(Rid))
             {
@@ -320,13 +369,38 @@ internal class FlecsManager : SingletonBase<FlecsManager>
                 }
                 compBuilder.Member<EntityType>(name);
             }
+            else if (type == typeof(ShapeType))
+            {
+                // Si no está ya registrado el enum en Flecs
+                if (WorldFlecs.Lookup(nameof(ShapeType)) == 0)
+                {
+                    var dataEnyu = WorldFlecs.Component<ShapeType>();
+                    foreach (var enumName in Enum.GetNames(type))
+                    {
+                        var value = Enum.Parse(type, enumName);
+                        dataEnyu.Constant(enumName, Convert.ToByte(value));
+                    }
+                }
+                compBuilder.Member<ShapeType>(name);
+            }
+            //else if (type == typeof(FastCollider[]))
+            //{
+            //    var elementType = type.GetElementType();
+            //    var arrayTypeName = $"{elementType.Name}Array";
+
+   
+            //    // Registrar el array como tipo opaco
+            //    if (WorldFlecs.Lookup(arrayTypeName) == 0)
+            //    {
+            //        WorldFlecs.Component<FastCollider[]>().SetName(arrayTypeName);
+            //    }
+
+            //    compBuilder.Member<FastCollider[]>(name);
+            //}
             else
             {
                 GameLog.LogCat($"[Flecs] Campo '{name}' de tipo {type.Name} no soportado.");
             }
         }
     }
-
-
-
 }

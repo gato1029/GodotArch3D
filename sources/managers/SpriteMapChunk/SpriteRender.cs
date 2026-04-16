@@ -1,5 +1,6 @@
 
 
+
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.Flecs.Globals;
@@ -42,11 +43,11 @@ public class SpriteRender
     public void FreeRidRender()
     {
 
-        MultimeshManager.Instance.AddPendingRemove(new PendingRemoveInstance(rid, instance, idMaterial));                 
+        //MultimeshManager.Instance.AddPendingRemove(new PendingRemoveInstance(rid, instance, idMaterial));                 
         if (entityReference.IsAlive())
         {
             //entityReference.Destruct();
-            FlecsManager.Instance.DestroyEntitySafe(entityReference);
+            //FlecsManager.Instance.DestroyEntitySafe(entityReference);
             //GD.Print("Elimine entidad animada" + tilePosition);
         }
 
@@ -59,10 +60,11 @@ public class SpriteRender
     internal void FreeRidRenderForced()
     {
 
-        MultimeshManager.Instance.AddPendingRemove(new PendingRemoveInstance(rid, instance, idMaterial));
+        //MultimeshManager.Instance.AddPendingRemove(new PendingRemoveInstance(rid, instance, idMaterial));
         if (entityReference.IsAlive())
         {
-            entityReference.Destruct();        
+            //FlecsManager.Instance.DestroyEntitySafe(entityReference);
+            //entityReference.Destruct();        
         }
       
            
@@ -110,90 +112,85 @@ public class SpriteRender
         RenderingServer.MultimeshInstanceSetTransform(rid, instance, transform3D);
         RenderingServer.MultimeshInstanceSetCustomData(rid, instance, data.uvFramesArray[0]);
         RenderingServer.MultimeshInstanceSetColor(rid, instance, new Color(0, 0, 0, dataInstance.layerTexture));
-        //EntityChunkMap.Instance.AddPendingInstance(new PendingInstance { entity = entityReference, 
-        //    layer = renderLayer,
-        //    tileId = Id,
-        //    transform = transform3D,
-        //    position= new Vector2(WorldPosition.X, WorldPosition.Y),
-        //    isTileSprite = true,
-        //    tilePosition = tilePosition });
+
         // Todo lo que toca entidades => ejecutar en el hilo principal
-        FlecsManager.Instance.RunOnMainThread(() =>
-        {
-            var world = FlecsManager.Instance.WorldFlecs;
+        //FlecsManager.Instance.RunOnMainThread(() =>
+        //{
+        //    var world = FlecsManager.Instance.WorldFlecs;
 
-            // ✅ Si la entidad ya existe y está viva, solo actualizar sus componentes
-            if (entityReference.IsAlive())
-            {
-                entityReference.Set(new RenderTransformComponent(transform3D));
-                entityReference.Set(new RenderGPUComponent(
-                    rid,
-                    instance,
-                    idMaterial,
-                    dataInstance.layerTexture,
-                    renderLayer,
-                    data.yDepthRender,
-                    data.scale,
-                    data.offsetInternal));
+        //    // ✅ Si la entidad ya existe y está viva, solo actualizar sus componentes
+        //    if (entityReference.IsAlive())
+        //    {
+        //        entityReference.Set(new RenderTransformComponent(transform3D));
+        //        entityReference.Set(new RenderGPUComponent(
+        //            rid,
+        //            instance,
+        //            idMaterial,
+        //            dataInstance.layerTexture,
+        //            renderLayer,
+        //            data.yDepthRender,
+        //            data.scale,
+        //            data.offsetInternal));
 
-                entityReference.Set(new AnimationComponent(Id, EntityType.TILESPRITE, 1,
-                    -1,
-                    1,
-                    0,
-                    data.frameDuration,
-                    false,
-                    true,
-                    true));
+        //        entityReference.Set(new AnimationComponent(Id, EntityType.TILESPRITE, AnimationType.PARADO,
+        //            AnimationType.NINGUNA,
+        //            1,
+        //            0,
+        //            data.frameDuration,
+        //            false,
+        //            true,
+        //            true));
 
-                var uv = data.uvFramesArray[0];
-                entityReference.Set(new RenderFrameDataComponent { uvMap = uv });
-                entityReference.Set(new PositionComponent
-                {
-                    position = new Vector2(WorldPosition.X, WorldPosition.Y),
-                    tilePosition = tilePosition
-                });
-            }
-            else
-            {
-                // 🆕 Si no existe, crearla
-                var entity = world.Entity();
+        //        var uv = data.uvFramesArray[0];
+        //        entityReference.Set(new RenderFrameDataComponent { uvMap = uv });
+        //        entityReference.Set(new PositionComponent
+        //        {
+        //            position = new Vector2(WorldPosition.X, WorldPosition.Y),
+        //            tilePosition = tilePosition
+        //        });
+        //        entityReference.Add<TileSpriteAnimationTag>();
+        //    }
+        //    else
+        //    {
+        //        // 🆕 Si no existe, crearla
+        //        var entity = world.Entity();
 
-                entity.Set(new RenderTransformComponent(transform3D));
-                entity.Set(new RenderGPUComponent(
-                    rid,
-                    instance,
-                    idMaterial,
-                    dataInstance.layerTexture,
-                    renderLayer,
-                    data.yDepthRender,
-                    data.scale,
-                    data.offsetInternal));
+        //        entity.Set(new RenderTransformComponent(transform3D));
+        //        entity.Set(new RenderGPUComponent(
+        //            rid,
+        //            instance,
+        //            idMaterial,
+        //            dataInstance.layerTexture,
+        //            renderLayer,
+        //            data.yDepthRender,
+        //            data.scale,
+        //            data.offsetInternal));
 
-                entity.Set(new AnimationComponent(
-                    Id,
-                    EntityType.TILESPRITE,
-                    1,
-                    -1,
-                    1,
-                    0,
-                    data.frameDuration,
-                    false,
-                    true,
-                    true));
+        //        entity.Set(new AnimationComponent(
+        //            Id,
+        //            EntityType.TILESPRITE,
+        //            AnimationType.PARADO,
+        //            AnimationType.NINGUNA,
+        //            1,
+        //            0,
+        //            data.frameDuration,
+        //            false,
+        //            true,
+        //            true));
 
-                var uv = data.uvFramesArray[0];
-                entity.Set(new RenderFrameDataComponent { uvMap = uv });
-                entity.Set(new PositionComponent
-                {
-                    position = new Vector2(WorldPosition.X, WorldPosition.Y),
-                    tilePosition = tilePosition
-                });
+        //        var uv = data.uvFramesArray[0];
+        //        entity.Set(new RenderFrameDataComponent { uvMap = uv });
+        //        entity.Set(new PositionComponent
+        //        {
+        //            position = new Vector2(WorldPosition.X, WorldPosition.Y),
+        //            tilePosition = tilePosition
+        //        });
 
-                entity.Add<TileSpriteAnimationTag>();
+        //        entity.Add<TileSpriteAnimationTag>();
 
-                entityReference = entity;
-            }
-        });
+        //        entityReference = entity;
+        //    }
+        //});
     }
 
 }

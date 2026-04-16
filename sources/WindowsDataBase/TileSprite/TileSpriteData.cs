@@ -1,6 +1,9 @@
 using Godot;
+using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotFlecs.sources.Flecs.Components;
 using LiteDB;
 using System;
 using System.Collections.Generic;
@@ -10,14 +13,22 @@ public class IdDataLong
 {
     [BsonId]
     public long id { get; set; }
+    public ushort idSave { get; set; }
     public string name { get; set; }
-    public long idGrouping { get; set; }
+    public long idGrouping { get; set; }        
+    public ushort idGroupingSave { get; set; }
+
     [BsonIgnore]
     public AtlasTexture textureVisual { get; set; }
+    
 
     public void ReGerenateId()
     {
         id = EpochIdGenerator.NewId();
+    }
+    public virtual void RefreshTextureVisual()
+    {
+        // implementación por defecto
     }
 
 }
@@ -34,14 +45,79 @@ public struct TileInfoKuro
 public enum TileSpriteType
 {
     Static = 0,
-    Animated = 1
+    Animated = 1,
+    AnimatedDirectionMultiple = 2,
+    AnimatedMultiple = 3,
+}
+
+public class SpriteAnimationMultiple
+{
+    public Dictionary<string, SpriteAnimationData> animations { get; set; }
+}
+public class SpriteMultipleAnimationDirection
+{
+    public DirectionAnimationType directionAnimationType { get; set; }
+    public Dictionary<string, SpriteAnimationDirection> animations { get; set; } = new Dictionary<string, SpriteAnimationDirection>();
+    public Dictionary<AnimationType, SpriteAnimationDirection> animationsTypes { get; set; } = new Dictionary<AnimationType, SpriteAnimationDirection>();
+
+
+}
+public class SpriteAnimationDirection
+{
+    public DirectionAnimationType directionAnimationType { get; set; }
+    public string name { get; set; }
+    public AnimationType animationType { get; set; }
+    public Dictionary<AnimationDirection, SpriteAnimationData> animations {get; set;}
+
+    public SpriteAnimationDirection()
+    {
+
+    }
+    public SpriteAnimationDirection(DirectionAnimationType directionAnimationType,string name)
+    {
+        animations = new Dictionary<AnimationDirection, SpriteAnimationData>();
+        this.directionAnimationType = directionAnimationType;
+        this.name = name;   
+        switch (directionAnimationType)
+        {
+            case DirectionAnimationType.NINGUNO:
+                break;
+            case DirectionAnimationType.DOS:
+                animations.Add(AnimationDirection.LEFT, new SpriteAnimationData());
+                animations.Add(AnimationDirection.RIGHT, new SpriteAnimationData());
+                break;
+            case DirectionAnimationType.CUATRO:
+                animations.Add(AnimationDirection.LEFT, new SpriteAnimationData());
+                animations.Add(AnimationDirection.RIGHT, new SpriteAnimationData());
+                animations.Add(AnimationDirection.UP, new SpriteAnimationData());
+                animations.Add(AnimationDirection.DOWN, new SpriteAnimationData());
+                break;
+            case DirectionAnimationType.OCHO:
+                animations.Add(AnimationDirection.LEFT, new SpriteAnimationData());
+                animations.Add(AnimationDirection.RIGHT, new SpriteAnimationData());
+                animations.Add(AnimationDirection.UP, new SpriteAnimationData());
+                animations.Add(AnimationDirection.DOWN, new SpriteAnimationData());
+                animations.Add(AnimationDirection.LEFTDOWN, new SpriteAnimationData());
+                animations.Add(AnimationDirection.RIGHTDOWN, new SpriteAnimationData());
+                animations.Add(AnimationDirection.LEFTUP, new SpriteAnimationData());
+                animations.Add(AnimationDirection.RIGHTUP, new SpriteAnimationData());
+                break;
+            default:
+                break;
+        }
+    }
+
 }
 public class TileSpriteData:IdDataLong
-{    
- //   public bool isAnimated { get; set; }
+{
+    //public ushort idSave { get; set; }
     public TileSpriteType tileSpriteType { get; set; }
     public SpriteData spriteData { get; set; }
     public SpriteAnimationData animationData { set; get; }
+
+    public SpriteAnimationMultiple spriteAnimationMultiple { get; set; }
+
+    public SpriteMultipleAnimationDirection spriteMultipleAnimationDirection { get; set; }
     public List<KuroTile> tilesOcupancy { get; set; } = new List<KuroTile>();
 
     public TileSpriteData()
@@ -75,17 +151,32 @@ public class TileSpriteData:IdDataLong
                     $"{animationData.mirrorY}-";
 
                 break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                string temp = "";
+                foreach (var item in spriteMultipleAnimationDirection.animations)
+                {
+                    if (item.Value.animations[AnimationDirection.LEFT].framesArray[0]!=null)
+                    {
+                        temp = temp + item.Value.animations[AnimationDirection.LEFT].framesArray[0].x.ToString();
+                    }
+                    
+                }
+                raw = $"{tileSpriteType}-" +
+                    $"{spriteMultipleAnimationDirection.animations}"+temp;
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
             default:
                 break;
         }
-  
+
 
         name = Convert.ToBase64String(Encoding.UTF8.GetBytes(raw));
         return name;
     }
 
     [BsonCtor]
-    public TileSpriteData(SpriteData spriteData, TileSpriteType tileSpriteType, SpriteAnimationData animationData) : base()
+    public TileSpriteData(SpriteData spriteData, TileSpriteType tileSpriteType, SpriteAnimationData animationData, SpriteMultipleAnimationDirection spriteMultipleAnimationDirection) : base()
     {
         switch (tileSpriteType)
         {
@@ -100,10 +191,28 @@ public class TileSpriteData:IdDataLong
                     animationData.framesArray[0].widht,
                     animationData.framesArray[0].height);
                 break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                SpriteAnimationData data =null;
+                foreach (var item in spriteMultipleAnimationDirection.animations)
+                {
+                    data = item.Value.animations[AnimationDirection.LEFT];
+                }
+                if (data!=null)
+                {
+                    textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(
+                      data.idMaterial,
+                      data.framesArray[0].x,
+                      data.framesArray[0].y,
+                      data.framesArray[0].widht,
+                      data.framesArray[0].height);
+                }                           
+                break;
+            case TileSpriteType.AnimatedMultiple:
+                break;
             default:
                 break;
         }
-        
+
     }
 }
 

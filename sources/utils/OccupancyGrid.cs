@@ -21,9 +21,9 @@ public class OccupancyGrid
         chunkManager.OnChunkUnload += ChunkManager_OnChunkUnload;
     }
 
-    private void ChunkManager_OnChunkUnload(Vector2 obj)
+    private void ChunkManager_OnChunkUnload(Vector2I obj)
     {
-        Vector2I chunkPosition = (Vector2I)obj;
+        Vector2I chunkPosition = obj;
 
         if (chunksLoad.TryGetValue(chunkPosition, out var chunk))
         {
@@ -34,9 +34,9 @@ public class OccupancyGrid
         }
     }
 
-    private void ChunkManager_OnChunkLoad(Vector2 obj)
+    private void ChunkManager_OnChunkLoad(Vector2I obj)
     {
-        Vector2I chunkPosition = (Vector2I)obj;
+        Vector2I chunkPosition = obj;
 
         // Ya está cargado → no repetir shapes
         if (chunksLoad.ContainsKey(chunkPosition))

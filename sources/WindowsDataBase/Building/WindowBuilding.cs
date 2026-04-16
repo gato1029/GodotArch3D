@@ -9,6 +9,7 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
 {
     public event IFacadeWindow<BuildingData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
     BuildingData objectData;
+    Vector2I sizeReal;
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
@@ -21,51 +22,9 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         
         OptionButtonTypeBuilding.ItemSelected += OptionButtonTypeBuilding_ItemSelected;
         ButtonSave.Pressed += ButtonSave_Pressed;
-        ControlSpriteBasico.OnNotifyChangued += ControlSpriteBasico_OnNotifyChangued;
-        ControlBuildingGridBasic.OnNotifyChangued += ControlBuildingGridBasic_OnNotifyChangued;
-        CheckBoxIsAnimated.Pressed += CheckBoxIsAnimated_Pressed;
-    }
-    ContainerAnimation ContainerAnimationBasico = null;
-    ScrollContainer scrollContainer;
-
+        sizeReal = this.Size;
+    }    
     
-
-    private void CheckBoxIsAnimated_Pressed()
-    {
-        if (CheckBoxIsAnimated.ButtonPressed)
-        {
-            scrollContainer = new ScrollContainer();
-            scrollContainer.Name = "Animacion";
-            scrollContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            ContainerAnimationBasico = GD.Load<PackedScene>("res://sources/WindowsDataBase/Character/ContainerAnimation.tscn").Instantiate<ContainerAnimation>();
-            ContainerAnimationBasico.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-            ContainerAnimationBasico.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-            scrollContainer.AddChild(ContainerAnimationBasico);
-            TabContainerBase.AddChild(scrollContainer);
-
-        }
-        else
-        {
-            TabContainerBase.RemoveChild(scrollContainer);
-            scrollContainer = null;
-            ContainerAnimationBasico = null;
-        }
-    }
-
-    private void ControlBuildingGridBasic_OnNotifyChangued(ControlBuildingGrid objectControl)
-    {
-        if (objectControl.SelectedBuildings.Count>0)
-        {
-            objectData.buildingPosition = objectControl.GetBuildingPosition();
-        }        
-    }
-
-    private void ControlSpriteBasico_OnNotifyChangued(ControlSprite objectControl)
-    {
-        ControlBuildingGridBasic.SetTexture(objectControl.GetSprite().Texture);
-        ControlBuildingGridBasic.SetScaleTexture(objectControl.ObjectData.scale);
-    }
-
     public void SetData(BuildingData data)
     {
         objectData = data;
@@ -76,22 +35,19 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         SpinBoxRangeAttack.Value = objectData.attackRange;
         SpinBoxChargueAttack.Value = objectData.attackCooldown;
         SpinBoxTimeBuild.Value = objectData.timeToBuild;
-        // ControlSpriteMiniatura.SetData(objectData.miniatura);
-        ControlSpriteBasico.SetData(objectData.spriteData);
-        CheckBoxIsAnimated.ButtonPressed = objectData.isAnimated;
+        ControlTileSpriteItem.SetIdTile(objectData.idTileSpriteNormal);
+        ControlProyectileItem.SetData(objectData.idProyectile);
 
-        if (objectData.isAnimated) 
-        { 
-            ContainerAnimationBasico.SetData(objectData.animationData.ToArray());
-        }
-        ControlBuildingGridBasic.SetTexture(ControlSpriteBasico.GetSprite().Texture);
-        ControlBuildingGridBasic.SetBuildingPosition(objectData.buildingPosition);
-        
-        ControlTower();
-        if (objectData.buildingType == BuildingType.TorreDefensa)
+        if (objectData.defensePowers!=null)
         {
-            ControlBulletSprite.SetData(data.spriteBullet);            
+            ControlDefensa.SetAllData(objectData.defensePowers.ToArray());
         }
+        if (objectData.attackPowers!=null)
+        {
+            ControlAtaque.SetAllData(objectData.attackPowers.ToArray());
+        }
+        
+        OptionButtonTypeBuilding_ItemSelected(OptionButtonTypeBuilding.Selected);
     }
     private void ButtonSave_Pressed()
     {
@@ -102,82 +58,53 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
         objectData.attackRange = (float)SpinBoxRangeAttack.Value;
         objectData.attackCooldown = (float)SpinBoxChargueAttack.Value;
         objectData.timeToBuild = (float)SpinBoxTimeBuild.Value;
-      //  objectData.miniatura = ControlSpriteMiniatura.ObjectData;
-        objectData.spriteData = ControlSpriteBasico.ObjectData;
-      
-        objectData.isAnimated = CheckBoxIsAnimated.ButtonPressed;
-
-        //if (objectData.miniatura.idMaterial == 0)
-        //{
-        //    objectData.miniatura = null;
-        //}
-        if (objectData.spriteData.idMaterial == 0)
-        {
-            objectData.spriteData = null;
-        }
-        if (objectData.isAnimated && objectData.animationData.Count > 0)
-        {
-            objectData.animationData = ContainerAnimationBasico.GetData().ToList();
-        }
-        if (objectData.buildingType == BuildingType.TorreDefensa)
-        {
-            objectData.spriteBullet = ControlBulletSprite.ObjectData;
-            TextureHelper.RecalulateUVFormat(objectData.spriteBullet);
-        }
-        TextureHelper.RecalulateUVFormat(objectData.spriteData);
+        objectData.idTileSpriteNormal = ControlTileSpriteItem.GetidTile();       
+        objectData.defensePowers = ControlDefensa.GetAllData();
+        objectData.attackPowers = ControlAtaque.GetAllData();
+        objectData.idProyectile = ControlProyectileItem.GetData();
         DataBaseManager.Instance.InsertUpdate(objectData);
+        
+        MasterDataManager.UpdateRegisterData(objectData.id, objectData);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }
 
     private void OptionButtonTypeBuilding_ItemSelected(long index)
     {
-        ClearControls();
+        
+        Vector2I sizeAtaque = new Vector2I(300,0);
+
         BuildingType type = (BuildingType)index;
         switch (type)
         {
             case BuildingType.Ninguno:
+                this.Size = sizeReal;
+                ContainerAtaque.Visible = false;
                 break;
             case BuildingType.ProductorMaterial:
+                this.Size = sizeReal;
+                ContainerAtaque.Visible = false;
                 break;
             case BuildingType.ProductorUnidades:
+                this.Size = sizeReal;
+                ContainerAtaque.Visible = false;
                 break;
-            case BuildingType.TorreDefensa:
-                ControlTower();
+            case BuildingType.TorreDefensa:     
+                this.Size = sizeReal+sizeAtaque;
+                ContainerAtaque.Visible = true;
                 break;
             case BuildingType.Procesador:
+                this.Size = sizeReal;
+                ContainerAtaque.Visible = false;
                 break;
             default:
                 break;
         }
 
     }
-    ControlSprite ControlBulletSprite = null;
-    TabBar tabBullet =null;
 
-    private void ClearControls()
-    {
-        if (tabBullet!=null)
-        {
-            TabContainerBase.RemoveChild(tabBullet);
-            tabBullet = null;
-            ControlBulletSprite = null;
-        }        
-    }
-    private void ControlTower()
-    {
-        tabBullet = new TabBar();
-        tabBullet.Name = "Proyectil";
-        tabBullet.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        ControlBulletSprite = GD.Load<PackedScene>("res://sources/WindowsDataBase/Accesories/ControlSprite.tscn").Instantiate<ControlSprite>();
-        ControlBulletSprite.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        ControlBulletSprite.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        tabBullet.AddChild(ControlBulletSprite);
-        TabContainerBase.AddChild(tabBullet);
 
- 
-       
-    }
+   
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
 	{

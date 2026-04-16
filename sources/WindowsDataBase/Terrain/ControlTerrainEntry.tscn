@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://c4jtgodssj6mt"]
+
+[ext_resource type="PackedScene" uid="uid://ejurkjhryff8" path="res://sources/KuroTiles/ControlKuroAutoTile.tscn" id="1_6wbpd"]
+[ext_resource type="Script" uid="uid://bq7sg6gu0ubr3" path="res://sources/WindowsDataBase/Terrain/ControlTerrainEntry.cs" id="1_7qobj"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="4_67agb"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="5_gqsy0"]
+
+[node name="ControlTerrainEntry" type="MarginContainer" unique_id=487726421]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+script = ExtResource("1_7qobj")
+
+[node name="Panel" type="Panel" parent="." unique_id=190121379]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="." unique_id=1107261677]
+layout_mode = 2
+columns = 2
+
+[node name="Label2" type="Label" parent="GridContainer" unique_id=1336321958]
+layout_mode = 2
+text = "Altura Relativa:"
+
+[node name="SpinBoxHeight" type="SpinBox" parent="GridContainer" unique_id=1925851395]
+layout_mode = 2
+size_flags_horizontal = 0
+max_value = 3.0
+
+[node name="Label4" type="Label" parent="GridContainer" unique_id=1579070564]
+layout_mode = 2
+text = "Base:"
+
+[node name="ControlBase" parent="GridContainer" unique_id=198056733 instance=ExtResource("1_6wbpd")]
+layout_mode = 2
+
+[node name="Label5" type="Label" parent="GridContainer" unique_id=1448336232]
+layout_mode = 2
+text = "Adornos Base:"
+
+[node name="ControlDecorBase" parent="GridContainer" unique_id=1996623721 instance=ExtResource("1_6wbpd")]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="GridContainer" unique_id=1058393630]
+custom_minimum_size = Vector2(85, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Superficie:"
+autowrap_mode = 2
+
+[node name="ControlSuperficie" parent="GridContainer" unique_id=1330994202 instance=ExtResource("1_6wbpd")]
+layout_mode = 2
+
+[node name="Label6" type="Label" parent="GridContainer" unique_id=527027109]
+layout_mode = 2
+text = "Adornos Superficie:"
+
+[node name="ControlDecorSuperficie" parent="GridContainer" unique_id=851414237 instance=ExtResource("1_6wbpd")]
+layout_mode = 2
+
+[node name="ButtonRemove" type="TextureButton" parent="." unique_id=873384091]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+texture_normal = ExtResource("4_67agb")
+script = ExtResource("5_gqsy0")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"

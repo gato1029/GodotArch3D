@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://b3u08sl4x5qab"]
+
+[ext_resource type="Texture2D" uid="uid://diyq2a0bn851i" path="res://resources/Textures/iconos/ItemPoint.png" id="1_2tpwr"]
+[ext_resource type="Script" uid="uid://0vuh1oxqfx7l" path="res://sources/WindowsDataBase/TileSprite/ControlItemAnimationMultipleDirection.cs" id="1_wbhdl"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="2_wbhdl"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="3_oj6tn"]
+
+[node name="ControlItemAnimationMultipleDirection" type="HBoxContainer"]
+size_flags_vertical = 3
+script = ExtResource("1_wbhdl")
+
+[node name="OptionButtonType" type="OptionButton" parent="."]
+layout_mode = 2
+
+[node name="LineEditName" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonSelect" type="TextureButton" parent="."]
+layout_mode = 2
+texture_normal = ExtResource("1_2tpwr")
+script = ExtResource("2_wbhdl")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDelete" type="TextureButton" parent="."]
+layout_mode = 2
+texture_normal = ExtResource("3_oj6tn")
+script = ExtResource("2_wbhdl")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"

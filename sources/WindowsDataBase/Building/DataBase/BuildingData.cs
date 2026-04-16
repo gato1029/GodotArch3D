@@ -1,3 +1,4 @@
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
@@ -23,6 +24,7 @@ public enum BuildingType
     Procesador = 5,
     GeneradorMejoras = 6,
     Adorno = 7,
+    EdificioDefensa = 8, // muralla
 }
 public class CostInput
 {
@@ -65,11 +67,11 @@ public class BuildingPosition
 }
 public class BuildingData:IdData
 {
-    public BuildingPosition buildingPosition { get; set; } // posicion de construccion
-    public SpriteData spriteData { get; set; } // Datos del sprite del edificio, puede ser una textura o atlas
-    public SpriteData spriteBullet { get; set; } // Datos del sprite del proyectil, si lo tuviese    
-    public bool isAnimated { get; set; } = false; // Es una animacion o no
-    public List<AnimationStateData> animationData { get; set; } = null; // Datos de la animación del edificio, si aplica
+    public long idTileSpriteNormal {  get; set; } // Edificio Normal
+    public long idTileSpriteDestruccion { get; set; } // Edificio Destruccion
+    public long idTileSpriteContruccion { get; set; } // Edificio Construccion
+
+    public int idProyectile { get; set; } // id del Proyectil
     public int level { get; set; } = 1; // Nivel del edificio, por defecto 1
     public int maxHealth { get; set; } = 100; // Salud máxima del edificio, por defecto 100    
     public float attackRange { get; set; } = 0f; // Rango de ataque, por defecto 0 (sin ataque)
@@ -91,12 +93,13 @@ public class BuildingData:IdData
     {
     }
     [BsonCtor]
-    public BuildingData(SpriteData spriteData)
+    public BuildingData(long idTileSpriteNormal)
     {
-        if (spriteData!= null &&spriteData.idMaterial>0)
-        {
-            textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(spriteData.idMaterial, spriteData.x, spriteData.y, spriteData.widht, spriteData.height);
-        }
-        
+        textureVisual = MasterDataManager.GetData<TileSpriteData>(idTileSpriteNormal).textureVisual;
+    }
+
+    public override void RefreshTextureVisual()
+    {
+        textureVisual = MasterDataManager.GetData<TileSpriteData>(idTileSpriteNormal).textureVisual;
     }
 }

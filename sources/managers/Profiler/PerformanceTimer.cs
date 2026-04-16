@@ -43,7 +43,20 @@ public class PerformanceTimer
             lastDurations[label] = ns;
         }
     }
+    public void Print(string label)
+    {
+        if (!Enabled) return;
 
+        if (lastDurations.TryGetValue(label, out double ms))
+        {
+            double seconds = ms / 1000.0;
+            GD.Print($"[Profiler] {label}: {ms:F4} ms ({seconds:F6} s)");
+        }
+        else
+        {
+            GD.Print($"[Profiler] {label}: (sin datos todavía)");
+        }
+    }
     public void PrintAll(int frameInterval, int currentFrame)
     {
         if (!Enabled || currentFrame % frameInterval != 0)

@@ -10,7 +10,7 @@ public partial class PanelColliders : PanelContainer
     [Export] Button buttonGuardar;
     PackedScene ColliderScene;
     // Called when the node enters the scene tree for the first time.
-    public delegate void RequestNotifyPreview(GeometricShape2D itemData);
+    public delegate void RequestNotifyPreview(GeometricShape2D itemData, ColliderScene colliderScene);
     public event RequestNotifyPreview OnNotifyPreview;
 
     public delegate void RequestNotifySave();
@@ -67,16 +67,21 @@ public partial class PanelColliders : PanelContainer
         var node = ColliderScene.Instantiate<ColliderScene>();
         container.AddChild(node);
         node.OnNotifyPreview += Node_OnNotifyPreview;
-        OnNotifyPreview?.Invoke(node.data);
+        OnNotifyPreview?.Invoke(node.data,node);
     }
 
-    private void Node_OnNotifyPreview(GeometricShape2D itemData)
+    private void Node_OnNotifyPreview(GeometricShape2D itemData, ColliderScene colliderScene)
     {
-        OnNotifyPreview?.Invoke(itemData);
+        OnNotifyPreview?.Invoke(itemData,colliderScene);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
 	{
 	}
+
+    internal void SetShapePosition(Vector2 positionShape)
+    {
+       
+    }
 }

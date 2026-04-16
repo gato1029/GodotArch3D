@@ -81,7 +81,8 @@ public enum PositionAnimationType
 public enum ColliderType 
 {
     RECTANGLE,
-    CIRCLE
+    CIRCLE,
+    POLYGON,
 }
 
 public enum AccesoryBodyPartType

@@ -60,17 +60,17 @@ internal class CharacterStateSystem : BaseSystem<World, float>
                 }
 
                 // 🔹 2. Seleccionar animación según el estado
-                if (rules.StateToAnimation.TryGetValue(character.characterStateType, out int newAnim))
-                {
-                    if (newAnim != animation.stateAnimation)
-                    {
-                        animation.lastStateAnimation = animation.stateAnimation;
-                        animation.stateAnimation = newAnim;
-                        animation.currentFrameIndex = 0;       // reset animación
-                        animation.TimeSinceLastFrame = 0f;     // reset timer
-                        animation.animationComplete = false;   // empezar de nuevo
-                    }
-                }
+                //if (rules.StateToAnimation.TryGetValue(character.characterStateType, out int newAnim))
+                //{
+                //    if (newAnim != animation.stateAnimation)
+                //    {
+                //        animation.lastStateAnimation = animation.stateAnimation;
+                //        animation.stateAnimation = newAnim;
+                //        animation.currentFrameIndex = 0;       // reset animación
+                //        animation.TimeSinceLastFrame = 0f;     // reset timer
+                //        animation.animationComplete = false;   // empezar de nuevo
+                //    }
+                //}
             }
         }
     }

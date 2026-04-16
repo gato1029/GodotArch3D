@@ -38,7 +38,7 @@ internal class CollisionManager : SingletonBase<CollisionManager>
 {
     public  SpatialHashMap<Entity> dynamicCollidersEntities;
     public  SpatialHashMap<Entity> MoveCollidersEntities;
-    public SpatialHashMap<IDataTile> tileColliders;
+
     public SpatialHashMap<TerrainDataGame> spriteColliders;
 
     public QuadTree<ColliderSprite> quadTreeColliders;
@@ -53,6 +53,15 @@ internal class CollisionManager : SingletonBase<CollisionManager>
 
     public SpatialHashMapColliders<Entity> BuildingsColliders;
     public SpatialHashMapColliders<Flecs.NET.Core.Entity> BuildingsCollidersFlecs;
+
+    // MEjoras 
+
+    // Para unidades y balas (se limpia cada frame)
+    //public FastSpatialHash fastDynamicGrid = new FastSpatialHash(4096, 10000);
+
+    //// Para árboles y recursos (persiste en memoria)
+    //public FastSpatialHash fastStaticGrid = new FastSpatialHash(8192, 100000);
+
     protected override void Initialize()
     {
         characterCollidersEntities = new SpatialHashMapColliders<Entity>(3);
@@ -60,15 +69,16 @@ internal class CollisionManager : SingletonBase<CollisionManager>
 
         dynamicCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128 
         MoveCollidersEntities = new SpatialHashMap<Entity>(8, delegate (Entity er) { return er.Id; }); // unidades de 128 x 128
-        tileColliders = new SpatialHashMap<IDataTile>(8, delegate (IDataTile er) { return er.IdCollider; });
-        spriteColliders = new SpatialHashMap<TerrainDataGame>(8, delegate (TerrainDataGame er) { return er.idUnique; });
+        
+        spriteColliders = new SpatialHashMap<TerrainDataGame>(8, delegate (TerrainDataGame er) { return er.idCollider; });
 
         terrainColliders = new SpatialHashMapColliders<TerrainDataGame>(2);        
         BuildingsColliders = new SpatialHashMapColliders<Entity>(4);
 
-        characterEntitiesFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(2);
+        characterEntitiesFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(8);
         BuildingsCollidersFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(2);
-        ResourceSourceCollidersFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(2);
+        ResourceSourceCollidersFlecs = new SpatialHashMapColliders<Flecs.NET.Core.Entity>(5);
+
     }
 
     protected override void Destroy()

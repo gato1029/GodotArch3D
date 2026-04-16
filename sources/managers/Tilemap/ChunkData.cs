@@ -1,8 +1,10 @@
 using Godot;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.Serializer.Data;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using MessagePack;
 using Newtonsoft.Json;
 using ProtoBuf;
 using System;
@@ -13,73 +15,70 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.managers.Tilemap;
 
-[ProtoContract]
-[ProtoInclude(100, typeof(TerrainDataGame))] // <--- IMPORTANTE
+[MessagePackObject]
+public class DataRender
+{
+    [Key(0)]
+    public long idDataTileSprite { get; set; }
+
+    [Key(1)]
+    public int idGroup { get; set; }
+
+    [Key(2)]
+    public bool render { get; set; }
+
+    [IgnoreMember]
+    public Vector2I positionTileWorld { get; set; }
+    [IgnoreMember]
+    public int  layer { get; set; } // no Guardar
+    
+    [IgnoreMember]
+    public Vector3 positionWorld { get; set; } // no guardar
+    [IgnoreMember]
+    public Vector2 positionCollider { get; set; } // no guardar
+    [IgnoreMember]
+    public Vector2 positionReal { get; set; } // no guardar
+    [IgnoreMember]
+    public Vector2I positionTileChunk { get; set; } // no guardar
+    public TileSpriteData GetSpriteData() { return MasterDataManager.GetData<TileSpriteData>(idDataTileSprite); } // no guardar
+}
 public class DataItem
 {
-    [ProtoIgnore, JsonIgnore] public int idUnique { get; set; }
-    [ProtoMember(1)] public long idDataTileSprite { get; set; }
-    [ProtoMember(2)] public int idGroup { get; set; }
-    [ProtoMember(3)] public int layer { get; set; }
-    [ProtoMember(4)] public bool render { get; set; }
-    [ProtoIgnore, JsonIgnore] public Vector3 positionWorld { get; set; }
-    [ProtoIgnore, JsonIgnore] public Vector2 positionCollider { get; set; }
-    [ProtoIgnore, JsonIgnore] public Vector2I positionTileWorld { get; set; }
-    [ProtoIgnore, JsonIgnore] public Vector2I positionTileChunk { get; set; }
-    [ProtoIgnore, JsonIgnore] public Vector2 positionReal { get; set; }
-    public virtual void SetDataGame() { }
+    public int idCollider { get; set; }
     public virtual void ClearDataGame() { }
-    public virtual TileSpriteData GetSpriteData() { return null; }
-    public virtual bool IsAnimation() { return false; }
-    public virtual AnimationStateData GetAnimationStateData() { return null; }
-    public virtual int GetTypeData() { return 0; }
-
-    // Campos auxiliares solo para serialización
-    [ProtoMember(5)]
-    public ProtoVector3 positionWorldSerialized
-    {
-        get => positionWorld;
-        set => positionWorld = value;
-    }
-
-    [ProtoMember(6)]
-    public ProtoVector2 positionColliderSerialized
-    {
-        get => positionCollider;
-        set => positionCollider = value;
-    }
-    [ProtoMember(7)]
-    public ProtoVector2I positionTileWorldSerialized
-    {
-        get => positionTileWorld;
-        set => positionTileWorld = value;
-    }
-    [ProtoMember(8)]
-    public ProtoVector2I positionTileChunkSerialized
-    {
-        get => positionTileChunk;
-        set => positionTileChunk = value;
-    }
-    [ProtoMember(9)]
-    public ProtoVector2 positionRealChunkSerialized
-    {
-        get => positionReal;
-        set => positionReal = value;
-    }
+    public virtual void SetDataGame(DataRender render) { }
 }
+[MessagePackObject]
 public class ChunkData<T>
 {
-    public Vector2 positionChunk { get; private set; }
-    public T[,] tiles;
-    public Vector2I size;
-    public bool changue;
+    [IgnoreMember]
+    public bool changue; // no guardar
+    [IgnoreMember]
+    public Vector2I size; // no guardar
+    [Key(0)]
+    public DataRender[,] renderTiles; //Guardar
+    [IgnoreMember]
+    public T[,] tiles; // no guardar
+
+    public ChunkData() { }
     public ChunkData(Vector2 positionChunk, Vector2I size)
     {
         this.size = size;
         this.positionChunk = positionChunk;
         tiles = new T[size.X, size.Y];
-        changue = false; 
+        renderTiles = new DataRender[size.X, size.Y];
+        changue = false;
     }
+    [IgnoreMember]
+    public Vector2 positionChunk { get; private set; }
+    public void CreateUpdateTile(Vector2I position, DataRender dataRender, T data) 
+    {
+        changue = true;                
+        renderTiles[position.X, position.Y] = dataRender;                
+        tiles[position.X, position.Y] = data;
+        
+    }
+
     public bool ExistTile(Vector2I position)
     {
         if (tiles[position.X, position.Y] == null)
@@ -91,18 +90,27 @@ public class ChunkData<T>
             return true;
         }
     }
-    public void CreateUpdateTile(Vector2I position, T data)
+    public ( T data, DataRender render) GetTileAt(Vector2 localPos)
     {
-        changue = true;
-        if (tiles[position.X, position.Y] == null)
+        int x = (int)localPos.X;
+        int y = (int)localPos.Y;
+
+        if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
         {
-            tiles[position.X, position.Y] = data;
-        }
-        else
-        {
-            tiles[position.X, position.Y]= data;
+            return (tiles[x, y], renderTiles[x,y]);
         }
 
+        return default; // Fuera de los límites
+    }
+
+    public (T data ,DataRender render) GetTileAt(int x, int y)
+    {
+        if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
+        {
+            return (tiles[x, y], renderTiles[x,y]);
+        }
+
+        return default; // Fuera de los límites
     }
 
     public void RemoveTile(Vector2I position)
@@ -111,29 +119,8 @@ public class ChunkData<T>
         if (tiles[position.X, position.Y] != null)
         {
             tiles[position.X, position.Y] = default;
+            renderTiles[position.X, position.Y] = null;
         }        
-    }
-
-    public T GetTileAt(Vector2 localPos)
-    {
-        int x = (int)localPos.X;
-        int y = (int)localPos.Y;
-
-        if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
-        {
-            return tiles[x, y];
-        }
-
-        return default; // Fuera de los límites
-    }
-    public T GetTileAt(int x, int y)
-    {
-        if (x >= 0 && x < tiles.GetLength(0) && y >= 0 && y < tiles.GetLength(1))
-        {
-            return tiles[x, y];
-        }
-
-        return default; // Fuera de los límites
     }
     public ChunkDataSerializable<T> ToSerializable()
     {

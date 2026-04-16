@@ -94,7 +94,7 @@ public partial class ControlAnimation : PanelContainer
         }
     }
 
-    private void PanelColliders_OnNotifyPreview(GeometricShape2D itemData)
+    private void PanelColliders_OnNotifyPreview(GeometricShape2D itemData, ColliderScene colliderScene)
     {
         objectData.colliderMultiple = panelColliders.GetAllCollidersData().ToArray();
         OnNotifyChangued?.Invoke(this);
@@ -125,7 +125,7 @@ public partial class ControlAnimation : PanelContainer
         }
     }
 
-    private void ControlCollider_OnNotifyPreview(GeometricShape2D itemData)
+    private void ControlCollider_OnNotifyPreview(GeometricShape2D itemData, ColliderScene colliderScene)
     {
         objectData.collider = itemData;
         OnNotifyChangued?.Invoke(this);

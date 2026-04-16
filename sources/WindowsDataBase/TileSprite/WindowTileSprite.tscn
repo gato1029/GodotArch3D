@@ -1,23 +1,32 @@
-[gd_scene load_steps=10 format=3 uid="uid://cfk6nlh8toxus"]
+[gd_scene format=3 uid="uid://cfk6nlh8toxus"]
 
 [ext_resource type="Script" uid="uid://bg1asma4221lc" path="res://sources/WindowsDataBase/TileSprite/WindowTileSprite.cs" id="1_ao2wx"]
 [ext_resource type="PackedScene" uid="uid://omg22kdm131a" path="res://sources/KuroTiles/ControlKuroTile.tscn" id="2_7hy0e"]
+[ext_resource type="Script" uid="uid://c1thn6nufciqn" path="res://addons/animated_panel_container_cs/AnimatedPanelContainer.cs" id="2_jxjt4"]
 [ext_resource type="PackedScene" uid="uid://cinkv05bue1lv" path="res://sources/KuroTiles/ControlListTextures.tscn" id="3_4l6m5"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="3_hx15v"]
 [ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="3_uojsg"]
 [ext_resource type="PackedScene" uid="uid://sv8lb7mas3mp" path="res://sources/WindowsDataBase/Generic/Controls/ControlSpriteEdit.tscn" id="3_y55g4"]
+[ext_resource type="Texture2D" uid="uid://cvyv7b7e0avlu" path="res://resources/Textures/iconos/Eye.png" id="4_aifj0"]
 [ext_resource type="PackedScene" uid="uid://7qitk1hya1sf" path="res://sources/WindowsDataBase/Character/Colliders/windowColliders.tscn" id="4_ao2wx"]
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="4_uojsg"]
 [ext_resource type="Texture2D" uid="uid://gnsswjongsbo" path="res://resources/Textures/iconos/Save as.png" id="5_47ght"]
+[ext_resource type="PackedScene" uid="uid://vtluekg6hu8r" path="res://sources/WindowsDataBase/TileSprite/ControlAnimationMultipleDirection.tscn" id="5_g5duy"]
+[ext_resource type="Texture2D" uid="uid://n841qxvcogdx" path="res://resources/Textures/iconos/Hide.png" id="7_o2orn"]
 
-[node name="WindowTileSprite" type="Window"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jxjt4"]
+
+[node name="WindowTileSprite" type="Window" unique_id=1831610868]
 oversampling_override = 1.0
 title = "TileSprite"
 initial_position = 1
-size = Vector2i(820, 600)
+size = Vector2i(1050, 900)
+content_scale_size = Vector2i(1200, 900)
+content_scale_mode = 2
+content_scale_aspect = 4
 script = ExtResource("1_ao2wx")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2136641246]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -30,198 +39,276 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1523197383]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer" unique_id=1005582166]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/PanelContainer/MarginContainer" unique_id=759655806]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer" unique_id=655813987]
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer" unique_id=1642359104]
 layout_mode = 2
-size_flags_vertical = 2
+size_flags_vertical = 3
 
-[node name="LineEditCode" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2" unique_id=1268677424]
 layout_mode = 2
+
+[node name="LineEditCode" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1663586007]
+layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Codigo Autogenerado"
 editable = false
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+[node name="LineEditCodeSave" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/HBoxContainer" unique_id=1689431828]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Codigo Autogenerado"
+editable = false
+
+[node name="GridContainerCabecera" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2" unique_id=1217681633]
+layout_mode = 2
+columns = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerCabecera" unique_id=1191084588]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Agrupador:"
+
+[node name="LineEditGrouping" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerCabecera" unique_id=88938764]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Hacer Click"
+editable = false
+
+[node name="Label4" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerCabecera" unique_id=301947491]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Tipo:"
+
+[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerCabecera" unique_id=772330263]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControlMultiple" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2" unique_id=864535425 instance=ExtResource("5_g5duy")]
+visible = false
+layout_mode = 2
+
+[node name="GridContainerTile" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2" unique_id=55496356]
+layout_mode = 2
+columns = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerTile" unique_id=139133572]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Tile:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerTile" unique_id=846652386]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControlTile" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerTile/VBoxContainer" unique_id=2034444213 instance=ExtResource("2_7hy0e")]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ControlListTexturesAnimated" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerTile/VBoxContainer" unique_id=31305667 instance=ExtResource("3_4l6m5")]
+visible = false
+layout_mode = 2
+
+[node name="ContainerConfigBase" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2" unique_id=1977287486]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase" unique_id=367402900]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/HBoxContainer" unique_id=1742989269]
+layout_mode = 2
+text = "Configuracion Basica:"
+
+[node name="ButtonHideConfigBase" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/HBoxContainer" unique_id=1465055245]
+layout_mode = 2
+size_flags_horizontal = 8
+toggle_mode = true
+texture_normal = ExtResource("4_aifj0")
+texture_pressed = ExtResource("7_o2orn")
+script = ExtResource("4_uojsg")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="AnimatedPanelContainerConfigBase" type="PanelContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase" unique_id=1998989579]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_jxjt4")
+script = ExtResource("2_jxjt4")
+metadata/_custom_type_script = "uid://c1thn6nufciqn"
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase" unique_id=1225458329]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="Label3" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="Label5" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=1788491329]
 layout_mode = 2
-text = "Agrupador:"
-
-[node name="LineEditGrouping" type="LineEdit" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-placeholder_text = "Hacer Click"
-editable = false
-
-[node name="Label4" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Tipo:"
-
-[node name="OptionButtonType" type="OptionButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-
-[node name="CheckBoxIsAnimation" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Label2" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-text = "Tile:"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
-
-[node name="ControlTile" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer/VBoxContainer" instance=ExtResource("2_7hy0e")]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="ControlListTexturesAnimated" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer/VBoxContainer" instance=ExtResource("3_4l6m5")]
-visible = false
-layout_mode = 2
-
-[node name="Label5" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
-layout_mode = 2
+size_flags_horizontal = 3
 text = "Offset Sprite X:"
 
-[node name="SpinBoxOffsetX" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="SpinBoxOffsetX" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=656947146]
 layout_mode = 2
-min_value = -100.0
+size_flags_horizontal = 3
+min_value = -1000.0
+max_value = 1000.0
 step = 0.10000000000582077
 
-[node name="Label6" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="Label6" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=978015594]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Offset Sprite Y:"
 
-[node name="SpinBoxOffsetY" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="SpinBoxOffsetY" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=417315954]
 layout_mode = 2
-min_value = -100.0
+size_flags_horizontal = 3
+min_value = -1000.0
+max_value = 1000.0
 step = 0.10000000000582077
 
-[node name="Label7" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="Label7" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=656846052]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Escala:"
 
-[node name="SpinBoxScale" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="SpinBoxScale" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=1927804623]
 layout_mode = 2
+size_flags_horizontal = 3
 step = 0.10000000000582077
 value = 1.00000000005821
 
-[node name="Label12" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="Label12" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=7151795]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Profundidad Y:"
 
-[node name="SpinBoxDepht" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="SpinBoxDepht" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=773902086]
 layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
 step = 0.10000000000582077
 
-[node name="Label8" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="Label8" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=271409973]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Color Base:"
 
-[node name="ColorButtonBase" type="ColorPickerButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="ColorButtonBase" type="ColorPickerButton" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer" unique_id=146347311]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="Label9" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="GridContainerBasicTransform" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2" unique_id=186045757]
 layout_mode = 2
-size_flags_horizontal = 8
+columns = 2
+
+[node name="Label9" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=525071301]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Espejo Horizontal:"
 
-[node name="CheckBoxMirrorHorizontal" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="CheckBoxMirrorHorizontal" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=695297560]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Habilitado"
 
-[node name="Label10" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="Label10" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=2106249826]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Espejo Vertical:"
 
-[node name="CheckBoxMirrorVertical" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="CheckBoxMirrorVertical" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=1832734881]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Habilitado"
 
-[node name="Label11" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="Label11" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=917773386]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Tiene Collider:"
 
-[node name="CheckBoxHasCollider" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainer"]
+[node name="CheckBoxHasCollider" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=786609294]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "Habilitado"
 
-[node name="GridContainerAnimated" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+[node name="GridContainerAnimated" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2" unique_id=1219682891]
 visible = false
 layout_mode = 2
 columns = 2
 
-[node name="Label" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+[node name="Label" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated" unique_id=1109237896]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Fps:"
 
-[node name="SpinBoxFps" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+[node name="SpinBoxFps" type="SpinBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated" unique_id=2035870408]
 layout_mode = 2
-step = 0.1
+step = 0.01
 value = 0.1
 
-[node name="Label2" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+[node name="Label2" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated" unique_id=183055869]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Bucle:"
 
-[node name="CheckBoxLoop" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated"]
+[node name="CheckBoxLoop" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/VBoxContainer2/GridContainerAnimated" unique_id=1402498403]
 layout_mode = 2
 button_pressed = true
 text = "Habilitado"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer" unique_id=1312786058]
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 6
+size_flags_vertical = 2
 
-[node name="ButtonSave" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonSave" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/HBoxContainer" unique_id=250101706]
 layout_mode = 2
 texture_normal = ExtResource("3_uojsg")
 script = ExtResource("4_uojsg")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="ButtonSaveSimilar" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonSaveSimilar" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/HBoxContainer" unique_id=1569371831]
 layout_mode = 2
 tooltip_text = "Duplicar"
 texture_normal = ExtResource("5_47ght")
 script = ExtResource("4_uojsg")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="ButtonDelete" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonDelete" type="TextureButton" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/VBoxContainer/HBoxContainer" unique_id=311050658]
 layout_mode = 2
 texture_normal = ExtResource("3_hx15v")
 script = ExtResource("4_uojsg")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="ControlSpriteEdit" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer" instance=ExtResource("3_y55g4")]
+[node name="HBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer" unique_id=1179012209]
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="ControlCollider" parent="MarginContainer/PanelContainer/MarginContainer/HBoxContainer" instance=ExtResource("4_ao2wx")]
+[node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer" unique_id=1513650902]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ControlSpriteEdit" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer/VSplitContainer" unique_id=521663054 instance=ExtResource("3_y55g4")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControlCollider" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer/VSplitContainer" unique_id=2123491756 instance=ExtResource("4_ao2wx")]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1

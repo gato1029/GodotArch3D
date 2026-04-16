@@ -1,3 +1,4 @@
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
@@ -10,17 +11,17 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 public class BulletData:IdData
 {
-    public SpriteData spriteData { get; set; }
-
+    public long idTileSprite {  get; set; } 
     [BsonCtor]
-    public BulletData(SpriteData spriteData)
+    public BulletData(long idTileSprite)
     {
-        if (spriteData != null)
-        {
-            textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(spriteData.idMaterial, spriteData.x, spriteData.y, spriteData.widht, spriteData.height);
-        }
+        textureVisual = MasterDataManager.GetData<TileSpriteData>(idTileSprite).textureVisual;
     }
 
+    public override void RefreshTextureVisual()
+    {
+        textureVisual = MasterDataManager.GetData<TileSpriteData>(idTileSprite).textureVisual;
+    }
     public BulletData()
     {
     }

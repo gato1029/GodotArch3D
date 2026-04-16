@@ -84,8 +84,8 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         objectData.description = TextEditDescription.Text;
         objectData.bonusDataArray = PanelBonificaciones.GetAllStats().ToArray();
         objectData.statsDataArray = PanelEstadisticas.GetAllStats().ToArray();
-        objectData.damageDataArray = PanelAtaque.GetAllStats().ToArray();
-        objectData.defenseDataArray = PanelDefensa.GetAllStats().ToArray();
+        objectData.damageDataArray = PanelAtaque.GetAllData().ToArray();
+        objectData.defenseDataArray = PanelDefensa.GetAllData().ToArray();
 
         objectData.characterBehaviorType = (CharacterBehaviorType)OptionButtonBehavior.GetSelectedId();
         objectData.characterType = (CharacterType)OptionButtonType.GetSelectedId();
@@ -95,9 +95,11 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
 
         objectData.unitMoveData = new UnitMoveData { radiusMove = (float)SpinBoxRadiusMove.Value, radiusSearch = (float)SpinBoxRadiusSearch.Value };
 
-        AnimationCharacterBaseData animationCharacterBaseDataSelected = AnimationCharacterManager.Instance.GetCharacterBaseData(objectData.idAnimationCharacterBaseData);
-        objectData.collisionMove = animationCharacterBaseDataSelected.collisionMove.Multiplicity(objectData.scale);
-        objectData.collisionBody = animationCharacterBaseDataSelected.collisionBody.Multiplicity(objectData.scale);
+        objectData.idTileSpriteData = ControlTileSpriteData.GetidTile();
+
+        //AnimationCharacterBaseData animationCharacterBaseDataSelected = AnimationCharacterManager.Instance.GetCharacterBaseData(objectData.idAnimationCharacterBaseData);
+        //objectData.collisionMove = animationCharacterBaseDataSelected.collisionMove.Multiplicity(objectData.scale);
+        //objectData.collisionBody = animationCharacterBaseDataSelected.collisionBody.Multiplicity(objectData.scale);
 
         DataBaseManager.Instance.InsertUpdate(objectData);
         OnNotifyChangued?.Invoke(this);
@@ -137,10 +139,12 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         SpinBoxRadiusMove.Value = objectData.unitMoveData.radiusMove;
         SpinBoxRadiusSearch.Value = objectData.unitMoveData.radiusSearch;
 
+        ControlTileSpriteData.SetIdTile(data.idTileSpriteData);
         OptionButtonBehavior_ItemSelected(0);
-        var dataInt = DataBaseManager.Instance.FindById<AnimationCharacterBaseData>(data.idAnimationCharacterBaseData);
-        FrameData iFrame = dataInt.animationDataArray[0].animationData[0].frameDataArray[0];
-        var dataTexture = MaterialManager.Instance.GetAtlasTexture(dataInt.animationDataArray[0].idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
-        Sprite2DView.Texture = dataTexture;
+
+        //var dataInt = DataBaseManager.Instance.FindById<AnimationCharacterBaseData>(data.idAnimationCharacterBaseData);
+        //FrameData iFrame = dataInt.animationDataArray[0].animationData[0].frameDataArray[0];
+        //var dataTexture = MaterialManager.Instance.GetAtlasTexture(dataInt.animationDataArray[0].idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
+        //Sprite2DView.Texture = dataTexture;
     }
 }

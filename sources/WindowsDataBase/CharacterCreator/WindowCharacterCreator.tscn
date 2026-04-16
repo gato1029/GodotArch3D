@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://dh83s6g7u7em0"]
+[gd_scene load_steps=7 format=3 uid="uid://dh83s6g7u7em0"]
 
 [ext_resource type="PackedScene" uid="uid://dbvmmc5uyo82x" path="res://sources/WindowsDataBase/Accesories/ContainerBonus.tscn" id="1_dqvk3"]
 [ext_resource type="Script" uid="uid://d285knhqtypno" path="res://sources/WindowsDataBase/CharacterCreator/WindowCharacterCreator.cs" id="1_o0s8w"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="1_y26u5"]
 [ext_resource type="PackedScene" uid="uid://kma1fph6dbb6" path="res://sources/WindowsDataBase/Accesories/ContainerStats.tscn" id="2_y26u5"]
+[ext_resource type="PackedScene" uid="uid://c3ttigs8l4153" path="res://sources/KuroTiles/ControlListTileSprite.tscn" id="3_0d5rq"]
 [ext_resource type="PackedScene" uid="uid://c5l0xhw6ebiwl" path="res://sources/WindowsDataBase/Accesories/ContainerElements.tscn" id="3_o0s8w"]
 
 [node name="WindowCharacterCreator" type="Window"]
@@ -47,6 +48,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 
 [node name="ButtonSearch" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Animacion
@@ -58,6 +60,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="Panel" type="Panel" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainer/CenterContainer"]
+visible = false
 custom_minimum_size = Vector2(250, 250)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -77,10 +80,15 @@ scale = Vector2(2, 2)
 [node name="Sprite2DView" type="Sprite2D" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainer/CenterContainer/Panel/Control"]
 texture = ExtResource("1_y26u5")
 
+[node name="ControlTileSpriteData" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainer/CenterContainer" instance=ExtResource("3_0d5rq")]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+onlyOneTile = true
+
 [node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "nombre Animacion"
+text = "Animacion Base"
 
 [node name="VBoxContainerDown" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase"]
 layout_mode = 2

@@ -155,7 +155,10 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         {
             materialData = materials[idMaterial];
         }
-        
+        if (materialData==null)
+        {
+            return new AtlasTexture();
+        }
         textureBase = (Texture2D)(materialData.textureMaterial);    
         AtlasTexture atlasTexture = new AtlasTexture();
         atlasTexture.Atlas = textureBase;

@@ -5,6 +5,7 @@ using GodotEcsArch.sources.Flecs.Creators;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using System.Collections.Generic;
 
@@ -13,6 +14,7 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
     private Entity[,] gridEntities;
     private long tileId = 1762385049549000;
     private int renderLayer;
+    private  FlecsManager flecsManager;
 
     public Vector2I Size { get; private set; }
     protected override void Initialize()
@@ -31,7 +33,11 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
     public void Configure(long tileId, int renderLayer)
     {
         this.renderLayer = renderLayer;
-        this.tileId = tileId;
+        this.tileId = tileId;        
+    }
+    public void ConfigureFlecs(FlecsManager flecsManager)
+    {
+        this.flecsManager = flecsManager;
     }
 
     public void Create(Vector2I size, Vector2I centerTile)
@@ -53,7 +59,7 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
                 TileSpriteData tileData = MasterDataManager.GetData<TileSpriteData>(tileId);
                 if (tileData!=null)
                 {
-                    var entity = TileSpriteCreator.Instance.CreateSingleSprite(tileData.spriteData, worldPos, tilePos, renderLayer);
+                    var entity = TileSpriteCreator.Instance.CreateSingleSprite(flecsManager,tileData.spriteData, worldPos, tilePos, renderLayer);
 
                     gridEntities[i, j] = entity;
                 }

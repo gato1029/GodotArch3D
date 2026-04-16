@@ -6,14 +6,34 @@ using System.Collections.Generic;
 
 public partial class ControlSpriteEdit : MarginContainer
 {
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+
+
+    public delegate void RequestNotifyPreviewShape(List<Vector2> PointsPoligon);
+    public event RequestNotifyPreviewShape OnNotifyPreviewShape;
+
+    public delegate void RequestNotifyMovePosition(Vector2 PositionShape, Vector2 size);
+    public event RequestNotifyMovePosition OnNotifyPositionShape;
+
+    public override void _Ready()
 	{
         InitializeUI(); // Insertado por el generador de UI
 		DrawSquare(new Vector2(0,0), new Vector2(100,100));
         CheckButtonModeGrid.Pressed += CheckButtonModeGrid_Pressed;
+        ShapesForm.OnNotifyPreviewShape += ShapesForm_OnNotifyPreviewShape;
+        ShapesForm.OnNotifyPositionShape += ShapesForm_OnNotifyPositionShape;
     }
-	Vector2I lastSize = Vector2I.Zero;
+
+    private void ShapesForm_OnNotifyPositionShape(Vector2 PositionShape, Vector2 size)
+    {
+        this.OnNotifyPositionShape?.Invoke(PositionShape,size);
+    }
+
+    private void ShapesForm_OnNotifyPreviewShape(List<Vector2> PointsPoligon)
+    {
+        this.OnNotifyPreviewShape?.Invoke(PointsPoligon);
+    }
+
+    Vector2I lastSize = Vector2I.Zero;
     private void CheckButtonModeGrid_Pressed()
     {
         lastSize = new Vector2I((int)SpinBoxX.Value, (int)SpinBoxY.Value);
@@ -117,10 +137,24 @@ public partial class ControlSpriteEdit : MarginContainer
     }
 	List<TileInfoKuro> animationData = null;
 
+    public void Clear()
+    {
+        TextureImage.Texture = null;
+        if (animationData!=null)
+        {
+            animationData.Clear();
+            indexFrame = 0;
+            currentfps = 0;
+            isPlayingAnimation = false;
+        }
+        
+    }
     public void SetTextureAnimation(List<TileInfoKuro> tileInfoKuros)
 	{
 		if (tileInfoKuros == null || tileInfoKuros.Count == 0)
 			return;
+        indexFrame = 0;
+        currentfps = 0;
 		isPlayingAnimation = true;
         var texture2D = tileInfoKuros[0].texture;
         TextureImage.Texture = texture2D;
@@ -164,7 +198,25 @@ public partial class ControlSpriteEdit : MarginContainer
 		ShapesForm.sizeShape = size;
     }
 
-	public void SetOffsetCenterY(float y)
+    internal void PaintDrawPolygon(List<Vector2> points, bool invertSign=false)
+    {
+        ShapesForm.shapeType = ShapesForm.ShapeType.Poligono;
+        List<Vector2> pointsNormalized = new List<Vector2>();
+        if (invertSign)
+        {
+            foreach (var item in points)
+            {
+                Vector2 nv = new Vector2(item.X, item.Y * (-1));
+                pointsNormalized.Add(nv);
+            }
+        }
+        ShapesForm.SetPoligonPoints(pointsNormalized);
+    }
+    internal void EnablePaintDrawPolygon()
+    {
+        ShapesForm.shapeType = ShapesForm.ShapeType.Poligono;
+    }
+    public void SetOffsetCenterY(float y)
 	{ 
 		centerOffsetY = y;
 		Vector2 cent = -(center.GetSize()) / 2f;
@@ -178,4 +230,6 @@ public partial class ControlSpriteEdit : MarginContainer
 	{
 		TextureImage.FlipH = v;
     }
+
+
 }

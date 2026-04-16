@@ -38,6 +38,24 @@ namespace GodotEcsArch.sources.utils
             Vector2 positionCenter = positionNormalize + new Vector2(x, y);
             return positionCenter;
         }
+        public static Vector2I WorldToTile(Vector2 worldPosition)
+        {
+            float tileSizeUnits = MeshCreator.PixelsToUnits(16); // 16 px → units
+
+            int tileX = (int)MathF.Floor(worldPosition.X / tileSizeUnits);
+            int tileY = (int)MathF.Floor(worldPosition.Y / tileSizeUnits);
+
+            return new Vector2I(tileX, tileY);
+        }
+        public static Vector2I WorldToTile(float x, float y)
+        {
+            float tileSizeUnits = MeshCreator.PixelsToUnits(16); // 16 px → units
+
+            int tileX = (int)MathF.Floor(x / tileSizeUnits);
+            int tileY = (int)MathF.Floor(y / tileSizeUnits);
+
+            return new Vector2I(tileX, tileY);
+        }
 
         public static RuleData FindBestMatchingRule(RuleData[] arrayRules, byte mask, int[] neighborTilesIds)
         {

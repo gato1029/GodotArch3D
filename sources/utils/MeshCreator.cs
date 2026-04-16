@@ -8,6 +8,17 @@ using System.Threading.Tasks;
 
 internal class MeshCreator
 {
+    static Mesh baseMesh;
+
+
+    public static Mesh GetBaseMesh()
+    {
+        if (baseMesh == null)
+        {
+            baseMesh = CreateSquareMesh(16, 16);
+        }
+        return baseMesh;
+    }
     public static float PixelsToUnits(float pixels)
     {
         return pixels / 32; // Se usa 32f para asegurar que la división sea en punto flotante

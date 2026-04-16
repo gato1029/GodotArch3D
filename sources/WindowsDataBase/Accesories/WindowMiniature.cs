@@ -135,7 +135,7 @@ public partial class WindowMiniature : Window
 
 
     }
-    private void Control_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData)
+    private void Control_OnNotifyPreview(GodotEcsArch.sources.managers.Collision.GeometricShape2D itemData, ColliderScene colliderScene)
     {
         objectData.collisionBody = itemData;
 
@@ -184,7 +184,7 @@ public partial class WindowMiniature : Window
         {
             ColliderContainer.SetData(objectData.collisionBody);
             CheckBoxHasCollider.ButtonPressed = true;
-            Control_OnNotifyPreview(objectData.collisionBody);
+            Control_OnNotifyPreview(objectData.collisionBody, null);
             CheckBoxHasCollider_PressedUI();
             CheckBoxHasCollider_Pressed();
         }
@@ -227,7 +227,7 @@ public partial class WindowMiniature : Window
             CollisionShapeView.Visible = true;
             if (objectData.collisionBody == null)
             {
-                Control_OnNotifyPreview(new Rectangle(16, 16, 0, 0));
+                Control_OnNotifyPreview(new Rectangle(16, 16, 0, 0), null);
             }
         }
         else
