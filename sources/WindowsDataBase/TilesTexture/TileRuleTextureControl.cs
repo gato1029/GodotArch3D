@@ -1,28 +1,45 @@
 using Godot;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 
 public partial class TileRuleTextureControl : Control
 {
-    private string widgetPath = "res://sources/KuroTiles/ControlKuroTile.tscn";
+    private string widgetPath = "res://sources/WindowsDataBase/TilesTexture/TileTextureControl.tscn";
     private PackedScene _widgetScene;
+
+    private string widgetRulePath = "res://sources/WindowsDataBase/TilesTexture/TileTextureRuleControl.tscn";
+    private PackedScene _widgetRuleScene;
 
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
         // 1. Cargar la escena del widget
         _widgetScene = GD.Load<PackedScene>(widgetPath);
+        _widgetRuleScene = GD.Load<PackedScene>(widgetRulePath);
+
         // Hacer que el contenedor ocupe todo el espacio de este Control
         FixedGridTiles.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        FixedGridRules.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         // Ejemplo: Crear una rejilla inicial de 3x3
         SetupGrid(3, 3);
         SpinBoxX.ValueChanged += SpinBoxX_ValueChanged;
         SpinBoxY.ValueChanged += SpinBoxY_ValueChanged;
-        
+
+        KuroCheckButtonSwitch.Pressed += KuroCheckButtonSwitch_Pressed;
+        KuroCheckButtonSwitch_Pressed();
+    }
+
+    private void KuroCheckButtonSwitch_Pressed()
+    {
+        bool isOn = KuroCheckButtonSwitch.ButtonPressed;
+
+        FixedGridTiles.Visible = isOn;
+        FixedGridRules.Visible = !isOn;
     }
 
     private void SpinBoxY_ValueChanged(double value)
     {
-       SetupGrid((int)SpinBoxY.Value, (int)value);
+       SetupGrid((int)SpinBoxX.Value, (int)value);
     }
 
     private void SpinBoxX_ValueChanged(double value)
@@ -35,27 +52,41 @@ public partial class TileRuleTextureControl : Control
     /// </summary>
     public void SetupGrid(int rows, int columns)
     {
-        if (FixedGridTiles == null) return;
+        if (FixedGridTiles == null || FixedGridRules == null) return;
 
-        // Actualizar propiedades del contenedor
+        // 🔹 Configurar ambos grids
         FixedGridTiles.Rows = rows;
         FixedGridTiles.Columns = columns;
 
-        // Limpiar widgets anteriores si existen
-        foreach (Node child in FixedGridTiles.GetChildren())
-        {
-            child.QueueFree();
-        }
+        FixedGridRules.Rows = rows;
+        FixedGridRules.Columns = columns;
 
-        // Crear nuevos widgets basándose en la cantidad total (filas * columnas)
+        // 🔹 Limpiar ambos
+        foreach (Node child in FixedGridTiles.GetChildren())
+            child.QueueFree();
+
+        foreach (Node child in FixedGridRules.GetChildren())
+            child.QueueFree();
+
         int totalWidgets = rows * columns;
+
+        // 🔹 Crear tiles
         for (int i = 0; i < totalWidgets; i++)
         {
             Control instance = _widgetScene.Instantiate<Control>();
             FixedGridTiles.AddChild(instance);
         }
 
-        // Forzar al contenedor a que se refresque inmediatamente
-        FixedGridTiles.Columns = columns; // El setter ya llama a Refresh()
+        // 🔹 Crear rules
+        for (int i = 0; i < totalWidgets; i++)
+        {
+            TileTextureRuleControl instance = _widgetRuleScene.Instantiate<TileTextureRuleControl>();            
+            FixedGridRules.AddChild(instance);
+            instance.SetData(NeighborCondition.Ignore);
+        }
+
+        // 🔹 Forzar refresh
+        FixedGridTiles.QueueSort();
+        FixedGridRules.QueueSort();
     }
 }

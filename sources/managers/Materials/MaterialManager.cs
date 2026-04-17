@@ -141,7 +141,42 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
     /// <summary>
     /// Retorna un AtlasTexture sin usar TextureMasterData es decir usa directamente el textureMaterial del MaterialData
     /// </summary>
+    public AtlasTexture GetAtlasTextureInternal(int idMaterial, int internalPosition)
+    {
+        internalPosition -= 1;
+        Texture2D textureBase = null;
+        MaterialData materialData;
+        if (!materials.ContainsKey(idMaterial))
+        {
+            materialData = DataBaseManager.Instance.FindById<MaterialData>(idMaterial);
+            RegisterMaterial(idMaterial, materialData);
+        }
+        else
+        {
+            materialData = materials[idMaterial];
+        }
+        if (materialData == null)
+        {
+            return new AtlasTexture();
+        }
+        textureBase = (Texture2D)(materialData.textureMaterial);
+        AtlasTexture atlasTexture = new AtlasTexture();
+        atlasTexture.Atlas = textureBase;
 
+        
+        int columns = (int)(materialData.widhtTexture / materialData.divisionPixelX); //8
+
+        int row = internalPosition / columns; // Fila correspondiente al índice
+        int column = internalPosition % columns; // Columna correspondiente al índice
+
+        // Calcular las coordenadas de la subimagen a partir del índice
+        int x = column * materialData.divisionPixelX;
+        int y = row * materialData.divisionPixelY;
+
+
+        atlasTexture.Region = new Rect2(x, y, materialData.divisionPixelX, materialData.divisionPixelY);
+        return atlasTexture;
+    }
     public AtlasTexture GetAtlasTextureInternal(int idMaterial, float x, float y, float width, float height)
     {
         MaterialData materialData = null;       

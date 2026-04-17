@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://b2nclm8nvyjb"]
+
+[ext_resource type="Script" uid="uid://28p7r8v0gfnv" path="res://sources/WindowsDataBase/TilesTexture/TileRuleTextureControl.cs" id="1_wrd5d"]
+[ext_resource type="Script" uid="uid://kr5g3m7w8x4v" path="res://addons/FixedGrid/FixedGridContainer.cs" id="2_nkc35"]
+[ext_resource type="Texture2D" uid="uid://cgib4xbvusljx" path="res://resources/Textures/internal/rule.png" id="2_s33oo"]
+[ext_resource type="Script" uid="uid://b2tq08112l2fo" path="res://sources/CustomWidgets/KuroCheckButton.cs" id="3_ruap1"]
+[ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="4_va4ud"]
+
+[node name="TileRuleTextureControl" type="Control" unique_id=1044990167]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("1_wrd5d")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1520532626]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=747347864]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer" unique_id=520653612]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=322547518]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="KuroCheckButtonSwitch" type="CheckButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=961748160]
+layout_mode = 2
+icon = ExtResource("2_s33oo")
+script = ExtResource("3_ruap1")
+TextureOn = ExtResource("4_va4ud")
+TextureOff = ExtResource("2_s33oo")
+metadata/_custom_type_script = "uid://b2tq08112l2fo"
+
+[node name="SpinBoxX" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1552927166]
+layout_mode = 2
+min_value = 1.0
+max_value = 5.0
+value = 3.0
+prefix = "X:"
+
+[node name="SpinBoxY" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1587188690]
+layout_mode = 2
+min_value = 1.0
+max_value = 5.0
+value = 3.0
+prefix = "Y:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=245466540]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="FixedGridTiles" type="Container" parent="PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=691774664]
+layout_mode = 2
+script = ExtResource("2_nkc35")
+Separation = Vector2(1, 1)
+metadata/_custom_type_script = "uid://kr5g3m7w8x4v"
+
+[node name="FixedGridRules" type="Container" parent="PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=2103708671]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+script = ExtResource("2_nkc35")
+Separation = Vector2(1, 1)
+metadata/_custom_type_script = "uid://kr5g3m7w8x4v"

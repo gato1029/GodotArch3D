@@ -61,7 +61,7 @@ public partial class KuroTextureButton : TextureButton
             var image = tex.GetImage();
             var bitmap = new Bitmap();
             bitmap.CreateFromImageAlpha(image);
-            TextureClickMask = bitmap;
+            //TextureClickMask = bitmap;
         }
 
         UpdateColor();

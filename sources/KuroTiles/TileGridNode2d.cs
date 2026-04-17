@@ -27,6 +27,13 @@ public partial class TileGridNode2d : Node2D
 
     public delegate void EventNotifyMultiSelection(List<TileInfoKuro> tiles);
     public event EventNotifyMultiSelection OnNotifyMultiSelection;
+
+    public delegate void EventNotifySelectionIndex(int index);
+    public event EventNotifySelectionIndex OnNotifySelectionIndex;
+
+    public delegate void EventNotifyMultiSelectionIndex(List<int> indices);
+    public event EventNotifyMultiSelectionIndex OnNotifyMultiSelectionIndex;
+
     // 🔹 NUEVO: Modo de selección
     public enum SelectionMode { SingleArea, MultiTile }
     [Export] public SelectionMode selectionMode = SelectionMode.SingleArea;
@@ -302,6 +309,7 @@ public partial class TileGridNode2d : Node2D
                     }
 
                     OnNotifyMultiSelection?.Invoke(GetSelectedFrames());
+                    OnNotifyMultiSelectionIndex?.Invoke(GetSelectedIndices());
                     QueueRedraw();
                 }
 
@@ -319,6 +327,12 @@ public partial class TileGridNode2d : Node2D
                     float h = (endY - startY + 1) * cellSize.Y;
 
                     OnNotifySelection?.Invoke(px, py, w, h);
+                    // Solo si es 1 tile
+                    if (dragStartCell == dragEndCell)
+                    {
+                        int index = CellToIndex(dragStartCell);
+                        OnNotifySelectionIndex?.Invoke(index);
+                    }
                 }
 
                 clickJustPressed = false;
@@ -365,7 +379,15 @@ public partial class TileGridNode2d : Node2D
             }
         }
     }
+    public List<int> GetSelectedIndices()
+    {
+        List<int> indices = new List<int>();
 
+        foreach (var cell in multiSelectedTiles)
+            indices.Add(CellToIndex(cell));
+
+        return indices;
+    }
 
     internal void SetSizeLineGrid(float zoom)
     {
@@ -450,5 +472,71 @@ public partial class TileGridNode2d : Node2D
         }
 
         return selectedFrames;
+    }
+
+    private int GetColumns()
+    {
+        if (imageTexture == null) return 0;
+        return Mathf.CeilToInt(imageTexture.Size.X / cellSize.X);
+    }
+    private int CellToIndex(Vector2I cell)
+    {
+        int cols = GetColumns();
+        return cell.Y * cols + cell.X + 1 ; // +1 para q
+    }
+    private Vector2I IndexToCell(int index)
+    {
+        int cols = GetColumns();
+        index -= 1;
+
+        int x = index % cols;
+        int y = index / cols;
+
+        return new Vector2I(x, y);
+    }
+    public void SetSelection(int index)
+    {
+        if (imageTexture == null || imageTexture.Texture == null)
+            return;
+
+        selectionMode = SelectionMode.SingleArea;
+
+        // Convertir índice → celda
+        Vector2I cell = IndexToCell(index);
+
+        // Limpiar multi selección por seguridad
+        multiSelectedTiles.Clear();
+
+        dragStartCell = cell;
+        dragEndCell = cell;
+
+        // Notificar selección en píxeles (como ya haces)
+        float px = cell.X * cellSize.X;
+        float py = cell.Y * cellSize.Y;
+        float w = cellSize.X;
+        float h = cellSize.Y;
+
+        OnNotifySelection?.Invoke(px, py, w, h);
+
+        // 🔹 NUEVO: notificar índice
+        OnNotifySelectionIndex?.Invoke(index);
+
+        forced = true;
+        QueueRedraw();
+    }
+    public void SetSelection(List<int> indices)
+    {
+        selectionMode = SelectionMode.MultiTile;
+        multiSelectedTiles.Clear();
+
+        foreach (var index in indices)
+        {
+            Vector2I cell = IndexToCell(index);
+
+            if (!multiSelectedTiles.Contains(cell))
+                multiSelectedTiles.Add(cell);
+        }
+
+        QueueRedraw();
     }
 }

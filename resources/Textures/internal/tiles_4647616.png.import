@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://6jgkuikjbh3o"
-path="res://.godot/imported/asterisk (1).png-f9a41899103c23907d6a224dd697c833.ctex"
+uid="uid://r8jpqdfxbqxv"
+path="res://.godot/imported/tiles_4647616.png-81bdab3c9a89c5696ed24a94943213a5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/Textures/internal/asterisk (1).png"
-dest_files=["res://.godot/imported/asterisk (1).png-f9a41899103c23907d6a224dd697c833.ctex"]
+source_file="res://resources/Textures/internal/tiles_4647616.png"
+dest_files=["res://.godot/imported/tiles_4647616.png-81bdab3c9a89c5696ed24a94943213a5.ctex"]
 
 [params]
 

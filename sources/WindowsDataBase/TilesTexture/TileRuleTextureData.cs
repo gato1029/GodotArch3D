@@ -27,7 +27,7 @@ public struct ConditionSlot
     public NeighborCondition Condition;
     public int TargetID; // Solo se usa si Condition es Specific.
 }
-public class TileRuleTexture
+public class TileRuleTextureData
 {
 
     // Propiedades de identificación y dimensiones
@@ -48,7 +48,7 @@ public class TileRuleTexture
     private int[] _specificIDs;
     private bool _hasSpecificRequirements;
 
-    public TileRuleTexture(int width, int height, int anchorX, int anchorY, string name = "New Rule")
+    public TileRuleTextureData(int width, int height, int anchorX, int anchorY, string name = "New Rule")
     {
         if (width * height > 32)
             throw new ArgumentException("El tamaño máximo soportado por la máscara de 2 bits es de 32 celdas (ej. 5x5).");

@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://c574qp3ym3q0i"]
+
+[ext_resource type="Script" uid="uid://cefc6f56fix0a" path="res://addons/tnowe_extra_controls/elements/scroll_zoom_view.gd" id="1_4ri7t"]
+[ext_resource type="PackedScene" uid="uid://b2nclm8nvyjb" path="res://sources/WindowsDataBase/TilesTexture/TileRuleTextureControl.tscn" id="2_a10je"]
+
+[node name="WindowGroupTileTexture" type="Window" unique_id=1669849788]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(500, 500)
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1445557776]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollZoomView" type="MarginContainer" parent="PanelContainer" unique_id=1502510122]
+layout_mode = 2
+script = ExtResource("1_4ri7t")
+metadata/_custom_type_script = "uid://cefc6f56fix0a"
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/ScrollZoomView" unique_id=793260577]
+layout_mode = 2
+columns = 4
+
+[node name="TileRuleTextureControl" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1044990167 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl2" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=148805949 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl3" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1968744180 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl4" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=703125815 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl5" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1499190893 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl6" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1808330245 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl7" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=474613086 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl8" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=458958208 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl9" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1855828921 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl10" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1857444340 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl11" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=275548806 instance=ExtResource("2_a10je")]
+layout_mode = 2
+
+[node name="TileRuleTextureControl12" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=475245892 instance=ExtResource("2_a10je")]
+layout_mode = 2

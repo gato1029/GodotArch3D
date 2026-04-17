@@ -1,0 +1,112 @@
+[gd_scene format=3 uid="uid://con3l2ovsldp4"]
+
+[ext_resource type="Script" uid="uid://soxyrq1y2cxj" path="res://sources/WindowsDataBase/TilesTexture/WindowTileTextureRule.cs" id="1_ld2w1"]
+[ext_resource type="Script" uid="uid://kr5g3m7w8x4v" path="res://addons/FixedGrid/FixedGridContainer.cs" id="1_rerhw"]
+[ext_resource type="Texture2D" uid="uid://6jgkuikjbh3o" path="res://resources/Textures/internal/asterisk.png" id="2_u7chy"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_ld2w1"]
+[ext_resource type="Texture2D" uid="uid://ba8f2acp42seg" path="res://resources/Textures/iconos/center.png" id="3_takuq"]
+[ext_resource type="Texture2D" uid="uid://bklx15q5uplw2" path="res://resources/Textures/internal/SquareEmpty.png" id="4_u7chy"]
+[ext_resource type="Texture2D" uid="uid://de2id6o0yusn8" path="res://resources/Textures/internal/question-mark.png" id="5_s3vtp"]
+[ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="6_u7chy"]
+
+[node name="WindowTileTextureRule" type="Window" unique_id=514984239]
+transparent_bg = true
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(350, 250)
+unresizable = true
+transparent = true
+script = ExtResource("1_ld2w1")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=7577569]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -166.5
+offset_top = -117.0
+offset_right = 166.5
+offset_bottom = 117.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=896120428]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1842032908]
+layout_mode = 2
+
+[node name="FixedGridContainer2" type="Container" parent="PanelContainer/MarginContainer/HBoxContainer" unique_id=1882329322]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 0
+script = ExtResource("1_rerhw")
+Columns = 2
+Rows = 5
+metadata/_custom_type_script = "uid://kr5g3m7w8x4v"
+
+[node name="KuroTextureButtonIgnorarCentro" type="TextureButton" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=316073438]
+layout_mode = 2
+texture_normal = ExtResource("3_takuq")
+stretch_mode = 3
+script = ExtResource("3_ld2w1")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="Label5" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=1184589590]
+layout_mode = 2
+text = "Centro Regla, No importa qué haya."
+
+[node name="KuroTextureButtonIgnorar" type="TextureButton" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=1032499940]
+layout_mode = 2
+texture_normal = ExtResource("2_u7chy")
+stretch_mode = 3
+script = ExtResource("3_ld2w1")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=1053400897]
+layout_mode = 2
+text = "No importa qué haya."
+
+[node name="KuroTextureButtonVacio" type="TextureButton" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=726763143]
+layout_mode = 2
+texture_normal = ExtResource("4_u7chy")
+stretch_mode = 3
+script = ExtResource("3_ld2w1")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="Label2" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=833013746]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "La celda debe tener ID 0, es decir debe estar vacio."
+autowrap_mode = 3
+
+[node name="KuroTextureButtonLleno" type="TextureButton" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=1992452969]
+layout_mode = 2
+texture_normal = ExtResource("5_s3vtp")
+stretch_mode = 3
+script = ExtResource("3_ld2w1")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="Label3" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=1358499146]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "Cualquier ID mayor a 0, es decir debe tener algun Tile."
+autowrap_mode = 3
+
+[node name="KuroTextureButtonExacto" type="TextureButton" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=663018430]
+layout_mode = 2
+texture_normal = ExtResource("6_u7chy")
+stretch_mode = 3
+script = ExtResource("3_ld2w1")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="Label4" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/FixedGridContainer2" unique_id=106725140]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "Un ID exacto"
+autowrap_mode = 3

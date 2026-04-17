@@ -11,13 +11,32 @@ public partial class WindowKuroTiles : MarginContainer
 
     public delegate void EventNotifyMultiSelection(List<TileInfoKuro> tiles);
     public event EventNotifyMultiSelection OnNotifyMultiSelection;
+
+    public delegate void EventNotifySelectionIndex(int index);
+    public event EventNotifySelectionIndex OnNotifySelectionIndex;
+
+    public delegate void EventNotifyMultiSelectionIndex(List<int> indices);
+    public event EventNotifyMultiSelectionIndex OnNotifyMultiSelectionIndex;
+
     public override void _Ready()
 	{
         InitializeUI(); // Insertado por el generador de UI
         Grid.OnNotifySelection += Grid_OnNotifySelection;
         Grid.OnNotifyMultiSelection += Grid_OnNotifyMultiSelection;
+        Grid.OnNotifySelectionIndex += Grid_OnNotifySelectionIndex;
+        Grid.OnNotifyMultiSelectionIndex += Grid_OnNotifyMultiSelectionIndex;
         SubViewport.OnNotifySelectionCameraZoom += SubViewport_OnNotifySelectionCameraZoom;
         
+    }
+
+    private void Grid_OnNotifyMultiSelectionIndex(List<int> indices)
+    {
+        OnNotifyMultiSelectionIndex?.Invoke(indices);
+    }
+
+    private void Grid_OnNotifySelectionIndex(int index)
+    {
+        OnNotifySelectionIndex?.Invoke(index);
     }
 
     private void Grid_OnNotifyMultiSelection(List<TileInfoKuro> tiles)
@@ -81,6 +100,14 @@ public partial class WindowKuroTiles : MarginContainer
     public void SetTileSize(int x, int y)
     {
         Grid.SetSizeCell(x, y);
+    }
+    public void SetSelection(int index)
+    {
+        Grid.SetSelection(index);
+    }
+    public void SetSelection(List<int> indices)
+    {
+        Grid.SetSelection(indices);
     }
     internal void SetSelection(float x, float y, float width, float height)
     {

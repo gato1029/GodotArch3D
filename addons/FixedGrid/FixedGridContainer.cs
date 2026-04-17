@@ -44,13 +44,63 @@ public partial class FixedGridContainer : Container
 
     private void SortMyChildren()
     {
-        Vector2 maxMin = GetMaxChildMinSize();
+        float[] colWidths = GetColumnWidths();
+        float[] rowHeights = GetRowHeights();
 
-        // Calculamos el espacio de la celda basado en el tamaño actual del contenedor
-        Vector2 cellSize = new Vector2(
-            Mathf.Max(maxMin.X, (Size.X - (Separation.X * (Columns - 1))) / Columns),
-            Mathf.Max(maxMin.Y, (Size.Y - (Separation.Y * (Rows - 1))) / Rows)
-        );
+        int index = 0;
+
+        float yOffset = 0;
+
+        for (int row = 0; row < Rows; row++)
+        {
+            float xOffset = 0;
+
+            for (int col = 0; col < Columns; col++)
+            {
+                if (index >= GetChildCount())
+                    return;
+
+                var node = GetChild(index);
+
+                if (node is Control child && child.Visible)
+                {
+                    Vector2 size = new Vector2(colWidths[col], rowHeights[row]);
+
+                    FitChildInRect(child, new Rect2(
+                        new Vector2(xOffset, yOffset),
+                        size
+                    ));
+                }
+
+                xOffset += colWidths[col] + Separation.X;
+                index++;
+            }
+
+            yOffset += rowHeights[row] + Separation.Y;
+        }
+    }
+
+    public override Vector2 _GetMinimumSize()
+    {
+        float[] colWidths = GetColumnWidths();
+        float[] rowHeights = GetRowHeights();
+
+        float totalWidth = 0;
+        foreach (var w in colWidths)
+            totalWidth += w;
+
+        float totalHeight = 0;
+        foreach (var h in rowHeights)
+            totalHeight += h;
+
+        totalWidth += Separation.X * (Columns - 1);
+        totalHeight += Separation.Y * (Rows - 1);
+
+        return new Vector2(totalWidth, totalHeight);
+    }
+    private float[] GetColumnWidths()
+    {
+        float[] widths = new float[Columns];
 
         int index = 0;
         foreach (var node in GetChildren())
@@ -58,36 +108,37 @@ public partial class FixedGridContainer : Container
             if (node is Control child && child.Visible)
             {
                 int col = index % Columns;
-                int row = index / Columns;
+                Vector2 min = child.GetCombinedMinimumSize();
 
-                if (row < Rows)
-                {
-                    Vector2 cellPos = new Vector2(
-                        col * (cellSize.X + Separation.X),
-                        row * (cellSize.Y + Separation.Y)
-                    );
-                    // Ajustamos al hijo al rectángulo de la celda
-                    FitChildInRect(child, new Rect2(cellPos, cellSize));
-                }
-                else
-                {
-                    // Si excede las filas/columnas, podrías ocultarlo o dejarlo fuera
-                    // FitChildInRect(child, new Rect2(Vector2.Zero, Vector2.Zero)); 
-                }
+                widths[col] = Mathf.Max(widths[col], min.X);
                 index++;
             }
         }
+
+        return widths;
     }
 
-    public override Vector2 _GetMinimumSize()
+    private float[] GetRowHeights()
     {
-        Vector2 maxMin = GetMaxChildMinSize();
-        return new Vector2(
-            (maxMin.X * Columns) + (Separation.X * (Columns - 1)),
-            (maxMin.Y * Rows) + (Separation.Y * (Rows - 1))
-        );
-    }
+        float[] heights = new float[Rows];
 
+        int index = 0;
+        foreach (var node in GetChildren())
+        {
+            if (node is Control child && child.Visible)
+            {
+                int row = index / Columns;
+                if (row >= Rows) break;
+
+                Vector2 min = child.GetCombinedMinimumSize();
+
+                heights[row] = Mathf.Max(heights[row], min.Y);
+                index++;
+            }
+        }
+
+        return heights;
+    }
     private void Refresh()
     {
         UpdateMinimumSize(); // Notifica al padre que el tamaño cambió

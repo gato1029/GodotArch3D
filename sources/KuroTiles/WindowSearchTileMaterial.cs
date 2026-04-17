@@ -13,6 +13,12 @@ public partial class WindowSearchTileMaterial : Window
     public delegate void EventNotifyMultiSelection(List<TileInfoKuro> tiles);
     public event EventNotifyMultiSelection OnNotifyMultiSelection;
 
+    public delegate void EventNotifySelectionIndex(int index, MaterialData materialData);
+    public event EventNotifySelectionIndex OnNotifySelectionIndex;
+
+    public delegate void EventNotifyMultiSelectionIndex(List<int> indices, MaterialData materialData);
+    public event EventNotifyMultiSelectionIndex OnNotifyMultiSelectionIndex;
+
     private MaterialData materialData;
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -21,12 +27,25 @@ public partial class WindowSearchTileMaterial : Window
         ButtonSearch.Pressed += ButtonSearch_Pressed;
         ControlKuroTiles.OnNotifySelection += ControlKuroTiles_OnNotifySelection;
         ControlKuroTiles.OnNotifyMultiSelection += ControlKuroTiles_OnNotifyMultiSelection;
+        ControlKuroTiles.OnNotifyMultiSelectionIndex += ControlKuroTiles_OnNotifyMultiSelectionIndex;
+        ControlKuroTiles.OnNotifySelectionIndex += ControlKuroTiles_OnNotifySelectionIndex;
         ControlKuroTiles.SetTextureEmpty();
         // 🔸 Conectar al evento global de entrada del viewport principal
         FocusExited += WindowSearchTileMaterial_FocusExited;
         CheckButtonKeepOpen.Pressed += CheckButtonKeepOpen_Pressed;
         
     }
+
+    private void ControlKuroTiles_OnNotifySelectionIndex(int index)
+    {
+        OnNotifySelectionIndex?.Invoke(index, materialData);
+    }
+
+    private void ControlKuroTiles_OnNotifyMultiSelectionIndex(List<int> indices)
+    {
+        OnNotifyMultiSelectionIndex?.Invoke(indices, materialData);
+    }
+
     public void SetMultipleSelectionMode(bool active)
     {
         ControlKuroTiles.SetModeSelection(active);
@@ -65,6 +84,25 @@ public partial class WindowSearchTileMaterial : Window
             QueueFree();
         }
                        
+    }
+
+    public void SetSelection(int idMaterial, int indexTile)
+    {
+        MaterialData materialData = DataBaseManager.Instance.FindById<MaterialData>(idMaterial);
+        this.materialData = materialData;
+        LineEditName.Text = materialData.name;
+        ControlKuroTiles.SetTileSize(materialData.divisionPixelX, materialData.divisionPixelY);
+        ControlKuroTiles.SetTexture((Texture2D)materialData.textureMaterial, materialData.id);
+        ControlKuroTiles.SetSelection(indexTile);
+    }
+    public void SetSelectionMultiple(int idMaterial, List<int> indicesTile)
+    {
+        MaterialData materialData = DataBaseManager.Instance.FindById<MaterialData>(idMaterial);
+        this.materialData = materialData;
+        LineEditName.Text = materialData.name;
+        ControlKuroTiles.SetTileSize(materialData.divisionPixelX, materialData.divisionPixelY);
+        ControlKuroTiles.SetTexture((Texture2D)materialData.textureMaterial, materialData.id);
+        ControlKuroTiles.SetSelection(indicesTile);
     }
 
     public void SetSelection(int idMaterial,float x, float y, float width, float height)
