@@ -2,9 +2,9 @@
 using Godot;
 using System;
 
-public partial class TileRuleTextureControl : Control
+public partial class RuleTextureControl : Control
 {
-    public delegate void EventNotifyChangued(TileRuleTextureControl objectControl);
+    public delegate void EventNotifyChangued(RuleTextureControl objectControl);
     public event EventNotifyChangued OnNotifyChangued;
 
     private HBoxContainer VBoxContainer;
@@ -14,6 +14,7 @@ public partial class TileRuleTextureControl : Control
     private SpinBox SpinBoxY;
     private FixedGridContainer FixedGridTiles;
     private FixedGridContainer FixedGridRules;
+    private KuroTextureButton KuroTextureButtonDelete;
 
     public void InitializeUI()
     {
@@ -24,5 +25,6 @@ public partial class TileRuleTextureControl : Control
         SpinBoxY = GetNode<SpinBox>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SpinBoxY");
         FixedGridTiles = GetNode<FixedGridContainer>("PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/FixedGridTiles");
         FixedGridRules = GetNode<FixedGridContainer>("PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/FixedGridRules");
+        KuroTextureButtonDelete = GetNode<KuroTextureButton>("PanelContainer/KuroTextureButtonDelete");
     }
 }

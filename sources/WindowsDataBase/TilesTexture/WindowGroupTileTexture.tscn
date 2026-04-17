@@ -1,12 +1,22 @@
 [gd_scene format=3 uid="uid://c574qp3ym3q0i"]
 
-[ext_resource type="Script" uid="uid://cefc6f56fix0a" path="res://addons/tnowe_extra_controls/elements/scroll_zoom_view.gd" id="1_4ri7t"]
-[ext_resource type="PackedScene" uid="uid://b2nclm8nvyjb" path="res://sources/WindowsDataBase/TilesTexture/TileRuleTextureControl.tscn" id="2_a10je"]
+[ext_resource type="Script" uid="uid://ddphb8ui0m822" path="res://sources/WindowsDataBase/TilesTexture/WindowGroupTileTexture.cs" id="1_a10je"]
+[ext_resource type="Texture2D" uid="uid://tkmubhuc3gmy" path="res://resources/Textures/iconos/Select.png" id="2_287r5"]
+[ext_resource type="PackedScene" uid="uid://b2nclm8nvyjb" path="res://sources/WindowsDataBase/TilesTexture/RuleTextureControl.tscn" id="2_a10je"]
+[ext_resource type="Script" uid="uid://ckc55m20w7igo" path="res://sources/CustomWidgets/KuroScrollZoomView.cs" id="2_s5lqk"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_hc6qb"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="4_lr3id"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="5_mago0"]
+[ext_resource type="Texture2D" uid="uid://cgib4xbvusljx" path="res://resources/Textures/internal/rule.png" id="6_rfbwy"]
+[ext_resource type="Script" uid="uid://b2tq08112l2fo" path="res://sources/CustomWidgets/KuroCheckButton.cs" id="7_mdk58"]
+[ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="8_wgh5f"]
+[ext_resource type="Script" uid="uid://bigd3vdfo0qf4" path="res://sources/CustomWidgets/KuroDraggableControl.cs" id="11_wgh5f"]
 
 [node name="WindowGroupTileTexture" type="Window" unique_id=1669849788]
 oversampling_override = 1.0
 position = Vector2i(0, 36)
 size = Vector2i(500, 500)
+script = ExtResource("1_a10je")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=1445557776]
 anchors_preset = 15
@@ -15,47 +25,99 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ScrollZoomView" type="MarginContainer" parent="PanelContainer" unique_id=1502510122]
-layout_mode = 2
-script = ExtResource("1_4ri7t")
-metadata/_custom_type_script = "uid://cefc6f56fix0a"
-
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/ScrollZoomView" unique_id=793260577]
-layout_mode = 2
-columns = 4
-
-[node name="TileRuleTextureControl" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1044990167 instance=ExtResource("2_a10je")]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1151961979]
 layout_mode = 2
 
-[node name="TileRuleTextureControl2" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=148805949 instance=ExtResource("2_a10je")]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=1485720462]
 layout_mode = 2
 
-[node name="TileRuleTextureControl3" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1968744180 instance=ExtResource("2_a10je")]
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1739686679]
+layout_mode = 2
+text = "Material Textura:"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1473921370]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="KuroTextureButton" type="TextureButton" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1194920566]
+layout_mode = 2
+texture_normal = ExtResource("2_287r5")
+script = ExtResource("3_hc6qb")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=981211914]
 layout_mode = 2
 
-[node name="TileRuleTextureControl4" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=703125815 instance=ExtResource("2_a10je")]
+[node name="KuroTextureButtonAdd" type="TextureButton" parent="PanelContainer/VBoxContainer/HBoxContainer2" unique_id=837610210]
 layout_mode = 2
+texture_normal = ExtResource("4_lr3id")
+script = ExtResource("3_hc6qb")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="TileRuleTextureControl5" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1499190893 instance=ExtResource("2_a10je")]
+[node name="KuroTextureButtonSave" type="TextureButton" parent="PanelContainer/VBoxContainer/HBoxContainer2" unique_id=1650057605]
 layout_mode = 2
+texture_normal = ExtResource("5_mago0")
+script = ExtResource("3_hc6qb")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="TileRuleTextureControl6" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1808330245 instance=ExtResource("2_a10je")]
+[node name="KuroCheckButtonSwitch" type="CheckButton" parent="PanelContainer/VBoxContainer/HBoxContainer2" unique_id=1574409682]
 layout_mode = 2
+icon = ExtResource("6_rfbwy")
+script = ExtResource("7_mdk58")
+TextureOn = ExtResource("8_wgh5f")
+TextureOff = ExtResource("6_rfbwy")
+metadata/_custom_type_script = "uid://b2tq08112l2fo"
 
-[node name="TileRuleTextureControl7" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=474613086 instance=ExtResource("2_a10je")]
+[node name="KuroScrollZoomView" type="MarginContainer" parent="PanelContainer/VBoxContainer" unique_id=1758056422]
+visible = false
 layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_s5lqk")
+PanButton = 7
+metadata/_custom_type_script = "uid://ckc55m20w7igo"
 
-[node name="TileRuleTextureControl8" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=458958208 instance=ExtResource("2_a10je")]
+[node name="Contenedor" type="GridContainer" parent="PanelContainer/VBoxContainer" unique_id=1709710252]
+visible = false
 layout_mode = 2
+size_flags_vertical = 3
+columns = 3
 
-[node name="TileRuleTextureControl9" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1855828921 instance=ExtResource("2_a10je")]
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer" unique_id=1411313568]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 5
 
-[node name="TileRuleTextureControl10" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=1857444340 instance=ExtResource("2_a10je")]
+[node name="KuroDraggableControl" type="Control" parent="PanelContainer/VBoxContainer/GridContainer" unique_id=210421661]
+custom_minimum_size = Vector2(150, 150)
 layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("11_wgh5f")
+metadata/_custom_type_script = "uid://bigd3vdfo0qf4"
 
-[node name="TileRuleTextureControl11" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=275548806 instance=ExtResource("2_a10je")]
-layout_mode = 2
+[node name="RuleTextureControl" parent="PanelContainer/VBoxContainer/GridContainer/KuroDraggableControl" unique_id=1044990167 instance=ExtResource("2_a10je")]
+layout_mode = 1
 
-[node name="TileRuleTextureControl12" parent="PanelContainer/ScrollZoomView/GridContainer" unique_id=475245892 instance=ExtResource("2_a10je")]
+[node name="KuroDraggableControl2" type="Control" parent="PanelContainer/VBoxContainer/GridContainer" unique_id=414656986]
+custom_minimum_size = Vector2(150, 150)
 layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("11_wgh5f")
+metadata/_custom_type_script = "uid://bigd3vdfo0qf4"
+
+[node name="RuleTextureControl" parent="PanelContainer/VBoxContainer/GridContainer/KuroDraggableControl2" unique_id=1654942613 instance=ExtResource("2_a10je")]
+layout_mode = 1
+
+[node name="KuroDraggableControl3" type="Control" parent="PanelContainer/VBoxContainer/GridContainer" unique_id=1110190428]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("11_wgh5f")
+metadata/_custom_type_script = "uid://bigd3vdfo0qf4"
+
+[node name="RuleTextureControl" parent="PanelContainer/VBoxContainer/GridContainer/KuroDraggableControl3" unique_id=271112121 instance=ExtResource("2_a10je")]
+layout_mode = 1

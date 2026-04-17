@@ -2,7 +2,7 @@ using Godot;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 
-public partial class TileRuleTextureControl : Control
+public partial class RuleTextureControl : Control
 {
     private string widgetPath = "res://sources/WindowsDataBase/TilesTexture/TileTextureControl.tscn";
     private PackedScene _widgetScene;
@@ -13,6 +13,7 @@ public partial class TileRuleTextureControl : Control
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
+        SceneRegistry.Register(this);
         // 1. Cargar la escena del widget
         _widgetScene = GD.Load<PackedScene>(widgetPath);
         _widgetRuleScene = GD.Load<PackedScene>(widgetRulePath);
@@ -25,8 +26,16 @@ public partial class TileRuleTextureControl : Control
         SpinBoxX.ValueChanged += SpinBoxX_ValueChanged;
         SpinBoxY.ValueChanged += SpinBoxY_ValueChanged;
 
+        KuroTextureButtonDelete.Pressed += KuroTextureButtonDelete_Pressed;
         KuroCheckButtonSwitch.Pressed += KuroCheckButtonSwitch_Pressed;
         KuroCheckButtonSwitch_Pressed();
+        var scenePath = SceneFilePath;
+        GD.Print(scenePath);
+    }
+
+    private void KuroTextureButtonDelete_Pressed()
+    {
+        this.QueueFree();
     }
 
     private void KuroCheckButtonSwitch_Pressed()
