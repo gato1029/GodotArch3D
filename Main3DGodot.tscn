@@ -90,11 +90,10 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
 
-[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu" unique_id=2052876277 node_paths=PackedStringArray("viewportMainEditor")]
+[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu" unique_id=2052876277]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3_kc28b")
-viewportMainEditor = NodePath("../../HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport")
 
 [node name="Atlas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1703351011]
 auto_translate_mode = 1
