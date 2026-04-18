@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://ddphb8ui0m822" path="res://sources/WindowsDataBase/TilesTexture/WindowGroupTileTexture.cs" id="1_a10je"]
 [ext_resource type="Texture2D" uid="uid://tkmubhuc3gmy" path="res://resources/Textures/iconos/Select.png" id="2_287r5"]
-[ext_resource type="PackedScene" uid="uid://b2nclm8nvyjb" path="res://sources/WindowsDataBase/TilesTexture/RuleTextureControl.tscn" id="2_a10je"]
 [ext_resource type="Script" uid="uid://ckc55m20w7igo" path="res://sources/CustomWidgets/KuroScrollZoomView.cs" id="2_s5lqk"]
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_hc6qb"]
 [ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="4_lr3id"]
@@ -10,12 +9,11 @@
 [ext_resource type="Texture2D" uid="uid://cgib4xbvusljx" path="res://resources/Textures/internal/rule.png" id="6_rfbwy"]
 [ext_resource type="Script" uid="uid://b2tq08112l2fo" path="res://sources/CustomWidgets/KuroCheckButton.cs" id="7_mdk58"]
 [ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="8_wgh5f"]
-[ext_resource type="Script" uid="uid://bigd3vdfo0qf4" path="res://sources/CustomWidgets/KuroDraggableControl.cs" id="11_wgh5f"]
 
 [node name="WindowGroupTileTexture" type="Window" unique_id=1669849788]
 oversampling_override = 1.0
 position = Vector2i(0, 36)
-size = Vector2i(500, 500)
+size = Vector2i(1000, 600)
 script = ExtResource("1_a10je")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=1445557776]
@@ -78,46 +76,6 @@ PanButton = 7
 metadata/_custom_type_script = "uid://ckc55m20w7igo"
 
 [node name="Contenedor" type="GridContainer" parent="PanelContainer/VBoxContainer" unique_id=1709710252]
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 columns = 3
-
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer" unique_id=1411313568]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-columns = 5
-
-[node name="KuroDraggableControl" type="Control" parent="PanelContainer/VBoxContainer/GridContainer" unique_id=210421661]
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 6
-script = ExtResource("11_wgh5f")
-metadata/_custom_type_script = "uid://bigd3vdfo0qf4"
-
-[node name="RuleTextureControl" parent="PanelContainer/VBoxContainer/GridContainer/KuroDraggableControl" unique_id=1044990167 instance=ExtResource("2_a10je")]
-layout_mode = 1
-
-[node name="KuroDraggableControl2" type="Control" parent="PanelContainer/VBoxContainer/GridContainer" unique_id=414656986]
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 6
-script = ExtResource("11_wgh5f")
-metadata/_custom_type_script = "uid://bigd3vdfo0qf4"
-
-[node name="RuleTextureControl" parent="PanelContainer/VBoxContainer/GridContainer/KuroDraggableControl2" unique_id=1654942613 instance=ExtResource("2_a10je")]
-layout_mode = 1
-
-[node name="KuroDraggableControl3" type="Control" parent="PanelContainer/VBoxContainer/GridContainer" unique_id=1110190428]
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 6
-script = ExtResource("11_wgh5f")
-metadata/_custom_type_script = "uid://bigd3vdfo0qf4"
-
-[node name="RuleTextureControl" parent="PanelContainer/VBoxContainer/GridContainer/KuroDraggableControl3" unique_id=271112121 instance=ExtResource("2_a10je")]
-layout_mode = 1

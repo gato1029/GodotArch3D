@@ -9,38 +9,30 @@
 [ext_resource type="Texture2D" uid="uid://hwrib00fkr42" path="res://resources/Textures/iconos/Cross Mark.png" id="6_va4ud"]
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="7_0dq4i"]
 
-[node name="RuleTextureControl" type="Control" unique_id=1044990167]
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 3
+[node name="PanelContainer" type="PanelContainer" unique_id=1520532626]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -146.5
+offset_top = -113.5
+offset_right = 146.5
+offset_bottom = 113.5
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 0
-size_flags_vertical = 4
 script = ExtResource("1_wrd5d")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1520532626]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1495557972]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1495557972]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="PanelContainer/VBoxContainer" unique_id=1191770985]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer" unique_id=1191770985]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 texture = ExtResource("2_vtic4")
 expand_mode = 1
 
-[node name="KuroTextureButtonDelete" type="TextureButton" parent="PanelContainer/VBoxContainer/TextureRect" unique_id=1894345927]
+[node name="KuroTextureButtonDelete" type="TextureButton" parent="VBoxContainer/TextureRect" unique_id=1894345927]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 1
 anchors_preset = 1
@@ -59,23 +51,23 @@ stretch_mode = 0
 script = ExtResource("7_0dq4i")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" unique_id=747347864]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=747347864]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer" unique_id=520653612]
+[node name="VBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer" unique_id=520653612]
 layout_mode = 2
-size_flags_horizontal = 4
 
-[node name="HBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=322547518]
+[node name="HBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer" unique_id=322547518]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="KuroCheckButtonSwitch" type="CheckButton" parent="PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=961748160]
+[node name="KuroCheckButtonSwitch" type="CheckButton" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=961748160]
 layout_mode = 2
 icon = ExtResource("2_s33oo")
 script = ExtResource("3_ruap1")
@@ -83,35 +75,35 @@ TextureOn = ExtResource("4_va4ud")
 TextureOff = ExtResource("2_s33oo")
 metadata/_custom_type_script = "uid://b2tq08112l2fo"
 
-[node name="SpinBoxX" type="SpinBox" parent="PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1552927166]
+[node name="SpinBoxX" type="SpinBox" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1552927166]
 layout_mode = 2
 min_value = 1.0
 max_value = 5.0
 value = 3.0
 prefix = "X:"
 
-[node name="SpinBoxY" type="SpinBox" parent="PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1587188690]
+[node name="SpinBoxY" type="SpinBox" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1587188690]
 layout_mode = 2
 min_value = 1.0
 max_value = 5.0
 value = 3.0
 prefix = "Y:"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=245466540]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer" unique_id=245466540]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FixedGridTiles" type="Container" parent="VBoxContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=691774664]
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 4
-
-[node name="FixedGridTiles" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=691774664]
-layout_mode = 2
+size_flags_vertical = 6
 script = ExtResource("2_nkc35")
 Separation = Vector2(1, 1)
 metadata/_custom_type_script = "uid://kr5g3m7w8x4v"
 
-[node name="FixedGridRules" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=2103708671]
+[node name="FixedGridRules" type="Container" parent="VBoxContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=2103708671]
 visible = false
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 3
 script = ExtResource("2_nkc35")
 Separation = Vector2(1, 1)

@@ -8,7 +8,81 @@ public partial class KuroDraggableControl : Control
 
     public override void _Ready()
     {
+        SceneRegistry.Register(this);
         AddToGroup(GroupName);
+        MouseFilter = MouseFilterEnum.Stop;
+
+        // 1. Configurar hijos existentes y conectar sus señales
+        foreach (var child in GetChildren())
+        {
+            if (child is Control c)
+            {
+                SetupChild(c);
+                // 🔥 Conectar la señal: cuando el hijo cambie de tamaño, el padre también
+                c.MinimumSizeChanged += RefreshMinimumSize;
+            }
+        }
+
+        // 2. Hacer lo mismo para hijos que se añadan en el futuro
+        ChildEnteredTree += (node) => {
+            if (node is Control child)
+            {
+                SetupChild(child);
+                child.MinimumSizeChanged += RefreshMinimumSize;
+                RefreshMinimumSize();
+            }
+        };
+
+        // 3. Ajustar tamaño inicial
+        RefreshMinimumSize();
+    }
+
+    public void RefreshMinimumSize()
+    {
+        Vector2 maxChildSize = Vector2.Zero;
+
+        foreach (var child in GetChildren())
+        {
+            if (child is Control c && c.Visible)
+            {
+                Vector2 childMin = c.GetCombinedMinimumSize();
+                maxChildSize.X = Mathf.Max(maxChildSize.X, childMin.X);
+                maxChildSize.Y = Mathf.Max(maxChildSize.Y, childMin.Y);
+            }
+        }
+
+        // Si el tamaño ha cambiado, lo aplicamos
+        if (CustomMinimumSize != maxChildSize)
+        {
+            CustomMinimumSize = maxChildSize;
+            // Esto notifica al GridContainer (el abuelo) que debe reacomodar todo
+            UpdateMinimumSize();
+        }
+    }
+
+
+    private void SetupChildrenMouseFilter(Node parent)
+    {
+        foreach (Node child in parent.GetChildren())
+        {
+            if (child is Control controlChild)
+            {
+                SetupChild(controlChild);
+            }
+        }
+    }
+
+    private void SetupChild(Control child)
+    {
+        // Forzamos 'Pass' para que el clic llegue al padre (KuroDraggableControl)
+        child.MouseFilter = MouseFilterEnum.Pass;
+
+        // Si el hijo tiene sus propios hijos (ej. un botón con un label), 
+        // también deben ser 'Pass' o 'Ignore'
+        if (child.GetChildCount() > 0)
+        {
+            SetupChildrenMouseFilter(child);
+        }
     }
 
     public override Variant _GetDragData(Vector2 atPosition)
@@ -16,45 +90,56 @@ public partial class KuroDraggableControl : Control
         var preview = (Control)Duplicate();
         preview.Modulate = new Color(1, 1, 1, 0.6f);
         SetDragPreview(preview);
-
         return this;
     }
 
     public override bool _CanDropData(Vector2 atPosition, Variant data)
     {
-        return data.Obj is Control;
+        return data.As<Node>() is KuroDraggableControl;
     }
-
     public override void _DropData(Vector2 atPosition, Variant data)
     {
         var draggedItem = data.As<Control>();
-        if (draggedItem == null) return;
+        if (draggedItem == null || draggedItem == this) return;
 
-        if (GetParent() is not Container container)
-            return;
+        var container = GetParent();
+        if (container == null) return;
 
-        int dropIndex = container.GetChildren().IndexOf(this);
+        // Calculamos si soltamos en la primera mitad o segunda mitad del control
+        // atPosition es LOCAL al control sobre el que sueltas.
+        int dropIndex = GetIndex();
 
-        // 🔥 mejora: detectar lado
-        var rect = GetRect();
-        if (atPosition.X > rect.Size.X / 2)
+        // Si soltamos en la mitad superior/izquierda o inferior/derecha
+        // Dependiendo de si tu grid es horizontal o vertical:
+        bool dropAfter = (atPosition.X > Size.X * 0.5f) || (atPosition.Y > Size.Y * 0.5f);
+
+        if (dropAfter)
             dropIndex++;
 
-        container.MoveChild(draggedItem, dropIndex);
-        UpdatePositions(container);
+        // Corregir el índice si el elemento arrastrado viene de una posición menor
+        if (draggedItem.GetParent() == container && draggedItem.GetIndex() < dropIndex)
+            dropIndex--;
+
+        container.MoveChild(draggedItem, Mathf.Clamp(dropIndex, 0, container.GetChildCount()));
+
+        // IMPORTANTE: Forzar el reordenamiento visual
+        if (container is Container c) c.QueueSort();
+
+        CallDeferred(nameof(UpdatePositions), container);
     }
 
-    protected virtual void UpdatePositions(Node container)
+
+    protected void UpdatePositions(Node container)
     {
-        for (int i = 0; i < container.GetChildCount(); i++)
+        foreach (var child in container.GetChildren())
         {
-            if (container.GetChild(i) is KuroDraggableControl item)
-                item.OnPositionChanged(i);
+            if (child is KuroDraggableControl item)
+                item.OnPositionChanged(child.GetIndex());
         }
     }
+    // Dentro de KuroDraggableControl.cs
 
-    protected virtual void OnPositionChanged(int index)
-    {
-        // override en hijos
-    }
+   
+
+    protected virtual void OnPositionChanged(int index) { }
 }

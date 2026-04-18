@@ -13,8 +13,10 @@ public partial class WindowGroupTileTexture : Window
 
     private void KuroTextureButtonAdd_Pressed()
     {
+        var drag = SceneRegistry.Instantiate<KuroDraggableControl>();
         var widget = SceneRegistry.Instantiate<RuleTextureControl>();
-        Contenedor.AddChild(widget);
+        drag.AddChild(widget);
+        Contenedor.AddChild(drag);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

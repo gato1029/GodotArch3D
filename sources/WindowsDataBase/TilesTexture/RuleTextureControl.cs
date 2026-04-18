@@ -2,7 +2,7 @@ using Godot;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 
-public partial class RuleTextureControl : Control
+public partial class RuleTextureControl : PanelContainer
 {
     private string widgetPath = "res://sources/WindowsDataBase/TilesTexture/TileTextureControl.tscn";
     private PackedScene _widgetScene;
@@ -97,5 +97,44 @@ public partial class RuleTextureControl : Control
         // 🔹 Forzar refresh
         FixedGridTiles.QueueSort();
         FixedGridRules.QueueSort();
+
+        // 2. Calcular el tamaño necesario para los Grids
+        // Usamos Max para que el componente no "salte" al cambiar entre Tiles y Rules
+        Vector2 gridMinSize = new Vector2(
+            Mathf.Max(FixedGridTiles.GetCombinedMinimumSize().X, FixedGridRules.GetCombinedMinimumSize().X),
+            Mathf.Max(FixedGridTiles.GetCombinedMinimumSize().Y, FixedGridRules.GetCombinedMinimumSize().Y)
+        );
+
+        // 3. Obtener el tamaño mínimo de los "otros" elementos
+        // Si tus SpinBoxes y botones están en un contenedor (ej: un VBoxContainer),
+        // podemos pedirle su tamaño mínimo ignorando los grids.
+        // Si no, lo más limpio es calcular el tamaño mínimo actual MENOS el espacio de los grids:
+
+        //CustomMinimumSize = Vector2.Zero; // Reseteamos para que recalcule el base real
+        Vector2 baseLayoutSize = GetCombinedMinimumSize() ;
+
+        // 4. Sumar el tamaño base al tamaño del grid
+        // Nota: Dependiendo de tu layout, si el grid está debajo de los controles, 
+        // sumas en Y. Si está al lado, sumas en X. 
+        // Si usas contenedores automáticos, esto suele bastar:
+   
+
+        this.CustomMinimumSize = new Vector2(
+    Mathf.Max(baseLayoutSize.X, gridMinSize.X),
+   Mathf.Max(baseLayoutSize.Y , gridMinSize.Y)
+);
+        UpdateMinimumSize();
+
+        //var parentGrid = GetParent() as Container;
+        //if (parentGrid != null)
+        //{
+        //    // Esto obliga al contenedor a reordenar a todos sus hijos inmediatamente
+        //    parentGrid.QueueSort();
+
+        //    // Hack útil: resetear el tamaño del padre para que se ajuste al nuevo mínimo
+        //    parentGrid.Size = Vector2.Zero;
+        //}
+
     }
+
 }
