@@ -20,7 +20,13 @@ public partial class WindowSearchTileMaterial : Window
     public event EventNotifyMultiSelectionIndex OnNotifyMultiSelectionIndex;
 
     private MaterialData materialData;
+    private bool alwaysOpen = false;
     // Called when the node enters the scene tree for the first time.
+
+    public void SetAlwaysOpen()
+    { 
+        alwaysOpen = true; 
+    }
     public override void _Ready()
 	{
         InitializeUI(); // Insertado por el generador de UI
@@ -71,6 +77,10 @@ public partial class WindowSearchTileMaterial : Window
     bool keepOpen = false;
     private void WindowSearchTileMaterial_FocusExited()
     {
+        if (alwaysOpen)
+        {
+            return;
+        }
         if (CheckButtonKeepOpen.ButtonPressed)
         {
             return;

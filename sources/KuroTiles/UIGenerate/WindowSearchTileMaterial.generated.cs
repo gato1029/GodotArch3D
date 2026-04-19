@@ -23,6 +23,10 @@ public partial class WindowSearchTileMaterial : Window
 
     private void CloseRequestedWindow()
     {
+        if (alwaysOpen)
+        {
+            return;
+        }
         QueueFree();
     }
 

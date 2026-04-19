@@ -12,6 +12,7 @@ public partial class TileTextureRuleControl : Control
     bool isCenter = false;
     WindowSearchTileMaterial windowLocal = null;
     WindowTileTextureRule windowTileTextureRule = null;
+    WindowGroupTileTexture groupTileTexture;
 
     string ignorarImagen = "res://resources/Textures/internal/asterisk.png";
     string VacioImagen = "res://resources/Textures/internal/SquareEmpty.png";
@@ -33,29 +34,14 @@ public partial class TileTextureRuleControl : Control
             {
                 case MouseButton.Left:
                     if (neighborCondition == NeighborCondition.Specific )
-                    {
-                        if (windowLocal == null)
-                        {
-                            windowLocal = GD.Load<PackedScene>("res://sources/KuroTiles/WindowSearchTileMaterial.tscn").Instantiate<WindowSearchTileMaterial>();
-                            // Escuchar cuando se cierre
-
-                            AddChild(windowLocal);
-
-                            windowLocal.TreeExited += () => windowLocal = null;
-                            //windowLocal.PopupHide += () => windowLocal = null;
-                            // 🔸 Colocar al costado derecho del Control
-                            Vector2I globalPos = (Vector2I)GetScreenPosition();
-                            Vector2I size = (Vector2I)GetGlobalRect().Size;
-
-                            // Si la ventana tiene tamaño fijo:
-                            windowLocal.Position = new Vector2I(globalPos.X + size.X + 10, globalPos.Y);
-                            windowLocal.OnNotifySelectionIndex += WindowLocal_OnNotifySelectionIndex;
-                            windowLocal.Popup();
-                            if (idMaterial != -1)
-                            {
-                                windowLocal.SetSelection(idMaterial, idTileTexture);
-                            }
-                        }
+                    {                     
+                        Vector2I globalPos = (Vector2I)GetScreenPosition();
+                        Vector2I size = (Vector2I)GetGlobalRect().Size;
+                        groupTileTexture.OpenMaterialWindow(
+                            this,
+                            new Vector2I(globalPos.X + size.X + 10, globalPos.Y)
+                        );
+                     
                     }
                     else
                     {
@@ -118,7 +104,10 @@ public partial class TileTextureRuleControl : Control
                 break;
         }        
     }
-
+    public void SetMaterial(int idMaterial)
+    { 
+        this.idMaterial = idMaterial;
+    }
     internal void SetData(NeighborCondition neighborCondition,int idMaterial=-1, int idIndex=0)
     {
         WindowTileTextureRule_OnNotifySelection(neighborCondition, false);
@@ -130,6 +119,22 @@ public partial class TileTextureRuleControl : Control
             TextureImage.Texture = MaterialManager.Instance.GetAtlasTextureInternal(idMaterial, idTileTexture);
         }        
     }
+
+
+    public bool HasMaterial() => idMaterial != -1;
+
+    public int GetMaterialId() => idMaterial;
+
+    public int GetTileIndex() => idTileTexture;
+
+    public void SetMaterialData(int materialId, int tileIndex)
+    {
+        idMaterial = materialId;
+        idTileTexture = tileIndex;
+
+        TextureImage.Texture =
+            MaterialManager.Instance.GetAtlasTextureInternal(materialId, tileIndex);
+    }
     private void WindowLocal_OnNotifySelectionIndex(int index, MaterialData materialData)
     {
         idTileTexture = index;
@@ -140,4 +145,9 @@ public partial class TileTextureRuleControl : Control
     public override void _Process(double delta)
 	{
 	}
+    
+    internal void SetGroup(WindowGroupTileTexture groupTileTexture)
+    {
+       this.groupTileTexture = groupTileTexture;
+    }
 }

@@ -160,7 +160,7 @@ public partial class KuroScrollZoomView : MarginContainer
 
         if (@event is InputEventMouseButton mouse)
         {
-            if (!mouse.Pressed || mouse.ButtonMask.HasFlag(PanButton))
+            if (mouse.ButtonIndex == MouseButton.Middle || mouse.ButtonIndex == MouseButton.Left)
             {
                 _inputDragging = mouse.Pressed;
                 _inputDragStart = mouse.Position;

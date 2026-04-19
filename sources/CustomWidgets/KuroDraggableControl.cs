@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 [GlobalClass]
-public partial class KuroDraggableControl : Control
+public partial class KuroDraggableControl : PanelContainer
 {
     [Export] public string GroupName = "draggable_items";
 
@@ -58,6 +58,8 @@ public partial class KuroDraggableControl : Control
             // Esto notifica al GridContainer (el abuelo) que debe reacomodar todo
             UpdateMinimumSize();
         }
+        SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        SizeFlagsVertical = SizeFlags.ExpandFill;   
     }
 
 
@@ -137,9 +139,6 @@ public partial class KuroDraggableControl : Control
                 item.OnPositionChanged(child.GetIndex());
         }
     }
-    // Dentro de KuroDraggableControl.cs
-
-   
-
+       
     protected virtual void OnPositionChanged(int index) { }
 }

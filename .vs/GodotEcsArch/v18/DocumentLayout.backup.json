@@ -3,36 +3,36 @@
   "WorkspaceRootPath": "D:\\GitKraken\\GodotFlecs3D\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\materials\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\materials\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\tiletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\tiletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\windowgrouptiletexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\windowgrouptiletexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\kurotiles\\windowsearchtilematerial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\kurotiles\\windowsearchtilematerial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\tiletexturerulecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\tiletexturerulecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlastexturesmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\atlastexturesmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\kurotiles\\tilegridnode2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\kurotiles\\tilegridnode2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\ruletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\ruletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\materials\\windownewmaterial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\materials\\windownewmaterial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\tileruletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\tileruletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\customwidgets\\kurodraggablecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\customwidgets\\kurodraggablecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\customwidgets\\kurocheckbutton.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\customwidgets\\kurocheckbutton.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\systems\\character\\characterstateconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\systems\\character\\characterstateconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\blackyworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -41,6 +41,18 @@
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\customwidgets\\kuroscrollzoomview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\customwidgets\\kuroscrollzoomview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\materials\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\materials\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\kurotiles\\tilegridnode2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\kurotiles\\tilegridnode2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,7 +62,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 822,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
@@ -60,7 +72,7 @@
               "RelativeDocumentMoniker": "sources\\BlackyTiles\\BlackyWorld.cs",
               "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyWorld.cs",
               "RelativeToolTip": "sources\\BlackyTiles\\BlackyWorld.cs",
-              "ViewState": "AgIAAEgAAAAAAAAAAAA8wGAAAAAeAAAAAAAAAA==",
+              "ViewState": "AgIAAEoAAAAAAAAAAAAcwGAAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-15T22:55:25.796Z",
               "IsPinned": true,
@@ -77,25 +89,12 @@
               "ViewState": "AgIAABkAAAAAAAAAAAAuwDIAAABfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-15T22:55:25.61Z",
-              "IsPinned": true
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "AtlasTexturesModsManager.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
-              "RelativeToolTip": "sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
-              "ViewState": "AgIAALkAAAAAAAAAAAAmwI4AAABHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T16:55:02.15Z",
               "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "WindowNewMaterial.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\Materials\\WindowNewMaterial.cs",
               "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Materials\\WindowNewMaterial.cs",
@@ -108,8 +107,116 @@
               "EditorCaption": ""
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WindowSearchTileMaterial.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\KuroTiles\\WindowSearchTileMaterial.cs",
+              "RelativeDocumentMoniker": "sources\\KuroTiles\\WindowSearchTileMaterial.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\KuroTiles\\WindowSearchTileMaterial.cs",
+              "RelativeToolTip": "sources\\KuroTiles\\WindowSearchTileMaterial.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAQwB8AAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T07:43:36.971Z",
+              "EditorCaption": ""
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "TileTextureControl.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAuwCQAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T07:24:07.85Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TileTextureRuleControl.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAADwvycAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T06:53:19.439Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "HerramientaMenuBar.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
+              "ViewState": "AgIAAIsAAAAAAAAAAAAcwKAAAAC0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T06:41:59.232Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "RuleTextureControl.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
+              "ViewState": "AgIAAPYAAAAAAAAAAAAAAAwBAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T05:51:02.206Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "KuroScrollZoomView.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroScrollZoomView.cs",
+              "RelativeDocumentMoniker": "sources\\CustomWidgets\\KuroScrollZoomView.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroScrollZoomView.cs",
+              "RelativeToolTip": "sources\\CustomWidgets\\KuroScrollZoomView.cs",
+              "ViewState": "AgIAAJYAAAAAAAAAAAAAAKsAAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T05:39:25.435Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "KuroDraggableControl.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroDraggableControl.cs",
+              "RelativeDocumentMoniker": "sources\\CustomWidgets\\KuroDraggableControl.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroDraggableControl.cs",
+              "RelativeToolTip": "sources\\CustomWidgets\\KuroDraggableControl.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAAwJAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T05:27:18.58Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WindowGroupTileTexture.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAAAIwFkAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-17T17:37:11.72Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
               "Title": "MaterialManager.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Materials\\MaterialManager.cs",
               "RelativeDocumentMoniker": "sources\\managers\\Materials\\MaterialManager.cs",
@@ -117,16 +224,11 @@
               "RelativeToolTip": "sources\\managers\\Materials\\MaterialManager.cs",
               "ViewState": "AgIAAIoAAAAAAAAAAADgv5EAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T09:34:39.395Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+              "WhenOpened": "2026-04-17T09:34:39.395Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 12,
               "Title": "TileGridNode2d.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\KuroTiles\\TileGridNode2d.cs",
               "RelativeDocumentMoniker": "sources\\KuroTiles\\TileGridNode2d.cs",
@@ -134,60 +236,7 @@
               "RelativeToolTip": "sources\\KuroTiles\\TileGridNode2d.cs",
               "ViewState": "AgIAANABAAAA6KG2DbsrwOQBAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T09:01:41.439Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "TileTextureRuleControl.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "ViewState": "AgIAAHQAAAAAAAAAAAAawIEAAABTAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T08:33:51.842Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "TileRuleTextureControl.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureControl.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureControl.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureControl.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureControl.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAgwCcAAAA0AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T07:56:56.414Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "CharacterStateConfig.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\systems\\Character\\CharacterStateConfig.cs",
-              "RelativeDocumentMoniker": "sources\\systems\\Character\\CharacterStateConfig.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\systems\\Character\\CharacterStateConfig.cs",
-              "RelativeToolTip": "sources\\systems\\Character\\CharacterStateConfig.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T07:55:30.659Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "KuroCheckButton.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroCheckButton.cs",
-              "RelativeDocumentMoniker": "sources\\CustomWidgets\\KuroCheckButton.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroCheckButton.cs",
-              "RelativeToolTip": "sources\\CustomWidgets\\KuroCheckButton.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T07:54:54.038Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-17T09:01:41.439Z"
             }
           ]
         }

@@ -10,18 +10,12 @@
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="7_0dq4i"]
 
 [node name="PanelContainer" type="PanelContainer" unique_id=1520532626]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -146.5
-offset_top = -113.5
-offset_right = 146.5
-offset_bottom = 113.5
-grow_horizontal = 2
-grow_vertical = 2
+offset_right = 133.0
+offset_bottom = 174.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_wrd5d")
+metadata/_edit_lock_ = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1495557972]
 layout_mode = 2
@@ -50,6 +44,21 @@ ignore_texture_size = true
 stretch_mode = 0
 script = ExtResource("7_0dq4i")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="LabelPosition" type="Label" parent="VBoxContainer/TextureRect" unique_id=1007436222]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -5.0
+offset_top = -11.5
+offset_right = 5.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "0"
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=747347864]
 layout_mode = 2
@@ -91,12 +100,12 @@ prefix = "Y:"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer" unique_id=245466540]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 6
+size_flags_vertical = 4
 
 [node name="FixedGridTiles" type="Container" parent="VBoxContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=691774664]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 6
+size_flags_vertical = 3
 script = ExtResource("2_nkc35")
 Separation = Vector2(1, 1)
 metadata/_custom_type_script = "uid://kr5g3m7w8x4v"

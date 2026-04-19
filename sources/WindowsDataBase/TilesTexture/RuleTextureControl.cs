@@ -4,12 +4,18 @@ using System;
 
 public partial class RuleTextureControl : PanelContainer
 {
+    [Export] public string GroupName = "draggable_items";
     private string widgetPath = "res://sources/WindowsDataBase/TilesTexture/TileTextureControl.tscn";
     private PackedScene _widgetScene;
 
     private string widgetRulePath = "res://sources/WindowsDataBase/TilesTexture/TileTextureRuleControl.tscn";
     private PackedScene _widgetRuleScene;
 
+    WindowGroupTileTexture groupTileTexture;
+
+    //
+    int position = 0;
+    int idMaterial = 0;
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
@@ -22,22 +28,164 @@ public partial class RuleTextureControl : PanelContainer
         FixedGridTiles.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         FixedGridRules.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         // Ejemplo: Crear una rejilla inicial de 3x3
-        SetupGrid(3, 3);
+        
         SpinBoxX.ValueChanged += SpinBoxX_ValueChanged;
         SpinBoxY.ValueChanged += SpinBoxY_ValueChanged;
 
         KuroTextureButtonDelete.Pressed += KuroTextureButtonDelete_Pressed;
         KuroCheckButtonSwitch.Pressed += KuroCheckButtonSwitch_Pressed;
         KuroCheckButtonSwitch_Pressed();
-        var scenePath = SceneFilePath;
-        GD.Print(scenePath);
+
+        //
+        AddToGroup(GroupName);
+        MouseFilter = MouseFilterEnum.Stop;
+
+        // Configurar hijos para que no bloqueen el drag
+        SetupChildrenMouseFilter(this);
+
+        // Detectar cambios de tamaño
+        foreach (var child in GetChildren())
+        {
+            if (child is Control c)
+                c.MinimumSizeChanged += RefreshMinimumSize;
+        }
+
+        ChildEnteredTree += (node) => {
+            if (node is Control child)
+            {
+                SetupChild(child);
+                child.MinimumSizeChanged += RefreshMinimumSize;
+                RefreshMinimumSize();
+            }
+        };
+
+        RefreshMinimumSize();
+    }
+    public void RefreshMinimumSize()
+    {
+        Vector2 maxChildSize = Vector2.Zero;
+
+        foreach (var child in GetChildren())
+        {
+            if (child is Control c && c.Visible)
+            {
+                Vector2 childMin = c.GetCombinedMinimumSize();
+                maxChildSize.X = Mathf.Max(maxChildSize.X, childMin.X);
+                maxChildSize.Y = Mathf.Max(maxChildSize.Y, childMin.Y);
+            }
+        }
+
+        if (CustomMinimumSize != maxChildSize)
+        {
+            CustomMinimumSize = maxChildSize;
+            UpdateMinimumSize();
+        }
+
+        SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        SizeFlagsVertical = SizeFlags.ExpandFill;
+    }
+    private void SetupChildrenMouseFilter(Node parent)
+    {
+        foreach (Node child in parent.GetChildren())
+        {
+            if (child is Control controlChild)
+            {
+                SetupChild(controlChild);
+            }
+        }
     }
 
+    private void SetupChild(Control child)
+    {
+        child.MouseFilter = MouseFilterEnum.Pass;
+
+        if (child.GetChildCount() > 0)
+            SetupChildrenMouseFilter(child);
+    }
+    public override Variant _GetDragData(Vector2 atPosition)
+    {
+        var preview = (Control)Duplicate();
+        preview.Modulate = new Color(1, 1, 1, 0.6f);
+        SetDragPreview(preview);
+        return this;
+    }
+
+    public override bool _CanDropData(Vector2 atPosition, Variant data)
+    {
+        return data.As<Node>() is RuleTextureControl;
+    }
+
+    public override void _DropData(Vector2 atPosition, Variant data)
+    {
+        var draggedItem = data.As<Control>();
+        if (draggedItem == null || draggedItem == this) return;
+
+        var container = GetParent();
+        if (container == null) return;
+
+        int dropIndex = GetIndex();
+
+        // 👉 mejor para listas verticales
+        bool dropAfter = atPosition.Y > Size.Y * 0.5f;
+
+        if (dropAfter)
+            dropIndex++;
+
+        if (draggedItem.GetParent() == container && draggedItem.GetIndex() < dropIndex)
+            dropIndex--;
+
+        container.MoveChild(draggedItem, Mathf.Clamp(dropIndex, 0, container.GetChildCount()));
+
+        if (container is Container c)
+            c.QueueSort();
+
+        CallDeferred(nameof(UpdatePositions), container);
+    }
+    private void UpdatePositions(Node container)
+    {
+        foreach (var child in container.GetChildren())
+        {
+            if (child is RuleTextureControl item)
+                item.SetPosition(child.GetIndex());
+        }
+    }
+    public void SetPosition(int position)
+    {
+        this.position = position;
+        LabelPosition.Text = (position + 1).ToString("D2");
+    }
+    public void SetMaterial(int idMaterial)
+    {
+        this.idMaterial = idMaterial;
+
+        foreach (var child in FixedGridTiles.GetChildren())
+        {
+            if (child is TileTextureControl item)
+            {
+                item.SetMaterial(idMaterial);
+            }
+        }
+
+
+        foreach (var child in FixedGridRules.GetChildren())
+        {
+            if (child is TileTextureRuleControl item)
+            {
+                item.SetMaterial(idMaterial);
+            }
+        }
+  
+
+    }
     private void KuroTextureButtonDelete_Pressed()
     {
-        this.QueueFree();
-    }
+        var container = GetParent();
 
+        QueueFree();
+
+        if (container != null)
+            CallDeferred(nameof(UpdatePositions), container);
+    }
     private void KuroCheckButtonSwitch_Pressed()
     {
         bool isOn = KuroCheckButtonSwitch.ButtonPressed;
@@ -82,8 +230,9 @@ public partial class RuleTextureControl : PanelContainer
         // 🔹 Crear tiles
         for (int i = 0; i < totalWidgets; i++)
         {
-            Control instance = _widgetScene.Instantiate<Control>();
+            TileTextureControl instance = _widgetScene.Instantiate<TileTextureControl>();
             FixedGridTiles.AddChild(instance);
+            instance.SetGroup(groupTileTexture);
         }
 
         // 🔹 Crear rules
@@ -91,6 +240,7 @@ public partial class RuleTextureControl : PanelContainer
         {
             TileTextureRuleControl instance = _widgetRuleScene.Instantiate<TileTextureRuleControl>();            
             FixedGridRules.AddChild(instance);
+            instance.SetGroup(groupTileTexture);
             instance.SetData(NeighborCondition.Ignore);
         }
 
@@ -105,19 +255,9 @@ public partial class RuleTextureControl : PanelContainer
             Mathf.Max(FixedGridTiles.GetCombinedMinimumSize().Y, FixedGridRules.GetCombinedMinimumSize().Y)
         );
 
-        // 3. Obtener el tamaño mínimo de los "otros" elementos
-        // Si tus SpinBoxes y botones están en un contenedor (ej: un VBoxContainer),
-        // podemos pedirle su tamaño mínimo ignorando los grids.
-        // Si no, lo más limpio es calcular el tamaño mínimo actual MENOS el espacio de los grids:
-
-        //CustomMinimumSize = Vector2.Zero; // Reseteamos para que recalcule el base real
         Vector2 baseLayoutSize = GetCombinedMinimumSize() ;
 
-        // 4. Sumar el tamaño base al tamaño del grid
-        // Nota: Dependiendo de tu layout, si el grid está debajo de los controles, 
-        // sumas en Y. Si está al lado, sumas en X. 
-        // Si usas contenedores automáticos, esto suele bastar:
-   
+
 
         this.CustomMinimumSize = new Vector2(
     Mathf.Max(baseLayoutSize.X, gridMinSize.X),
@@ -125,16 +265,12 @@ public partial class RuleTextureControl : PanelContainer
 );
         UpdateMinimumSize();
 
-        //var parentGrid = GetParent() as Container;
-        //if (parentGrid != null)
-        //{
-        //    // Esto obliga al contenedor a reordenar a todos sus hijos inmediatamente
-        //    parentGrid.QueueSort();
-
-        //    // Hack útil: resetear el tamaño del padre para que se ajuste al nuevo mínimo
-        //    parentGrid.Size = Vector2.Zero;
-        //}
 
     }
-
+    
+    internal void SetGroupParent(WindowGroupTileTexture windowGroupTileTexture)
+    {
+        groupTileTexture = windowGroupTileTexture;
+        SetupGrid(3, 3);
+    }
 }

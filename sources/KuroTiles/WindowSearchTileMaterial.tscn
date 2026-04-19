@@ -9,7 +9,6 @@ oversampling_override = 1.0
 title = "Buscar Tile Material"
 position = Vector2i(0, 36)
 size = Vector2i(800, 800)
-exclusive = true
 always_on_top = true
 script = ExtResource("1_ikj3x")
 

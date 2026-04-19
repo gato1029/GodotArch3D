@@ -8,6 +8,7 @@ public partial class RuleTextureControl : PanelContainer
     public event EventNotifyChangued OnNotifyChangued;
 
     private KuroTextureButton KuroTextureButtonDelete;
+    private Label LabelPosition;
     private HBoxContainer VBoxContainer;
     private VBoxContainer HBoxContainer;
     private KuroCheckButton KuroCheckButtonSwitch;
@@ -19,6 +20,7 @@ public partial class RuleTextureControl : PanelContainer
     public void InitializeUI()
     {
         KuroTextureButtonDelete = GetNode<KuroTextureButton>("VBoxContainer/TextureRect/KuroTextureButtonDelete");
+        LabelPosition = GetNode<Label>("VBoxContainer/TextureRect/LabelPosition");
         VBoxContainer = GetNode<HBoxContainer>("VBoxContainer/MarginContainer/VBoxContainer");
         HBoxContainer = GetNode<VBoxContainer>("VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer");
         KuroCheckButtonSwitch = GetNode<KuroCheckButton>("VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/KuroCheckButtonSwitch");

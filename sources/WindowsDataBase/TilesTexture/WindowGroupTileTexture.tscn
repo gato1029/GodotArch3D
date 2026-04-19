@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://c574qp3ym3q0i"]
 
 [ext_resource type="Script" uid="uid://ddphb8ui0m822" path="res://sources/WindowsDataBase/TilesTexture/WindowGroupTileTexture.cs" id="1_a10je"]
-[ext_resource type="Texture2D" uid="uid://tkmubhuc3gmy" path="res://resources/Textures/iconos/Select.png" id="2_287r5"]
 [ext_resource type="Script" uid="uid://ckc55m20w7igo" path="res://sources/CustomWidgets/KuroScrollZoomView.cs" id="2_s5lqk"]
+[ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="2_xm4qy"]
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_hc6qb"]
 [ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="4_lr3id"]
 [ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="5_mago0"]
@@ -23,43 +23,50 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=1151961979]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=299484466]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1151961979]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=1485720462]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1485720462]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1739686679]
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1739686679]
 layout_mode = 2
 text = "Material Textura:"
 
-[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1473921370]
+[node name="LineEditMaterial" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1473921370]
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
 
-[node name="KuroTextureButton" type="TextureButton" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1194920566]
+[node name="KuroTextureButtonSearch" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1194920566]
 layout_mode = 2
-texture_normal = ExtResource("2_287r5")
+texture_normal = ExtResource("2_xm4qy")
 script = ExtResource("3_hc6qb")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=981211914]
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=981211914]
 layout_mode = 2
 
-[node name="KuroTextureButtonAdd" type="TextureButton" parent="PanelContainer/VBoxContainer/HBoxContainer2" unique_id=837610210]
+[node name="KuroTextureButtonAdd" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=837610210]
 layout_mode = 2
 texture_normal = ExtResource("4_lr3id")
 script = ExtResource("3_hc6qb")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="KuroTextureButtonSave" type="TextureButton" parent="PanelContainer/VBoxContainer/HBoxContainer2" unique_id=1650057605]
+[node name="KuroTextureButtonSave" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1650057605]
 layout_mode = 2
 texture_normal = ExtResource("5_mago0")
 script = ExtResource("3_hc6qb")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="KuroCheckButtonSwitch" type="CheckButton" parent="PanelContainer/VBoxContainer/HBoxContainer2" unique_id=1574409682]
+[node name="KuroCheckButtonSwitch" type="CheckButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1574409682]
 layout_mode = 2
 icon = ExtResource("6_rfbwy")
 script = ExtResource("7_mdk58")
@@ -67,15 +74,18 @@ TextureOn = ExtResource("8_wgh5f")
 TextureOff = ExtResource("6_rfbwy")
 metadata/_custom_type_script = "uid://b2tq08112l2fo"
 
-[node name="KuroScrollZoomView" type="MarginContainer" parent="PanelContainer/VBoxContainer" unique_id=1758056422]
-visible = false
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=61103135]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="KuroScrollZoomView" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=1758056422]
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("2_s5lqk")
 PanButton = 7
 metadata/_custom_type_script = "uid://ckc55m20w7igo"
 
-[node name="Contenedor" type="GridContainer" parent="PanelContainer/VBoxContainer" unique_id=1709710252]
+[node name="Contenedor" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/KuroScrollZoomView" unique_id=1709710252]
 layout_mode = 2
 size_flags_vertical = 3
-columns = 3
+columns = 4
