@@ -144,11 +144,10 @@ public partial class TilesSubViewport : SubViewport
         tilesCamera2d.Position = screenCenter;
     }
 
+    Vector2 zoomOrigin = new Vector2(1,1);
     internal void SetCameraPosition(float x, float y)
     {
-        CenterCameraOnViewport();
-        Vector2 pos = tilesCamera2d.Position;
-        tilesCamera2d.Position =  new Vector2(x,y);
-        GD.Print("Camera Position set to: " + tilesCamera2d.Position);
+        zoomOrigin = tilesCamera2d.Zoom;                
+        tilesCamera2d.Position =  new Vector2(x,y);             
     }
 }

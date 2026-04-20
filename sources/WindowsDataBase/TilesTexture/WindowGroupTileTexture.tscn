@@ -54,6 +54,14 @@ metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 [node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=981211914]
 layout_mode = 2
 
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=262749881]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1984103176]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="KuroTextureButtonAdd" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=837610210]
 layout_mode = 2
 texture_normal = ExtResource("4_lr3id")

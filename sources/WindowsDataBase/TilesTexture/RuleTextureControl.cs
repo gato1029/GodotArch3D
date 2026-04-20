@@ -13,12 +13,15 @@ public partial class RuleTextureControl : PanelContainer
 
     WindowGroupTileTexture groupTileTexture;
 
+    TileRuleTextureData tileRuleTextureData;
+
     //
     int position = 0;
     int idMaterial = 0;
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
+        tileRuleTextureData = new TileRuleTextureData();
         SceneRegistry.Register(this);
         // 1. Cargar la escena del widget
         _widgetScene = GD.Load<PackedScene>(widgetPath);
@@ -186,12 +189,23 @@ public partial class RuleTextureControl : PanelContainer
         if (container != null)
             CallDeferred(nameof(UpdatePositions), container);
     }
+
+    public void SwitchTypeRules(bool rules)
+    {
+        KuroCheckButtonSwitch.ButtonPressed = rules;
+        KuroCheckButtonSwitch_Pressed();
+    }
     private void KuroCheckButtonSwitch_Pressed()
     {
         bool isOn = KuroCheckButtonSwitch.ButtonPressed;
 
         FixedGridTiles.Visible = isOn;
         FixedGridRules.Visible = !isOn;
+        if (groupTileTexture!=null)
+        {
+            groupTileTexture.SetDisableSelection();
+        }
+        
     }
 
     private void SpinBoxY_ValueChanged(double value)
@@ -210,6 +224,7 @@ public partial class RuleTextureControl : PanelContainer
     public void SetupGrid(int rows, int columns)
     {
         if (FixedGridTiles == null || FixedGridRules == null) return;
+        tileRuleTextureData.SetSize(rows, columns);
 
         // 🔹 Configurar ambos grids
         FixedGridTiles.Rows = rows;
@@ -232,7 +247,7 @@ public partial class RuleTextureControl : PanelContainer
         {
             TileTextureControl instance = _widgetScene.Instantiate<TileTextureControl>();
             FixedGridTiles.AddChild(instance);
-            instance.SetGroup(groupTileTexture);
+            instance.SetGroup(groupTileTexture, tileRuleTextureData, i, idMaterial);
         }
 
         // 🔹 Crear rules
@@ -240,7 +255,7 @@ public partial class RuleTextureControl : PanelContainer
         {
             TileTextureRuleControl instance = _widgetRuleScene.Instantiate<TileTextureRuleControl>();            
             FixedGridRules.AddChild(instance);
-            instance.SetGroup(groupTileTexture);
+            instance.SetGroup(groupTileTexture, tileRuleTextureData, i, idMaterial);
             instance.SetData(NeighborCondition.Ignore);
         }
 
@@ -265,12 +280,26 @@ public partial class RuleTextureControl : PanelContainer
 );
         UpdateMinimumSize();
 
-
+        
     }
     
     internal void SetGroupParent(WindowGroupTileTexture windowGroupTileTexture)
     {
         groupTileTexture = windowGroupTileTexture;
+        
         SetupGrid(3, 3);
+    }
+
+    internal void SetData(TileRuleTextureData tileRuleTextureData, int idMaterial)
+    {
+        this.tileRuleTextureData = tileRuleTextureData;
+        SetupGrid(tileRuleTextureData.Rows,tileRuleTextureData.Columns);
+        SetMaterial(idMaterial);
+        
+    }
+
+    internal TileRuleTextureData GetData()
+    {
+       return tileRuleTextureData;
     }
 }

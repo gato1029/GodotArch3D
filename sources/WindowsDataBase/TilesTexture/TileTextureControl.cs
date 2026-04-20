@@ -1,14 +1,18 @@
 using Godot;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
+using System.Reflection.Metadata.Ecma335;
 
 public partial class TileTextureControl : Control
 {
-    // -1 mantener, 0 eliminar, >0 nuevo ID
+    // -1 mantener,-2 eliminar, >=0 nuevo ID
     int idMaterial    = -1;
     int idTileTexture = -1;
+    int indexPosition = -1;
 
+    TileRuleTextureData tileRuleTextureData;
 
     private bool isEditing = false;
     private float blinkTime = 0f;
@@ -36,8 +40,9 @@ public partial class TileTextureControl : Control
                     {
                         return;
                     }
+                    // 🔥 NUEVO: avisar al grupo
+                    groupTileTexture?.SetCurrent(this);
                     isEditing = true;
-                    TextureImage.Texture = GD.Load<Texture2D>(SeleccionActualImagen);
                     TextureImage.Modulate = new Color(0.6f, 0.8f, 1f, 1f);
                     blinkTime = 0f;
                     Vector2I globalPos = (Vector2I)GetScreenPosition();
@@ -55,18 +60,21 @@ public partial class TileTextureControl : Control
                         // Tenía material → pasar a mantener
                         idMaterial = -1;
                         TextureImage.Texture = GD.Load<Texture2D>(mantenerImagen);
+                        tileRuleTextureData.SetOutputByIndex(indexPosition, -1);
                     }
                     else if (idMaterial == -1)
                     {
                         // Estaba en mantener → pasar a eliminar
                         idMaterial = 0;
                         TextureImage.Texture = GD.Load<Texture2D>(eliminarImagen);
+                        tileRuleTextureData.SetOutputByIndex(indexPosition, -2);
                     }
                     else if (idMaterial == 0)
                     {
                         // Estaba en eliminar → volver a mantener
                         idMaterial = -1;
                         TextureImage.Texture = GD.Load<Texture2D>(mantenerImagen);
+                        tileRuleTextureData.SetOutputByIndex(indexPosition, -1);
                     }
 
                     OnNotifyChangued?.Invoke(this);                    
@@ -86,6 +94,7 @@ public partial class TileTextureControl : Control
         this.idMaterial = idMaterial;
         idTileTexture = idIndex;                
         TextureImage.Texture = MaterialManager.Instance.GetAtlasTextureInternal(idMaterial, idTileTexture);
+        tileRuleTextureData.SetOutputByIndex(indexPosition, idTileTexture);
     }
 
     public bool HasMaterial() => idMaterial != -1;
@@ -98,13 +107,10 @@ public partial class TileTextureControl : Control
     {
         idMaterial = materialId;
         idTileTexture = tileIndex;
-
-        TextureImage.Texture =
-            MaterialManager.Instance.GetAtlasTextureInternal(materialId, tileIndex);
-
-        // 🔥 detener efecto
-        isEditing = false;
+        TextureImage.Texture =MaterialManager.Instance.GetAtlasTextureInternal(materialId, tileIndex);        
         TextureImage.Modulate = Colors.White;
+
+        tileRuleTextureData.SetOutputByIndex(indexPosition, idTileTexture);
     }
     private void WindowLocal_OnNotifySelectionIndex(int index, MaterialData materialData)
     {
@@ -121,11 +127,27 @@ public partial class TileTextureControl : Control
         blinkTime += (float)delta * 6f; // velocidad
 
         float alpha = 0.5f + 0.5f * Mathf.Sin(blinkTime);
-        TextureImage.Modulate = new Color(0.7f, 23.9f, 1.2f, alpha);
+        TextureImage.Modulate = new Color(0.9f, 0.9f, 0.9f, alpha);
     }
 
-    internal void SetGroup(WindowGroupTileTexture groupTileTexture)
+    public void StopEditing()
     {
+        isEditing = false;
+        TextureImage.Modulate = Colors.White;
+    }
+
+    
+    internal void SetGroup(WindowGroupTileTexture groupTileTexture,TileRuleTextureData tileRuleTextureData, int indexPosition, int materialId)
+    {
+        this.idMaterial = materialId;
+       this.tileRuleTextureData = tileRuleTextureData;
+       this.indexPosition = indexPosition;
        this.groupTileTexture = groupTileTexture;
+        if (tileRuleTextureData.GetOutputByIndex(indexPosition)!=-1)
+        {
+            idTileTexture = tileRuleTextureData.GetOutputByIndex(indexPosition);
+            TextureImage.Texture = MaterialManager.Instance.GetAtlasTextureInternal(materialId, idTileTexture);
+            TextureImage.Modulate = Colors.White;
+        }
     }
 }

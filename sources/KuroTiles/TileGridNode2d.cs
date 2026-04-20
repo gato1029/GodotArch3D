@@ -13,7 +13,7 @@ public partial class TileGridNode2d : Node2D
     [Export] public SpinBox spinBoxX;
     [Export] public SpinBox spinBoxY;
     [Export] public SubViewport subViewport;
-    [Export] public Color selectionColor = new Color(1, 0, 0, 0.3f);
+    [Export] public Color selectionColor = new Color(1f, 0.3f, 0.3f, 0.5f);
 
     private Vector2I selectedCell = new Vector2I(-1, -1);
     private bool isDragging = false;
@@ -159,7 +159,11 @@ public partial class TileGridNode2d : Node2D
             new Vector2((endXCell - startXCell + 1) * cellSize.X, (endYCell - startYCell + 1) * cellSize.Y)
         );
 
-        DrawRect(rect, selectionColor);
+        // relleno
+        DrawRect(rect, new Color(1f, 1f, 1f, 0.15f));
+
+        // borde fuerte
+        DrawRect(rect, new Color(1f, 0.2f, 0.2f, 1f), false, 2f);
     }
 
     // 🔹 NUEVO
@@ -175,7 +179,11 @@ public partial class TileGridNode2d : Node2D
                 startPos + new Vector2(cell.X * cellSize.X, cell.Y * cellSize.Y),
                 cellSize
             );
-            DrawRect(rect, selectionColor);
+            // relleno
+            DrawRect(rect, new Color(1f, 1f, 1f, 0.15f));
+
+            // borde fuerte
+            DrawRect(rect, new Color(1f, 0.2f, 0.2f, 1f), false, 2f);
             DrawString(
                 ThemeDB.FallbackFont, // fuente por defecto
                 rect.Position + cellSize / 2, // centro del tile
@@ -518,10 +526,31 @@ public partial class TileGridNode2d : Node2D
 
         OnNotifySelection?.Invoke(px, py, w, h);
 
-        // 🔹 NUEVO: notificar índice
-        OnNotifySelectionIndex?.Invoke(index);
+        // =========================================
+        // 🔥 CALCULAR POSICIÓN REAL DEL TILE
+        // =========================================
+
+        //// Centro del tile en espacio LOCAL del TextureRect
+        //Vector2 localPos = new Vector2(
+        //    cell.X * cellSize.X + cellSize.X / 2f,
+        //    cell.Y * cellSize.Y + cellSize.Y / 2f
+        //);
+
+        //// Convertir a espacio GLOBAL del SubViewport (correcto aunque haya Panel)
+        //Vector2 globalPos = imageTexture.GetGlobalTransformWithCanvas() * localPos;
+
+        //// =========================================
+        //// 🔥 MOVER LA CÁMARA
+        //// =========================================
+        //Camera2D cam = GetViewport().GetCamera2D();
+        //if (cam != null)
+        //{
+        //    cam.Position = globalPos;
+        //}
 
         forced = true;
+
+
         QueueRedraw();
     }
     public void SetSelection(List<int> indices)
@@ -538,5 +567,21 @@ public partial class TileGridNode2d : Node2D
         }
 
         QueueRedraw();
+    }
+
+    public Vector2 GetGlobalPositionFromIndex(int index)
+    {
+        if (imageTexture == null || imageTexture.Texture == null)
+            return Vector2.Zero;
+
+        Vector2I cell = IndexToCell(index);
+
+        Vector2 gridLocalPos = new Vector2(
+          cell.X * cellSize.X + cellSize.X / 2f,
+          cell.Y * cellSize.Y + cellSize.Y / 2f
+      );
+
+        // 🔥 convertir desde el grid (Node2D) al mundo del viewport
+        return ToGlobal(gridLocalPos - imageTexture.Size / 2f);
     }
 }

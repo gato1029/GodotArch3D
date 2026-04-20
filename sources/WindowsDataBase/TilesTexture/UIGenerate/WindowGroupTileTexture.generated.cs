@@ -9,6 +9,7 @@ public partial class WindowGroupTileTexture : Window
 
     private LineEdit LineEditMaterial;
     private KuroTextureButton KuroTextureButtonSearch;
+    private LineEdit LineEditName;
     private KuroTextureButton KuroTextureButtonAdd;
     private KuroTextureButton KuroTextureButtonSave;
     private KuroCheckButton KuroCheckButtonSwitch;
@@ -20,6 +21,7 @@ public partial class WindowGroupTileTexture : Window
         CloseRequested += CloseRequestedWindow;
         LineEditMaterial = GetNode<LineEdit>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/LineEditMaterial");
         KuroTextureButtonSearch = GetNode<KuroTextureButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/KuroTextureButtonSearch");
+        LineEditName = GetNode<LineEdit>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/LineEditName");
         KuroTextureButtonAdd = GetNode<KuroTextureButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/KuroTextureButtonAdd");
         KuroTextureButtonSave = GetNode<KuroTextureButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/KuroTextureButtonSave");
         KuroCheckButtonSwitch = GetNode<KuroCheckButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer2/KuroCheckButtonSwitch");

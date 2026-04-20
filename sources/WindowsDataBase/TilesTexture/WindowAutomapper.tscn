@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://mbh8u22qt1wu"]
+
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="1_6ooek"]
+[ext_resource type="Script" uid="uid://ykn10cc2n23f" path="res://sources/WindowsDataBase/TilesTexture/WindowAutomapper.cs" id="1_b1cas"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="1_s2n66"]
+[ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="2_efxwo"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="3_b1cas"]
+
+[node name="WindowAutomapper" type="Window" unique_id=1703383277]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(500, 500)
+script = ExtResource("1_b1cas")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=352565552]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1383085634]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1454337981]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1206308421]
+layout_mode = 2
+columns = 5
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=559962618]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1061526870]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonAdd" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1526386414]
+layout_mode = 2
+texture_normal = ExtResource("1_6ooek")
+script = ExtResource("2_efxwo")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonDelete" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1813207570]
+layout_mode = 2
+texture_normal = ExtResource("3_b1cas")
+script = ExtResource("2_efxwo")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ButtonSave" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1477051409]
+layout_mode = 2
+texture_normal = ExtResource("1_s2n66")
+script = ExtResource("2_efxwo")
+metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
+
+[node name="ItemsContainer" type="ItemList" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=127813809]
+layout_mode = 2
+size_flags_vertical = 3

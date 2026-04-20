@@ -58,8 +58,14 @@ public partial class WindowKuroTiles : MarginContainer
         Grid.SetTextureEmpty(); 
     }
     Vector2 sizeTexture= Vector2.Zero;
+    int idCurrentMaterial = -1;
     public void SetTexture(Texture2D texture, int id)
     {
+        if (idCurrentMaterial==id)
+        {
+            return;
+        }
+        idCurrentMaterial = id;
         sizeTexture = texture.GetSize();
         if (texture.GetSize().X > 800 || texture.GetSize().Y > 800)
         {
@@ -104,11 +110,15 @@ public partial class WindowKuroTiles : MarginContainer
     public void SetSelection(int index)
     {
         Grid.SetSelection(index);
+        Vector2 globalPos = Grid.GetGlobalPositionFromIndex(index);
+
+        SubViewport.SetCameraPosition(globalPos.X, globalPos.Y);
     }
     public void SetSelection(List<int> indices)
     {
         Grid.SetSelection(indices);
     }
+
     internal void SetSelection(float x, float y, float width, float height)
     {
         Grid.SetSelection(x, y, width, height);
