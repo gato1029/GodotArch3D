@@ -16,6 +16,7 @@ using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
 
@@ -184,6 +185,9 @@ public partial class HerramientaMenuBar : MenuBar
                 break;            
             case 1:
                 FacadeWindowDataSearch<AutoTileSpriteData> wa = new FacadeWindowDataSearch<AutoTileSpriteData>(KuroWindowFactory.GetPath<WindowAutoTileSprite>(), this);
+                break;
+            case 2:
+                FacadeWindowDataSearch<AutomapperData> wauto = new FacadeWindowDataSearch<AutomapperData>(KuroWindowFactory.GetPath<WindowAutomapper>(), this);
                 break;
             default:
                 break;

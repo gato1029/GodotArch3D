@@ -126,7 +126,7 @@ public partial class TileTextureRuleControl : Control
                 break;
             case NeighborCondition.Specific:
                 TextureImage.Texture = GD.Load<Texture2D>(ExactoImagen);
-                tileRuleTextureData.SetConditionByIndex(indexPosition, NeighborCondition.Specific);
+                
                 // 🔥 NUEVO: avisar al grupo
                 groupTileTexture?.SetCurrent(this);
                 isEditing = true;

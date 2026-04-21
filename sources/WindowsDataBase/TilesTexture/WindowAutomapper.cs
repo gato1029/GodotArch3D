@@ -1,10 +1,14 @@
 using Godot;
+using GodotEcsArch.sources.CustomWidgets.Internals;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
 
+
+[KuroRegisterWindow("res://sources/WindowsDataBase/TilesTexture/WindowAutomapper.tscn")]
 public partial class WindowAutomapper : Window, IFacadeWindow<AutomapperData>
 {
     public event IFacadeWindow<AutomapperData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
@@ -25,6 +29,7 @@ public partial class WindowAutomapper : Window, IFacadeWindow<AutomapperData>
 
     private void ItemsContainer_ItemSelected(long index)
     {
+        ItemsContainer.DeselectAll();
         // Usamos el índice directamente para obtener el elemento correcto
         int selectedIndex = (int)index;
         if (selectedIndex < 0 || selectedIndex >= data.Phases.Count) return;
@@ -33,11 +38,13 @@ public partial class WindowAutomapper : Window, IFacadeWindow<AutomapperData>
 
         var scene = GD.Load<PackedScene>("res://sources/WindowsDataBase/TilesTexture/WindowGroupTileTexture.tscn");
         var widget = scene.Instantiate<WindowGroupTileTexture>();
-
-        widget.SetData(element, element.materialId);
-        widget.SetParentData(data, selectedIndex);
-
         AddChild(widget);
+
+        widget.SetParentData(data, selectedIndex);
+        widget.SetData(element, element.materialId);
+        
+
+        
         widget.Popup();
     }
 
@@ -82,9 +89,13 @@ public partial class WindowAutomapper : Window, IFacadeWindow<AutomapperData>
 
     public void ButtonSave_Pressed()
     {
+        data.name = LineEditName.Text;
         // Aseguramos que el orden esté actualizado antes de guardar
         UpdateInternalOrder();
         DataBaseManager.Instance.InsertUpdate<AutomapperData>(data);
+        OnNotifyChanguedSimple?.Invoke();        
+        Message.ShowMessage(this, "Guardado Exitoso :)!");
+        QueueFree();
     }
 
     /// <summary>
@@ -102,7 +113,7 @@ public partial class WindowAutomapper : Window, IFacadeWindow<AutomapperData>
     /// <summary>
     /// Limpia y reconstruye la lista visual basada en los datos actuales
     /// </summary>
-    private void RefreshUI()
+    public void RefreshUI()
     {
         ItemsContainer.Clear();
         for (int i = 0; i < data.Phases.Count; i++)
@@ -117,6 +128,7 @@ public partial class WindowAutomapper : Window, IFacadeWindow<AutomapperData>
     void IFacadeWindow<AutomapperData>.SetData(AutomapperData data)
     {
         this.data = data;
+        LineEditName.Text = data.name;
         RefreshUI();
     }
 }

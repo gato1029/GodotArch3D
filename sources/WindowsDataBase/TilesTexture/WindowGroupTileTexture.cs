@@ -15,6 +15,8 @@ public partial class WindowGroupTileTexture : Window
     MaterialData material;
     WindowSearchTileMaterial windowLocal = null;
     AutomapperData dataParent = null;
+    
+
     // ventana compartida de tiles
     private WindowSearchTileMaterial sharedWindow;
     private TileTextureRuleControl currentRequester;
@@ -40,8 +42,12 @@ public partial class WindowGroupTileTexture : Window
     private void KuroTextureButtonSave_Pressed()
     {
         ruleTextureData.rules = GetAllRules();
-        dataParent.Phases[positionIndex] = ruleTextureData;
-        DataBaseManager.Instance.InsertUpdate(dataParent);
+        ruleTextureData.name = LineEditName.Text;
+        ruleTextureData.order = positionIndex;
+        dataParent.Phases[positionIndex] = ruleTextureData;        
+        WindowAutomapper parent = GetParent() as WindowAutomapper;
+        parent.RefreshUI();
+        QueueFree();
     }
 
     private void KuroCheckButtonSwitch_Pressed()
@@ -80,7 +86,19 @@ public partial class WindowGroupTileTexture : Window
             sharedWindow.SetSelection(requester.GetMaterialId(), requester.GetTileIndex());
         }
     }
-
+    public void SetClearCurrent()
+    {
+        if (currentRequesterAlter != null)
+        {
+            currentRequesterAlter.StopEditing();
+        }
+        if (currentRequester != null)
+        {
+            currentRequester.StopEditing();
+        }
+        currentRequester = null;
+        currentRequesterAlter = null;
+    }
     public void SetCurrent(TileTextureRuleControl newControl)
     {
         // apagar anterior
@@ -152,7 +170,20 @@ public partial class WindowGroupTileTexture : Window
             sharedWindow.SetAlwaysOpen();
         }
 
+        // Posición y tamaño del window actual
+        Vector2 parentPos = this.Position;
+        Vector2 parentSize = this.Size;
+
         sharedWindow.Popup();
+
+        // Posicionar a la derecha del window padre
+        Vector2 finalPos = new Vector2(
+            parentPos.X + parentSize.X,
+            parentPos.Y
+        );
+
+        sharedWindow.CallDeferred(MethodName.SetPosition, finalPos);
+
         //sharedWindow.Hide();
         sharedWindow.OnNotifySelectionIndex += OnMaterialSelected;
 
@@ -256,9 +287,10 @@ public partial class WindowGroupTileTexture : Window
 
     internal void SetData(AutoTilePhase element, int materialId)
     {
+        LineEditName.Text = element.name;
         ruleTextureData = element;
         material = MasterDataManager.GetData<MaterialData>(materialId);
-
+        WindowQuery_OnNotifySelected(material);
         foreach (var item in ruleTextureData.rules)
         {
             var scene = GD.Load<PackedScene>("res://sources/WindowsDataBase/TilesTexture/RuleTextureControl.tscn");

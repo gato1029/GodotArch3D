@@ -23,88 +23,86 @@ public enum NeighborCondition : byte
 /// </summary>
 public struct ConditionSlot
 {
-    public NeighborCondition Condition;
-    public int TargetID; // Solo se usa si Condition es Specific.
+    public NeighborCondition Condition { get; set; }
+    public int TargetID { get; set; } // Solo se usa si Condition es Specific.
 }
 
 public class TileRuleTextureData
 {
     // Propiedades de identificación y dimensiones
     public string Name { get; set; }
-    public int Rows { get; private set; }
-    public int Columns { get; private set; }
-    public int AnchorX { get; private set; } // origen x
-    public int AnchorY { get; private set; } // origen y
+    public int Rows { get; set; }
+    public int Columns { get; set; }
+    public int AnchorX { get; set; }
+    public int AnchorY { get; set; }
 
-    private ConditionSlot[,] _inputPattern;
+    public ConditionSlot[] _inputPattern { get; set; }
 
-    // El Sello (Output): -1 = Mantener, -2 = Borrar, >=0 = Nuevo ID
-    public int[,] Output { get; private set; }
+    // -1 = Mantener, -2 = Borrar, >=0 = Nuevo ID
+    public int[] Output { get; set; }
 
-    // Máscaras de Bits (Soportan hasta 5x5 celdas usando 2 bits c/u)
-    public long FilterMask { get; private set; }
-    public long ValueMask { get; private set; }
+    // Máscaras binarias
+    public long FilterMask { get; set; }
+    public long ValueMask { get; set; }
 
-    // Optimización para IDs específicos
-    private int[] _specificIDs;
-    private bool _hasSpecificRequirements;
+    // IDs específicos
+    public int[] _specificIDs { get; set; }
+    public bool _hasSpecificRequirements { get; set; }
 
     public TileRuleTextureData()
     {
+        AnchorX = -1;
+        AnchorY = -1;
         Name = "NewRule";
     }
+
+    private int ToIndex(int x, int y) => y * Rows + x;
 
     public void ConfigureDimensions(int width, int height)
     {
         ResetPrecompute();
+
         if (width * height > 32)
-            throw new ArgumentException("El tamaño máximo soportado es 32 celdas (ej. 5x5).");
+            throw new ArgumentException("El tamaño máximo soportado es 32 celdas.");
 
         Rows = width;
         Columns = height;
 
-        // Re-crear estructuras internas
-        Output = new int[width, height];
-        _specificIDs = new int[width * height];
+        int size = width * height;
 
-        // Inicialización por defecto
-        for (int i = 0; i < _specificIDs.Length; i++)
+        Output = new int[size];
+        _inputPattern = new ConditionSlot[size];
+        _specificIDs = new int[size];
+
+        for (int i = 0; i < size; i++)
+        {
+            Output[i] = -1;
             _specificIDs[i] = -1;
 
-        for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++)
-            Output[x, y] = -1;
-        _inputPattern = new ConditionSlot[width, height];
-
-        // Inicialización por defecto
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
+            _inputPattern[i] = new ConditionSlot
             {
-                _inputPattern[x, y] = new ConditionSlot
-                {
-                    Condition = NeighborCondition.Ignore,
-                    TargetID = -1,
-                };
-            }
+                Condition = NeighborCondition.Ignore,
+                TargetID = -1
+            };
         }
+
         Precompute();
     }
 
     public void SetConditionByIndex(int index, NeighborCondition condition, int targetID = -1)
     {
         if (_inputPattern == null)
-            throw new InvalidOperationException(
-                "InputPattern no inicializado. Llama a ConfigureDimensions."
-            );
+            throw new InvalidOperationException("InputPattern no inicializado.");
 
-        if (index < 0 || index >= Rows * Columns)
+        if (index < 0 || index >= _inputPattern.Length)
             throw new ArgumentOutOfRangeException(nameof(index));
 
-        int x = index % Rows;
-        int y = index / Rows;
+        _inputPattern[index] = new ConditionSlot
+        {
+            Condition = condition,
+            TargetID = targetID
+        };
 
-        _inputPattern[x, y] = new ConditionSlot { Condition = condition, TargetID = targetID };
         Precompute();
     }
 
@@ -113,70 +111,54 @@ public class TileRuleTextureData
         if (_inputPattern == null)
             throw new InvalidOperationException("InputPattern no inicializado.");
 
-        if (index < 0 || index >= Rows * Columns)
+        if (index < 0 || index >= _inputPattern.Length)
             throw new ArgumentOutOfRangeException(nameof(index));
 
-        int x = index % Rows;
-        int y = index / Rows;
-
-        return _inputPattern[x, y];
+        return _inputPattern[index];
     }
 
     public int GetOutputByIndex(int index)
     {
         if (Output == null)
-            throw new InvalidOperationException("Output no está inicializado.");
+            throw new InvalidOperationException("Output no inicializado.");
 
-        if (index < 0 || index >= Rows * Columns)
+        if (index < 0 || index >= Output.Length)
             throw new ArgumentOutOfRangeException(nameof(index));
 
-        int x = index % Rows;
-        int y = index / Rows;
-
-        return Output[x, y];
+        return Output[index];
     }
 
     public void SetOutputByIndex(int index, int value)
     {
         if (Output == null)
-            throw new InvalidOperationException(
-                "Output no está inicializado. Llama primero a ConfigureDimensions."
-            );
+            throw new InvalidOperationException("Output no inicializado.");
 
-        if (index < 0 || index >= Rows * Columns)
-            throw new ArgumentOutOfRangeException(nameof(index), $"Índice fuera de rango: {index}");
+        if (index < 0 || index >= Output.Length)
+            throw new ArgumentOutOfRangeException(nameof(index));
 
-        int x = index % Rows;
-        int y = index / Rows;
-
-        Output[x, y] = value;
+        Output[index] = value;
     }
 
     public void ClearOutput(int defaultValue = -1)
     {
         if (Output == null)
-            throw new InvalidOperationException("Output no está inicializado.");
+            throw new InvalidOperationException("Output no inicializado.");
 
-        for (int y = 0; y < Columns; y++)
-        {
-            for (int x = 0; x < Rows; x++)
-            {
-                Output[x, y] = defaultValue;
-            }
-        }
+        for (int i = 0; i < Output.Length; i++)
+            Output[i] = defaultValue;
     }
 
     public void SetOutput(int x, int y, int value)
     {
         if (Output == null)
-            throw new InvalidOperationException(
-                "Output no está inicializado. Llama primero a ConfigureDimensions."
-            );
+            throw new InvalidOperationException("Output no inicializado.");
 
-        if (x < 0 || x >= Rows || y < 0 || y >= Columns)
+        int index = ToIndex(x, y);
+
+        if (index < 0 || index >= Output.Length)
             throw new ArgumentOutOfRangeException($"Posición fuera de rango: ({x},{y})");
 
-        Output[x, y] = value;
+        Output[index] = value;
     }
 
     public void SetAnchor(int anchorX, int anchorY)
@@ -207,12 +189,10 @@ public class TileRuleTextureData
     public void SetAnchorByIndex(int index)
     {
         if (Rows <= 0 || Columns <= 0)
-            throw new InvalidOperationException(
-                "Dimensiones no configuradas. Llama a ConfigureDimensions."
-            );
+            throw new InvalidOperationException("Dimensiones no configuradas.");
 
         if (index < 0 || index >= Rows * Columns)
-            throw new ArgumentOutOfRangeException(nameof(index), $"Índice fuera de rango: {index}");
+            throw new ArgumentOutOfRangeException(nameof(index));
 
         AnchorX = index % Rows;
         AnchorY = index / Rows;
@@ -233,9 +213,6 @@ public class TileRuleTextureData
         _hasSpecificRequirements = false;
     }
 
-    /// <summary>
-    /// Compila el patrón de entrada en máscaras binarias de alto rendimiento.
-    /// </summary>
     public void Precompute()
     {
         FilterMask = 0;
@@ -244,40 +221,31 @@ public class TileRuleTextureData
 
         int bitOffset = 0;
 
-        for (int y = 0; y < Columns; y++)
+        for (int i = 0; i < _inputPattern.Length; i++)
         {
-            for (int x = 0; x < Rows; x++)
+            var slot = _inputPattern[i];
+
+            if (slot.Condition != NeighborCondition.Ignore)
             {
-                var slot = _inputPattern[x, y];
-                int index = y * Rows + x;
+                FilterMask |= (0x3L << bitOffset);
+                ValueMask |= ((long)slot.Condition << bitOffset);
 
-                if (slot.Condition != NeighborCondition.Ignore)
+                if (slot.Condition == NeighborCondition.Specific)
                 {
-                    FilterMask |= (0x3L << bitOffset);
-                    ValueMask |= ((long)slot.Condition << bitOffset);
-
-                    if (slot.Condition == NeighborCondition.Specific)
-                    {
-                        _specificIDs[index] = slot.TargetID;
-                        _hasSpecificRequirements = true;
-                    }
+                    _specificIDs[i] = slot.TargetID;
+                    _hasSpecificRequirements = true;
                 }
-
-                bitOffset += 2;
             }
+
+            bitOffset += 2;
         }
     }
 
-    /// <summary>
-    /// Valida si el área del mapa coincide con esta regla.
-    /// </summary>
     public bool IsMatch(long mapMask, int worldX, int worldY, IReadOnlyTileMap map)
     {
-        // Paso 1: Comparación binaria (O(1)). El 99% de las veces termina aquí.
         if ((mapMask & FilterMask) != ValueMask)
             return false;
 
-        // Paso 2: Validación de IDs específicos (solo si existen).
         if (_hasSpecificRequirements)
         {
             for (int i = 0; i < _specificIDs.Length; i++)
@@ -288,7 +256,6 @@ public class TileRuleTextureData
                     int lx = i % Rows;
                     int ly = i / Rows;
 
-                    // Posición relativa al mundo considerando el ancla
                     int targetX = worldX - AnchorX + lx;
                     int targetY = worldY - AnchorY + ly;
 
@@ -301,29 +268,26 @@ public class TileRuleTextureData
         return true;
     }
 
-    /// <summary>
-    /// Aplica los cambios visuales definidos en el Output de la regla.
-    /// </summary>
     public void Apply(int worldX, int worldY, ITileMapActions map)
     {
         int startX = worldX - AnchorX;
         int startY = worldY - AnchorY;
 
-        for (int y = 0; y < Columns; y++)
+        for (int i = 0; i < Output.Length; i++)
         {
-            for (int x = 0; x < Rows; x++)
+            int action = Output[i];
+            if (action == -1)
+                continue;
+
+            int x = i % Rows;
+            int y = i / Rows;
+
+            int targetX = startX + x;
+            int targetY = startY + y;
+
+            if (map.IsInside(targetX, targetY))
             {
-                int action = Output[x, y];
-                if (action == -1)
-                    continue; // Mantener original
-
-                int targetX = startX + x;
-                int targetY = startY + y;
-
-                if (map.IsInside(targetX, targetY))
-                {
-                    map.SetVisualTile(targetX, targetY, action);
-                }
+                map.SetVisualTile(targetX, targetY, action);
             }
         }
     }

@@ -45,6 +45,7 @@ public partial class RuleTextureControl : PanelContainer
 
         // Configurar hijos para que no bloqueen el drag
         SetupChildrenMouseFilter(this);
+        
 
         // Detectar cambios de tamaño
         foreach (var child in GetChildren())
@@ -61,7 +62,7 @@ public partial class RuleTextureControl : PanelContainer
                 RefreshMinimumSize();
             }
         };
-
+        
         RefreshMinimumSize();
     }
     public void RefreshMinimumSize()
@@ -221,10 +222,14 @@ public partial class RuleTextureControl : PanelContainer
     /// <summary>
     /// Configura las dimensiones del grid y genera los widgets necesarios.
     /// </summary>
-    public void SetupGrid(int rows, int columns)
+    public void SetupGrid(int rows, int columns, bool refreshInternal = true)
     {
         if (FixedGridTiles == null || FixedGridRules == null) return;
-        tileRuleTextureData.SetSize(rows, columns);
+        if (refreshInternal)
+        {
+            tileRuleTextureData.SetSize(rows, columns);
+        }
+        
 
         // 🔹 Configurar ambos grids
         FixedGridTiles.Rows = rows;
@@ -256,7 +261,7 @@ public partial class RuleTextureControl : PanelContainer
             TileTextureRuleControl instance = _widgetRuleScene.Instantiate<TileTextureRuleControl>();            
             FixedGridRules.AddChild(instance);
             instance.SetGroup(groupTileTexture, tileRuleTextureData, i, idMaterial);
-            instance.SetData(NeighborCondition.Ignore);
+            //instance.SetData(NeighborCondition.Ignore);
         }
 
         // 🔹 Forzar refresh
@@ -293,8 +298,9 @@ public partial class RuleTextureControl : PanelContainer
     internal void SetData(TileRuleTextureData tileRuleTextureData, int idMaterial)
     {
         this.tileRuleTextureData = tileRuleTextureData;
-        SetupGrid(tileRuleTextureData.Rows,tileRuleTextureData.Columns);
         SetMaterial(idMaterial);
+        SetupGrid(tileRuleTextureData.Rows,tileRuleTextureData.Columns,false);
+        groupTileTexture.SetClearCurrent();
         
     }
 
