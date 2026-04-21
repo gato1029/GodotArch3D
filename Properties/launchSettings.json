@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug WindowGroupTileTexture": {
+	"Godot Debug WindowTileSprite": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/TilesTexture/WindowGroupTileTexture.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/TileSprite/WindowTileSprite.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

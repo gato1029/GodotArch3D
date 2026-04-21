@@ -3,64 +3,44 @@
   "WorkspaceRootPath": "D:\\GitKraken\\GodotFlecs3D\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\windowgrouptiletexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\windowgrouptiletexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\tilestexture\\blackytilepalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\tilestexture\\blackytilepalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\ruletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\ruletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\generic\\facade\\facadewindowdatasearch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\generic\\facade\\facadewindowdatasearch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\windowautomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\windowautomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\tileruletexturedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\tileruletexturedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\databasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\databasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\herramientamenubar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlastexturesmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\atlastexturesmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\blackyworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\blackyworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\tiletexturerulecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\tiletexturerulecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilesprite\\windowtilesprite.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilesprite\\windowtilesprite.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\tiletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\tiletexturecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\tilestexture\\tilepalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\tilestexture\\tilepalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\kurotiles\\windowkurotiles.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\kurotiles\\windowkurotiles.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\tilestexture\\iblackychunktilemaptexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\tilestexture\\iblackychunktilemaptexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\kurotiles\\tilegridnode2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\kurotiles\\tilegridnode2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\tilestexture\\blackyheightleveltexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\tilestexture\\blackyheightleveltexture.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\customwidgets\\kuroscrollzoomview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\customwidgets\\kuroscrollzoomview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\tilestexture\\blackychunktexturemap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\tilestexture\\blackychunktexturemap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\materials\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\materials\\materialmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:main3d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\windowsdatabase\\tilestexture\\windowautomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\windowsdatabase\\tilestexture\\windowautomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -75,20 +55,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 8,
-              "Title": "BlackyWorld.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyWorld.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyTiles\\BlackyWorld.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyWorld.cs",
-              "RelativeToolTip": "sources\\BlackyTiles\\BlackyWorld.cs",
-              "ViewState": "AgIAAEoAAAAAAAAAAAAcwGAAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-15T22:55:25.796Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
               "Title": "Main3D.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\Main3D.cs",
               "RelativeDocumentMoniker": "Main3D.cs",
@@ -101,176 +67,125 @@
               "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "WindowGroupTileTexture.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\WindowGroupTileTexture.cs",
-              "ViewState": "AgIAAJkAAAAAAAAAAAAkwLgAAABEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T17:37:11.72Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "WindowAutomapper.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
-              "ViewState": "AgIAAEwAAAAAAAAAAADgv2AAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-20T16:48:00.492Z",
-              "EditorCaption": ""
-            },
-            {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "FacadeWindowDataSearch.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\Generic\\Facade\\FacadeWindowDataSearch.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\Generic\\Facade\\FacadeWindowDataSearch.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\Generic\\Facade\\FacadeWindowDataSearch.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\Generic\\Facade\\FacadeWindowDataSearch.cs",
-              "ViewState": "AgIAALIAAAAAAAAAAAASwMMAAAAQAAAAAAAAAA==",
+              "Title": "BlackyWorld.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyWorld.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\BlackyWorld.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\BlackyWorld.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\BlackyWorld.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAqwC4AAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-21T06:31:43.539Z",
+              "WhenOpened": "2026-03-15T22:55:25.796Z",
+              "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "RuleTextureControl.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\RuleTextureControl.cs",
-              "ViewState": "AgIAAL8AAAAAAAAAAAAqwC4BAAArAAAAAAAAAA==",
+              "Title": "AtlasTexturesModsManager.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "RelativeDocumentMoniker": "sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "RelativeToolTip": "sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAowFQAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-21T05:31:43.171Z",
+              "WhenOpened": "2026-04-21T20:36:55.854Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BlackyTilePalette.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\BlackyTilePalette.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\TilesTexture\\BlackyTilePalette.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\BlackyTilePalette.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\TilesTexture\\BlackyTilePalette.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-21T20:33:50.197Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "WindowTileSprite.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TileSprite\\WindowTileSprite.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TileSprite\\WindowTileSprite.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TileSprite\\WindowTileSprite.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TileSprite\\WindowTileSprite.cs",
+              "ViewState": "AgIAABoDAAAAAAAAAAApwCwDAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-21T20:21:19.252Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "TileRuleTextureData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureData.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureData.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\TileRuleTextureData.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAiwBAAAAAuAAAAAAAAAA==",
+              "Title": "TilePalette.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\TilePalette.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\TilesTexture\\TilePalette.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\TilePalette.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\TilesTexture\\TilePalette.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-21T05:59:27.844Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "TileTextureRuleControl.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\TileTextureRuleControl.cs",
-              "ViewState": "AgIAAK0AAAAAAAAAAAAnwLsAAAArAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-18T06:53:19.439Z",
+              "WhenOpened": "2026-04-21T20:11:05.424Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "DataBaseManager.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\DataBaseManager.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\DataBaseManager.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\DataBaseManager.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\DataBaseManager.cs",
-              "ViewState": "AgIAAMgDAAAAAAAAAAASwOgDAAAUAAAAAAAAAA==",
+              "Title": "IBlackyChunkTilemapTexture.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\IBlackyChunkTilemapTexture.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\TilesTexture\\IBlackyChunkTilemapTexture.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\IBlackyChunkTilemapTexture.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\TilesTexture\\IBlackyChunkTilemapTexture.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-21T06:35:16.078Z",
+              "WhenOpened": "2026-04-21T20:11:01.276Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "HerramientaMenuBar.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\HerramientaMenuBar.cs",
-              "ViewState": "AgIAAKkAAAAAAAAAAAAIwL0AAABZAAAAAAAAAA==",
+              "Title": "BlackyHeightLevelTexture.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\BlackyHeightLevelTexture.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\TilesTexture\\BlackyHeightLevelTexture.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\BlackyHeightLevelTexture.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\TilesTexture\\BlackyHeightLevelTexture.cs",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAmwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-18T06:41:59.232Z",
+              "WhenOpened": "2026-04-21T19:59:00.151Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "TileTextureControl.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
-              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
-              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\TileTextureControl.cs",
-              "ViewState": "AgIAACEAAAAAAAAAAAAqwDEAAAAkAAAAAAAAAA==",
+              "DocumentIndex": 7,
+              "Title": "BlackyChunkTextureMap.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\BlackyChunkTextureMap.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyTiles\\TilesTexture\\BlackyChunkTextureMap.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\TilesTexture\\BlackyChunkTextureMap.cs",
+              "RelativeToolTip": "sources\\BlackyTiles\\TilesTexture\\BlackyChunkTextureMap.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-18T07:24:07.85Z",
+              "WhenOpened": "2026-04-21T16:51:07.186Z",
               "EditorCaption": ""
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "WindowKuroTiles.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\KuroTiles\\WindowKuroTiles.cs",
-              "RelativeDocumentMoniker": "sources\\KuroTiles\\WindowKuroTiles.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\KuroTiles\\WindowKuroTiles.cs",
-              "RelativeToolTip": "sources\\KuroTiles\\WindowKuroTiles.cs",
-              "ViewState": "AgIAAGYAAAAAAAAAAAAAADgAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-19T06:05:24.045Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "KuroScrollZoomView.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroScrollZoomView.cs",
-              "RelativeDocumentMoniker": "sources\\CustomWidgets\\KuroScrollZoomView.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\CustomWidgets\\KuroScrollZoomView.cs",
-              "RelativeToolTip": "sources\\CustomWidgets\\KuroScrollZoomView.cs",
-              "ViewState": "AgIAAJYAAAAAAAAAAAAAAKsAAABIAAAAAAAAAA==",
+              "DocumentIndex": 9,
+              "Title": "WindowAutomapper.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
+              "RelativeDocumentMoniker": "sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
+              "RelativeToolTip": "sources\\WindowsDataBase\\TilesTexture\\WindowAutomapper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-18T05:39:25.435Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "MaterialManager.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Materials\\MaterialManager.cs",
-              "RelativeDocumentMoniker": "sources\\managers\\Materials\\MaterialManager.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Materials\\MaterialManager.cs",
-              "RelativeToolTip": "sources\\managers\\Materials\\MaterialManager.cs",
-              "ViewState": "AgIAAIoAAAAAAAAAAADgv5EAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T09:34:39.395Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "TileGridNode2d.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\KuroTiles\\TileGridNode2d.cs",
-              "RelativeDocumentMoniker": "sources\\KuroTiles\\TileGridNode2d.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\KuroTiles\\TileGridNode2d.cs",
-              "RelativeToolTip": "sources\\KuroTiles\\TileGridNode2d.cs",
-              "ViewState": "AgIAACwCAAAAAAAAAAAmwEYCAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-17T09:01:41.439Z",
+              "WhenOpened": "2026-04-20T16:48:00.492Z",
               "EditorCaption": ""
             }
           ]
