@@ -25,7 +25,8 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     private  RenderManagerOptimized renderManager;
 
     private  Dictionary<MaterialType,List<MaterialData>> materialsByType = new Dictionary<MaterialType, List<MaterialData>>();
-    private  Dictionary<string, int> _textureLookup = new();   
+    private  Dictionary<string, int> _textureLookup = new();
+    private Dictionary<int, MaterialModData> materialsMods = new Dictionary<int, MaterialModData>();
 
     //public void ForceChargue()
     //{
@@ -74,7 +75,24 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
 
         return false; // no hubo cambios
     }
+    internal IEnumerable<MaterialModData> GetAllMaterialsTextures()
+    {
+        return materialsMods.Values;
+    }
+    public MaterialModData GetMaterialTextureByAtlasId(int atlasId)
+    {
+        return materialsMods[atlasId];
+    }
+    public MaterialModData GetMaterialTexture(string textureIdMod)
+    {
+        if (!_textureLookup.TryGetValue(textureIdMod, out var idAtlasTexture))
+        {
+            GD.PrintErr($"❌ Texture no encontrada: {textureIdMod}");
+            return null;
+        }
 
+        return materialsMods[idAtlasTexture];
+    }
     public  (Rid rid, int instance,int layerTexture) CreateInstanceRender(string textureIdMod)
     {
 
@@ -119,6 +137,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
 
             if (!processed.Add(item.idTextureAtlas))
                 continue; // ya existe → lo saltamos
+            materialsMods.Add(item.idTextureAtlas, item);
             var pathComplete = FileHelper.GetPathGameDB(item.pathTextureAtlas);
             textureArrayManager.SetTexture(item.idTextureAtlas, pathComplete);
         }
@@ -214,4 +233,6 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     {
         
     }
+
+
 }

@@ -106,6 +106,10 @@ public class AtlasTextureGenerator:SingletonBase<AtlasTextureGenerator>
             materialModData.xInAtlas = placements[i].X;
             materialModData.yInAtlas = placements[i].Y;
             materialModData.timeStamp = materiales[i].timeStamp;
+            materialModData.widthAtlas = materiales[i].widhtTexture;
+            materialModData.heightAtlas = materiales[i].heightTexture;
+            materialModData.divisionPixelAtlasX = materiales[i].divisionPixelX;
+            materialModData.divisionPixelAtlasY = materiales[i].divisionPixelY;
             db.Guardar(materialModData);
         }
 

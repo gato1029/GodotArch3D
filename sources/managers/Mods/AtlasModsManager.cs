@@ -17,6 +17,8 @@ namespace GodotEcsArch.sources.managers.Mods;
 
 public class AtlasModsManager : SingletonBase<AtlasModsManager>
 {
+
+    
     // 🔹 Atlas por tipo de dato. Cada mod se registra con su ID de mod y el ID del dato, apuntando al dato en sí.
     private AtlasModsGeneric<ResourceSourceData> fuenteRecursos = new();
     private AtlasModsGeneric<TileSpriteData> spriteData = new();
@@ -53,7 +55,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             CargarPorMod(idMod);
             CargarPorModEspecial(idMod);
         }
-        int a = 0;
+        
     }
 
     private void CargarPorModEspecial(byte idMod)

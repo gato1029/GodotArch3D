@@ -203,7 +203,7 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
     public AtlasTexture GetAtlasTextureInternal(SpriteData spriteData)
     {
         MaterialData materialData = null;
-        TextureMasterData textureMasterData;
+       
         Texture2D textureBase = null;
         if (!materials.ContainsKey(spriteData.idMaterial))
         {
