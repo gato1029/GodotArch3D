@@ -14,9 +14,11 @@ namespace GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 public class TileTextureData: IdDataLong
 {
     public string idMod {  get; set; } // de aqui podemos buscar la textura y su offset en el atlas
+    public int idMaterial { get; set; }
     public int index {  get; set; }
     public bool isAnimated { get; set; }
     public int[] indexAnimation { get; set; }
+    public bool hasCollider { get; set; }
     // aqui debe ir para guardar la informacion del collider si lo necesitara
     public FastCollider fastCollider { get; set; }
 

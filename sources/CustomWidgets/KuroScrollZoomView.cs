@@ -8,6 +8,9 @@ public partial class KuroScrollZoomView : MarginContainer
     [Export] public bool PanEnabled { get; set; } = true;
     [Export] public bool ZoomOnlyAtCenter { get; set; } = false;
 
+    // 🔥 NUEVO: modo pixel perfect
+    [Export] public bool PixelPerfectZoom { get; set; } = false;
+
     // 🔹 INPUT CONFIG
     [Export(PropertyHint.Flags, "Left,Right,Middle,Back:128,Forward:256")]
     public MouseButtonMask PanButton = MouseButtonMask.Left | MouseButtonMask.Middle;
@@ -32,7 +35,15 @@ public partial class KuroScrollZoomView : MarginContainer
     public float ZoomAmount
     {
         get => _zoomAmount;
-        set { _zoomAmount = value; SetProcess(true); }
+        set
+        {
+            if (PixelPerfectZoom)
+                _zoomAmount = Mathf.Clamp(Mathf.Round(value), ZoomRange.X, ZoomRange.Y);
+            else
+                _zoomAmount = Mathf.Clamp(value, ZoomRange.X, ZoomRange.Y);
+
+            SetProcess(true);
+        }
     }
 
     private Vector2 _scrollOffset = Vector2.Zero;
@@ -54,11 +65,24 @@ public partial class KuroScrollZoomView : MarginContainer
     {
         ApplyChildSize();
         ApplyScrollOffset();
+        ApplyTextureFilter();
+    }
+
+    // 🔥 Fuerza texturas nítidas
+    private void ApplyTextureFilter()
+    {
+        if (GetChildCount() == 0) return;
+
+        if (GetChild(0) is CanvasItem child)
+        {
+            child.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
+        }
     }
 
     private void ApplyChildSize()
     {
         if (!IsInsideTree() || GetChildCount() == 0) return;
+
         if (GetChild(0) is Control child)
         {
             child.Size = new Vector2(
@@ -71,25 +95,40 @@ public partial class KuroScrollZoomView : MarginContainer
     private void ApplyScrollOffset()
     {
         if (!IsInsideTree() || GetChildCount() == 0) return;
-        if (GetChild(0) is Control child) child.Position = _scrollOffset;
+
+        if (GetChild(0) is Control child)
+            child.Position = _scrollOffset.Round(); // 🔥 evita blur por subpíxel
     }
 
     private void ApplyZoom()
     {
         if (!IsInsideTree() || GetChildCount() == 0) return;
-        if (GetChild(0) is Control child) child.Scale = new Vector2(_zoomVisible, _zoomVisible);
+
+        if (GetChild(0) is Control child)
+            child.Scale = new Vector2(_zoomVisible, _zoomVisible);
     }
 
     public override void _Process(double delta)
     {
-        // Forzamos el pivote al centro si la opción está activa
+        // 🔹 Pivote
         if (ZoomOnlyAtCenter || !ZoomUseMouseAsPivot)
-        {
             _zoomPivot = Size * 0.5f;
-        }
 
         float oldZoom = _zoomVisible;
-        _zoomVisible = Mathf.Lerp(_zoomVisible, _zoomAmount, ZoomInterpSpeed);
+
+        if (PixelPerfectZoom)
+        {
+            // 🔥 Sin interpolación = ultra nítido
+            _zoomVisible = _zoomAmount;
+        }
+        else
+        {
+            // 🔹 Zoom suave
+            _zoomVisible = Mathf.Lerp(_zoomVisible, _zoomAmount, ZoomInterpSpeed);
+
+            // 🔥 Reduce blur por decimales extremos
+            _zoomVisible = Mathf.Round(_zoomVisible * 100f) / 100f;
+        }
 
         ApplyZoom();
 
@@ -110,13 +149,11 @@ public partial class KuroScrollZoomView : MarginContainer
         {
             if (!_inputDragging)
             {
-                // Solo actualizamos pivote del mouse si no estamos forzando el centro
                 if (!ZoomOnlyAtCenter)
                     _zoomPivot = motion.Position;
                 return;
             }
 
-            // Si el paneo está desactivado, salimos
             if (!PanEnabled) return;
 
             if (!_inputDragCanMove)
@@ -131,7 +168,7 @@ public partial class KuroScrollZoomView : MarginContainer
 
         if (@event is InputEventMouseButton mouse)
         {
-            // Paneo
+            // 🔹 Paneo
             if ((PanButton & (MouseButtonMask)(1 << (int)(mouse.ButtonIndex - 1))) != 0)
             {
                 if (PanEnabled)
@@ -142,14 +179,18 @@ public partial class KuroScrollZoomView : MarginContainer
                 }
             }
 
-            // Zoom
+            // 🔹 Zoom
             if (mouse.ButtonIndex == MouseButton.WheelUp)
             {
-                ZoomAmount = Mathf.Min(_zoomAmount * (1f + (ZoomStep - 1f) * mouse.Factor), ZoomRange.Y);
+                ZoomAmount = PixelPerfectZoom
+                    ? _zoomAmount + 1
+                    : _zoomAmount * (1f + (ZoomStep - 1f) * mouse.Factor);
             }
             else if (mouse.ButtonIndex == MouseButton.WheelDown)
             {
-                ZoomAmount = Mathf.Max(_zoomAmount / (1f + (ZoomStep - 1f) * mouse.Factor), ZoomRange.X);
+                ZoomAmount = PixelPerfectZoom
+                    ? _zoomAmount - 1
+                    : _zoomAmount / (1f + (ZoomStep - 1f) * mouse.Factor);
             }
         }
     }

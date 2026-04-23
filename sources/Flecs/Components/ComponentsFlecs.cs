@@ -359,8 +359,7 @@ public record struct SpatialIDComponent
      uint Mask     // Con qué CHOCO (ej: Choco con ENEMIGOS y MUROS)
 );
 public enum SlopeType : byte
-{
-    None,
+{    
     BottomLeft,  // Triángulo 1
     TopRight,    // Triángulo 2
     TopLeft,     // Triángulo 3

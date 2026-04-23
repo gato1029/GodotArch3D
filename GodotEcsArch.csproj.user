@@ -4,6 +4,6 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup>
-    <ActiveDebugProfile>Godot Debug WindowAutomapper</ActiveDebugProfile>
+    <ActiveDebugProfile>Godot Debug TileTextureConfigControl</ActiveDebugProfile>
   </PropertyGroup>
 </Project>
