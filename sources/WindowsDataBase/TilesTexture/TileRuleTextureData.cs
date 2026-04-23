@@ -6,6 +6,20 @@ using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 
 namespace GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 
+public struct TileDataSlot
+{
+    public int TileID { get; set; }     // El ID del visual/lógica
+    public int MaterialID { get; set; } // El ID de la textura o material
+
+    // Constructor para facilitar la asignación
+    public TileDataSlot(int tileId, int materialId)
+    {
+        TileID = tileId;
+        MaterialID = materialId;
+    }
+}
+
+
 /// <summary>
 /// Estados lógicos para la comparación de vecinos.
 /// Ocupan 2 bits (0-3).
@@ -24,7 +38,7 @@ public enum NeighborCondition : byte
 public struct ConditionSlot
 {
     public NeighborCondition Condition { get; set; }
-    public int TargetID { get; set; } // Solo se usa si Condition es Specific.
+    public TileDataSlot TargetID { get; set; } // Solo se usa si Condition es Specific.
 }
 
 public class TileRuleTextureData
@@ -39,15 +53,18 @@ public class TileRuleTextureData
     public ConditionSlot[] _inputPattern { get; set; }
 
     // -1 = Mantener, -2 = Borrar, >=0 = Nuevo ID
-    public int[] Output { get; set; }
+
 
     // Máscaras binarias
     public long FilterMask { get; set; }
     public long ValueMask { get; set; }
 
     // IDs específicos
-    public int[] _specificIDs { get; set; }
+
     public bool _hasSpecificRequirements { get; set; }
+
+    public TileDataSlot[] Output { get; set; }
+    public TileDataSlot[] _specificIDs { get; set; }
 
     public TileRuleTextureData()
     {
@@ -70,26 +87,28 @@ public class TileRuleTextureData
 
         int size = width * height;
 
-        Output = new int[size];
+        // Inicializamos con los nuevos tipos
+        Output = new TileDataSlot[size];
+        _specificIDs = new TileDataSlot[size];
         _inputPattern = new ConditionSlot[size];
-        _specificIDs = new int[size];
+       
 
         for (int i = 0; i < size; i++)
         {
-            Output[i] = -1;
-            _specificIDs[i] = -1;
+            Output[i] = new TileDataSlot(-1, -1);
+            _specificIDs[i] = new TileDataSlot(-1, -1);
 
             _inputPattern[i] = new ConditionSlot
             {
                 Condition = NeighborCondition.Ignore,
-                TargetID = -1
+                TargetID = new TileDataSlot(-1, -1)
             };
         }
 
         Precompute();
     }
 
-    public void SetConditionByIndex(int index, NeighborCondition condition, int targetID = -1)
+    public void SetConditionByIndex(int index, NeighborCondition condition, int targetID = -1, int idmaterial=-1)
     {
         if (_inputPattern == null)
             throw new InvalidOperationException("InputPattern no inicializado.");
@@ -100,7 +119,7 @@ public class TileRuleTextureData
         _inputPattern[index] = new ConditionSlot
         {
             Condition = condition,
-            TargetID = targetID
+            TargetID = new TileDataSlot( targetID, idmaterial),
         };
 
         Precompute();
@@ -117,7 +136,7 @@ public class TileRuleTextureData
         return _inputPattern[index];
     }
 
-    public int GetOutputByIndex(int index)
+    public TileDataSlot GetOutputByIndex(int index)
     {
         if (Output == null)
             throw new InvalidOperationException("Output no inicializado.");
@@ -128,7 +147,7 @@ public class TileRuleTextureData
         return Output[index];
     }
 
-    public void SetOutputByIndex(int index, int value)
+    public void SetOutputByIndex(int index, int value, int materialId)
     {
         if (Output == null)
             throw new InvalidOperationException("Output no inicializado.");
@@ -136,7 +155,7 @@ public class TileRuleTextureData
         if (index < 0 || index >= Output.Length)
             throw new ArgumentOutOfRangeException(nameof(index));
 
-        Output[index] = value;
+        Output[index] = new TileDataSlot(value,materialId);
     }
 
     public void ClearOutput(int defaultValue = -1)
@@ -145,10 +164,10 @@ public class TileRuleTextureData
             throw new InvalidOperationException("Output no inicializado.");
 
         for (int i = 0; i < Output.Length; i++)
-            Output[i] = defaultValue;
+            Output[i] =  new TileDataSlot(-1,-1);
     }
 
-    public void SetOutput(int x, int y, int value)
+    public void SetOutput(int x, int y, int value, int materialId)
     {
         if (Output == null)
             throw new InvalidOperationException("Output no inicializado.");
@@ -158,7 +177,7 @@ public class TileRuleTextureData
         if (index < 0 || index >= Output.Length)
             throw new ArgumentOutOfRangeException($"Posición fuera de rango: ({x},{y})");
 
-        Output[index] = value;
+        Output[index] = new TileDataSlot(value,materialId);
     }
 
     public void SetAnchor(int anchorX, int anchorY)
@@ -225,21 +244,30 @@ public class TileRuleTextureData
         {
             var slot = _inputPattern[i];
 
+            // 1. Seguimos usando la condición para las máscaras binarias (Ignore, Empty, Filled)
             if (slot.Condition != NeighborCondition.Ignore)
             {
                 FilterMask |= (0x3L << bitOffset);
                 ValueMask |= ((long)slot.Condition << bitOffset);
 
+                // 2. Si es específico, guardamos el TileID en nuestro nuevo array de structs
                 if (slot.Condition == NeighborCondition.Specific)
                 {
-                    _specificIDs[i] = slot.TargetID;
+                    // Guardamos el ID objetivo y su material (si lo tienes en el slot)
+                    _specificIDs[i] = new TileDataSlot(slot.TargetID.TileID, slot.TargetID.MaterialID);
                     _hasSpecificRequirements = true;
+                }
+                else
+                {
+                    // Limpiamos el slot si ya no es específico
+                    _specificIDs[i] = new TileDataSlot(-1, -1);
                 }
             }
 
             bitOffset += 2;
         }
     }
+
 
     public bool IsMatch(long mapMask, int worldX, int worldY, IReadOnlyTileMap map)
     {
@@ -250,7 +278,7 @@ public class TileRuleTextureData
         {
             for (int i = 0; i < _specificIDs.Length; i++)
             {
-                int requiredID = _specificIDs[i];
+                int requiredID = _specificIDs[i].TileID;
                 if (requiredID != -1)
                 {
                     int lx = i % Rows;
@@ -275,7 +303,7 @@ public class TileRuleTextureData
 
         for (int i = 0; i < Output.Length; i++)
         {
-            int action = Output[i];
+            int action = Output[i].TileID;
             if (action == -1)
                 continue;
 

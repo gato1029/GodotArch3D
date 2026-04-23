@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://15nvwtx0udap"]
+
+[ext_resource type="Script" uid="uid://b2fhkpccpbh4n" path="res://sources/WindowsDataBase/TilesTexture/TileTextureConfigControl.cs" id="1_67mc6"]
+[ext_resource type="Script" uid="uid://ce5005tpxrd60" path="res://addons/ComboBox/ComboBox.cs" id="1_ka7e6"]
+[ext_resource type="Script" uid="uid://ckc55m20w7igo" path="res://sources/CustomWidgets/KuroScrollZoomView.cs" id="1_qif6g"]
+[ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="2_ka7e6"]
+
+[node name="TileTextureConfigControl" type="PanelContainer" unique_id=1219697117]
+custom_minimum_size = Vector2(256, 256)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_67mc6")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1618613455]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=31247940]
+layout_mode = 2
+
+[node name="ComboBoxCollider" type="OptionButton" parent="MarginContainer/VBoxContainer" unique_id=627992465]
+layout_mode = 2
+item_count = 3
+popup/item_0/text = "Cuadrado"
+popup/item_0/id = 0
+popup/item_1/text = "Circulo"
+popup/item_1/id = 1
+popup/item_2/text = "Triangulo"
+popup/item_2/id = 2
+script = ExtResource("1_ka7e6")
+metadata/_custom_type_script = "uid://ce5005tpxrd60"
+
+[node name="KuroScrollZoomView" type="MarginContainer" parent="MarginContainer/VBoxContainer" unique_id=1680747103]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("1_qif6g")
+PanEnabled = false
+ZoomOnlyAtCenter = true
+metadata/_custom_type_script = "uid://ckc55m20w7igo"
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer/KuroScrollZoomView" unique_id=1250821305]
+layout_mode = 2
+
+[node name="TextureRectTile" type="TextureRect" parent="MarginContainer/VBoxContainer/KuroScrollZoomView/CenterContainer" unique_id=1541975115]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_ka7e6")
+stretch_mode = 3

@@ -358,10 +358,20 @@ public record struct SpatialIDComponent
      uint Layer,    // Qué SOY (ej: Soy una BALA)
      uint Mask     // Con qué CHOCO (ej: Choco con ENEMIGOS y MUROS)
 );
+public enum SlopeType : byte
+{
+    None,
+    BottomLeft,  // Triángulo 1
+    TopRight,    // Triángulo 2
+    TopLeft,     // Triángulo 3
+    BottomRight  // Triángulo 4
+}
+
 public enum ShapeType : byte
 {
     Circle,
-    Rect
+    Rect,
+    Slope // triangulos
 }
 [RegisterComponentFlecs]
 public record struct FastColliderComponent
@@ -422,12 +432,13 @@ public record struct MoveColliderComponent
 );
 [RegisterComponentFlecs]
 public record struct FastCollider
-(
-     ShapeType Shape,
-     float Width,
-     float Height,
-     Vector2 Offset
-);
+{
+    public SlopeType Slope { get; set; } // Solo se usa si Shape == Slope
+    public ShapeType Shape { get; set; }
+    public float Width { get; set; }
+    public float Height { get; set; }
+    public Vector2 Offset { get; set; }
+}
 
 [RegisterComponentFlecs]
 public record struct BodyColliderComponent

@@ -191,7 +191,8 @@ public partial class TileTextureRuleControl : Control
         WindowTileTextureRule_OnNotifySelection(tileRuleTextureData.GetConditionByIndex(indexPosition).Condition,tileRuleTextureData.IsAnchor(indexPosition));
         if (tileRuleTextureData.GetConditionByIndex(indexPosition).Condition == NeighborCondition.Specific)
         {
-            idTileTexture = tileRuleTextureData.GetConditionByIndex(indexPosition).TargetID;
+            idTileTexture = tileRuleTextureData.GetConditionByIndex(indexPosition).TargetID.TileID;
+            this.idMaterial = tileRuleTextureData.GetConditionByIndex(indexPosition).TargetID.MaterialID;
             TextureImage.Texture = MaterialManager.Instance.GetAtlasTextureInternal(idMaterial, idTileTexture);
             tileRuleTextureData.SetConditionByIndex(indexPosition, NeighborCondition.Specific, idTileTexture);
         }

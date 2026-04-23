@@ -35,8 +35,100 @@ public static class CollisionMathHelper
         if (c1.Shape == ShapeType.Rect && c2.Shape == ShapeType.Circle)
             return CircleToRect(cx2, cy2, c2.Width, cx1, cy1, c1.Width, c1.Height);
 
+        // Caso 4: Rectángulo vs Slope
+        if (c1.Shape == ShapeType.Rect && c2.Shape == ShapeType.Slope)
+            return RectToSlope(cx1, cy1, c1.Width, c1.Height, cx2, cy2, c2.Width, c2.Height, c2.Slope);
+
+        if (c1.Shape == ShapeType.Slope && c2.Shape == ShapeType.Rect)
+            return RectToSlope(cx2, cy2, c2.Width, c2.Height, cx1, cy1, c1.Width, c1.Height, c1.Slope);
+        // Caso 5: Círculo vs Slope
+        if (c1.Shape == ShapeType.Circle && c2.Shape == ShapeType.Slope)
+            return CircleToSlope(cx1, cy1, c1.Width, cx2, cy2, c2.Width, c2.Height, c2.Slope);
+
+        if (c1.Shape == ShapeType.Slope && c2.Shape == ShapeType.Circle)
+            return CircleToSlope(cx2, cy2, c2.Width, cx1, cy1, c1.Width, c1.Height, c1.Slope);
+
+
         return false;
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool RectToSlope(float rx, float ry, float rw, float rh, float sx, float sy, float sw, float sh, SlopeType type)
+    {
+        // 1. AABB rápido: ¿Se tocan siquiera los cuadros?
+        if (Math.Abs(rx - sx) >= (rw + sw) * 0.5f || Math.Abs(ry - sy) >= (rh + sh) * 0.5f)
+            return false;
+
+        // 2. Dependiendo del tipo de triángulo, chequeamos la esquina más crítica
+        // Para suelos (Bottom), chequeamos las esquinas de abajo del rect.
+        // Para techos (Top), chequeamos las esquinas de arriba.
+        return type switch
+        {
+            SlopeType.BottomLeft => PointToSlope(rx - rw * 0.5f, ry + rh * 0.5f, sx, sy, sw, sh, type),
+            SlopeType.BottomRight => PointToSlope(rx + rw * 0.5f, ry + rh * 0.5f, sx, sy, sw, sh, type),
+            SlopeType.TopLeft => PointToSlope(rx - rw * 0.5f, ry - rh * 0.5f, sx, sy, sw, sh, type),
+            SlopeType.TopRight => PointToSlope(rx + rw * 0.5f, ry - rh * 0.5f, sx, sy, sw, sh, type),
+            _ => false
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool PointToSlope(float px, float py, float sx, float sy, float sw, float sh, SlopeType type)
+    {
+        float hw = sw * 0.5f;
+        float hh = sh * 0.5f;
+
+        // Coordenadas normalizadas 0.0 a 1.0 dentro del Tile
+        float tx = (px - (sx - hw)) / sw;
+        float ty = (py - (sy - hh)) / sh;
+
+        // Evitar errores de precisión fuera del tile
+        tx = Math.Clamp(tx, 0f, 1f);
+        ty = Math.Clamp(ty, 0f, 1f);
+
+        return type switch
+        {
+            SlopeType.BottomLeft => ty >= (1.0f - tx), // Triángulo 1
+            SlopeType.TopRight => ty <= (1.0f - tx), // Triángulo 2
+            SlopeType.TopLeft => ty <= tx,          // Triángulo 3
+            SlopeType.BottomRight => ty >= tx,          // Triángulo 4
+            _ => false
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool CircleToSlope(float cx, float cy, float cradius, float sx, float sy, float sw, float sh, SlopeType type)
+    {
+        // 1. AABB rápido (Caja del círculo vs Caja del Tile)
+        if (Math.Abs(cx - sx) >= (cradius + sw * 0.5f) || Math.Abs(cy - sy) >= (cradius + sh * 0.5f))
+            return false;
+
+        // 2. Si el centro del círculo ya está dentro de la masa sólida, hay colisión
+        if (PointToSlope(cx, cy, sx, sy, sw, sh, type)) return true;
+
+        // 3. Chequeo de proximidad a la diagonal
+        // Calculamos la posición relativa del centro (0 a 1)
+        float tx = (cx - (sx - sw * 0.5f)) / sw;
+        tx = Math.Clamp(tx, 0f, 1f);
+
+        // Calculamos la Y de la línea en esa X
+        float lineYLocal = type switch
+        {
+            SlopeType.BottomLeft or SlopeType.TopRight => 1.0f - tx,
+            SlopeType.TopLeft or SlopeType.BottomRight => tx,
+            _ => 0f
+        };
+
+        float lineYWorld = (sy + sh * 0.5f) - (lineYLocal * sh);
+
+        // 4. Distancia vertical a la diagonal
+        float distY = Math.Abs(cy - lineYWorld);
+
+        // Si la distancia vertical es menor que el radio, hay colisión aproximada
+        // (Para mayor precisión en ángulos agudos se usa la distancia perpendicular, 
+        // pero para tiles de 45° esto es perfecto y mucho más rápido).
+        return distY < cradius;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool PointCheck(

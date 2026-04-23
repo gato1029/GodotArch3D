@@ -60,21 +60,21 @@ public partial class TileTextureControl : Control
                         // Tenía material → pasar a mantener
                         idMaterial = -1;
                         TextureImage.Texture = GD.Load<Texture2D>(mantenerImagen);
-                        tileRuleTextureData.SetOutputByIndex(indexPosition, -1);
+                        tileRuleTextureData.SetOutputByIndex(indexPosition, -1,-1);
                     }
                     else if (idMaterial == -1)
                     {
                         // Estaba en mantener → pasar a eliminar
                         idMaterial = 0;
                         TextureImage.Texture = GD.Load<Texture2D>(eliminarImagen);
-                        tileRuleTextureData.SetOutputByIndex(indexPosition, -2);
+                        tileRuleTextureData.SetOutputByIndex(indexPosition, -2, -1);
                     }
                     else if (idMaterial == 0)
                     {
                         // Estaba en eliminar → volver a mantener
                         idMaterial = -1;
                         TextureImage.Texture = GD.Load<Texture2D>(mantenerImagen);
-                        tileRuleTextureData.SetOutputByIndex(indexPosition, -1);
+                        tileRuleTextureData.SetOutputByIndex(indexPosition, -1, -1);
                     }
 
                     OnNotifyChangued?.Invoke(this);                    
@@ -94,7 +94,7 @@ public partial class TileTextureControl : Control
         this.idMaterial = idMaterial;
         idTileTexture = idIndex;                
         TextureImage.Texture = MaterialManager.Instance.GetAtlasTextureInternal(idMaterial, idTileTexture);
-        tileRuleTextureData.SetOutputByIndex(indexPosition, idTileTexture);
+        tileRuleTextureData.SetOutputByIndex(indexPosition, idTileTexture,idMaterial);
     }
 
     public bool HasMaterial() => idMaterial != -1;
@@ -110,7 +110,7 @@ public partial class TileTextureControl : Control
         TextureImage.Texture =MaterialManager.Instance.GetAtlasTextureInternal(materialId, tileIndex);        
         TextureImage.Modulate = Colors.White;
 
-        tileRuleTextureData.SetOutputByIndex(indexPosition, idTileTexture);
+        tileRuleTextureData.SetOutputByIndex(indexPosition, idTileTexture,idMaterial);
     }
     private void WindowLocal_OnNotifySelectionIndex(int index, MaterialData materialData)
     {
@@ -143,9 +143,10 @@ public partial class TileTextureControl : Control
        this.tileRuleTextureData = tileRuleTextureData;
        this.indexPosition = indexPosition;
        this.groupTileTexture = groupTileTexture;
-        if (tileRuleTextureData.GetOutputByIndex(indexPosition)!=-1)
+        if (tileRuleTextureData.GetOutputByIndex(indexPosition).TileID!=-1)
         {
-            idTileTexture = tileRuleTextureData.GetOutputByIndex(indexPosition);
+            idTileTexture = tileRuleTextureData.GetOutputByIndex(indexPosition).TileID;
+            this.idMaterial = tileRuleTextureData.GetOutputByIndex(indexPosition).MaterialID;
             TextureImage.Texture = MaterialManager.Instance.GetAtlasTextureInternal(materialId, idTileTexture);
             TextureImage.Modulate = Colors.White;
         }
