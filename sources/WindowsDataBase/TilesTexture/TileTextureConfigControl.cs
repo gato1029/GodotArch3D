@@ -1,13 +1,15 @@
 using Godot;
+using GodotEcsArch.sources.CustomWidgets.Internals;
+using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Linq;
-
-public partial class TileTextureConfigControl : Window
+[KuroRegisterWindow("res://sources/WindowsDataBase/TilesTexture/TileTextureConfigControl.tscn")]
+public partial class TileTextureConfigControl : Window, IFacadeWindow<TileTextureData>
 {
-
     private bool isDragging = false;
     private bool isResizing = false;
 
@@ -17,13 +19,14 @@ public partial class TileTextureConfigControl : Window
     private int activeHandle = -1; // 0-3 esquinas
     private const float HANDLE_SIZE = 0.6f;
 
-
     private float animTimer = 0f;
     private int animFrame = 0;
-    
 
     TileTextureData data;
     FastCollider fastCollider;
+    MaterialData material;
+    public event IFacadeWindow<TileTextureData>.EventNotifyChanguedSimple OnNotifyChanguedSimple;
+
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
@@ -41,12 +44,70 @@ public partial class TileTextureConfigControl : Window
         //TextureRectTile en este rectecxture debemos dibujar los colliders segun el tipo
         fastCollider.Width = (float)TextureRectTile.Size.X;
         fastCollider.Height = (float)TextureRectTile.Size.Y;
+        KuroTextureButtonSave.Pressed += KuroTextureButtonSave_Pressed;
+        KuroTextureButtonDelete.Pressed += KuroTextureButtonDelete_Pressed;
         ComboBoxColliderTriangulos.ItemSelected += ComboBoxColliderTriangulos_ItemSelected;
         NivelarComboTriangulo();
         
-        //CenterContainerTile contenedor
     }
 
+    private void KuroTextureButtonDelete_Pressed()
+    {
+        DataBaseManager.Instance.RemoveDirectById<TileTextureData>(data.id);
+        QueueFree();
+    }
+
+    private void KuroTextureButtonSave_Pressed()
+    {
+        data.name = data.idMod+":"+data.index;
+        data.fastColliderTemplate = fastCollider;
+        data.fastCollider = new FastCollider
+        {
+            Shape = fastCollider.Shape,
+            Height = MeshCreator.PixelsToUnits(fastCollider.Height),
+            Width = MeshCreator.PixelsToUnits(fastCollider.Width),
+            Offset =MeshCreator.PixelsToUnits(GetColliderCenterCartesian()),
+            Slope = fastCollider.Slope
+            
+        };
+        
+        DataBaseManager.Instance.InsertUpdate(data);
+        OnNotifyChanguedSimple?.Invoke();
+        QueueFree();
+    }
+
+    public void SetData(TileTextureData data)
+    {
+        this.data = data;
+        fastCollider = data.fastColliderTemplate;
+        KuroCheckButtonCollider.ButtonPressed = data.hasCollider;
+        var mat = MaterialManager.Instance.GetMaterial(data.idMaterial);
+        if (data.isAnimated)
+        {
+            WindowLocal_OnNotifyMultiSelectionIndex(data.indexAnimation.ToList(), mat);
+        }
+        else
+        {
+            WindowLocal_OnNotifyMultiSelectionIndex(new System.Collections.Generic.List<int> { data.index }, mat);
+        }
+
+        //KuroCheckButtonCollider_Pressed();
+        
+        if (data.hasCollider)
+        {
+            ComboBoxCollider.Visible = true;
+            ComboBoxCollider.Selected = (int)fastCollider.Shape;
+            if (fastCollider.Shape == ShapeType.Slope)
+            {
+                ComboBoxColliderTriangulos.Selected = (int)fastCollider.Slope;          
+            }
+          
+        }
+        OnTextureRectDraw();
+
+
+
+    }
     private void SpinBoxfps_ValueChanged(double value)
     {
         data.fpsTemplate = (float)value;
@@ -55,12 +116,15 @@ public partial class TileTextureConfigControl : Window
 
     private void KuroTextureButtonSearch_Pressed()
     {
-        var  windowLocal = GD.Load<PackedScene>("res://sources/KuroTiles/WindowSearchTileMaterial.tscn").Instantiate<WindowSearchTileMaterial>();
+        var windowLocal = GD.Load<PackedScene>(
+                "res://sources/KuroTiles/WindowSearchTileMaterial.tscn"
+            )
+            .Instantiate<WindowSearchTileMaterial>();
         // Escuchar cuando se cierre
         AddChild(windowLocal);
-        if (data.index!=-1)
+        if (data.index != -1)
         {
-            if (data.indexAnimation!=null)
+            if (data.indexAnimation != null)
             {
                 windowLocal.SetSelectionMultiple(data.idMaterial, data.indexAnimation.ToList());
             }
@@ -68,7 +132,6 @@ public partial class TileTextureConfigControl : Window
             {
                 windowLocal.SetSelection(data.idMaterial, data.index);
             }
-            
         }
         windowLocal.TreeExited += () => windowLocal = null;
         windowLocal.SetMultipleSelectionMode(true);
@@ -78,9 +141,11 @@ public partial class TileTextureConfigControl : Window
     }
 
     private void WindowLocal_OnNotifyMultiSelectionIndex(
-       System.Collections.Generic.List<int> indices,
-       MaterialData materialData)
+        System.Collections.Generic.List<int> indices,
+        MaterialData materialData
+    )
     {
+        material = materialData;
         if (indices == null || indices.Count == 0)
             return;
 
@@ -114,27 +179,25 @@ public partial class TileTextureConfigControl : Window
             StartTileAnimation();
         }
 
+        if (fastCollider.Shape== ShapeType.Slope)
+        {
+            fastCollider.Width = material.divisionPixelX;
+            fastCollider.Height = material.divisionPixelY;
+
+        }
+
         // 🔹 collider siempre consistente
-        fastCollider.Width = materialData.divisionPixelX;
-        fastCollider.Height = materialData.divisionPixelY;
+
 
         TextureRectTile.QueueRedraw();
     }
+
     private void StartTileAnimation()
     {
         animTimer = 0f;
         animFrame = 0;
     }
-    private void WindowLocal_OnNotifySelectionIndex(int index, MaterialData materialData)
-    {
-        fastCollider.Width = materialData.divisionPixelX;
-        fastCollider.Height =materialData.divisionPixelY;
-        data.index = index;
-        data.idMaterial = materialData.id;
-        data.idMod = materialData.idNameMod;
-        var text= MaterialManager.Instance.GetAtlasTextureInternal(materialData.id, index);
-        TextureRectTile.Texture = text;
-    }
+
 
     private void OnTextureRectGuiInput(InputEvent @event)
     {
@@ -191,6 +254,7 @@ public partial class TileTextureConfigControl : Window
                 break;
         }
     }
+
     private Vector2 GetHandlePosition(Rect2 rect, int index)
     {
         return index switch
@@ -199,16 +263,15 @@ public partial class TileTextureConfigControl : Window
             1 => rect.Position + new Vector2(rect.Size.X, 0), // top-right
             2 => rect.Position + rect.Size, // bottom-right
             3 => rect.Position + new Vector2(0, rect.Size.Y), // bottom-left
-            _ => rect.Position
+            _ => rect.Position,
         };
     }
+
     private Rect2 GetColliderRect()
     {
-        return new Rect2(
-            fastCollider.Offset,
-            new Vector2(fastCollider.Width, fastCollider.Height)
-        );
+        return new Rect2(fastCollider.Offset, new Vector2(fastCollider.Width, fastCollider.Height));
     }
+
     private void ClampCollider()
     {
         var maxSize = TextureRectTile.Size;
@@ -236,6 +299,7 @@ public partial class TileTextureConfigControl : Window
             );
         }
     }
+
     private void HandleMouseMove(Vector2 mousePos)
     {
         // 🟡 MOVER
@@ -280,9 +344,8 @@ public partial class TileTextureConfigControl : Window
                 return;
             }
         }
-
-    
     }
+
     private void HandleMouseDown(Vector2 mousePos)
     {
         var rect = GetColliderRect();
@@ -333,10 +396,18 @@ public partial class TileTextureConfigControl : Window
 
                 switch (i)
                 {
-                    case 0: handlePos += new Vector2(half, half); break;
-                    case 1: handlePos += new Vector2(-half, half); break;
-                    case 2: handlePos += new Vector2(-half, -half); break;
-                    case 3: handlePos += new Vector2(half, -half); break;
+                    case 0:
+                        handlePos += new Vector2(half, half);
+                        break;
+                    case 1:
+                        handlePos += new Vector2(-half, half);
+                        break;
+                    case 2:
+                        handlePos += new Vector2(-half, -half);
+                        break;
+                    case 3:
+                        handlePos += new Vector2(half, -half);
+                        break;
                 }
 
                 if (mousePos.DistanceTo(handlePos) < 6f)
@@ -356,8 +427,6 @@ public partial class TileTextureConfigControl : Window
                 dragStartOffset = fastCollider.Offset;
             }
         }
-
-       
     }
 
     private void ResizeCircle(Vector2 mousePos)
@@ -377,6 +446,7 @@ public partial class TileTextureConfigControl : Window
         // mantener el centro fijo
         fastCollider.Offset = center - new Vector2(newRadius, newRadius);
     }
+
     private void KuroCheckButtonCollider_Pressed()
     {
         if (KuroCheckButtonCollider.ButtonPressed)
@@ -387,7 +457,7 @@ public partial class TileTextureConfigControl : Window
                 Shape = ShapeType.Rect,
                 Width = TextureRectTile.Size.X,
                 Height = TextureRectTile.Size.Y,
-                Offset = Vector2.Zero
+                Offset = Vector2.Zero,
             };
             ComboBoxCollider.Selected = 0;
             data.hasCollider = true;
@@ -406,6 +476,7 @@ public partial class TileTextureConfigControl : Window
     {
         SlopeType slope = (SlopeType)index;
         fastCollider.Slope = slope;
+        fastCollider.Offset = Vector2.Zero;
         TextureRectTile.QueueRedraw();
     }
 
@@ -416,8 +487,7 @@ public partial class TileTextureConfigControl : Window
         foreach (SlopeType item in Enum.GetValues(typeof(SlopeType)))
         {
             ComboBoxColliderTriangulos.AddItem(item.ToString());
-        } 
-        
+        }
     }
 
     private void ComboBoxCollider_ItemSelected(long index)
@@ -433,6 +503,13 @@ public partial class TileTextureConfigControl : Window
                 ComboBoxColliderTriangulos.Visible = false;
                 break;
             case 2:
+                fastCollider.Offset = Vector2.Zero;
+                if (material!=null)
+                {
+                    fastCollider.Width = material.divisionPixelX;
+                    fastCollider.Height = material.divisionPixelY;
+                }                
+
                 fastCollider.Shape = ShapeType.Slope;
                 fastCollider.Slope = SlopeType.BottomLeft;
                 ComboBoxColliderTriangulos.Visible = true;
@@ -440,7 +517,7 @@ public partial class TileTextureConfigControl : Window
             default:
                 break;
         }
-        data.fastColliderTemplate = fastCollider;
+        //data.fastColliderTemplate = fastCollider;
         TextureRectTile.QueueRedraw();
     }
 
@@ -453,56 +530,65 @@ public partial class TileTextureConfigControl : Window
         var color = new Color(0, 1, 0, 0.5f);
         var thickness = 0.2f;
 
-  
-     
         switch (fastCollider.Shape)
         {
             case ShapeType.Rect:
-                {
-                    var rect = GetColliderRect();
-                    TextureRectTile.DrawRect(rect, color, false, thickness);
-                    break;
-                }
+            {
+                var rect = GetColliderRect();
+                TextureRectTile.DrawRect(rect, color, false, thickness);
+                break;
+            }
 
             case ShapeType.Circle:
-                {
-                    var rect = GetColliderRect();
-                    var center = rect.Position + rect.Size / 2f;
-                    var radius = rect.Size.X / 2f; // asumiendo círculo perfecto
+            {
+                var rect = GetColliderRect();
+                var center = rect.Position + rect.Size / 2f;
+                var radius = rect.Size.X / 2f; // asumiendo círculo perfecto
 
-                    TextureRectTile.DrawArc(center, radius, 0, Mathf.Tau, 32, color, thickness);
+                TextureRectTile.DrawArc(center, radius, 0, Mathf.Tau, 32, color, thickness);
 
-                    
+                // 📍 Punto en el borde (derecha del círculo)
+                var handlePos = center + new Vector2(radius, 0);
 
-                    // 📍 Punto en el borde (derecha del círculo)
-                    var handlePos = center + new Vector2(radius, 0);
+                float half = HANDLE_SIZE / 2f;
 
-                    float half = HANDLE_SIZE / 2f;
-
-                    TextureRectTile.DrawRect(
-                        new Rect2(handlePos - new Vector2(half, half), new Vector2(HANDLE_SIZE, HANDLE_SIZE)),
-                        Colors.Red
-                    );
-                    break;
-                }
+                TextureRectTile.DrawRect(
+                    new Rect2(
+                        handlePos - new Vector2(half, half),
+                        new Vector2(HANDLE_SIZE, HANDLE_SIZE)
+                    ),
+                    Colors.Red
+                );
+                break;
+            }
 
             case ShapeType.Slope:
-                {
-                    // 🔺 NO SE TOCA → usa todo el tile
-                    var size = TextureRectTile.Size;
-                    DrawSlopePreview(size, color, thickness);
-                    break;
-                }
+            {
+                // 🔺 NO SE TOCA → usa todo el tile
+                var size = TextureRectTile.Size;
+                DrawSlopePreview(size, color, thickness);
+                break;
+            }
         }
         if (fastCollider.Shape == ShapeType.Rect || fastCollider.Shape == ShapeType.Circle)
         {
             var rect = GetColliderRect();
             var center = rect.Position + rect.Size / 2f;
-
+            
             float s = 3f;
 
-            TextureRectTile.DrawLine(center + new Vector2(-s, 0), center + new Vector2(s, 0), Colors.Yellow, 0.6f);
-            TextureRectTile.DrawLine(center + new Vector2(0, -s), center + new Vector2(0, s), Colors.Yellow, 0.6f);
+            TextureRectTile.DrawLine(
+                center + new Vector2(-s, 0),
+                center + new Vector2(s, 0),
+                Colors.Yellow,
+                0.6f
+            );
+            TextureRectTile.DrawLine(
+                center + new Vector2(0, -s),
+                center + new Vector2(0, s),
+                Colors.Yellow,
+                0.6f
+            );
         }
         if (fastCollider.Shape == ShapeType.Rect)
         {
@@ -512,14 +598,22 @@ public partial class TileTextureConfigControl : Window
             for (int i = 0; i < 4; i++)
             {
                 var p = GetHandlePosition(rect, i);
-
+                
                 // 👉 mover el handle hacia adentro (mejor UX)
                 switch (i)
                 {
-                    case 0: p += new Vector2(half, half); break;
-                    case 1: p += new Vector2(-half, half); break;
-                    case 2: p += new Vector2(-half, -half); break;
-                    case 3: p += new Vector2(half, -half); break;
+                    case 0:
+                        p += new Vector2(half, half);
+                        break;
+                    case 1:
+                        p += new Vector2(-half, half);
+                        break;
+                    case 2:
+                        p += new Vector2(-half, -half);
+                        break;
+                    case 3:
+                        p += new Vector2(half, -half);
+                        break;
                 }
 
                 TextureRectTile.DrawRect(
@@ -542,33 +636,57 @@ public partial class TileTextureConfigControl : Window
             );
         }
     }
+    private Vector2 GetColliderCenterCartesian()
+    {
+        var rect = GetColliderRect();
+        var centerUI = rect.Position + rect.Size / 2f;
+        var halfSize = TextureRectTile.Size / 2f;
 
+        var result = centerUI - halfSize;
+
+        // opcional: invertir Y para sistema matemático real
+        result.Y *= -1;
+
+        return result;
+    }
     private void DrawSlopePreview(Vector2 size, Color color, float thickness)
     {
-        Vector2 p1, p2, p3;
+        Vector2 p1,
+            p2,
+            p3;
 
         // Dibujamos según el Enum SlopeType que definimos antes
         switch (fastCollider.Slope)
         {
             case SlopeType.BottomLeft: // Triángulo 1
-                p1 = new Vector2(0, 0); p2 = new Vector2(0, size.Y); p3 = new Vector2(size.X, size.Y);
+                p1 = new Vector2(0, 0);
+                p2 = new Vector2(0, size.Y);
+                p3 = new Vector2(size.X, size.Y);
                 break;
             case SlopeType.TopRight: // Triángulo 2
-                p1 = new Vector2(0, 0); p2 = new Vector2(size.X, 0); p3 = new Vector2(size.X, size.Y);
+                p1 = new Vector2(0, 0);
+                p2 = new Vector2(size.X, 0);
+                p3 = new Vector2(size.X, size.Y);
                 break;
             case SlopeType.TopLeft: // Triángulo 3
-                p1 = new Vector2(0, 0); p2 = new Vector2(size.X, 0); p3 = new Vector2(0, size.Y);
+                p1 = new Vector2(0, 0);
+                p2 = new Vector2(size.X, 0);
+                p3 = new Vector2(0, size.Y);
                 break;
             case SlopeType.BottomRight: // Triángulo 4
-                p1 = new Vector2(size.X, 0); p2 = new Vector2(size.X, size.Y); p3 = new Vector2(0, size.Y);
+                p1 = new Vector2(size.X, 0);
+                p2 = new Vector2(size.X, size.Y);
+                p3 = new Vector2(0, size.Y);
                 break;
-            default: return;
+            default:
+                return;
         }
 
         // Dibujamos el triángulo
         Vector2[] points = { p1, p2, p3, p1 };
         TextureRectTile.DrawPolyline(points, color, thickness);
     }
+
     public override void _Process(double delta)
     {
         if (!data.isAnimated || data.indexAnimation == null || data.indexAnimation.Length == 0)
@@ -594,7 +712,6 @@ public partial class TileTextureConfigControl : Window
             TextureRectTile.Texture = texture;
         }
     }
+
+
 }
-
-
-

@@ -3,14 +3,14 @@
   "profiles": {
 	"Godot Debug": {
 	  "commandName": "Executable",
-	  "executablePath": "C:/OnlyGodot/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64.exe",
+	  "executablePath": "D:/godot/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64.exe",
 	  "commandLineArgs": "--path . --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug Window": {
+	"Godot Debug TileTextureConfigControl": {
 	  "commandName": "Executable",
-	  "executablePath": "C:/OnlyGodot/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64.exe",
+	  "executablePath": "D:/godot/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64/Godot_v4.6.2-stable_mono_win64.exe",
 	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/TilesTexture/TileTextureConfigControl.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true

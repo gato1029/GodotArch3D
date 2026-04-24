@@ -1,3 +1,4 @@
+using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.utils;
 using LiteDB;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Flecs.NET.Core.Ecs.Alerts;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Materials
 {
@@ -110,6 +112,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         [BsonCtor]
         public MaterialData(int type, string pathTexture, int widhtTexture, int heightTexture, int divisionPixelX, int divisionPixelY,int id):base()
         {
+            idNameMod = ModHelper.Mod.name + ":" + id;
             this.type = type;
             this.pathTexture = pathTexture;
             this.widhtTexture = widhtTexture;

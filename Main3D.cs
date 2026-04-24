@@ -31,14 +31,10 @@ public partial class Main3D : Node3D
     List<Vector2> points = new List<Vector2>();
     Polygon polygon;
     public override void _Ready()
-    {
-        
-        //NodeMainHelper.node3DMain = this;
+    {                
         NodeMainHelper.SetNode3DMain(this);
-
         PerformanceTimer.Instance.Enabled = true;
-        //EcsManager.Instance.SetNode3DMain(this);
-       // FlecsManager.Instance.SetNode3DMain(this);
+        ModHelper.Init();        
 
         MultimeshManager.Instance.Init();
         ChunkManager.Initialize();

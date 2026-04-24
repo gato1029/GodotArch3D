@@ -110,13 +110,15 @@ auto_translate_mode = 2
 oversampling_override = 1.0
 title = "Menu Tiles"
 size = Vector2i(127, 100)
-item_count = 3
+item_count = 4
 item_0/text = "TileSprite"
 item_0/id = 0
 item_1/text = "AutoTileSprite"
 item_1/id = 1
 item_2/text = "AutoMapperTexture"
 item_2/id = 2
+item_3/text = "TileTextureAnimacionCollider"
+item_3/id = 3
 
 [node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1127058186]
 auto_translate_mode = 1

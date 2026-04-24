@@ -189,6 +189,9 @@ public partial class HerramientaMenuBar : MenuBar
             case 2:
                 FacadeWindowDataSearch<AutomapperData> wauto = new FacadeWindowDataSearch<AutomapperData>(KuroWindowFactory.GetPath<WindowAutomapper>(), this);
                 break;
+            case 3:
+                FacadeWindowDataSearch<TileTextureData> wtco = new FacadeWindowDataSearch<TileTextureData>(KuroWindowFactory.GetPath<TileTextureConfigControl>(), this);
+                break;
             default:
                 break;
         }

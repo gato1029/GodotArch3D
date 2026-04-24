@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 internal class MeshCreator
 {
     static Mesh baseMesh;
-
+    const float PixelsToUnitsFactor = 1f / 32f;
 
     public static Mesh GetBaseMesh()
     {
@@ -21,7 +21,11 @@ internal class MeshCreator
     }
     public static float PixelsToUnits(float pixels)
     {
-        return pixels / 32; // Se usa 32f para asegurar que la división sea en punto flotante
+        return pixels * PixelsToUnitsFactor; 
+    }
+    public static Vector2 PixelsToUnits(Vector2 pixels)
+    {
+        return new Vector2( pixels.X * PixelsToUnitsFactor, pixels.Y * PixelsToUnitsFactor) ;
     }
     public static ArrayMesh CreateSquareMesh(float widthPixels, float heightPixels)
     {

@@ -106,6 +106,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<TerrainDataTransition>("TerrainDataTransition");
             RegisterCollection<InfoModData>("InfoModData");
             RegisterCollection<AutomapperData>("AutomapperData");
+            RegisterCollection<TileTextureData>("TileTextureData");
 
             ILiteCollection<TextureMasterData> TextureMasterDataCollection =
                 db.GetCollection<TextureMasterData>("TextureMasterData");

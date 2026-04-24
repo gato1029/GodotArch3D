@@ -368,8 +368,8 @@ public enum SlopeType : byte
 
 public enum ShapeType : byte
 {
-    Circle,
     Rect,
+    Circle,    
     Slope // triangulos
 }
 [RegisterComponentFlecs]
@@ -430,7 +430,7 @@ public record struct MoveColliderComponent
     float AvoidanceRadius
 );
 [RegisterComponentFlecs]
-public record struct FastCollider
+public struct FastCollider
 {
     public SlopeType Slope { get; set; } // Solo se usa si Shape == Slope
     public ShapeType Shape { get; set; }

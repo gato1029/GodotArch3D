@@ -29,5 +29,10 @@ public class TileTextureData: IdDataLong
     public float fpsTemplate { get; set; }
     public FastCollider fastColliderTemplate { get; set; }
 
+    public TileTextureData()
+    {
+        ReGerenateId();
+    }
+
 
 }
