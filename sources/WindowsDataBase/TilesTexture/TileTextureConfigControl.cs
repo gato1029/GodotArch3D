@@ -5,7 +5,7 @@ using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Linq;
 
-public partial class TileTextureConfigControl : PanelContainer
+public partial class TileTextureConfigControl : Window
 {
 
     private bool isDragging = false;
@@ -20,7 +20,7 @@ public partial class TileTextureConfigControl : PanelContainer
 
     private float animTimer = 0f;
     private int animFrame = 0;
-    [Export] public float AnimSpeed = 6f; // frames por segundo
+    
 
     TileTextureData data;
     FastCollider fastCollider;
@@ -37,6 +37,7 @@ public partial class TileTextureConfigControl : PanelContainer
         KuroTextureButtonSearch.Pressed += KuroTextureButtonSearch_Pressed;
         TextureRectTile.MouseFilter = Control.MouseFilterEnum.Stop;
         KuroCheckButtonCollider.Pressed += KuroCheckButtonCollider_Pressed;
+        SpinBoxfps.ValueChanged += SpinBoxfps_ValueChanged;
         //TextureRectTile en este rectecxture debemos dibujar los colliders segun el tipo
         fastCollider.Width = (float)TextureRectTile.Size.X;
         fastCollider.Height = (float)TextureRectTile.Size.Y;
@@ -44,6 +45,12 @@ public partial class TileTextureConfigControl : PanelContainer
         NivelarComboTriangulo();
         
         //CenterContainerTile contenedor
+    }
+
+    private void SpinBoxfps_ValueChanged(double value)
+    {
+        data.fpsTemplate = (float)value;
+        data.fps = (float)(1 / value);
     }
 
     private void KuroTextureButtonSearch_Pressed()
@@ -433,7 +440,7 @@ public partial class TileTextureConfigControl : PanelContainer
             default:
                 break;
         }
-        data.fastCollider = fastCollider;
+        data.fastColliderTemplate = fastCollider;
         TextureRectTile.QueueRedraw();
     }
 
@@ -569,7 +576,7 @@ public partial class TileTextureConfigControl : PanelContainer
 
         animTimer += (float)delta;
 
-        if (animTimer >= 1f / AnimSpeed)
+        if (animTimer >= 1f / SpinBoxfps.Value)
         {
             animTimer = 0f;
 

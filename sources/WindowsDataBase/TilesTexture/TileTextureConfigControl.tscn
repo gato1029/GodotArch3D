@@ -10,44 +10,43 @@
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_ksdjt"]
 [ext_resource type="Texture2D" uid="uid://bnx5ahqxjgdbk" path="res://resources/Textures/iconos/Rectangular.png" id="5_nye3q"]
 
-[node name="TileTextureConfigControl" type="PanelContainer" unique_id=1219697117]
+[node name="Window" type="Window" unique_id=1690251245]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(400, 400)
+script = ExtResource("1_67mc6")
+
+[node name="TileTextureConfigControl" type="PanelContainer" parent="." unique_id=1219697117]
 custom_minimum_size = Vector2(300, 300)
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -64.0
-offset_top = -64.0
-offset_right = 64.0
-offset_bottom = 64.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-script = ExtResource("1_67mc6")
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1618613455]
+[node name="MarginContainer" type="MarginContainer" parent="TileTextureConfigControl" unique_id=1618613455]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=31247940]
+[node name="VBoxContainer" type="VBoxContainer" parent="TileTextureConfigControl/MarginContainer" unique_id=31247940]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1192445291]
+[node name="HBoxContainer" type="HBoxContainer" parent="TileTextureConfigControl/MarginContainer/VBoxContainer" unique_id=1192445291]
 layout_mode = 2
 
-[node name="KuroTextureButtonSearch" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1580959976]
+[node name="KuroTextureButtonSearch" type="TextureButton" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1580959976]
 layout_mode = 2
 size_flags_horizontal = 0
 texture_normal = ExtResource("2_hr0l7")
 script = ExtResource("3_ksdjt")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
-[node name="KuroCheckButtonCollider" type="CheckButton" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=377702811]
+[node name="KuroCheckButtonCollider" type="CheckButton" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/HBoxContainer" unique_id=377702811]
 layout_mode = 2
 size_flags_horizontal = 2
 tooltip_text = "Tiene Collider"
@@ -57,12 +56,12 @@ TextureOn = ExtResource("5_nye3q")
 TextureOff = ExtResource("3_hw8rp")
 metadata/_custom_type_script = "uid://b2tq08112l2fo"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=733864064]
+[node name="VBoxContainer" type="VBoxContainer" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/HBoxContainer" unique_id=733864064]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="ComboBoxCollider" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=627992465]
+[node name="ComboBoxCollider" type="OptionButton" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=627992465]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -77,14 +76,24 @@ popup/item_2/id = 2
 script = ExtResource("1_ka7e6")
 metadata/_custom_type_script = "uid://ce5005tpxrd60"
 
-[node name="ComboBoxColliderTriangulos" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1973415647]
+[node name="ComboBoxColliderTriangulos" type="OptionButton" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1973415647]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("1_ka7e6")
 metadata/_custom_type_script = "uid://ce5005tpxrd60"
 
-[node name="KuroScrollZoomView" type="MarginContainer" parent="MarginContainer/VBoxContainer" unique_id=1680747103]
+[node name="HBoxContainer2" type="HBoxContainer" parent="TileTextureConfigControl/MarginContainer/VBoxContainer" unique_id=1772094045]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1429768373]
+layout_mode = 2
+text = "Frames por Segundo:"
+
+[node name="SpinBoxfps" type="SpinBox" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1544716077]
+layout_mode = 2
+
+[node name="KuroScrollZoomView" type="MarginContainer" parent="TileTextureConfigControl/MarginContainer/VBoxContainer" unique_id=1680747103]
 clip_contents = true
 custom_minimum_size = Vector2(250, 250)
 layout_mode = 2
@@ -92,13 +101,12 @@ size_flags_vertical = 3
 script = ExtResource("1_qif6g")
 PanEnabled = false
 ZoomOnlyAtCenter = true
-PixelPerfectZoom = true
 metadata/_custom_type_script = "uid://ckc55m20w7igo"
 
-[node name="CenterContainerTile" type="CenterContainer" parent="MarginContainer/VBoxContainer/KuroScrollZoomView" unique_id=1250821305]
+[node name="CenterContainerTile" type="CenterContainer" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/KuroScrollZoomView" unique_id=1250821305]
 layout_mode = 2
 
-[node name="TextureRectTile" type="TextureRect" parent="MarginContainer/VBoxContainer/KuroScrollZoomView/CenterContainerTile" unique_id=1541975115]
+[node name="TextureRectTile" type="TextureRect" parent="TileTextureConfigControl/MarginContainer/VBoxContainer/KuroScrollZoomView/CenterContainerTile" unique_id=1541975115]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

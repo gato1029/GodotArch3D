@@ -17,9 +17,17 @@ public class TileTextureData: IdDataLong
     public int idMaterial { get; set; }
     public int index {  get; set; }
     public bool isAnimated { get; set; }
+    
     public int[] indexAnimation { get; set; }
     public bool hasCollider { get; set; }
-    // aqui debe ir para guardar la informacion del collider si lo necesitara
-    public FastCollider fastCollider { get; set; }
+
+    // informacion en unidades de mundo
+    public float fps {  get; set; }
+    public FastCollider fastCollider {  get; set; }
+
+    // informacion en pixeles
+    public float fpsTemplate { get; set; }
+    public FastCollider fastColliderTemplate { get; set; }
+
 
 }
