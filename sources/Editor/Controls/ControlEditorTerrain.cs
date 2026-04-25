@@ -54,9 +54,15 @@ public partial class ControlEditorTerrain : MarginContainer
         TabContainerLevels.TabChanged += TabContainerLevels_TabChanged;
 
         MapManagerEditor.Instance.OnMapLevelDataChanged += Instance_OnMapLevelDataChanged;
+        ButtonSearchTexture.Pressed += ButtonSearchTexture_Pressed;
         ButtonSeedRandom.Pressed += ButtonSeedRandom_Pressed;
         SpinBoxSeed.Value = CommonOperations.GetRandomInt();
 
+    }
+
+    private void ButtonSearchTexture_Pressed()
+    {
+      
     }
 
     private void TabContainerLevels_TabChanged(long tab)

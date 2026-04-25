@@ -18,6 +18,9 @@ public partial class ControlEditorTerrain : MarginContainer
     private Button ButtonAutomaticTerrain;
     private Button ButtonRefresh;
     private TabContainer TabContainerLevels;
+    private MarginContainer DisenioTextura;
+    private Button ButtonSearchTexture;
+    private WindowKuroTiles KuroTilesTexture;
     private MarginContainer CapasDiseño;
     private VBoxContainer ContainerLayers;
 
@@ -34,6 +37,9 @@ public partial class ControlEditorTerrain : MarginContainer
         ButtonAutomaticTerrain = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/ButtonAutomaticTerrain");
         ButtonRefresh = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer2/ButtonRefresh");
         TabContainerLevels = GetNode<TabContainer>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainerLevels");
+        DisenioTextura = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura");
+        ButtonSearchTexture = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura/VBoxContainer/ButtonSearchTexture");
+        KuroTilesTexture = GetNode<WindowKuroTiles>("PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura/VBoxContainer/KuroTilesTexture");
         CapasDiseño = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño");
         ContainerLayers = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño/ScrollContainer/ContainerLayers");
     }
