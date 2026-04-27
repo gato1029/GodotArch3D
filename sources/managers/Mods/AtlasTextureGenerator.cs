@@ -15,6 +15,7 @@ public class AtlasTextureGenerator:SingletonBase<AtlasTextureGenerator>
 {
 
     private int idAtlasGlobal = 1;
+    private int idSubAtlasGlobal = 1;
     private MaterialModDbService db = MaterialModDbService.Instance;
     public void GenerateMasterAtlas(List<MaterialData> materials, MaterialType materialType)    
     {        
@@ -110,9 +111,11 @@ public class AtlasTextureGenerator:SingletonBase<AtlasTextureGenerator>
             materialModData.heightAtlas = materiales[i].heightTexture;
             materialModData.divisionPixelAtlasX = materiales[i].divisionPixelX;
             materialModData.divisionPixelAtlasY = materiales[i].divisionPixelY;
+            materialModData.idSubTexture = idSubAtlasGlobal;
             db.Guardar(materialModData);
+            idSubAtlasGlobal++;
         }
-
+        
 
 
         return ;

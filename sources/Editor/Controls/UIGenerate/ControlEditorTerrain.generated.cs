@@ -8,6 +8,7 @@ public partial class ControlEditorTerrain : MarginContainer
     public event EventNotifyChangued OnNotifyChangued;
 
     private PanelContainer PanelContainerFocus;
+    private TabContainer TabContainerPrincipal;
     private VBoxContainer Diseño;
     private TextureRect TextureRectImage;
     private Button ButtonSearch;
@@ -27,20 +28,21 @@ public partial class ControlEditorTerrain : MarginContainer
     public void InitializeUI()
     {
         PanelContainerFocus = GetNode<PanelContainer>("PanelContainerFocus");
-        Diseño = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainer/Diseño");
-        TextureRectImage = GetNode<TextureRect>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/VBoxContainer/TextureRectImage");
-        ButtonSearch = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/VBoxContainer/ButtonSearch");
-        SpinBoxSeed = GetNode<SpinBox>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/HBoxContainer/SpinBoxSeed");
-        ButtonSeedRandom = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/HBoxContainer/ButtonSeedRandom");
-        SpinBoxChunkX = GetNode<SpinBox>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer/SpinBoxChunkX");
-        SpinBoxChunkY = GetNode<SpinBox>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer/SpinBoxChunkY");
-        ButtonAutomaticTerrain = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/ButtonAutomaticTerrain");
-        ButtonRefresh = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer2/ButtonRefresh");
-        TabContainerLevels = GetNode<TabContainer>("PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainerLevels");
-        DisenioTextura = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura");
-        ButtonSearchTexture = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura/VBoxContainer/ButtonSearchTexture");
-        KuroTilesTexture = GetNode<WindowKuroTiles>("PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura/VBoxContainer/KuroTilesTexture");
-        CapasDiseño = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño");
-        ContainerLayers = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño/ScrollContainer/ContainerLayers");
+        TabContainerPrincipal = GetNode<TabContainer>("PanelContainerFocus/MarginContainer/TabContainerPrincipal");
+        Diseño = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño");
+        TextureRectImage = GetNode<TextureRect>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/HBoxContainer/VBoxContainer/TextureRectImage");
+        ButtonSearch = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/HBoxContainer/VBoxContainer/ButtonSearch");
+        SpinBoxSeed = GetNode<SpinBox>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/HBoxContainer/SpinBoxSeed");
+        ButtonSeedRandom = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/HBoxContainer/ButtonSeedRandom");
+        SpinBoxChunkX = GetNode<SpinBox>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/GridContainer/SpinBoxChunkX");
+        SpinBoxChunkY = GetNode<SpinBox>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/GridContainer/SpinBoxChunkY");
+        ButtonAutomaticTerrain = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/ButtonAutomaticTerrain");
+        ButtonRefresh = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/HBoxContainer2/ButtonRefresh");
+        TabContainerLevels = GetNode<TabContainer>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/TabContainerLevels");
+        DisenioTextura = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura");
+        ButtonSearchTexture = GetNode<Button>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura/VBoxContainer/ButtonSearchTexture");
+        KuroTilesTexture = GetNode<WindowKuroTiles>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura/VBoxContainer/KuroTilesTexture");
+        CapasDiseño = GetNode<MarginContainer>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/CapasDiseño");
+        ContainerLayers = GetNode<VBoxContainer>("PanelContainerFocus/MarginContainer/TabContainerPrincipal/CapasDiseño/ScrollContainer/ContainerLayers");
     }
 }

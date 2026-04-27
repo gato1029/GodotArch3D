@@ -32,6 +32,13 @@ public class BlackyTileRenderInstance
         this.x = x;
         this.y = y;
     }
+    public BlackyTileRenderInstance(Rid rid, int instance)
+    {
+        this.rid = rid;
+        this.Instance = instance;
+        IsDestroyed = true;
+        
+    }
     public bool IsDestroyed { get; private set; }
 
     public void MarkDestroyed()

@@ -9,6 +9,7 @@ using GodotEcsArch.sources.Flecs.Systems.Debug;
 using GodotEcsArch.sources.Flecs.Systems.Generic;
 using GodotEcsArch.sources.Flecs.Systems.Human;
 using GodotEcsArch.sources.Flecs.Systems.Rendering;
+using GodotEcsArch.sources.Flecs.Transforms;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -178,9 +179,10 @@ public class FlecsManager
 
 
         // transform
-        RegisterSystem<SpriteTransformStaticSystem>();
+       // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
         RegisterSystem<SpriteTransformSystem>();
         RegisterSystem<SpriteTransformLayerSystem>();
+        RegisterSystem<TileTextureTransformSystem>();
 
         // estados
         RegisterSystem<CharacterStateLayerSystem>();        
@@ -195,6 +197,7 @@ public class FlecsManager
         RegisterSystem<RenderSpriteTileSystem>();
         RegisterSystem<RenderSpriteSystem>();
         RegisterSystem<LayeredSpriteRenderSystem>();
+        RegisterSystem<RenderTileTextureSystem> ();
         RegisterSystem<HumanCameraMoveSystem>();
         
         //RegisterSystem<RvoDebugSystem>();

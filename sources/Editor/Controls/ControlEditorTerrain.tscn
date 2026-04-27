@@ -26,100 +26,100 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="TabContainer" type="TabContainer" parent="PanelContainerFocus/MarginContainer" unique_id=1313300915]
+[node name="TabContainerPrincipal" type="TabContainer" parent="PanelContainerFocus/MarginContainer" unique_id=1313300915]
 layout_mode = 2
 current_tab = 1
 
-[node name="Diseño" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer" unique_id=674987642]
+[node name="Diseño" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal" unique_id=674987642]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 metadata/_tab_index = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño" unique_id=135047350]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño" unique_id=135047350]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer" unique_id=1661807374]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/HBoxContainer" unique_id=1661807374]
 layout_mode = 2
 size_flags_horizontal = 6
 
-[node name="TextureRectImage" type="TextureRect" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/VBoxContainer" unique_id=654075186]
+[node name="TextureRectImage" type="TextureRect" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/HBoxContainer/VBoxContainer" unique_id=654075186]
 custom_minimum_size = Vector2(150, 150)
 layout_mode = 2
 size_flags_horizontal = 4
 texture = ExtResource("1_dtmik")
 stretch_mode = 4
 
-[node name="ButtonSearch" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer/VBoxContainer" unique_id=876094547]
+[node name="ButtonSearch" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/HBoxContainer/VBoxContainer" unique_id=876094547]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Buscar Terreno Automatico"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño" unique_id=259550131]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño" unique_id=259550131]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer" unique_id=704669843]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer" unique_id=704669843]
 layout_mode = 2
 
-[node name="SpinBoxSeed" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/HBoxContainer" unique_id=1970959376]
+[node name="SpinBoxSeed" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/HBoxContainer" unique_id=1970959376]
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 max_value = 1000000.0
 prefix = "Semilla:"
 
-[node name="ButtonSeedRandom" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/HBoxContainer" unique_id=989626350]
+[node name="ButtonSeedRandom" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/HBoxContainer" unique_id=989626350]
 layout_mode = 2
 text = "Aleatorio"
 
-[node name="GridContainer" type="GridContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer" unique_id=1020317276]
+[node name="GridContainer" type="GridContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer" unique_id=1020317276]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 columns = 2
 
-[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer" unique_id=2055785382]
+[node name="Label" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/GridContainer" unique_id=2055785382]
 layout_mode = 2
 text = "Posicion Chunk X:"
 
-[node name="SpinBoxChunkX" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer" unique_id=572771879]
+[node name="SpinBoxChunkX" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/GridContainer" unique_id=572771879]
 layout_mode = 2
 min_value = -1000.0
 max_value = 1000.0
 
-[node name="Label2" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer" unique_id=793198949]
+[node name="Label2" type="Label" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/GridContainer" unique_id=793198949]
 layout_mode = 2
 text = "Posicion Chunk Y:"
 
-[node name="SpinBoxChunkY" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer/GridContainer" unique_id=828088707]
+[node name="SpinBoxChunkY" type="SpinBox" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer/GridContainer" unique_id=828088707]
 layout_mode = 2
 min_value = -1000.0
 max_value = 1000.0
 
-[node name="ButtonAutomaticTerrain" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/VBoxContainer" unique_id=1216715623]
+[node name="ButtonAutomaticTerrain" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/VBoxContainer" unique_id=1216715623]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Generar Terreno Automatico"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño" unique_id=289949168]
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño" unique_id=289949168]
 layout_mode = 2
 
-[node name="ButtonRefresh" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/HBoxContainer2" unique_id=198733365]
+[node name="ButtonRefresh" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/HBoxContainer2" unique_id=198733365]
 layout_mode = 2
 text = "Refrescar Reglas"
 
-[node name="TabContainerLevels" type="TabContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño" unique_id=425652022]
+[node name="TabContainerLevels" type="TabContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño" unique_id=425652022]
 layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="TabBar" type="TabBar" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainerLevels" unique_id=1884717684]
+[node name="TabBar" type="TabBar" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/TabContainerLevels" unique_id=1884717684]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="ItemList" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainer/Diseño/TabContainerLevels/TabBar" unique_id=1613011489]
+[node name="ItemList" type="ItemList" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/Diseño/TabContainerLevels/TabBar" unique_id=1613011489]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -127,7 +127,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="DisenioTextura" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainer" unique_id=1787493451]
+[node name="DisenioTextura" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal" unique_id=1787493451]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -135,21 +135,21 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 metadata/_tab_index = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura" unique_id=1770113352]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura" unique_id=1770113352]
 layout_mode = 2
 
-[node name="ButtonSearchTexture" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura/VBoxContainer" unique_id=1390874339]
+[node name="ButtonSearchTexture" type="Button" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura/VBoxContainer" unique_id=1390874339]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "Buscar  Textura"
 icon = ExtResource("3_2ft82")
 
-[node name="KuroTilesTexture" parent="PanelContainerFocus/MarginContainer/TabContainer/DisenioTextura/VBoxContainer" unique_id=884146616 instance=ExtResource("3_hx40v")]
+[node name="KuroTilesTexture" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura/VBoxContainer" unique_id=884146616 instance=ExtResource("3_hx40v")]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CapasDiseño" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainer" unique_id=1120931377]
+[node name="CapasDiseño" type="MarginContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal" unique_id=1120931377]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
@@ -158,9 +158,9 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 metadata/_tab_index = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño" unique_id=706306242]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/CapasDiseño" unique_id=706306242]
 layout_mode = 2
 
-[node name="ContainerLayers" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainer/CapasDiseño/ScrollContainer" unique_id=1699489387]
+[node name="ContainerLayers" type="VBoxContainer" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/CapasDiseño/ScrollContainer" unique_id=1699489387]
 layout_mode = 2
 size_flags_horizontal = 3

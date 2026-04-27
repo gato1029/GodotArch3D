@@ -116,25 +116,7 @@ public partial class Main3D : Node3D
     {
     }
 
-    private Vector3 GetRandomVector3(Vector2 min, Vector2 max)
-    {
-        // Generar valores aleatorios dentro del rango para x y y
-        float randomX = _rng.RandfRange(min.X, max.X);
-        float randomY = _rng.RandfRange(min.Y, max.Y);
 
-        // Retornar el Vector2 con los valores aleatorios
-        return new Vector3(randomX, randomY, 1);
-    }
-
-    private Vector2 GetRandomVector2(Vector2 min, Vector2 max)
-    {
-        // Generar valores aleatorios dentro del rango para x y y
-        float randomX = _rng.RandfRange(min.X, max.X);
-        float randomY = _rng.RandfRange(min.Y, max.Y);
-
-        // Retornar el Vector2 con los valores aleatorios
-        return new Vector2(randomX, randomY);
-    }
 
     private int frameCounter = 0;
 
@@ -143,28 +125,12 @@ public partial class Main3D : Node3D
     {
         //Vector2I screenSize = DisplayServer.ScreenGetSize();
         //GD.Print("Resolución máxima del monitor: " + screenSize);
-        
-        
-        //terrainMap.UpdatePositionChunk(PositionsManager.Instance.positionCamera);
-        //EcsManager.Instance.UpdateSystems((float)delta, 0);
         RenderCommandQueue.ExecuteFrame();       
         ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
         CurrentWorlds.Instance.GetAllWorld().ForEach(world =>
         {
             world.Update((float)delta);
         });
-
-        //FlecsManager.Instance.Update((float)delta);
-
-        //MultimeshManager.Instance.ProcessPendingRemove();
-        //EntityChunkMap.Instance.ProcessPendingRemoveInstaces();
-        //EntityChunkMap.Instance.ProcessPendingInstaces();
-
-
-        //var valor =PositionsManager.Instance.positionMouseCamera;
-
-        //bool resp = Collision2D.polygonPoint(polygon.WorldPoints, valor.X,valor.Y);
-        //GameLog.LogCat("CollisionPolygonPoint" + resp);
 
     }
 

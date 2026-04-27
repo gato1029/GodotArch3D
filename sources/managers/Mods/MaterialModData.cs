@@ -16,7 +16,7 @@ public class MaterialModData
     public int divisionPixelAtlasX { get; set; }
     public int divisionPixelAtlasY { get; set; }
     public long timeStamp { get; set; } = 0;
-
+    public int idSubTexture {  get; set; }
     public void UpdateTimeStamp()
     {
         timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();

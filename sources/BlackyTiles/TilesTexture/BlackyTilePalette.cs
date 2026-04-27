@@ -1,24 +1,19 @@
 using Godot;
 using GodotEcsArch.sources.managers.Mods;
-using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
-using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyTiles.TilesTexture;
 
 public struct TileDataMod
 {
-    public int AtlasId;     // Runtime (rápido)
-    public ushort Index;    // Índice dentro del atlas
+    public int SubTextureId;   // runtime handle global único
+    public ushort Index;       // índice local dentro de la subtextura
 }
 
 public struct TileDataPersisted
 {
-    public string ModName;  // Persistente (seguro)
+    public string ModName;     // identidad persistente estable
     public ushort Index;
 }
 
@@ -26,87 +21,87 @@ public class BlackyTilePalette
 {
     private ushort idIncremental = 1;
 
-    // Runtime
+    // =========================
+    // Runtime palette
+    // =========================
     private Dictionary<ushort, TileDataMod> palette = new();
-    private Dictionary<(int atlasId, ushort index), ushort> lookup = new();
 
-    // Persistencia (opcional mantener en memoria)
-    private Dictionary<ushort, TileDataPersisted> persistedPalette = new();
-
-    // Cache para acelerar rebuild
-    private Dictionary<string, int> modNameToAtlasId = new();
+    // evita duplicados runtime
+    private Dictionary<(int subTextureId, ushort index), ushort> lookup = new();
 
     // =========================
-    // 🧱 CREACIÓN / REGISTRO
+    // Persistencia
+    // =========================
+    private Dictionary<ushort, TileDataPersisted> persistedPalette = new();
+
+    // =========================
+    // CREACIÓN / REGISTRO
     // =========================
     public ushort GetOrCreateTile(string modName, ushort indexTexture)
     {
         var data = AtlasTexturesModsManager.Instance.GetMaterialTexture(modName);
+
         if (data == null)
         {
             GD.PrintErr($"Mod no encontrado: {modName}");
             return 0;
         }
 
-        int atlasId = data.idTextureAtlas;
-        var key = (atlasId, indexTexture);
+        var key = (data.idSubTexture, indexTexture);
 
-        // 🔁 Ya existe
         if (lookup.TryGetValue(key, out ushort existingId))
             return existingId;
 
-        // 🆕 Crear nuevo
         ushort newId = idIncremental++;
 
-        var runtimeData = new TileDataMod
+        palette[newId] = new TileDataMod
         {
-            AtlasId = atlasId,
+            SubTextureId = data.idSubTexture,
             Index = indexTexture
         };
 
-        var persistedData = new TileDataPersisted
+        persistedPalette[newId] = new TileDataPersisted
         {
             ModName = modName,
             Index = indexTexture
         };
 
-        palette[newId] = runtimeData;
-        persistedPalette[newId] = persistedData;
         lookup[key] = newId;
 
         return newId;
     }
 
     // =========================
-    // 🎨 RENDER
+    // UV RENDER
     // =========================
     public Color GetTileUV(ushort tileId)
     {
         if (!palette.TryGetValue(tileId, out var tile))
             return Colors.Black;
 
-        var data = AtlasTexturesModsManager.Instance.GetMaterialTextureByAtlasId(tile.AtlasId);
+        var data = AtlasTexturesModsManager.Instance.GetMaterialTextureBySubId(tile.SubTextureId);
+
         if (data == null)
             return Colors.Magenta;
 
-        var offset = new Vector2I(data.xInAtlas, data.yInAtlas);
+        int localColumns = data.widthAtlas / data.divisionPixelAtlasX;
 
-        int columns = data.widthAtlas / data.divisionPixelAtlasX;
+        int row = tile.Index / localColumns;
+        int column = tile.Index % localColumns;
 
-        int row = tile.Index / columns;
-        int column = tile.Index % columns;
+        int x = data.xInAtlas + (column * data.divisionPixelAtlasX);
+        int y = data.yInAtlas + (row * data.divisionPixelAtlasY);
 
-        int x = column * data.divisionPixelAtlasX;
-        int y = row * data.divisionPixelAtlasY;
-
-        int newX = offset.X + x;
-        int newY = offset.Y + y;
-
-        return new Color(newX, newY, data.divisionPixelAtlasX, data.divisionPixelAtlasY);
+        return new Color(
+            x,
+            y,
+            data.divisionPixelAtlasX,
+            data.divisionPixelAtlasY
+        );
     }
 
     // =========================
-    // 💾 SERIALIZACIÓN
+    // SERIALIZACIÓN
     // =========================
     public Dictionary<ushort, TileDataPersisted> GetPersistedPalette()
     {
@@ -120,41 +115,34 @@ public class BlackyTilePalette
     }
 
     // =========================
-    // 🔄 REBUILD (CLAVE)
+    // REBUILD RUNTIME
     // =========================
     private void RebuildPalette()
     {
         palette.Clear();
         lookup.Clear();
-        modNameToAtlasId.Clear();
-
         idIncremental = 1;
-
-        // 🔥 construir cache de mods
-        foreach (var mod in AtlasTexturesModsManager.Instance.GetAllMaterialsTextures())
-        {
-            modNameToAtlasId[mod.idNameMod] = mod.idTextureAtlas;
-        }
 
         foreach (var kv in persistedPalette)
         {
             ushort tileId = kv.Key;
             var persisted = kv.Value;
 
-            if (!modNameToAtlasId.TryGetValue(persisted.ModName, out int atlasId))
+            var data = AtlasTexturesModsManager.Instance.GetMaterialTexture(persisted.ModName);
+
+            if (data == null)
             {
                 GD.PrintErr($"Mod faltante al reconstruir: {persisted.ModName}");
                 continue;
             }
 
-            var runtimeData = new TileDataMod
+            palette[tileId] = new TileDataMod
             {
-                AtlasId = atlasId,
+                SubTextureId = data.idSubTexture,
                 Index = persisted.Index
             };
 
-            palette[tileId] = runtimeData;
-            lookup[(atlasId, persisted.Index)] = tileId;
+            lookup[(data.idSubTexture, persisted.Index)] = tileId;
 
             if (tileId >= idIncremental)
                 idIncremental = (ushort)(tileId + 1);
@@ -162,10 +150,23 @@ public class BlackyTilePalette
     }
 
     // =========================
-    // 🔍 UTILIDAD
+    // UTILIDAD
     // =========================
     public bool TryGetTile(ushort id, out TileDataMod tile)
     {
         return palette.TryGetValue(id, out tile);
+    }
+
+    public bool Exists(ushort id)
+    {
+        return palette.ContainsKey(id);
+    }
+
+    public void Clear()
+    {
+        palette.Clear();
+        lookup.Clear();
+        persistedPalette.Clear();
+        idIncremental = 1;
     }
 }

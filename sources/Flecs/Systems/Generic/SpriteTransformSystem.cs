@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
+
 internal class SpriteTransformSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;

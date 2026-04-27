@@ -21,10 +21,12 @@ using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
+using GodotFlecs.sources.KuroTiles;
 using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Reflection.Emit;
 using static Flecs.NET.Core.Ecs.Units;
 using static Godot.ClassDB;
@@ -32,9 +34,17 @@ using static Godot.ClassDB;
 
 public partial class ControlEditorTerrain : MarginContainer
 {
+
+    public enum ModeEditorTerrain
+    {
+        Auto,
+        Pattern
+    }
     private TerrainData objectSelected;
     private MapTerrain terrainMap;
     private MapType mapType;
+    private ModeEditorTerrain modeEditor;
+
     Vector2I sizeMap = Vector2I.Zero;
     private AutoTileSpriteData currentAutoTileSpriteData=null;
     List<ItemList> itemListsArray = new List<ItemList>();
@@ -52,17 +62,57 @@ public partial class ControlEditorTerrain : MarginContainer
         ButtonRefresh.Pressed += ButtonRefresh_Pressed;
 
         TabContainerLevels.TabChanged += TabContainerLevels_TabChanged;
-
+        TabContainerPrincipal.TabChanged += TabContainerPrincipal_TabChanged;
         MapManagerEditor.Instance.OnMapLevelDataChanged += Instance_OnMapLevelDataChanged;
         ButtonSearchTexture.Pressed += ButtonSearchTexture_Pressed;
         ButtonSeedRandom.Pressed += ButtonSeedRandom_Pressed;
         SpinBoxSeed.Value = CommonOperations.GetRandomInt();
+        KuroTilesTexture.SetModeSelection(false);
+        KuroTilesTexture.OnNotifySelectionMatrix += KuroTilesTexture_OnNotifySelectionMatrix;
+    }
 
+    private void KuroTilesTexture_OnNotifySelectionMatrix(TileSelectionMatrixData matrix, int idMaterial)
+    {
+        //if (matrix.width == 1 && matrix.height == 1)
+        //{
+        //    //TilesEntityPreviewHelper.Create(new Vector2I(1, 1), idMaterial, index - 1);
+        //}
+        //else
+        {
+            TilesEntityPreviewHelper.Create(idMaterial, matrix);
+        }
+        
+    }
+
+    private void KuroTilesTexture_OnNotifySelectionIndex(int index, int idMaterial)
+    {
+        
+    }
+    
+    private void TabContainerPrincipal_TabChanged(long tab)
+    {
+        modeEditor = (ModeEditorTerrain)tab;
+        switch (modeEditor)
+        {
+            case ModeEditorTerrain.Auto:
+                break;
+            case ModeEditorTerrain.Pattern:
+                TilesEntityPreviewHelper.Initialize(blackyWorldMap.flecsManager);
+                break;
+            default:
+                break;
+        }
     }
 
     private void ButtonSearchTexture_Pressed()
     {
-      
+        FacadeWindowDataSearch<MaterialData> windowQuery = new FacadeWindowDataSearch<MaterialData>("res://sources/WindowsDataBase/Materials/windowNewMaterial.tscn", this, WindowType.SELECTED,true);
+        windowQuery.OnNotifySelected += WindowQuery_OnNotifySelected;
+    }
+
+    private void WindowQuery_OnNotifySelected(MaterialData objectSelected)
+    {
+        KuroTilesTexture.SetTexture((Texture2D)objectSelected.textureMaterial, objectSelected.id);
     }
 
     private void TabContainerLevels_TabChanged(long tab)
@@ -277,30 +327,41 @@ public partial class ControlEditorTerrain : MarginContainer
 
         Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
         CurrentMouseTile    = mouseTile;
-        // Mueve blueprint y preview
-        SelectionBlueprint.Instance.Move(mouseTile);
-        PlacementPreview.Instance.Move(mouseTile);
-
+                
         if (MapManagerEditor.Instance.editorMode != EditorMode.TERRENO)
             return;
 
-        // Mostrar preview si hay objeto seleccionado
-        if (currentAutoTileSpriteData != null )
+        switch (modeEditor)
         {
-            // Crear preview si cambio dimencion
-            if (PlacementPreview.Instance.Size != SelectionBlueprint.Instance.Size)
-            {
-                var sprite = MasterDataManager.GetData<TileSpriteData>(currentAutoTileSpriteData.tileRuleTemplates[0].TileCentral.idTileSprite);
-                PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, sprite);                
-            }
+            case ModeEditorTerrain.Auto:
+                break;
+            case ModeEditorTerrain.Pattern:
+                TilesEntityPreviewHelper.Move(CurrentMouseTile);
+                break;
+            default:
+                break;
         }
+        //// Mueve blueprint y preview
+        //SelectionBlueprint.Instance.Move(mouseTile);
+        //PlacementPreview.Instance.Move(mouseTile);
 
-        // Pintar o borrar tiles
-        if (Input.IsMouseButtonPressed(MouseButton.Left))
-            ApplyPaint();
+        //// Mostrar preview si hay objeto seleccionado
+        //if (currentAutoTileSpriteData != null )
+        //{
+        //    // Crear preview si cambio dimencion
+        //    if (PlacementPreview.Instance.Size != SelectionBlueprint.Instance.Size)
+        //    {
+        //        var sprite = MasterDataManager.GetData<TileSpriteData>(currentAutoTileSpriteData.tileRuleTemplates[0].TileCentral.idTileSprite);
+        //        PlacementPreview.Instance.Create(SelectionBlueprint.Instance.Size, mouseTile, sprite);                
+        //    }
+        //}
 
-        if (Input.IsMouseButtonPressed(MouseButton.Right))
-            ApplyErase();
+        //// Pintar o borrar tiles
+        //if (Input.IsMouseButtonPressed(MouseButton.Left))
+        //    ApplyPaint();
+
+        //if (Input.IsMouseButtonPressed(MouseButton.Right))
+        //    ApplyErase();
     }
 
     private void ApplyPaint()

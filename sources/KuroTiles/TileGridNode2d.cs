@@ -1,10 +1,81 @@
 using Godot;
-using RVO;
 using System;
 using System.Collections.Generic;
 
 namespace GodotFlecs.sources.KuroTiles;
 
+
+public class TilePreviewData
+{
+    public int idMaterial;
+    public int index;
+    public int localX;
+    public int localY;
+
+    public int atlasX;
+    public int atlasY;
+
+    public int width;
+    public int height;
+
+    public Texture2D texture;
+
+    public bool isEmpty = false;
+
+    public TilePreviewData() { }
+
+    public TilePreviewData(bool empty)
+    {
+        isEmpty = empty;
+        index = -1;
+        idMaterial = -1;
+    }
+}
+
+public class TileSelectionMatrixData
+{
+    // matriz local [y,x]
+    public TilePreviewData[,] matrix;
+
+    // tamaño local de la matriz
+    public int width;
+    public int height;
+
+    // celda origen real en atlas
+    public Vector2I atlasStartCell;
+
+    // metadata
+    public int idMaterial;
+    public Vector2I cellSize;
+
+    public bool IsEmpty()
+    {
+        return matrix == null || width == 0 || height == 0;
+    }
+
+    public TilePreviewData Get(int x, int y)
+    {
+        if (matrix == null) return null;
+        if (y < 0 || y >= height) return null;
+        if (x < 0 || x >= width) return null;
+
+        return matrix[y, x];
+    }
+
+    public List<TilePreviewData> ToFlatList()
+    {
+        List<TilePreviewData> list = new List<TilePreviewData>();
+
+        if (matrix == null) return list;
+
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+                if (matrix[y, x] != null)
+                    list.Add(matrix[y, x]);
+
+        return list;
+    }
+}
 public partial class TileGridNode2d : Node2D
 {
     [Export] public Vector2I cellSize = new Vector2I(64, 64);
@@ -34,52 +105,64 @@ public partial class TileGridNode2d : Node2D
     public delegate void EventNotifyMultiSelectionIndex(List<int> indices);
     public event EventNotifyMultiSelectionIndex OnNotifyMultiSelectionIndex;
 
-    // 🔹 NUEVO: Modo de selección
+    // 🔥 NUEVO EVENTO MATRIZ
+    public delegate void EventNotifySelectionMatrix(TileSelectionMatrixData matrix);
+    public event EventNotifySelectionMatrix OnNotifySelectionMatrix;
+
     public enum SelectionMode { SingleArea, MultiTile }
     [Export] public SelectionMode selectionMode = SelectionMode.SingleArea;
 
-    // 🔹 NUEVO: Lista de tiles seleccionados
     private List<Vector2I> multiSelectedTiles = new List<Vector2I>();
 
     private int idMaterial;
+
+    private Image cachedAtlasImage;
+
     public override void _Ready()
     {
         lineColor = Colors.Gray;
         lineColor.A = 0.7f;
+
         if (spinBoxX != null)
             spinBoxX.ValueChanged += OnSpinBoxXChanged;
+
         if (spinBoxY != null)
             spinBoxY.ValueChanged += OnSpinBoxYChanged;
     }
 
     internal void SetTextureEmpty()
     {
+        
         imageTexture.Texture = null;
         QueueRedraw();
     }
 
     public void SetTexture(Texture2D texture, int id)
     {
-        idMaterial = id;    
+        idMaterial = id;
         imageTexture.Texture = texture;
+        cachedAtlasImage = texture.GetImage();
         if (imageTexture != null)
         {
             Vector2 textureSize = texture.GetSize();
             imageTexture.Size = textureSize;
             imageTexture.Position = -textureSize / 2f;
         }
+
         QueueRedraw();
     }
 
-    public void SetTexture(TextureRect texture,int id)
+    public void SetTexture(TextureRect texture, int id)
     {
         idMaterial = id;
         imageTexture = texture;
+        cachedAtlasImage = ((Texture2D)texture.Texture).GetImage();
         if (imageTexture != null)
         {
             Vector2 textureSize = imageTexture.Size;
             imageTexture.Position = -textureSize / 2f;
         }
+
         QueueRedraw();
     }
 
@@ -104,14 +187,17 @@ public partial class TileGridNode2d : Node2D
     }
 
     bool forced = false;
+
     public override void _Draw()
     {
         if (imageTexture == null || imageTexture.Texture == null) return;
+
         Vector2 textureSize = imageTexture.Size;
         Vector2 center = Position;
 
         int sizeCellsX = Mathf.CeilToInt(textureSize.X / cellSize.X);
         int sizeCellsY = Mathf.CeilToInt(textureSize.Y / cellSize.Y);
+
         int sizeX = sizeCellsX * cellSize.X;
         int sizeY = sizeCellsY * cellSize.Y;
 
@@ -141,7 +227,6 @@ public partial class TileGridNode2d : Node2D
             forced = false;
         }
 
-        // 🔹 NUEVO: Dibuja los tiles seleccionados con su número
         DrawMultiSelection();
     }
 
@@ -159,38 +244,35 @@ public partial class TileGridNode2d : Node2D
             new Vector2((endXCell - startXCell + 1) * cellSize.X, (endYCell - startYCell + 1) * cellSize.Y)
         );
 
-        // relleno
         DrawRect(rect, new Color(1f, 1f, 1f, 0.15f));
-
-        // borde fuerte
         DrawRect(rect, new Color(1f, 0.2f, 0.2f, 1f), false, 2f);
     }
 
-    // 🔹 NUEVO
     private void DrawMultiSelection()
     {
         if (multiSelectedTiles.Count == 0) return;
+
         Vector2 startPos = Position - imageTexture.Size / 2f;
 
         for (int i = 0; i < multiSelectedTiles.Count; i++)
         {
             Vector2I cell = multiSelectedTiles[i];
+
             Rect2 rect = new Rect2(
                 startPos + new Vector2(cell.X * cellSize.X, cell.Y * cellSize.Y),
                 cellSize
             );
-            // relleno
-            DrawRect(rect, new Color(1f, 1f, 1f, 0.15f));
 
-            // borde fuerte
+            DrawRect(rect, new Color(1f, 1f, 1f, 0.15f));
             DrawRect(rect, new Color(1f, 0.2f, 0.2f, 1f), false, 2f);
+
             DrawString(
-                ThemeDB.FallbackFont, // fuente por defecto
-                rect.Position + cellSize / 2, // centro del tile
+                ThemeDB.FallbackFont,
+                rect.Position + cellSize / 2,
                 (i + 1).ToString(),
                 HorizontalAlignment.Center,
                 -1,
-                24, // tamaño fuente
+                24,
                 Colors.White
             );
         }
@@ -199,6 +281,7 @@ public partial class TileGridNode2d : Node2D
     public Vector2I GetCellAtPosition(Vector2 mouseGlobalPos)
     {
         if (imageTexture == null) return new Vector2I(-1, -1);
+
         Vector2 localPos = GetMouseLocalToTexture();
         var cell = SnapToGrid(ClampToTextureRect(localPos));
         return cell;
@@ -207,14 +290,15 @@ public partial class TileGridNode2d : Node2D
     private Vector2I SnapToGrid(Vector2 position)
     {
         return new Vector2I(
-           (int)(Mathf.Floor(position.X / cellSize.X) * cellSize.X),
-           (int)(Mathf.Floor(position.Y / cellSize.Y) * cellSize.Y)
-       );
+            (int)(Mathf.Floor(position.X / cellSize.X) * cellSize.X),
+            (int)(Mathf.Floor(position.Y / cellSize.Y) * cellSize.Y)
+        );
     }
 
     private Vector2 ClampToTextureRect(Vector2 position)
     {
         Vector2 textureSize = imageTexture.Size;
+
         return new Vector2(
             Mathf.Clamp(position.X, 0, textureSize.X - 0.001f),
             Mathf.Clamp(position.Y, 0, textureSize.Y - 0.001f)
@@ -230,9 +314,11 @@ public partial class TileGridNode2d : Node2D
     private bool IsMouseInsideTexture(Vector2 localPos)
     {
         Vector2 imageSize = imageTexture.Size;
+
         return localPos.X >= 0 && localPos.X <= imageSize.X &&
                localPos.Y >= 0 && localPos.Y <= imageSize.Y;
     }
+
     private List<Vector2I> GetCellsInsideArea(Vector2I start, Vector2I end)
     {
         List<Vector2I> cells = new List<Vector2I>();
@@ -249,19 +335,82 @@ public partial class TileGridNode2d : Node2D
         return cells;
     }
 
+    // 🔥 NUEVO CONSTRUCTOR MATRIZ
+    private TileSelectionMatrixData BuildSelectionMatrix(Vector2I start, Vector2I end)
+    {
+        TileSelectionMatrixData data = new TileSelectionMatrixData();
+
+        int startX = Mathf.Min(start.X, end.X);
+        int startY = Mathf.Min(start.Y, end.Y);
+        int endX = Mathf.Max(start.X, end.X);
+        int endY = Mathf.Max(start.Y, end.Y);
+
+        int width = endX - startX + 1;
+        int height = endY - startY + 1;
+
+        data.width = width;
+        data.height = height;
+        data.atlasStartCell = new Vector2I(startX, startY);
+        data.idMaterial = idMaterial;
+        data.cellSize = cellSize;
+
+        data.matrix = new TilePreviewData[width, height];
+
+        Texture2D baseTexture = (Texture2D)imageTexture.Texture;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                Vector2I atlasCell = new Vector2I(startX + x, startY + y);
+
+                int px = atlasCell.X * cellSize.X;
+                int py = atlasCell.Y * cellSize.Y;
+
+                AtlasTexture atlasTex = new AtlasTexture
+                {
+                    Atlas = baseTexture,
+                    Region = new Rect2(px, py, cellSize.X, cellSize.Y)
+                };
+                Rect2 tileRegion = new Rect2(px, py, cellSize.X, cellSize.Y);
+                bool empty = IsTileRegionEmpty(baseTexture, tileRegion);
+                TilePreviewData preview = new TilePreviewData
+                {
+                    idMaterial = idMaterial,
+                    index = CellToIndex(atlasCell),
+
+                    localX = x,
+                    localY = y,
+
+                    atlasX = px,
+                    atlasY = py,
+
+                    width = cellSize.X,
+                    height = cellSize.Y,
+
+                    texture = atlasTex,
+                    isEmpty = empty
+                };
+
+                data.matrix[x, y] = preview;
+            }
+        }
+
+        return data;
+    }
+
     private bool clickJustPressed = false;
     private Vector2 clickStartMousePos;
-    private const float dragThreshold = 4f; // píxeles de movimiento para considerar drag
+    private const float dragThreshold = 4f;
+
     public override void _Input(InputEvent @event)
     {
-        // CLICK DERECHO limpia selección (MultiTile)
         if (@event is InputEventMouseButton right && right.ButtonIndex == MouseButton.Right && right.Pressed)
         {
             if (selectionMode == SelectionMode.MultiTile)
                 ClearMultiSelection();
         }
 
-        // CLICK IZQUIERDO
         if (@event is InputEventMouseButton mouse && mouse.ButtonIndex == MouseButton.Left)
         {
             if (mouse.Pressed)
@@ -274,42 +423,33 @@ public partial class TileGridNode2d : Node2D
 
                 Vector2I cell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
 
+                dragStartCell = dragEndCell = cell;
+
                 if (selectionMode == SelectionMode.SingleArea)
-                {
-                    dragStartCell = dragEndCell = cell;
                     isDragging = true;
-                }
-                else if (selectionMode == SelectionMode.MultiTile)
-                {
-                    // Prepararnos para posible drag; no asumimos drag hasta que se mueva suficiente
-                    dragStartCell = dragEndCell = cell;
+                else
                     isDragging = false;
-                }
 
                 QueueRedraw();
             }
-            else // MOUSE UP
+            else
             {
-                // Si estábamos haciendo drag en MultiTile, notificamos lista final
                 if (isDragging && selectionMode == SelectionMode.MultiTile)
                 {
                     OnNotifyMultiSelection?.Invoke(GetSelectedFrames());
+                    OnNotifyMultiSelectionIndex?.Invoke(GetSelectedIndices());
                 }
                 else if (clickJustPressed && selectionMode == SelectionMode.MultiTile)
                 {
-                    // CLICK SIMPLE en MultiTile -> toggle o añadir si Ctrl
                     Vector2 localMouse = GetMouseLocalToTexture();
                     Vector2I cell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
 
                     bool isCtrl = Input.IsKeyPressed(Key.Ctrl);
+
                     if (isCtrl)
-                    {
-                        // CTRL + CLICK -> siempre agregar (permitir duplicados)
                         multiSelectedTiles.Add(cell);
-                    }
                     else
                     {
-                        // Click normal -> toggle
                         if (!multiSelectedTiles.Contains(cell))
                             multiSelectedTiles.Add(cell);
                         else
@@ -321,7 +461,6 @@ public partial class TileGridNode2d : Node2D
                     QueueRedraw();
                 }
 
-                // IMPORTANTE: SingleArea notifica siempre al soltar (mantener comportamiento original)
                 if (selectionMode == SelectionMode.SingleArea)
                 {
                     int startX = Mathf.Min(dragStartCell.X, dragEndCell.X);
@@ -335,7 +474,10 @@ public partial class TileGridNode2d : Node2D
                     float h = (endY - startY + 1) * cellSize.Y;
 
                     OnNotifySelection?.Invoke(px, py, w, h);
-                    // Solo si es 1 tile
+
+                    // 🔥 NUEVA MATRIZ LOCAL
+                    OnNotifySelectionMatrix?.Invoke(BuildSelectionMatrix(dragStartCell, dragEndCell));
+
                     if (dragStartCell == dragEndCell)
                     {
                         int index = CellToIndex(dragStartCell);
@@ -347,7 +489,6 @@ public partial class TileGridNode2d : Node2D
                 isDragging = false;
             }
         }
-        // MOUSE MOTION
         else if (@event is InputEventMouseMotion motion)
         {
             if (selectionMode == SelectionMode.MultiTile)
@@ -368,10 +509,7 @@ public partial class TileGridNode2d : Node2D
                     if (IsMouseInsideTexture(localMouse))
                     {
                         dragEndCell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
-
-                        // Obtener todas las celdas en el rectángulo y reemplazar selección
                         multiSelectedTiles = GetCellsInsideArea(dragStartCell, dragEndCell);
-
                         QueueRedraw();
                     }
                 }
@@ -379,6 +517,7 @@ public partial class TileGridNode2d : Node2D
             else if (selectionMode == SelectionMode.SingleArea && isDragging)
             {
                 Vector2 localMouse = GetMouseLocalToTexture();
+
                 if (IsMouseInsideTexture(localMouse))
                 {
                     dragEndCell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
@@ -387,6 +526,7 @@ public partial class TileGridNode2d : Node2D
             }
         }
     }
+
     public List<int> GetSelectedIndices()
     {
         List<int> indices = new List<int>();
@@ -412,12 +552,12 @@ public partial class TileGridNode2d : Node2D
         QueueRedraw();
     }
 
-    // 🔹 NUEVO: limpiar selección múltiple
     public void ClearMultiSelection()
     {
         multiSelectedTiles.Clear();
         QueueRedraw();
     }
+
     public void SetSelection(List<TileInfoKuro> tiles)
     {
         if (tiles == null || tiles.Count == 0)
@@ -432,7 +572,6 @@ public partial class TileGridNode2d : Node2D
 
         foreach (var tile in tiles)
         {
-            // Convertir coordenadas de pixel a celda
             int cellX = tile.x / cellSize.X;
             int cellY = tile.y / cellSize.Y;
             Vector2I cell = new Vector2I(cellX, cellY);
@@ -443,6 +582,7 @@ public partial class TileGridNode2d : Node2D
 
         QueueRedraw();
     }
+
     public List<TileInfoKuro> GetSelectedFrames()
     {
         List<TileInfoKuro> selectedFrames = new List<TileInfoKuro>();
@@ -454,21 +594,18 @@ public partial class TileGridNode2d : Node2D
 
         foreach (var cell in multiSelectedTiles)
         {
-            // Calcula posición en píxeles dentro del atlas
             int px = cell.X * cellSize.X;
             int py = cell.Y * cellSize.Y;
 
-            // Crea un AtlasTexture que recorta esa región
             AtlasTexture atlasTex = new AtlasTexture
             {
                 Atlas = baseTexture,
                 Region = new Rect2(px, py, cellSize.X, cellSize.Y)
             };
 
-            // Arma la estructura final
             TileInfoKuro tile = new TileInfoKuro
             {
-                idMaterial = this.idMaterial , 
+                idMaterial = this.idMaterial,
                 x = px,
                 y = py,
                 width = cellSize.X,
@@ -487,11 +624,13 @@ public partial class TileGridNode2d : Node2D
         if (imageTexture == null) return 0;
         return Mathf.CeilToInt(imageTexture.Size.X / cellSize.X);
     }
+
     private int CellToIndex(Vector2I cell)
     {
         int cols = GetColumns();
-        return cell.Y * cols + cell.X + 1 ; // +1 para q
+        return cell.Y * cols + cell.X + 1;
     }
+
     private Vector2I IndexToCell(int index)
     {
         int cols = GetColumns();
@@ -502,57 +641,33 @@ public partial class TileGridNode2d : Node2D
 
         return new Vector2I(x, y);
     }
+
     public void SetSelection(int index)
     {
         if (imageTexture == null || imageTexture.Texture == null)
             return;
 
         selectionMode = SelectionMode.SingleArea;
-
-        // Convertir índice → celda
-        Vector2I cell = IndexToCell(index);
-
-        // Limpiar multi selección por seguridad
         multiSelectedTiles.Clear();
+
+        Vector2I cell = IndexToCell(index);
 
         dragStartCell = cell;
         dragEndCell = cell;
 
-        // Notificar selección en píxeles (como ya haces)
         float px = cell.X * cellSize.X;
         float py = cell.Y * cellSize.Y;
         float w = cellSize.X;
         float h = cellSize.Y;
 
         OnNotifySelection?.Invoke(px, py, w, h);
-
-        // =========================================
-        // 🔥 CALCULAR POSICIÓN REAL DEL TILE
-        // =========================================
-
-        //// Centro del tile en espacio LOCAL del TextureRect
-        //Vector2 localPos = new Vector2(
-        //    cell.X * cellSize.X + cellSize.X / 2f,
-        //    cell.Y * cellSize.Y + cellSize.Y / 2f
-        //);
-
-        //// Convertir a espacio GLOBAL del SubViewport (correcto aunque haya Panel)
-        //Vector2 globalPos = imageTexture.GetGlobalTransformWithCanvas() * localPos;
-
-        //// =========================================
-        //// 🔥 MOVER LA CÁMARA
-        //// =========================================
-        //Camera2D cam = GetViewport().GetCamera2D();
-        //if (cam != null)
-        //{
-        //    cam.Position = globalPos;
-        //}
+        OnNotifySelectionIndex?.Invoke(index);
+        OnNotifySelectionMatrix?.Invoke(BuildSelectionMatrix(cell, cell));
 
         forced = true;
-
-
         QueueRedraw();
     }
+
     public void SetSelection(List<int> indices)
     {
         selectionMode = SelectionMode.MultiTile;
@@ -577,11 +692,44 @@ public partial class TileGridNode2d : Node2D
         Vector2I cell = IndexToCell(index);
 
         Vector2 gridLocalPos = new Vector2(
-          cell.X * cellSize.X + cellSize.X / 2f,
-          cell.Y * cellSize.Y + cellSize.Y / 2f
-      );
+            cell.X * cellSize.X + cellSize.X / 2f,
+            cell.Y * cellSize.Y + cellSize.Y / 2f
+        );
 
-        // 🔥 convertir desde el grid (Node2D) al mundo del viewport
         return ToGlobal(gridLocalPos - imageTexture.Size / 2f);
+    }
+    private bool IsTileRegionEmpty(Texture2D texture, Rect2 region)
+    {
+        if (cachedAtlasImage == null)
+            return true;
+
+        Image img = cachedAtlasImage;
+        if (img == null)
+            return true;
+
+     //   img.Lock();
+
+        int startX = Mathf.Clamp((int)region.Position.X, 0, img.GetWidth() - 1);
+        int startY = Mathf.Clamp((int)region.Position.Y, 0, img.GetHeight() - 1);
+
+        int endX = Mathf.Clamp((int)(region.Position.X + region.Size.X), 0, img.GetWidth());
+        int endY = Mathf.Clamp((int)(region.Position.Y + region.Size.Y), 0, img.GetHeight());
+
+        for (int y = startY; y < endY; y++)
+        {
+            for (int x = startX; x < endX; x++)
+            {
+                Color c = img.GetPixel(x, y);
+
+                if (c.A > 0.01f)
+                {
+                 //   img.Unlock();
+                    return false;
+                }
+            }
+        }
+
+     //   img.Unlock();
+        return true;
     }
 }

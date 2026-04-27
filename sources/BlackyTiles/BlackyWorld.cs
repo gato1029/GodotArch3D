@@ -8,6 +8,7 @@ using GodotEcsArch.sources.BlackyTiles.Procedural.Resources;
 using GodotEcsArch.sources.BlackyTiles.Procedural.Terrain;
 using GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.BlackyTiles.Tiles;
+using GodotEcsArch.sources.BlackyTiles.TilesTexture;
 using GodotEcsArch.sources.Flecs;
 using GodotEcsArch.sources.Flecs.Systems.Generic;
 using GodotEcsArch.sources.managers.Chunks;
@@ -34,6 +35,7 @@ public class BlackyWorld
     public bool isActive { get; private set; } = true;
     // --- EL MOTOR ---
     public FlecsManager flecsManager { get; private set; }
+    public BlackyTilePalette tilesPalette { get; private set; }
 
     // --- LAS COLISIONES (Viven aquí) ---
     public FastSpatialHash DynamicHash { get; private set; }
@@ -115,6 +117,8 @@ public class BlackyWorld
 
         GridMove = new BlackyChunkedBitGrid(MapSize.X, MapSize.Y, 16);
         flecsManager = new FlecsManager(NodeMainHelper.node3DMain);
+
+        tilesPalette = new BlackyTilePalette();
         flecsManager.WorldFlecs.SetCtx(this);
         
         RenderData = new BlackyChunkRenderData(chunkSize, heightCount);    
@@ -143,12 +147,12 @@ public class BlackyWorld
         postProcessorResource  = new BlackyResourcesPostProcessor(worldSeed);
 
 
-        ReglasProcesador();
-        GeneratorResources = new BlackyResourcesGenerator(Heights, Generator, Resources, postProcessorResource, worldSeed);
-        GeneradoresProcedurales();
-        GeneradorRecursos();
-        chunkManager.OnChunkPreLoadGenerator += ChunkManager_OnChunkPreLoadGenerator;
-        RenderCommandQueue.Enqueue(new ForceUpdateChunksCommand(chunkManager, new Vector2I(0, 0)));
+        //ReglasProcesador();
+        //GeneratorResources = new BlackyResourcesGenerator(Heights, Generator, Resources, postProcessorResource, worldSeed);
+        //GeneradoresProcedurales();
+        //GeneradorRecursos();
+        //chunkManager.OnChunkPreLoadGenerator += ChunkManager_OnChunkPreLoadGenerator;
+        //RenderCommandQueue.Enqueue(new ForceUpdateChunksCommand(chunkManager, new Vector2I(0, 0)));
 
         CurrentWorlds.Instance.AddWorld("mundo", this);
 

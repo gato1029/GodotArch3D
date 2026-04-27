@@ -42,7 +42,7 @@ public partial class WindowSearchTileMaterial : Window
         
     }
 
-    private void ControlKuroTiles_OnNotifySelectionIndex(int index)
+    private void ControlKuroTiles_OnNotifySelectionIndex(int index, int idMaterial)
     {
         OnNotifySelectionIndex?.Invoke(index, materialData);
     }

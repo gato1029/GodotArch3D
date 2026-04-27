@@ -25,8 +25,9 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     private  RenderManagerOptimized renderManager;
 
     private  Dictionary<MaterialType,List<MaterialData>> materialsByType = new Dictionary<MaterialType, List<MaterialData>>();
-    private  Dictionary<string, int> _textureLookup = new();
+    private  Dictionary<string, MaterialModData> _textureLookup = new();
     private Dictionary<int, MaterialModData> materialsMods = new Dictionary<int, MaterialModData>();
+    private Dictionary<int, MaterialModData> subMaterialsModsGlobal = new Dictionary<int, MaterialModData>();
 
     //public void ForceChargue()
     //{
@@ -64,7 +65,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
                 var materialModData = MaterialModDbService.Instance.Obtener(mat.idNameMod);
 
                 if (materialModData == null)
-                    continue;
+                    return true;
 
                 if (mat.timeStamp != materialModData.timeStamp)
                 {
@@ -79,6 +80,10 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     {
         return materialsMods.Values;
     }
+    public MaterialModData GetMaterialTextureBySubId(int subTextureId)
+    {
+        return subMaterialsModsGlobal[subTextureId];
+    }
     public MaterialModData GetMaterialTextureByAtlasId(int atlasId)
     {
         return materialsMods[atlasId];
@@ -91,7 +96,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
             return null;
         }
 
-        return materialsMods[idAtlasTexture];
+        return idAtlasTexture;
     }
     public  (Rid rid, int instance,int layerTexture) CreateInstanceRender(string textureIdMod)
     {
@@ -102,7 +107,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
             return (default, -1, -1);
         }
 
-        var (multimeshRid, instanceId, layer) = renderManager.CreateInstance(idAtlasTexture);
+        var (multimeshRid, instanceId, layer) = renderManager.CreateInstance(idAtlasTexture.idTextureAtlas);
         if (instanceId == -1)
         {
             GD.PrintErr($"No se pudo crear instancia para textureId: {textureIdMod}");
@@ -133,8 +138,8 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
 
         foreach (var item in data)
         {
-            _textureLookup[item.idNameMod] = item.idTextureAtlas;
-
+            _textureLookup[item.idNameMod] = item;
+            subMaterialsModsGlobal.Add(item.idSubTexture, item);
             if (!processed.Add(item.idTextureAtlas))
                 continue; // ya existe → lo saltamos
             materialsMods.Add(item.idTextureAtlas, item);

@@ -1,4 +1,5 @@
 using Godot;
+using GodotFlecs.sources.KuroTiles;
 using System;
 using System.Collections.Generic;
 
@@ -6,17 +7,22 @@ public partial class WindowKuroTiles : MarginContainer
 {
     // Called when the node enters the scene tree for the first time.
 
+    Vector2 sizeTexture = Vector2.Zero;
+    int idCurrentMaterial = -1;
     public delegate void EventNotifySelection(float x, float y, float width, float height);
     public event EventNotifySelection OnNotifySelection;
 
     public delegate void EventNotifyMultiSelection(List<TileInfoKuro> tiles);
     public event EventNotifyMultiSelection OnNotifyMultiSelection;
 
-    public delegate void EventNotifySelectionIndex(int index);
+    public delegate void EventNotifySelectionIndex(int index, int idMaterial);
     public event EventNotifySelectionIndex OnNotifySelectionIndex;
 
     public delegate void EventNotifyMultiSelectionIndex(List<int> indices);
     public event EventNotifyMultiSelectionIndex OnNotifyMultiSelectionIndex;
+
+    public delegate void EventNotifySelectionMatrix(TileSelectionMatrixData matrix, int idMaterial);
+    public event EventNotifySelectionMatrix OnNotifySelectionMatrix;
 
     public override void _Ready()
 	{
@@ -25,8 +31,14 @@ public partial class WindowKuroTiles : MarginContainer
         Grid.OnNotifyMultiSelection += Grid_OnNotifyMultiSelection;
         Grid.OnNotifySelectionIndex += Grid_OnNotifySelectionIndex;
         Grid.OnNotifyMultiSelectionIndex += Grid_OnNotifyMultiSelectionIndex;
+        Grid.OnNotifySelectionMatrix += Grid_OnNotifySelectionMatrix;
         SubViewport.OnNotifySelectionCameraZoom += SubViewport_OnNotifySelectionCameraZoom;
         
+    }
+
+    private void Grid_OnNotifySelectionMatrix(TileSelectionMatrixData matrix)
+    {
+       OnNotifySelectionMatrix?.Invoke(matrix, idCurrentMaterial);
     }
 
     private void Grid_OnNotifyMultiSelectionIndex(List<int> indices)
@@ -36,7 +48,7 @@ public partial class WindowKuroTiles : MarginContainer
 
     private void Grid_OnNotifySelectionIndex(int index)
     {
-        OnNotifySelectionIndex?.Invoke(index);
+        OnNotifySelectionIndex?.Invoke(index, idCurrentMaterial);
     }
 
     private void Grid_OnNotifyMultiSelection(List<TileInfoKuro> tiles)
@@ -57,8 +69,7 @@ public partial class WindowKuroTiles : MarginContainer
     {
         Grid.SetTextureEmpty(); 
     }
-    Vector2 sizeTexture= Vector2.Zero;
-    int idCurrentMaterial = -1;
+ 
     public void SetTexture(Texture2D texture, int id)
     {
         if (idCurrentMaterial==id)

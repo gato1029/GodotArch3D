@@ -171,6 +171,16 @@ public record struct TileSpriteAnimationTag();
 public record struct RenderDisabledTag();
 
 [RegisterComponentFlecs]
+public record struct TileTextureTag();
+
+[RegisterComponentFlecs]
+public record struct DirtyTileRenderTag();
+
+[RegisterComponentFlecs]
+public record struct DirtyTransformTag();
+
+
+[RegisterComponentFlecs]
 public record struct IdGenericComponent
 (
     long id,
