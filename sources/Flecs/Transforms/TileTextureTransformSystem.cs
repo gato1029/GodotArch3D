@@ -16,7 +16,7 @@ internal class TileTextureTransformSystem : FlecsSystemBase
         qb.With<PositionComponent>()
           .With<RenderGPUComponent>()
           .With<RenderTransformComponent>()
-          .With<TileTextureTag>()
+          .With<TileTextureComponent>()
           .With<DirtyTransformTag>();          
     }
 

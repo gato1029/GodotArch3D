@@ -3,7 +3,7 @@ namespace GodotEcsArch.sources.BlackyTiles.TilesTexture;
 public static class BlackyChunkTilemapTextureFactory
 {
     public static IBlackyChunkTilemapTexture Create(
-        TilePalette palette,
+        TilePaletteCount palette,
         int layerIndex,
         int size,
         int chunkWorldX,
@@ -19,5 +19,14 @@ public static class BlackyChunkTilemapTextureFactory
             return new BlackyChunkTilemapTextureUShort(
                 layerIndex, size, chunkWorldX, chunkWorldY);
         }
+    }
+    public static IBlackyChunkTilemapTexture Create(    
+    int layerIndex,
+    int size,
+    int chunkWorldX,
+    int chunkWorldY)
+    {        
+            return new BlackyChunkTilemapTextureUShort(
+            layerIndex, size, chunkWorldX, chunkWorldY);        
     }
 }

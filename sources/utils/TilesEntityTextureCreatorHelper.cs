@@ -24,12 +24,15 @@ public static class TilesEntityTextureCreatorHelper
         {
             return default;
         }
+
         var mat = MasterDataManager.GetData<MaterialData>(idMaterial);
         var instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(mat.idNameMod);        
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);        
         transform = transform.ScaledLocal(new Godot.Vector3(1, 1, 1));                
         var world  = flecsManager.WorldFlecs.GetCtx<BlackyWorld>();
         var pallete = world.tilesPalette;
+
+        // aqui necesito la paleta por region y de acuerdo a eso creamos tile simple o animado
         var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
         entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance,mat.id, instanceRender.layerTexture, renderLayer, 0, 1, Vector2.Zero));
@@ -37,7 +40,7 @@ public static class TilesEntityTextureCreatorHelper
         entity.Set(new RenderFrameDataComponent { uvMap = pallete.GetTileUV(idInternal)});
         entity.Set(new PositionComponent { tilePosition = tilePosition, height = 3 });
         entity.Add<DirtyTileRenderTag>();
-        entity.Add<TileTextureTag>();
+        entity.Set(new TileTextureComponent { indexTile = idInternal, isAnimated = false });
         return entity;
     }
 }

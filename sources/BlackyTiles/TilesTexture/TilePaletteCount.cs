@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyTiles.TilesTexture;
 
-public class TilePalette
+public class TilePaletteCount
 {
     public int Count { get; private set; }
 
-    public TilePalette(int count)
+    public TilePaletteCount(int count)
     {
         Count = count;
     }

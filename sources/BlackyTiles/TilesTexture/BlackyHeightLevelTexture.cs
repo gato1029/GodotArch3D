@@ -46,8 +46,7 @@ public class BlackyHeightLevelTexture
     }
 
     public IBlackyChunkTilemapTexture GetOrCreateLayer(
-        int layer,
-        TilePalette palette,
+        int layer,      
         int size,
         int worldX,
         int worldY)
@@ -56,8 +55,7 @@ public class BlackyHeightLevelTexture
 
         if (tilemap == null)
         {
-            tilemap = BlackyChunkTilemapTextureFactory.Create(
-                palette,
+            tilemap = BlackyChunkTilemapTextureFactory.Create(                
                 layer,
                 size,
                 worldX,

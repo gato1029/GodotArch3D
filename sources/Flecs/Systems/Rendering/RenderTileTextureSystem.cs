@@ -15,7 +15,7 @@ internal class RenderTileTextureSystem : FlecsSystemBase
         qb.With<RenderGPUComponent>()
            .With<RenderFrameDataComponent>()
            .With<RenderTransformComponent>()
-           .With<TileTextureTag>()
+           .With<TileTextureComponent>()
            .With<DirtyTileRenderTag>() // solo si esta sucio volvemos a dibujar
            .Without<RenderDisabledTag>();
     }

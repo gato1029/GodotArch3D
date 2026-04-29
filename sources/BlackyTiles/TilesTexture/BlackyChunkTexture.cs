@@ -1,3 +1,4 @@
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ namespace GodotEcsArch.sources.BlackyTiles.TilesTexture;
 
 public class BlackyChunkTexture
 {
+    public BlackyRegion ParentRegion { get; }
     public BlackyChunkCoord Coord { get; }
 
     private readonly BlackyHeightLevelTexture[] _heights;
@@ -23,9 +25,11 @@ public class BlackyChunkTexture
 
     public BlackyChunkTexture(
         BlackyChunkCoord coord,
+        BlackyRegion parentRegion,
         int size,
         int maxHeights,
-        int maxLayers)
+        int maxLayers
+        )
     {
         Coord = coord;
         _size = size;
@@ -36,6 +40,31 @@ public class BlackyChunkTexture
         WorldBaseY = coord.Y * size;
 
         _heights = new BlackyHeightLevelTexture[maxHeights];
+        ParentRegion = parentRegion;
+        parentRegion.RegisterChunk(coord);
+    }
+
+    // ==========================================
+    // MÉTODO PARA EL RENDERIZADOR
+    // ==========================================
+
+    /// <summary>
+    /// Devuelve los datos de textura (UVs y dimensiones) para un tile ID específico.
+    /// Este ID debe ser el ushort que está guardado en las capas de este chunk.
+    /// </summary>
+    public Color GetTileUV(ushort tileId)
+    {
+        // El chunk no sabe qué es el "ID 5", pero su región sí.
+        return ParentRegion.GetTileUV(tileId);
+    }
+
+    /// <summary>
+    /// Devuelve la paleta completa de la región si el renderizador 
+    /// necesita procesar múltiples tiles de forma masiva.
+    /// </summary>
+    public BlackyTilePalette GetPalette()
+    {
+        return ParentRegion.Palette;
     }
 
     #region Heights
@@ -91,14 +120,13 @@ public class BlackyChunkTexture
 
     public IBlackyChunkTilemapTexture GetOrCreateLayer(
         int height,
-        int layer,
-        TilePalette palette)
+        int layer
+        )
     {
         var h = GetOrCreateHeight(height);
 
         return h.GetOrCreateLayer(
-            layer,
-            palette,
+            layer,            
             _size,
             WorldBaseX,
             WorldBaseY);

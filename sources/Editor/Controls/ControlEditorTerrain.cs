@@ -73,22 +73,10 @@ public partial class ControlEditorTerrain : MarginContainer
 
     private void KuroTilesTexture_OnNotifySelectionMatrix(TileSelectionMatrixData matrix, int idMaterial)
     {
-        //if (matrix.width == 1 && matrix.height == 1)
-        //{
-        //    //TilesEntityPreviewHelper.Create(new Vector2I(1, 1), idMaterial, index - 1);
-        //}
-        //else
-        {
-            TilesEntityPreviewHelper.Create(idMaterial, matrix);
-        }
-        
+        TilesEntityPreviewHelper.Create(idMaterial, matrix);     
     }
 
-    private void KuroTilesTexture_OnNotifySelectionIndex(int index, int idMaterial)
-    {
-        
-    }
-    
+ 
     private void TabContainerPrincipal_TabChanged(long tab)
     {
         modeEditor = (ModeEditorTerrain)tab;

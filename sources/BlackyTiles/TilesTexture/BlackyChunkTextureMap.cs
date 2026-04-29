@@ -11,10 +11,16 @@ namespace GodotEcsArch.sources.BlackyTiles.TilesTexture;
 public class BlackyChunkTextureMap
 {
     private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
+    private readonly Dictionary<(int, int), BlackyRegion> _regions = new();
 
     public int ChunkSize { get; }
     public int HeightCount { get; }
     public int MaxLayers { get; }
+
+    // Tamaño de región: 16x16 chunks. 
+    // Usamos bit shift (>> 4) porque 2^4 = 16. Es mucho más rápido que la división.
+    private const int RegionShift = 4;
+    private const int ChunksPerRegionSide = 16; // no se usa por el momento
 
     // 🔥 CACHE SECUENCIAL
     private BlackyChunkCoord _lastCoord;
@@ -28,7 +34,23 @@ public class BlackyChunkTextureMap
     }
 
     // ===============================
-    // CHUNKS
+    // GESTIÓN DE REGIONES
+    // ===============================
+
+    public BlackyRegion GetOrCreateRegion(int regX, int regY)
+    {
+        var key = (regX, regY);
+        if (!_regions.TryGetValue(key, out var region))
+        {
+            region = new BlackyRegion(regX, regY);
+            _regions[key] = region;
+            // Aquí podrías disparar la carga desde disco si el archivo existe
+        }
+        return region;
+    }
+
+    // ===============================
+    // GESTIÓN DE CHUNKS
     // ===============================
 
     public BlackyChunkTexture GetOrCreateChunk(int chunkX, int chunkY)
@@ -37,13 +59,25 @@ public class BlackyChunkTextureMap
 
         if (!_chunks.TryGetValue(coord, out var chunk))
         {
+            // 1. Calcular a qué región pertenece este chunk
+            int regX = chunkX >> RegionShift;
+            int regY = chunkY >> RegionShift;
+
+            // 2. Obtener o crear la región
+            var region = GetOrCreateRegion(regX, regY);
+
+            // 3. Crear el chunk pasándole su región padre
             chunk = new BlackyChunkTexture(
                 coord,
+                region, // <--- El chunk ahora sabe a qué región pertenece
                 ChunkSize,
                 HeightCount,
                 MaxLayers);
 
             _chunks[coord] = chunk;
+
+            // 4. Registrar el chunk en la región (para saber qué guardar luego)
+            region.RegisterChunk(coord);
         }
 
         return chunk;
@@ -74,23 +108,44 @@ public class BlackyChunkTextureMap
     // ===============================
     // TILE ACCESS
     // ===============================
-
-    public void SetTile(
-        int worldX,
-        int worldY,
-        int height,
-        int layer,
-        int tileId,
-        TilePalette palette)
+    
+    public void SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex)
     {
+        // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
 
-        var tilemap = chunk.GetOrCreateLayer(height, layer, palette);
-        tilemap.SetTile(localX, localY, tileId);
+        // 2. Le pedimos a la región del chunk que nos dé un ID de su paleta
+        ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex);
+
+        // 3. Guardamos el ID en el chunk
+        // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);
+        tileLayer.SetTile(localX, localY, tileId);
 
         chunk.MarkDirty();
     }
+    // ===============================
+    // COORDINADAS Y RESOLUCIÓN
+    // ===============================
 
+    public (BlackyChunkTexture chunk, int localX, int localY) ResolveOrCreate(int worldX, int worldY)
+    {
+        var coord = WorldToChunkCoord(worldX, worldY);
+
+        if (_lastChunk != null && coord.Equals(_lastCoord))
+        {
+            var (lx, ly) = WorldToLocal(worldX, worldY);
+            return (_lastChunk, lx, ly);
+        }
+
+        var chunk = GetOrCreateChunk(coord.X, coord.Y);
+
+        _lastCoord = coord;
+        _lastChunk = chunk;
+
+        var (localX, localY) = WorldToLocal(worldX, worldY);
+        return (chunk, localX, localY);
+    }
     public int GetTile(
         int worldX,
         int worldY,
@@ -116,14 +171,14 @@ public class BlackyChunkTextureMap
     // ===============================
 
     public void SetTilesBlock(
-        int startX,
-        int startY,
-        int width,
-        int height,
-        int heightLevel,
-        int layer,
-        int tileId,
-        TilePalette palette)
+      int startX,
+      int startY,
+      int width,
+      int height,
+      int heightLevel,
+      int layer,
+      string modName,      // 👈 Ahora recibimos la identidad del tile
+      ushort textureIndex) // 👈 Y su índice en el atlas
     {
         int endX = startX + width;
         int endY = startY + height;
@@ -140,7 +195,12 @@ public class BlackyChunkTextureMap
             {
                 var chunk = GetOrCreateChunk(cx, cy);
 
-                var tilemap = chunk.GetOrCreateLayer(heightLevel, layer, palette);
+                // 🔥 CRUCIAL: Obtener el ID específico para la región de este chunk
+                // Así nos aseguramos que si el bloque cruza fronteras de región,
+                // el ID sea el correcto para cada una.
+                ushort localId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex);
+
+                var tilemap = chunk.GetOrCreateLayer(heightLevel, layer);
 
                 int chunkWorldX = cx * ChunkSize;
                 int chunkWorldY = cy * ChunkSize;
@@ -151,44 +211,20 @@ public class BlackyChunkTextureMap
                 int localEndX = Math.Min(endX - chunkWorldX, ChunkSize);
                 int localEndY = Math.Min(endY - chunkWorldY, ChunkSize);
 
-                // 🔥 BULK DIRECTO
+                // Pintamos usando el ID local resuelto para esta región
                 tilemap.FillRectLocal(
                     localStartX,
                     localStartY,
                     localEndX,
                     localEndY,
-                    tileId);
+                    localId); // 👈 ID dinámico por región
 
                 chunk.MarkDirty();
             }
         }
     }
 
-    // ===============================
-    // COORDINATES
-    // ===============================
 
-    public (BlackyChunkTexture chunk, int localX, int localY)
-        ResolveOrCreate(int worldX, int worldY)
-    {
-        var coord = WorldToChunkCoord(worldX, worldY);
-
-        // 🔥 FAST PATH
-        if (_lastChunk != null && coord.Equals(_lastCoord))
-        {
-            var (lx, ly) = WorldToLocal(worldX, worldY);
-            return (_lastChunk, lx, ly);
-        }
-
-        var chunk = GetOrCreateChunk(coord.X, coord.Y);
-
-        _lastCoord = coord;
-        _lastChunk = chunk;
-
-        var (localX, localY) = WorldToLocal(worldX, worldY);
-
-        return (chunk, localX, localY);
-    }
 
     public (BlackyChunkTexture chunk, int localX, int localY)
         Resolve(int worldX, int worldY)

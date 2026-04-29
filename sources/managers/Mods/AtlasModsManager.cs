@@ -7,11 +7,13 @@ using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Flecs.NET.Core.Ecs.Units;
 
 namespace GodotEcsArch.sources.managers.Mods;
 
@@ -19,7 +21,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 {
 
     
-    // 🔹 Atlas por tipo de dato. Cada mod se registra con su ID de mod y el ID del dato, apuntando al dato en sí.
+    // 🔹 Atlas por tipo de dato. Cada mod se registra con su ID de mod y el ID del dato, apuntando al dato en sí.    
     private AtlasModsGeneric<ResourceSourceData> fuenteRecursos = new();
     private AtlasModsGeneric<TileSpriteData> spriteData = new();
     private AtlasModsGeneric<AutoTileSpriteData> autoSpriteData = new();
@@ -32,9 +34,13 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private AtlasModsGeneric<CharacterModelBaseData> characterData = new();
 
     private Dictionary<Type, object> _atlasByType = new();
+
+
+    private Dictionary<string, TileTextureData> tilesTextureData = new();
     protected override void Initialize()
     {
         // Registrar atlas
+        
         _atlasByType[typeof(ResourceSourceData)] = fuenteRecursos;
         _atlasByType[typeof(TileSpriteData)] = spriteData;
         _atlasByType[typeof(TerrainData)] = terrainData;
@@ -54,8 +60,20 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
             CargarPorMod(idMod);
             CargarPorModEspecial(idMod);
+            CargarTilesTextureData();
         }
         
+        
+    }
+
+    private void CargarTilesTextureData()
+    {
+        var data = DataBaseManager.Instance.FindAll<TileTextureData>();
+
+        foreach (var item in data)
+        {
+            tilesTextureData.Add(item.name, item);
+        }
     }
 
     private void CargarPorModEspecial(byte idMod)
@@ -68,15 +86,27 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
     // 🔹 Carga todos los tipos de datos de un mod ya con DB cargada
     private void CargarPorMod(byte idMod)
-    {
+    {        
         CargarDatos(fuenteRecursos, idMod);
         CargarDatos(spriteData, idMod);
         CargarDatos(terrainData, idMod);
         CargarDatos(terrainDataTransicion, idMod);
         CargarDatos(autoSpriteData, idMod);
     }
-    public bool TryGet<T>(byte modId, int dataId, out T value) where T : class
+
+    public bool TryGet(string nameMod, ushort index, out TileTextureData value) 
     {
+        string key = nameMod + ":" + index;
+        value = default;
+
+        if (!tilesTextureData.TryGetValue(key, out value))
+            return false;
+        
+        return value != null;
+    }
+    public bool TryGet<T>(string nameMod, int dataId, out T value) where T : class
+    {
+        var modId = TableMods.Instance.ObtenerId(nameMod).Value;
         value = default;
 
         if (!_atlasByType.TryGetValue(typeof(T), out var atlasObj))
@@ -87,8 +117,10 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         value = atlas.Obtener(modId, dataId);
         return value != null;
     }
-    public T Get<T>(byte modId, int dataId) where T : class
+
+    public T Get<T>(string nameMod, int dataId) where T : class
     {
+        var modId = TableMods.Instance.ObtenerId(nameMod).Value;
         if (!_atlasByType.TryGetValue(typeof(T), out var atlasObj))
             throw new Exception($"No hay atlas registrado para el tipo {typeof(T).Name}");
 
@@ -118,9 +150,6 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         }
     }
 
-    // 🔹 Getters (lectura)
-    public AtlasModsGeneric<ResourceSourceData> GetRecursos() => fuenteRecursos;
-    public AtlasModsGeneric<TileSpriteData> GetSprites() => spriteData;
 
     internal void FirstLoad()
     {
