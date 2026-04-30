@@ -13,6 +13,8 @@ public static class ModHelper
     public static InfoModData Mod;
     public static void Init()
     {
+        DataBaseManager.Instance.LoadCurrentDataBase();
         Mod =DataBaseManager.Instance.FindById<InfoModData>(1);
+        int a = 0;
     }
 }

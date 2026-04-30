@@ -808,6 +808,48 @@ namespace GodotEcsArch.sources.WindowsDataBase
             // Busca el documento por ID
             return result.ToList(); // Devuelve el documento o null si no se encuentra
         }
+        public List<T> FindAllByField<T>(string fieldName, BsonValue value)
+    where T : class
+        {
+            var currentType = typeof(T);
+            var baseType = currentType.BaseType;
+            string collectionName;
+
+            // 1. Lógica de selección de colección (Mantenida de tu ejemplo)
+            var typeToMap = (baseType != null &&
+                             baseType != typeof(object) &&
+                             baseType != typeof(IdData) &&
+                             baseType != typeof(IdDataLong))
+                             ? baseType : currentType;
+
+            if (!collectionNameMap.TryGetValue(typeToMap, out collectionName))
+            {
+                throw new InvalidOperationException(
+                    $"No se ha configurado un nombre de colección para el tipo {typeToMap.Name}"
+                );
+            }
+
+            // 2. Obtener la colección como BsonDocument
+            var collection = db.GetCollection<BsonDocument>(collectionName);
+            var query = collection.Query();
+
+            // 3. Si es un subtipo, filtramos primero por el discriminador "type"
+            if (typeToMap != currentType)
+            {
+                query = query.Where(x => x["type"] == currentType.Name);
+            }
+
+            // 4. Filtro genérico por campo y valor
+            // LiteDB se encarga de comparar el BsonValue correctamente según su tipo
+            var filteredDocuments = query
+                .Where(x => x[fieldName] == value)
+                .ToList();
+
+            // 5. Mapeo y retorno
+            return filteredDocuments
+                .Select(BsonMapper.Global.ToObject<T>)
+                .ToList();
+        }
 
         public List<T> FindAllByName<T>(string name)
             where T : class

@@ -61,6 +61,7 @@ public partial class TileTextureConfigControl : Window, IFacadeWindow<TileTextur
     {
         data.name = data.idMod+":"+data.index;
         data.fastColliderTemplate = fastCollider;
+        data.fps = (float)SpinBoxfps.Value;
         data.fastCollider = new FastCollider
         {
             Shape = fastCollider.Shape,
@@ -81,6 +82,8 @@ public partial class TileTextureConfigControl : Window, IFacadeWindow<TileTextur
         this.data = data;
         fastCollider = data.fastColliderTemplate;
         KuroCheckButtonCollider.ButtonPressed = data.hasCollider;
+        SpinBoxfps.Value = data.fps;
+
         var mat = MaterialManager.Instance.GetMaterial(data.idMaterial);
         if (data.isAnimated)
         {

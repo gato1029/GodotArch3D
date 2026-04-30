@@ -139,7 +139,7 @@ public partial class WindowKuroTiles : MarginContainer
         // Posición final donde queremos mover la cámara
         Vector2 targetPosition = selectionCenter - textureOffset;
 
-        GD.Print("Selection Center: " + selectionCenter + " | Target: " + targetPosition);
+      
 
         // Mover la cámara del SubViewport
         SubViewport.SetCameraPosition(targetPosition.X, targetPosition.Y);

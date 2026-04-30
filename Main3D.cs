@@ -31,10 +31,20 @@ public partial class Main3D : Node3D
     List<Vector2> points = new List<Vector2>();
     Polygon polygon;
     public override void _Ready()
-    {                
+    {    
+        ModHelper.Init();            
         NodeMainHelper.SetNode3DMain(this);
         PerformanceTimer.Instance.Enabled = true;
-        ModHelper.Init();        
+        
+        //InfoModData infoModData = new InfoModData()
+        //{
+        //    id = 1,
+        //    name = "Base",
+        //    Author = "Josue Cc.",
+        //    Description = "Mod base para el juego",
+        //    Version = "1.0"
+        //};
+        //DataBaseManager.Instance.InsertUpdate(infoModData);
 
         MultimeshManager.Instance.Init();
         ChunkManager.Initialize();
@@ -44,23 +54,14 @@ public partial class Main3D : Node3D
         //ProjectilePool.Instance.ReturnProjectile(dat);
         //ProjectilePool.Instance._commandBuffer.Playback(w);
 
-      //  WireShape.Instance.DrawGrid(1024, 1024, 16, new Vector2(0, 0), -50, Colors.DarkCyan);
+        //  WireShape.Instance.DrawGrid(1024, 1024, 16, new Vector2(0, 0), -50, Colors.DarkCyan);
 
 
         //DataBaseManager.Instance.MigrateRegenerateIdSavePerGroup<ResourceSourceData>();
 
-        //InfoModData infoModData = new InfoModData()
-        //{
-        //    id = 1, 
-        //    name = "Base",
-        //    Author = "Josue Cc.",
-        //    Description = "Mod base para el juego",
-        //    Version = "1.0"
-        //};
-        //DataBaseManager.Instance.InsertUpdate(infoModData);
-
+      
         //NormalizeMods();
-        
+
     }
 
     private void NormalizeMods()

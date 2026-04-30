@@ -1,4 +1,8 @@
 using Godot;
+using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
 
@@ -118,6 +122,20 @@ public partial class TileGridNode2d : Node2D
 
     private Image cachedAtlasImage;
 
+    // Diccionario para acceso rápido: Key = Índice del Tile, Value = Datos de la DB
+    private Dictionary<int, TileTextureData> specialTilesMap = new Dictionary<int, TileTextureData>();
+
+    // Colores para las marcas visuales
+    [Export] public Color colliderMarkColor = new Color(0.0f, 0.5f, 1.0f, 0.9f); // Azul brillante (Azure)
+    [Export] public Color animatedMarkColor = new Color(1.0f, 0.5f, 0.0f, 0.8f); // Naranja vibrante
+    private string tooltipText = "";
+    private Vector2 tooltipPos = Vector2.Zero;
+    private bool showTooltip = false;
+
+    [Export] public Color tooltipBgColor = new Color(0, 0, 0, 0.7f);
+    [Export] public Color tooltipTextColor = Colors.White;
+
+
     public override void _Ready()
     {
         lineColor = Colors.Gray;
@@ -148,7 +166,7 @@ public partial class TileGridNode2d : Node2D
             imageTexture.Size = textureSize;
             imageTexture.Position = -textureSize / 2f;
         }
-
+        AnalizeSpecialTile();
         QueueRedraw();
     }
 
@@ -162,9 +180,22 @@ public partial class TileGridNode2d : Node2D
             Vector2 textureSize = imageTexture.Size;
             imageTexture.Position = -textureSize / 2f;
         }
-
+        AnalizeSpecialTile();
         QueueRedraw();
     }
+    private void AnalizeSpecialTile()
+    {
+        specialTilesMap.Clear();
+        var dataList = DataBaseManager.Instance.FindAllByField<TileTextureData>("idMaterial", idMaterial);
+
+        foreach (var item in dataList)
+        {
+            // Guardamos por índice para buscarlo rápido en el _Draw
+            specialTilesMap[item.index] = item;
+        }
+        QueueRedraw();
+    }
+
 
     public void SetSizeCell(int x, int y)
     {
@@ -187,7 +218,6 @@ public partial class TileGridNode2d : Node2D
     }
 
     bool forced = false;
-
     public override void _Draw()
     {
         if (imageTexture == null || imageTexture.Texture == null) return;
@@ -195,6 +225,7 @@ public partial class TileGridNode2d : Node2D
         Vector2 textureSize = imageTexture.Size;
         Vector2 center = Position;
 
+        // 1. CÁLCULO DE DIMENSIONES
         int sizeCellsX = Mathf.CeilToInt(textureSize.X / cellSize.X);
         int sizeCellsY = Mathf.CeilToInt(textureSize.Y / cellSize.Y);
 
@@ -206,6 +237,9 @@ public partial class TileGridNode2d : Node2D
         int endX = (int)(center.X + sizeX / 2f);
         int endY = (int)(center.Y + sizeY / 2f);
 
+        Vector2 startPosRelative = new Vector2(startX, startY);
+
+        // 2. DIBUJO DE LÍNEAS DE LA CUADRÍCULA
         for (int j = 0; j <= sizeCellsY; j++)
         {
             float y = startY + j * cellSize.Y;
@@ -218,17 +252,72 @@ public partial class TileGridNode2d : Node2D
             DrawLine(new Vector2(x, startY), new Vector2(x, endY), lineColor, lineWidth);
         }
 
-        if (isDragging && dragStartCell.X != -1 && dragStartCell.Y != -1)
-            PaintSelection();
+        // 3. DIBUJO DE TILES ESPECIALES (Datos de la Base de Datos)
+        // Usamos el diccionario cargado en AnalizeSpecialTile
+        foreach (var entry in specialTilesMap)
+        {
+            int index = entry.Key;
+            var data = entry.Value;
+            Vector2I cell = IndexToCell(index);
 
+            // Calculamos la posición visual de la celda
+            Rect2 tileRect = new Rect2(
+                startPosRelative + new Vector2(cell.X * cellSize.X, cell.Y * cellSize.Y),
+                cellSize
+            );
+
+            // Si tiene collider: Marca roja (borde grueso interior)
+            if (data.hasCollider)
+            {
+                DrawRect(tileRect.Grow(-2), colliderMarkColor, false, 2f);
+            }
+
+            // Si es animado: Marca azul/cian (pequeño indicador arriba a la derecha)
+            if (data.isAnimated)
+            {
+                Vector2 markerPos = new Vector2(tileRect.End.X - 10, tileRect.Position.Y + 10);
+                DrawCircle(markerPos, 4f, animatedMarkColor);
+            }
+        }
+
+        // 4. DIBUJO DE SELECCIÓN EN PROGRESO (DRAGGING)
+        if (isDragging && dragStartCell.X != -1 && dragStartCell.Y != -1)
+        {
+            PaintSelection();
+        }
+
+        // 5. DIBUJO DE FORZADO (REFRESCO MANUAL)
         if (forced)
         {
             PaintSelection();
             forced = false;
         }
 
+        // 6. DIBUJO DE SELECCIÓN MÚLTIPLE (TILES YA SELECCIONADOS)
         DrawMultiSelection();
+
+        // 7. DIBUJO DEL TOOLTIP
+        if (showTooltip && !string.IsNullOrEmpty(tooltipText))
+        {
+            // Convertimos la posición global del viewport a local del nodo para dibujar correctamente
+            Vector2 localTooltipPos = ToLocal(tooltipPos);
+
+            Font font = ThemeDB.FallbackFont;
+            int fontSize = 18;
+            Vector2 textSize = font.GetMultilineStringSize(tooltipText, HorizontalAlignment.Left, -1, fontSize);
+
+            Rect2 bgRect = new Rect2(localTooltipPos, textSize + new Vector2(10, 6));
+
+            // Dibujar fondo y borde
+            DrawRect(bgRect, tooltipBgColor);
+            DrawRect(bgRect, Colors.White, false, 1f);
+
+            // Dibujar texto
+            DrawMultilineString(font, bgRect.Position + new Vector2(5, fontSize), tooltipText, HorizontalAlignment.Left, -1, fontSize,-1, tooltipTextColor);
+        }
+
     }
+
 
     private void PaintSelection()
     {
@@ -523,6 +612,37 @@ public partial class TileGridNode2d : Node2D
                     dragEndCell = SnapToGrid(ClampToTextureRect(localMouse)) / cellSize;
                     QueueRedraw();
                 }
+            }
+
+            // LÓGICA DE TOOLTIP
+            Vector2 localMouse2 = GetMouseLocalToTexture();
+            if (IsMouseInsideTexture(localMouse2))
+            {
+                Vector2I cell = SnapToGrid(ClampToTextureRect(localMouse2)) / cellSize;
+                int index = CellToIndex(cell);
+
+                if (specialTilesMap.TryGetValue(index, out var data))
+                {
+                    List<string> info = new List<string>();
+                    if (data.hasCollider) info.Add("🟦 Collider");
+                    if (data.isAnimated) info.Add("🟧 Animación");
+
+                    tooltipText = string.Join("\n", info);
+                    tooltipPos = GetViewport().GetMousePosition();
+                    showTooltip = true;
+                }
+                else
+                {
+                    showTooltip = false;
+                }
+
+                // 🔥 IMPORTANTE: Llama a redibujar siempre que el mouse se mueva dentro
+                QueueRedraw();
+            }
+            else if (showTooltip)
+            {
+                showTooltip = false;
+                QueueRedraw();
             }
         }
     }
