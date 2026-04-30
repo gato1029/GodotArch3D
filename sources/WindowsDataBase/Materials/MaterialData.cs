@@ -112,7 +112,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         [BsonCtor]
         public MaterialData(int type, string pathTexture, int widhtTexture, int heightTexture, int divisionPixelX, int divisionPixelY,int id):base()
         {
-            idNameMod = ModHelper.Mod.name + ":" + id;
+            //idNameMod = ModHelper.Mod.name + ":" + id;
             this.type = type;
             this.pathTexture = pathTexture;
             this.widhtTexture = widhtTexture;

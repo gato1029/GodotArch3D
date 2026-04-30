@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://bcav722ca18vm"]
+
+[ext_resource type="Script" uid="uid://bhevlcw60viok" path="res://sources/BlackyTextures/Controls/ControlBlackyAtlasTexture.cs" id="1_8c6t6"]
+[ext_resource type="Script" uid="uid://dogsen58ejvak" path="res://sources/BlackyTextures/BlackyAtlasCameraViewport.cs" id="2_d3dpe"]
+[ext_resource type="Script" uid="uid://cdhlqgub7r41r" path="res://sources/BlackyTextures/BlackyAtlasSelectionCanvas.cs" id="3_y4bwp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8c6t6"]
+bg_color = Color(0.13725491, 0.15294118, 0.18039216, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22745098, 0.2509804, 0.2901961, 1)
+corner_detail = 4
+
+[node name="ControlBlackyAtlasTexture" type="MarginContainer" unique_id=434538793]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+script = ExtResource("1_8c6t6")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=719960345]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_8c6t6")
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="PanelContainer" unique_id=499047708]
+layout_mode = 2
+stretch = true
+
+[node name="AtlasViewport" type="SubViewport" parent="PanelContainer/SubViewportContainer" unique_id=1620578985 node_paths=PackedStringArray("AtlasCamera", "AtlasCanvas")]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1258, 878)
+render_target_update_mode = 4
+script = ExtResource("2_d3dpe")
+AtlasCamera = NodePath("AtlasCamera")
+AtlasCanvas = NodePath("AtlasCanvas")
+
+[node name="AtlasCamera" type="Camera2D" parent="PanelContainer/SubViewportContainer/AtlasViewport" unique_id=899597904]
+
+[node name="AtlasCanvas" type="Node2D" parent="PanelContainer/SubViewportContainer/AtlasViewport" unique_id=1988740690]
+script = ExtResource("3_y4bwp")

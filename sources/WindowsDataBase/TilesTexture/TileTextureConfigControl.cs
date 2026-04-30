@@ -106,7 +106,7 @@ public partial class TileTextureConfigControl : Window, IFacadeWindow<TileTextur
             }
           
         }
-        OnTextureRectDraw();
+        TextureRectTile._Draw();
 
 
 

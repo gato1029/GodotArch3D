@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://buehwgy68rjhg" path="res://sources/Editor/Controls/ControlEditorTerrain.cs" id="1_y23i0"]
 [ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="3_2ft82"]
 [ext_resource type="PackedScene" uid="uid://dsvs8m3y8k51r" path="res://sources/KuroTiles/WindowKuroTiles.tscn" id="3_hx40v"]
+[ext_resource type="PackedScene" uid="uid://bcav722ca18vm" path="res://sources/BlackyTextures/Controls/ControlBlackyAtlasTexture.tscn" id="5_dacub"]
 
 [node name="ControlEditorTerrain" type="MarginContainer" unique_id=551278664]
 anchors_preset = 9
@@ -146,6 +147,10 @@ text = "Buscar  Textura"
 icon = ExtResource("3_2ft82")
 
 [node name="KuroTilesTexture" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura/VBoxContainer" unique_id=884146616 instance=ExtResource("3_hx40v")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ControlBlackyAtlasTexture" parent="PanelContainerFocus/MarginContainer/TabContainerPrincipal/DisenioTextura/VBoxContainer" unique_id=434538793 instance=ExtResource("5_dacub")]
 layout_mode = 2
 size_flags_vertical = 3
 

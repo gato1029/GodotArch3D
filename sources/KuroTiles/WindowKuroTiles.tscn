@@ -1,11 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://dsvs8m3y8k51r"]
+[gd_scene format=3 uid="uid://dsvs8m3y8k51r"]
 
 [ext_resource type="Script" uid="uid://db7oh57um3iv2" path="res://sources/KuroTiles/WindowKuroTiles.cs" id="1_e5mwp"]
 [ext_resource type="Texture2D" uid="uid://cy4ksrqvjo3xt" path="res://resources/basic_ground_tiles.png" id="2_ye65h"]
 [ext_resource type="Script" uid="uid://gfd3b4q0oawa" path="res://sources/KuroTiles/TilesSubViewport.cs" id="3_0oig4"]
 [ext_resource type="Script" uid="uid://bmv5lch3c8dy6" path="res://sources/KuroTiles/TileGridNode2d.cs" id="4_vuotd"]
 
-[node name="WindowKuroTiles" type="MarginContainer"]
+[node name="WindowKuroTiles" type="MarginContainer" unique_id=591744738]
 offset_right = 800.0
 offset_bottom = 800.0
 theme_override_constants/margin_left = 10
@@ -14,30 +14,30 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 script = ExtResource("1_e5mwp")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1190227784]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=261680087]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=757329803]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer" unique_id=1393392301]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=1757784190]
 layout_mode = 2
 text = "Tamaño Tile:"
 
-[node name="SpinBoxX" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="SpinBoxX" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=1075066809]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 min_value = 1.0
@@ -45,7 +45,7 @@ max_value = 512.0
 value = 16.0
 prefix = "Pix X:"
 
-[node name="SpinBoxY" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="SpinBoxY" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=839128326]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 min_value = 1.0
@@ -53,13 +53,13 @@ max_value = 512.0
 value = 16.0
 prefix = "Pix Y:"
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer" unique_id=834156676]
 layout_mode = 2
 size_flags_vertical = 3
 stretch = true
 mouse_target = true
 
-[node name="SubViewport" type="SubViewport" parent="VBoxContainer/SubViewportContainer" node_paths=PackedStringArray("tilesCamera2d")]
+[node name="SubViewport" type="SubViewport" parent="VBoxContainer/SubViewportContainer" unique_id=493349440 node_paths=PackedStringArray("tilesCamera2d")]
 transparent_bg = true
 handle_input_locally = false
 size = Vector2i(780, 725)
@@ -69,11 +69,11 @@ script = ExtResource("3_0oig4")
 tilesCamera2d = NodePath("Camera2D")
 enabledrag = true
 
-[node name="Camera2D" type="Camera2D" parent="VBoxContainer/SubViewportContainer/SubViewport"]
+[node name="Camera2D" type="Camera2D" parent="VBoxContainer/SubViewportContainer/SubViewport" unique_id=1239513644]
 position = Vector2(400, 400)
 zoom = Vector2(0.5, 0.5)
 
-[node name="Panel" type="Panel" parent="VBoxContainer/SubViewportContainer/SubViewport"]
+[node name="Panel" type="Panel" parent="VBoxContainer/SubViewportContainer/SubViewport" unique_id=1899597763]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -84,7 +84,7 @@ grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1558543952]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -94,7 +94,7 @@ grow_vertical = 2
 texture = ExtResource("2_ye65h")
 stretch_mode = 5
 
-[node name="Grid" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" node_paths=PackedStringArray("imageTexture", "spinBoxX", "spinBoxY", "subViewport")]
+[node name="Grid" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1413291465 node_paths=PackedStringArray("imageTexture", "spinBoxX", "spinBoxY", "subViewport")]
 script = ExtResource("4_vuotd")
 cellSize = Vector2i(16, 16)
 imageTexture = NodePath("../TextureRect")

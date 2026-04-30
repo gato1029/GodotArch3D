@@ -60,7 +60,8 @@ public class BlackyTilePalette
 
         // Cachear datos de animación
         // Obtener datos del mod (animación y colisión)
-        bool existsInMod = AtlasModsManager.Instance.TryGet(modName, indexTexture, out TileTextureData modTileData);
+        string keyMod = modName+":"+indexTexture;
+        bool existsInMod = AtlasModsManager.Instance.TryGet(modName,keyMod, out TileTextureData modTileData);
 
         bool hasAnim = existsInMod && modTileData.indexAnimation != null && modTileData.indexAnimation.Length > 0;
 
