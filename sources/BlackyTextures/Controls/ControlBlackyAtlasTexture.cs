@@ -5,6 +5,7 @@ using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotFlecs.sources.KuroTiles;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public partial class ControlBlackyAtlasTexture : MarginContainer
 {
@@ -23,10 +24,7 @@ public partial class ControlBlackyAtlasTexture : MarginContainer
 
         controller.OnNotifySelectionMatrix += Controller_OnNotifySelectionMatrix;
         controller.OnNotifyMultiSelectionIndex += Controller_OnNotifyMultiSelectionIndex;
-
-
-        var data = DataBaseManager.Instance.FindById<MaterialData>(1);
-        SetTexture((Texture2D)data.textureMaterial, 1);
+ 
     }
 
     private void Controller_OnNotifySelectionMatrix(TileSelectionMatrixData matrix, int idMaterial)
@@ -39,9 +37,9 @@ public partial class ControlBlackyAtlasTexture : MarginContainer
         OnNotifyMultiSelectionIndex?.Invoke(indices);
     }
 
-    public void SetTexture(Texture2D texture, int idMaterial,string idMod = "VACIO")
+    public void SetTexture(Texture2D texture, Vector2I cellSize, int idMaterial,string idMod = "VACIO")
     {
-        controller.SetTexture(texture, idMaterial);
+        controller.SetTexture(texture, cellSize, idMaterial,idMod);
 
         if (texture.GetSize().X > 800 || texture.GetSize().Y > 800)
             AtlasViewport.SetAbsoluteZoom(0.5f);

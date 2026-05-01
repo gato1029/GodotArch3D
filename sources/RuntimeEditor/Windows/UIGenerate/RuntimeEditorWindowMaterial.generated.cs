@@ -7,14 +7,14 @@ public partial class RuntimeEditorWindowMaterial : Window
     public delegate void EventNotifyChangued(RuntimeEditorWindowMaterial objectControl);
     public event EventNotifyChangued OnNotifyChangued;
 
-    private ComboBox ComboBoxTipos;
-    private ItemList ItemListElementos;
+    private KuroOptionButton ListaTipos;
+    private KuroItemList ItemsList;
 
     public void InitializeUI()
     {
         CloseRequested += CloseRequestedWindow;
-        ComboBoxTipos = GetNode<ComboBox>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ComboBoxTipos");
-        ItemListElementos = GetNode<ItemList>("PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ItemListElementos");
+        ListaTipos = GetNode<KuroOptionButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ListaTipos");
+        ItemsList = GetNode<KuroItemList>("PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ItemsList");
     }
 
     private void CloseRequestedWindow()

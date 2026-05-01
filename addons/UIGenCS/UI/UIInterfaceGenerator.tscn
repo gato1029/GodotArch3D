@@ -1,29 +1,34 @@
-[gd_scene load_steps=4 format=3 uid="uid://dxj8xoytaxr5"]
+[gd_scene format=3 uid="uid://dxj8xoytaxr5"]
 
 [ext_resource type="Script" uid="uid://bak0n0v8acin0" path="res://addons/UIGenCS/UI/UiInterfaceGenerator.cs" id="1_74ap8"]
 [ext_resource type="Texture2D" uid="uid://cgdx2y3hlgrfe" path="res://addons/UIGenCS/UI/code24.png" id="2_6j8dc"]
 [ext_resource type="Texture2D" uid="uid://lt4hgm4ti2ry" path="res://addons/UIGenCS/UI/c-sharp.png" id="3_yfbwy"]
+[ext_resource type="Texture2D" uid="uid://dt85w5888x8gw" path="res://addons/UIGenCS/UI/leaf-32.png" id="4_gdrrq"]
 
-[node name="UiInterfaceGenerator" type="Control"]
+[node name="UiInterfaceGenerator" type="Control" unique_id=1371339294]
 layout_mode = 3
 anchors_preset = 0
 size_flags_horizontal = 0
 script = ExtResource("1_74ap8")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=910046216]
 layout_mode = 1
 offset_right = 116.0
 offset_bottom = 32.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1196082854]
 layout_mode = 2
 
-[node name="MenuButtonOptions" type="MenuButton" parent="VBoxContainer/HBoxContainer"]
+[node name="MenuButtonOptions" type="MenuButton" parent="VBoxContainer/HBoxContainer" unique_id=1136202759]
 layout_mode = 2
 tooltip_text = "Config Options"
 icon = ExtResource("2_6j8dc")
+item_count = 1
+popup/item_0/text = "Public"
+popup/item_0/checkable = 1
+popup/item_0/id = 0
 
-[node name="ButtonGenerate" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="ButtonGenerate" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1596302447]
 layout_mode = 2
 size_flags_horizontal = 0
 tooltip_text = "Generate Automatic Interface c#"
@@ -31,3 +36,12 @@ text = "Private
 "
 icon = ExtResource("3_yfbwy")
 flat = true
+
+[node name="ButtonGenerateNode" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1232006911]
+layout_mode = 2
+size_flags_horizontal = 0
+tooltip_text = "Generate Automatic Interface c#"
+text = "Private Node"
+icon = ExtResource("4_gdrrq")
+flat = true
+alignment = 0

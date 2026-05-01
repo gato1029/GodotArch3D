@@ -123,7 +123,7 @@ public partial class MaterialManager: SingletonBase<MaterialManager>
         {
             materialData = materials[idMaterial];
         }
-        if (materialData.type <= 5)
+        if (materialData.type != MaterialType.ACCESORIOS_ANIMADOS)
         {
             textureMasterData = GetTextureMaster(materialData.idTextureMaster);
             textureBase = (Texture2D)textureMasterData.texture;

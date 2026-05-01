@@ -1,0 +1,255 @@
+[gd_scene format=3 uid="uid://cvhhaa4u84pwg"]
+
+[ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_1rbl4"]
+[ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="2_kfhju"]
+[ext_resource type="PackedScene" uid="uid://ckwoyhgb501je" path="res://sources/Editor/Controls/EditorPanel.tscn" id="3_x58t3"]
+[ext_resource type="Script" uid="uid://bnwmpmtuqvith" path="res://sources/Editor/ViewPortContainerEditor.cs" id="4_0x4a8"]
+[ext_resource type="Script" uid="uid://c7v3wfvlpfs26" path="res://sources/RuntimeEditor/Editor/EditorTerreno.cs" id="5_8qgvi"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="6_2n80q"]
+[ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="7_wsd07"]
+[ext_resource type="Texture2D" uid="uid://bol7ivbg2eei" path="res://resources/Textures/iconos/tree.png" id="8_f1fuj"]
+[ext_resource type="Texture2D" uid="uid://bbuvwyt7liqe4" path="res://resources/Textures/iconos/casa-ecologica.png" id="9_34055"]
+[ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="10_egwe3"]
+[ext_resource type="Texture2D" uid="uid://4fsf6xnbk6cv" path="res://resources/Textures/iconos/castle-tower.png" id="11_qdd1k"]
+[ext_resource type="Shader" uid="uid://dvbvdwx16lalc" path="res://Blur.gdshader" id="12_7liqt"]
+[ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="13_q6grh"]
+[ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="14_0xllq"]
+
+[sub_resource type="Environment" id="Environment_xh56v"]
+background_color = Color(0.05882353, 0.08235294, 0.12941177, 1)
+ambient_light_color = Color(0.5529655, 0.71749705, 0.9567016, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yxrc8"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mkeog"]
+shader = ExtResource("12_7liqt")
+shader_parameter/lod = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qnrjl"]
+bg_color = Color(0.20702255, 0.16753408, 0.51106745, 0.24705882)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.24115616, 0.24115604, 0.2411559, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 20
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_d6wxi"]
+shader = ExtResource("12_7liqt")
+shader_parameter/lod = 0.72800003458
+
+[node name="MainEditor" type="Node" unique_id=2058894889]
+
+[node name="Base" type="Node" parent="." unique_id=656869099]
+
+[node name="mainArch" type="Node3D" parent="Base" unique_id=1157692729]
+script = ExtResource("1_1rbl4")
+
+[node name="Game" type="Node" parent="." unique_id=809468821]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Game" unique_id=1550609064]
+environment = SubResource("Environment_xh56v")
+
+[node name="center" type="MeshInstance3D" parent="Game" unique_id=1771001052]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("SphereMesh_yxrc8")
+surface_material_override/0 = ExtResource("2_kfhju")
+
+[node name="Editor" type="Node" parent="." unique_id=583536065]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Editor" unique_id=1121266236]
+visible = false
+offset_right = 1280.0
+offset_bottom = 900.0
+size_flags_vertical = 3
+
+[node name="AnimatedPanelContainer" parent="Editor/HBoxContainer" unique_id=1502952452 instance=ExtResource("3_x58t3")]
+layout_mode = 2
+
+[node name="PanelContainer" type="Panel" parent="Editor/HBoxContainer" unique_id=141419533]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Editor/HBoxContainer/PanelContainer" unique_id=496205027]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+stretch = true
+script = ExtResource("4_0x4a8")
+
+[node name="SubViewport" type="SubViewport" parent="Editor/HBoxContainer/PanelContainer/SubViewportContainer" unique_id=1243047204]
+handle_input_locally = false
+size = Vector2i(817, 900)
+render_target_update_mode = 0
+
+[node name="Panel" type="Panel" parent="Editor" unique_id=1185316212]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Editor" unique_id=1094276308]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer" unique_id=309976312]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Editor/VBoxContainer/PanelContainer" unique_id=1806320088]
+layout_mode = 2
+
+[node name="MenuBar" type="MenuBar" parent="Editor/VBoxContainer/PanelContainer/HBoxContainer" unique_id=1066248599]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MenuButton" type="MenuButton" parent="Editor/VBoxContainer/PanelContainer/HBoxContainer/MenuBar" unique_id=8807159]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Archivo"
+
+[node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer" unique_id=1853149494]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Editor/VBoxContainer/MarginContainer" unique_id=606403333]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=2081333398]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer" unique_id=1421187636]
+layout_mode = 2
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer" unique_id=1644086248]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Terreno" type="CenterContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=891608852]
+layout_mode = 2
+script = ExtResource("5_8qgvi")
+
+[node name="KuroButton" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Terreno" unique_id=1873994625]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("7_wsd07")
+ButtonText = "Terreno"
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="KuroButton2" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=601592721]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("8_f1fuj")
+ButtonText = "Recursos"
+Spacing = 1
+Padding = 1
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="KuroButton4" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1915230957]
+custom_minimum_size = Vector2(80, 120)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("9_34055")
+ButtonText = "Edificios Visuales"
+TextVerticalAlignment = 2
+Spacing = 0
+Padding = 0
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="KuroButton5" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=596606079]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("10_egwe3")
+ButtonText = "Personajes"
+TextVerticalAlignment = 0
+Spacing = 1
+Padding = 1
+TextColor = Color(0.89, 0.89, 0.89, 1)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="CenterContainer" type="CenterContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1386846687]
+layout_mode = 2
+
+[node name="KuroButton3" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/CenterContainer" unique_id=1636081198]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("11_qdd1k")
+ButtonText = "Edificios"
+Spacing = 1
+Padding = 1
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=941727953]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 0
+
+[node name="PanelContainer2" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/MarginContainer" unique_id=1326400082]
+visible = false
+material = SubResource("ShaderMaterial_mkeog")
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_qnrjl")
+
+[node name="Panel" type="Panel" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/MarginContainer" unique_id=852981326]
+material = SubResource("ShaderMaterial_d6wxi")
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="Render" type="Node" parent="." unique_id=1916277622]
+
+[node name="Camera3D" type="Camera3D" parent="Render" unique_id=667132760]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 50)
+projection = 1
+current = true
+size = 10.0
+script = ExtResource("13_q6grh")
+MouseEdgeMargin = 5.0
+MinZoomSize = 5.0
+MaxZoomSize = 30.0
+
+[node name="InputHandlerGame" type="Node" parent="Render" unique_id=815912482]
+script = ExtResource("14_0xllq")

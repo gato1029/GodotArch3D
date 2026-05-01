@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cvqdxcqphb3k"]
+
+[ext_resource type="Script" uid="uid://8uhc4tjc5pjq" path="res://sources/RuntimeEditor/Windows/WindowEditorRuntimeTerrain.cs" id="1_1tbo3"]
+[ext_resource type="PackedScene" uid="uid://bcav722ca18vm" path="res://sources/BlackyTextures/Controls/ControlBlackyAtlasTexture.tscn" id="1_rp5y2"]
+
+[node name="WindowEditorRuntimeTerrain" type="Window" unique_id=1279437036]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(600, 600)
+script = ExtResource("1_1tbo3")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1298628343]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EditorTextura" parent="PanelContainer" unique_id=434538793 instance=ExtResource("1_rp5y2")]
+layout_mode = 2

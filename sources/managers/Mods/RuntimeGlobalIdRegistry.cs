@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using System;
@@ -41,13 +42,16 @@ public class RuntimeGlobalIdRegistry : SingletonBase<RuntimeGlobalIdRegistry>
 
     private void RegistrarTodo<T>(RuntimeAssetType assetType) where T : class
     {
-        foreach (var item in AtlasModsManager.Instance.GetDictionaryAll<int, T>())
+        foreach (var item in AtlasModsManager.GetDictionaryAll<T, int>())
         {
-            string modName = TableMods.Instance.ObtenerNombre(item.modId);
+            string modName = TableMods.Instance.ObtenerNombre(item.Key);
 
-            var persistent = new PersistentAssetRef(assetType, modName, item.key);
+            foreach (var itemInternal in item.Value)
+            {
+                var persistent = new PersistentAssetRef(assetType, modName, itemInternal.Key);
+                Registrar(persistent, itemInternal.Value);
+            }
 
-            Registrar(persistent, item.value);
         }
     }
 

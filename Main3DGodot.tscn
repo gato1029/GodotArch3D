@@ -24,7 +24,7 @@ albedo_color = Color(0.8732984, 0.8732984, 0.8732984, 0.5019608)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yxrc8"]
 
-[node name="Main3dGodot" type="Node" unique_id=2058894889]
+[node name="Main3dGodotModsConfig" type="Node" unique_id=2058894889]
 
 [node name="Base" type="Node" parent="." unique_id=656869099]
 

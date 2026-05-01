@@ -24,10 +24,10 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     private  TextureArrayManager textureArrayManager;
     private  RenderManagerOptimized renderManager;
 
-    private  Dictionary<MaterialType,List<MaterialData>> materialsByType = new Dictionary<MaterialType, List<MaterialData>>();
+    private  Dictionary<MaterialType,List<MaterialData>> materialsByType = new Dictionary<MaterialType, List<MaterialData>>(); // esto solo es temporal para aglomerar por tipos
     private  Dictionary<string, MaterialModData> _textureLookup = new();
-    private Dictionary<int, MaterialModData> materialsMods = new Dictionary<int, MaterialModData>();
-    private Dictionary<int, MaterialModData> subMaterialsModsGlobal = new Dictionary<int, MaterialModData>();
+    private Dictionary<int, MaterialModData> materialsMods = new Dictionary<int, MaterialModData>(); // aqui se carga solo un material por mod
+    private Dictionary<int, MaterialModData> subMaterialsModsGlobal = new Dictionary<int, MaterialModData>(); // aqui se carga todas las subtexturas y pertenencia
 
     //public void ForceChargue()
     //{
@@ -43,6 +43,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         textureArrayManager = new TextureArrayManager();
         renderManager = new RenderManagerOptimized(textureArrayManager);
         LoadAllMods();
+        AtlasModsManager.Instance.FirstLoad(); // luego de que cargo la tabla de mods, genero todos los manager por mods
         CreateAllMaterials();
 
         bool needRebuildAtlas = ReviewDiferences();
@@ -163,18 +164,18 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         foreach (var item in mods)
         {
             var info = item.Value;
-            DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);
-            var data= DataBaseManager.Instance.FindAll<MaterialData>();
+
+            var data = AtlasModsManager.GetAll<MaterialData>(info.Name);
             LoadMaterials(info,data);
         }
     }
 
-    private  void LoadMaterials(ModInfo info, List<MaterialData> data)
+    private  void LoadMaterials(ModInfo info, IEnumerable<MaterialData> data)
     {
         foreach (var item in data)
         {
             
-            if (item.type != (int)MaterialType.ACCESORIOS_ANIMADOS)
+            if (item.type != MaterialType.ACCESORIOS_ANIMADOS)
             {
                 if (!materialsByType.ContainsKey((MaterialType)item.type))
                 {// crear la lista
@@ -214,6 +215,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
             }
         }
         TableMods.Instance.FinalizarCarga();
+        
     }
     public  List<string> GetDatabaseFiles(string folderPath, params string[] extensions)
     {

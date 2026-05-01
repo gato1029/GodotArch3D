@@ -83,9 +83,8 @@ public class BlackyWorld
     {
 
         AtlasTexturesModsManager.Instance.FirstLoad();
-        AtlasModsManager.Instance.FirstLoad();
-
-        DataBaseManager.Instance.LoadCurrentDataBase();
+        
+        DataBaseManager.Instance.LoadCurrentDataBase(); // esto luego tiene que salir
 
         simulationTick = new SimulationTick{ 
             FixedDelta = 0.1f, 

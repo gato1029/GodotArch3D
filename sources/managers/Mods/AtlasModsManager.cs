@@ -1,4 +1,6 @@
+using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
@@ -9,39 +11,95 @@ using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+
 
 namespace GodotEcsArch.sources.managers.Mods;
+
 
 public class AtlasModsManager : SingletonBase<AtlasModsManager>
 {
     // =========================================================
-    // ATLASS
+    // ATLASES (ID -> DATA)
     // =========================================================
 
-    private readonly AtlasModsGeneric<int, ResourceSourceData> fuenteRecursos = new();
-    private readonly AtlasModsGeneric<int, TileSpriteData> spriteData = new();
-    private readonly AtlasModsGeneric<int, AutoTileSpriteData> autoSpriteData = new();
-    private readonly AtlasModsGeneric<int, TerrainData> terrainData = new();
-    private readonly AtlasModsGeneric<int, TerrainDataTransition> terrainDataTransicion = new();
+    private readonly AtlasMods<int, MaterialData> materiales = new();
+    private readonly AtlasMods<int, ResourceSourceData> fuenteRecursos = new();
+    private readonly AtlasMods<int, TileSpriteData> spriteData = new();
+    private readonly AtlasMods<int, AutoTileSpriteData> autoSpriteData = new();
+    private readonly AtlasMods<int, TerrainData> terrainData = new();
+    private readonly AtlasMods<int, TerrainDataTransition> terrainDataTransicion = new();
 
-    private readonly AtlasModsGeneric<int, BuildingData> buildingData = new();
-    private readonly AtlasModsGeneric<int, BulletData> bulletData = new();
-    private readonly AtlasModsGeneric<int, CharacterModelBaseData> characterData = new();
+    private readonly AtlasMods<int, BuildingData> buildingData = new();
+    private readonly AtlasMods<int, BulletData> bulletData = new();
+    private readonly AtlasMods<int, CharacterModelBaseData> characterData = new();
 
-    private readonly AtlasModsGeneric<string, TileTextureData> tilesTextureData = new();
-    private readonly Dictionary<byte, Dictionary<int, List<TileTextureData>>> _tilesByMaterialIndex = new();
-
-    private readonly Dictionary<Type, IAtlasModsGeneric> _atlasByType = new();
+    // string-key atlas
+    private readonly AtlasMods<string, TileTextureData> tilesTextureData = new();
 
     // =========================================================
-    // INIT
+    // INDEXES (RELACIONES / QUERIES)
+    // =========================================================
+
+    private readonly Dictionary<byte, MultiIndex<int, TileTextureData>> _tilesByMaterialIndex = new();
+
+    // =========================================================
+    // TYPE REGISTRY (interno seguro)
+    // =========================================================
+
+    private readonly Dictionary<Type, object> _atlases = new();
+
+    private void RegisterAtlas<T>(AtlasMods<int, T> atlas) where T : class
+    {
+        _atlases[typeof(T)] = atlas;
+    }
+
+    private void RegisterAtlas<T>(AtlasMods<string, T> atlas) where T : class
+    {
+        _atlases[typeof(T)] = atlas;
+    }
+    private AtlasMods<int, T> GetAtlas<T>() where T : class
+    {
+        return _atlases.TryGetValue(typeof(T), out var atlas)
+            ? atlas as AtlasMods<int, T>
+            : null;
+    }
+
+    // =========================================================
+    // MOD RESOLUTION (SIN CACHE, SIMPLE Y CORRECTO)
+    // =========================================================
+
+    private bool TryGetModId(string modName, out byte modId)
+    {
+        var id = TableMods.Instance.ObtenerId(modName);
+
+        if (id == null)
+        {
+            modId = default;
+            return false;
+        }
+
+        modId = id.Value;
+        return true;
+    }
+
+    // =========================================================
+    // SINGLETON INIT
     // =========================================================
 
     protected override void Initialize()
     {
-        RegistrarAtlas();
+        RegisterAtlas(materiales);
+        RegisterAtlas(fuenteRecursos);
+        RegisterAtlas(spriteData);
+        RegisterAtlas(autoSpriteData);
+        RegisterAtlas(terrainData);
+        RegisterAtlas(terrainDataTransicion);
+        RegisterAtlas(buildingData);
+        RegisterAtlas(bulletData);
+        RegisterAtlas(characterData);
+        RegisterAtlas(tilesTextureData);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {
@@ -52,26 +110,146 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
             CargarPorMod(idMod);
             CargarPorModEspecial(idMod);
-            CargarTilesTextureData(tilesTextureData, idMod);
+            CargarTilesTextureData(idMod);
+            CargarMateriales(idMod,info.Name);
         }
     }
 
-    private void RegistrarAtlas()
+    // =========================================================
+    // 🟢 API PRINCIPAL (NORMAL - modName)
+    // =========================================================
+
+    public static T Get<T>(string modName, int id) where T : class
+        => Instance.InternalGet<T, int>(modName, id);
+
+    public static bool TryGet<T>(string modName, int id, out T value) where T : class
+        => Instance.InternalTryGet<T, int>(modName, id, out value);
+
+    private T InternalGet<T, TKey>(string modName, TKey id)
+        where T : class where TKey : notnull
     {
-        _atlasByType[typeof(ResourceSourceData)] = fuenteRecursos;
-        _atlasByType[typeof(TileSpriteData)] = spriteData;
-        _atlasByType[typeof(AutoTileSpriteData)] = autoSpriteData;
-        _atlasByType[typeof(TerrainData)] = terrainData;
-        _atlasByType[typeof(TerrainDataTransition)] = terrainDataTransicion;
-        _atlasByType[typeof(BuildingData)] = buildingData;
-        _atlasByType[typeof(BulletData)] = bulletData;
-        _atlasByType[typeof(CharacterModelBaseData)] = characterData;
-        _atlasByType[typeof(TileTextureData)] = tilesTextureData;
+        if (!TryGetModId(modName, out var modId))
+            return null;
+
+        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        return atlas?.Get(modId, id);
+    }
+
+    private bool InternalTryGet<T, TKey>(string modName, TKey id, out T value)
+        where T : class where TKey : notnull
+    {
+        value = null;
+
+        if (!TryGetModId(modName, out var modId))
+            return false;
+
+        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+
+        return atlas != null && atlas.TryGet(modId, id, out value);
+    }
+
+    public static IEnumerable<T> GetAll<T>(string modName) where T : class
+    => Instance.InternalGetAll<T>(modName);
+
+    private IEnumerable<T> InternalGetAll<T>(string modName) where T : class
+    {
+        if (!TryGetModId(modName, out var modId))
+            yield break;
+
+        var atlas = GetAtlas<T>();
+
+        if (atlas == null)
+            yield break;
+
+        foreach (var item in atlas.GetAll(modId))
+            yield return item;
     }
 
     // =========================================================
-    // CARGA
+    // 🔴 API HOT PATH (modId directo)
     // =========================================================
+
+    public static T GetFast<T>(byte modId, int id) where T : class
+        => Instance.InternalGetFast<T, int>(modId, id);
+
+    public static bool TryGetFast<T>(byte modId, int id, out T value) where T : class
+        => Instance.InternalTryGetFast<T, int>(modId, id, out value);
+
+    private T InternalGetFast<T, TKey>(byte modId, TKey id)
+        where T : class where TKey : notnull
+    {
+        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        return atlas?.Get(modId, id);
+    }
+
+    private bool InternalTryGetFast<T, TKey>(byte modId, TKey id, out T value)
+        where T : class where TKey : notnull
+    {
+        value = null;
+
+        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        return atlas != null && atlas.TryGet(modId, id, out value);
+    }
+
+    // =========================================================
+    // 🟡 TILE TEXTURE (STRING KEY ATLAS)
+    // =========================================================
+
+    public static bool TryGetTileTexture(string modName, string name, out TileTextureData value)
+        => Instance.InternalTryGetTileTexture(modName, name, out value);
+    private bool InternalTryGetTileTexture(string modName, string name, out TileTextureData value)
+    {
+        value = null;
+
+        if (!TryGetModId(modName, out var modId))
+            return false;
+
+        return tilesTextureData.TryGet(modId, name, out value);
+    }
+    public static TileTextureData GetTileTexture(string modName, string name)
+        => Instance.InternalGetTileTexture(modName, name);
+
+    private TileTextureData InternalGetTileTexture(string modName, string name)
+    {
+        if (!TryGetModId(modName, out var modId))
+            return null;
+
+        return tilesTextureData.Get(modId, name);
+    }
+
+    // =========================================================
+    // 🔵 QUERY SYSTEM (RELACIÓN MATERIAL -> TILES)
+    // =========================================================
+
+    public static IReadOnlyList<TileTextureData> GetTilesByMaterial(string modName, int materialId)
+        => Instance.InternalGetTilesByMaterial(modName, materialId);
+
+    private IReadOnlyList<TileTextureData> InternalGetTilesByMaterial(string modName, int materialId)
+    {
+        if (!TryGetModId(modName, out var modId))
+            return Array.Empty<TileTextureData>();
+
+        if (_tilesByMaterialIndex.TryGetValue(modId, out var index))
+            return index.Get(materialId);
+
+        return Array.Empty<TileTextureData>();
+    }
+
+    // =========================================================
+    // LOADERS
+    // =========================================================
+
+    private void CargarMateriales(byte idMod, string name)
+    {
+        var data = DataBaseManager.Instance.FindAll<MaterialData>();
+
+        foreach (var item in data)
+        {
+            item.idNameMod = name +":"+ item.id;
+            materiales.Register(idMod, item.id, item);
+        }
+    
+    }
 
     private void CargarPorMod(byte idMod)
     {
@@ -89,177 +267,51 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatosEspecial(characterData, idMod);
     }
 
-    private void CargarTilesTextureData(AtlasModsGeneric<string, TileTextureData> atlas, byte idMod)
+    private void CargarTilesTextureData(byte idMod)
     {
         var data = DataBaseManager.Instance.FindAll<TileTextureData>();
 
-        // Inicializamos el contenedor del mod para el índice si no existe
         if (!_tilesByMaterialIndex.ContainsKey(idMod))
-            _tilesByMaterialIndex[idMod] = new Dictionary<int, List<TileTextureData>>();
+            _tilesByMaterialIndex[idMod] = new MultiIndex<int, TileTextureData>();
 
-        var modIndex = _tilesByMaterialIndex[idMod];
+        var index = _tilesByMaterialIndex[idMod];
 
         foreach (var item in data)
         {
-            // 1. Registro original (para que TryGet<string, TileTextureData> siga funcionando)
-            atlas.Registrar(idMod, item.name, item);
-
-            // 2. Registro en el índice de materiales
-            if (!modIndex.ContainsKey(item.idMaterial))
-                modIndex[item.idMaterial] = new List<TileTextureData>();
-
-            modIndex[item.idMaterial].Add(item);
+            tilesTextureData.Register(idMod, item.name, item);
+            index.Add(item.idMaterial, item);
         }
     }
 
-    public List<TileTextureData> GetTilesByMaterial(string nameMod, int idMaterial)
-    {
-        var modIdNullable = TableMods.Instance.ObtenerId(nameMod);
-        if (modIdNullable == null) return new List<TileTextureData>();
-
-        byte modId = modIdNullable.Value;
-
-        // Buscamos en el índice secundario directamente
-        if (_tilesByMaterialIndex.TryGetValue(modId, out var materialDict))
-        {
-            if (materialDict.TryGetValue(idMaterial, out var list))
-            {
-                return list; // O(1) - Acceso instantáneo
-            }
-        }
-
-        return new List<TileTextureData>();
-    }
-
-    private void CargarDatos<T>(AtlasModsGeneric<int, T> atlas, byte idMod) where T : IdDataLong
+    private void CargarDatos<T>(AtlasMods<int, T> atlas, byte idMod) where T : IdDataLong
     {
         var data = DataBaseManager.Instance.FindAll<T>();
 
         foreach (var item in data)
-            atlas.Registrar(idMod, item.idSave, item);
+            atlas.Register(idMod, item.idSave, item);
     }
 
-    private void CargarDatosEspecial<T>(AtlasModsGeneric<int, T> atlas, byte idMod) where T : IdData
+    private void CargarDatosEspecial<T>(AtlasMods<int, T> atlas, byte idMod) where T : IdData
     {
         var data = DataBaseManager.Instance.FindAll<T>();
 
         foreach (var item in data)
-            atlas.Registrar(idMod, item.id, item);
+            atlas.Register(idMod, item.id, item);
     }
-
-    // =========================================================
-    // GET PUNTUAL
-    // =========================================================
-
-    public bool TryGet<TKey, T>(string nameMod, TKey dataId, out T value) where T : class
+    public static Dictionary<byte, Dictionary<TKey, T>> GetDictionaryAll<T, TKey>() where T : class
+    => Instance.InternalGetDictionaryAll<T, TKey>();
+    private Dictionary<byte, Dictionary<TKey, T>> InternalGetDictionaryAll<T, TKey>()
+    where T : class where TKey : notnull
     {
-        value = default;
+        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
 
-        var modIdNullable = TableMods.Instance.ObtenerId(nameMod);
-        if (modIdNullable == null)
-            return false;
+        if (atlas == null)
+            return new Dictionary<byte, Dictionary<TKey, T>>();
 
-        byte modId = modIdNullable.Value;
-
-        if (!_atlasByType.TryGetValue(typeof(T), out var atlas))
-            return false;
-
-        value = atlas.ObtenerRaw(modId, dataId) as T;
-        return value != null;
+        return atlas.GetRawData();
     }
-
-    public T Get<TKey, T>(string nameMod, TKey dataId) where T : class
-    {
-        var modIdNullable = TableMods.Instance.ObtenerId(nameMod);
-
-        if (modIdNullable == null)
-            throw new Exception($"No existe mod {nameMod}");
-
-        byte modId = modIdNullable.Value;
-
-        if (!_atlasByType.TryGetValue(typeof(T), out var atlas))
-            throw new Exception($"No existe atlas para {typeof(T).Name}");
-
-        T result = atlas.ObtenerRaw(modId, dataId) as T;
-
-        if (result == null)
-            throw new Exception($"No existe dataId {dataId} en {typeof(T).Name}");
-
-        return result;
-    }
-
-    // =========================================================
-    // DICCIONARIO POR MOD
-    // =========================================================
-
-    public Dictionary<TKey, T> GetDictionaryByMod<TKey, T>(string nameMod) where T : class
-    {
-        var modIdNullable = TableMods.Instance.ObtenerId(nameMod);
-
-        if (modIdNullable == null)
-            return new Dictionary<TKey, T>();
-
-        byte modId = modIdNullable.Value;
-
-        if (!_atlasByType.TryGetValue(typeof(T), out var atlas))
-            return new Dictionary<TKey, T>();
-
-        var result = atlas.ObtenerDictionaryRaw(modId) as Dictionary<TKey, T>;
-        return result ?? new Dictionary<TKey, T>();
-    }
-
-    public IEnumerable<T> GetAllByMod<T>(string nameMod) where T : class
-    {
-        var modIdNullable = TableMods.Instance.ObtenerId(nameMod);
-        if (modIdNullable == null)
-            yield break;
-
-        byte modId = modIdNullable.Value;
-
-        if (!_atlasByType.TryGetValue(typeof(T), out var atlas))
-            yield break;
-
-        foreach (var item in atlas.ObtenerValoresRaw(modId))
-        {
-            if (item is T typed)
-                yield return typed;
-        }
-    }
-
-    // =========================================================
-    // TODO GLOBAL (TODOS LOS MODS)
-    // =========================================================
-
-    public IEnumerable<T> GetAll<T>() where T : class
-    {
-        if (!_atlasByType.TryGetValue(typeof(T), out var atlas))
-            yield break;
-
-        foreach (var item in atlas.ObtenerValoresTodosRaw())
-        {
-            if (item is T typed)
-                yield return typed;
-        }
-    }
-
-    public IEnumerable<(byte modId, TKey key, T value)> GetDictionaryAll<TKey, T>() where T : class
-    {
-        if (!_atlasByType.TryGetValue(typeof(T), out var atlas))
-            yield break;
-
-        foreach (var raw in atlas.ObtenerTodoRaw())
-        {
-            if (raw is ValueTuple<byte, TKey, T> tuple)
-                yield return tuple;
-        }
-    }
-
-    // =========================================================
-    // DEBUG
-    // =========================================================
-
     internal void FirstLoad()
     {
-        GD.Print("AtlasModsManager: FirstLoad - Cargando mods...");
+       
     }
 }

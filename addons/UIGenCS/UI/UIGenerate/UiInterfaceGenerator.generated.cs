@@ -9,10 +9,12 @@ public partial class UiInterfaceGenerator : Control
 
     private MenuButton MenuButtonOptions;
     private Button ButtonGenerate;
+    private Button ButtonGenerateNode;
 
     public void InitializeUI()
     {
         MenuButtonOptions = GetNode<MenuButton>("VBoxContainer/HBoxContainer/MenuButtonOptions");
         ButtonGenerate = GetNode<Button>("VBoxContainer/HBoxContainer/ButtonGenerate");
+        ButtonGenerateNode = GetNode<Button>("VBoxContainer/HBoxContainer/ButtonGenerateNode");
     }
 }

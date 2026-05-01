@@ -1,14 +1,16 @@
 [gd_scene format=3 uid="uid://kg6ftjpkbb35"]
 
 [ext_resource type="Script" uid="uid://bi8gc84nodrb3" path="res://sources/RuntimeEditor/Windows/RuntimeEditorWindowMaterial.cs" id="1_a3p52"]
-[ext_resource type="Script" uid="uid://ce5005tpxrd60" path="res://addons/ComboBox/ComboBox.cs" id="1_whpr2"]
+[ext_resource type="Script" uid="uid://d4g3outtemvav" path="res://sources/CustomWidgets/KuroOptionButton.cs" id="2_a3p52"]
+[ext_resource type="Script" uid="uid://bv2acki07u6at" path="res://sources/CustomWidgets/KuroItemList.cs" id="3_l8ddv"]
 
 [node name="RuntimeEditorWindowMaterial" type="Window" unique_id=770279822]
 oversampling_override = 1.0
 title = "Texturas"
-position = Vector2i(0, 36)
+initial_position = 1
 size = Vector2i(500, 500)
 script = ExtResource("1_a3p52")
+materialType = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=866966594]
 anchors_preset = 15
@@ -34,17 +36,20 @@ layout_mode = 2
 layout_mode = 2
 text = "Mod:"
 
-[node name="ComboBoxTipos" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1725028649]
+[node name="ListaTipos" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1737109408]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("1_whpr2")
-metadata/_custom_type_script = "uid://ce5005tpxrd60"
+script = ExtResource("2_a3p52")
+metadata/_custom_type_script = "uid://d4g3outtemvav"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1150577920]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ItemListElementos" type="ItemList" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=320455422]
+[node name="ItemsList" type="ItemList" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=448130903]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+fixed_icon_size = Vector2i(100, 100)
+script = ExtResource("3_l8ddv")
+metadata/_custom_type_script = "uid://bv2acki07u6at"

@@ -27,9 +27,17 @@ public partial class UiInterfaceGenerator : Control
         InitializeUI(); // Insertado por el generador de UI
         ItemStates =new Dictionary<int, bool>();
         ButtonGenerate.Pressed += ButtonGenerate_Pressed;
+        ButtonGenerateNode.Pressed += ButtonGenerateNode_Pressed;
         uIGenerator = new UIGenerator();        
         AddOptions();
     }
+
+    private void ButtonGenerateNode_Pressed()
+    {
+        uIGenerator.GeneratorType = GeneratorTypeMode.Node;
+        uIGenerator._Run();
+    }
+
     public override void _ExitTree()
     {
         if (!_isInitialized)
@@ -99,7 +107,7 @@ public partial class UiInterfaceGenerator : Control
 
     private void ButtonGenerate_Pressed()
     {
-     
+        uIGenerator.GeneratorType = GeneratorTypeMode.Root;
         uIGenerator._Run();
     }
 

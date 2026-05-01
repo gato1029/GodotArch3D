@@ -74,7 +74,7 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
         SpinBoxX.Value = objectData.divisionPixelX;
         SpinBoxY.Value = objectData.divisionPixelY;
         LineEditCategory.Text = objectData.category;
-        OptionButtonType.Selected = OptionButtonType.GetItemIndex(objectData.type);
+        OptionButtonType.Selected = OptionButtonType.GetItemIndex((int)objectData.type);
         mode = 1;
         TextureSplit_Clik();
     }
@@ -84,10 +84,10 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
         DataBaseManager.Instance.RemoveById<MaterialData>(objectData.id);
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
-        if (objectData.type <= 4)
-        {
-            GenerateMasterAtlas();
-        }
+        //if (objectData.type <= 4)
+        //{
+        //    GenerateMasterAtlas();
+        //}
     }
     private void FileSearch()
     {
@@ -124,9 +124,9 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
         objectData.divisionPixelX = (int)SpinBoxX.Value;
         objectData.divisionPixelY = (int)SpinBoxY.Value;
         objectData.category = LineEditCategory.Text;
-        objectData.type = OptionButtonType.GetItemId(OptionButtonType.GetSelectedId());
-
-        if (objectData.type == 6   )
+        objectData.type = (MaterialType)OptionButtonType.GetItemId(OptionButtonType.GetSelectedId());
+        objectData.UpdateTimeStamp();
+        if (objectData.type == MaterialType.ACCESORIOS_ANIMADOS)
         {
 
             objectData.originXTextureMaster = 0;
@@ -148,12 +148,12 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
             DataBaseManager.Instance.InsertUpdateLog(objectData, int.Parse(LineEditId.Text));
             
         }
-       
-        if (objectData.type <= 5 && ChangeTexture)
-        {
-            GenerateMasterAtlas();
-        }
-  
+
+        //if (objectData.type <= 5 && ChangeTexture)
+        //{
+        //    GenerateMasterAtlas();
+        //}
+        
         OnNotifyChanguedSimple?.Invoke();
         QueueFree();
     }
@@ -161,7 +161,7 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
     private void GenerateMasterAtlas()
     {
         MaterialType materialType = (MaterialType)objectData.type;
-        BsonExpression bsonExpression = BsonExpression.Create("type = @0", objectData.type);
+        BsonExpression bsonExpression = BsonExpression.Create("type = @0", (int)objectData.type);
         var listData = DataBaseManager.Instance.FindAllFilter<MaterialData>(bsonExpression);
 
         int atlasSize = 4096;

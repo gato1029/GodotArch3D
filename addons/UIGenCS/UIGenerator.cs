@@ -4,7 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
-
+public enum GeneratorTypeMode
+{
+    Root,
+    Node
+}
 public enum UIGeneratorMode
 {
    Public,
@@ -14,9 +18,12 @@ public enum UIGeneratorMode
 public partial class UIGenerator : EditorScript
 {
     UIGeneratorMode uiGeneratorMode = UIGeneratorMode.Private;
+    GeneratorTypeMode generatorType = GeneratorTypeMode.Root;
+
     string access = "private";
 
     public UIGeneratorMode UiGeneratorMode { get => uiGeneratorMode; set => uiGeneratorMode = value; }
+    public GeneratorTypeMode GeneratorType { get => generatorType; set => generatorType = value; }
 
     public override void _Run()
     {
@@ -32,7 +39,28 @@ public partial class UIGenerator : EditorScript
             default:
                 break;
         }
-        var rootNode = EditorInterface.Singleton.GetEditedSceneRoot();
+        Node rootNode = null;
+
+        switch (generatorType)
+        {
+            case GeneratorTypeMode.Root:
+                rootNode = EditorInterface.Singleton.GetEditedSceneRoot();
+                break;
+
+            case GeneratorTypeMode.Node:
+                var selection = EditorInterface.Singleton.GetSelection();
+                var selectedNodes = selection.GetSelectedNodes();
+
+                if (selectedNodes.Count == 0)
+                {
+                    GD.PrintErr("¡Error! Debes seleccionar un nodo para usar GeneratorTypeMode.Node.");
+                    return;
+                }
+
+                rootNode = selectedNodes[0] as Node;
+                break;
+        }
+
         if (rootNode == null)
         {
             GD.PrintErr("¡Error! No hay ninguna escena cargada.");

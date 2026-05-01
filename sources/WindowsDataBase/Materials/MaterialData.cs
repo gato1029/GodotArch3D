@@ -74,7 +74,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
     }
     public class MaterialData : IdData
     {                
-        public int type { get; set; }
+        public MaterialType type { get; set; }
         public string category { get; set; }
         public string pathTexture { get; set; }
         public int widhtTexture { get; set; }
@@ -110,9 +110,9 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         }
 
         [BsonCtor]
-        public MaterialData(int type, string pathTexture, int widhtTexture, int heightTexture, int divisionPixelX, int divisionPixelY,int id):base()
+        public MaterialData(MaterialType type, string pathTexture, int widhtTexture, int heightTexture, int divisionPixelX, int divisionPixelY,int id):base()
         {
-            //idNameMod = ModHelper.Mod.name + ":" + id;
+            
             this.type = type;
             this.pathTexture = pathTexture;
             this.widhtTexture = widhtTexture;
@@ -125,7 +125,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
             Texture2D texture2D = null;
             float widht;
             float height;
-            if (type<=5)
+            if (type!=MaterialType.ACCESORIOS_ANIMADOS)
             {
                 MaterialManager.Instance.RegisterMaterial(id, this);
                 texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));

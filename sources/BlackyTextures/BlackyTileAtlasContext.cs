@@ -27,8 +27,9 @@ public class BlackyTileAtlasContext
     // Diccionario para acceso rápido: Key = Índice del Tile, Value = Dato
     private Dictionary<int, TileTextureData> specialTilesMap = new Dictionary<int, TileTextureData>();
 
-    public void SetTexture(Texture2D texture, int idMaterial, string idMod ="VACIO")
+    public void SetTexture(Texture2D texture, Vector2I cellSize, int idMaterial, string idMod ="VACIO")
     {
+        CellSize = cellSize;
         IdMod = idMod;
         AtlasTexture = texture;
         IdMaterial = idMaterial;
@@ -56,7 +57,7 @@ public class BlackyTileAtlasContext
         else
         {
             // se carga desde locales donde se busca todos los mods aqui solo se consulta lo que cargo inicialmente
-            var list = AtlasModsManager.Instance.GetTilesByMaterial(IdMod, IdMaterial);
+            var list = AtlasModsManager.GetTilesByMaterial(IdMod, IdMaterial);
             foreach (var item in list)
             {
                 specialTilesMap[item.index] = item;
