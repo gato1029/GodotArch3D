@@ -25,8 +25,8 @@ public partial class ControlBlackyAtlasTexture : MarginContainer
         controller.OnNotifyMultiSelectionIndex += Controller_OnNotifyMultiSelectionIndex;
 
 
-        var data = DataBaseManager.Instance.FindById<MaterialData>(2);
-        SetTexture((Texture2D)data.textureMaterial, 2);
+        var data = DataBaseManager.Instance.FindById<MaterialData>(1);
+        SetTexture((Texture2D)data.textureMaterial, 1);
     }
 
     private void Controller_OnNotifySelectionMatrix(TileSelectionMatrixData matrix, int idMaterial)
@@ -39,7 +39,7 @@ public partial class ControlBlackyAtlasTexture : MarginContainer
         OnNotifyMultiSelectionIndex?.Invoke(indices);
     }
 
-    public void SetTexture(Texture2D texture, int idMaterial)
+    public void SetTexture(Texture2D texture, int idMaterial,string idMod = "VACIO")
     {
         controller.SetTexture(texture, idMaterial);
 

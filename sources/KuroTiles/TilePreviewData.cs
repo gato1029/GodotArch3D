@@ -5,6 +5,7 @@ namespace GodotFlecs.sources.KuroTiles;
 public class TilePreviewData
 {
     public int idMaterial;
+    public string idMod;
     public int index;
     public int localX;
     public int localY;

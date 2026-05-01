@@ -16,6 +16,7 @@ public class TileSelectionMatrixData
     public Vector2I atlasStartCell;
 
     // metadata
+    public string idMod;
     public int idMaterial;
     public Vector2I cellSize;
 

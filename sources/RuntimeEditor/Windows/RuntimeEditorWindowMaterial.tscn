@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://kg6ftjpkbb35"]
+
+[ext_resource type="Script" uid="uid://bi8gc84nodrb3" path="res://sources/RuntimeEditor/Windows/RuntimeEditorWindowMaterial.cs" id="1_a3p52"]
+[ext_resource type="Script" uid="uid://ce5005tpxrd60" path="res://addons/ComboBox/ComboBox.cs" id="1_whpr2"]
+
+[node name="RuntimeEditorWindowMaterial" type="Window" unique_id=770279822]
+oversampling_override = 1.0
+title = "Texturas"
+position = Vector2i(0, 36)
+size = Vector2i(500, 500)
+script = ExtResource("1_a3p52")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=866966594]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=771819283]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=381458925]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=229618505]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2034169075]
+layout_mode = 2
+text = "Mod:"
+
+[node name="ComboBoxTipos" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1725028649]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("1_whpr2")
+metadata/_custom_type_script = "uid://ce5005tpxrd60"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1150577920]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemListElementos" type="ItemList" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=320455422]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

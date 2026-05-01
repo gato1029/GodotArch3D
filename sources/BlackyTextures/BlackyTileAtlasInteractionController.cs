@@ -21,10 +21,10 @@ public class BlackyTileAtlasInteractionController
         SelectionState = new BlackyTileAtlasSelectionState();
     }
 
-    public void SetTexture(Texture2D texture, int idMaterial)
+    public void SetTexture(Texture2D texture, int idMaterial,string idMod="VACIO")
     {
         SelectionState.Clear();
-        Context.SetTexture(texture, idMaterial);
+        Context.SetTexture(texture, idMaterial, idMod);
         OccupancyMap.Build(texture, Context.CellSize);
        
     }

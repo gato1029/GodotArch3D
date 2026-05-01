@@ -30,6 +30,7 @@ public static class BlackyTileMatrixBuilder
         data.height = height;
         data.atlasStartCell = new Vector2I(startX, startY);
         data.idMaterial = context.IdMaterial;
+        data.idMod = context.IdMod;
         data.cellSize = context.CellSize;
 
         // se mantiene TU convención exacta
@@ -46,6 +47,7 @@ public static class BlackyTileMatrixBuilder
                 TilePreviewData preview = new TilePreviewData
                 {
                     idMaterial = context.IdMaterial,
+                    idMod = context.IdMod,
                     index = context.CellToIndex(atlasCell),
 
                     localX = x,

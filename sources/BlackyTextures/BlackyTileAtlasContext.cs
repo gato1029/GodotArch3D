@@ -1,11 +1,16 @@
 using Godot;
+using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
+using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.BlackyTextures;
 
 public class BlackyTileAtlasContext
 {
     public int IdMaterial { get; private set; } = -1;
+    public string IdMod { get; private set; } 
 
     public Texture2D AtlasTexture { get; private set; }
     public Image CachedImage { get; private set; }
@@ -19,14 +24,45 @@ public class BlackyTileAtlasContext
 
     public bool HasTexture => AtlasTexture != null;
 
-    public void SetTexture(Texture2D texture, int idMaterial)
+    // Diccionario para acceso rápido: Key = Índice del Tile, Value = Dato
+    private Dictionary<int, TileTextureData> specialTilesMap = new Dictionary<int, TileTextureData>();
+
+    public void SetTexture(Texture2D texture, int idMaterial, string idMod ="VACIO")
     {
+        IdMod = idMod;
         AtlasTexture = texture;
         IdMaterial = idMaterial;
 
         CachedImage = texture != null ? texture.GetImage() : null;
 
         RecalculateGridMetrics();
+        LoadSpecial();
+    }
+
+    private void LoadSpecial()
+    {
+        specialTilesMap.Clear();
+        if (IdMod == "VACIO")
+        {
+            // se carga desde base datos del mod es decir se consulta la bd constante            
+            var dataList = DataBaseManager.Instance.FindAllByField<TileTextureData>("idMaterial", IdMaterial);
+
+            foreach (var item in dataList)
+            {
+                // Guardamos por índice para buscarlo rápido en el _Draw
+                specialTilesMap[item.index] = item;
+            }
+        }
+        else
+        {
+            // se carga desde locales donde se busca todos los mods aqui solo se consulta lo que cargo inicialmente
+            var list = AtlasModsManager.Instance.GetTilesByMaterial(IdMod, IdMaterial);
+            foreach (var item in list)
+            {
+                specialTilesMap[item.index] = item;
+            }
+        }
+
     }
 
     public void SetCellSize(int x, int y)

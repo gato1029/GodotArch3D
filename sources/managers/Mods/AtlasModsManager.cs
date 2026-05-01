@@ -31,6 +31,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasModsGeneric<int, CharacterModelBaseData> characterData = new();
 
     private readonly AtlasModsGeneric<string, TileTextureData> tilesTextureData = new();
+    private readonly Dictionary<byte, Dictionary<int, List<TileTextureData>>> _tilesByMaterialIndex = new();
 
     private readonly Dictionary<Type, IAtlasModsGeneric> _atlasByType = new();
 
@@ -88,15 +89,46 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatosEspecial(characterData, idMod);
     }
 
-    private void CargarTilesTextureData<T>(AtlasModsGeneric<string, T> atlas, byte idMod) where T : IdDataLong
+    private void CargarTilesTextureData(AtlasModsGeneric<string, TileTextureData> atlas, byte idMod)
     {
-        var data = DataBaseManager.Instance.FindAll<T>();
+        var data = DataBaseManager.Instance.FindAll<TileTextureData>();
+
+        // Inicializamos el contenedor del mod para el índice si no existe
+        if (!_tilesByMaterialIndex.ContainsKey(idMod))
+            _tilesByMaterialIndex[idMod] = new Dictionary<int, List<TileTextureData>>();
+
+        var modIndex = _tilesByMaterialIndex[idMod];
 
         foreach (var item in data)
         {
-            string key = item.name;
-            atlas.Registrar(idMod, key, item);
+            // 1. Registro original (para que TryGet<string, TileTextureData> siga funcionando)
+            atlas.Registrar(idMod, item.name, item);
+
+            // 2. Registro en el índice de materiales
+            if (!modIndex.ContainsKey(item.idMaterial))
+                modIndex[item.idMaterial] = new List<TileTextureData>();
+
+            modIndex[item.idMaterial].Add(item);
         }
+    }
+
+    public List<TileTextureData> GetTilesByMaterial(string nameMod, int idMaterial)
+    {
+        var modIdNullable = TableMods.Instance.ObtenerId(nameMod);
+        if (modIdNullable == null) return new List<TileTextureData>();
+
+        byte modId = modIdNullable.Value;
+
+        // Buscamos en el índice secundario directamente
+        if (_tilesByMaterialIndex.TryGetValue(modId, out var materialDict))
+        {
+            if (materialDict.TryGetValue(idMaterial, out var list))
+            {
+                return list; // O(1) - Acceso instantáneo
+            }
+        }
+
+        return new List<TileTextureData>();
     }
 
     private void CargarDatos<T>(AtlasModsGeneric<int, T> atlas, byte idMod) where T : IdDataLong
