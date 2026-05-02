@@ -15,7 +15,9 @@ public partial class EditorTerreno : CenterContainer
        var w =  RuntimeServices.NodeRegistry.Create<RuntimeEditorWindowMaterial>();
        w.OnSelection += W_OnSelection;
        AddChild(w);
-       w.Popup();
+       
+        w.SetTipoTexturas(GodotEcsArch.sources.WindowsDataBase.Materials.MaterialType.TERRENO);
+        w.Popup();
     }
 
     private void W_OnSelection(GodotEcsArch.sources.WindowsDataBase.Materials.MaterialData materialData)

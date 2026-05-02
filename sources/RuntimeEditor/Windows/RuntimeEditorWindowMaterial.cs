@@ -23,6 +23,7 @@ public partial class RuntimeEditorWindowMaterial : Window
     public void SetTipoTexturas(MaterialType materialType)
     {
         this.materialType = materialType;
+        CargarMaterialTexturas(ListaTipos.GetSelectedData<ModInfo>());
     }
     private void ItemsList_OnDataSelected(object obj)
     {

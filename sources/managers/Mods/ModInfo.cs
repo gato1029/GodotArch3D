@@ -1,6 +1,6 @@
 namespace GodotEcsArch.sources.managers.Mods;
 
-public struct ModInfo
+public class ModInfo
 {
     public string Name;        // mod_fire
     public string DbPath;      // .../mod_fire/data.db

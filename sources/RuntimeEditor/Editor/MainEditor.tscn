@@ -1,9 +1,7 @@
 [gd_scene format=3 uid="uid://cvhhaa4u84pwg"]
 
-[ext_resource type="Script" uid="uid://dbh051le3jk5v" path="res://Main3D.cs" id="1_1rbl4"]
+[ext_resource type="Script" uid="uid://baiskt2tp7b6q" path="res://sources/RuntimeEditor/Editor/MainEditor.cs" id="1_kfhju"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="2_kfhju"]
-[ext_resource type="PackedScene" uid="uid://ckwoyhgb501je" path="res://sources/Editor/Controls/EditorPanel.tscn" id="3_x58t3"]
-[ext_resource type="Script" uid="uid://bnwmpmtuqvith" path="res://sources/Editor/ViewPortContainerEditor.cs" id="4_0x4a8"]
 [ext_resource type="Script" uid="uid://c7v3wfvlpfs26" path="res://sources/RuntimeEditor/Editor/EditorTerreno.cs" id="5_8qgvi"]
 [ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="6_2n80q"]
 [ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="7_wsd07"]
@@ -43,11 +41,11 @@ shader = ExtResource("12_7liqt")
 shader_parameter/lod = 0.72800003458
 
 [node name="MainEditor" type="Node" unique_id=2058894889]
+script = ExtResource("1_kfhju")
 
 [node name="Base" type="Node" parent="." unique_id=656869099]
 
-[node name="mainArch" type="Node3D" parent="Base" unique_id=1157692729]
-script = ExtResource("1_1rbl4")
+[node name="mainRender" type="Node3D" parent="Base" unique_id=1157692729]
 
 [node name="Game" type="Node" parent="." unique_id=809468821]
 
@@ -60,36 +58,6 @@ mesh = SubResource("SphereMesh_yxrc8")
 surface_material_override/0 = ExtResource("2_kfhju")
 
 [node name="Editor" type="Node" parent="." unique_id=583536065]
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Editor" unique_id=1121266236]
-visible = false
-offset_right = 1280.0
-offset_bottom = 900.0
-size_flags_vertical = 3
-
-[node name="AnimatedPanelContainer" parent="Editor/HBoxContainer" unique_id=1502952452 instance=ExtResource("3_x58t3")]
-layout_mode = 2
-
-[node name="PanelContainer" type="Panel" parent="Editor/HBoxContainer" unique_id=141419533]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SubViewportContainer" type="SubViewportContainer" parent="Editor/HBoxContainer/PanelContainer" unique_id=496205027]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-stretch = true
-script = ExtResource("4_0x4a8")
-
-[node name="SubViewport" type="SubViewport" parent="Editor/HBoxContainer/PanelContainer/SubViewportContainer" unique_id=1243047204]
-handle_input_locally = false
-size = Vector2i(817, 900)
-render_target_update_mode = 0
 
 [node name="Panel" type="Panel" parent="Editor" unique_id=1185316212]
 visible = false

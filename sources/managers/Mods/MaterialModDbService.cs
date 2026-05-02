@@ -29,7 +29,7 @@ public class MaterialModDbService:SingletonBase<MaterialModDbService>
         catch (Exception e)
         {
             string errorMessage = $"❌ Error initializing MaterialModDbService at {dbPath}: {e.Message}";
-            throw;
+            //throw;
         }
     }
 
@@ -41,7 +41,8 @@ public class MaterialModDbService:SingletonBase<MaterialModDbService>
 
     public MaterialModData Obtener(string idNameMod)
     {
-        return _collection.FindById(idNameMod);
+        var value = _collection.FindById(idNameMod);
+        return value;
     }
 
     public List<MaterialModData> ObtenerTodos()
