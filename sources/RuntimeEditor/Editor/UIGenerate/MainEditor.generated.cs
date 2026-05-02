@@ -12,6 +12,11 @@ public partial class MainEditor : Node
     private Node Game;
     private MeshInstance3D center;
     private Node Editor;
+    private MenuEditorContenedor MenuEditorContenedor;
+    private KuroButton ButtonNuevoMapa;
+    private KuroButton ButtonGuardarMapa;
+    private KuroButton ButtonGuardarComoMapa;
+    private KuroButton ButtonEliminarMapa;
     private EditorTerreno Terreno;
     private KuroButton KuroButton;
     private KuroButton KuroButton2;
@@ -29,6 +34,11 @@ public partial class MainEditor : Node
         Game = GetNode<Node>("Game");
         center = GetNode<MeshInstance3D>("Game/center");
         Editor = GetNode<Node>("Editor");
+        MenuEditorContenedor = GetNode<MenuEditorContenedor>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor");
+        ButtonNuevoMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonNuevoMapa");
+        ButtonGuardarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonGuardarMapa");
+        ButtonGuardarComoMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonGuardarComoMapa");
+        ButtonEliminarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonEliminarMapa");
         Terreno = GetNode<EditorTerreno>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Terreno");
         KuroButton = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Terreno/KuroButton");
         KuroButton2 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton2");

@@ -1,6 +1,6 @@
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Maps;
 using GodotEcsArch.sources.managers.Resources;
@@ -57,8 +57,8 @@ public partial class ControlEditorResourceSources : MarginContainer
     {
         mapBase = data.resourceSourceMap;
         blackyWorldMap = data.blackyWorldMap;
-        PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
-        SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        //PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        //SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
     }
 
     private void LoadItems()
@@ -171,7 +171,7 @@ public partial class ControlEditorResourceSources : MarginContainer
         {
             Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
 
-            blackyWorldMap.Resources.Create(objectSelected.idSave, mouseTile, true);
+            //blackyWorldMap.Resources.Create(objectSelected.idSave, mouseTile, true);
 
             //mapBase.AddUpdateResource(mouseTile, objectSelected.id, indexTileSpriteSelected);
 
@@ -183,7 +183,7 @@ public partial class ControlEditorResourceSources : MarginContainer
         if (objectSelected != null && objectSelected.id != 0)
         {
             Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-           blackyWorldMap.Resources.remove(mouseTile);
+           //blackyWorldMap.Resources.remove(mouseTile);
             //mapBase.RemoveResource(mouseTile);
         }
     }

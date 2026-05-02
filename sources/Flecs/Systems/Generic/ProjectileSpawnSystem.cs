@@ -1,7 +1,7 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.Flecs.Components;
 using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers.Multimesh;
@@ -55,7 +55,7 @@ namespace GodotFlecs.sources.Flecs.Systems.Generic
 
                 // Crear el proyectil como nueva entidad Flecs
                 var blackyWorld = it.World().GetCtx<BlackyWorld>();
-                var projectile = blackyWorld.flecsManager.WorldFlecs.Entity();
+                var projectile = blackyWorld.Simulation.Flecs.WorldFlecs.Entity();
                 projectile.Set(new PositionComponent { position = pos.position , height = 4});
                     projectile.Set(new ProjectileComponent
                     {

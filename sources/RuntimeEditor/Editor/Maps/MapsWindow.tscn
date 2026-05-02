@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://cbvoiddrr7dsy"]
+
+[ext_resource type="Script" uid="uid://bhedpgvsq6bt7" path="res://sources/RuntimeEditor/Editor/Maps/MapsWindow.cs" id="1_yl8bw"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="2_dklyk"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="3_kopjm"]
+
+[node name="MapsWindow" type="Window" unique_id=1660072927]
+oversampling_override = 1.0
+title = "Nuevo Mapa"
+initial_position = 2
+size = Vector2i(350, 400)
+script = ExtResource("1_yl8bw")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1423111942]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=973882518]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+focus_mode = 1
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=2138640503]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1711092247]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1890877346]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1454314158]
+layout_mode = 2
+text = "demo1"
+
+[node name="Label4" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=367719449]
+layout_mode = 2
+text = "Tipo:"
+
+[node name="OptionButtonType" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=2048810291]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=268708291]
+layout_mode = 2
+text = "Descripcion:"
+
+[node name="TextEditDescription" type="TextEdit" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=420727299]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1892248765]
+layout_mode = 2
+text = "Tamaño:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer" unique_id=1101883385]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="SpinBoxWidth" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer/VBoxContainer" unique_id=1474293958]
+layout_mode = 2
+max_value = 10000.0
+value = 512.0
+suffix = "Ancho"
+
+[node name="SpinBox2Height" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer/VBoxContainer" unique_id=885789090]
+layout_mode = 2
+max_value = 10000.0
+value = 512.0
+suffix = "Alto"
+
+[node name="ButtonSave" type="TextureButton" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=674259533]
+custom_minimum_size = Vector2(117, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("2_dklyk")
+IconTexture = ExtResource("3_kopjm")
+ButtonText = "Guardar"
+TextPosition = 2
+TextHorizontalAlignment = 0
+IconMinSize = Vector2(32, 32)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

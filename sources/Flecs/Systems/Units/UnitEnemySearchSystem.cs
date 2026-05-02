@@ -1,6 +1,7 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
@@ -32,13 +33,13 @@ public class UnitEnemySearchSystem: FlecsSystemBase
     }
     protected override void OnIter(Iter it)
     {
-        var world = it.World().GetCtx<GodotEcsArch.sources.BlackyTiles.BlackyWorld>();
+        var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
 
-        var sim = world.simulationTick;
+        var sim = world.Simulation.Tick;
         if (sim == null || sim.TickCount == 0) return;
 
-        var dynGrid = world.DynamicHash;
+        var dynGrid = world.State.DynamicHash;
 
         var posArray = it.Field<PositionComponent>(0);
         var spatialArray = it.Field<SpatialIDComponent>(1);

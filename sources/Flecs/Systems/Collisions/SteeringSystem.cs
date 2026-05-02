@@ -1,8 +1,9 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
-using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
+
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -37,7 +38,7 @@ public class SteeringSystem : FlecsSystemBase
     {
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
-        var sim = world.simulationTick;
+        var sim = world.Simulation.Tick;
 
         // 🔥 AQUI VA (ANTES DE TODO)
         if ((sim.FrameIndex & 1) != 0)
@@ -50,7 +51,7 @@ public class SteeringSystem : FlecsSystemBase
         var steeringArray = it.Field<SteeringComponent>(4);
         var resArray = it.Field<MoveResolutorComponent>(5);
 
-        var dynGrid = world.DynamicHash;
+        var dynGrid = world.State.DynamicHash;
 
         for (int i = 0; i < it.Count(); i++)
         {

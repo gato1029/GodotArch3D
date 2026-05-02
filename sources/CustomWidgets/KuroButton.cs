@@ -10,10 +10,6 @@ public partial class KuroButton : TextureButton
     public enum CaptionHAlign { Left, Center, Right }
     public enum CaptionVAlign { Top, Center, Bottom }
 
-    //====================================================
-    // FIELDS
-    //====================================================
-
     private Texture2D _iconTexture;
     private string _buttonText = "";
     private TextPlacement _textPosition = TextPlacement.Bottom;
@@ -25,6 +21,8 @@ public partial class KuroButton : TextureButton
     private int _padding = 6;
     private int _fontSize = 16;
     private float _iconScale = 1.0f;
+    private Vector2 _iconMinSize = new Vector2(64, 64);
+    private bool _iconExpand = true;
     private float _lineSpacingFactor = 0.75f;
 
     private Font _customFont;
@@ -50,10 +48,6 @@ public partial class KuroButton : TextureButton
 
     private Vector2 _targetScale = Vector2.One;
 
-    //====================================================
-    // EXPORTS
-    //====================================================
-
     [ExportGroup("Main")]
     [Export] public Texture2D IconTexture { get => _iconTexture; set { _iconTexture = value; RefreshControl(); } }
     [Export] public string ButtonText { get => _buttonText; set { _buttonText = value; RefreshControl(); } }
@@ -67,15 +61,12 @@ public partial class KuroButton : TextureButton
     [Export] public int Spacing { get => _spacing; set { _spacing = value; RefreshControl(); } }
     [Export] public int Padding { get => _padding; set { _padding = value; RefreshControl(); } }
     [Export] public int FontSize { get => _fontSize; set { _fontSize = value; RefreshControl(); } }
+    [Export(PropertyHint.Range, "0.1,1.0,0.05")] public float IconScale { get => _iconScale; set { _iconScale = value; RefreshControl(); } }
+    [Export] public Vector2 IconMinSize { get => _iconMinSize; set { _iconMinSize = value; RefreshControl(); } }
+    [Export] public bool IconExpand { get => _iconExpand; set { _iconExpand = value; RefreshControl(); } }
+    [Export(PropertyHint.Range, "0.5,1.2,0.01")] public float LineSpacingFactor { get => _lineSpacingFactor; set { _lineSpacingFactor = value; RefreshControl(); } }
 
-    [Export(PropertyHint.Range, "0.1,1.0,0.05")]
-    public float IconScale { get => _iconScale; set { _iconScale = value; RefreshControl(); } }
-
-    [Export(PropertyHint.Range, "0.5,1.2,0.01")]
-    public float LineSpacingFactor { get => _lineSpacingFactor; set { _lineSpacingFactor = value; RefreshControl(); } }
-
-    [Export]
-    public Font CustomFont { get => _customFont; set { _customFont = value; RefreshControl(); } }
+    [Export] public Font CustomFont { get => _customFont; set { _customFont = value; RefreshControl(); } }
 
     [ExportGroup("Colors")]
     [Export] public Color TextColor { get => _textColor; set { _textColor = value; RefreshControl(); } }
@@ -100,18 +91,8 @@ public partial class KuroButton : TextureButton
     [Export] public float PressScale { get => _pressScale; set => _pressScale = value; }
     [Export] public float AnimationSpeed { get => _animationSpeed; set => _animationSpeed = value; }
 
-    //====================================================
-    // READY
-    //====================================================
-
     public override void _Ready()
     {
-        TextureNormal = null;
-        TextureHover = null;
-        TexturePressed = null;
-        TextureDisabled = null;
-        TextureFocused = null;
-
         MouseEntered += OnMouseEntered;
         MouseExited += OnMouseExited;
         ButtonDown += OnButtonDown;
@@ -128,22 +109,18 @@ public partial class KuroButton : TextureButton
         QueueRedraw();
     }
 
-    //====================================================
-    // HELPERS
-    //====================================================
-
     private Font GetWorkingFont() => _customFont ?? GetThemeDefaultFont();
 
     private void RefreshControl()
     {
+        CustomMinimumSize = _GetMinimumSize();
         UpdateMinimumSize();
         QueueRedraw();
     }
 
     private List<string> WrapText(Font font, string text, float maxWidth)
     {
-        List<string> lines = new List<string>();
-
+        List<string> lines = new();
         if (string.IsNullOrEmpty(text) || font == null)
         {
             lines.Add(text);
@@ -177,8 +154,7 @@ public partial class KuroButton : TextureButton
 
     private Vector2 MeasureWrappedText(Font font, List<string> lines, float maxWidth)
     {
-        if (font == null || lines.Count == 0)
-            return Vector2.Zero;
+        if (font == null || lines.Count == 0) return Vector2.Zero;
 
         float maxLine = 0f;
         float lineHeight = (font.GetAscent(_fontSize) + font.GetDescent(_fontSize)) * _lineSpacingFactor;
@@ -192,45 +168,39 @@ public partial class KuroButton : TextureButton
         return new Vector2(Mathf.Min(maxLine, maxWidth), lineHeight * lines.Count);
     }
 
-    //====================================================
-    // MINIMUM SIZE
-    //====================================================
-
     public override Vector2 _GetMinimumSize()
     {
-        Font font = GetWorkingFont();
-        Vector2 iconSize = _iconTexture != null ? _iconTexture.GetSize() : new Vector2(64, 64);
+        Vector2 iconSize = _iconMinSize * _iconScale;
 
-        float maxTextWidth = (_textPosition == TextPlacement.Left || _textPosition == TextPlacement.Right) ? 140 : iconSize.X;
+        if (string.IsNullOrEmpty(_buttonText))
+            return iconSize;
+
+        Font font = GetWorkingFont();
+
+        float maxTextWidth = (_textPosition == TextPlacement.Left || _textPosition == TextPlacement.Right)
+            ? 160
+            : iconSize.X;
 
         List<string> lines = WrapText(font, _buttonText, maxTextWidth);
         Vector2 textSize = MeasureWrappedText(font, lines, maxTextWidth);
 
-        int effectiveSpacing = lines.Count > 1 ? Mathf.Max(1, (int)(_spacing * 0.25f)) : _spacing;
+        int effectiveSpacing = _spacing;
 
-        if (string.IsNullOrEmpty(_buttonText))
-            return iconSize + new Vector2(_padding * 2, _padding * 2);
-
-        switch (_textPosition)
+        if (_textPosition == TextPlacement.Bottom || _textPosition == TextPlacement.Top)
         {
-            case TextPlacement.Bottom:
-            case TextPlacement.Top:
-                return new Vector2(
-                    Mathf.Max(iconSize.X, textSize.X),
-                    iconSize.Y + textSize.Y + effectiveSpacing
-                ) + new Vector2(_padding * 2, _padding * 2);
-
-            default:
-                return new Vector2(
-                    iconSize.X + textSize.X + effectiveSpacing,
-                    Mathf.Max(iconSize.Y, textSize.Y)
-                ) + new Vector2(_padding * 2, _padding * 2);
+            return new Vector2(
+                Mathf.Max(iconSize.X, textSize.X),
+                iconSize.Y + textSize.Y + effectiveSpacing
+            ) + new Vector2(_padding * 2, _padding * 2);
+        }
+        else
+        {
+            return new Vector2(
+                iconSize.X + textSize.X + effectiveSpacing,
+                Mathf.Max(iconSize.Y, textSize.Y)
+            ) + new Vector2(_padding * 2, _padding * 2);
         }
     }
-
-    //====================================================
-    // DRAW
-    //====================================================
 
     public override void _Draw()
     {
@@ -239,65 +209,60 @@ public partial class KuroButton : TextureButton
 
     private void DrawCompleteButton()
     {
+        if (string.IsNullOrEmpty(_buttonText))
+        {
+            Rect2 soloRect = new Rect2(Vector2.Zero, Size);
+            Rect2 fittedSoloIcon = _iconExpand ? soloRect : GetAspectFitRect(_iconTexture, soloRect, _iconScale);
+
+            if (_iconTexture != null)
+                DrawTextureRect(_iconTexture, fittedSoloIcon, false, GetCurrentColor());
+            return;
+        }
+
         Font font = GetWorkingFont();
         if (font == null) return;
 
+        Rect2 contentRect = new Rect2(new Vector2(_padding, _padding), Size - new Vector2(_padding * 2, _padding * 2));
+
         float maxTextWidth = (_textPosition == TextPlacement.Left || _textPosition == TextPlacement.Right)
-            ? Mathf.Max(60, Size.X * 0.35f)
+            ? Mathf.Max(80, Size.X * 0.45f)
             : Size.X - (_padding * 2);
 
         List<string> lines = WrapText(font, _buttonText, maxTextWidth);
         Vector2 textSize = MeasureWrappedText(font, lines, maxTextWidth);
+        int effectiveSpacing = string.IsNullOrEmpty(_buttonText) ? 0 : _spacing;
 
-        int effectiveSpacing = lines.Count > 1 ? Mathf.Max(1, (int)(_spacing * 0.25f)) : _spacing;
-
-        Rect2 contentRect = new Rect2(
-            new Vector2(_padding, _padding),
-            Size - new Vector2(_padding * 2, _padding * 2)
-        );
-
-        Rect2 textRect = contentRect;
-        Rect2 iconRect = contentRect;
-
-        if (!string.IsNullOrEmpty(_buttonText))
+        if (_textPosition == TextPlacement.Left || _textPosition == TextPlacement.Right)
         {
-            switch (_textPosition)
-            {
-                case TextPlacement.Bottom:
-                    {
-                        float reserved = Mathf.Min(textSize.Y + effectiveSpacing, contentRect.Size.Y * 0.26f);
-                        iconRect = new Rect2(contentRect.Position, new Vector2(contentRect.Size.X, contentRect.Size.Y - reserved));
-                        textRect = new Rect2(new Vector2(contentRect.Position.X, iconRect.End.Y + effectiveSpacing), new Vector2(contentRect.Size.X, reserved));
-                        break;
-                    }
-
-                case TextPlacement.Top:
-                    {
-                        float reserved = Mathf.Min(textSize.Y + effectiveSpacing, contentRect.Size.Y * 0.26f);
-                        textRect = new Rect2(contentRect.Position, new Vector2(contentRect.Size.X, reserved));
-                        iconRect = new Rect2(new Vector2(contentRect.Position.X, contentRect.Position.Y + reserved), new Vector2(contentRect.Size.X, contentRect.Size.Y - reserved));
-                        break;
-                    }
-
-                case TextPlacement.Left:
-                    {
-                        float reserved = Mathf.Min(textSize.X + effectiveSpacing, contentRect.Size.X * 0.38f);
-                        textRect = new Rect2(contentRect.Position, new Vector2(reserved, contentRect.Size.Y));
-                        iconRect = new Rect2(new Vector2(contentRect.Position.X + reserved, contentRect.Position.Y), new Vector2(contentRect.Size.X - reserved, contentRect.Size.Y));
-                        break;
-                    }
-
-                case TextPlacement.Right:
-                    {
-                        float reserved = Mathf.Min(textSize.X + effectiveSpacing, contentRect.Size.X * 0.38f);
-                        iconRect = new Rect2(contentRect.Position, new Vector2(contentRect.Size.X - reserved, contentRect.Size.Y));
-                        textRect = new Rect2(new Vector2(iconRect.End.X + effectiveSpacing, contentRect.Position.Y), new Vector2(reserved - effectiveSpacing, contentRect.Size.Y));
-                        break;
-                    }
-            }
+            DrawHorizontalLayout(font, contentRect, lines, textSize, effectiveSpacing);
+            return;
         }
 
-        Rect2 fittedIcon = GetAspectFitRect(_iconTexture, iconRect, _iconScale);
+        DrawVerticalLayout(font, contentRect, lines, textSize, effectiveSpacing);
+    }
+
+    private void DrawHorizontalLayout(Font font, Rect2 contentRect, List<string> lines, Vector2 textSize, int spacing)
+    {
+        Vector2 rawIconSize = _iconMinSize * _iconScale;
+
+        float totalWidth = rawIconSize.X + textSize.X + spacing;
+        float startX = contentRect.Position.X + (contentRect.Size.X - totalWidth) / 2f;
+
+        Rect2 textRect;
+        Rect2 iconRect;
+
+        if (_textPosition == TextPlacement.Left)
+        {
+            iconRect = new Rect2(startX, contentRect.Position.Y, rawIconSize.X, contentRect.Size.Y);
+            textRect = new Rect2(startX + rawIconSize.X + spacing, contentRect.Position.Y, textSize.X, contentRect.Size.Y);
+        }
+        else
+        {
+            textRect = new Rect2(startX, contentRect.Position.Y, textSize.X, contentRect.Size.Y);
+            iconRect = new Rect2(startX + textSize.X + spacing, contentRect.Position.Y, rawIconSize.X, contentRect.Size.Y);
+        }
+
+        Rect2 fittedIcon = _iconExpand ? iconRect : GetAspectFitRect(_iconTexture, iconRect, 1f);
 
         if (_iconTexture != null)
             DrawTextureRect(_iconTexture, fittedIcon, false, GetCurrentColor());
@@ -305,14 +270,35 @@ public partial class KuroButton : TextureButton
         DrawCaption(font, lines, textRect);
     }
 
-    //====================================================
-    // TEXT ENGINE
-    //====================================================
+    private void DrawVerticalLayout(Font font, Rect2 contentRect, List<string> lines, Vector2 textSize, int spacing)
+    {
+        Rect2 textRect;
+        Rect2 iconRect;
+
+        float reserved = textSize.Y + spacing;
+
+        if (_textPosition == TextPlacement.Bottom)
+        {
+            iconRect = new Rect2(contentRect.Position, new Vector2(contentRect.Size.X, contentRect.Size.Y - reserved));
+            textRect = new Rect2(new Vector2(contentRect.Position.X, iconRect.End.Y + spacing), new Vector2(contentRect.Size.X, textSize.Y));
+        }
+        else
+        {
+            textRect = new Rect2(contentRect.Position, new Vector2(contentRect.Size.X, textSize.Y));
+            iconRect = new Rect2(new Vector2(contentRect.Position.X, textRect.End.Y + spacing), new Vector2(contentRect.Size.X, contentRect.Size.Y - reserved));
+        }
+
+        Rect2 fittedIcon = _iconExpand ? iconRect : GetAspectFitRect(_iconTexture, iconRect, _iconScale);
+
+        if (_iconTexture != null)
+            DrawTextureRect(_iconTexture, fittedIcon, false, GetCurrentColor());
+
+        DrawCaption(font, lines, textRect);
+    }
 
     private void DrawCaption(Font font, List<string> lines, Rect2 textRect)
     {
-        if (lines == null || lines.Count == 0 || string.IsNullOrEmpty(_buttonText))
-            return;
+        if (lines == null || lines.Count == 0 || string.IsNullOrEmpty(_buttonText)) return;
 
         float lineHeight = (font.GetAscent(_fontSize) + font.GetDescent(_fontSize)) * _lineSpacingFactor;
         float totalHeight = lineHeight * lines.Count;
@@ -324,7 +310,6 @@ public partial class KuroButton : TextureButton
             case CaptionVAlign.Center:
                 startY = textRect.Position.Y + (textRect.Size.Y - totalHeight) / 2f + font.GetAscent(_fontSize);
                 break;
-
             case CaptionVAlign.Bottom:
                 startY = textRect.End.Y - totalHeight + font.GetAscent(_fontSize);
                 break;
@@ -334,7 +319,6 @@ public partial class KuroButton : TextureButton
         {
             string line = lines[i];
             float lineWidth = font.GetStringSize(line, HorizontalAlignment.Left, -1, _fontSize).X;
-
             float x = textRect.Position.X;
 
             switch (_captionHAlign)
@@ -342,7 +326,6 @@ public partial class KuroButton : TextureButton
                 case CaptionHAlign.Center:
                     x = textRect.Position.X + (textRect.Size.X - lineWidth) / 2f;
                     break;
-
                 case CaptionHAlign.Right:
                     x = textRect.End.X - lineWidth;
                     break;
@@ -356,40 +339,28 @@ public partial class KuroButton : TextureButton
             if (_useOutline)
             {
                 for (int ox = -_outlineSize; ox <= _outlineSize; ox++)
-                {
                     for (int oy = -_outlineSize; oy <= _outlineSize; oy++)
                     {
                         if (ox == 0 && oy == 0) continue;
                         DrawString(font, pos + new Vector2(ox, oy), line, HorizontalAlignment.Left, -1, _fontSize, _outlineColor);
                     }
-                }
             }
 
             DrawString(font, pos, line, HorizontalAlignment.Left, -1, _fontSize, _textColor);
         }
     }
 
-    //====================================================
-    // ICON FIT
-    //====================================================
-
     private Rect2 GetAspectFitRect(Texture2D tex, Rect2 target, float scale)
     {
-        if (tex == null)
-            return target;
+        if (tex == null) return target;
 
         Vector2 texSize = tex.GetSize();
         float ratio = Mathf.Min(target.Size.X / texSize.X, target.Size.Y / texSize.Y) * scale;
-
         Vector2 finalSize = texSize * ratio;
         Vector2 finalPos = target.Position + (target.Size - finalSize) / 2f;
 
         return new Rect2(finalPos, finalSize);
     }
-
-    //====================================================
-    // COLOR STATE
-    //====================================================
 
     private Color GetCurrentColor()
     {
@@ -403,31 +374,8 @@ public partial class KuroButton : TextureButton
         }
     }
 
-    //====================================================
-    // EVENTS
-    //====================================================
-
-    private void OnMouseEntered()
-    {
-        if (_animatedScale)
-            _targetScale = new Vector2(_hoverScale, _hoverScale);
-    }
-
-    private void OnMouseExited()
-    {
-        if (_animatedScale)
-            _targetScale = Vector2.One;
-    }
-
-    private void OnButtonDown()
-    {
-        if (_animatedScale)
-            _targetScale = new Vector2(_pressScale, _pressScale);
-    }
-
-    private void OnButtonUp()
-    {
-        if (_animatedScale)
-            _targetScale = new Vector2(_hoverScale, _hoverScale);
-    }
+    private void OnMouseEntered() { if (_animatedScale) _targetScale = new Vector2(_hoverScale, _hoverScale); }
+    private void OnMouseExited() { if (_animatedScale) _targetScale = Vector2.One; }
+    private void OnButtonDown() { if (_animatedScale) _targetScale = new Vector2(_pressScale, _pressScale); }
+    private void OnButtonUp() { if (_animatedScale) _targetScale = new Vector2(_hoverScale, _hoverScale); }
 }

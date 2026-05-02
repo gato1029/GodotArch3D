@@ -1,7 +1,7 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.utils;
@@ -35,7 +35,7 @@ public class MovementResolutionSystem : FlecsSystemBase
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
         if (blackyWorld == null) return;
 
-        var sim = blackyWorld.simulationTick;
+        var sim = blackyWorld.Simulation.Tick;
 
         var posArray = it.Field<PositionComponent>(0);
         var velArray = it.Field<VelocityComponent>(1);

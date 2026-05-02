@@ -1,5 +1,6 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs;

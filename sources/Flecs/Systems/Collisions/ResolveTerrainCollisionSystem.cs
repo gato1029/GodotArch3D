@@ -1,6 +1,6 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
@@ -62,8 +62,8 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
             {
                 for (int ty = tilePositionMin.Y; ty <= tilePositionMax.Y; ty++)
                 {
-                    var height = blackyWorld.Heights.GetTopHeight(tx, ty);
-                    var tile = blackyWorld.Terrain.GetTileTop(tx, ty, height);
+                    var height = blackyWorld.Services.HeightTool.GetTopHeight(tx, ty);
+                    var tile = blackyWorld.Services.TerrainPainter.GetTileTop(tx, ty, height);
 
                     if (tile.CollisionId == 0) continue;
 

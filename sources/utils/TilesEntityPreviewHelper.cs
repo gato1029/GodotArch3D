@@ -1,7 +1,7 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
 using GodotEcsArch.sources.BlackyTiles.Commands;
-using GodotEcsArch.sources.BlackyTiles.Tiles;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using System;

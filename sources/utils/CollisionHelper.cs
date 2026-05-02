@@ -1,4 +1,4 @@
-using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
 using System;
 using System.Collections.Generic;
 using System.Linq;

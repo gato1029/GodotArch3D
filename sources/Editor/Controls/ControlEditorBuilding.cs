@@ -1,5 +1,5 @@
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.Flecs.Creators;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Buildings;
@@ -47,8 +47,8 @@ public partial class ControlEditorBuilding : MarginContainer
     {
         mapBase = data.mapBuildings;
         blackyWorldMap = data.blackyWorldMap;
-        PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
-        SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        //PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        //SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
     }
 
     private void LoadItems()
@@ -136,7 +136,7 @@ public partial class ControlEditorBuilding : MarginContainer
         {
             Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
        
-            blackyWorldMap.Building.Create(objectSelected.id, mouseTile,true);
+            //blackyWorldMap.Building.Create(objectSelected.id, mouseTile,true);
 
             //GodotFlecs.sources.Flecs.Creators.BuildingCreator.Instance.Create(objectSelected.id,  mouseTile);
             //foreach (var (_, tilePos) in SelectionBlueprint.Instance.IterateWithTilePositions())
@@ -152,7 +152,7 @@ public partial class ControlEditorBuilding : MarginContainer
         if (objectSelected != null && objectSelected.id != 0)
         {
             Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-            blackyWorldMap.Building.Remove(mouseTile);
+            //blackyWorldMap.Building.Remove(mouseTile);
             //GodotFlecs.sources.Flecs.Creators.BuildingCreator.Instance.RemoveTile(mouseTile);
         }
     }

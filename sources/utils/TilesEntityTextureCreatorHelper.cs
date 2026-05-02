@@ -1,7 +1,7 @@
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
-using GodotEcsArch.sources.BlackyTiles.TilesTexture;
+using GodotEcsArch.sources.BlackyEngine.Core;
+
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
@@ -30,7 +30,7 @@ public static class TilesEntityTextureCreatorHelper
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);        
         transform = transform.ScaledLocal(new Godot.Vector3(1, 1, 1));                
         var world  = flecsManager.WorldFlecs.GetCtx<BlackyWorld>();
-        var pallete = world.tilesPalette;
+        var pallete = world.State.TilePalette;
 
         // aqui necesito la paleta por region y de acuerdo a eso creamos tile simple o animado
         var entity = flecsManager.WorldFlecs.Entity();

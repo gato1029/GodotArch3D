@@ -2,8 +2,9 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
-using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
+
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -48,7 +49,7 @@ public class MoveSeparationSystem : FlecsSystemBase
     {
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
         if (blackyWorld == null) return;
-        var sim = blackyWorld.simulationTick;
+        var sim = blackyWorld.Simulation.Tick;
         // 🔥 AQUI VA (ANTES DE TODO)
         bool shouldUpdate = (sim.FrameIndex & 1) == 0;
 
@@ -66,8 +67,8 @@ public class MoveSeparationSystem : FlecsSystemBase
         var steeringArray = it.Field<SteeringComponent>(4);
         var velArray = it.Field<VelocityComponent>(5);
 
-        var dynGrid = blackyWorld.DynamicHash;
-        var staGrid = blackyWorld.StaticSpatial;
+        var dynGrid = blackyWorld.State.DynamicHash;
+        var staGrid = blackyWorld.State.StaticSpatial;
 
         for (int i = 0; i < it.Count(); i++)
         {

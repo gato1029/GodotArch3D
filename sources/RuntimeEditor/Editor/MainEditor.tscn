@@ -2,8 +2,13 @@
 
 [ext_resource type="Script" uid="uid://baiskt2tp7b6q" path="res://sources/RuntimeEditor/Editor/MainEditor.cs" id="1_kfhju"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="2_kfhju"]
+[ext_resource type="Script" uid="uid://bvt1ctkwmebai" path="res://sources/RuntimeEditor/Editor/MenuEditorContenedor.cs" id="3_0x4a8"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="4_ktcb6"]
+[ext_resource type="Texture2D" uid="uid://e4igfbbvdqym" path="res://resources/Textures/iconos/file.png" id="4_x58t3"]
 [ext_resource type="Script" uid="uid://c7v3wfvlpfs26" path="res://sources/RuntimeEditor/Editor/EditorTerreno.cs" id="5_8qgvi"]
+[ext_resource type="Texture2D" uid="uid://gnsswjongsbo" path="res://resources/Textures/iconos/Save as.png" id="6_0x4a8"]
 [ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="6_2n80q"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="7_8qgvi"]
 [ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="7_wsd07"]
 [ext_resource type="Texture2D" uid="uid://bol7ivbg2eei" path="res://resources/Textures/iconos/tree.png" id="8_f1fuj"]
 [ext_resource type="Texture2D" uid="uid://bbuvwyt7liqe4" path="res://resources/Textures/iconos/casa-ecologica.png" id="9_34055"]
@@ -74,30 +79,72 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer" unique_id=309976312]
-custom_minimum_size = Vector2(0, 80)
+[node name="MarginContainer2" type="MarginContainer" parent="Editor/VBoxContainer" unique_id=410903497]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+
+[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer2" unique_id=309976312]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Editor/VBoxContainer/PanelContainer" unique_id=1806320088]
+[node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer" unique_id=2069281643]
 layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
-[node name="MenuBar" type="MenuBar" parent="Editor/VBoxContainer/PanelContainer/HBoxContainer" unique_id=1066248599]
+[node name="MenuEditorContenedor" type="HBoxContainer" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer" unique_id=1806320088]
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/separation = 10
+script = ExtResource("3_0x4a8")
 
-[node name="MenuButton" type="MenuButton" parent="Editor/VBoxContainer/PanelContainer/HBoxContainer/MenuBar" unique_id=8807159]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
-text = "Archivo"
+[node name="ButtonNuevoMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=697197094]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+tooltip_text = "Nuevo Mapa"
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("4_x58t3")
+IconMinSize = Vector2(50, 50)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonGuardarMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=493633072]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+tooltip_text = "Guardar Mapa"
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("4_ktcb6")
+IconMinSize = Vector2(50, 50)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonGuardarComoMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=631784614]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+tooltip_text = "Guardar Como"
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("6_0x4a8")
+IconMinSize = Vector2(50, 50)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonEliminarMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=416660920]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+tooltip_text = "Eliminar Mapa"
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("7_8qgvi")
+IconMinSize = Vector2(50, 50)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer" unique_id=1853149494]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
+theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_bottom = 10
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Editor/VBoxContainer/MarginContainer" unique_id=606403333]
 layout_mode = 2
@@ -121,42 +168,41 @@ layout_mode = 2
 script = ExtResource("5_8qgvi")
 
 [node name="KuroButton" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Terreno" unique_id=1873994625]
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(44, 69.25)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("7_wsd07")
 ButtonText = "Terreno"
+IconMinSize = Vector2(32, 32)
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="KuroButton2" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=601592721]
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(44, 69.25)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("8_f1fuj")
 ButtonText = "Recursos"
-Spacing = 1
-Padding = 1
+IconMinSize = Vector2(32, 32)
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="KuroButton4" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1915230957]
-custom_minimum_size = Vector2(80, 120)
+custom_minimum_size = Vector2(44, 86.5)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("9_34055")
-ButtonText = "Edificios Visuales"
+ButtonText = "Edificios Visuales "
 TextVerticalAlignment = 2
-Spacing = 0
-Padding = 0
+IconMinSize = Vector2(32, 32)
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="KuroButton5" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=596606079]
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(44, 69.25)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -164,8 +210,7 @@ script = ExtResource("6_2n80q")
 IconTexture = ExtResource("10_egwe3")
 ButtonText = "Personajes"
 TextVerticalAlignment = 0
-Spacing = 1
-Padding = 1
+IconMinSize = Vector2(32, 32)
 TextColor = Color(0.89, 0.89, 0.89, 1)
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
@@ -173,15 +218,14 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 layout_mode = 2
 
 [node name="KuroButton3" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/CenterContainer" unique_id=1636081198]
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(44, 69.25)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("11_qdd1k")
 ButtonText = "Edificios"
-Spacing = 1
-Padding = 1
+IconMinSize = Vector2(32, 32)
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=941727953]

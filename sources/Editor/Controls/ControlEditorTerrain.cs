@@ -3,9 +3,10 @@ using Arch.Core;
 using Arch.Core.Extensions;
 using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
+
 using GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Maps;
@@ -85,7 +86,7 @@ public partial class ControlEditorTerrain : MarginContainer
             case ModeEditorTerrain.Auto:
                 break;
             case ModeEditorTerrain.Pattern:
-                TilesEntityPreviewHelper.Initialize(blackyWorldMap.flecsManager);
+                //TilesEntityPreviewHelper.Initialize(blackyWorldMap.flecsManager);
                 break;
             default:
                 break;
@@ -204,8 +205,8 @@ public partial class ControlEditorTerrain : MarginContainer
         mapType = obj.maptype;
         sizeMap = obj.size;
         blackyWorldMap = obj.blackyWorldMap;
-        PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
-        SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        //PlacementPreview.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
+        //SelectionBlueprint.Instance.ConfigureFlecs(blackyWorldMap.flecsManager);
 
         PlacementPreview.Instance.Configure(tileId: 1, layer: 20);
         SelectionBlueprint.Instance.Configure(1762385049549000, 30);
@@ -364,7 +365,7 @@ public partial class ControlEditorTerrain : MarginContainer
             }
 
             {
-                blackyWorldMap.Terrain.SetTerrainList(tilesToUpdate, objectSelected.idSave,currentRuleId, currentAltura, (int)currentLayer);
+                //blackyWorldMap.Terrain.SetTerrainList(tilesToUpdate, objectSelected.idSave,currentRuleId, currentAltura, (int)currentLayer);
             }            
             lastMouseTile = CurrentMouseTile;
         }
@@ -386,7 +387,7 @@ public partial class ControlEditorTerrain : MarginContainer
             {
                 autotileErase = false;
             }
-            blackyWorldMap.Terrain.RemoveTerrainList(tilesToUpdate,currentAltura, (int)currentLayer, currentRuleId,autotileErase);
+            //blackyWorldMap.Terrain.RemoveTerrainList(tilesToUpdate,currentAltura, (int)currentLayer, currentRuleId,autotileErase);
         }
     }
 }

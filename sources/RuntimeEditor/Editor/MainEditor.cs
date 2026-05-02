@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyTiles.Commands;
 using GodotEcsArch.sources.Flecs;
 using GodotEcsArch.sources.managers;
@@ -22,14 +23,16 @@ public partial class MainEditor : Node
     }
     public override void _Process(double delta)
     {
- 
-        //RenderCommandQueue.ExecuteFrame();
-        //ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
-        //CurrentWorlds.Instance.GetAllWorld().ForEach(world =>
-        //{
-        //    world.Update((float)delta);
-        //});
 
+        RenderCommandQueue.ExecuteFrame();
+        ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
+
+        var worlds = BlackyWorldRegistry.Instance.GetAllWorlds();
+
+        foreach (var item in worlds)
+        {
+            item.Update((float)delta);
+        }        
     }
 }
 

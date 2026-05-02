@@ -1,6 +1,6 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 
@@ -23,7 +23,7 @@ public class RegisterGridMoveSystem : FlecsSystemBase
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
 
-        var grid = world.GridMove;
+        var grid = world.State.GridMove;
 
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<FastColliderComponent>(1);

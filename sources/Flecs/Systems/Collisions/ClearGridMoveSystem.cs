@@ -1,6 +1,6 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
 using System.Collections.Generic;
@@ -26,6 +26,6 @@ public class ClearGridMoveSystem : FlecsSystemBase
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
 
-        world.GridMove.ClearAll();
+        world.State.GridMove.ClearAll();
     }
 }

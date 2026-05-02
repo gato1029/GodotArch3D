@@ -26,6 +26,12 @@ public partial class EditorTerreno : CenterContainer
         AddChild(w);
         w.Popup();
         w.SetMaterial(materialData);
+        w.OnNotifySelectionMatrix += W_OnNotifySelectionMatrix;
+    }
+
+    private void W_OnNotifySelectionMatrix(GodotFlecs.sources.KuroTiles.TileSelectionMatrixData arg1, int arg2)
+    {
+        
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

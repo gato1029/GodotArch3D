@@ -1,6 +1,6 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotFlecs.sources.Flecs.Components;
 
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
@@ -36,7 +36,7 @@ public class RegisterFastHashSystem : FlecsSystemBase
             float actualY = p.position.Y;// + col.OffsetY;
             
             //Registramos en el hash dinámico
-            blackyWorld.DynamicHash.UpdatePosition(sid.Value, actualX, actualY);
+            blackyWorld.State.DynamicHash.UpdatePosition(sid.Value, actualX, actualY);
         }
     }
 }

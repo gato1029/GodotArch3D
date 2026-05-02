@@ -1,5 +1,7 @@
 using Godot;
-using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
+
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.managers.serializer;
@@ -24,12 +26,6 @@ public enum MapInfoType
     Terreno,
     FuenteRecursos,
     Edificios
-}
-public enum MapType
-{
-    Mapa = 0,
-    Habitacion = 1,
-    Mazmorra = 2
 }
 [ProtoContract]
 public class MapDataMarker
@@ -131,7 +127,9 @@ public class MapLevelData
         
         //mapResources = new MapResources(pathCurrentCarpet+"/InternalData", layer + 1);      
 
-        blackyWorldMap = new BlackyWorld(32, 4,797864 , size, new BlackyChunkOccupancyMap(3,32),ChunkManager.Instance.tiles16X16);
+      //  blackyWorldMap = new BlackyWorld(32, 4,797864 , size, new BlackyChunkOccupancyMap(3,32),ChunkManager.Instance.tiles16X16);
+
+        // elimar luego
     }
     public void SaveAll()
     {

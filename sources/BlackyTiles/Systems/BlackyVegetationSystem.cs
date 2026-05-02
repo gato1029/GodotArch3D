@@ -1,4 +1,6 @@
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
