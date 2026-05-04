@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,17 @@ using static Godot.HttpRequest;
 
     internal class FileHelper
     {
+        private static string RootPath;
+        private static string ModsPath;
+
+    public static void SetModsPath(string modsPath)
+    {
+        ModsPath = modsPath.Trim();
+    }
+    public static void Initialize(string rootPath)
+    {
+        RootPath = rootPath;
+    }
     public static void DeleteFile(string filePath)
     {
         // Soporta rutas absolutas y rutas internas del proyecto (res:// o user://)
@@ -51,11 +63,11 @@ using static Godot.HttpRequest;
         {
         string gameDirectory = OS.GetExecutablePath().GetBaseDir();
 #if DEBUG
-        gameDirectory = "D:\\GitKraken";
+        gameDirectory = RootPath;
 #endif
         // Obtener la ruta del directorio actual del juego (directorio donde se encuentra el ejecutable)
-        string finalCarpet = "AssetExternals" + "/" + carpet;
-        string finalCarpetCompressed = "AssetExternals" + "/" + carpet+"/DDS";
+        string finalCarpet = ModHelper.Mod.name+"/" + carpet;
+        string finalCarpetCompressed = ModHelper.Mod.name + "/" + carpet+"/DDS";
         // Crear la ruta completa para la carpeta AssetExternals
         string destinationFolder = Path.Combine(gameDirectory, finalCarpet );
         string destinationFolderCompressed = Path.Combine(gameDirectory, finalCarpetCompressed);
@@ -82,12 +94,12 @@ using static Godot.HttpRequest;
             {
                 File.Copy(sourcePath, destinationPath, true);
 
-                // Crear una instancia de Image para cargar el archivo
-                Image image = new Image();
-                Error result = image.Load(destinationPath);
+                //// Crear una instancia de Image para cargar el archivo
+                //Image image = new Image();
+                //Error result = image.Load(destinationPath);
                
-                image.Compress(Image.CompressMode.S3Tc);            
-                image.SaveDds(destinationPathCompressed);
+                //image.Compress(Image.CompressMode.S3Tc);            
+                //image.SaveDds(destinationPathCompressed);
             }
             return finalCarpet+"/"+fileName;
         }
@@ -102,13 +114,37 @@ using static Godot.HttpRequest;
     public static string GetPathGameDB(string sourcePathDB)
     {
         string gameDirectory = OS.GetExecutablePath().GetBaseDir();
-        #if DEBUG
-                gameDirectory = "D:\\GitKraken";
-        #endif
-        string destinationFolder = Path.Combine(gameDirectory, sourcePathDB);
 
+#if DEBUG
+        gameDirectory = RootPath;
+#endif
 
-        return destinationFolder;
+        // Ruta final completa (esta sí puede incluir archivo)
+        string fullPath = Path.Combine(gameDirectory, sourcePathDB);
+
+        // Ruta solo para crear carpeta
+        string folderToCreate = fullPath;
+
+        string lastSegment = Path.GetFileName(fullPath);
+
+        if (!string.IsNullOrEmpty(lastSegment) && Path.HasExtension(lastSegment))
+        {
+            folderToCreate = Path.GetDirectoryName(fullPath) ?? gameDirectory;
+        }
+
+        if (!Directory.Exists(folderToCreate))
+        {
+            Directory.CreateDirectory(folderToCreate);
+        }
+
+        return fullPath;
+    }
+
+    internal static string GetPathByMod(string pathTexture)
+    {
+        string gameDirectory = ModsPath;
+        string fullPath = Path.Combine(gameDirectory, pathTexture);
+        return fullPath;
     }
 }
 

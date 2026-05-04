@@ -88,10 +88,7 @@ public sealed class BlackyWorld : IDisposable
         
 
         Name = name;
-        WorldTypeDetail = worldTypeDetail;
-        AtlasTexturesModsManager.Instance.FirstLoad();
-        DataBaseManager.Instance.LoadCurrentDataBase();
-
+        WorldTypeDetail = worldTypeDetail;        
         Config = new BlackyWorldConfig(
             name,
             worldTypeDetail,
@@ -112,7 +109,7 @@ public sealed class BlackyWorld : IDisposable
 
         BlackyWorldRegistry.Instance.AddWorld(name, this, true);
 
-        DebugBoot();
+        //DebugBoot();
     }
 
     // =========================================

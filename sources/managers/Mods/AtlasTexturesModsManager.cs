@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.managers.Textures;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
@@ -36,9 +37,53 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     //}
     protected override void Initialize()
     {
+      
+    }
+    public void LoadCurrentMod()
+    {
+        
+        string folderPath = FileHelper.GetPathGameDB("");
+        string folderPathDb = FileHelper.GetPathGameDB("db/MiBaseDeDatos2.db");
+        string modName = new DirectoryInfo(folderPath).Name;
+
+        var modInfo = new ModInfo(modName, folderPathDb, folderPath);
+
+        if (!mods.ContainsKey(modName))
+        {
+            mods.Add(modName, modInfo);
+            TableMods.Instance.Registrar(modInfo);
+            GD.Print($"Mod cargado: {modName}");
+        }
+        else
+        {
+            GD.PrintErr($"Mod duplicado: {modName}");
+        }
+                
+    }
+    private void ChargueEditorMods()
+    {
+        // esta funcion se llama desde el editor, cada vez que se hace un cambio en los mods, para recargar todo y ver los cambios reflejados
         mods.Clear();
         materialsByType.Clear();
         _textureLookup.Clear();
+        materialsMods.Clear();
+        TableMods.Instance.Clear(); // limpio la tabla de mods para volver a cargar solo el mod actual, asi evito cargar mods que no estoy editando y tener que revisar cambios innecesarios
+        textureArrayManager = new TextureArrayManager();
+        renderManager = new RenderManagerOptimized(textureArrayManager);
+        LoadCurrentMod();
+        AtlasModsManager.Instance.ClearAll(); // limpio todos los manager de mods para volver a cargar solo el mod actual, asi evito cargar mods que no estoy editando y tener que revisar cambios innecesarios
+        AtlasModsManager.Instance.FirstLoad(); // luego de que cargo la tabla de mods, genero todos los manager por mods
+        CreateAllMaterials();
+        CreateAtlasMaterial();
+        CreateTexturesRendering();
+        BuildRendering();
+    }
+    private void ChargueAllMods()
+    {
+        mods.Clear();
+        materialsByType.Clear();
+        _textureLookup.Clear();
+        materialsMods.Clear();
 
         textureArrayManager = new TextureArrayManager();
         renderManager = new RenderManagerOptimized(textureArrayManager);
@@ -53,10 +98,13 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
             GD.Print("🔄 Rebuilding atlas...");
             CreateAtlasMaterial();
         }
+        else
+        {
+            GD.Print("Atlas Sin modifcacion");
+        }
         CreateTexturesRendering();
         BuildRendering();
     }
- 
     private  bool ReviewDiferences()
     {
         foreach (var item in materialsByType)
@@ -191,15 +239,30 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
             }
         }
     }
-    public  void LoadAllMods()
+    public void LoadAllMods()
     {
         var basePath = ProjectSettings.GlobalizePath(EditorWorldsPath);
         var files = GetDatabaseFiles(basePath, "db");
 
         foreach (var file in files)
         {
-            string folderPath = Path.GetDirectoryName(file);
-            string modName = new DirectoryInfo(folderPath).Name;
+            // carpeta donde está el db
+            string dbFolder = Path.GetDirectoryName(file);
+
+            // carpeta superior = carpeta real del mod
+            DirectoryInfo parentFolder = Directory.GetParent(dbFolder);
+
+            if (parentFolder == null)
+            {
+                GD.PrintErr($"No se pudo resolver carpeta padre para: {file}");
+                continue;
+            }
+
+            string folderPath = parentFolder.FullName;
+            string modName = parentFolder.Name;
+
+            if (modName == "Orquestador")
+                continue;
 
             var modInfo = new ModInfo(modName, file, folderPath);
 
@@ -214,8 +277,8 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
                 GD.PrintErr($"Mod duplicado: {modName}");
             }
         }
+
         TableMods.Instance.FinalizarCarga();
-        
     }
     public  List<string> GetDatabaseFiles(string folderPath, params string[] extensions)
     {
@@ -236,8 +299,16 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         return result;
     }
 
-    internal void FirstLoad()
+    internal void FirstLoad(bool AllMods=true)
     {
+        if (AllMods)
+        {
+            ChargueAllMods();
+        }
+        else
+        {
+            ChargueEditorMods(); 
+        }
         
     }
 

@@ -140,7 +140,7 @@ public partial class ControlEditorResourceSources : MarginContainer
     {
         foreach (var item in tiles)
         {
-            Vector2 posTile = TilesHelper.WorldPositionTile(new Vector2I(item.x, item.y));
+            Vector2 posTile = TilesHelper.TilePositionToWorldPosition(new Vector2I(item.x, item.y));
             int id = WireShape.Instance.DrawFilledSquare(new Vector2(16, 16), posTile, 1, Godot.Colors.Blue, .5f);
            idsTiles.Add((id,item));
         }           
@@ -153,7 +153,7 @@ public partial class ControlEditorResourceSources : MarginContainer
         {
             var index = idsTiles[i].Item1;
             var tile = idsTiles[i].Item2;
-            Vector2 posTile = TilesHelper.WorldPositionTile(new Vector2I(tile.x, tile.y)+ mouseTile);
+            Vector2 posTile = TilesHelper.TilePositionToWorldPosition(new Vector2I(tile.x, tile.y)+ mouseTile);
             WireShape.Instance.UpdatePosition(index, posTile);            
         }
     }

@@ -89,7 +89,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
                                 Height = col.Radius,
                                 Offset = new Godot.Vector2(col.Offset.X, col.Offset.Y)
                             };
-                            var posTile =TilesHelper.WorldPositionTile(new Godot.Vector2I(tx, ty));
+                            var posTile =TilesHelper.TilePositionToWorldPosition(new Godot.Vector2I(tx, ty));
 
                             if (CollisionMathHelper.Check(pos.position.X, pos.position.Y, ref colUnit,
                                                         posTile.X, posTile.Y, ref tileCol))

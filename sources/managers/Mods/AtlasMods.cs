@@ -54,4 +54,13 @@ public class AtlasMods<TKey, TValue> where TKey : notnull
     {
         return _data;
     }
+    public void Clear()
+    {
+        foreach (var kv in _data)
+        {
+            kv.Value.Clear();
+        }
+
+        _data.Clear();
+    }
 }

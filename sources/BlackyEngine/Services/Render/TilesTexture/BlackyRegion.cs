@@ -66,6 +66,11 @@ public class BlackyRegion
         return Palette.GetTileUV(tileId);
     }
 
+    public void TryGetTileDataMod(ushort tileId, out TileDataMod tileDataMod)
+    {
+        Palette.TryGetTileDataMod(tileId,out tileDataMod);
+    }
+
     // ===============================
     // PERSISTENCIA
     // ===============================

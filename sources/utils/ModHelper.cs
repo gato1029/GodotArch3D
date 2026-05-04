@@ -10,11 +10,16 @@ namespace GodotEcsArch.sources.utils;
 
 public static class ModHelper
 {
+    public static bool AllMods { get; set; }
     public static InfoModData Mod;
-    public static void Init()
+    public static void Init(bool allMods)
     {
-        DataBaseManager.Instance.LoadCurrentDataBase();
-        Mod =DataBaseManager.Instance.FindById<InfoModData>(1);
-        int a = 0;
+        AllMods = allMods;
+        if (!allMods)
+        {
+            DataBaseManager.Instance.LoadCurrentDataBase();
+            Mod = DataBaseManager.Instance.FindById<InfoModData>(1);
+        }
+        
     }
 }

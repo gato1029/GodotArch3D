@@ -39,7 +39,7 @@ internal class TileTextureTransformSystem : FlecsSystemBase
 
             float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
 
-            Vector2 newWorldPos = TilesHelper.WorldPositionTile(p.tilePosition);
+            Vector2 newWorldPos = TilesHelper.TilePositionToWorldPosition(p.tilePosition);
             p.position = newWorldPos;
             var tt = t.transform;
             tt.Origin = new Vector3(newWorldPos.X + r.originOffset.X, newWorldPos.Y + r.originOffset.Y, renderZ);

@@ -17,8 +17,7 @@ public partial class MainEditor : Node
     private KuroButton ButtonGuardarMapa;
     private KuroButton ButtonGuardarComoMapa;
     private KuroButton ButtonEliminarMapa;
-    private EditorTerreno Terreno;
-    private KuroButton KuroButton;
+    private KuroButton KuroButtonTerreno;
     private KuroButton KuroButton2;
     private KuroButton KuroButton4;
     private KuroButton KuroButton5;
@@ -39,8 +38,7 @@ public partial class MainEditor : Node
         ButtonGuardarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonGuardarMapa");
         ButtonGuardarComoMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonGuardarComoMapa");
         ButtonEliminarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonEliminarMapa");
-        Terreno = GetNode<EditorTerreno>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Terreno");
-        KuroButton = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/Terreno/KuroButton");
+        KuroButtonTerreno = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButtonTerreno");
         KuroButton2 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton2");
         KuroButton4 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton4");
         KuroButton5 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton5");

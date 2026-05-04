@@ -38,7 +38,7 @@ public class BlackyBuildingSystem
 
     public Entity Create(long id, Vector2I positionTileWorld, bool renderForce = false)
     {          
-        Vector2 position = TilesHelper.WorldPositionTile(positionTileWorld);
+        Vector2 position = TilesHelper.TilePositionToWorldPosition(positionTileWorld);
 
         var dataTemplate = MasterDataManager.GetData<BuildingData>(id);
 

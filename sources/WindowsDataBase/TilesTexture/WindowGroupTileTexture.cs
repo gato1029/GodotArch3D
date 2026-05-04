@@ -1,13 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.managers;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
+using GodotFlecs.sources.KuroTiles;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using static ControlEditorTerrain;
 using static System.Formats.Asn1.AsnWriter;
 
 public partial class WindowGroupTileTexture : Window
@@ -191,6 +196,8 @@ public partial class WindowGroupTileTexture : Window
         LineEditMaterial.Text = material.name;
         sharedWindow.SetSelection(material.id, 0);
         UpdateMaterial();
+        //materialSelected = material;
+        //EditorTile();
     }
 
     private void WindowLocal_OnNotifySelectionIndex(int index, MaterialData materialData)
@@ -268,8 +275,7 @@ public partial class WindowGroupTileTexture : Window
         return list;
     }
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) { }
+
 
     internal void SetDisableSelection()
     {
@@ -306,5 +312,171 @@ public partial class WindowGroupTileTexture : Window
     {
         dataParent = data;
         positionIndex = index;
+    }
+
+
+
+    /// <summary>
+    ///     
+
+    private void EditorTile()
+    {
+        modeEditorTerrain = ModeEditorTerrain.ELIMINACION;
+        var temp = AtlasModsManager.Get<MaterialData>("Base", 1);
+        TilesEntityPreviewHelper.Create(new Vector2I(1, 1), materialSelected, 0);
+    }
+    enum ModeEditorTerrain
+    {
+        SELECCION,
+        CREACION,
+        ELIMINACION,
+    }
+
+    private MaterialData materialSelected;
+    
+
+    ModeEditorTerrain modeEditorTerrain = ModeEditorTerrain.SELECCION;
+    TileSelectionMatrixData matrixCurrent = null;
+    private Vector2I lastPaintTile = new Vector2I(int.MinValue, int.MinValue);
+    private bool uiMouseCaptured = false;
+    public override void _Process(double delta)
+    {
+        //if (IsMouseBlockedByUI())
+        //    return;
+        //Vector2I currentMouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
+        //TilesEntityPreviewHelper.Move(currentMouseTile);
+
+        //bool leftPressed = Input.IsMouseButtonPressed(MouseButton.Left);
+        //bool rightPressed = Input.IsMouseButtonPressed(MouseButton.Right);
+
+        //switch (modeEditorTerrain)
+        //{
+        //    case ModeEditorTerrain.SELECCION:
+
+        //        break;
+        //    case ModeEditorTerrain.CREACION:
+        //        if (leftPressed)
+        //        {
+        //            if (matrixCurrent == null)
+        //            {
+        //                return;
+        //            }
+        //            if (currentMouseTile != lastPaintTile)
+        //            {
+        //                ApplyPaint();
+        //                lastPaintTile = currentMouseTile;
+        //            }
+        //            else
+        //            {
+        //                lastPaintTile = new Vector2I(int.MinValue, int.MinValue);
+        //            }
+        //        }
+        //        if (rightPressed)
+        //        {
+        //            if (currentMouseTile != lastPaintTile)
+        //            {
+        //                ApplyErase();
+        //                lastPaintTile = currentMouseTile;
+        //            }
+        //            else
+        //            {
+        //                lastPaintTile = new Vector2I(int.MinValue, int.MinValue);
+        //            }
+        //        }
+
+        //        break;
+        //    case ModeEditorTerrain.ELIMINACION:
+        //        if (leftPressed || rightPressed)
+        //        {
+        //            if (currentMouseTile != lastPaintTile)
+        //            {
+        //                ApplyErase();
+        //                lastPaintTile = currentMouseTile;
+        //            }
+        //            else
+        //            {
+        //                lastPaintTile = new Vector2I(int.MinValue, int.MinValue);
+        //            }
+        //        }
+        //        break;
+        //    default:
+        //        break;
+        //}
+    }
+
+    private bool IsMouseBlockedByUI()
+    {
+        bool leftPressed = Input.IsMouseButtonPressed(MouseButton.Left);
+        bool rightPressed = Input.IsMouseButtonPressed(MouseButton.Right);
+
+        // si soltó ambos botones se libera la captura
+        if (!leftPressed && !rightPressed)
+            uiMouseCaptured = false;
+
+        // si ya estaba capturado por ui, seguimos bloqueando
+        if (uiMouseCaptured)
+            return true;
+
+        // si en este frame el mouse está sobre ui y se empezó a presionar
+        if (IsMouseOverUI())
+        {
+            if (leftPressed || rightPressed)
+                uiMouseCaptured = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsMouseOverUI()
+    {
+        var hoveredLocal = GetViewport().GuiGetHoveredControl();
+
+        if (hoveredLocal != null)
+            return true;
+
+        var parentViewport = GetParent()?.GetViewport();
+        if (parentViewport != null)
+        {
+            var hoveredParent = parentViewport.GuiGetHoveredControl();
+            if (hoveredParent != null)
+                return true;
+        }
+
+        return false;
+    }
+
+    private void ApplyErase()
+    {
+        int altura = 1;
+        int capa = 1;
+        var tiles = TilesEntityPreviewHelper.GetOnlyValidTiles();
+        foreach (var item in tiles)
+        {
+            BlackyWorldContext.PintarTerreno.RemoveTile(
+                item.tilePosition.X,
+                item.tilePosition.Y,
+                altura,
+                capa
+            );
+        }
+    }
+
+    private void ApplyPaint()
+    {
+        int altura = 1;
+        int capa = 1;
+        var tiles = TilesEntityPreviewHelper.GetOnlyValidTiles();
+        foreach (var item in tiles)
+        {
+            BlackyWorldContext.PintarTerreno.SetTile(
+                item.tilePosition.X,
+                item.tilePosition.Y,
+                altura,
+                capa,
+                item.data.idMod,
+                (ushort)item.data.index
+            );
+        }
     }
 }

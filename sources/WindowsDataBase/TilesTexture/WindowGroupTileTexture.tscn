@@ -9,11 +9,21 @@
 [ext_resource type="Texture2D" uid="uid://cgib4xbvusljx" path="res://resources/Textures/internal/rule.png" id="6_rfbwy"]
 [ext_resource type="Script" uid="uid://b2tq08112l2fo" path="res://sources/CustomWidgets/KuroCheckButton.cs" id="7_mdk58"]
 [ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="8_wgh5f"]
+[ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="10_mdk58"]
+[ext_resource type="Script" uid="uid://bbpen4bq65cw2" path="res://sources/WindowsDataBase/TilesTexture/PerfiladorAutoTileTexture.cs" id="10_wgh5f"]
+[ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="12_wgh5f"]
+
+[sub_resource type="Environment" id="Environment_yy7vt"]
+background_color = Color(0.05882353, 0.08235294, 0.12941177, 1)
+ambient_light_color = Color(0.5529655, 0.71749705, 0.9567016, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2wjbp"]
 
 [node name="WindowGroupTileTexture" type="Window" unique_id=1669849788]
 oversampling_override = 1.0
+title = "Reglas"
 initial_position = 2
-size = Vector2i(1000, 600)
+size = Vector2i(1064, 632)
 wrap_controls = true
 script = ExtResource("1_a10je")
 
@@ -83,18 +93,71 @@ TextureOn = ExtResource("8_wgh5f")
 TextureOff = ExtResource("6_rfbwy")
 metadata/_custom_type_script = "uid://b2tq08112l2fo"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=61103135]
+[node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1957417949]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="KuroScrollZoomView" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=1758056422]
+[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3" unique_id=1104676691]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelContainer2" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer" unique_id=1434085035]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer2" unique_id=259210539]
+layout_mode = 2
+
+[node name="KuroScrollZoomView" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer2/ScrollContainer" unique_id=1758056422]
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("2_s5lqk")
 PanButton = 7
 metadata/_custom_type_script = "uid://ckc55m20w7igo"
 
-[node name="Contenedor" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/KuroScrollZoomView" unique_id=1709710252]
+[node name="Contenedor" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer2/ScrollContainer/KuroScrollZoomView" unique_id=1709710252]
+texture_filter = 1
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_vertical = 3
-columns = 4
+columns = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer" unique_id=4248127]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer" unique_id=1152664335]
+layout_mode = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer/SubViewportContainer" unique_id=368020270]
+handle_input_locally = false
+size = Vector2i(506, 512)
+size_2d_override_stretch = true
+render_target_update_mode = 4
+
+[node name="Game" type="Node" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer/SubViewportContainer/SubViewport" unique_id=695057234]
+script = ExtResource("10_wgh5f")
+
+[node name="mainRender" type="Node3D" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer/SubViewportContainer/SubViewport/Game" unique_id=547414567]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer/SubViewportContainer/SubViewport/Game" unique_id=69923912]
+environment = SubResource("Environment_yy7vt")
+
+[node name="center" type="MeshInstance3D" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer/SubViewportContainer/SubViewport/Game" unique_id=368524001]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("SphereMesh_2wjbp")
+surface_material_override/0 = ExtResource("12_wgh5f")
+
+[node name="Render" type="Node" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer/SubViewportContainer/SubViewport" unique_id=1549136733]
+
+[node name="Camera3D" type="Camera3D" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/HSplitContainer/PanelContainer/SubViewportContainer/SubViewport/Render" unique_id=2032827935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 50)
+projection = 1
+current = true
+size = 10.0
+script = ExtResource("10_mdk58")
+MouseEdgeMargin = 5.0
+MinZoomSize = 5.0
+MaxZoomSize = 30.0

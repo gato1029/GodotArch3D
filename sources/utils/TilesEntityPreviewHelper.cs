@@ -1,24 +1,40 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
 using GodotEcsArch.sources.BlackyTiles.Commands;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using System;
+using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.utils;
 
+public struct TilePreviewWithPosition
+{
+    public TilePreviewData data;
+    public Vector2I tilePosition;
+
+    public TilePreviewWithPosition(TilePreviewData data, Vector2I tilePosition)
+    {
+        this.data = data;
+        this.tilePosition = tilePosition;
+    }
+}
 public struct TilePreviewData
 {
     public bool isEmpty;
     public int idMaterial;
+    public string idMod;
     public int index;
 
-    public TilePreviewData(int idMaterial, int index, bool isEmpty = false)
+    public TilePreviewData(int idMaterial, string idMod, int index, bool isEmpty = false)
     {
         this.idMaterial = idMaterial;
         this.index = index;
         this.isEmpty = isEmpty;
+        this.idMod = idMod;
     }
 
     public static TilePreviewData Empty()
@@ -27,7 +43,8 @@ public struct TilePreviewData
         {
             isEmpty = true,
             idMaterial = -1,
-            index = -1
+            index = -1,
+            idMod =""
         };
     }
 }
@@ -36,20 +53,19 @@ public static class TilesEntityPreviewHelper
 {
     private static TilePreviewData[,] _previewMatrixData;
     private static Entity[,] _previewEntities;
-    private static Vector2I _pivot;
-    private static FlecsManager _flecsManager;
+    private static Vector2I _pivot;    
     private static Vector2I _size;
     private static Vector2I _positionLast;
 
-    public static void Initialize(FlecsManager flecsManager)
-    {
-        _flecsManager = flecsManager;
-    }
+    //public static void Initialize(FlecsManager flecsManager)
+    //{
+    //    _flecsManager = flecsManager;
+    //}
 
     // =========================================================
     // CREATE SIMPLE RECTANGLE (MISMO TILE)
     // =========================================================
-    public static void Create(Vector2I size, int idMaterial, int index)
+    public static void Create(Vector2I size, MaterialData idMaterial, int index)
     {
         Clear();
         TilePreviewData[,] matrixData = new TilePreviewData[size.X, size.Y];
@@ -58,7 +74,7 @@ public static class TilesEntityPreviewHelper
         {
             for (int y = 0; y < size.Y; y++)
             {
-                matrixData[x, y] = new TilePreviewData(idMaterial, index);
+                matrixData[x, y] = new TilePreviewData(idMaterial.id,idMaterial.idNameMod, index);
             }
         }
 
@@ -68,7 +84,7 @@ public static class TilesEntityPreviewHelper
     // =========================================================
     // CREATE RECTANGLE (MISMO MATERIAL, DIFERENTES INDEX)
     // =========================================================
-    public static void Create(int idMaterial, int[,] matrixIndexes)
+    public static void Create(MaterialData idMaterial, int[,] matrixIndexes)
     {
         Clear();
         int width = matrixIndexes.GetLength(0);
@@ -80,7 +96,7 @@ public static class TilesEntityPreviewHelper
         {
             for (int y = 0; y < height; y++)
             {
-                matrixData[x, y] = new TilePreviewData(idMaterial, matrixIndexes[x, y]);
+                matrixData[x, y] = new TilePreviewData(idMaterial.id,idMaterial.idNameMod, matrixIndexes[x, y]);
             }
         }
 
@@ -118,8 +134,9 @@ public static class TilesEntityPreviewHelper
                 Vector2I localOffset = new Vector2I(x, y);
 
                 var entity = TilesEntityTextureCreatorHelper.CreateSingle(
-                    _flecsManager,
+                    BlackyWorldContext.Flecs,
                     tileData.idMaterial,
+                    tileData.idMod,
                     tileData.index,
                     localOffset
                 );
@@ -128,7 +145,7 @@ public static class TilesEntityPreviewHelper
             }
         }
     }
-    internal static void Create(int idMaterial, GodotFlecs.sources.KuroTiles.TileSelectionMatrixData matrix)
+    internal static void Create(MaterialData idMaterial, GodotFlecs.sources.KuroTiles.TileSelectionMatrixData matrix)
     {
         Clear();
 
@@ -141,7 +158,7 @@ public static class TilesEntityPreviewHelper
                 int index = matrix.matrix[x, y].index - 1;
                 bool isEmpty = matrix.matrix[x, y].isEmpty;
                 int idMaterialIN = matrix.matrix[x,y].idMaterial;
-                matrixData[x, y] = new TilePreviewData(idMaterialIN, index,isEmpty);
+                matrixData[x, y] = new TilePreviewData(idMaterialIN,idMaterial.idNameMod, index,isEmpty);
             }
         }
 
@@ -184,12 +201,69 @@ public static class TilesEntityPreviewHelper
             }
         }
     }
-
-    private static Vector2I CalculateOffset(int x, int y, int centerX, int centerY)
+    public static TilePreviewWithPosition[,] GetMatrixWithWorldPositionFast()
     {
-        return new Vector2I(x - centerX, y - centerY);
-    }
+        if (_previewMatrixData == null)
+            return null;
 
+        int width = _size.X;
+        int height = _size.Y;
+
+        TilePreviewWithPosition[,] result = new TilePreviewWithPosition[width, height];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                TilePreviewData tileData = _previewMatrixData[x, y];
+
+                if (tileData.isEmpty)
+                {
+                    result[x, y] = new TilePreviewWithPosition(tileData, Vector2I.Zero);
+                    continue;
+                }
+
+                Vector2I offset = new Vector2I(x - _pivot.X, (_size.Y - 1 - y) - _pivot.Y);
+                Vector2I worldPos = _positionLast + offset;
+
+                result[x, y] = new TilePreviewWithPosition(tileData, worldPos);
+            }
+        }
+
+        return result;
+    }
+    public static List<TilePreviewWithPosition> GetOnlyValidTiles()
+    {
+        List<TilePreviewWithPosition> list = new();
+
+        if (_previewMatrixData == null)
+            return list;
+
+        int width = _size.X;
+        int height = _size.Y;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                TilePreviewData tileData = _previewMatrixData[x, y];
+
+                if (tileData.isEmpty)
+                    continue;
+
+                Vector2I offset = new Vector2I(
+                    x - _pivot.X,
+                    (_size.Y - 1 - y) - _pivot.Y
+                );
+
+                Vector2I worldPos = _positionLast + offset;
+
+                list.Add(new TilePreviewWithPosition(tileData, worldPos));
+            }
+        }
+
+        return list;
+    }
     // =========================================================
     // CLEAR
     // =========================================================

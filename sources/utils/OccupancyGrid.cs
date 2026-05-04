@@ -58,7 +58,7 @@ public class OccupancyGrid
                 {
                     Vector2I posTile = new(x, y);
                     Vector2I posGlobal = chunkManager.TilePositionGlobal(chunkPosition, posTile);
-                    Vector2 posWorld = TilesHelper.WorldPositionTile(posGlobal);
+                    Vector2 posWorld = TilesHelper.TilePositionToWorldPosition(posGlobal);
 
                     int id = WireShape.Instance.DrawFilledSquare(
                         new Vector2(16, 16), posWorld, -100, Godot.Colors.Red, .5f
@@ -127,7 +127,7 @@ public class OccupancyGrid
                     {
                         Vector2I local = new Vector2I(x, y);
                         Vector2I global = chunkManager.TilePositionGlobal(chunkPos, local);
-                        Vector2 worldPos = TilesHelper.WorldPositionTile(global);
+                        Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(global);
 
                         int id = WireShape.Instance.DrawFilledSquare(
                             new Vector2(16, 16),
@@ -154,7 +154,7 @@ public class OccupancyGrid
             // Dibujar solo el tile afectado si no estaba dibujado
             if (!chunkShapes.ContainsKey(tilePositionGlobal))
             {
-                Vector2 worldPos = TilesHelper.WorldPositionTile(tilePositionGlobal);
+                Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tilePositionGlobal);
                 int id = WireShape.Instance.DrawFilledSquare(
                     new Vector2(16, 16),
                     worldPos,

@@ -90,29 +90,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
     protected override void Initialize()
     {
-        RegisterAtlas(materiales);
-        RegisterAtlas(fuenteRecursos);
-        RegisterAtlas(spriteData);
-        RegisterAtlas(autoSpriteData);
-        RegisterAtlas(terrainData);
-        RegisterAtlas(terrainDataTransicion);
-        RegisterAtlas(buildingData);
-        RegisterAtlas(bulletData);
-        RegisterAtlas(characterData);
-        RegisterAtlas(tilesTextureData);
-
-        foreach (var mod in TableMods.Instance.ObtenerTodos())
-        {
-            byte idMod = mod.Key;
-            var info = mod.Value;
-
-            DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);
-
-            CargarPorMod(idMod);
-            CargarPorModEspecial(idMod);
-            CargarTilesTextureData(idMod);
-            CargarMateriales(idMod,info.Name);
-        }
+    
     }
 
     // =========================================================
@@ -310,8 +288,59 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
         return atlas.GetRawData();
     }
+    public void ClearAll()
+    {
+        // ================================
+        // CLEAR ALL ATLASES
+        // ================================
+        materiales.Clear();
+        fuenteRecursos.Clear();
+        spriteData.Clear();
+        autoSpriteData.Clear();
+        terrainData.Clear();
+        terrainDataTransicion.Clear();
+        buildingData.Clear();
+        bulletData.Clear();
+        characterData.Clear();
+        tilesTextureData.Clear();
+
+        // ================================
+        // CLEAR INDEXES
+        // ================================
+        foreach (var kv in _tilesByMaterialIndex)
+            kv.Value.Clear();
+
+        _tilesByMaterialIndex.Clear();
+
+        // ================================
+        // CLEAR TYPE REGISTRY
+        // ================================
+        _atlases.Clear();
+    }
     internal void FirstLoad()
     {
-       
+        RegisterAtlas(materiales);
+        RegisterAtlas(fuenteRecursos);
+        RegisterAtlas(spriteData);
+        RegisterAtlas(autoSpriteData);
+        RegisterAtlas(terrainData);
+        RegisterAtlas(terrainDataTransicion);
+        RegisterAtlas(buildingData);
+        RegisterAtlas(bulletData);
+        RegisterAtlas(characterData);
+        RegisterAtlas(tilesTextureData);
+
+        foreach (var mod in TableMods.Instance.ObtenerTodos())
+        {
+            byte idMod = mod.Key;
+            var info = mod.Value;
+            FileHelper.SetModsPath(info.FolderPath);
+            DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);
+
+            CargarPorMod(idMod);
+            CargarPorModEspecial(idMod);
+            CargarTilesTextureData(idMod);
+            CargarMateriales(idMod, info.Name);
+        }
     }
 }

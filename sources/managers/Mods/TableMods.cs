@@ -113,6 +113,17 @@ public class TableMods : SingletonBase<TableMods>
             }
         }
     }
+    public void Clear()
+    {
+        _currentId = 0;
+        _freeIds.Clear();
+
+        _mods.Clear();
+        _nameToId.Clear();
+        _modsInfo.Clear();
+
+        _initialized = false;
+    }
 
     // 🔹 Finalizar carga
     public void FinalizarCarga()

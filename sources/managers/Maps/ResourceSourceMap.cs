@@ -49,7 +49,7 @@ public class ResourceSourceMap
   
     public void AddUpdateResource(Vector2I tilePositionGlobal,long idResource, int indexTileSpriteSelected)
     {
-        Vector2 positionCenter = TilesHelper.WorldPositionTile(tilePositionGlobal);
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(tilePositionGlobal);
 
         var data = MasterDataManager.GetData<ResourceSourceData>(idResource);
         long idTileSpriteData = data.listIdTileSpriteData[indexTileSpriteSelected];

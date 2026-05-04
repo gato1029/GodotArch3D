@@ -125,16 +125,28 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
             Texture2D texture2D = null;
             float widht;
             float height;
+
+            string fullPath = "";
+            if (ModHelper.AllMods)
+            {
+                fullPath = FileHelper.GetPathByMod(pathTexture);
+            }
+            else
+            {
+                fullPath = FileHelper.GetPathGameDB(pathTexture);
+            }            
+
             if (type!=MaterialType.ACCESORIOS_ANIMADOS)
             {
                 MaterialManager.Instance.RegisterMaterial(id, this);
-                texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
+                texture2D = (Texture2D)TextureHelper.LoadTextureLocal(fullPath);
                 textureMaterial = texture2D;
             }
             else
             {
                 materialGeneric = GD.Load<ShaderMaterial>("res://resources/Material/Sprite3DMultimeshGeneric.tres");
-                texture2D = (Texture2D)TextureHelper.LoadTextureLocal(FileHelper.GetPathGameDB(pathTexture));
+                
+                texture2D = (Texture2D)TextureHelper.LoadTextureLocal(fullPath);
                 textureMaterial = texture2D;
                 widht = texture2D.GetWidth();
                 height = texture2D.GetHeight();

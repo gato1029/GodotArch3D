@@ -21,7 +21,7 @@ public partial class TileGridNode2d : Node2D
     private bool isDragging = false;
     private Vector2I dragStartCell = new Vector2I(-1, -1);
     private Vector2I dragEndCell = new Vector2I(-1, -1);
-
+    private bool hasSingleSelection = false;
     Color lineColor = Colors.Red;
 
     public delegate void EventNotifySelection(float x, float y, float width, float height);
@@ -209,6 +209,11 @@ public partial class TileGridNode2d : Node2D
 
         // 4. DIBUJO DE SELECCIÓN EN PROGRESO (DRAGGING)
         if (isDragging && dragStartCell.X != -1 && dragStartCell.Y != -1)
+        {
+            PaintSelection();
+        }
+        // selección persistente ya confirmada
+        if (hasSingleSelection && !isDragging)
         {
             PaintSelection();
         }
@@ -479,6 +484,7 @@ public partial class TileGridNode2d : Node2D
 
                 if (selectionMode == SelectionMode.SingleArea)
                 {
+                    hasSingleSelection = true;
                     int startX = Mathf.Min(dragStartCell.X, dragEndCell.X);
                     int startY = Mathf.Min(dragStartCell.Y, dragEndCell.Y);
                     int endX = Mathf.Max(dragStartCell.X, dragEndCell.X);
@@ -593,6 +599,7 @@ public partial class TileGridNode2d : Node2D
 
     internal void SetSelection(float x, float y, float width, float height)
     {
+        hasSingleSelection = true;
         dragStartCell = new Vector2I((int)(x / cellSize.X), (int)(y / cellSize.Y));
         dragEndCell = new Vector2I((int)((x + width - 1) / cellSize.X), (int)((y + height - 1) / cellSize.Y));
         forced = true;
@@ -601,12 +608,14 @@ public partial class TileGridNode2d : Node2D
 
     public void ClearMultiSelection()
     {
+        hasSingleSelection = false;
         multiSelectedTiles.Clear();
         QueueRedraw();
     }
 
     public void SetSelection(List<TileInfoKuro> tiles)
     {
+        hasSingleSelection = false;
         if (tiles == null || tiles.Count == 0)
         {
             multiSelectedTiles.Clear();
@@ -710,7 +719,7 @@ public partial class TileGridNode2d : Node2D
         OnNotifySelection?.Invoke(px, py, w, h);
         OnNotifySelectionIndex?.Invoke(index);
         OnNotifySelectionMatrix?.Invoke(BuildSelectionMatrix(cell, cell));
-
+        hasSingleSelection = true;
         forced = true;
         QueueRedraw();
     }

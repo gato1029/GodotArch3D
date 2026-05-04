@@ -39,7 +39,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
     internal class DataBaseManager : SingletonBase<DataBaseManager>
     {
         LiteDatabase db;
-        string dataBasePath = FileHelper.GetPathGameDB("AssetExternals/db/MiBaseDeDatos2.db");
+        string dataBasePath = "";
         private Dictionary<Type, string> collectionNameMap = new Dictionary<Type, string>();
 
         public BsonMapper ConfigMapper()
@@ -62,8 +62,8 @@ namespace GodotEcsArch.sources.WindowsDataBase
             {
                 db.Dispose();
             }
-            dataBasePath = FileHelper.GetPathGameDB("AssetExternals/db/MiBaseDeDatos2.db");
-            Initialize();
+            dataBasePath = FileHelper.GetPathGameDB("db/MiBaseDeDatos2.db");
+            CargarDB();
         }
 
         public void LoadCustomDataBase(string path)
@@ -73,10 +73,11 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 db.Dispose();
             }
             dataBasePath = path;
-            Initialize();
+            CargarDB();
         }
 
-        protected override void Initialize()
+        protected override void Initialize() { }
+        private  void CargarDB()
         {
             var mapper = ConfigMapper();
             db = new LiteDatabase(dataBasePath, mapper);

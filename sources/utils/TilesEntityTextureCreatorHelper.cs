@@ -18,15 +18,15 @@ namespace GodotEcsArch.sources.utils;
 
 public static class TilesEntityTextureCreatorHelper
 {
-    public static Entity CreateSingle(FlecsManager flecsManager, int idMaterial, int index , Vector2I tilePosition, int renderLayer = 0)
+    public static Entity CreateSingle(FlecsManager flecsManager, int idMaterial, string idMod, int index , Vector2I tilePosition, int renderLayer = 0)
     {
         if (flecsManager == null)
         {
             return default;
         }
 
-        var mat = MasterDataManager.GetData<MaterialData>(idMaterial);
-        var instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(mat.idNameMod);        
+        //var mat = MasterDataManager.GetData<MaterialData>(idMaterial);
+        var instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(idMod);        
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);        
         transform = transform.ScaledLocal(new Godot.Vector3(1, 1, 1));                
         var world  = flecsManager.WorldFlecs.GetCtx<BlackyWorld>();
@@ -35,8 +35,8 @@ public static class TilesEntityTextureCreatorHelper
         // aqui necesito la paleta por region y de acuerdo a eso creamos tile simple o animado
         var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance,mat.id, instanceRender.layerTexture, renderLayer, 0, 1, Vector2.Zero));
-        ushort idInternal = pallete.GetOrCreateTile(mat.idNameMod, (ushort)index);        
+        entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance,0, instanceRender.layerTexture, renderLayer, 0, 1, Vector2.Zero));
+        ushort idInternal = pallete.GetOrCreateTile(idMod, (ushort)index);        
         entity.Set(new RenderFrameDataComponent { uvMap = pallete.GetTileUV(idInternal)});
         entity.Set(new PositionComponent { tilePosition = tilePosition, height = 3 });
         entity.Add<DirtyTileRenderTag>();

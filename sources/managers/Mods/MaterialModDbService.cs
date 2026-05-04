@@ -17,7 +17,7 @@ public class MaterialModDbService:SingletonBase<MaterialModDbService>
    
     protected override void Initialize()
     {
-        string dbPath = FileHelper.GetPathGameDB("ModsGame/db/OrchestMaterial.db");
+        string dbPath = FileHelper.GetPathGameDB("Orquestador/db/OrchestMaterial.db");
         try
         {
             _db = new LiteDatabase(dbPath);

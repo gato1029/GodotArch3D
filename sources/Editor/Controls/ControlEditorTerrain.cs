@@ -74,7 +74,7 @@ public partial class ControlEditorTerrain : MarginContainer
 
     private void KuroTilesTexture_OnNotifySelectionMatrix(TileSelectionMatrixData matrix, int idMaterial)
     {
-        TilesEntityPreviewHelper.Create(idMaterial, matrix);     
+        //TilesEntityPreviewHelper.Create(idMaterial, matrix);     
     }
 
  

@@ -26,12 +26,12 @@ public sealed class BlackyWorldServices
 
     public BlackyHeightSystem HeightTool { get; }
 
-    public BlackyChunkTextureMap TerrainTexturePainter { get; }
+    public BlackyChunkTextureMap TerrainTexturePainter { get; } // para pintar Terreno
 
     // ============================
     // Render helpers
     // ============================
-    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; }
+    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; } // para renderizar pintar Terreno
 
     public BlackyTileRenderSystem TileRenderer { get; }
 

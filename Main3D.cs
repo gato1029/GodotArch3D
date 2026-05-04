@@ -31,11 +31,14 @@ public partial class Main3D : Node3D
     List<Vector2> points = new List<Vector2>();
     Polygon polygon;
     public override void _Ready()
-    {    
-        ModHelper.Init();            
+    {
+        FileHelper.Initialize("D:\\GitKraken/AssetExternals/NuevosMods/Base");
+        ModHelper.Init(false);            
         NodeMainHelper.SetNode3DMain(this);
         PerformanceTimer.Instance.Enabled = true;
-        
+        ChunkManager.Initialize();
+        DataBaseManager.Instance.LoadCurrentDataBase();
+
         //InfoModData infoModData = new InfoModData()
         //{
         //    id = 1,
@@ -46,8 +49,8 @@ public partial class Main3D : Node3D
         //};
         //DataBaseManager.Instance.InsertUpdate(infoModData);
 
-        MultimeshManager.Instance.Init();
-        ChunkManager.Initialize();
+        //MultimeshManager.Instance.Init();
+
 
         //var w = EcsManager.Instance.World;
         //var dat =ProjectilePool.Instance.SpawnProjectile();
@@ -59,7 +62,7 @@ public partial class Main3D : Node3D
 
         //DataBaseManager.Instance.MigrateRegenerateIdSavePerGroup<ResourceSourceData>();
 
-      
+
         //NormalizeMods();
 
     }
@@ -126,12 +129,12 @@ public partial class Main3D : Node3D
     {
         //Vector2I screenSize = DisplayServer.ScreenGetSize();
         //GD.Print("Resolución máxima del monitor: " + screenSize);
-        RenderCommandQueue.ExecuteFrame();       
-        ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
-        CurrentWorlds.Instance.GetAllWorld().ForEach(world =>
-        {
-            world.Update((float)delta);
-        });
+        //RenderCommandQueue.ExecuteFrame();       
+        //ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
+        //CurrentWorlds.Instance.GetAllWorld().ForEach(world =>
+        //{
+        //    world.Update((float)delta);
+        //});
 
     }
 

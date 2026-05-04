@@ -122,7 +122,7 @@ public class BlackyResourcesSourceSystem
     public Entity Create(ushort id, Vector2I positionTileWorld, bool renderForce = false)
     {
 
-        Vector2 position = TilesHelper.WorldPositionTile(positionTileWorld);
+        Vector2 position = TilesHelper.TilePositionToWorldPosition(positionTileWorld);
 
         var dataTemplate = MasterDataManager.GetBySaveIds<ResourceSourceData>(id);
 

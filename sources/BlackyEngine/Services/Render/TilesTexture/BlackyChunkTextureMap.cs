@@ -7,10 +7,21 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
-
+public struct TileChange
+{
+    public int WorldX;
+    public int WorldY;
+    public int Height;
+    public int Layer;
+    public ushort TileId;
+    public BlackyRegion region;
+    public bool remove;
+}
 
 public class BlackyChunkTextureMap
 {
+    public event Action<TileChange> OnTileChanged;
+
     private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly Dictionary<(int, int), BlackyRegion> _regions = new();
 
@@ -109,7 +120,25 @@ public class BlackyChunkTextureMap
     // ===============================
     // TILE ACCESS
     // ===============================
-    
+
+    public void RemoveTile(int worldX, int worldY, int height, int layer)
+    {
+        // 1. Resolvemos el chunk y las coordenadas locales
+        var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
+             
+        // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);
+
+        tileLayer.ClearTile(localX, localY);
+        OnTileChanged?.Invoke(new TileChange
+        {
+            WorldX = worldX,
+            WorldY = worldY,
+            Height = height,
+            Layer = layer,
+            remove = true
+        });
+    }
     public void SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
@@ -121,9 +150,22 @@ public class BlackyChunkTextureMap
         // 3. Guardamos el ID en el chunk
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-        tileLayer.SetTile(localX, localY, tileId);
+        
 
-        chunk.MarkDirty();
+        tileLayer.SetTile(localX, localY, tileId);        
+        OnTileChanged?.Invoke(new TileChange
+        {
+            WorldX = worldX,
+            WorldY = worldY,
+            Height = height,
+            Layer = layer,
+            TileId = tileId,
+            region = chunk.ParentRegion,
+            remove = false
+        });
+
+
+  
     }
     // ===============================
     // COORDINADAS Y RESOLUCIÓN
@@ -283,4 +325,6 @@ public class BlackyChunkTextureMap
             result += b;
         return result;
     }
+
+  
 }

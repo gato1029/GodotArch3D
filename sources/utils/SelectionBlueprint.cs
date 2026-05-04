@@ -55,7 +55,7 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
                 Vector2I offset = new(i - halfSize.X, j - halfSize.Y);
                 Vector2I tilePos = centerTile + offset;
 
-                Vector2 worldPos = TilesHelper.WorldPositionTile(tilePos);
+                Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tilePos);
                 TileSpriteData tileData = MasterDataManager.GetData<TileSpriteData>(tileId);
                 if (tileData!=null)
                 {
@@ -92,7 +92,7 @@ public class SelectionBlueprint:SingletonBase<SelectionBlueprint>
 
                 Vector2I offset = new(x - halfSize.X, y - halfSize.Y);
                 Vector2I newTilePos = targetTilePosition + offset;
-                Vector2 newWorldPos = TilesHelper.WorldPositionTile(newTilePos);
+                Vector2 newWorldPos = TilesHelper.TilePositionToWorldPosition(newTilePos);
 
                 ref var position = ref entity.GetMut<PositionComponent>();
                 position.position = newWorldPos;

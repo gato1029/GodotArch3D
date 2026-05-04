@@ -5,15 +5,15 @@ using System.Linq;
 
 public partial class RuntimeEditorWindowMaterial : Window
 {
-    public delegate void EventOnSelection(MaterialData materialData);
+    public delegate void EventOnSelection(MaterialData materialData, ModInfo modInfo);
     public event EventOnSelection OnSelection;
 
     [Export] public MaterialType materialType = MaterialType.TERRENO;
-
+    
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
-        AtlasTexturesModsManager.Instance.FirstLoad();
+        //AtlasTexturesModsManager.Instance.FirstLoad();
         ListaTipos.OnDataSelected += ListaTipos_OnDataSelected;
         ItemsList.OnDataSelected += ItemsList_OnDataSelected;
         CargarMods();
@@ -28,7 +28,7 @@ public partial class RuntimeEditorWindowMaterial : Window
     private void ItemsList_OnDataSelected(object obj)
     {
         var data = (MaterialData)obj;
-        OnSelection?.Invoke(data);
+        OnSelection?.Invoke(data,ListaTipos.GetSelectedData<ModInfo>());
         QueueFree();
     }
 

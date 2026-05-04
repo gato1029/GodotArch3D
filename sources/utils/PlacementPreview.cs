@@ -47,7 +47,7 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
                 Vector2I offset = new(i - halfSize.X, j - halfSize.Y);
                 Vector2I tilePos = centerTile + offset;
 
-                Vector2 worldPos = TilesHelper.WorldPositionTile(tilePos);
+                Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tilePos);
 
                 var entity = TileSpriteCreator.Instance.CreateSingleSprite(flecsManager,tileSpriteData, worldPos,tilePos,renderLayer);
                 // Crear la entidad del preview usando SpriteData
@@ -77,7 +77,7 @@ public class PlacementPreview : SingletonBase<PlacementPreview>
                 var spriteData = entity.Get<RenderGPUComponent>();
                 Vector2I offset = new(x - halfSize.X, y - halfSize.Y);
                 Vector2I newTilePos = targetTilePosition + offset;
-                Vector2 newWorldPos = TilesHelper.WorldPositionTile(newTilePos);
+                Vector2 newWorldPos = TilesHelper.TilePositionToWorldPosition(newTilePos);
 
                 Vector2 positionNormalize = newTilePos * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
                 Vector2 positionCenter = positionNormalize + new Vector2(xx, yy);

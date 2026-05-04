@@ -29,4 +29,13 @@ public class MultiIndex<TKey, TValue> where TKey : notnull
     {
         return _index.TryGetValue(key, out list);
     }
+    public void Clear()
+    {
+        foreach (var kv in _index)
+        {
+            kv.Value.Clear();
+        }
+
+        _index.Clear();
+    }
 }

@@ -8,8 +8,9 @@ using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
-public struct TileDataMod
+public class TileDataMod
 {
+    public string ModName;
     public int SubTextureId;
     public ushort Index;
 
@@ -80,6 +81,7 @@ public class BlackyTilePalette
         // Llenar el struct con cache total
         palette[newId] = new TileDataMod
         {
+            ModName = modName,
             SubTextureId = data.idSubTexture,
             Index = indexTexture,
             BaseUV = baseUV,
@@ -210,7 +212,7 @@ public class BlackyTilePalette
     // =========================
     // UTILIDADES
     // =========================
-    public bool TryGetTile(ushort id, out TileDataMod tile) => palette.TryGetValue(id, out tile);
+    public bool TryGetTileDataMod(ushort id, out TileDataMod tile) => palette.TryGetValue(id, out tile);
     public bool Exists(ushort id) => palette.ContainsKey(id);
     public void Clear() { palette.Clear(); lookup.Clear(); persistedPalette.Clear(); idIncremental = 1; }
 }

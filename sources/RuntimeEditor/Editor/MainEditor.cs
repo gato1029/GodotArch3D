@@ -14,16 +14,34 @@ public partial class MainEditor : Node
     public override void _Ready()
     {
         InitializeUI(); // Insertado por el generador de UI
-                        
-        ModHelper.Init();
+        FileHelper.Initialize("D:\\GitKraken\\ModsGame");
+        ModHelper.Init(true);
+        AtlasTexturesModsManager.Instance.FirstLoad();
         NodeMainHelper.SetNode3DMain(mainRender);
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();
-        AtlasTexturesModsManager.Instance.FirstLoad();
+        KuroButtonTerreno.Pressed += KuroButtonTerreno_Pressed;
     }
+    private WindowEditorRuntimeTerrain _terrainWindow;
+    private void KuroButtonTerreno_Pressed()
+    {
+        if (IsInstanceValid(_terrainWindow))
+        {
+            _terrainWindow.Popup();
+            _terrainWindow.GrabFocus();
+            return;
+        }
+
+        _terrainWindow = RuntimeServices.NodeRegistry.Create<WindowEditorRuntimeTerrain>();
+        AddChild(_terrainWindow);
+
+        _terrainWindow.TreeExited += () => _terrainWindow = null;
+
+        _terrainWindow.Popup();
+    }
+
     public override void _Process(double delta)
     {
-
         RenderCommandQueue.ExecuteFrame();
         ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
 

@@ -28,13 +28,24 @@ namespace GodotEcsArch.sources.utils
             }
         }
 
-        public static Vector2 WorldPositionTile(Vector2I positionTile)
+        public static Vector2 TilePositionToWorldPosition(Vector2I positionTile)
         {
             Vector2 tileSize = new Vector2(16, 16);
             
             float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
             float y = MeshCreator.PixelsToUnits(tileSize.Y) / 2f;
             Vector2 positionNormalize = positionTile * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
+            Vector2 positionCenter = positionNormalize + new Vector2(x, y);
+            return positionCenter;
+        }
+
+        public static Vector2 TilePositionToWorldPosition(int xx, int yy)
+        {
+            Vector2 tileSize = new Vector2(16, 16);
+
+            float x = MeshCreator.PixelsToUnits(tileSize.X) / 2f;
+            float y = MeshCreator.PixelsToUnits(tileSize.Y) / 2f;
+            Vector2 positionNormalize = new Vector2I(xx,yy) * new Vector2(MeshCreator.PixelsToUnits(tileSize.X), MeshCreator.PixelsToUnits(tileSize.Y));
             Vector2 positionCenter = positionNormalize + new Vector2(x, y);
             return positionCenter;
         }

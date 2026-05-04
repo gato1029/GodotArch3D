@@ -85,7 +85,7 @@ namespace GodotEcsArch.sources.BlackyTiles.Systems
 
                     if (entityId != 0)
                     {
-                        Vector2 posWorld = TilesHelper.WorldPositionTile(global);
+                        Vector2 posWorld = TilesHelper.TilePositionToWorldPosition(global);
                         int shapeId = WireShape.Instance.DrawFilledSquare(
                             new Vector2(16, 16),
                             posWorld,
@@ -133,7 +133,7 @@ namespace GodotEcsArch.sources.BlackyTiles.Systems
             {
                 if (!shapes.ContainsKey(tilePosGlobal))
                 {
-                    Vector2 posWorld = TilesHelper.WorldPositionTile(tilePosGlobal);
+                    Vector2 posWorld = TilesHelper.TilePositionToWorldPosition(tilePosGlobal);
                     int shapeId = WireShape.Instance.DrawFilledSquare(
                         new Vector2(16, 16),
                         posWorld,

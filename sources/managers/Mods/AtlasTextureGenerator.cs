@@ -75,7 +75,7 @@ public class AtlasTextureGenerator:SingletonBase<AtlasTextureGenerator>
     {
       
 
-        string pathSave = "ModsGame/Atlas/atlas_" + materialType.ToString() + "_" + idAtlas.ToString() + ".png";
+        string pathSave = "Orquestador/Atlas/atlas_" + materialType.ToString() + "_" + idAtlas.ToString() + ".png";
         string path = FileHelper.GetPathGameDB(pathSave);
         int idAtlasHash = StableHash.FromString(pathSave);
 
