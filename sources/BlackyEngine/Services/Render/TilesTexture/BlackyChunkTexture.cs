@@ -117,11 +117,7 @@ public class BlackyChunkTexture
 
     #endregion
 
-    public BlackyDualNodeTilemap GetOrCreateDualLayer(int height, int layer)
-    {
-        var h = GetOrCreateHeight(height);
-        return h.GetOrCreateDualLayer(layer, _size);
-    }
+    
 
     #region Layers helper
 

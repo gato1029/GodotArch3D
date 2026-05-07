@@ -4,7 +4,9 @@
 [ext_resource type="Material" uid="uid://bj0owcxmfeky" path="res://resources/Material/grid.tres" id="2_xh56v"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_e6381"]
 [ext_resource type="Script" uid="uid://xfxpirr8k7b" path="res://sources/WindowsDataBase/HerramientaMenuBar.cs" id="3_kc28b"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="4_kc28b"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="4_tksb4"]
+[ext_resource type="Texture2D" uid="uid://cqt3q1wbbj08m" path="res://resources/Textures/iconos/Clone Figure.png" id="5_hq8xv"]
 [ext_resource type="Texture2D" uid="uid://c5brcvag3uklm" path="res://resources/Textures/iconos/Image.png" id="5_kc28b"]
 [ext_resource type="PackedScene" uid="uid://ckwoyhgb501je" path="res://sources/Editor/Controls/EditorPanel.tscn" id="5_namcl"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
@@ -90,12 +92,26 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
 
-[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu" unique_id=2052876277]
+[node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu" unique_id=1944438083]
+layout_mode = 2
+
+[node name="KuroButton" type="TextureButton" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer" unique_id=958875849]
+custom_minimum_size = Vector2(48, 81.5)
+layout_mode = 2
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("5_hq8xv")
+ButtonText = "Dual Grid"
+Padding = 8
+FontSize = 12
+IconMinSize = Vector2(32, 32)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer" unique_id=2052876277]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("3_kc28b")
 
-[node name="Atlas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1703351011]
+[node name="Atlas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer/MenuBar" unique_id=1703351011]
 auto_translate_mode = 1
 item_count = 3
 item_0/text = "Materiales"
@@ -105,7 +121,7 @@ item_1/id = 1
 item_2/text = "Agrupadores"
 item_2/id = 2
 
-[node name="Creador Tiles" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1018385119]
+[node name="Creador Tiles" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer/MenuBar" unique_id=1018385119]
 auto_translate_mode = 2
 oversampling_override = 1.0
 title = "Menu Tiles"
@@ -120,7 +136,7 @@ item_2/id = 2
 item_3/text = "TileTextureAnimacionCollider"
 item_3/id = 3
 
-[node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1127058186]
+[node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer/MenuBar" unique_id=1127058186]
 auto_translate_mode = 1
 oversampling_override = 1.0
 size = Vector2i(200, 100)
@@ -132,7 +148,7 @@ item_1/text = "Visualizar Editor"
 item_1/checkable = 1
 item_1/id = 1
 
-[node name="Componentes" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=90285667]
+[node name="Componentes" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer/MenuBar" unique_id=90285667]
 auto_translate_mode = 1
 oversampling_override = 1.0
 size = Vector2i(191, 143)
@@ -155,7 +171,7 @@ item_7/text = "Transicion Terreno"
 item_7/icon = ExtResource("5_kc28b")
 item_7/id = 7
 
-[node name="Armamento" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=1905487791]
+[node name="Armamento" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer/MenuBar" unique_id=1905487791]
 auto_translate_mode = 1
 item_count = 2
 item_0/text = "Animacion Accesorios"
@@ -163,7 +179,7 @@ item_0/id = 0
 item_1/text = "Creacion Accesorios"
 item_1/id = 1
 
-[node name="Mapas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/MenuBar" unique_id=604479288]
+[node name="Mapas" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/VBoxContainer/Menu/HBoxContainer/MenuBar" unique_id=604479288]
 auto_translate_mode = 1
 item_count = 2
 item_0/text = "Nuevo Mapa"
@@ -171,7 +187,12 @@ item_0/id = 0
 item_1/text = "Cargar Mapa"
 item_1/id = 1
 
+[node name="HBoxContainer2" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer" unique_id=173106671]
+layout_mode = 2
+size_flags_vertical = 3
+
 [node name="HBoxContainer" type="HBoxContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer" unique_id=1751649261]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -188,6 +209,7 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="AnimatedPanelContainer" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer" unique_id=1502952452 instance=ExtResource("5_namcl")]
+visible = false
 layout_mode = 2
 
 [node name="PanelContainer" type="Panel" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer" unique_id=141419533]
@@ -207,8 +229,8 @@ script = ExtResource("6_yxrc8")
 
 [node name="SubViewport" type="SubViewport" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer" unique_id=1243047204]
 handle_input_locally = false
-size = Vector2i(817, 855)
-render_target_update_mode = 4
+size = Vector2i(1280, 805)
+render_target_update_mode = 0
 
 [node name="Render" type="Node" parent="Editor/MainWindows/Control/Panel/VBoxContainer/HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport" unique_id=1916277622]
 
