@@ -25,6 +25,13 @@ public interface IBlackyChunkTilemapTexture
     void ClearTile(int x, int y);
     bool IsEmpty(int x, int y);
 
+    // NUEVO
+    void SetSolid(int x, int y, bool value);
+    bool IsSolid(int x, int y);
+
+    void SetDualMask(int x, int y, byte mask);
+    byte GetDualMask(int x, int y);
+
     // ===============================
     // BULK (IMPORTANTE)
     // ===============================

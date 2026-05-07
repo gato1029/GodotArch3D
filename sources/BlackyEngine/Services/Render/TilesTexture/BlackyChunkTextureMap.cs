@@ -7,25 +7,7 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
-public readonly struct BlackyDualNodeRef
-{
-    public readonly BlackyChunkTexture Chunk;
-    public readonly BlackyDualNodeTilemap DualLayer;
-    public readonly int LocalX;
-    public readonly int LocalY;
 
-    public BlackyDualNodeRef(
-        BlackyChunkTexture chunk,
-        BlackyDualNodeTilemap dualLayer,
-        int localX,
-        int localY)
-    {
-        Chunk = chunk;
-        DualLayer = dualLayer;
-        LocalX = localX;
-        LocalY = localY;
-    }
-}
 public struct TileChange
 {
     public int WorldX;
@@ -40,7 +22,7 @@ public struct TileChange
 public class BlackyChunkTextureMap
 {
     public event Action<TileChange> OnTileChanged;
-    private readonly HashSet<(int x, int y, int h, int l, string modName)> _dirtyDualVisuals = new();
+    private readonly ushort[] _dualMaskToAtlas;
 
     private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly Dictionary<(int, int), BlackyRegion> _regions = new();
@@ -347,248 +329,131 @@ public class BlackyChunkTextureMap
     }
 
     // dual
-
-    public BlackyDualNodeRef ResolveDualNodeOrCreate(
-        int worldNodeX,
-        int worldNodeY,
-        int height,
-        int layer)
-    {
-        var coord = WorldToChunkCoord(worldNodeX, worldNodeY);
-
-        var chunk = GetOrCreateChunk(coord.X, coord.Y);
-
-        int localX = Mod(worldNodeX, ChunkSize);
-        int localY = Mod(worldNodeY, ChunkSize);
-
-        var dualLayer = chunk.GetOrCreateDualLayer(height, layer);
-
-        return new BlackyDualNodeRef(chunk, dualLayer, localX, localY);
-    }
-
-    public bool ResolveDualNode(
-    int worldNodeX,
-    int worldNodeY,
+    public void RemoveTileDual(
+    int worldX,
+    int worldY,
     int height,
     int layer,
-    out BlackyDualNodeRef nodeRef)
-    {
-        var coord = WorldToChunkCoord(worldNodeX, worldNodeY);
-
-        if (!_chunks.TryGetValue(coord, out var chunk))
-        {
-            nodeRef = default;
-            return false;
-        }
-
-        if (!chunk.TryGetHeight(height, out var h))
-        {
-            nodeRef = default;
-            return false;
-        }
-
-        if (!h.TryGetDualLayer(layer, out var dualLayer))
-        {
-            nodeRef = default;
-            return false;
-        }
-
-        int localX = Mod(worldNodeX, ChunkSize);
-        int localY = Mod(worldNodeY, ChunkSize);
-
-        nodeRef = new BlackyDualNodeRef(chunk, dualLayer, localX, localY);
-        return true;
-    }
-
-    public byte GetGlobalDualNode(
-    int worldNodeX,
-    int worldNodeY,
-    int height,
-    int layer)
-    {
-        if (!ResolveDualNode(worldNodeX, worldNodeY, height, layer, out var nodeRef))
-            return 0;
-
-        return nodeRef.DualLayer.GetNode(nodeRef.LocalX, nodeRef.LocalY);
-    }
-    public void SetGlobalDualNode(
-    int worldNodeX,
-    int worldNodeY,
-    int height,
-    int layer,
-    byte value,
     string modName)
     {
-        var nodeRef = ResolveDualNodeOrCreate(worldNodeX, worldNodeY, height, layer);
+        var (chunk, lx, ly) =
+            ResolveOrCreate(worldX, worldY);
 
-        nodeRef.DualLayer.SetNode(nodeRef.LocalX, nodeRef.LocalY, value);
-        nodeRef.Chunk.MarkDirty();
+        var tileLayer =
+            chunk.GetOrCreateLayer(height, layer);
 
-        for (int oy = -1; oy <= 0; oy++)
-        {
-            for (int ox = -1; ox <= 0; ox++)
-            {
-                _dirtyDualVisuals.Add((
-                    worldNodeX + ox,
-                    worldNodeY + oy,
-                    height,
-                    layer,
-                    modName));
-            }
-        }
+        tileLayer.SetSolid(lx, ly, false);
+
+        RebuildDualNeighborhood(
+            worldX,
+            worldY,
+            height,
+            layer,
+            modName);
     }
-    public int GetDualMaskGlobal(
-    int visualX,
-    int visualY,
+    public void SetTileDual(
+    int worldX,
+    int worldY,
     int height,
-    int layer)
+    int layer,
+    string modName)
+    {
+        var (chunk, lx, ly) =
+            ResolveOrCreate(worldX, worldY);
+
+        var tileLayer =
+            chunk.GetOrCreateLayer(height, layer);
+
+        tileLayer.SetSolid(lx, ly, true);
+
+        RebuildDualNeighborhood(
+            worldX,
+            worldY,
+            height,
+            layer,
+            modName);
+    }
+    public void RebuildDualNeighborhood(
+    int x,
+    int y,
+    int height,
+    int layer,
+    string modName)
+    {
+        RebuildDualCell(x - 1, y - 1, height, layer, modName);
+        RebuildDualCell(x, y - 1, height, layer, modName);
+        RebuildDualCell(x - 1, y, height, layer, modName);
+        RebuildDualCell(x, y, height, layer, modName);
+    }
+    public void RebuildDualCell(
+    int vx,
+    int vy,
+    int height,
+    int layer,
+    string modName)
     {
         int mask = 0;
 
-        if (GetGlobalDualNode(visualX, visualY, height, layer) != 0) mask |= 1;
-        if (GetGlobalDualNode(visualX + 1, visualY, height, layer) != 0) mask |= 2;
-        if (GetGlobalDualNode(visualX, visualY + 1, height, layer) != 0) mask |= 4;
-        if (GetGlobalDualNode(visualX + 1, visualY + 1, height, layer) != 0) mask |= 8;
+        if (IsSolidGlobal(vx, vy, height, layer))
+            mask |= 1;
 
-        return mask;
-    }
+        if (IsSolidGlobal(vx + 1, vy, height, layer))
+            mask |= 2;
 
-    public void RebuildDualVisualTile(
-    int visualX,
-    int visualY,
-    int height,
-    int layer,
-    string modName)
-    {
-        int spriteIndex = GetDualMaskGlobal(visualX, visualY, height, layer);
+        if (IsSolidGlobal(vx, vy + 1, height, layer))
+            mask |= 4;
 
-        var (chunk, localX, localY) = ResolveOrCreate(visualX, visualY);
+        if (IsSolidGlobal(vx + 1, vy + 1, height, layer))
+            mask |= 8;
 
-        ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, (ushort)spriteIndex);
+        var (chunk, lx, ly) = ResolveOrCreate(vx, vy);
 
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-        tileLayer.SetTile(localX, localY, tileId);
+
+        tileLayer.SetDualMask(lx, ly, (byte)mask);
+
+        ushort atlasIndex = 0;
+
+        if (mask != 0)
+            atlasIndex = _dualMaskToAtlas[mask];
+
+        ushort tileId =
+            chunk.ParentRegion.GetOrCreateTile(
+                modName,
+                atlasIndex);
+
+        tileLayer.SetTile(lx, ly, tileId);
 
         chunk.MarkDirty();
 
         OnTileChanged?.Invoke(new TileChange
         {
-            WorldX = visualX,
-            WorldY = visualY,
+            WorldX = vx,
+            WorldY = vy,
             Height = height,
             Layer = layer,
             TileId = tileId,
             region = chunk.ParentRegion,
-            remove = false
+            remove = mask == 0
         });
     }
-
-    public void FlushDualVisualChanges()
-    {
-        foreach (var d in _dirtyDualVisuals)
-        {
-            RebuildDualVisualTile(d.x, d.y, d.h, d.l, d.modName);
-        }
-
-        _dirtyDualVisuals.Clear();
-    }
-
-    public void SetDualNodeSolid(
-    int worldNodeX,
-    int worldNodeY,
-    int height,
-    int layer,
-    string modName)
-    {
-        SetGlobalDualNode(worldNodeX, worldNodeY, height, layer, 1, modName);
-    }
-    public void ClearDualNode(
-    int worldNodeX,
-    int worldNodeY,
-    int height,
-    int layer,
-    string modName)
-    {
-        SetGlobalDualNode(worldNodeX, worldNodeY, height, layer, 0, modName);
-    }
-
-    public void PaintDualCell(
+    public bool IsSolidGlobal(
     int worldX,
     int worldY,
     int height,
-    int layer,
-    string modName)
+    int layer)
     {
-        SetGlobalDualNode(worldX, worldY, height, layer, 1, modName);
-        SetGlobalDualNode(worldX + 1, worldY, height, layer, 1, modName);
-        SetGlobalDualNode(worldX, worldY + 1, height, layer, 1, modName);
-        SetGlobalDualNode(worldX + 1, worldY + 1, height, layer, 1, modName);
-    }
-    public void ClearDualCell(
-    int worldX,
-    int worldY,
-    int height,
-    int layer,
-    string modName)
-    {
-        SetGlobalDualNode(worldX, worldY, height, layer, 0, modName);
-        SetGlobalDualNode(worldX + 1, worldY, height, layer, 0, modName);
-        SetGlobalDualNode(worldX, worldY + 1, height, layer, 0, modName);
-        SetGlobalDualNode(worldX + 1, worldY + 1, height, layer, 0, modName);
-    }
+        var (chunk, lx, ly) = Resolve(worldX, worldY);
 
-    //PaintDualCell(10,5,...);
-    //FlushDualVisualChanges();
+        if (chunk == null)
+            return false;
 
-    public void PaintDualBlock(
-    int startX,
-    int startY,
-    int width,
-    int height,
-    int heightLevel,
-    int layer,
-    string modName)
-    {
-        int endX = startX + width;
-        int endY = startY + height;
+        if (!chunk.TryGetHeight(height, out var h))
+            return false;
 
-        // =========================
-        // 1. Pintar malla nodal envolvente
-        // =========================
-        for (int y = startY; y <= endY; y++)
-        {
-            for (int x = startX; x <= endX; x++)
-            {
-                SetGlobalDualNode(x, y, heightLevel, layer, 1, modName);
-            }
-        }
+        if (!h.TryGetLayer(layer, out var l))
+            return false;
 
-        // =========================
-        // 2. Flush visual único
-        // =========================
-        FlushDualVisualChanges();
-    }
-
-    public void ClearDualBlock(
-    int startX,
-    int startY,
-    int width,
-    int height,
-    int heightLevel,
-    int layer,
-    string modName)
-    {
-        int endX = startX + width;
-        int endY = startY + height;
-
-        for (int y = startY; y <= endY; y++)
-        {
-            for (int x = startX; x <= endX; x++)
-            {
-                SetGlobalDualNode(x, y, heightLevel, layer, 0, modName);
-            }
-        }
-
-        FlushDualVisualChanges();
+        return l.IsSolid(lx, ly);
     }
 }

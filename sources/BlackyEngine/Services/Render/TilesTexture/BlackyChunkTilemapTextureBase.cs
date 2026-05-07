@@ -31,6 +31,11 @@ public abstract class BlackyChunkTilemapTextureBase : IBlackyChunkTilemapTexture
 
     public bool HasDirtyTiles => _useRegion || _dirtySet.Count > 0;
 
+    public abstract void SetSolid(int x, int y, bool value);
+    public abstract bool IsSolid(int x, int y);
+
+    public abstract void SetDualMask(int x, int y, byte mask);
+    public abstract byte GetDualMask(int x, int y);
     protected BlackyChunkTilemapTextureBase(int layerIndex, int size, int worldX, int worldY)
     {
         LayerIndex = layerIndex;
