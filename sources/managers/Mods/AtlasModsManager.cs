@@ -172,7 +172,12 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // =========================================================
     // 🟡 TILE TEXTURE (STRING KEY ATLAS)
     // =========================================================
-
+    public static bool TryGetTileTextureIndex(string modName, int indexTexture, out TileTextureData value)
+    {
+        string keyMod = modName + ":" + indexTexture;
+        return Instance.InternalTryGetTileTexture(modName, keyMod, out value);
+    }
+    
     public static bool TryGetTileTexture(string modName, string name, out TileTextureData value)
         => Instance.InternalTryGetTileTexture(modName, name, out value);
     private bool InternalTryGetTileTexture(string modName, string name, out TileTextureData value)
@@ -288,6 +293,58 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
         return atlas.GetRawData();
     }
+    // =========================================================
+    // HELPERS VARIOS
+    // =========================================================
+
+    public static AtlasTexture[] GetAtlasTexture(string idMod_idMaterial,int internalPosition,out bool isAnimated,out TileTextureData tileTextureData)
+    {
+        var data = AtlasTexturesModsManager.Instance.GetMaterialTexture(idMod_idMaterial);
+        
+
+        bool exist = TryGetTileTextureIndex(idMod_idMaterial, internalPosition, out tileTextureData);
+        isAnimated = exist && tileTextureData.isAnimated;
+
+        AtlasTexture baseUV = CalculateUVFromId(data.idSubTexture, (ushort)internalPosition);
+        AtlasTexture[] animatedUVs = null;
+
+        if (isAnimated)
+        {
+            animatedUVs = new AtlasTexture[tileTextureData.indexAnimation.Length];
+            for (int i = 0; i < tileTextureData.indexAnimation.Length; i++)
+            {
+                animatedUVs[i] = CalculateUVFromId(data.idSubTexture, (ushort)tileTextureData.indexAnimation[i]);
+            }
+        }
+        else
+        {
+            animatedUVs = new AtlasTexture[1];
+            animatedUVs[0] = baseUV;
+        }
+        return animatedUVs;
+    }
+
+    private static AtlasTexture CalculateUVFromId(int subTextureId, ushort localIndex)
+    {
+        var data = AtlasTexturesModsManager.Instance.GetMaterialTextureBySubId(subTextureId);
+        AtlasTexture atlasTexture = new AtlasTexture();
+        if (data == null)
+        {
+            atlasTexture.Region = new Rect2(0,0,0,0);
+            return atlasTexture;
+        }
+
+        int localColumns = data.widthAtlas / data.divisionPixelAtlasX;
+        int row = localIndex / localColumns;
+        int column = localIndex % localColumns;
+        
+
+        atlasTexture.Region = new Rect2(data.xInAtlas + (column * data.divisionPixelAtlasX), data.yInAtlas + (row * data.divisionPixelAtlasY),
+            data.divisionPixelAtlasX, data.divisionPixelAtlasY);
+
+        return atlasTexture;
+    }
+
     public void ClearAll()
     {
         // ================================

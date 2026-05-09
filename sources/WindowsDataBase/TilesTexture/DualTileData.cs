@@ -9,11 +9,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 public class DualTileData
 {
     // Tile principal/top
-    public int TileIndex { get; set; }
-
-    // ID de textura/atlas
-    public string TextureId { get; set; } = "";
-
+    public DualTilePart MainTile { get; set; }
+    
     // Tipo de altura
     // 1,2,3...
     public int Height { get; set; }
@@ -24,13 +21,11 @@ public class DualTileData
     public List<DualTilePart> Parts { get; set; } = new();
 
     public DualTileData(
-        int tileIndex,
-        string textureId,
+        DualTilePart mainTile,
         int height
     )
     {
-        TileIndex = tileIndex;
-        TextureId = textureId;
+        this.MainTile = mainTile;        
         Height = height;
     }
 }
@@ -40,15 +35,15 @@ public class DualTilePart
 {
     public int TileIndex { get; set; }
 
-    public string TextureId { get; set; } = "";
-
+    public string IdMod { get; set; } = "";    
     public DualTilePart(
         int tileIndex,
-        string textureId
+        string idMod       
+
     )
     {
         TileIndex = tileIndex;
-        TextureId = textureId;
+        IdMod = idMod;        
     }
 }
 

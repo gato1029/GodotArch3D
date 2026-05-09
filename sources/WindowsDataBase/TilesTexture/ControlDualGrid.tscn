@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://bp433vd15d553"]
 
+[ext_resource type="PackedScene" uid="uid://bcav722ca18vm" path="res://sources/BlackyTextures/Controls/ControlBlackyAtlasTexture.tscn" id="1_hyn27"]
+
 [node name="ControlDualGrid" type="PanelContainer" unique_id=1351490201]
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,10 +12,9 @@ grow_vertical = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=739058490]
 layout_mode = 2
 
-[node name="Tree" type="Tree" parent="HBoxContainer" unique_id=1139999554]
-layout_mode = 2
-size_flags_horizontal = 3
-
 [node name="PanelContainer" type="PanelContainer" parent="HBoxContainer" unique_id=1007271273]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="ControlBlackyAtlasTexture" parent="HBoxContainer/PanelContainer" unique_id=434538793 instance=ExtResource("1_hyn27")]
+layout_mode = 2

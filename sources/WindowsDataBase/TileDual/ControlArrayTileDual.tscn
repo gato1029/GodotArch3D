@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://sjevlrbvu3x1"]
+
+[node name="ControlArrayTileDual" type="PanelContainer" unique_id=1339792890]
+custom_minimum_size = Vector2(100, 150)
+offset_right = 100.0
+offset_bottom = 150.0
