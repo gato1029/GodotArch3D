@@ -29,6 +29,23 @@ namespace GodotEcsArch.sources.utils
             GD.PrintErr($"Error al cargar la imagen desde: {filePath}. Error: {result}");
             return null;
         }
+        public static Texture LoadTextureDirect(string filePath)
+        {  
+            Image imageCompressed = new Image();
+            Error result = imageCompressed.Load(filePath);
+            result = imageCompressed.GenerateMipmaps();
+
+            if (result == Error.Ok)
+            {
+                // Convertir la imagen cargada en una textura
+                ImageTexture texture = ImageTexture.CreateFromImage(imageCompressed);
+
+                return texture;
+            }
+
+            GD.PrintErr($"Error al cargar la imagen desde: {filePath}. Error: {result}");
+            return null;
+        }
         public static Texture LoadTextureLocal(string filePath)
         {
             string rutaCarpeta = Path.GetDirectoryName(filePath) +"/DDS/";

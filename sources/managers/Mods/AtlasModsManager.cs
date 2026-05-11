@@ -29,6 +29,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<int, TileSpriteData> spriteData = new();
     private readonly AtlasMods<int, AutoTileSpriteData> autoSpriteData = new();
     private readonly AtlasMods<int, TerrainData> terrainData = new();
+    private readonly AtlasMods<int, DualTileTemplate> dualTileTemplate = new();
     private readonly AtlasMods<int, TerrainDataTransition> terrainDataTransicion = new();
 
     private readonly AtlasMods<int, BuildingData> buildingData = new();
@@ -241,6 +242,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(terrainData, idMod);
         CargarDatos(terrainDataTransicion, idMod);
         CargarDatos(autoSpriteData, idMod);
+        CargarDatos(dualTileTemplate, idMod);
     }
 
     private void CargarPorModEspecial(byte idMod)
@@ -327,7 +329,10 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private static AtlasTexture CalculateUVFromId(int subTextureId, ushort localIndex)
     {
         var data = AtlasTexturesModsManager.Instance.GetMaterialTextureBySubId(subTextureId);
-        AtlasTexture atlasTexture = new AtlasTexture();
+        
+        AtlasTexture atlasTexture = new AtlasTexture();        
+        atlasTexture.Atlas = data.textureVisual;
+
         if (data == null)
         {
             atlasTexture.Region = new Rect2(0,0,0,0);
@@ -337,6 +342,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         int localColumns = data.widthAtlas / data.divisionPixelAtlasX;
         int row = localIndex / localColumns;
         int column = localIndex % localColumns;
+        
         
 
         atlasTexture.Region = new Rect2(data.xInAtlas + (column * data.divisionPixelAtlasX), data.yInAtlas + (row * data.divisionPixelAtlasY),
@@ -360,6 +366,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         bulletData.Clear();
         characterData.Clear();
         tilesTextureData.Clear();
+        dualTileTemplate.Clear();
 
         // ================================
         // CLEAR INDEXES
@@ -376,7 +383,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     }
     internal void FirstLoad()
     {
-        RegisterAtlas(materiales);
+        
         RegisterAtlas(fuenteRecursos);
         RegisterAtlas(spriteData);
         RegisterAtlas(autoSpriteData);
@@ -386,6 +393,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(bulletData);
         RegisterAtlas(characterData);
         RegisterAtlas(tilesTextureData);
+        RegisterAtlas(dualTileTemplate);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {
@@ -396,8 +404,21 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
             CargarPorMod(idMod);
             CargarPorModEspecial(idMod);
-            CargarTilesTextureData(idMod);
+            CargarTilesTextureData(idMod);            
+        }
+    }
+
+    internal void FirstLoadMaterial()
+    {
+        RegisterAtlas(materiales);
+        foreach (var mod in TableMods.Instance.ObtenerTodos())
+        {
+            byte idMod = mod.Key;
+            var info = mod.Value;
+            FileHelper.SetModsPath(info.FolderPath);
+            DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);            
             CargarMateriales(idMod, info.Name);
         }
+        
     }
 }

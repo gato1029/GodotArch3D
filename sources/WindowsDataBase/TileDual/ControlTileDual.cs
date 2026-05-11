@@ -9,8 +9,8 @@ public partial class ControlTileDual : PanelContainer
 	ControlBlackyAtlasTexture commonBlackyAtlasTexture;
     DualTilePart dualTilePart;
 
-
-	private TileTextureData tileTextureData;
+    public event Action<ControlTileDual> OnDualTilePartRemoved;
+    private TileTextureData tileTextureData;
 	private bool isAnimated => tileTextureData != null;
 	private AtlasTexture[] atlasTextures;
     public override void _Ready()
@@ -18,17 +18,29 @@ public partial class ControlTileDual : PanelContainer
         InitializeUI(); // Insertado por el generador de UI
 		TileTexture.GuiInput += TileTexture_GuiInput;
     }
-
     private void TileTexture_GuiInput(InputEvent @event)
     {
-        // Solo procesar click izquierdo
-        if (@event is InputEventMouseButton mouseButton &&
-            mouseButton.Pressed &&
-            mouseButton.ButtonIndex == MouseButton.Left)
+        if (@event is not InputEventMouseButton mouseButton)
+            return;
+
+        if (!mouseButton.Pressed)
+            return;
+
+        // CLICK DERECHO -> quitar tile
+        if (mouseButton.ButtonIndex == MouseButton.Right)
         {
-            if (dualTilePart != null)
+            dualTilePart.IdMod = "";
+            dualTilePart.TileIndex = -1;
+            RefreshTexture();
+            OnDualTilePartRemoved?.Invoke(this);            
+            return;
+        }
+
+             
+        if (mouseButton.ButtonIndex == MouseButton.Middle)
+        {
+            if (dualTilePart != null && dualTilePart.IdMod != "")
             {
-                // Formato esperado: "mod:id"
                 string[] split = dualTilePart.IdMod.Split(':');
 
                 if (split.Length >= 2)
@@ -38,7 +50,7 @@ public partial class ControlTileDual : PanelContainer
                     if (int.TryParse(split[1], out int idMaterial))
                     {
                         var mat = AtlasModsManager.Get<MaterialData>(
-                            dualTilePart.IdMod,
+                            idMod,
                             idMaterial
                         );
 
@@ -48,17 +60,37 @@ public partial class ControlTileDual : PanelContainer
                                 mat.textureVisual,
                                 new Vector2I(mat.divisionPixelX, mat.divisionPixelY),
                                 idMaterial,
-                                idMod
+                                dualTilePart.IdMod
                             );
 
                             commonBlackyAtlasTexture.SetSelection(
-                                dualTilePart.TileIndex
+                                dualTilePart.TileIndex + 1
                             );
                         }
                     }
                 }
             }
+
+            return;
         }
+       if (mouseButton.ButtonIndex == MouseButton.Left)
+        {
+            if (commonBlackyAtlasTexture!=null)
+            {
+                // CLICK SIMPLE -> asignar tile actual
+                var selection = commonBlackyAtlasTexture.GetCurrentSelectionMatrix();
+                if (selection!=null)
+                {
+                    var tileSelect = selection.matrix[0, 0];
+
+                    dualTilePart.IdMod = tileSelect.idMod;
+                    dualTilePart.TileIndex = tileSelect.index - 1;
+                    RefreshTexture();
+                }                
+            }
+            
+        }
+
     }
 
     public void SetCommonBlackyAtlasTexture( ControlBlackyAtlasTexture common )
@@ -70,23 +102,38 @@ public partial class ControlTileDual : PanelContainer
 		return dualTilePart;
     }
 
-	public void SetDualTilePart( DualTilePart dualTilePart)
+    private void RefreshTexture()
+    {
+        if (dualTilePart != null && dualTilePart.IdMod != "")
+        {
+            var temp = AtlasModsManager.GetAtlasTexture(dualTilePart.IdMod, dualTilePart.TileIndex, out bool isAnimated, out TileTextureData tileTextureData);
+            if (!isAnimated)
+            {
+                TileTexture.Texture = temp[0];
+                this.tileTextureData = null;
+            }
+            else
+            {
+                atlasTextures = temp;
+                this.tileTextureData = tileTextureData;
+            }
+        }
+        else
+        {
+            TileTexture.Texture = null;
+            this.tileTextureData = null;
+        }
+    }
+    public void SetDualTilePart( DualTilePart dualTilePart)
 	{        
         this.dualTilePart = dualTilePart;
-        var temp = AtlasModsManager.GetAtlasTexture(dualTilePart.IdMod,dualTilePart.TileIndex, out bool isAnimated, out TileTextureData tileTextureData);
-		if (!isAnimated)
-		{
-            TileTexture.Texture = temp[0];
-			isAnimated = false;
-			tileTextureData = null;
+        if (dualTilePart.IdMod=="")
+        {
+            // aun sin asignar, no hacemos nada
+            return;
         }
-		else
-		{
-			atlasTextures = temp;
-            isAnimated = true;
-            this.tileTextureData = tileTextureData;
-        }
-		
+        RefreshTexture();
+
     }
 
 	int currentFrame = 0;

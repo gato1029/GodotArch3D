@@ -1,3 +1,6 @@
+using Godot;
+using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
 using LiteDB;
 using System;
 
@@ -17,8 +20,17 @@ public class MaterialModData
     public int divisionPixelAtlasY { get; set; }
     public long timeStamp { get; set; } = 0;
     public int idSubTexture {  get; set; }
+
+    [BsonIgnore]
+    public Texture2D textureVisual { get; set; }
     public void UpdateTimeStamp()
     {
         timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    }
+
+    internal void CreateTexture(string pathComplete)
+    {        
+        textureVisual = (Texture2D)TextureHelper.LoadTextureLocal(pathComplete);
+        int t = 0;
     }
 }

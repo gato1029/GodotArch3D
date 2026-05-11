@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://bor51mewublcc"]
+
+[ext_resource type="Script" uid="uid://djwepjkvhcsqu" path="res://sources/WindowsDataBase/Common/KuroSearchItems.cs" id="1_c751l"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="1_giesn"]
+[ext_resource type="StyleBox" uid="uid://mt7spt4q2ixl" path="res://resources/Estilos/EstiloTransparente.tres" id="2_i0s71"]
+[ext_resource type="Texture2D" uid="uid://mk3iydyb275k" path="res://resources/Textures/Emerald Treasure/images/map_point.png" id="2_vvhr5"]
+[ext_resource type="Script" uid="uid://c1thn6nufciqn" path="res://addons/animated_panel_container_cs/AnimatedPanelContainer.cs" id="3_vvhr5"]
+
+[node name="KuroSearchItems" type="PanelContainer" unique_id=1075427436]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 208.0
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("2_i0s71")
+script = ExtResource("1_c751l")
+
+[node name="ContainerSolo" type="PanelContainer" parent="." unique_id=967076877]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("2_i0s71")
+script = ExtResource("3_vvhr5")
+metadata/_custom_type_script = "uid://c1thn6nufciqn"
+
+[node name="ButtonOcultarMostrar" type="TextureButton" parent="ContainerSolo" unique_id=1893315453]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_giesn")
+IconTexture = ExtResource("2_vvhr5")
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ContainerIzquierdo" type="PanelContainer" parent="." unique_id=306578582]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+script = ExtResource("3_vvhr5")
+metadata/_custom_type_script = "uid://c1thn6nufciqn"
+
+[node name="MarginContainer" type="MarginContainer" parent="ContainerIzquierdo" unique_id=2031727090]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ContainerIzquierdo/MarginContainer" unique_id=1648203242]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ContainerIzquierdo/MarginContainer/VBoxContainer" unique_id=1158332707]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="ButtonOcultar" type="TextureButton" parent="ContainerIzquierdo/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1982212182]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_giesn")
+IconTexture = ExtResource("2_vvhr5")
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="LabelName" type="Label" parent="ContainerIzquierdo/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1168332937]
+layout_mode = 2
+text = "Elementos a Buscar"
+
+[node name="HSeparator" type="HSeparator" parent="ContainerIzquierdo/MarginContainer/VBoxContainer" unique_id=1524757109]
+layout_mode = 2
+
+[node name="ScrollContainerPadre" type="ScrollContainer" parent="ContainerIzquierdo/MarginContainer/VBoxContainer" unique_id=1937353586]
+custom_minimum_size = Vector2(188, 800)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Elementos" type="VBoxContainer" parent="ContainerIzquierdo/MarginContainer/VBoxContainer/ScrollContainerPadre" unique_id=105705998]
+custom_minimum_size = Vector2(190, 900)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

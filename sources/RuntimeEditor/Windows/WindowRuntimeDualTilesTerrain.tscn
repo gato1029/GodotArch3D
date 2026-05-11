@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://fl5hwage65hr"]
+
+[ext_resource type="Script" uid="uid://d4g3outtemvav" path="res://sources/CustomWidgets/KuroOptionButton.cs" id="1_0ib2l"]
+[ext_resource type="Script" uid="uid://bycji1ge4lgav" path="res://sources/RuntimeEditor/Windows/WindowRuntimeDualTilesTerrain.cs" id="1_v3lnn"]
+[ext_resource type="Script" uid="uid://bv2acki07u6at" path="res://sources/CustomWidgets/KuroItemList.cs" id="2_v3lnn"]
+
+[node name="WindowDualTilesTerrain" type="Window" unique_id=602711479]
+oversampling_override = 1.0
+initial_position = 1
+size = Vector2i(500, 500)
+script = ExtResource("1_v3lnn")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=542246176]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=886872641]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1463959876]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=660047577]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1791319842]
+layout_mode = 2
+text = "Mod:"
+
+[node name="ListaTipos" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2005811551]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("1_0ib2l")
+metadata/_custom_type_script = "uid://d4g3outtemvav"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=220532612]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemsList" type="ItemList" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=562038835]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+fixed_icon_size = Vector2i(100, 100)
+script = ExtResource("2_v3lnn")
+metadata/_custom_type_script = "uid://bv2acki07u6at"

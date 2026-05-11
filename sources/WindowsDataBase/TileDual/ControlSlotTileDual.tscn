@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://c1d05ieec0x7x"]
+
+[ext_resource type="Script" uid="uid://cf4obrmrpy82u" path="res://sources/WindowsDataBase/TileDual/ControlSlotTileDual.cs" id="1_ielou"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="2_l10e3"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="3_73i31"]
+
+[node name="ControlSlotTileDual" type="PanelContainer" unique_id=807875574]
+custom_minimum_size = Vector2(170, 400)
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 43.0
+grow_vertical = 2
+size_flags_vertical = 3
+script = ExtResource("1_ielou")
+
+[node name="Panel" type="Panel" parent="." unique_id=430605223]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=1017125619]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_constants/margin_top = 60
+
+[node name="TextureTemplate" type="TextureRect" parent="Panel/MarginContainer" unique_id=1886963516]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+expand_mode = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=824770869]
+layout_mode = 2
+
+[node name="LabelSlot" type="Label" parent="VBoxContainer" unique_id=365092342]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Slot:1"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer" unique_id=457428181]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainerItems" type="VBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=1560137022]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=605346413]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="ButtonAgregar" type="TextureButton" parent="PanelContainer" unique_id=1931407408]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+tooltip_text = "Agregar Variante por Altura"
+script = ExtResource("2_l10e3")
+IconTexture = ExtResource("3_73i31")
+IconMinSize = Vector2(24, 24)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

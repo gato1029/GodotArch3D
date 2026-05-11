@@ -4,8 +4,11 @@ using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using GodotFlecs.sources.KuroTiles;
+using System;
 using static Flecs.NET.Core.Ecs.Metrics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public partial class WindowEditorRuntimeTerrain : Window
 {
@@ -15,11 +18,19 @@ public partial class WindowEditorRuntimeTerrain : Window
         CREACION,
         ELIMINACION,
     }
+    enum ModePaint
+    {
+        NORMAL,
+        AUTO_DUAL,
+    }
 
     private MaterialData materialSelected;
     private RuntimeWindowDockController dockController;
+    private DualTileTemplate dualTileTemplate;
 
     ModeEditorTerrain modeEditorTerrain = ModeEditorTerrain.SELECCION;
+    ModePaint modePaint = ModePaint.NORMAL;
+
     TileSelectionMatrixData matrixCurrent = null;
     private Vector2I lastPaintTile = new Vector2I(int.MinValue, int.MinValue);
     private bool uiMouseCaptured = false;
@@ -34,9 +45,30 @@ public partial class WindowEditorRuntimeTerrain : Window
         dockController.DockWindow(RuntimeWindowDockController.WindowDockPosition.TopRight, 10, 100);
         EditorTextura.OnNotifySelectionMatrix += EditorTextura_OnNotifySelectionMatrix;
         KuroButtonBuscar.Pressed += KuroButtonBuscar_Pressed;
+        KuroButtonBuscarAutomatico.Pressed += KuroButtonBuscarAutomatico_Pressed;
         KuroButtonBorrar.Pressed += KuroButtonBorrar_Pressed;
         KuroButtonCrear.Pressed += KuroButtonCrear_Pressed;
         KuroButtonSeleccion.Pressed += KuroButtonSeleccion_Pressed;
+    }
+
+    private void KuroButtonBuscarAutomatico_Pressed()
+    {
+        var wDual = RuntimeServices.NodeRegistry.Create<WindowRuntimeDualTilesTerrain>();
+        wDual.OnSelection += WDual_OnSelection;
+        AddChild(wDual);        
+        wDual.Popup();
+        
+    }
+
+    private void WDual_OnSelection(GodotEcsArch.sources.WindowsDataBase.TilesTexture.DualTileTemplate objeto)
+    {
+        TexturaDual.Texture = objeto.textureVisual;
+        LabelDualName.Text = objeto.name;
+        modeEditorTerrain = ModeEditorTerrain.CREACION;        
+        dualTileTemplate = objeto;
+        ConfigModePaint(ModePaint.AUTO_DUAL);
+        TilesEntityPreviewHelper.Create(new Vector2I(1,1), objeto.GetSlot(1).GetData(0).GetPart(0).IdMod, objeto.GetSlot(1).GetData(0).GetPart(0).TileIndex);
+
     }
 
     private void KuroButtonSeleccion_Pressed()
@@ -49,7 +81,18 @@ public partial class WindowEditorRuntimeTerrain : Window
     private void KuroButtonCrear_Pressed()
     {
         modeEditorTerrain = ModeEditorTerrain.CREACION;
-        TilesEntityPreviewHelper.Create(materialSelected, matrixCurrent);
+        switch (modePaint)
+        {
+            case ModePaint.NORMAL:
+                TilesEntityPreviewHelper.Create(materialSelected, matrixCurrent);
+                break;
+            case ModePaint.AUTO_DUAL:
+                TilesEntityPreviewHelper.Create(new Vector2I(1, 1), dualTileTemplate.GetSlot(1).GetData(0).GetPart(0).IdMod, dualTileTemplate.GetSlot(1).GetData(0).GetPart(0).TileIndex);
+                break;
+            default:
+                break;
+        }
+        
     }
 
     public override void _ExitTree()
@@ -77,8 +120,26 @@ public partial class WindowEditorRuntimeTerrain : Window
     {
         modeEditorTerrain = ModeEditorTerrain.CREACION;
         SetMaterial(materialData);
+        ConfigModePaint(ModePaint.NORMAL);
     }
 
+    private void ConfigModePaint(ModePaint mode)
+    {
+        modePaint = mode;
+        switch (mode)
+        {
+            case ModePaint.NORMAL:
+                ContenedorDual.Visible = false;
+                EditorTextura.Visible = true;
+                break;
+            case ModePaint.AUTO_DUAL:
+                ContenedorDual.Visible = true;
+                EditorTextura.Visible = false;
+                break;
+            default:
+                break;
+        }
+    }
     private void SetMaterial(MaterialData materialData)
     {
         materialSelected = materialData;
@@ -117,7 +178,8 @@ public partial class WindowEditorRuntimeTerrain : Window
             case ModeEditorTerrain.CREACION:
                 if (leftPressed)
                 {
-                    if (matrixCurrent==null)
+                    
+                    if (matrixCurrent==null && dualTileTemplate==null)
                     {
                         return;
                     }
@@ -229,14 +291,32 @@ public partial class WindowEditorRuntimeTerrain : Window
         var tiles = TilesEntityPreviewHelper.GetOnlyValidTiles();
         foreach (var item in tiles)
         {
-            BlackyWorldContext.PintarTerreno.SetTile(
-                item.tilePosition.X,
-                item.tilePosition.Y,
-                altura,
-                capa,
-                item.data.idMod,
-                (ushort)item.data.index
-            );
+            switch (modePaint)
+            {
+                case ModePaint.NORMAL:
+                    BlackyWorldContext.PintarTerreno.SetTile(
+                        item.tilePosition.X,
+                        item.tilePosition.Y,
+                        altura,
+                        capa,
+                        item.data.idMod,
+                        (ushort)item.data.index
+                    );
+
+                    break;
+                case ModePaint.AUTO_DUAL:
+                    BlackyWorldContext.PintarTerreno.SetTileDual(
+                       item.tilePosition.X,
+                       item.tilePosition.Y,
+                       altura,
+                       capa,
+                       dualTileTemplate
+                   );
+                    break;
+                default:
+                    break;
+            }
+            
         }
     }
 }

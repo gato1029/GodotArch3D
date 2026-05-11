@@ -41,10 +41,10 @@ public partial class ControlBlackyAtlasTexture : MarginContainer
     {
         controller.SetTexture(texture, cellSize, idMaterial,idMod);
 
-        if (texture.GetSize().X > 800 || texture.GetSize().Y > 800)
-            AtlasViewport.SetAbsoluteZoom(0.5f);
-        else
-            AtlasViewport.SetAbsoluteZoom(1f);
+        ////if (texture.GetSize().X > 800 || texture.GetSize().Y > 800)
+        ////    AtlasViewport.SetAbsoluteZoom(0.5f);
+        ////else
+        ////    AtlasViewport.SetAbsoluteZoom(1f);
 
         AtlasCanvas.QueueRedraw();
     }

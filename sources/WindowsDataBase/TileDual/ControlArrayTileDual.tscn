@@ -1,6 +1,70 @@
 [gd_scene format=3 uid="uid://sjevlrbvu3x1"]
 
+[ext_resource type="PackedScene" uid="uid://bkk0feiey6qkv" path="res://sources/WindowsDataBase/TileDual/ControlTileDual.tscn" id="1_k4g5g"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="1_mjg1b"]
+[ext_resource type="Script" uid="uid://b4mkfsoh5oyk4" path="res://sources/WindowsDataBase/TileDual/ControlArrayTileDual.cs" id="1_y4vcy"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="2_y4vcy"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="5_ovu4f"]
+
 [node name="ControlArrayTileDual" type="PanelContainer" unique_id=1339792890]
-custom_minimum_size = Vector2(100, 150)
-offset_right = 100.0
-offset_bottom = 150.0
+custom_minimum_size = Vector2(150, 300)
+offset_right = 150.0
+offset_bottom = 300.0
+script = ExtResource("1_y4vcy")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2013031349]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1368524058]
+layout_mode = 2
+
+[node name="LabelAltura" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1517903770]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "Generico"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=2119664489]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainerItems" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer" unique_id=2033570976]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+
+[node name="ControlTileDual" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainerItems" unique_id=902451201 instance=ExtResource("1_k4g5g")]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=518757674]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="ButtonAgregar" type="TextureButton" parent="MarginContainer/PanelContainer" unique_id=1255464867]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_mjg1b")
+IconTexture = ExtResource("2_y4vcy")
+IconMinSize = Vector2(24, 24)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="PanelContainer2" type="PanelContainer" parent="MarginContainer" unique_id=1469122354]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="ButtonRemoverTodo" type="TextureButton" parent="MarginContainer/PanelContainer2" unique_id=418331883]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_mjg1b")
+IconTexture = ExtResource("5_ovu4f")
+IconMinSize = Vector2(24, 24)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

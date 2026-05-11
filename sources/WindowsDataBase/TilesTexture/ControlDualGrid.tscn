@@ -1,6 +1,13 @@
 [gd_scene format=3 uid="uid://bp433vd15d553"]
 
+[ext_resource type="Script" uid="uid://rnpvacc5r52x" path="res://sources/WindowsDataBase/TilesTexture/ControlDualGrid.cs" id="1_4ovrs"]
 [ext_resource type="PackedScene" uid="uid://bcav722ca18vm" path="res://sources/BlackyTextures/Controls/ControlBlackyAtlasTexture.tscn" id="1_hyn27"]
+[ext_resource type="PackedScene" uid="uid://bor51mewublcc" path="res://sources/WindowsDataBase/Common/KuroSearchItems.tscn" id="2_x8xtv"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="3_u3etv"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="4_iwqxo"]
+[ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="4_x8xtv"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="5_7a7x7"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="6_5qsp0"]
 
 [node name="ControlDualGrid" type="PanelContainer" unique_id=1351490201]
 anchors_preset = 15
@@ -8,13 +15,87 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_4ovrs")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=739058490]
+[node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=1946190923]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer" unique_id=1007271273]
+[node name="KuroItems" parent="HBoxContainer2" unique_id=1154977173 instance=ExtResource("2_x8xtv")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2" unique_id=1773333836]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ControlBlackyAtlasTexture" parent="HBoxContainer/PanelContainer" unique_id=434538793 instance=ExtResource("1_hyn27")]
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/VBoxContainer" unique_id=1505055700]
 layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=2122375844]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=1316224701]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=677075772]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+script = ExtResource("3_u3etv")
+IconTexture = ExtResource("4_iwqxo")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=1404882766]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+script = ExtResource("3_u3etv")
+IconTexture = ExtResource("5_7a7x7")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=1882424413]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+script = ExtResource("3_u3etv")
+IconTexture = ExtResource("6_5qsp0")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer2/VBoxContainer" unique_id=739058490]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer2/VBoxContainer/HBoxContainer" unique_id=1765904036]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GridContainerItems" type="GridContainer" parent="HBoxContainer2/VBoxContainer/HBoxContainer/ScrollContainer" unique_id=1341440123]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 16
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer2/VBoxContainer/HBoxContainer" unique_id=1110221428]
+layout_mode = 2
+
+[node name="ControlVisualizadorTexture" parent="HBoxContainer2/VBoxContainer/HBoxContainer/PanelContainer" unique_id=434538793 instance=ExtResource("1_hyn27")]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonBuscarTextura" type="TextureButton" parent="HBoxContainer2/VBoxContainer/HBoxContainer/PanelContainer" unique_id=1613281903]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+script = ExtResource("3_u3etv")
+IconTexture = ExtResource("4_x8xtv")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

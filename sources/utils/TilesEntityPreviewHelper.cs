@@ -65,7 +65,26 @@ public static class TilesEntityPreviewHelper
     // =========================================================
     // CREATE SIMPLE RECTANGLE (MISMO TILE)
     // =========================================================
-    public static void Create(Vector2I size, MaterialData idMaterial, int index)
+
+    public static void Create(Vector2I size, string NameMod_IDMaterial, int index)
+    {
+        int idMaterial = int.Parse(NameMod_IDMaterial.Split(':')[1]);
+
+        Clear();
+        TilePreviewData[,] matrixData = new TilePreviewData[size.X, size.Y];
+
+        for (int x = 0; x < size.X; x++)
+        {
+            for (int y = 0; y < size.Y; y++)
+            {
+                matrixData[x, y] = new TilePreviewData(idMaterial, NameMod_IDMaterial, index);
+            }
+        }
+
+        Create(matrixData);
+    }
+
+    public static void Create(Vector2I size, MaterialData materialData, int index)
     {
         Clear();
         TilePreviewData[,] matrixData = new TilePreviewData[size.X, size.Y];
@@ -74,7 +93,7 @@ public static class TilesEntityPreviewHelper
         {
             for (int y = 0; y < size.Y; y++)
             {
-                matrixData[x, y] = new TilePreviewData(idMaterial.id,idMaterial.idNameMod, index);
+                matrixData[x, y] = new TilePreviewData(materialData.id,materialData.idNameMod, index);
             }
         }
 

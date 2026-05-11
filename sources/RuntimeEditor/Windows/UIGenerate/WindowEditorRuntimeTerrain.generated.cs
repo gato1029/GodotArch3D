@@ -15,6 +15,9 @@ public partial class WindowEditorRuntimeTerrain : Window
     private SpinBox SpinBoxAltura;
     private SpinBox SpinBoxCapa;
     private ControlBlackyAtlasTexture EditorTextura;
+    private CenterContainer ContenedorDual;
+    private TextureRect TexturaDual;
+    private Label LabelDualName;
 
     public void InitializeUI()
     {
@@ -27,6 +30,9 @@ public partial class WindowEditorRuntimeTerrain : Window
         SpinBoxAltura = GetNode<SpinBox>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/SpinBoxAltura");
         SpinBoxCapa = GetNode<SpinBox>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/SpinBoxCapa");
         EditorTextura = GetNode<ControlBlackyAtlasTexture>("PanelContainer/ScrollContainer/VBoxContainer/EditorTextura");
+        ContenedorDual = GetNode<CenterContainer>("PanelContainer/ScrollContainer/VBoxContainer/ContenedorDual");
+        TexturaDual = GetNode<TextureRect>("PanelContainer/ScrollContainer/VBoxContainer/ContenedorDual/VBoxContainer/TexturaDual");
+        LabelDualName = GetNode<Label>("PanelContainer/ScrollContainer/VBoxContainer/ContenedorDual/VBoxContainer/LabelDualName");
     }
 
     private void CloseRequestedWindow()

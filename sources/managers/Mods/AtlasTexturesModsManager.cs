@@ -72,11 +72,12 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         renderManager = new RenderManagerOptimized(textureArrayManager);
         LoadCurrentMod();
         AtlasModsManager.Instance.ClearAll(); // limpio todos los manager de mods para volver a cargar solo el mod actual, asi evito cargar mods que no estoy editando y tener que revisar cambios innecesarios
-        AtlasModsManager.Instance.FirstLoad(); // luego de que cargo la tabla de mods, genero todos los manager por mods
+        AtlasModsManager.Instance.FirstLoadMaterial(); // luego de que cargo la tabla de mods, genero todos los manager por mods
         CreateAllMaterials();
         CreateAtlasMaterial();
         CreateTexturesRendering();
         BuildRendering();
+        AtlasModsManager.Instance.FirstLoad(); // luego de que cargo la tabla de mods, genero todos los manager por mods
     }
     private void ChargueAllMods()
     {
@@ -88,7 +89,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         textureArrayManager = new TextureArrayManager();
         renderManager = new RenderManagerOptimized(textureArrayManager);
         LoadAllMods();
-        AtlasModsManager.Instance.FirstLoad(); // luego de que cargo la tabla de mods, genero todos los manager por mods
+        AtlasModsManager.Instance.FirstLoadMaterial(); // luego de que cargo la tabla de mods, genero todos los manager por mods
         CreateAllMaterials();
 
         bool needRebuildAtlas = ReviewDiferences();
@@ -104,6 +105,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         }
         CreateTexturesRendering();
         BuildRendering();
+        AtlasModsManager.Instance.FirstLoad(); // luego de que cargo la tabla de mods, genero todos los manager por mods
     }
     private  bool ReviewDiferences()
     {
@@ -180,20 +182,22 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     }
     private  void CreateTexturesRendering()
     {
-
-        var data = MaterialModDbService.Instance.ObtenerTodos();
+        // aqui se crean las texturas en el render manager, y se asignan los atlas a cada material para que luego puedan ser usados en el shader
+        List<MaterialModData> data = MaterialModDbService.Instance.ObtenerTodos();
 
         HashSet<int> processed = new HashSet<int>();
 
         foreach (var item in data)
         {
             _textureLookup[item.idNameMod] = item;
+            var pathComplete = FileHelper.GetPathGameDB(item.pathTextureAtlas);
+            item.CreateTexture(pathComplete);
             subMaterialsModsGlobal.Add(item.idSubTexture, item);
             if (!processed.Add(item.idTextureAtlas))
                 continue; // ya existe → lo saltamos
-            materialsMods.Add(item.idTextureAtlas, item);
-            var pathComplete = FileHelper.GetPathGameDB(item.pathTextureAtlas);
+            materialsMods.Add(item.idTextureAtlas, item);            
             textureArrayManager.SetTexture(item.idTextureAtlas, pathComplete);
+            
         }
 
        

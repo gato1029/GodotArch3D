@@ -14,8 +14,7 @@ public partial class PerfiladorAutoTileTexture : Node
 	public override void _Ready()
 	{
         InitializeUI(); // Insertado por el generador de UI
-        ModHelper.Init(false);
-        AtlasTexturesModsManager.Instance.FirstLoad(false);
+      
         NodeMainHelper.SetNode3DMain(mainRender);
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();

@@ -1,4 +1,5 @@
 using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -336,27 +337,27 @@ public class BlackyChunkTextureMap
     int layer,
     string modName)
     {
-        var (chunk, lx, ly) =
-            ResolveOrCreate(worldX, worldY);
+        //var (chunk, lx, ly) =
+        //    ResolveOrCreate(worldX, worldY);
 
-        var tileLayer =
-            chunk.GetOrCreateLayer(height, layer);
+        //var tileLayer =
+        //    chunk.GetOrCreateLayer(height, layer);
 
-        tileLayer.SetSolid(lx, ly, false);
+        //tileLayer.SetSolid(lx, ly, false);
 
-        RebuildDualNeighborhood(
-            worldX,
-            worldY,
-            height,
-            layer,
-            modName);
+        //RebuildDualNeighborhood(
+        //    worldX,
+        //    worldY,
+        //    height,
+        //    layer,
+        //    modName);
     }
     public void SetTileDual(
     int worldX,
     int worldY,
     int height,
     int layer,
-    string modName)
+    DualTileTemplate dualTileTemplate)
     {
         var (chunk, lx, ly) =
             ResolveOrCreate(worldX, worldY);
@@ -371,40 +372,49 @@ public class BlackyChunkTextureMap
             worldY,
             height,
             layer,
-            modName);
+            dualTileTemplate);
     }
+
+    public static class DualMask
+    {
+        public const byte TopLeft = 1;      // 0001
+        public const byte TopRight = 2;     // 0010
+        public const byte BottomLeft = 4;   // 0100
+        public const byte BottomRight = 8;  // 1000
+    }
+
     public void RebuildDualNeighborhood(
     int x,
     int y,
     int height,
     int layer,
-    string modName)
+    DualTileTemplate dualTileTemplate)
     {
-        RebuildDualCell(x - 1, y - 1, height, layer, modName);
-        RebuildDualCell(x, y - 1, height, layer, modName);
-        RebuildDualCell(x - 1, y, height, layer, modName);
-        RebuildDualCell(x, y, height, layer, modName);
+        RebuildDualCell(x - 1, y - 1, height, layer, dualTileTemplate);
+        RebuildDualCell(x, y - 1, height, layer, dualTileTemplate);
+        RebuildDualCell(x - 1, y, height, layer, dualTileTemplate);
+        RebuildDualCell(x, y, height, layer, dualTileTemplate);
     }
     public void RebuildDualCell(
     int vx,
     int vy,
     int height,
     int layer,
-    string modName)
+    DualTileTemplate dualTileTemplate)
     {
         int mask = 0;
 
         if (IsSolidGlobal(vx, vy, height, layer))
-            mask |= 1;
+            mask |= DualMask.TopLeft;
 
         if (IsSolidGlobal(vx + 1, vy, height, layer))
-            mask |= 2;
+            mask |= DualMask.TopRight;
 
         if (IsSolidGlobal(vx, vy + 1, height, layer))
-            mask |= 4;
+            mask |= DualMask.BottomLeft;
 
         if (IsSolidGlobal(vx + 1, vy + 1, height, layer))
-            mask |= 8;
+            mask |= DualMask.BottomRight;
 
         var (chunk, lx, ly) = ResolveOrCreate(vx, vy);
 
@@ -412,31 +422,30 @@ public class BlackyChunkTextureMap
 
         tileLayer.SetDualMask(lx, ly, (byte)mask);
 
-        ushort atlasIndex = 0;
-
-        if (mask != 0)
-            atlasIndex = _dualMaskToAtlas[mask];
-
-        ushort tileId =
-            chunk.ParentRegion.GetOrCreateTile(
-                modName,
-                atlasIndex);
-
-        tileLayer.SetTile(lx, ly, tileId);
-
-        chunk.MarkDirty();
-
-        OnTileChanged?.Invoke(new TileChange
+        // Nada que dibujar
+        if (mask == 0)
         {
-            WorldX = vx,
-            WorldY = vy,
-            Height = height,
-            Layer = layer,
-            TileId = tileId,
-            region = chunk.ParentRegion,
-            remove = mask == 0
-        });
+            
+            //ClearTile(vx, vy, height, layer);
+            return;
+        }
+
+        // 🔥 Aquí es donde el DualTileTemplate cobra vida: usamos la máscara para obtener el índice correcto del atlas
+
+        var slot = dualTileTemplate.GetSlot(mask);
+        var slotHeight = slot.GetGeneric();
+        if (slot.HasData(height))
+        {
+            slotHeight = slot.GetData(height);
+        }
+
+        for (int i = 0; i < slotHeight.Parts.Count; i++)
+        {
+            DualTilePart item = slotHeight.Parts[i];
+            SetTile(vx, vy , height, layer, item.IdMod, (ushort)item.TileIndex);    
+        }               
     }
+
     public bool IsSolidGlobal(
     int worldX,
     int worldY,

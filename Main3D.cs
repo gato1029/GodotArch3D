@@ -32,8 +32,10 @@ public partial class Main3D : Node3D
     Polygon polygon;
     public override void _Ready()
     {
-        FileHelper.Initialize("D:\\GitKraken/AssetExternals/NuevosMods/Base");
-        ModHelper.Init(false);            
+        FileHelper.Initialize("D:\\GitKraken/AssetExternals/NuevosMods/Base");        
+        ModHelper.Init(false);
+        AtlasTexturesModsManager.Instance.FirstLoad(false);
+
         NodeMainHelper.SetNode3DMain(this);
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();

@@ -17,6 +17,8 @@ public class BlackyChunkTilemapTextureUShort : BlackyChunkTilemapTextureBase
         : base(layer, size, wx, wy)
     {
         _tiles = new ushort[size * size];
+        _solid = new byte[size * size];
+        _dualMask = new byte[size * size];
     }
 
     public override void SetTile(int x, int y, int tileId, bool isDirty = true)

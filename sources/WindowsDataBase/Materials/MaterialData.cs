@@ -103,7 +103,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         public int idMaterialPositionBatch { get; set; }
 
         [BsonIgnore]
-        public string idNameMod { get; set; }
+        public string idNameMod { get; set; } // Nombre del mod + id del material para identificarlo univocamente MOD:ID
         public MaterialData()
         {
             MaterialManager.Instance.RegisterMaterial(-1, this);            

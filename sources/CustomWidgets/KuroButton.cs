@@ -21,8 +21,8 @@ public partial class KuroButton : TextureButton
     private int _padding = 6;
     private int _fontSize = 16;
     private float _iconScale = 1.0f;
-    private Vector2 _iconMinSize = new Vector2(64, 64);
-    private bool _iconExpand = true;
+    private Vector2 _iconMinSize = new Vector2(32, 32);
+    private bool _iconExpand = false;
     private float _lineSpacingFactor = 0.75f;
 
     private Font _customFont;
@@ -47,6 +47,8 @@ public partial class KuroButton : TextureButton
     private float _animationSpeed = 12f;
 
     private Vector2 _targetScale = Vector2.One;
+
+    private Object _internalData; // For external use, not serialized or exposed
 
     [ExportGroup("Main")]
     [Export] public Texture2D IconTexture { get => _iconTexture; set { _iconTexture = value; RefreshControl(); } }
@@ -100,6 +102,8 @@ public partial class KuroButton : TextureButton
 
         RefreshControl();
     }
+    public void SetInternalData(Object data) => _internalData = data;
+    public Object GetInternalData() => _internalData;
 
     public override void _Process(double delta)
     {

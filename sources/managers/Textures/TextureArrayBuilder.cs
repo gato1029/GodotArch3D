@@ -199,6 +199,7 @@ public class TextureArrayBuilder
         Texture2DArray textureArray = new Texture2DArray();
         textureArray.CreateFromImages(images);
 
+       
         if (TargetMaterial != null)
         {
             TargetMaterial.SetShaderParameter(ShaderUniformName, textureArray);
@@ -216,15 +217,40 @@ public class TextureArrayBuilder
     private Image LoadAndResizeImage(string path, int width, int height)
     {
         Image source = Image.LoadFromFile(path);
+
         if (source == null)
         {
             GD.PrintErr($"❌ No se pudo cargar: {path}");
             return CreateTransparentImage(width, height);
         }
 
-        Image result = Image.CreateEmpty(width, height, false, Image.Format.Rgba8);
-        result.Fill(new Color(0, 0, 0, 0));
-        result.BlitRect(source, new Rect2I(0, 0, source.GetWidth(), source.GetHeight()), new Vector2I(0, 0));
+        // Ya tiene el tamaño correcto
+        if (source.GetWidth() == width &&
+            source.GetHeight() == height)
+        {
+            return source;
+        }
+
+        // Crear imagen destino
+        Image result = Image.CreateEmpty(
+            width,
+            height,
+            false,
+            Image.Format.Rgba8
+        );
+
+        result.Fill(Colors.Transparent);
+
+        // Copiar respetando límites
+        int copyWidth = Mathf.Min(source.GetWidth(), width);
+        int copyHeight = Mathf.Min(source.GetHeight(), height);
+
+        result.BlitRect(
+            source,
+            new Rect2I(0, 0, copyWidth, copyHeight),
+            Vector2I.Zero
+        );
+
         return result;
     }
 
