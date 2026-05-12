@@ -1,10 +1,13 @@
+using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
 using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Flecs.NET.Core.Ecs.Units;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
@@ -18,13 +21,12 @@ public struct TileChange
     public ushort TileId;
     public BlackyRegion region;
     public bool remove;
+    public bool dual; 
 }
 
 public class BlackyChunkTextureMap
 {
     public event Action<TileChange> OnTileChanged;
-    private readonly ushort[] _dualMaskToAtlas;
-
     private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly Dictionary<(int, int), BlackyRegion> _regions = new();
 
@@ -124,14 +126,17 @@ public class BlackyChunkTextureMap
     // TILE ACCESS
     // ===============================
 
-    public void RemoveTile(int worldX, int worldY, int height, int layer)
+    public void RemoveTile(int worldX, int worldY, int height, int layer, bool dual = false)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
 
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-
+        if (tileLayer.GetDualMask(localX, localY) != 0 && dual == false)
+        {
+            return;
+        }
         tileLayer.ClearTile(localX, localY);
         OnTileChanged?.Invoke(new TileChange
         {
@@ -142,7 +147,7 @@ public class BlackyChunkTextureMap
             remove = true
         });
     }
-    public void SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex)
+    public void SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex,bool dual=false)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
@@ -156,6 +161,11 @@ public class BlackyChunkTextureMap
 
 
         tileLayer.SetTile(localX, localY, tileId);
+
+        if (tileLayer.GetDualMask(localX, localY) != 0 && dual ==false)
+        {
+            return;
+        }
         OnTileChanged?.Invoke(new TileChange
         {
             WorldX = worldX,
@@ -164,9 +174,10 @@ public class BlackyChunkTextureMap
             Layer = layer,
             TileId = tileId,
             region = chunk.ParentRegion,
-            remove = false
+            remove = false,
+            dual = dual
         });
-
+        
         chunk.MarkDirty();
 
     }
@@ -335,28 +346,6 @@ public class BlackyChunkTextureMap
     int worldY,
     int height,
     int layer,
-    string modName)
-    {
-        //var (chunk, lx, ly) =
-        //    ResolveOrCreate(worldX, worldY);
-
-        //var tileLayer =
-        //    chunk.GetOrCreateLayer(height, layer);
-
-        //tileLayer.SetSolid(lx, ly, false);
-
-        //RebuildDualNeighborhood(
-        //    worldX,
-        //    worldY,
-        //    height,
-        //    layer,
-        //    modName);
-    }
-    public void SetTileDual(
-    int worldX,
-    int worldY,
-    int height,
-    int layer,
     DualTileTemplate dualTileTemplate)
     {
         var (chunk, lx, ly) =
@@ -365,14 +354,88 @@ public class BlackyChunkTextureMap
         var tileLayer =
             chunk.GetOrCreateLayer(height, layer);
 
-        tileLayer.SetSolid(lx, ly, true);
 
-        RebuildDualNeighborhood(
+        tileLayer.SetSolid(lx, ly, false);   
+    }
+    public void ApplyBrushRemoveDual(
+    int baseX,
+    int baseY,
+    int altura,
+    int capa,
+    Brush brush,
+    DualTileTemplate dualTileTemplate)
+    {
+        HashSet<(int x, int y)> affected = new();
+
+        foreach (var offset in brush.Cells)
+        {
+            int x = baseX + offset.x;
+            int y = baseY + offset.y;
+
+            RemoveTileDual(x, y, altura, capa, dualTileTemplate);
+
+            for (int oy = -1; oy <= 1; oy++)
+                for (int ox = -1; ox <= 1; ox++)
+                    affected.Add((x + ox, y + oy));
+        }
+
+        foreach (var p in affected)
+        {
+            RebuildDualCell(p.x, p.y, altura, capa, dualTileTemplate);
+        }
+    }
+
+    public void ApplyBrushCreateDual(
+    int baseX,
+    int baseY,
+    int altura,
+    int capa,
+    Brush brush,
+    DualTileTemplate dualTileTemplate)
+    {
+        HashSet<(int x, int y)> affected = new();
+
+        foreach (var offset in brush.Cells)
+        {
+            int x = baseX + offset.x;
+            int y = baseY + offset.y;
+
+            SetTileDual(x, y, altura, capa, dualTileTemplate,true);
+
+            for (int oy = -1; oy <= 1; oy++)
+                for (int ox = -1; ox <= 1; ox++)
+                    affected.Add((x + ox, y + oy));
+        }
+
+        foreach (var p in affected)
+        {
+            RebuildDualCell(p.x, p.y, altura, capa, dualTileTemplate);
+        }
+    }
+    public void SetTileDual(
+    int worldX,
+    int worldY,
+    int height,
+    int layer,
+    DualTileTemplate dualTileTemplate, bool isInternal=false)
+    {
+        var (chunk, lx, ly) =
+            ResolveOrCreate(worldX, worldY);
+
+        var tileLayer =
+            chunk.GetOrCreateLayer(height, layer);
+
+        tileLayer.SetSolid(lx, ly, true);
+        if (!isInternal)
+        {
+            RebuildDualNeighborhood(
             worldX,
             worldY,
             height,
             layer,
             dualTileTemplate);
+        }
+        
     }
 
     public static class DualMask
@@ -393,17 +456,23 @@ public class BlackyChunkTextureMap
         public const byte TopLeft = 8;
     }
     public void RebuildDualNeighborhood(
-        int x,
-        int y,
-        int height,
-        int layer,
-        DualTileTemplate dualTileTemplate)
+    int x,
+    int y,
+    int height,
+    int layer,
+    DualTileTemplate dualTileTemplate)
     {
-        RebuildDualCell(x - 1, y - 1, height, layer, dualTileTemplate);
-        RebuildDualCell(x, y - 1, height, layer, dualTileTemplate);
+        //RebuildDualCell(x, y, height, layer, dualTileTemplate);
+        //RebuildDualCell(x - 1, y, height, layer, dualTileTemplate);       
+        //RebuildDualCell(x, y - 1, height, layer, dualTileTemplate);        
+        //RebuildDualCell(x - 1, y - 1, height, layer, dualTileTemplate);
 
-        RebuildDualCell(x - 1, y, height, layer, dualTileTemplate);
-        RebuildDualCell(x, y, height, layer, dualTileTemplate);
+        for (int oy = -1; oy <= 1; oy++)
+            for (int ox = -1; ox <= 1; ox++)
+            {
+                RebuildDualCell(x + ox, y + oy, height, layer, dualTileTemplate);
+            }
+
     }
     public void RebuildDualCell(
     int vx,
@@ -411,56 +480,79 @@ public class BlackyChunkTextureMap
     int height,
     int layer,
     DualTileTemplate dualTileTemplate)
-    {
-        
+    {   // El tile visual NO existe
+        byte mask = 0;
 
-        int mask = 0;
-
-        // TL = 8
-        if (IsSolidGlobal(vx, vy, height, layer))
+        // TL
+        if (IsSolidGlobal(vx, vy + 1, height, layer))
             mask |= DualMask.TopLeft;
 
-        if (IsSolidGlobal(vx + 1, vy, height, layer))
+        // TR
+        if (IsSolidGlobal(vx + 1, vy + 1, height, layer))
             mask |= DualMask.TopRight;
 
-        if (IsSolidGlobal(vx, vy + 1, height, layer))
+        // BL
+        if (IsSolidGlobal(vx, vy, height, layer))
             mask |= DualMask.BottomLeft;
 
-        if (IsSolidGlobal(vx + 1, vy + 1, height, layer))
+        // BR
+        if (IsSolidGlobal(vx + 1, vy, height, layer))
             mask |= DualMask.BottomRight;
+        
+        var (chunk, lx, ly) =
+            ResolveOrCreate(vx, vy);
 
+        var tileLayer =
+            chunk.GetOrCreateLayer(height, layer);
 
-
-        var (chunk, lx, ly) = ResolveOrCreate(vx, vy);
-
-        var tileLayer = chunk.GetOrCreateLayer(height, layer);
-
+        int lastMask = tileLayer.GetDualMask(lx, ly);
         tileLayer.SetDualMask(lx, ly, (byte)mask);
 
-        // Nada que dibujar
+        bool markDelete = false;
         if (mask == 0)
         {
-            
-            //ClearTile(vx, vy, height, layer);
-            return;
+            //RemoveTile(vx, vy, height, layer);            
+            //return;
+            markDelete = true;
         }
 
-        // 🔥 Aquí es donde el DualTileTemplate cobra vida: usamos la máscara para obtener el índice correcto del atlas
-
         var slot = dualTileTemplate.GetSlot(mask);
-        var slotHeight = slot.GetGeneric();
+        if (markDelete)
+        {
+            slot = dualTileTemplate.GetSlot(lastMask);
+        }
+        
+        var slotHeight =
+            slot.GetGeneric();
+
         if (slot.HasData(height))
         {
-            slotHeight = slot.GetData(height);
+            slotHeight =
+                slot.GetData(height);
         }
 
         for (int i = 0; i < slotHeight.Parts.Count; i++)
-        {
-            DualTilePart item = slotHeight.Parts[i];
-            SetTile(vx, vy , height, layer, item.IdMod, (ushort)item.TileIndex);    
-        }               
-    }
+        {         
+            var item = slotHeight.Parts[i];
 
+            if (markDelete)
+            {
+                RemoveTile(vx, vy-i, height, layer,true);
+            }
+            else
+            {
+                SetTile(
+                     vx,
+                     vy - i,
+                     height,
+                     layer,
+                     item.IdMod,
+                     (ushort)item.TileIndex, true
+                 );
+            }
+         
+        }
+    }
     public bool IsSolidGlobal(
     int worldX,
     int worldY,

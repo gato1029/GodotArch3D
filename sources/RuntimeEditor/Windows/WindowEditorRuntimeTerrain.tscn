@@ -6,8 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="3_r3egx"]
 [ext_resource type="Texture2D" uid="uid://ldqgfwg01ovw" path="res://resources/Textures/iconos/401777844281.png" id="4_2bh83"]
 [ext_resource type="Texture2D" uid="uid://culf4xppd8qcm" path="res://resources/Textures/iconos/search-engine-optimization.png" id="4_synvq"]
-[ext_resource type="Texture2D" uid="uid://8j2c7vqahfpc" path="res://resources/Textures/internal/glassTransparent.png" id="4_vr4w3"]
 [ext_resource type="Texture2D" uid="uid://d25jx2a8fyitk" path="res://resources/Textures/iconos/eraser.png" id="5_vr4w3"]
+[ext_resource type="Texture2D" uid="uid://diicte0ohe5nr" path="res://resources/Textures/iconos/cepillo-de-pintura.png" id="5_ysqg2"]
+[ext_resource type="Texture2D" uid="uid://dc6hs5kainn8m" path="res://resources/Textures/iconos/palette.png" id="6_ptgif"]
+[ext_resource type="Script" uid="uid://d4g3outtemvav" path="res://sources/CustomWidgets/KuroOptionButton.cs" id="9_ptgif"]
 [ext_resource type="Texture2D" uid="uid://c5brcvag3uklm" path="res://resources/Textures/iconos/Image.png" id="9_sdf7j"]
 
 [node name="WindowEditorRuntimeTerrain" type="Window" unique_id=1279437036]
@@ -60,7 +62,7 @@ layout_mode = 2
 size_flags_horizontal = 8
 tooltip_text = "Crear Tile"
 script = ExtResource("3_347gf")
-IconTexture = ExtResource("4_vr4w3")
+IconTexture = ExtResource("5_ysqg2")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="KuroButtonSeleccion" type="TextureButton" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=68652568]
@@ -81,7 +83,29 @@ script = ExtResource("3_347gf")
 IconTexture = ExtResource("5_vr4w3")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="SpinBoxAltura" type="SpinBox" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=1497147011]
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=1947792265]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=657511711]
+layout_mode = 2
+texture = ExtResource("6_ptgif")
+
+[node name="TipoBrush" type="OptionButton" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=172084177]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("9_ptgif")
+metadata/_custom_type_script = "uid://d4g3outtemvav"
+
+[node name="SpinBoxSizeBrush" type="SpinBox" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=310327887]
+layout_mode = 2
+alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=938363571]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="SpinBoxAltura" type="SpinBox" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=1497147011]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -90,7 +114,7 @@ max_value = 3.0
 value = 1.0
 prefix = "Altura:"
 
-[node name="SpinBoxCapa" type="SpinBox" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=1669933323]
+[node name="SpinBoxCapa" type="SpinBox" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=1669933323]
 layout_mode = 2
 size_flags_horizontal = 8
 min_value = 1.0

@@ -177,6 +177,7 @@ public class BlackyTileTextureRenderSystem
                     for (int x = 0; x < layer.Size; x++)
                     {
                         int tileId = layer.GetTile(x, y);
+                        bool isDual = layer.GetDualMask(x, y) != 0;
                         if (tileId == 0)
                             continue;
 
@@ -237,7 +238,7 @@ public class BlackyTileTextureRenderSystem
         // aqui notifica cuando un tile cambio y debemos repintarlo
         var chunkCoord = chunkMap.WorldToChunkCoord(change.WorldX, change.WorldY);
         Vector2I pos = new(chunkCoord.X, chunkCoord.Y);
-        RenderTile(pos, change.Height, change.Layer, change.WorldX, change.WorldY, change.TileId, change.region,change.remove);
+        RenderTile(pos, change.Height, change.Layer, change.WorldX, change.WorldY, change.TileId, change.region,change.remove,change.dual);
     }
 
     private void RenderTile(
@@ -247,7 +248,7 @@ public class BlackyTileTextureRenderSystem
         int worldX,
         int worldY,
         ushort tileId,
-        BlackyRegion region, bool remove)
+        BlackyRegion region, bool remove, bool dual)
     {
         if (!chunkRenderInstances.TryGetValue(chunkCoord, out var chunkRender))
         {
@@ -266,7 +267,7 @@ public class BlackyTileTextureRenderSystem
             {
                 instance.MarkDestroyed();
                 RenderCommandQueue.Enqueue(
-                    new DestroyTileInstanceTextureCommand(height, layer, worldX, worldY, instance, chunkRender));
+                    new DestroyTileInstanceTextureCommand(height, layer, worldX, worldY, dual, instance, chunkRender));
             }
 
             return;
@@ -291,14 +292,14 @@ public class BlackyTileTextureRenderSystem
             // destruir anterior porque cambia
             instance.MarkDestroyed();
             RenderCommandQueue.Enqueue(
-                new DestroyTileInstanceTextureCommand(height, layer, worldX, worldY, instance, chunkRender));
+                new DestroyTileInstanceTextureCommand(height, layer, worldX, worldY,dual, instance, chunkRender));
         }
 
         // =====================================================
         // CREAR NUEVA
         // =====================================================
         RenderCommandQueue.Enqueue(
-            new CreateTileInstanceTextureCommand(height, layer, worldX, worldY, tileDataMod, chunkRender));
+            new CreateTileInstanceTextureCommand(height, layer, worldX, worldY, dual, tileDataMod, chunkRender));
     }
    
 

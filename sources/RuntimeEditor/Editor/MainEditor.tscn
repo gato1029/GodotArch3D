@@ -101,7 +101,7 @@ theme_override_constants/separation = 10
 script = ExtResource("3_0x4a8")
 
 [node name="ButtonNuevoMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=697197094]
-custom_minimum_size = Vector2(30, 30)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -111,7 +111,7 @@ IconTexture = ExtResource("4_x58t3")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="ButtonGuardarMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=493633072]
-custom_minimum_size = Vector2(30, 30)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 tooltip_text = "Guardar Mapa"
 script = ExtResource("6_2n80q")
@@ -119,7 +119,7 @@ IconTexture = ExtResource("4_ktcb6")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="ButtonGuardarComoMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=631784614]
-custom_minimum_size = Vector2(30, 30)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 tooltip_text = "Guardar Como"
 script = ExtResource("6_2n80q")
@@ -127,7 +127,7 @@ IconTexture = ExtResource("6_0x4a8")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="ButtonEliminarMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=416660920]
-custom_minimum_size = Vector2(30, 30)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 tooltip_text = "Eliminar Mapa"
 script = ExtResource("6_2n80q")
@@ -243,7 +243,7 @@ layout_mode = 2
 [node name="Render" type="Node" parent="." unique_id=1916277622]
 
 [node name="Camera3D" type="Camera3D" parent="Render" unique_id=667132760]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 50)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 500)
 projection = 1
 current = true
 size = 10.0

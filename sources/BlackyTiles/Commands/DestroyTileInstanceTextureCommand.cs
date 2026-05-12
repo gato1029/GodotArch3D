@@ -18,9 +18,11 @@ public class DestroyTileInstanceTextureCommand : IRenderCommand
     public readonly int y;
     private readonly TileRenderTextureInstance textureInstance;
     private readonly BlackyChunkRenderTiles chunkRender;
+    private readonly bool dual;
 
-    public DestroyTileInstanceTextureCommand(int height, int layer, int x, int y, TileRenderTextureInstance textureInstance, BlackyChunkRenderTiles chunkRender)
+    public DestroyTileInstanceTextureCommand(int height, int layer, int x, int y,bool dual, TileRenderTextureInstance textureInstance, BlackyChunkRenderTiles chunkRender)
     {
+        this.dual = dual;
         this.height = height;
         this.layer = layer;
         this.x = x;

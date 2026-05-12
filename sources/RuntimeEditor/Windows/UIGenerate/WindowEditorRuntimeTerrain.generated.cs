@@ -12,6 +12,8 @@ public partial class WindowEditorRuntimeTerrain : Window
     private KuroButton KuroButtonCrear;
     private KuroButton KuroButtonSeleccion;
     private KuroButton KuroButtonBorrar;
+    private KuroOptionButton TipoBrush;
+    private SpinBox SpinBoxSizeBrush;
     private SpinBox SpinBoxAltura;
     private SpinBox SpinBoxCapa;
     private ControlBlackyAtlasTexture EditorTextura;
@@ -27,8 +29,10 @@ public partial class WindowEditorRuntimeTerrain : Window
         KuroButtonCrear = GetNode<KuroButton>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/KuroButtonCrear");
         KuroButtonSeleccion = GetNode<KuroButton>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/KuroButtonSeleccion");
         KuroButtonBorrar = GetNode<KuroButton>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/KuroButtonBorrar");
-        SpinBoxAltura = GetNode<SpinBox>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/SpinBoxAltura");
-        SpinBoxCapa = GetNode<SpinBox>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/SpinBoxCapa");
+        TipoBrush = GetNode<KuroOptionButton>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer2/TipoBrush");
+        SpinBoxSizeBrush = GetNode<SpinBox>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer2/SpinBoxSizeBrush");
+        SpinBoxAltura = GetNode<SpinBox>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer/SpinBoxAltura");
+        SpinBoxCapa = GetNode<SpinBox>("PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer/SpinBoxCapa");
         EditorTextura = GetNode<ControlBlackyAtlasTexture>("PanelContainer/ScrollContainer/VBoxContainer/EditorTextura");
         ContenedorDual = GetNode<CenterContainer>("PanelContainer/ScrollContainer/VBoxContainer/ContenedorDual");
         TexturaDual = GetNode<TextureRect>("PanelContainer/ScrollContainer/VBoxContainer/ContenedorDual/VBoxContainer/TexturaDual");

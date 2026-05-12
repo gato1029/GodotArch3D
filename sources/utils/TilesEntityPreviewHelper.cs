@@ -129,7 +129,7 @@ public static class TilesEntityPreviewHelper
     {
         
 
-        //_pivot = Vector2I.Zero; top left
+        //_pivot = new Vector2I(0, 0); //top left
         _previewMatrixData = matrixData;
 
         int width = matrixData.GetLength(0);
@@ -212,7 +212,7 @@ public static class TilesEntityPreviewHelper
 
                 ref PositionComponent pos = ref entity.GetMut<PositionComponent>();
 
-                Vector2I offset = new Vector2I(x - _pivot.X, (_size.Y - 1 - y) - _pivot.Y);
+                Vector2I offset = new Vector2I(x -_pivot.X, (_size.Y - 1 - y) - _pivot.Y);
 
                 pos.tilePosition = newPositionCenter + offset;
 
@@ -319,5 +319,13 @@ public static class TilesEntityPreviewHelper
         _positionLast = Vector2I.Zero;
     }
 
-
+    internal static Vector2I GetSizeReal()
+    {
+        return _size;
+    }
+    internal static Vector2I GetPivot()
+    {
+        return _pivot;
+    }
+    
 }

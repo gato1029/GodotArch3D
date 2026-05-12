@@ -18,7 +18,7 @@ namespace GodotEcsArch.sources.utils;
 
 public static class TilesEntityTextureCreatorHelper
 {
-    public static Entity CreateSingle(FlecsManager flecsManager, int idMaterial, string idMod, int index , Vector2I tilePosition, int renderLayer = 0)
+    public static Entity CreateSingle(FlecsManager flecsManager, int idMaterial, string idMod, int index , Vector2I tilePosition, int renderLayer = 1)
     {
         if (flecsManager == null)
         {
@@ -38,7 +38,7 @@ public static class TilesEntityTextureCreatorHelper
         entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance,0, instanceRender.layerTexture, renderLayer, 0, 1, Vector2.Zero));
         ushort idInternal = pallete.GetOrCreateTile(idMod, (ushort)index);        
         entity.Set(new RenderFrameDataComponent { uvMap = pallete.GetTileUV(idInternal)});
-        entity.Set(new PositionComponent { tilePosition = tilePosition, height = 3 });
+        entity.Set(new PositionComponent { tilePosition = tilePosition, height = 10 });
         entity.Add<DirtyTileRenderTag>();
         entity.Set(new TileTextureComponent { indexTile = idInternal, isAnimated = false });
         return entity;

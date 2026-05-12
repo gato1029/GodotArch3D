@@ -10,7 +10,7 @@ using GodotEcsArch.sources.Flecs.Systems.Debug;
 using GodotEcsArch.sources.Flecs.Systems.Generic;
 using GodotEcsArch.sources.Flecs.Systems.Human;
 using GodotEcsArch.sources.Flecs.Systems.Rendering;
-using GodotEcsArch.sources.Flecs.Transforms;
+using GodotEcsArch.sources.Flecs.Systems.Transforms;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
