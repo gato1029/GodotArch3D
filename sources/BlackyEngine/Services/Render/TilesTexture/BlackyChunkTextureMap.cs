@@ -377,21 +377,31 @@ public class BlackyChunkTextureMap
 
     public static class DualMask
     {
-        public const byte TopLeft = 1;      // 0001
-        public const byte TopRight = 2;     // 0010
-        public const byte BottomLeft = 4;   // 0100
-        public const byte BottomRight = 8;  // 1000
-    }
+        // Orden visual:
+        //
+        // TL TR
+        // BL BR
+        //
+        // Bits:
+        //
+        // 8 4
+        // 2 1
 
+        public const byte BottomRight = 1;
+        public const byte BottomLeft = 2;
+        public const byte TopRight = 4;
+        public const byte TopLeft = 8;
+    }
     public void RebuildDualNeighborhood(
-    int x,
-    int y,
-    int height,
-    int layer,
-    DualTileTemplate dualTileTemplate)
+        int x,
+        int y,
+        int height,
+        int layer,
+        DualTileTemplate dualTileTemplate)
     {
         RebuildDualCell(x - 1, y - 1, height, layer, dualTileTemplate);
         RebuildDualCell(x, y - 1, height, layer, dualTileTemplate);
+
         RebuildDualCell(x - 1, y, height, layer, dualTileTemplate);
         RebuildDualCell(x, y, height, layer, dualTileTemplate);
     }
@@ -402,8 +412,11 @@ public class BlackyChunkTextureMap
     int layer,
     DualTileTemplate dualTileTemplate)
     {
+        
+
         int mask = 0;
 
+        // TL = 8
         if (IsSolidGlobal(vx, vy, height, layer))
             mask |= DualMask.TopLeft;
 
@@ -415,6 +428,8 @@ public class BlackyChunkTextureMap
 
         if (IsSolidGlobal(vx + 1, vy + 1, height, layer))
             mask |= DualMask.BottomRight;
+
+
 
         var (chunk, lx, ly) = ResolveOrCreate(vx, vy);
 
