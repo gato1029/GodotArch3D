@@ -63,6 +63,28 @@ public partial class WindowEditorRuntimeTerrain : Window
     private void SpinBoxSizeBrush_ValueChanged(double value)
     {
         sizeBrush = (int)value;
+        switch (modeEditorTerrain)
+        {
+            case ModeEditorTerrain.CREACION:
+                switch (modePaint)
+                {
+                    case ModePaint.NORMAL:
+                 
+                        break;
+                    case ModePaint.AUTO_DUAL:
+                        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), dualTileTemplate.GetSlot(1).GetData(0).GetPart(0).IdMod, dualTileTemplate.GetSlot(15).GetData(0).GetPart(0).TileIndex);
+
+                        break;
+                }
+                break;
+            case ModeEditorTerrain.ELIMINACION:
+                var temp = AtlasModsManager.Get<MaterialData>("Base", 1);
+                // para el modo eliminación, el preview se muestra con un tile de material base cualquiera, ya que no importa el tile que se muestre
+                TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), temp, 0);
+                break;
+            default:
+                break;
+        }
     }
 
     private void LoadBrushs()

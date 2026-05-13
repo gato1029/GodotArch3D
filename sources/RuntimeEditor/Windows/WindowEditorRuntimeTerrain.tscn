@@ -99,6 +99,8 @@ metadata/_custom_type_script = "uid://d4g3outtemvav"
 
 [node name="SpinBoxSizeBrush" type="SpinBox" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=310327887]
 layout_mode = 2
+min_value = 1.0
+value = 1.0
 alignment = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=938363571]
