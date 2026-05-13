@@ -69,7 +69,17 @@ public partial class WindowEditorRuntimeTerrain : Window
                 switch (modePaint)
                 {
                     case ModePaint.NORMAL:
-                 
+                        if (TilesEntityPreviewHelper.GetOnlyValidTiles().Count== 1)
+                        {
+                            var item =TilesEntityPreviewHelper.GetOnlyValidTiles()[0];
+                            
+                            TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush),item.data.idMod, item.data.index);
+                        }
+                        else
+                        {
+                            TilesEntityPreviewHelper.Create(materialSelected, matrixCurrent);
+                        }
+                        
                         break;
                     case ModePaint.AUTO_DUAL:
                         TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), dualTileTemplate.GetSlot(1).GetData(0).GetPart(0).IdMod, dualTileTemplate.GetSlot(15).GetData(0).GetPart(0).TileIndex);
@@ -207,7 +217,7 @@ public partial class WindowEditorRuntimeTerrain : Window
     private void EditorTextura_OnNotifySelectionMatrix(TileSelectionMatrixData matrix, int arg2)
     {
         matrixCurrent = matrix;
-        TilesEntityPreviewHelper.Create(materialSelected, matrix);
+        TilesEntityPreviewHelper.Create(materialSelected, matrixCurrent);
     }
 
     public override void _Process(double delta)
