@@ -133,11 +133,16 @@ public class BlackyChunkTextureMap
 
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-        if (tileLayer.GetDualMask(localX, localY) != 0 && dual == false)
-        {
-            return;
-        }
+
+        //if (tileLayer.GetDualMask(localX, localY) != 0 && dual == false)
+        //{
+        //    return;
+        //}
         tileLayer.ClearTile(localX, localY);
+        if (dual == false)
+        {
+            tileLayer.SetSolid(localX,localY,false);
+        }        
         OnTileChanged?.Invoke(new TileChange
         {
             WorldX = worldX,
@@ -158,14 +163,18 @@ public class BlackyChunkTextureMap
         // 3. Guardamos el ID en el chunk
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-
-
         tileLayer.SetTile(localX, localY, tileId);
 
-        if (tileLayer.GetDualMask(localX, localY) != 0 && dual ==false)
+        //if (tileLayer.GetDualMask(localX, localY) != 0 && dual ==false)
+        //{
+        //    return;
+        //}
+
+        if (dual == true)
         {
-            return;
+            tileLayer.SetSolid(localX, localY, false);
         }
+        
         OnTileChanged?.Invoke(new TileChange
         {
             WorldX = worldX,
