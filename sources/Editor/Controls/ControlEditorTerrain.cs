@@ -325,7 +325,7 @@ public partial class ControlEditorTerrain : MarginContainer
             case ModeEditorTerrain.Auto:
                 break;
             case ModeEditorTerrain.Pattern:
-                TilesEntityPreviewHelper.Move(CurrentMouseTile);
+                //TilesEntityPreviewHelper.Move(CurrentMouseTile);
                 break;
             default:
                 break;
