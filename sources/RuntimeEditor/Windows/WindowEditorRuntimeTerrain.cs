@@ -225,7 +225,19 @@ public partial class WindowEditorRuntimeTerrain : Window
         if (IsMouseBlockedByUI())
             return;
         Vector2I currentMouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-        TilesEntityPreviewHelper.Move(currentMouseTile);
+        Vector2 offsetVisual = Vector2.Zero;
+
+        switch (modePaint)
+        {
+            case ModePaint.NORMAL:
+                offsetVisual = new Vector2(0.25f,0.25f);
+                break;
+            case ModePaint.AUTO_DUAL:
+                break;
+            default:
+                break;
+        }
+        TilesEntityPreviewHelper.Move(currentMouseTile,offsetVisual);
 
         bool leftPressed = Input.IsMouseButtonPressed(MouseButton.Left);
         bool rightPressed = Input.IsMouseButtonPressed(MouseButton.Right);

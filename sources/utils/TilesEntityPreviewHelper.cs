@@ -186,7 +186,7 @@ public static class TilesEntityPreviewHelper
     // =========================================================
     // MOVE PREVIEW CENTRADO
     // =========================================================
-    public static void Move(Vector2I newPositionCenter)
+    public static void Move(Vector2I newPositionCenter, Vector2 offsetExternal)
     {
         if (_previewMatrixData == null || _previewEntities == null)
             return;
@@ -211,11 +211,11 @@ public static class TilesEntityPreviewHelper
                     continue;
 
                 ref PositionComponent pos = ref entity.GetMut<PositionComponent>();
-
                 Vector2I offset = new Vector2I(x -_pivot.X, (_size.Y - 1 - y) - _pivot.Y);
-
                 pos.tilePosition = newPositionCenter + offset;
 
+                ref RenderGPUComponent rgpu = ref entity.GetMut<RenderGPUComponent>();
+                rgpu.originOffset = offsetExternal;
                 entity.Add<DirtyTransformTag>();
             }
         }

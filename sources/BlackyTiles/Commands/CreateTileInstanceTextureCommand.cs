@@ -49,6 +49,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         {
             offset = new Vector2(0.25f, 0.25f);
         }
+        else
+        {
+            offset = new Vector2(0.25f, 0.25f);
+        }
 
         float depthOffset = 0;
         float depthValue = positionCenter.Y + depthOffset - height * CommonAtributes.HEIGHT_OFFSET ;
