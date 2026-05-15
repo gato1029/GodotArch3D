@@ -11,7 +11,7 @@ public enum BlackyRenderLayer
 {
     TerrenoBase = 0, // para tiles que no tienen entidad, como el suelo este no cambiara cuando se diseñe el mapa
     Superficie = 1, // esto si puede cambiar poner hierba, tierra de cultivo, etc
-    Camino = 2, // para caminos, esto es para que se renderice por encima de la superficie pero debajo de las entidades
+    Caminos = 2, // para caminos, esto es para que se renderice por encima de la superficie pero debajo de las entidades
     Adornos = 3, // para adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades
                  // los recursos edificios, personajes, entidades se renderizaran por encima de todo esto, en su propia capa de renderizado, para que se rendericen por encima de todo esto, y asi no se vean tapados por nada del terreno
 }
