@@ -6,9 +6,9 @@ namespace GodotEcsArch.sources.managers.Mods;
 
 public class AtlasMods<TKey, TValue> where TKey : notnull
 {
-    private readonly Dictionary<byte, Dictionary<TKey, TValue>> _data = new();
+    private readonly Dictionary<ushort, Dictionary<TKey, TValue>> _data = new();
 
-    public void Register(byte modId, TKey id, TValue value)
+    public void Register(ushort modId, TKey id, TValue value)
     {
         if (!_data.TryGetValue(modId, out var dict))
         {
@@ -19,7 +19,7 @@ public class AtlasMods<TKey, TValue> where TKey : notnull
         dict[id] = value;
     }
 
-    public TValue Get(byte modId, TKey id)
+    public TValue Get(ushort modId, TKey id)
     {
         return _data.TryGetValue(modId, out var dict) &&
                dict.TryGetValue(id, out var value)
@@ -27,7 +27,7 @@ public class AtlasMods<TKey, TValue> where TKey : notnull
             : default;
     }
 
-    public bool TryGet(byte modId, TKey id, out TValue value)
+    public bool TryGet(ushort modId, TKey id, out TValue value)
     {
         if (_data.TryGetValue(modId, out var dict))
             return dict.TryGetValue(id, out value);
@@ -36,21 +36,21 @@ public class AtlasMods<TKey, TValue> where TKey : notnull
         return false;
     }
 
-    public IReadOnlyDictionary<TKey, TValue> GetByMod(byte modId)
+    public IReadOnlyDictionary<TKey, TValue> GetByMod(ushort modId)
     {
         return _data.TryGetValue(modId, out var dict)
             ? dict
             : new Dictionary<TKey, TValue>();
     }
 
-    public IEnumerable<TValue> GetAll(byte modId)
+    public IEnumerable<TValue> GetAll(ushort modId)
     {
         if (_data.TryGetValue(modId, out var dict))
             return dict.Values;
 
         return Array.Empty<TValue>();
     }
-    public Dictionary<byte, Dictionary<TKey, TValue>> GetRawData()
+    public Dictionary<ushort, Dictionary<TKey, TValue>> GetRawData()
     {
         return _data;
     }

@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.managers.Mods;
 
+// podemos tener hasta 65535 mods activos, pero el ID 0 se reserva para el "mod base" del juego, que es el que contiene los datos originales sin modificaciones, por eso empezamos en 1
 public class TableMods : SingletonBase<TableMods>
 {
-    private byte _currentId = 0;
+    private ushort _currentId = 0;
 
-    private Queue<byte> _freeIds = new Queue<byte>();
+    private Queue<ushort> _freeIds = new Queue<ushort>();
 
     // ID -> Nombre
-    private Dictionary<byte, string> _mods = new();
+    private Dictionary<ushort, string> _mods = new();
 
     // Nombre -> ID
-    private Dictionary<string, byte> _nameToId = new();
+    private Dictionary<string, ushort> _nameToId = new();
 
     // Nombre -> Info
     private Dictionary<string, ModInfo> _modsInfo = new();
@@ -24,7 +25,7 @@ public class TableMods : SingletonBase<TableMods>
     private bool _initialized = false;
 
     // 🔹 Registrar mod (con info)
-    public byte Registrar(ModInfo info)
+    public ushort Registrar(ModInfo info)
     {
         if (_initialized)
             throw new InvalidOperationException("No se puede registrar después de inicializar");
@@ -35,7 +36,7 @@ public class TableMods : SingletonBase<TableMods>
         if (_nameToId.TryGetValue(info.Name, out var existingId))
             return existingId;
 
-        byte id;
+        ushort id;
 
         if (_freeIds.Count > 0)
         {
@@ -43,7 +44,7 @@ public class TableMods : SingletonBase<TableMods>
         }
         else
         {
-            if (_currentId == byte.MaxValue)
+            if (_currentId == ushort.MaxValue)
                 throw new InvalidOperationException("Se alcanzó el límite de mods activos (255)");
 
             _currentId++;
@@ -53,18 +54,18 @@ public class TableMods : SingletonBase<TableMods>
         _mods[id] = info.Name;
         _nameToId[info.Name] = id;
         _modsInfo[info.Name] = info;
-
+        info.Id = id;
         return id;
     }
 
     // 🔹 Obtener nombre por ID
-    public string ObtenerNombre(byte id)
+    public string ObtenerNombre(ushort id)
     {
         return _mods.TryGetValue(id, out var nombre) ? nombre : null;
     }
 
     // 🔹 Obtener info por ID
-    public ModInfo ObtenerInfo(byte id)
+    public ModInfo ObtenerInfo(ushort id)
     {
         if (_mods.TryGetValue(id, out var nombre) &&
             _modsInfo.TryGetValue(nombre, out var info))
@@ -82,13 +83,13 @@ public class TableMods : SingletonBase<TableMods>
     }
 
     // 🔹 Obtener ID por nombre
-    public byte? ObtenerId(string nombre)
+    public ushort? ObtenerId(string nombre)
     {
         return _nameToId.TryGetValue(nombre, out var id) ? id : default;
     }
 
     // 🔹 Eliminar
-    public bool Eliminar(byte id)
+    public bool Eliminar(ushort id)
     {
         if (!_mods.TryGetValue(id, out var nombre))
             return false;
@@ -103,13 +104,13 @@ public class TableMods : SingletonBase<TableMods>
     }
 
     // 🔹 Iterar (solo lectura)
-    public IEnumerable<KeyValuePair<byte, ModInfo>> ObtenerTodos()
+    public IEnumerable<KeyValuePair<ushort, ModInfo>> ObtenerTodos()
     {
         foreach (var kv in _mods)
         {
             if (_modsInfo.TryGetValue(kv.Value, out var info))
             {
-                yield return new KeyValuePair<byte, ModInfo>(kv.Key, info);
+                yield return new KeyValuePair<ushort, ModInfo>(kv.Key, info);
             }
         }
     }

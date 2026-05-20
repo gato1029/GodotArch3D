@@ -7,9 +7,10 @@
 [ext_resource type="Script" uid="uid://c1thn6nufciqn" path="res://addons/animated_panel_container_cs/AnimatedPanelContainer.cs" id="3_vvhr5"]
 
 [node name="KuroSearchItems" type="PanelContainer" unique_id=1075427436]
-anchors_preset = 9
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 208.0
+grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -38,6 +39,7 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("2_i0s71")
 script = ExtResource("3_vvhr5")
 metadata/_custom_type_script = "uid://c1thn6nufciqn"
 
@@ -49,7 +51,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ContainerIzquierdo/MarginContainer" unique_id=1648203242]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ContainerIzquierdo/MarginContainer/VBoxContainer" unique_id=1158332707]
 layout_mode = 2
@@ -72,12 +74,12 @@ text = "Elementos a Buscar"
 layout_mode = 2
 
 [node name="ScrollContainerPadre" type="ScrollContainer" parent="ContainerIzquierdo/MarginContainer/VBoxContainer" unique_id=1937353586]
-custom_minimum_size = Vector2(188, 800)
+custom_minimum_size = Vector2(188, 50)
 layout_mode = 2
+size_flags_horizontal = 0
 size_flags_vertical = 3
 
 [node name="Elementos" type="VBoxContainer" parent="ContainerIzquierdo/MarginContainer/VBoxContainer/ScrollContainerPadre" unique_id=105705998]
-custom_minimum_size = Vector2(190, 900)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 2
 size_flags_vertical = 3

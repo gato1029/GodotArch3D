@@ -201,6 +201,10 @@ item_0/id = 0
 item_1/text = "Cargar Mapa"
 item_1/id = 1
 
+[node name="FoldableContainer" type="FoldableContainer" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=1633491136]
+layout_mode = 2
+folded = true
+
 [node name="ContenedorEditor" type="PanelContainer" parent="Editor/MainWindows/Control/Panel/MenuContainer" unique_id=2067458146]
 layout_mode = 2
 size_flags_vertical = 3

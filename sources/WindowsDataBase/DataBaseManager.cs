@@ -1,10 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Godot;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
@@ -19,12 +12,20 @@ using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
 using LiteDB;
 using RVO;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using TileData = GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase.TileData;
 
 namespace GodotEcsArch.sources.WindowsDataBase
@@ -109,6 +110,9 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<AutomapperData>("AutomapperData");
             RegisterCollection<TileTextureData>("TileTextureData");
             RegisterCollection<DualTileTemplate>("DualTileTemplate");
+            RegisterCollection<TerrainBaseData>("TerrainBaseData");
+
+            
 
             ILiteCollection<TextureMasterData> TextureMasterDataCollection =
                 db.GetCollection<TextureMasterData>("TextureMasterData");

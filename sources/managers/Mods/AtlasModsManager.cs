@@ -43,7 +43,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // INDEXES (RELACIONES / QUERIES)
     // =========================================================
 
-    private readonly Dictionary<byte, MultiIndex<int, TileTextureData>> _tilesByMaterialIndex = new();
+    private readonly Dictionary<ushort, MultiIndex<int, TileTextureData>> _tilesByMaterialIndex = new();
 
     // =========================================================
     // TYPE REGISTRY (interno seguro)
@@ -71,7 +71,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // MOD RESOLUTION (SIN CACHE, SIMPLE Y CORRECTO)
     // =========================================================
 
-    private bool TryGetModId(string modName, out byte modId)
+    private bool TryGetModId(string modName, out ushort modId)
     {
         var id = TableMods.Instance.ObtenerId(modName);
 
@@ -151,17 +151,17 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     public static T GetFast<T>(byte modId, int id) where T : class
         => Instance.InternalGetFast<T, int>(modId, id);
 
-    public static bool TryGetFast<T>(byte modId, int id, out T value) where T : class
+    public static bool TryGetFast<T>(ushort modId, int id, out T value) where T : class
         => Instance.InternalTryGetFast<T, int>(modId, id, out value);
 
-    private T InternalGetFast<T, TKey>(byte modId, TKey id)
+    private T InternalGetFast<T, TKey>(ushort modId, TKey id)
         where T : class where TKey : notnull
     {
         var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
         return atlas?.Get(modId, id);
     }
 
-    private bool InternalTryGetFast<T, TKey>(byte modId, TKey id, out T value)
+    private bool InternalTryGetFast<T, TKey>(ushort modId, TKey id, out T value)
         where T : class where TKey : notnull
     {
         value = null;
@@ -223,7 +223,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // LOADERS
     // =========================================================
 
-    private void CargarMateriales(byte idMod, string name)
+    private void CargarMateriales(ushort idMod, string name)
     {
         var data = DataBaseManager.Instance.FindAll<MaterialData>();
 
@@ -235,7 +235,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     
     }
 
-    private void CargarPorMod(byte idMod)
+    private void CargarPorMod(ushort idMod)
     {
         CargarDatos(fuenteRecursos, idMod);
         CargarDatos(spriteData, idMod);
@@ -245,14 +245,14 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(dualTileTemplate, idMod);
     }
 
-    private void CargarPorModEspecial(byte idMod)
+    private void CargarPorModEspecial(ushort idMod)
     {
         CargarDatosEspecial(buildingData, idMod);
         CargarDatosEspecial(bulletData, idMod);
         CargarDatosEspecial(characterData, idMod);
     }
 
-    private void CargarTilesTextureData(byte idMod)
+    private void CargarTilesTextureData(ushort idMod)
     {
         var data = DataBaseManager.Instance.FindAll<TileTextureData>();
 
@@ -268,7 +268,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         }
     }
 
-    private void CargarDatos<T>(AtlasMods<int, T> atlas, byte idMod) where T : IdDataLong
+    private void CargarDatos<T>(AtlasMods<int, T> atlas, ushort idMod) where T : IdDataLong
     {
         var data = DataBaseManager.Instance.FindAll<T>();
 
@@ -276,22 +276,22 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             atlas.Register(idMod, item.idSave, item);
     }
 
-    private void CargarDatosEspecial<T>(AtlasMods<int, T> atlas, byte idMod) where T : IdData
+    private void CargarDatosEspecial<T>(AtlasMods<int, T> atlas, ushort idMod) where T : IdData
     {
         var data = DataBaseManager.Instance.FindAll<T>();
 
         foreach (var item in data)
             atlas.Register(idMod, item.id, item);
     }
-    public static Dictionary<byte, Dictionary<TKey, T>> GetDictionaryAll<T, TKey>() where T : class
+    public static Dictionary<ushort, Dictionary<TKey, T>> GetDictionaryAll<T, TKey>() where T : class
     => Instance.InternalGetDictionaryAll<T, TKey>();
-    private Dictionary<byte, Dictionary<TKey, T>> InternalGetDictionaryAll<T, TKey>()
+    private Dictionary<ushort, Dictionary<TKey, T>> InternalGetDictionaryAll<T, TKey>()
     where T : class where TKey : notnull
     {
         var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
 
         if (atlas == null)
-            return new Dictionary<byte, Dictionary<TKey, T>>();
+            return new Dictionary<ushort, Dictionary<TKey, T>>();
 
         return atlas.GetRawData();
     }
@@ -397,7 +397,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {
-            byte idMod = mod.Key;
+            ushort idMod = mod.Key;
             var info = mod.Value;
             FileHelper.SetModsPath(info.FolderPath);
             DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);
@@ -413,7 +413,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(materiales);
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {
-            byte idMod = mod.Key;
+            ushort idMod = mod.Key;
             var info = mod.Value;
             FileHelper.SetModsPath(info.FolderPath);
             DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);            

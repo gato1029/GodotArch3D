@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 public class TerrainBaseData: IdDataLong
 {
-    public ushort idDualTemplate { get; set; }        
+    public long idDualTemplate { get; set; }        
     public int materialTemplate { get; set; }
 }
 
 public class SurfaceBaseData : IdDataLong
 {
-    public ushort idDuaTemplate { get; set; }
+    public long idDuaTemplate { get; set; }
 
     // luego agregar costo materiales etc
     //public int costo {  get; set; }

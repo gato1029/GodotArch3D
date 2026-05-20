@@ -45,7 +45,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(tileDataMod.ModName);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
         Vector2 offset = new Vector2(0, 0);
- //       if (dual)
+        if (dual)
         {
             offset = new Vector2(0.25f, 0.25f);
         }

@@ -1,6 +1,8 @@
 using Godot;
 using Godot.Collections;
 using GodotEcsArch.sources.Helpers;
+using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -10,6 +12,8 @@ public partial class KuroSearchItems : PanelContainer
     private Vector2 _size;
     private bool _isExpanded = false;
     private double _duration = 0.6;
+
+    [Export] bool _startExpanded = false;
     // Called when the node enters the scene tree for the first time.
     List<Object> _objects = new List<Object>();
     public event Action<Object> OnObjectPressed;
@@ -17,17 +21,29 @@ public partial class KuroSearchItems : PanelContainer
 	{
         InitializeUI(); // Insertado por el generador de UI
 		ButtonOcultar.Pressed += ButtonOcultar_Pressed;
-        ButtonOcultarMostrar.Pressed += ButtonOcultarMostrar_Pressed;
-       // AddObject("prueba2", "gatito");
+        ButtonOcultarMostrar.Pressed += ButtonOcultarMostrar_Pressed;       
+        if (_startExpanded)
+        {
+            Expandir();
+        }
+    }
+    public void ReloadObjects<T>() where T : IdDataLong
+    {
+        ClearObjects();
+        var items = DataBaseManager.Instance.FindAll<T>();        
+        foreach (var obj in items)
+        {
+            AddObject(obj,obj.name, obj.textureVisual);
+        }
+    }
+    public void RefreshObject(Object obj)
+    {
+        RemoveObject(obj);
+        AddObject(obj, (string)obj.GetType().GetProperty("name").GetValue(obj), (Texture2D)obj.GetType().GetProperty("textureVisual").GetValue(obj));        
     }
 
     public  async void AddObject(Object obj,string name, Texture2D icon=null)
-    {
-        //if (!IsNodeReady())
-        //{
-        //    CallDeferred(nameof(AddObject), (Variant)obj, name, icon);
-        //    return;
-        //}
+    {        
         _objects.Add(obj);
         var button = new KuroButton();
         button.SetInternalData(obj);
@@ -45,8 +61,6 @@ public partial class KuroSearchItems : PanelContainer
             OnObjectPressed?.Invoke(obj);
         };
         Elementos.AddChild(button);
-
-
     }
 
   

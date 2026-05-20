@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://bmgdtgx4evyjb"]
+
+[ext_resource type="Script" uid="uid://cld5t6xqcmys2" path="res://sources/Editor/Common/WindowDataGenericMod.cs" id="1_wohey"]
+[ext_resource type="PackedScene" uid="uid://nvo80o8qce3p" path="res://sources/Editor/Common/KuroControlWindow.tscn" id="1_xs8uc"]
+[ext_resource type="PackedScene" uid="uid://bor51mewublcc" path="res://sources/WindowsDataBase/Common/KuroSearchItems.tscn" id="2_wohey"]
+
+[node name="WindowDataGenericMod" type="Window" unique_id=226182346]
+transparent_bg = true
+oversampling_override = 1.0
+position = Vector2i(0, 4)
+size = Vector2i(600, 600)
+borderless = true
+transparent = true
+script = ExtResource("1_wohey")
+
+[node name="KuroControlWindow" parent="." unique_id=1599535816 instance=ExtResource("1_xs8uc")]
+mouse_filter = 1
+NameWindow = "kuro"
+
+[node name="Contenido" type="MarginContainer" parent="KuroControlWindow" unique_id=1410002719]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 80
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+metadata/_edit_use_anchors_ = true
+
+[node name="KuroItemsData" parent="KuroControlWindow/Contenido" unique_id=1075427436 instance=ExtResource("2_wohey")]
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_startExpanded = true

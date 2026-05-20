@@ -139,10 +139,10 @@ public class BlackyChunkTextureMap
         //    return;
         //}
         tileLayer.ClearTile(localX, localY);
-        if (dual == false)
-        {
-            tileLayer.SetSolid(localX,localY,false);
-        }        
+        //if (dual == false)
+        //{
+        //    tileLayer.SetSolid(localX,localY,false);
+        //}        
         OnTileChanged?.Invoke(new TileChange
         {
             WorldX = worldX,
@@ -170,10 +170,10 @@ public class BlackyChunkTextureMap
         //    return;
         //}
 
-        if (dual == true)
-        {
-            tileLayer.SetSolid(localX, localY, false);
-        }
+        //if (dual == true)
+        //{
+        //    tileLayer.SetSolid(localX, localY, false);
+        //}
         
         OnTileChanged?.Invoke(new TileChange
         {

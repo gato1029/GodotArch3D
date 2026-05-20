@@ -43,7 +43,7 @@ public partial class WindowRuntimeDualTilesTerrain : Window
     private void CargarMods()
     {
         var listMods = TableMods.Instance.ObtenerTodos().ToList();
-        foreach (System.Collections.Generic.KeyValuePair<byte, ModInfo> item in listMods)
+        foreach (System.Collections.Generic.KeyValuePair<ushort, ModInfo> item in listMods)
         {
             ListaTipos.AddItemWithData(item.Value.Name, item.Value);
         }

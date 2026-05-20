@@ -5,6 +5,7 @@ public class ModInfo
     public string Name;        // mod_fire
     public string DbPath;      // .../mod_fire/data.db
     public string FolderPath;  // .../mod_fire/
+    public ushort Id { get; internal set; }
 
     public ModInfo(string name, string dbPath, string folderPath)
     {
@@ -12,4 +13,6 @@ public class ModInfo
         DbPath = dbPath;
         FolderPath = folderPath;
     }
+
+    
 }

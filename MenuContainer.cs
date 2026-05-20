@@ -9,7 +9,15 @@ public partial class MenuContainer : VBoxContainer
 	{
         InitializeUI(); // Insertado por el generador de UI
         ButtonDualGrid.Pressed += ButtonDualGrid_Pressed;
-	}
+        ButtonTerreno.Pressed += ButtonTerreno_Pressed;
+    }
+
+    private void ButtonTerreno_Pressed()
+    {
+        ContenedorEditor.ClearChildrens();
+        var control =  RuntimeServices.NodeRegistry.Create<RuntimeTerrainControl>();        
+        ContenedorEditor.AddChild(control);
+    }
 
     private void ButtonDualGrid_Pressed()
     {

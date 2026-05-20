@@ -214,14 +214,9 @@ public static class TilesEntityPreviewHelper
                 Vector2I offset = new Vector2I(x -_pivot.X, (_size.Y - 1 - y) - _pivot.Y);
                 pos.tilePosition = newPositionCenter + offset;
 
-<<<<<<< HEAD
-                ref RenderGPUComponent rgpu = ref entity.GetMut<RenderGPUComponent>();
-                rgpu.originOffset = offsetExternal;
-=======
                 ref RenderGPUComponent renderComp = ref entity.GetMut<RenderGPUComponent>();
                     renderComp.originOffset = offsetExternal;
 
->>>>>>> origin/main
                 entity.Add<DirtyTransformTag>();
             }
         }
