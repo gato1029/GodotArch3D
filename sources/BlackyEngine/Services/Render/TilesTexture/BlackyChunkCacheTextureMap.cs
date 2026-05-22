@@ -24,7 +24,7 @@ public struct TileChange
     public bool dual; 
 }
 
-public class BlackyChunkTextureMap
+public class BlackyChunkCacheTextureMap
 {
     public event Action<TileChange> OnTileChanged;
     private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
@@ -43,7 +43,7 @@ public class BlackyChunkTextureMap
     private BlackyChunkCoord _lastCoord;
     private BlackyChunkTexture _lastChunk;
 
-    public BlackyChunkTextureMap(int chunkSize, int heightCount, int maxLayers)
+    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers)
     {
         ChunkSize = chunkSize;
         HeightCount = heightCount;

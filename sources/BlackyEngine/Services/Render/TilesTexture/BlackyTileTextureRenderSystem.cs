@@ -86,7 +86,7 @@ public class BlackyTileTextureRenderSystem
 {
 
 
-    private readonly BlackyChunkTextureMap chunkMap;
+    private readonly BlackyChunkCacheTextureMap chunkMap;
     private readonly ChunkManagerBase chunkManager;
 
     // chunk → instances
@@ -97,7 +97,7 @@ public class BlackyTileTextureRenderSystem
     private readonly Dictionary<Vector2I, BlackyChunkRenderTiles> chunkRenderInstances = new Dictionary<Vector2I, BlackyChunkRenderTiles>();
 
     public BlackyTileTextureRenderSystem(
-        BlackyChunkTextureMap chunkMap,
+        BlackyChunkCacheTextureMap chunkMap,
         ChunkManagerBase chunkManager)
     {
         this.chunkMap = chunkMap;

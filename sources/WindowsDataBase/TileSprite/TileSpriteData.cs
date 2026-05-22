@@ -20,7 +20,11 @@ public class IdDataLong
 
     [BsonIgnore]
     public AtlasTexture textureVisual { get; set; }
-    
+
+    [BsonIgnore]
+    public string nameMod { get; set; }
+    [BsonIgnore]
+    public ushort idMod { get; set; }
 
     public void ReGerenateId()
     {

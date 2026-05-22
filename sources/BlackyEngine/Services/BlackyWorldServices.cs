@@ -7,11 +7,24 @@ using global::GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using global::GodotEcsArch.sources.BlackyTiles.Entities;
 using global::GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
+using GodotEcsArch.sources.BlackyTiles.Data;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services;
 
 public sealed class BlackyWorldServices
 {
+
+    // ==============================
+    // Terreno
+    // ==============================
+
+    public BlackyWorldDataMap<ushort> TerrainData { get; } // para pintar el terreno, el ushort es el id del terreno que se pintara en ese lugar
+    public BlackyWorldDataMap<ushort> RampasData { get; } // para pintar rampas y similares, el ushort es el id del tile que se pintara en ese lugar
+    public BlackyWorldDataMap<ushort> SuperficiesData { get; } // para pintar superficies, el ushort es el id del tile que se pintara en ese lugar
+    public BlackyWorldDataMap<ushort> CaminosData { get; } // para pintar caminos, el ushort es el id del tile que se pintara en ese lugar
+    public BlackyWorldDataMap<ushort> AdornosData { get; } // para pintar adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades, el ushort es el id del tile que se pintara en ese lugar
+
+
     // ============================
     // Spawn / Author tools
     // ============================
@@ -26,14 +39,18 @@ public sealed class BlackyWorldServices
 
     public BlackyHeightSystem HeightTool { get; }
 
-    public BlackyChunkTextureMap TerrainTexturePainter { get; } // para pintar Terreno
+    // ============================
+    // Cache para renderizado
+    // ============================
+
+    public BlackyChunkCacheTextureMap TerrainTexturePainter { get; } // para pintar Terreno
 
     // ============================
     // Render helpers
     // ============================
-    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; } // para renderizar pintar Terreno
+    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; } // para renderizar pintar Terreno // esto luego se eliminara
 
-    public BlackyTileRenderSystem TileRenderer { get; }
+    public BlackyTileRenderSystem TileRenderer { get; } // eliminar luego
 
     public BlackyEntityRenderSystem EntityRenderer { get; }
 
@@ -53,7 +70,9 @@ public sealed class BlackyWorldServices
         // Render infra first
         // ============================
 
-        TerrainTexturePainter = new BlackyChunkTextureMap(inf.ChunkSize, inf.HeightCount,5);
+        TerrainData = new BlackyWorldDataMap<ushort>(inf.ChunkSize, BlackyRenderLayer.TerrenoBase, TerrainTexturePainter,true);
+
+        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5);
 
         TileRenderer = new BlackyTileRenderSystem(
             sim.Flecs,

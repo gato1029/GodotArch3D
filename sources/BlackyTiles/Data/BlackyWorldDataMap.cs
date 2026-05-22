@@ -10,20 +10,13 @@ namespace GodotEcsArch.sources.BlackyTiles.Data;
 public enum BlackyRenderLayer
 {
     TerrenoBase = 0, // para tiles que no tienen entidad, como el suelo este no cambiara cuando se diseñe el mapa
-    Superficie = 1, // esto si puede cambiar poner hierba, tierra de cultivo, etc
-    Caminos = 2, // para caminos, esto es para que se renderice por encima de la superficie pero debajo de las entidades
-    Adornos = 3, // para adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades
+    Rampas = 1, // para rampas Y similares, esto es para que se renderice por encima de la superficie pero debajo de las entidades
+    Superficie = 2, // esto si puede cambiar poner hierba, tierra de cultivo, etc
+    Caminos = 3, // para caminos, esto es para que se renderice por encima de la superficie pero debajo de las entidades    
+    Adornos = 4, // para adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades
                  // los recursos edificios, personajes, entidades se renderizaran por encima de todo esto, en su propia capa de renderizado, para que se rendericen por encima de todo esto, y asi no se vean tapados por nada del terreno
 }
-public struct BlackyWorldCellChange
-{
-    public int WorldX;
-    public int WorldY;
 
-    public int Height;
-
-    public BlackyRenderLayer RenderLayer;
-}
 public abstract class BlackyWorldDataMap<T>
        where T : struct
 {
@@ -40,18 +33,17 @@ public abstract class BlackyWorldDataMap<T>
     // VISUAL CACHE
     // =====================================================
 
-    protected readonly BlackyChunkTextureMap
+    protected readonly BlackyChunkCacheTextureMap
         _textureMap;
 
     // =====================================================
     // CONFIG
     // =====================================================
 
+    public bool isDual { get; }
     public int ChunkSize { get; }
 
-    public BlackyRenderLayer
-        RenderLayer
-    { get; }
+    public BlackyRenderLayer  RenderLayer { get; }
 
     // =====================================================
     // CACHE
@@ -70,12 +62,13 @@ public abstract class BlackyWorldDataMap<T>
     protected BlackyWorldDataMap(
         int chunkSize,
         BlackyRenderLayer renderLayer,
-        BlackyChunkTextureMap textureMap)
+        BlackyChunkCacheTextureMap textureMap, bool isDual)
     {
         ChunkSize = chunkSize;
 
         RenderLayer = renderLayer;
 
+        this.isDual = isDual;
         _textureMap = textureMap;
     }
 
