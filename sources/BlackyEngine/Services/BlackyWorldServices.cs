@@ -70,7 +70,7 @@ public sealed class BlackyWorldServices
         // Render infra first
         // ============================
 
-        TerrainData = new BlackyWorldDataMap<ushort>(inf.ChunkSize, BlackyRenderLayer.TerrenoBase, TerrainTexturePainter,true);
+        //TerrainData = new BlackyWorldDataMap<ushort>(inf.ChunkSize, BlackyRenderLayer.TerrenoBase, TerrainTexturePainter,true);
 
         TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5);
 

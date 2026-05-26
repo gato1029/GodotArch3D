@@ -126,7 +126,7 @@ public class BlackyChunkCacheTextureMap
     // TILE ACCESS
     // ===============================
 
-    public void RemoveTile(int worldX, int worldY, int height, int layer, bool dual = false)
+    public void RemoveTile(int worldX, int worldY, int height, int layer)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
@@ -134,15 +134,13 @@ public class BlackyChunkCacheTextureMap
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
 
-        //if (tileLayer.GetDualMask(localX, localY) != 0 && dual == false)
-        //{
-        //    return;
-        //}
+        if (tileLayer.GetDualMask(localX, localY) != 0)
+        {
+            tileLayer.SetSolid(localX,localY,false);
+            
+        }
         tileLayer.ClearTile(localX, localY);
-        //if (dual == false)
-        //{
-        //    tileLayer.SetSolid(localX,localY,false);
-        //}        
+        
         OnTileChanged?.Invoke(new TileChange
         {
             WorldX = worldX,
@@ -152,7 +150,27 @@ public class BlackyChunkCacheTextureMap
             remove = true
         });
     }
-    public void SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex,bool dual=false)
+
+    public void RemoveTileDualInternal(int worldX, int worldY, int height, int layer, bool dual = false)
+    {
+        // 1. Resolvemos el chunk y las coordenadas locales
+        var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
+
+        // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);
+
+     
+        tileLayer.ClearTile(localX, localY);     
+        OnTileChanged?.Invoke(new TileChange
+        {
+            WorldX = worldX,
+            WorldY = worldY,
+            Height = height,
+            Layer = layer,
+            remove = true
+        });
+    }
+    public void SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
@@ -165,16 +183,40 @@ public class BlackyChunkCacheTextureMap
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
         tileLayer.SetTile(localX, localY, tileId);
 
-        //if (tileLayer.GetDualMask(localX, localY) != 0 && dual ==false)
-        //{
-        //    return;
-        //}
+        if (tileLayer.GetDualMask(localX, localY) != 0)
+        {
+            tileLayer.SetSolid(localX, localY, false);
+            
+        }
 
-        //if (dual == true)
-        //{
-        //    tileLayer.SetSolid(localX, localY, false);
-        //}
+        OnTileChanged?.Invoke(new TileChange
+        {
+            WorldX = worldX,
+            WorldY = worldY,
+            Height = height,
+            Layer = layer,
+            TileId = tileId,
+            region = chunk.ParentRegion,
+            remove = false,
+            dual = false
+        });
         
+        chunk.MarkDirty();
+
+    }
+    public void SetTileDualInternal(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex, bool dual = false)
+    {
+        // 1. Resolvemos el chunk y las coordenadas locales
+        var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
+
+        // 2. Le pedimos a la región del chunk que nos dé un ID de su paleta
+        ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex);
+
+        // 3. Guardamos el ID en el chunk
+        // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);
+        tileLayer.SetTile(localX, localY, tileId);
+
         OnTileChanged?.Invoke(new TileChange
         {
             WorldX = worldX,
@@ -186,7 +228,7 @@ public class BlackyChunkCacheTextureMap
             remove = false,
             dual = dual
         });
-        
+
         chunk.MarkDirty();
 
     }
@@ -546,11 +588,11 @@ public class BlackyChunkCacheTextureMap
 
             if (markDelete)
             {
-                RemoveTile(vx, vy-i, height, layer,true);
+                RemoveTileDualInternal(vx, vy-i, height, layer,true);
             }
             else
             {
-                SetTile(
+                SetTileDualInternal(
                      vx,
                      vy - i,
                      height,
