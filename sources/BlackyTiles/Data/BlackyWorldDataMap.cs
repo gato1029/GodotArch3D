@@ -24,17 +24,18 @@ public abstract class BlackyWorldDataMap<T>
     // CHUNKS
     // =====================================================
 
-    protected readonly Dictionary<
-        BlackyChunkCoord,
-        BlackyChunkData<T>>
-        _chunks = new();
-
+    protected readonly Dictionary<BlackyChunkCoord,BlackyChunkData<T>> _chunks = new();
+    protected readonly HashSet<BlackyChunkCoord>
+    _dirtyChunks = new();
     // =====================================================
     // VISUAL CACHE
     // =====================================================
 
     protected readonly BlackyChunkCacheTextureMap
         _textureMap;
+
+    protected readonly BlackyWorldRegions
+        _regions;
 
     // =====================================================
     // CONFIG
@@ -62,14 +63,66 @@ public abstract class BlackyWorldDataMap<T>
     protected BlackyWorldDataMap(
         int chunkSize,
         BlackyRenderLayer renderLayer,
-        BlackyChunkCacheTextureMap textureMap, bool isDual)
+        BlackyChunkCacheTextureMap textureMap, bool isDual, BlackyWorldRegions regions)
     {
         ChunkSize = chunkSize;
 
         RenderLayer = renderLayer;
-
+        _regions = regions;
         this.isDual = isDual;
         _textureMap = textureMap;
+    }
+    public void ClearDirtyRegion(
+    BlackyRegion region)
+    {
+        List<BlackyChunkCoord> toRemove =
+            new();
+
+        foreach (var coord in _dirtyChunks)
+        {
+            int regionX =
+                coord.X >> BlackyWorldRegions.RegionShift;
+
+            int regionY =
+                coord.Y >> BlackyWorldRegions.RegionShift;
+            if (regionX == region.X &&
+                regionY == region.Y)
+            {
+                toRemove.Add(coord);
+            }
+        }
+
+        foreach (var coord in toRemove)
+        {
+            _dirtyChunks.Remove(coord);
+
+            if (_chunks.TryGetValue(
+                coord,
+                out var chunk))
+            {
+                chunk.ClearDirty();
+            }
+        }
+    }
+
+    public IEnumerable<BlackyChunkCoord>
+    GetDirtyChunksForRegion(
+        BlackyRegion region)
+    {
+        foreach (var coord in _dirtyChunks)
+        {
+            int regionX =
+                coord.X >> BlackyWorldRegions.RegionShift;
+
+            int regionY =
+                coord.Y >> BlackyWorldRegions.RegionShift;
+
+            if (regionX == region.X &&
+                regionY == region.Y)
+            {
+                yield return coord;
+            }
+        }
     }
 
     // =====================================================
@@ -90,6 +143,10 @@ public abstract class BlackyWorldDataMap<T>
             chunk.GetOrCreateHeight(
                 height);
 
+        var coord = WorldToChunkCoord(worldX, worldY);
+
+        MarkChunkDirty(      coord,         chunk);
+        _regions.MarkRegionDirtyByChunk( coord.X, coord.Y);
         return ref h.GetCell(
             lx,
             ly);
@@ -125,6 +182,17 @@ public abstract class BlackyWorldDataMap<T>
 
         return true;
     }
+    public bool TryGetChunk(
+    int chunkX,
+    int chunkY,
+    out BlackyChunkData<T> chunk)
+    {
+        return _chunks.TryGetValue(
+            new BlackyChunkCoord(
+                chunkX,
+                chunkY),
+            out chunk);
+    }
 
     // =====================================================
     // RESOLVE
@@ -142,6 +210,8 @@ public abstract class BlackyWorldDataMap<T>
             WorldToChunkCoord(
                 worldX,
                 worldY);
+
+
 
         if (_lastChunk != null &&
             coord.Equals(_lastCoord))
@@ -168,6 +238,8 @@ public abstract class BlackyWorldDataMap<T>
             _chunks[coord] = chunk;
         }
 
+
+
         _lastCoord = coord;
         _lastChunk = chunk;
 
@@ -181,7 +253,19 @@ public abstract class BlackyWorldDataMap<T>
             lx,
             ly);
     }
+    protected void MarkChunkDirty(
+    BlackyChunkCoord coord,
+    BlackyChunkData<T> chunk)
+    {
+        chunk.MarkDirty();
+        _dirtyChunks.Add(coord);
+        var region =
+            _regions.GetOrCreateRegionByChunk(
+                coord.X,
+                coord.Y);
 
+        region.MarkChunkDirty(coord);
+    }
     public (
         BlackyChunkData<T> chunk,
         int lx,

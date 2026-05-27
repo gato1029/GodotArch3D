@@ -14,19 +14,36 @@ public class BlackyRegion
     public int Y { get; }
 
     // La paleta local de esta región
-    public BlackyTilePalette Palette { get; private set; }
+    public BlackyPersistentTilePalette Palette { get; private set; }
+    public BlackyRuntimeTilePalette RuntimeTilePalette { get; private set; }
 
     // Opcional: Mantener una lista de los chunks cargados en esta región 
     // para facilitar el guardado masivo.
     private readonly HashSet<BlackyChunkCoord> _containedChunks = new();
-
+    private readonly HashSet<BlackyChunkCoord> _dirtyChunks = new();
     public BlackyRegion(int x, int y)
     {
         X = x;
         Y = y;
-        Palette = new BlackyTilePalette();
+        Palette = new BlackyPersistentTilePalette();
+        RuntimeTilePalette = new BlackyRuntimeTilePalette();
+    }
+    public void MarkChunkDirty(
+    BlackyChunkCoord coord)
+    {
+        _dirtyChunks.Add(coord);
     }
 
+    public IEnumerable<BlackyChunkCoord>
+        GetDirtyChunks()
+    {
+        return _dirtyChunks;
+    }
+
+    public void ClearDirtyChunks()
+    {
+        _dirtyChunks.Clear();
+    }
     // ===============================
     // GESTIÓN DE CHUNKS
     // ===============================
@@ -53,22 +70,45 @@ public class BlackyRegion
     /// <summary>
     /// Obtiene el ID local (ushort) para un tile basado en su nombre de mod e índice.
     /// </summary>
-    public ushort GetOrCreateTile(string modName, ushort indexTexture)
+    public ushort GetOrCreateTile(string modName, ushort indexTexture, bool isPersistent=true)
     {
-        return Palette.GetOrCreateTile(modName, indexTexture);
+        if (isPersistent)
+        {
+            return Palette.GetOrCreateTile(modName, indexTexture);
+        }
+        else
+        {
+            return RuntimeTilePalette.GetOrCreateTile(modName, indexTexture);
+        }
     }
+
+    
 
     /// <summary>
     /// Devuelve la información de textura (UVs) para un ID local.
     /// </summary>
-    public Color GetTileUV(ushort tileId)
+    public Color GetTileUV(ushort tileId, bool isPersistent = true)
     {
-        return Palette.GetTileUV(tileId);
+        if (isPersistent)
+        {
+            return Palette.GetTileUV(tileId);
+        }
+        else
+        {
+            return RuntimeTilePalette.GetTileUV(tileId);
+        }        
     }
 
-    public void TryGetTileDataMod(ushort tileId, out TileDataMod tileDataMod)
+    public void TryGetTileDataMod(ushort tileId, out TileDataMod tileDataMod, bool isPersistent = true)
     {
-        Palette.TryGetTileDataMod(tileId,out tileDataMod);
+        if (isPersistent)
+        {
+            Palette.TryGetTileDataMod(tileId, out tileDataMod);
+        }
+        else
+        {
+            RuntimeTilePalette.TryGetTileDataMod(tileId, out tileDataMod);
+        }
     }
 
     // ===============================
@@ -78,7 +118,7 @@ public class BlackyRegion
     /// <summary>
     /// Prepara los datos de la paleta para ser guardados.
     /// </summary>
-    public Dictionary<ushort, TileDataPersisted> GetSaveData()
+    public Dictionary<ushort, TileDataPersisted> GetSavePaletteData()
     {
         return Palette.GetPersistedPalette();
     }

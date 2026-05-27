@@ -6,6 +6,7 @@ using global::GodotEcsArch.sources.BlackyEngine.State;
 using global::GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using global::GodotEcsArch.sources.BlackyTiles.Entities;
 using global::GodotEcsArch.sources.BlackyTiles.Systems;
+using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyTiles.Data;
 
@@ -18,7 +19,8 @@ public sealed class BlackyWorldServices
     // Terreno
     // ==============================
 
-    public BlackyWorldDataMap<ushort> TerrainData { get; } // para pintar el terreno, el ushort es el id del terreno que se pintara en ese lugar
+    public BlackyWorldRegions regionsRender { get; } = new BlackyWorldRegions();
+    public BlackyTerrainWorldData TerrainData { get; } // para pintar el terreno, el ushort es el id del terreno que se pintara en ese lugar
     public BlackyWorldDataMap<ushort> RampasData { get; } // para pintar rampas y similares, el ushort es el id del tile que se pintara en ese lugar
     public BlackyWorldDataMap<ushort> SuperficiesData { get; } // para pintar superficies, el ushort es el id del tile que se pintara en ese lugar
     public BlackyWorldDataMap<ushort> CaminosData { get; } // para pintar caminos, el ushort es el id del tile que se pintara en ese lugar
@@ -69,10 +71,10 @@ public sealed class BlackyWorldServices
         // ============================
         // Render infra first
         // ============================
+       
+        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender);
 
-        //TerrainData = new BlackyWorldDataMap<ushort>(inf.ChunkSize, BlackyRenderLayer.TerrenoBase, TerrainTexturePainter,true);
-
-        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5);
+        TerrainData = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
 
         TileRenderer = new BlackyTileRenderSystem(
             sim.Flecs,

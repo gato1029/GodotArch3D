@@ -90,7 +90,7 @@ public static class BlackyWorldContext
     public static BlackyChunkedBitGrid GridMove => State.GridMove;
     public static BlackyChunkRenderData RenderData => State.RenderData;
     public static BlackySpatialEntityMap SpatialEntityMap => State.SpatialEntityMap;
-    public static BlackyTilePalette TilePalette => State.TilePalette;
+    public static BlackyPersistentTilePalette TilePalette => State.TilePalette;
     public static ChunkManagerBase ChunkManager => World.Streaming.chunkManagerLocal;
     public static BlackyChunkOccupancyMap OccupancyMap => State.OccupancyMap;
 

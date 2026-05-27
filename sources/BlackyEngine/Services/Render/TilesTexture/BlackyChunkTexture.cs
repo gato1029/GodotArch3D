@@ -63,7 +63,7 @@ public class BlackyChunkTexture
     /// Devuelve la paleta completa de la región si el renderizador 
     /// necesita procesar múltiples tiles de forma masiva.
     /// </summary>
-    public BlackyTilePalette GetPalette()
+    public BlackyPersistentTilePalette GetPalette()
     {
         return ParentRegion.Palette;
     }

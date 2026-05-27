@@ -1,0 +1,447 @@
+using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
+using GodotEcsArch.sources.BlackyTiles.Data;
+using MessagePack;
+using Microsoft.VisualBasic;
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace GodotEcsArch.sources.BlackyEngine.Data;
+
+// =====================================================
+// TERRAIN
+// =====================================================
+
+[MessagePackObject]
+public class TerrainHeightSave
+{
+    [Key(0)]
+    public int Height { get; set; }
+
+    [Key(1)]
+    public ushort[] TerrainIds { get; set; }
+}
+
+[MessagePackObject]
+public class TerrainChunkSave
+{
+    [Key(0)]
+    public int ChunkX { get; set; }
+
+    [Key(1)]
+    public int ChunkY { get; set; }
+
+    [Key(2)]
+    public List<TerrainHeightSave> Heights { get; set; } = new();
+}
+
+// =====================================================
+// VISUAL
+// =====================================================
+
+[MessagePackObject]
+public class VisualHeightSave
+{
+    [Key(0)]
+    public int Height { get; set; }
+
+    [Key(1)]
+    public ushort[] Tiles { get; set; }
+}
+
+[MessagePackObject]
+public class VisualChunkSave
+{
+    [Key(0)]
+    public int ChunkX { get; set; }
+
+    [Key(1)]
+    public int ChunkY { get; set; }
+
+    [Key(2)]
+    public List<VisualHeightSave> Heights { get; set; } = new();
+}
+
+// =====================================================
+// REGION
+// =====================================================
+
+[MessagePackObject]
+public class RegionSaveData
+{
+    [Key(0)]
+    public int RegionX { get; set; }
+
+    [Key(1)]
+    public int RegionY { get; set; }
+
+    [Key(2)]
+    public Dictionary<ushort, TileDataPersisted> Palette { get; set; } = new();
+
+    [Key(3)]
+    public List<TerrainChunkSave> TerrainChunks { get; set; } = new();
+
+    [Key(4)]
+    public List<VisualChunkSave> RampChunks { get; set; } = new();
+}
+
+// =====================================================
+// PERSISTENCE
+// =====================================================
+public enum SaveFormat
+{
+    Binary,
+    Json
+}
+public class BlackyWorldPersistence
+{
+    private readonly BlackyWorldRegions _regions;
+
+    private readonly BlackyTerrainWorldData _terrainWorld;
+
+    private readonly BlackyRampVisualWorld _rampWorld;
+
+    private readonly SaveFormat _format;
+
+    public BlackyWorldPersistence(
+        BlackyWorldRegions regions,
+        BlackyTerrainWorldData terrainWorld,
+        BlackyRampVisualWorld rampWorld,
+        SaveFormat format = SaveFormat.Binary)
+    {
+        _regions = regions;
+        _terrainWorld = terrainWorld;
+        _rampWorld = rampWorld;
+
+        _format = format;
+    }
+
+    // =====================================================
+    // LOAD
+    // =====================================================
+
+    public RegionSaveData LoadRegion(string path)
+    {
+        string extension =
+            Path.GetExtension(path);
+
+        if (extension == ".json")
+        {
+            string json =
+                File.ReadAllText(path);
+
+            byte[] bytes =
+                MessagePackSerializer
+                    .ConvertFromJson(json);
+
+            return MessagePackSerializer
+                .Deserialize<RegionSaveData>(bytes);
+        }
+
+        byte[] data =
+            File.ReadAllBytes(path);
+
+        return MessagePackSerializer
+            .Deserialize<RegionSaveData>(data);
+    }
+
+    // =====================================================
+    // SAVE ALL DIRTY
+    // =====================================================
+
+    public void SaveAllDirtyRegions(string rootPath)
+    {
+        foreach (var region in _regions.GetDirtyRegions())
+        {
+            // ============================================
+            // BUILD SAVE
+            // ============================================
+
+            RegionSaveData save =
+                SaveRegion(
+                    region.X,
+                    region.Y);
+
+            // ============================================
+            // PATH
+            // ============================================
+
+            string regionFolder =
+                Path.Combine(
+                    rootPath,
+                    "regions");
+
+            Directory.CreateDirectory(
+                regionFolder);
+
+            string extension =
+                _format == SaveFormat.Json
+                    ? "json"
+                    : "bin";
+
+            string fileName =
+                $"region_{region.X}_{region.Y}.{extension}";
+
+            string fullPath =
+                Path.Combine(
+                    regionFolder,
+                    fileName);
+
+            // ============================================
+            // SAVE JSON
+            // ============================================
+
+            if (_format == SaveFormat.Json)
+            {
+                byte[] bytes =
+                    MessagePackSerializer.Serialize(save);
+
+                string json =
+                    MessagePackSerializer
+                        .ConvertToJson(bytes);
+
+                File.WriteAllText(
+                    fullPath,
+                    json);
+            }
+
+            // ============================================
+            // SAVE BINARY
+            // ============================================
+
+            else
+            {
+                byte[] bytes =
+                    MessagePackSerializer
+                        .Serialize(save);
+
+                File.WriteAllBytes(
+                    fullPath,
+                    bytes);
+            }
+
+            // ============================================
+            // CLEAR DIRTY
+            // ============================================
+
+            _terrainWorld.ClearDirtyRegion(
+                region);
+
+            _rampWorld.ClearDirtyRegion(
+                region);
+
+            _regions.ClearDirtyRegion(
+                region.X,
+                region.Y);
+        }
+    }
+
+    // =====================================================
+    // SAVE REGION
+    // =====================================================
+
+    public RegionSaveData SaveRegion(
+        int regionX,
+        int regionY)
+    {
+        var region =
+            _regions.GetOrCreateRegion(
+                regionX,
+                regionY);
+
+        RegionSaveData save =
+            new RegionSaveData
+            {
+                RegionX = regionX,
+                RegionY = regionY,
+
+                Palette =
+                    region.GetSavePaletteData()
+            };
+
+        // =================================================
+        // TERRAIN
+        // =================================================
+
+        save.TerrainChunks =
+            SaveTerrainRegion(region);
+
+        // =================================================
+        // RAMPS
+        // =================================================
+
+        save.RampChunks =
+            SaveVisualRegion(
+                region,
+                _rampWorld);
+
+        _regions.ClearDirtyRegion(
+            regionX,
+            regionY);
+
+        _terrainWorld.ClearDirtyRegion(region);
+
+        _rampWorld.ClearDirtyRegion(region);
+
+        return save;
+    }
+
+    // =====================================================
+    // SAVE VISUAL
+    // =====================================================
+
+    private List<VisualChunkSave> SaveVisualRegion(
+        BlackyRegion region,
+        BlackyWorldDataMap<VisualTileCell> world)
+    {
+        List<VisualChunkSave> result = new();
+
+        foreach (var coord in world.GetDirtyChunksForRegion(region))
+        {
+            if (!world.TryGetChunk(
+                coord.X,
+                coord.Y,
+                out var chunk))
+            {
+                continue;
+            }
+
+            VisualChunkSave chunkSave =
+                new()
+                {
+                    ChunkX = coord.X,
+                    ChunkY = coord.Y
+                };
+
+            foreach (var pair in chunk.Heights)
+            {
+                int height = pair.Key;
+
+                var heightData = pair.Value;
+
+                ushort[] tiles =
+                    new ushort[
+                        world.ChunkSize *
+                        world.ChunkSize];
+
+                bool hasData = false;
+
+                for (int y = 0; y < world.ChunkSize; y++)
+                {
+                    for (int x = 0; x < world.ChunkSize; x++)
+                    {
+                        ushort tile =
+                            heightData
+                                .GetCell(x, y)
+                                .TileId;
+
+                        tiles[
+                            y * world.ChunkSize + x]
+                                = tile;
+
+                        if (tile != 0)
+                            hasData = true;
+                    }
+                }
+
+                if (!hasData)
+                    continue;
+
+                chunkSave.Heights.Add(
+                    new VisualHeightSave
+                    {
+                        Height = height,
+                        Tiles = tiles
+                    });
+            }
+
+            if (chunkSave.Heights.Count > 0)
+            {
+                result.Add(chunkSave);
+            }
+        }
+
+        return result;
+    }
+
+    // =====================================================
+    // SAVE TERRAIN
+    // =====================================================
+
+    private List<TerrainChunkSave> SaveTerrainRegion(
+        BlackyRegion region)
+    {
+        List<TerrainChunkSave> result = new();
+
+        foreach (var coord in _terrainWorld.GetDirtyChunksForRegion(region))
+        {
+            if (!_terrainWorld.TryGetChunk(
+                coord.X,
+                coord.Y,
+                out var chunk))
+            {
+                continue;
+            }
+
+            TerrainChunkSave chunkSave =
+                new()
+                {
+                    ChunkX = coord.X,
+                    ChunkY = coord.Y
+                };
+
+            foreach (var pair in chunk.Heights)
+            {
+                int height = pair.Key;
+
+                var heightData = pair.Value;
+
+                ushort[] terrain =
+                    new ushort[
+                        _terrainWorld.ChunkSize *
+                        _terrainWorld.ChunkSize];
+
+                bool hasData = false;
+
+                for (int y = 0;
+                    y < _terrainWorld.ChunkSize;
+                    y++)
+                {
+                    for (int x = 0;
+                        x < _terrainWorld.ChunkSize;
+                        x++)
+                    {
+                        ushort id =
+                            heightData
+                                .GetCell(x, y)
+                                .id;
+
+                        terrain[
+                            y * _terrainWorld.ChunkSize + x]
+                                = id;
+
+                        if (id != 0)
+                            hasData = true;
+                    }
+                }
+
+                if (!hasData)
+                    continue;
+
+                chunkSave.Heights.Add(
+                    new TerrainHeightSave
+                    {
+                        Height = height,
+                        TerrainIds = terrain
+                    });
+            }
+
+            if (chunkSave.Heights.Count > 0)
+            {
+                result.Add(chunkSave);
+            }
+        }
+
+        return result;
+    }
+}

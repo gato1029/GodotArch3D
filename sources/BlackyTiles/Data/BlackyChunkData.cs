@@ -8,26 +8,41 @@ namespace GodotEcsArch.sources.BlackyTiles.Data;
 public class BlackyChunkData<T>
        where T : struct
 {
-    private readonly Dictionary<int, BlackyChunkHeightData<T>>
-        _heights = new();
+    private readonly Dictionary<int, BlackyChunkHeightData<T>>  _heights = new();
 
     private readonly int _chunkSize;
+    private bool _dirty;
 
+    public void MarkDirty()
+    {
+        _dirty = true;
+    }
+
+    public void ClearDirty()
+    {
+        _dirty = false;
+    }
+    public bool IsDirty()
+    {
+        return _dirty;
+    }
     public BlackyChunkData(int chunkSize)
     {
         _chunkSize = chunkSize;
     }
 
+    public Dictionary<int, BlackyChunkHeightData<T>> Heights => _heights;
+
     public BlackyChunkHeightData<T>
         GetOrCreateHeight(int height)
     {
-        if (!_heights.TryGetValue(height, out var h))
+        if (!Heights.TryGetValue(height, out var h))
         {
             h =
                 new BlackyChunkHeightData<T>(
                     _chunkSize);
 
-            _heights[height] = h;
+            Heights[height] = h;
         }
 
         return h;
@@ -37,6 +52,6 @@ public class BlackyChunkData<T>
         int height,
         out BlackyChunkHeightData<T> h)
     {
-        return _heights.TryGetValue(height, out h);
+        return Heights.TryGetValue(height, out h);
     }
 }

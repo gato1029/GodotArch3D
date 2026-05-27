@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
 using GodotEcsArch.sources.BlackyTiles;
+using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ public class BlackyChunkCacheTextureMap
 {
     public event Action<TileChange> OnTileChanged;
     private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
-    private readonly Dictionary<(int, int), BlackyRegion> _regions = new();
+    private readonly BlackyWorldRegions _regions;
 
     public int ChunkSize { get; }
     public int HeightCount { get; }
@@ -43,45 +44,47 @@ public class BlackyChunkCacheTextureMap
     private BlackyChunkCoord _lastCoord;
     private BlackyChunkTexture _lastChunk;
 
-    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers)
+    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions)
     {
         ChunkSize = chunkSize;
         HeightCount = heightCount;
         MaxLayers = maxLayers;
+        _regions = regions;
     }
 
     // ===============================
     // GESTIÓN DE REGIONES
     // ===============================
 
-    public BlackyRegion GetOrCreateRegion(int regX, int regY)
-    {
-        var key = (regX, regY);
-        if (!_regions.TryGetValue(key, out var region))
-        {
-            region = new BlackyRegion(regX, regY);
-            _regions[key] = region;
-            // Aquí podrías disparar la carga desde disco si el archivo existe
-        }
-        return region;
-    }
+    //public BlackyRegion GetOrCreateRegion(int regX, int regY)
+    //{
+    //    var key = (regX, regY);
+    //    if (!_regions.TryGetValue(key, out var region))
+    //    {
+    //        region = new BlackyRegion(regX, regY);
+    //        _regions[key] = region;
+    //        // Aquí podrías disparar la carga desde disco si el archivo existe
+    //    }
+    //    return region;
+    //}
 
     // ===============================
     // GESTIÓN DE CHUNKS
     // ===============================
 
+    
     public BlackyChunkTexture GetOrCreateChunk(int chunkX, int chunkY)
     {
         var coord = new BlackyChunkCoord(chunkX, chunkY);
 
         if (!_chunks.TryGetValue(coord, out var chunk))
         {
-            // 1. Calcular a qué región pertenece este chunk
-            int regX = chunkX >> RegionShift;
-            int regY = chunkY >> RegionShift;
+            //// 1. Calcular a qué región pertenece este chunk
+            //int regX = chunkX >> RegionShift;
+            //int regY = chunkY >> RegionShift;
 
             // 2. Obtener o crear la región
-            var region = GetOrCreateRegion(regX, regY);
+            var region = _regions.GetOrCreateRegionByChunk(chunkX, chunkY);
 
             // 3. Crear el chunk pasándole su región padre
             chunk = new BlackyChunkTexture(
@@ -170,7 +173,9 @@ public class BlackyChunkCacheTextureMap
             remove = true
         });
     }
-    public void SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex)
+
+
+    public ushort SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
@@ -202,6 +207,7 @@ public class BlackyChunkCacheTextureMap
         });
         
         chunk.MarkDirty();
+        return tileId;
 
     }
     public void SetTileDualInternal(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex, bool dual = false)
@@ -231,6 +237,7 @@ public class BlackyChunkCacheTextureMap
 
         chunk.MarkDirty();
 
+        
     }
     // ===============================
     // COORDINADAS Y RESOLUCIÓN

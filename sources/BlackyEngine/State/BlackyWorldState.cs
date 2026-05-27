@@ -23,7 +23,7 @@ public sealed class BlackyWorldState : IDisposable
 
     public BlackyChunkRenderData RenderData { get; }
     public BlackySpatialEntityMap SpatialEntityMap { get; }
-    public BlackyTilePalette TilePalette { get; }
+    public BlackyPersistentTilePalette TilePalette { get; }
 
     public BlackyChunkOccupancyMap OccupancyMap { get; }
 
@@ -41,7 +41,7 @@ public sealed class BlackyWorldState : IDisposable
 
         RenderData = new BlackyChunkRenderData(config.ChunkSize, config.HeightCount);
         SpatialEntityMap = new BlackySpatialEntityMap();
-        TilePalette = new BlackyTilePalette();
+        TilePalette = new BlackyPersistentTilePalette();
 
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize);
 
