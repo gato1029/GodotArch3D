@@ -451,15 +451,15 @@ public partial class WindowGroupTileTexture : Window
         int altura = 1;
         int capa = 1;
         var tiles = TilesEntityPreviewHelper.GetOnlyValidTiles();
-        foreach (var item in tiles)
-        {
-            BlackyWorldContext.PintarTerreno.RemoveTile(
-                item.tilePosition.X,
-                item.tilePosition.Y,
-                altura,
-                capa
-            );
-        }
+        //foreach (var item in tiles)
+        //{
+        //    BlackyWorldContext.PintarTerreno.RemoveTile(
+        //        item.tilePosition.X,
+        //        item.tilePosition.Y,
+        //        altura,
+        //        capa
+        //    );
+        //}
     }
 
     private void ApplyPaint()
@@ -467,16 +467,16 @@ public partial class WindowGroupTileTexture : Window
         int altura = 1;
         int capa = 1;
         var tiles = TilesEntityPreviewHelper.GetOnlyValidTiles();
-        foreach (var item in tiles)
-        {
-            BlackyWorldContext.PintarTerreno.SetTile(
-                item.tilePosition.X,
-                item.tilePosition.Y,
-                altura,
-                capa,
-                item.data.idMod,
-                (ushort)item.data.index
-            );
-        }
+        //foreach (var item in tiles)
+        //{
+        //    BlackyWorldContext.PintarTerreno.SetTile(
+        //        item.tilePosition.X,
+        //        item.tilePosition.Y,
+        //        altura,
+        //        capa,
+        //        item.data.idMod,
+        //        (ushort)item.data.index
+        //    );
+        //}
     }
 }

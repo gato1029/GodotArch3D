@@ -21,7 +21,7 @@ public sealed class BlackyWorldServices
 
     public BlackyWorldRegions regionsRender { get; } = new BlackyWorldRegions();
     public BlackyTerrainWorldData TerrainData { get; } // para pintar el terreno, el ushort es el id del terreno que se pintara en ese lugar
-    public BlackyWorldDataMap<ushort> RampasData { get; } // para pintar rampas y similares, el ushort es el id del tile que se pintara en ese lugar
+    public BlackyRampVisualWorld RampasData { get; } // para pintar rampas y similares, el ushort es el id del tile que se pintara en ese lugar
     public BlackyWorldDataMap<ushort> SuperficiesData { get; } // para pintar superficies, el ushort es el id del tile que se pintara en ese lugar
     public BlackyWorldDataMap<ushort> CaminosData { get; } // para pintar caminos, el ushort es el id del tile que se pintara en ese lugar
     public BlackyWorldDataMap<ushort> AdornosData { get; } // para pintar adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades, el ushort es el id del tile que se pintara en ese lugar
@@ -75,6 +75,7 @@ public sealed class BlackyWorldServices
         TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender);
 
         TerrainData = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
+        RampasData = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender);
 
         TileRenderer = new BlackyTileRenderSystem(
             sim.Flecs,

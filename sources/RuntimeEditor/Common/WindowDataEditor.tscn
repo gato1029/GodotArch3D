@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://bitjyylj8d0y7"]
+
+[ext_resource type="Script" uid="uid://byy3o1iner6ln" path="res://sources/RuntimeEditor/Common/WindowDataEditor.cs" id="1_k44lu"]
+[ext_resource type="PackedScene" uid="uid://nvo80o8qce3p" path="res://sources/Editor/Common/KuroControlWindow.tscn" id="2_3kxpo"]
+[ext_resource type="Script" uid="uid://d4g3outtemvav" path="res://sources/CustomWidgets/KuroOptionButton.cs" id="3_e6dbv"]
+[ext_resource type="PackedScene" uid="uid://bor51mewublcc" path="res://sources/WindowsDataBase/Common/KuroSearchItems.tscn" id="3_nys2x"]
+
+[node name="WindowDataEditor" type="Window" unique_id=226182346]
+transparent_bg = true
+oversampling_override = 1.0
+position = Vector2i(0, 4)
+size = Vector2i(600, 600)
+borderless = true
+transparent = true
+script = ExtResource("1_k44lu")
+
+[node name="KuroControlWindow" parent="." unique_id=1599535816 instance=ExtResource("2_3kxpo")]
+mouse_filter = 1
+NameWindow = "kuro"
+
+[node name="Contenido" type="MarginContainer" parent="KuroControlWindow" unique_id=1410002719]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 80
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="KuroControlWindow/Contenido" unique_id=230737882]
+layout_mode = 2
+
+[node name="KuroOptionButtonMod" type="OptionButton" parent="KuroControlWindow/Contenido/VBoxContainer" unique_id=113096981]
+layout_mode = 2
+script = ExtResource("3_e6dbv")
+metadata/_custom_type_script = "uid://d4g3outtemvav"
+
+[node name="KuroItemsData" parent="KuroControlWindow/Contenido/VBoxContainer" unique_id=1075427436 instance=ExtResource("3_nys2x")]
+layout_mode = 2
+size_flags_horizontal = 1
+_startExpanded = true

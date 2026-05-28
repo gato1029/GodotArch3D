@@ -1,7 +1,9 @@
 using Godot;
 using Godot.Collections;
 using GodotEcsArch.sources.Helpers;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
@@ -36,6 +38,25 @@ public partial class KuroSearchItems : PanelContainer
             AddObject(obj,obj.name, obj.textureVisual);
         }
     }
+    public void ReloadObjectsByModIDLong<T>(string nameMod) where T:class
+    {
+        ClearObjects();
+        var items = AtlasModsManager.GetAll<T>(nameMod);    
+        foreach (dynamic obj in items)
+        {
+            AddObject(obj, obj.name, obj.textureVisual);
+        }
+    }
+    public void ReloadObjectsByModID<T>(string nameMod) where T : class
+    {
+        ClearObjects();
+        var items = AtlasModsManager.GetAll<T>(nameMod);
+        foreach (dynamic obj in items)
+        {
+            AddObject(obj, obj.name, obj.textureVisual);
+        }
+    }
+
     public void RefreshObject(Object obj)
     {
         RemoveObject(obj);

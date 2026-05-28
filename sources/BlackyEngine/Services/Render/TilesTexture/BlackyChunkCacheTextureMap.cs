@@ -216,7 +216,7 @@ public class BlackyChunkCacheTextureMap
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
 
         // 2. Le pedimos a la región del chunk que nos dé un ID de su paleta
-        ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex);
+        ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex,false);
 
         // 3. Guardamos el ID en el chunk
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)

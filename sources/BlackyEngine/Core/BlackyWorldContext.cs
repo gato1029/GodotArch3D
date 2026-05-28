@@ -1,3 +1,4 @@
+using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Generation;
 using GodotEcsArch.sources.BlackyEngine.Generation.Biomes;
 using GodotEcsArch.sources.BlackyEngine.Generation.Resources;
@@ -61,7 +62,9 @@ public static class BlackyWorldContext
     public static BlackyResourcesSourceSystem Resources => Services.ResourcePainter;
     public static BlackyBuildingSystem Buildings => Services.BuildingPainter;
     public static BlackyHeightSystem Heights => Services.HeightTool;
-    public static BlackyChunkCacheTextureMap PintarTerreno => Services.TerrainTexturePainter;
+    //public static BlackyChunkCacheTextureMap PintarTerreno => Services.TerrainTexturePainter;
+    public static BlackyRampVisualWorld PintarRampas => Services.RampasData;
+    public static BlackyTerrainWorldData PintarTerreno => Services.TerrainData;
 
     // ================================
     // Render Services

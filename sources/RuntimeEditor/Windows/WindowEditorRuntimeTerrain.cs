@@ -2,6 +2,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
+using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
@@ -57,7 +58,47 @@ public partial class WindowEditorRuntimeTerrain : Window
         KuroButtonSeleccion.Pressed += KuroButtonSeleccion_Pressed;
         TipoBrush.OnDataSelected += TipoBrush_OnDataSelected;
         SpinBoxSizeBrush.ValueChanged += SpinBoxSizeBrush_ValueChanged;
+        KuroOptionButtonCapa.OnDataSelected += KuroOptionButtonCapa_OnDataSelected;
+        LoadCapas();
         LoadBrushs();
+    }
+
+    private void KuroOptionButtonCapa_OnDataSelected(object obj)
+    {
+        var selectedLayer = (BlackyRenderLayer)obj;
+        switch (selectedLayer)
+        {
+            case BlackyRenderLayer.TerrenoBase:
+                KuroButtonBuscar.Visible = false;
+                KuroButtonBuscarAutomatico.Visible = true;
+                break;
+            case BlackyRenderLayer.Rampas:
+                KuroButtonBuscar.Visible = true;
+                KuroButtonBuscarAutomatico.Visible = false;
+                break;
+            case BlackyRenderLayer.Superficie:
+                KuroButtonBuscar.Visible = false;
+                KuroButtonBuscarAutomatico.Visible = true;
+                break;
+            case BlackyRenderLayer.Caminos:
+                KuroButtonBuscar.Visible = false;
+                KuroButtonBuscarAutomatico.Visible = true;
+                break;
+            case BlackyRenderLayer.Adornos:
+                KuroButtonBuscar.Visible = true;
+                KuroButtonBuscarAutomatico.Visible = false;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void LoadCapas()
+    {
+        foreach (BlackyRenderLayer item in Enum.GetValues(typeof(BlackyRenderLayer)))
+        {
+            KuroOptionButtonCapa.AddItemWithData(item.ToString(), item);
+        }
     }
 
     private void SpinBoxSizeBrush_ValueChanged(double value)
@@ -112,10 +153,23 @@ public partial class WindowEditorRuntimeTerrain : Window
 
     private void KuroButtonBuscarAutomatico_Pressed()
     {
-        var wDual = RuntimeServices.NodeRegistry.Create<WindowRuntimeDualTilesTerrain>();
-        wDual.OnSelection += WDual_OnSelection;
-        AddChild(wDual);        
-        wDual.Popup();
+       var layerSelected= (BlackyRenderLayer) KuroOptionButtonCapa.GetSelectedData();
+        switch (layerSelected)
+        {
+            case BlackyRenderLayer.TerrenoBase:
+                var wDual = RuntimeServices.NodeRegistry.Create<WindowRuntimeDualTilesTerrain>();
+                wDual.OnSelection += WDual_OnSelection;
+                AddChild(wDual);
+                wDual.Popup();
+                break;        
+            case BlackyRenderLayer.Superficie:
+                break;
+            case BlackyRenderLayer.Caminos:
+                break;            
+            default:
+                break;
+        }
+        
         
     }
 
@@ -349,7 +403,7 @@ public partial class WindowEditorRuntimeTerrain : Window
     private void ApplyErase()
     {
         int altura = (int)SpinBoxAltura.Value;
-        int capa = (int)SpinBoxCapa.Value;
+        var capa = (BlackyRenderLayer)KuroOptionButtonCapa.GetSelectedData();
 
         var tiles = TilesEntityPreviewHelper.GetOnlyValidTiles();
         var item = tiles[0];
@@ -373,41 +427,60 @@ public partial class WindowEditorRuntimeTerrain : Window
                 break;
         }
         Vector2I currentMouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-        switch (modePaint)
+
+        switch (capa)
         {
-            case ModePaint.NORMAL:
-                foreach (var offset in brush.Cells)
-                {
-                    int x = currentMouseTile.X + offset.x;
-                    int y = currentMouseTile.Y + offset.y;
-                    BlackyWorldContext.PintarTerreno.RemoveTile(
-                            x,
-                            y,
-                            altura,
-                            capa
-                        );
-                }
+            case BlackyRenderLayer.TerrenoBase:
+                BlackyWorldContext.PintarTerreno.SetDualTemplate(dualTileTemplate);
+                BlackyWorldContext.PintarTerreno.RemoveTerrain(
+                  currentMouseTile.X,
+                  currentMouseTile.Y,
+                  altura,
+                  brush);
+                break;
+            case BlackyRenderLayer.Rampas:
+                break;
+            case BlackyRenderLayer.Superficie:
+                break;
+            case BlackyRenderLayer.Caminos:
+                break;
+            case BlackyRenderLayer.Adornos:
+                break;            
+        }
+        //switch (modePaint)
+        //{
+        //    case ModePaint.NORMAL:
+        //        foreach (var offset in brush.Cells)
+        //        {
+        //            int x = currentMouseTile.X + offset.x;
+        //            int y = currentMouseTile.Y + offset.y;
+        //            BlackyWorldContext.PintarTerreno.RemoveTerrain(
+        //                    x,
+        //                    y,
+        //                    altura                            
+        //                );
+        //        }
                  
-                break;
+        //        break;
 
-            case ModePaint.AUTO_DUAL:
+        //    case ModePaint.AUTO_DUAL:
 
-                BlackyWorldContext.PintarTerreno.ApplyBrushRemoveDual(
-                    currentMouseTile.X,
-                    currentMouseTile.Y,
-                    altura,
-                    capa,
-                    brush,
-                    dualTileTemplate
-                );
-                break;
-        }        
+        //        BlackyWorldContext.PintarTerreno.ApplyBrushRemoveDual(
+        //            currentMouseTile.X,
+        //            currentMouseTile.Y,
+        //            altura,
+        //            capa,
+        //            brush,
+        //            dualTileTemplate
+        //        );
+        //        break;
+        //}
     }
-    
+
     private void ApplyPaint()
     {
         int altura = (int)SpinBoxAltura.Value;
-        int capa = (int)SpinBoxCapa.Value;
+        var capa = (BlackyRenderLayer)KuroOptionButtonCapa.GetSelectedData();
         var tiles = TilesEntityPreviewHelper.GetOnlyValidTiles();
         Brush brush = Brushes.Single;
         switch (brushType)
@@ -428,49 +501,73 @@ public partial class WindowEditorRuntimeTerrain : Window
                 break;
         }
         Vector2I currentMouseTile = (Vector2I)PositionsManager.Instance.positionMouseTileGlobal;
-        switch (modePaint)
+
+        switch (capa)
         {
-            case ModePaint.NORMAL:
-                PaintNormal(altura, capa,tiles,brush);
+            case BlackyRenderLayer.TerrenoBase:
+                BlackyWorldContext.PintarTerreno.SetDualTemplate(dualTileTemplate);
+                BlackyWorldContext.PintarTerreno.SetTerrain(currentMouseTile.X,currentMouseTile.Y,altura,1,brush);
                 break;
-            case ModePaint.AUTO_DUAL:
-                PaintDual(altura, capa, currentMouseTile, brush);
+            case BlackyRenderLayer.Rampas:
+                PaintNormal(altura, capa, tiles, brush);
+                break;
+            case BlackyRenderLayer.Superficie:
+                break;
+            case BlackyRenderLayer.Caminos:
+                break;
+            case BlackyRenderLayer.Adornos:
+                PaintNormal(altura, capa, tiles, brush);
                 break;
             default:
                 break;
         }
+        //switch (modePaint)
+        //{
+        //    case ModePaint.NORMAL:
+        //        PaintNormal(altura, capa,tiles,brush);
+        //        break;
+        //    case ModePaint.AUTO_DUAL:
+        //        PaintDual(altura, capa, currentMouseTile, brush);
+        //        break;
+        //    default:
+        //        break;
+        //}
 
     }
 
-    private void PaintDual(int altura, int capa, Vector2I tilePosition, Brush brush)
-    {        
-        BlackyWorldContext.PintarTerreno.ApplyBrushCreateDual(
-            tilePosition.X,
-            tilePosition.Y,
-            altura,
-            capa,
-            brush,
-            dualTileTemplate
-        );
-    }
+    //private void PaintDual(int altura, int capa, Vector2I tilePosition, Brush brush)
+    //{        
+    //    BlackyWorldContext.PintarTerreno.ApplyBrushCreateDual(
+    //        tilePosition.X,
+    //        tilePosition.Y,
+    //        altura,
+    //        capa,
+    //        brush,
+    //        dualTileTemplate
+    //    );
+    //}
 
-    private void PaintNormal(int altura, int capa, List<TilePreviewWithPosition> tiles, Brush brush)
+    private void PaintNormal(int altura, BlackyRenderLayer capa, List<TilePreviewWithPosition> tiles, Brush brush)
     {
-        if (tiles.Count==1) // Si solo hay una celda seleccionada, aplicamos el pincel
+
+        if (tiles.Count == 1) // Si solo hay una celda seleccionada, aplicamos el pincel
         {
             var item = tiles[0];
             foreach (var offset in brush.Cells)
             {
                 int x = item.tilePosition.X + offset.x;
                 int y = item.tilePosition.Y + offset.y;
-                BlackyWorldContext.PintarTerreno.SetTile(
-                      x,
-                      y,
-                      altura,
-                      capa,
-                      item.data.idMod,
-                      (ushort)item.data.index
-                  );
+
+                switch (capa)
+                {
+                    case BlackyRenderLayer.Rampas:
+                        BlackyWorldContext.PintarRampas.SetTile(x, y, altura, item.data.idMod, (ushort)item.data.index);
+                        break;                    
+                    case BlackyRenderLayer.Adornos:
+                        break;
+                    default:
+                        break;
+                }                
             }
         }
         else
@@ -478,16 +575,18 @@ public partial class WindowEditorRuntimeTerrain : Window
           // si hay varias celdas seleccionadas, aplicamos el pincel a cada una de ellas sin importar el tipo de pincel, para evitar complicaciones
             foreach (var item in tiles)
             {
-                BlackyWorldContext.PintarTerreno.SetTile(
-                    item.tilePosition.X,
-                    item.tilePosition.Y,
-                    altura,
-                    capa,
-                    item.data.idMod,
-                    (ushort)item.data.index
-                );
+                switch (capa)
+                {                    
+                    case BlackyRenderLayer.Rampas:
+                        BlackyWorldContext.PintarRampas.SetTile(item.tilePosition.X, item.tilePosition.Y, altura, item.data.idMod, (ushort)item.data.index);
+                        break;                 
+                    case BlackyRenderLayer.Adornos:
+                        break;
+                    default:
+                        break;
+                }                
             }
         }
-      
+
     }
 }

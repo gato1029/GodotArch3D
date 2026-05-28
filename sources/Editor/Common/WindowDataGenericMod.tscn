@@ -7,7 +7,6 @@
 [node name="WindowDataGenericMod" type="Window" unique_id=226182346]
 transparent_bg = true
 oversampling_override = 1.0
-position = Vector2i(0, 4)
 size = Vector2i(600, 600)
 borderless = true
 transparent = true

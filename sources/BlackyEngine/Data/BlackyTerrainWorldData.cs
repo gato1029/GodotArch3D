@@ -13,7 +13,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Data;
 
 public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
 {
-    private readonly DualTileTemplate _dualTemplate;
+    private DualTileTemplate _dualTemplate;
     public BlackyTerrainWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions) : base(chunkSize, BlackyRenderLayer.TerrenoBase, textureMap, true, regions)
     {
 
@@ -22,6 +22,10 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
     // SET TERRAIN
     // =====================================================
 
+    public void SetDualTemplate(DualTileTemplate dualTemplate)
+    {
+        _dualTemplate = dualTemplate;
+    }
     public void SetTerrain(
         int worldX,
         int worldY,

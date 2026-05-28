@@ -66,6 +66,12 @@ public partial class KuroOptionButton : OptionButton
         return _itemsData[Selected] as T;
     }
 
+    public object GetSelectedData()
+    {
+        if (Selected < 0 || Selected >= _itemsData.Count) return null;
+        return _itemsData[Selected];
+    }
+
     public new void Clear()
     {
         base.Clear();
