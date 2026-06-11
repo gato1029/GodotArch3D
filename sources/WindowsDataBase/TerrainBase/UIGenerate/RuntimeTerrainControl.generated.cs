@@ -11,6 +11,7 @@ public partial class RuntimeTerrainControl : PanelContainer
     private KuroButton ButtonNuevo;
     private LineEdit LineEditName;
     private KuroButton ButtonDual;
+    private ControlListTileSprite ControlSprites;
     private KuroButton ButtonGuardar;
     private KuroButton ButtonEliminar;
 
@@ -20,6 +21,7 @@ public partial class RuntimeTerrainControl : PanelContainer
         ButtonNuevo = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/ButtonNuevo");
         LineEditName = GetNode<LineEdit>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/LineEditName");
         ButtonDual = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ButtonDual");
+        ControlSprites = GetNode<ControlListTileSprite>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ControlSprites");
         ButtonGuardar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonGuardar");
         ButtonEliminar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonEliminar");
     }

@@ -23,6 +23,7 @@ public struct TileChange
     public BlackyRegion region;
     public bool remove;
     public bool dual; 
+    public bool isPersistent;
 }
 
 public class BlackyChunkCacheTextureMap
@@ -175,7 +176,7 @@ public class BlackyChunkCacheTextureMap
     }
 
 
-    public ushort SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex)
+    public ushort SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex, bool DualOffset)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
@@ -203,7 +204,8 @@ public class BlackyChunkCacheTextureMap
             TileId = tileId,
             region = chunk.ParentRegion,
             remove = false,
-            dual = false
+            dual = DualOffset,
+            isPersistent = true
         });
         
         chunk.MarkDirty();
@@ -232,7 +234,9 @@ public class BlackyChunkCacheTextureMap
             TileId = tileId,
             region = chunk.ParentRegion,
             remove = false,
-            dual = dual
+            dual = dual,
+            isPersistent = false
+
         });
 
         chunk.MarkDirty();
@@ -403,8 +407,7 @@ public class BlackyChunkCacheTextureMap
     int worldX,
     int worldY,
     int height,
-    int layer,
-    DualTileTemplate dualTileTemplate)
+    int layer)
     {
         var (chunk, lx, ly) =
             ResolveOrCreate(worldX, worldY);
@@ -430,7 +433,7 @@ public class BlackyChunkCacheTextureMap
             int x = baseX + offset.x;
             int y = baseY + offset.y;
 
-            RemoveTileDual(x, y, altura, capa, dualTileTemplate);
+            RemoveTileDual(x, y, altura, capa);
 
             for (int oy = -1; oy <= 1; oy++)
                 for (int ox = -1; ox <= 1; ox++)

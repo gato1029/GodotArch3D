@@ -1,3 +1,4 @@
+using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.KuroTiles;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
@@ -97,13 +98,25 @@ public partial class ControlListTileSprite : MarginContainer
         }
 
         // Aseguramos que pueda recibir eventos
-        textureRect.MouseFilter = Control.MouseFilterEnum.Stop;
-
+        textureRect.MouseFilter = Control.MouseFilterEnum.Stop;        
         // Asignamos el evento de click
         textureRect.GuiInput += (InputEvent @event) =>
         {
             if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
             {
+                if (mouseEvent.ButtonIndex == MouseButton.Left)
+                {
+                    long spdata = (long)textureRect.GetMeta("id");
+                    var dataTile = TileSpriteManager.Instance.GetData(spdata);
+
+                    PackedScene scene = GD.Load<PackedScene>("res://sources/WindowsDataBase/TileSprite/WindowTileSprite.tscn");
+                    WindowTileSprite windowTileSprite = (WindowTileSprite)scene.Instantiate();
+                    AddChild(windowTileSprite);
+                    windowTileSprite.Show();
+                    windowTileSprite.SetData(dataTile);
+                    
+                    
+                }
                 if (mouseEvent.ButtonIndex == MouseButton.Right)
                 {
                     // Eliminamos el TextureRect del contenedor

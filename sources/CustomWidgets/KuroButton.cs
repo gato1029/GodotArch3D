@@ -9,6 +9,7 @@ public partial class KuroButton : TextureButton
     public enum TextPlacement { Bottom, Top, Left, Right }
     public enum CaptionHAlign { Left, Center, Right }
     public enum CaptionVAlign { Top, Center, Bottom }
+    public enum IconAlign  { Left, Center, Right  }
 
     private Texture2D _iconTexture;
     private string _buttonText = "";
@@ -50,10 +51,14 @@ public partial class KuroButton : TextureButton
 
     private Object _internalData; // For external use, not serialized or exposed
 
+    private IconAlign _iconAlign = IconAlign.Left;
+
+    
     [ExportGroup("Main")]
     [Export] public Texture2D IconTexture { get => _iconTexture; set { _iconTexture = value; RefreshControl(); } }
     [Export] public string ButtonText { get => _buttonText; set { _buttonText = value; RefreshControl(); } }
     [Export] public TextPlacement TextPosition { get => _textPosition; set { _textPosition = value; RefreshControl(); } }
+    [Export] public IconAlign IconHorizontalAlignment { get => _iconAlign; set { _iconAlign = value; RefreshControl(); }  }
 
     [ExportGroup("Text Alignment")]
     [Export] public CaptionHAlign TextHorizontalAlignment { get => _captionHAlign; set { _captionHAlign = value; RefreshControl(); } }
@@ -249,24 +254,66 @@ public partial class KuroButton : TextureButton
     {
         Vector2 rawIconSize = _iconMinSize * _iconScale;
 
-        float totalWidth = rawIconSize.X + textSize.X + spacing;
-        float startX = contentRect.Position.X + (contentRect.Size.X - totalWidth) / 2f;
+        float iconX = contentRect.Position.X;
 
-        Rect2 textRect;
-        Rect2 iconRect;
+        switch (_iconAlign)
+        {
+            case IconAlign.Center:
+                iconX = contentRect.Position.X +
+                        (contentRect.Size.X - rawIconSize.X) * 0.5f;
+                break;
+
+            case IconAlign.Right:
+                iconX = contentRect.End.X - rawIconSize.X;
+                break;
+
+            case IconAlign.Left:
+            default:
+                iconX = contentRect.Position.X;
+                break;
+        }
+
+        Rect2 iconRect = new();
+        Rect2 textRect = new();
 
         if (_textPosition == TextPlacement.Left)
         {
-            iconRect = new Rect2(startX, contentRect.Position.Y, rawIconSize.X, contentRect.Size.Y);
-            textRect = new Rect2(startX + rawIconSize.X + spacing, contentRect.Position.Y, textSize.X, contentRect.Size.Y);
+            // Icono a la izquierda, texto a la derecha
+            iconRect = new Rect2(
+                iconX,
+                contentRect.Position.Y,
+                rawIconSize.X,
+                contentRect.Size.Y
+            );
+
+            textRect = new Rect2(
+                iconRect.End.X + spacing,
+                contentRect.Position.Y,
+                contentRect.End.X - (iconRect.End.X + spacing),
+                contentRect.Size.Y
+            );
         }
         else
         {
-            textRect = new Rect2(startX, contentRect.Position.Y, textSize.X, contentRect.Size.Y);
-            iconRect = new Rect2(startX + textSize.X + spacing, contentRect.Position.Y, rawIconSize.X, contentRect.Size.Y);
+            // Texto a la izquierda, icono a la derecha
+            iconRect = new Rect2(
+                iconX,
+                contentRect.Position.Y,
+                rawIconSize.X,
+                contentRect.Size.Y
+            );
+
+            textRect = new Rect2(
+                contentRect.Position.X,
+                contentRect.Position.Y,
+                iconRect.Position.X - spacing - contentRect.Position.X,
+                contentRect.Size.Y
+            );
         }
 
-        Rect2 fittedIcon = _iconExpand ? iconRect : GetAspectFitRect(_iconTexture, iconRect, 1f);
+        Rect2 fittedIcon = _iconExpand
+            ? iconRect
+            : GetAspectFitRect(_iconTexture, iconRect, 1f);
 
         if (_iconTexture != null)
             DrawTextureRect(_iconTexture, fittedIcon, false, GetCurrentColor());

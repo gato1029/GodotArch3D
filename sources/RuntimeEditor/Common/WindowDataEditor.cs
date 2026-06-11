@@ -1,5 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using System;
 
@@ -19,8 +21,8 @@ public partial class WindowDataEditor : Window
     {
         var items =TableMods.Instance.ObtenerTodos();
         foreach (var item in items)
-        {
-            KuroOptionButtonMod.AddItemWithData(item.Value.Name, item);
+        {            
+            KuroOptionButtonMod.AddItemWithData(item.Value.Name, item.Value);
         }
     }
 
@@ -37,13 +39,14 @@ public partial class WindowDataEditor : Window
 
     public void LoadData<T>() where T : class
     {
+        
         var modInfo = (ModInfo)KuroOptionButtonMod.GetSelectedData();
-
-        if (typeof(T) == typeof(IdDataLong))
+        Type parentType = typeof(T).BaseType;
+        if (parentType == typeof(IdDataLong))
         {
             KuroItemsData.ReloadObjectsByModIDLong<T>(modInfo.Name);
         }
-        else if (typeof(T) == typeof(IdData))
+        else if (parentType == typeof(IdData))
         {
             KuroItemsData.ReloadObjectsByModID<T>(modInfo.Name);
         }

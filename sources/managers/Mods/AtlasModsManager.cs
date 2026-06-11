@@ -8,11 +8,14 @@ using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using static Flecs.NET.Core.Ecs.Units;
 
 
 namespace GodotEcsArch.sources.managers.Mods;
@@ -20,21 +23,30 @@ namespace GodotEcsArch.sources.managers.Mods;
 
 public class AtlasModsManager : SingletonBase<AtlasModsManager>
 {
+    private class AtlasMetadata
+    {
+        public Type KeyType { get; init; }
+        public object Atlas { get; init; }
+    }
     // =========================================================
     // ATLASES (ID -> DATA)
     // =========================================================
 
-    private readonly AtlasMods<int, MaterialData> materiales = new();
-    private readonly AtlasMods<int, ResourceSourceData> fuenteRecursos = new();
-    private readonly AtlasMods<int, TileSpriteData> spriteData = new();
-    private readonly AtlasMods<int, AutoTileSpriteData> autoSpriteData = new();
-    private readonly AtlasMods<int, TerrainData> terrainData = new();
-    private readonly AtlasMods<int, DualTileTemplate> dualTileTemplate = new();
-    private readonly AtlasMods<int, TerrainDataTransition> terrainDataTransicion = new();
+    // Datos solo cacheados nunca en disco, resueltos de otra forma
+    private readonly AtlasMods<int, MaterialData> materiales = new(); // estos nunca se guardan en disco solo en memoria, resuelto de otra forma
+    private readonly AtlasMods<long, TileSpriteData> spriteData = new(); // estos nunca se guardan en disco solo en memoria
+    private readonly AtlasMods<long, AutoTileSpriteData> autoSpriteData = new(); // estos nunca se guardan en disco solo en memoria
+    private readonly AtlasMods<long, DualTileTemplate> dualTileTemplate = new();
 
-    private readonly AtlasMods<int, BuildingData> buildingData = new();
-    private readonly AtlasMods<int, BulletData> bulletData = new();
-    private readonly AtlasMods<int, CharacterModelBaseData> characterData = new();
+    // si requieren persistencia
+    private readonly AtlasMods<ushort, ResourceSourceData> fuenteRecursos = new();    
+    private readonly AtlasMods<ushort, TerrainData> terrainData = new();    
+    private readonly AtlasMods<ushort, TerrainDataTransition> terrainDataTransicion = new();
+    private readonly AtlasMods<ushort, TerrainBaseData> terrenos = new ();
+
+    private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a ushort
+    private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a ushort
+    private readonly AtlasMods<int, CharacterModelBaseData> characterData = new(); // deben cambiar a ushort
 
     // string-key atlas
     private readonly AtlasMods<string, TileTextureData> tilesTextureData = new();
@@ -49,22 +61,48 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // TYPE REGISTRY (interno seguro)
     // =========================================================
 
-    private readonly Dictionary<Type, object> _atlases = new();
-
-    private void RegisterAtlas<T>(AtlasMods<int, T> atlas) where T : class
+    private readonly Dictionary<Type, AtlasMetadata> _atlases = new();
+    private void RegisterAtlas<TKey, T>(AtlasMods<TKey, T> atlas)
+    where T : class
+    where TKey : notnull
     {
-        _atlases[typeof(T)] = atlas;
+        _atlases[typeof(T)] = new AtlasMetadata
+        {
+            KeyType = typeof(TKey),
+            Atlas = atlas
+        };
     }
+    //private void RegisterAtlas<T>(AtlasMods<long, T> atlas) where T : class
+    //{
+    //    _atlases[typeof(T)] = atlas;
+    //}
 
-    private void RegisterAtlas<T>(AtlasMods<string, T> atlas) where T : class
+    //private void RegisterAtlas<T>(AtlasMods<int, T> atlas) where T : class
+    //{
+    //    _atlases[typeof(T)] = atlas;
+    //}
+
+
+    //private void RegisterAtlas<T>(AtlasMods<ushort, T> atlas) where T : class
+    //{
+    //    _atlases[typeof(T)] = atlas;
+    //}
+
+    //private void RegisterAtlas<T>(AtlasMods<string, T> atlas) where T : class
+    //{
+    //    _atlases[typeof(T)] = atlas;
+    //}
+    private AtlasMods<TKey, T> GetAtlas<TKey, T>()
+        where T : class
+        where TKey : notnull
     {
-        _atlases[typeof(T)] = atlas;
-    }
-    private AtlasMods<int, T> GetAtlas<T>() where T : class
-    {
-        return _atlases.TryGetValue(typeof(T), out var atlas)
-            ? atlas as AtlasMods<int, T>
-            : null;
+        if (!_atlases.TryGetValue(typeof(T), out var meta))
+            return null;
+
+        GD.Print($"Buscando: {typeof(T).Name}<{typeof(TKey).Name}>");
+        GD.Print($"Encontrado: {meta.Atlas.GetType()}");
+
+        return meta.Atlas as AtlasMods<TKey, T>;
     }
 
     // =========================================================
@@ -101,6 +139,12 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     public static T Get<T>(string modName, int id) where T : class
         => Instance.InternalGet<T, int>(modName, id);
 
+    public static T Get<T>(string modName, long id) where T : class
+    => Instance.InternalGet<T, long>(modName, id);
+
+    public static T Get<T>(string modName, ushort id) where T : class
+=> Instance.InternalGet<T, ushort>(modName, id);
+
     public static bool TryGet<T>(string modName, int id, out T value) where T : class
         => Instance.InternalTryGet<T, int>(modName, id, out value);
 
@@ -110,7 +154,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         if (!TryGetModId(modName, out var modId))
             return null;
 
-        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        var atlas = GetAtlas<TKey, T>();
         return atlas?.Get(modId, id);
     }
 
@@ -122,7 +166,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         if (!TryGetModId(modName, out var modId))
             return false;
 
-        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        var atlas = GetAtlas<TKey, T>();
 
         return atlas != null && atlas.TryGet(modId, id, out value);
     }
@@ -130,20 +174,38 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     public static IEnumerable<T> GetAll<T>(string modName) where T : class
     => Instance.InternalGetAll<T>(modName);
 
-    private IEnumerable<T> InternalGetAll<T>(string modName) where T : class
+    private IEnumerable<T> InternalGetAll<T>(string modName)
+      where T : class
     {
         if (!TryGetModId(modName, out var modId))
             yield break;
 
-        var atlas = GetAtlas<T>();
-
-        if (atlas == null)
+        if (!_atlases.TryGetValue(typeof(T), out var meta))
             yield break;
 
-        foreach (var item in atlas.GetAll(modId))
-            yield return item;
-    }
+        switch (meta.KeyType)
+        {
+            case var t when t == typeof(int):
+                foreach (var item in ((AtlasMods<int, T>)meta.Atlas).GetAll(modId))
+                    yield return item;
+                break;
 
+            case var t when t == typeof(ushort):
+                foreach (var item in ((AtlasMods<ushort, T>)meta.Atlas).GetAll(modId))
+                    yield return item;
+                break;
+
+            case var t when t == typeof(long):
+                foreach (var item in ((AtlasMods<long, T>)meta.Atlas).GetAll(modId))
+                    yield return item;
+                break;
+
+            case var t when t == typeof(string):
+                foreach (var item in ((AtlasMods<string, T>)meta.Atlas).GetAll(modId))
+                    yield return item;
+                break;
+        }
+    }
     // =========================================================
     // 🔴 API HOT PATH (modId directo)
     // =========================================================
@@ -157,7 +219,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private T InternalGetFast<T, TKey>(ushort modId, TKey id)
         where T : class where TKey : notnull
     {
-        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        var atlas = GetAtlas<TKey, T>();
         return atlas?.Get(modId, id);
     }
 
@@ -166,7 +228,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     {
         value = null;
 
-        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        var atlas = GetAtlas<TKey, T>();
         return atlas != null && atlas.TryGet(modId, id, out value);
     }
 
@@ -235,14 +297,23 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     
     }
 
-    private void CargarPorMod(ushort idMod)
+    private void CargarPorModGenerico(ushort idMod, string name)
     {
-        CargarDatos(fuenteRecursos, idMod);
-        CargarDatos(spriteData, idMod);
-        CargarDatos(terrainData, idMod);
-        CargarDatos(terrainDataTransicion, idMod);
-        CargarDatos(autoSpriteData, idMod);
-        CargarDatos(dualTileTemplate, idMod);
+        CargarDatosBase(spriteData, idMod, name);
+        CargarDatosBase(autoSpriteData, idMod, name);
+        CargarDatosBase(dualTileTemplate, idMod, name);
+    }
+
+    
+
+    private void CargarPorMod(ushort idMod, string name)
+    {
+        CargarDatos(fuenteRecursos, idMod,name);        
+        CargarDatos(terrainData, idMod, name);
+        CargarDatos(terrainDataTransicion, idMod, name);                
+        CargarDatos(terrenos, idMod, name);
+
+        
     }
 
     private void CargarPorModEspecial(ushort idMod)
@@ -267,13 +338,27 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             index.Add(item.idMaterial, item);
         }
     }
-
-    private void CargarDatos<T>(AtlasMods<int, T> atlas, ushort idMod) where T : IdDataLong
+    private void CargarDatosBase<T>(AtlasMods<long, T> atlas, ushort idMod, string nameMod) where T : IdDataLong
     {
         var data = DataBaseManager.Instance.FindAll<T>();
 
         foreach (var item in data)
+        {
+            item.idMod = idMod;
+            item.nameMod = nameMod;
+            atlas.Register(idMod, item.id, item);
+        }
+    }
+    private void CargarDatos<T>(AtlasMods<ushort, T> atlas, ushort idMod, string nameMod) where T : IdDataLong
+    {
+        var data = DataBaseManager.Instance.FindAll<T>();
+
+        foreach (var item in data)
+        {
+            item.idMod = idMod;
+            item.nameMod = nameMod;
             atlas.Register(idMod, item.idSave, item);
+        }
     }
 
     private void CargarDatosEspecial<T>(AtlasMods<int, T> atlas, ushort idMod) where T : IdData
@@ -288,7 +373,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private Dictionary<ushort, Dictionary<TKey, T>> InternalGetDictionaryAll<T, TKey>()
     where T : class where TKey : notnull
     {
-        var atlas = GetAtlas<T>() as AtlasMods<TKey, T>;
+        var atlas = GetAtlas<TKey, T>();
 
         if (atlas == null)
             return new Dictionary<ushort, Dictionary<TKey, T>>();
@@ -367,7 +452,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         characterData.Clear();
         tilesTextureData.Clear();
         dualTileTemplate.Clear();
-
+        terrenos.Clear();
         // ================================
         // CLEAR INDEXES
         // ================================
@@ -394,6 +479,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(characterData);
         RegisterAtlas(tilesTextureData);
         RegisterAtlas(dualTileTemplate);
+        RegisterAtlas(terrenos);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {
@@ -402,8 +488,10 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             FileHelper.SetModsPath(info.FolderPath);
             DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);
 
-            CargarPorMod(idMod);
-            CargarPorModEspecial(idMod);
+            CargarPorMod(idMod, info.Name);
+            CargarPorModGenerico(idMod, info.Name);
+
+            CargarPorModEspecial(idMod);            
             CargarTilesTextureData(idMod);            
         }
     }
@@ -422,3 +510,4 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         
     }
 }
+

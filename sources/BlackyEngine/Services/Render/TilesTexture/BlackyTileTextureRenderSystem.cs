@@ -238,7 +238,7 @@ public class BlackyTileTextureRenderSystem
         // aqui notifica cuando un tile cambio y debemos repintarlo
         var chunkCoord = chunkMap.WorldToChunkCoord(change.WorldX, change.WorldY);
         Vector2I pos = new(chunkCoord.X, chunkCoord.Y);
-        RenderTile(pos, change.Height, change.Layer, change.WorldX, change.WorldY, change.TileId, change.region,change.remove,change.dual);
+        RenderTile(pos, change.Height, change.Layer, change.WorldX, change.WorldY, change.TileId, change.region,change.remove,change.dual,change.isPersistent);
     }
 
     private void RenderTile(
@@ -248,8 +248,9 @@ public class BlackyTileTextureRenderSystem
         int worldX,
         int worldY,
         ushort tileId,
-        BlackyRegion region, bool remove, bool dual)
+        BlackyRegion region, bool remove, bool dual, bool isPersistent)
     {
+        
         if (!chunkRenderInstances.TryGetValue(chunkCoord, out var chunkRender))
         {
             chunkRender = new();
@@ -276,7 +277,7 @@ public class BlackyTileTextureRenderSystem
         // =====================================================
         // OBTENER NUEVA DATA
         // =====================================================
-        region.TryGetTileDataMod(tileId, out TileDataMod tileDataMod);
+        region.TryGetTileDataMod(tileId, out TileDataMod tileDataMod,isPersistent);
 
         // =====================================================
         // SI YA EXISTE Y ES LA MISMA TEXTURA -> IGNORAR

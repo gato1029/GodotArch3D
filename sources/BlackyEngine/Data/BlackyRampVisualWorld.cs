@@ -54,7 +54,7 @@ public class BlackyRampVisualWorld
                 worldY,
                 height);
 
-        cell.TileId = _textureMap.SetTile( worldX,  worldY,  height, (int)RenderLayer, modName, textureIndex);
+        cell.TileId = _textureMap.SetTile( worldX,  worldY,  height, (int)RenderLayer, modName, textureIndex,true);
 
     }
 

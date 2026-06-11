@@ -1,4 +1,6 @@
 using Godot;
+using GodotEcsArch.sources.Helpers;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
@@ -23,8 +25,10 @@ public partial class RuntimeTerrainControl : PanelContainer
     private void KuroItems_OnObjectPressed(object obj)
     {
         data = (TerrainBaseData)obj;
+        var dual = MasterDataManager.GetData<DualTileTemplate>(data.idDualTemplate);
         LineEditName.Text = data.name;
-        ButtonDual.IconTexture = data.textureVisual;
+        ButtonDual.IconTexture = dual.textureVisual;
+        ControlSprites.SetIdTiles(data.rampas);
     }
 
     private void ButtonDual_Pressed()
@@ -48,6 +52,7 @@ public partial class RuntimeTerrainControl : PanelContainer
         data = new TerrainBaseData();
         LineEditName.Text = string.Empty;         
         ButtonDual.IconTexture = null;
+        ControlSprites.ClearChildrens();
     }
 
     private void ButtonNuevo_Pressed()
@@ -65,6 +70,7 @@ public partial class RuntimeTerrainControl : PanelContainer
     private void ButtonGuardar_Pressed()
     {
         data.name = LineEditName.Text;
+        data.rampas = ControlSprites.GetIdTiles();
         DataBaseManager.Instance.InsertUpdate(data);
         KuroItems.RefreshObject(data);
     }

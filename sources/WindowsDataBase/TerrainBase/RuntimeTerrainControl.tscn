@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://e4igfbbvdqym" path="res://resources/Textures/iconos/file.png" id="4_i5ri6"]
 [ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="4_smlrj"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="5_o3314"]
+[ext_resource type="PackedScene" uid="uid://c3ttigs8l4153" path="res://sources/KuroTiles/ControlListTileSprite.tscn" id="6_smlrj"]
 
 [node name="RuntimeTerrainControl" type="PanelContainer" unique_id=680472044]
 anchors_preset = 15
@@ -72,6 +73,14 @@ script = ExtResource("2_5etia")
 IconTexture = ExtResource("3_5etia")
 IconMinSize = Vector2(64, 64)
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="Label3" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=536083197]
+layout_mode = 2
+text = "Rampas:"
+
+[node name="ControlSprites" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1844269654 instance=ExtResource("6_smlrj")]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=1942224493]
 layout_mode = 2

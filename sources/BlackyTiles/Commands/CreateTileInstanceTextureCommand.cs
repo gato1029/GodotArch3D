@@ -23,10 +23,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
     public readonly int y;
     public readonly TileDataMod tileDataMod;
     private readonly BlackyChunkRenderTiles chunkRender;
-    private readonly bool dual;
-    public CreateTileInstanceTextureCommand(int height, int layer, int x, int y, bool dual, TileDataMod tileDataMod, BlackyChunkRenderTiles chunkRender)
+    private readonly bool dualOffset;
+    public CreateTileInstanceTextureCommand(int height, int layer, int x, int y, bool dualOffset, TileDataMod tileDataMod, BlackyChunkRenderTiles chunkRender)
     {
-        this.dual = dual;
+        this.dualOffset = dualOffset;
         this.height = height;
         this.layer = layer;
         this.x = x;
@@ -45,14 +45,14 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(tileDataMod.ModName);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
         Vector2 offset = new Vector2(0, 0);
-        if (dual)
+        if (dualOffset)
         {
             offset = new Vector2(0.25f, 0.25f);
         }
-        else
-        {
-            offset = new Vector2(0.25f, 0.25f);
-        }
+        //else
+        //{
+        //    offset = new Vector2(0.25f, 0.25f);
+        //}
 
         float depthOffset = 0;
         float depthValue = positionCenter.Y + depthOffset - height * CommonAtributes.HEIGHT_OFFSET ;

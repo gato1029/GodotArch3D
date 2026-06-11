@@ -7,6 +7,7 @@ using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using GodotFlecs.sources.KuroTiles;
 using System;
@@ -39,7 +40,7 @@ public partial class WindowEditorRuntimeTerrain : Window
     TileSelectionMatrixData matrixCurrent = null;
     private Vector2I lastPaintTile = new Vector2I(int.MinValue, int.MinValue);
     private bool uiMouseCaptured = false;
-
+    bool AnyWindowOpen = false;
     private BrushType brushType = BrushType.Square;
     private int sizeBrush = 1;
     // Called when the node enters the scene tree for the first time.
@@ -52,46 +53,17 @@ public partial class WindowEditorRuntimeTerrain : Window
         dockController.DockWindow(RuntimeWindowDockController.WindowDockPosition.TopRight, 10, 100);
         EditorTextura.OnNotifySelectionMatrix += EditorTextura_OnNotifySelectionMatrix;
         KuroButtonBuscar.Pressed += KuroButtonBuscar_Pressed;
-        KuroButtonBuscarAutomatico.Pressed += KuroButtonBuscarAutomatico_Pressed;
+        //KuroButtonBuscarAutomatico.Pressed += KuroButtonBuscarAutomatico_Pressed;
         KuroButtonBorrar.Pressed += KuroButtonBorrar_Pressed;
         KuroButtonCrear.Pressed += KuroButtonCrear_Pressed;
         KuroButtonSeleccion.Pressed += KuroButtonSeleccion_Pressed;
         TipoBrush.OnDataSelected += TipoBrush_OnDataSelected;
-        SpinBoxSizeBrush.ValueChanged += SpinBoxSizeBrush_ValueChanged;
-        KuroOptionButtonCapa.OnDataSelected += KuroOptionButtonCapa_OnDataSelected;
+        SpinBoxSizeBrush.ValueChanged += SpinBoxSizeBrush_ValueChanged;        
         LoadCapas();
         LoadBrushs();
     }
 
-    private void KuroOptionButtonCapa_OnDataSelected(object obj)
-    {
-        var selectedLayer = (BlackyRenderLayer)obj;
-        switch (selectedLayer)
-        {
-            case BlackyRenderLayer.TerrenoBase:
-                KuroButtonBuscar.Visible = false;
-                KuroButtonBuscarAutomatico.Visible = true;
-                break;
-            case BlackyRenderLayer.Rampas:
-                KuroButtonBuscar.Visible = true;
-                KuroButtonBuscarAutomatico.Visible = false;
-                break;
-            case BlackyRenderLayer.Superficie:
-                KuroButtonBuscar.Visible = false;
-                KuroButtonBuscarAutomatico.Visible = true;
-                break;
-            case BlackyRenderLayer.Caminos:
-                KuroButtonBuscar.Visible = false;
-                KuroButtonBuscarAutomatico.Visible = true;
-                break;
-            case BlackyRenderLayer.Adornos:
-                KuroButtonBuscar.Visible = true;
-                KuroButtonBuscarAutomatico.Visible = false;
-                break;
-            default:
-                break;
-        }
-    }
+    
 
     private void LoadCapas()
     {
@@ -151,38 +123,7 @@ public partial class WindowEditorRuntimeTerrain : Window
         brushType = (BrushType)obj;
     }
 
-    private void KuroButtonBuscarAutomatico_Pressed()
-    {
-       var layerSelected= (BlackyRenderLayer) KuroOptionButtonCapa.GetSelectedData();
-        switch (layerSelected)
-        {
-            case BlackyRenderLayer.TerrenoBase:
-                var wDual = RuntimeServices.NodeRegistry.Create<WindowRuntimeDualTilesTerrain>();
-                wDual.OnSelection += WDual_OnSelection;
-                AddChild(wDual);
-                wDual.Popup();
-                break;        
-            case BlackyRenderLayer.Superficie:
-                break;
-            case BlackyRenderLayer.Caminos:
-                break;            
-            default:
-                break;
-        }
-        
-        
-    }
-
-    private void WDual_OnSelection(GodotEcsArch.sources.WindowsDataBase.TilesTexture.DualTileTemplate objeto)
-    {
-        TexturaDual.Texture = objeto.textureVisual;
-        LabelDualName.Text = objeto.name;
-        modeEditorTerrain = ModeEditorTerrain.CREACION;        
-        dualTileTemplate = objeto;
-        ConfigModePaint(ModePaint.AUTO_DUAL);
-        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush,sizeBrush), objeto.GetSlot(1).GetData(0).GetPart(0).IdMod, objeto.GetSlot(15).GetData(0).GetPart(0).TileIndex);
-
-    }
+    
 
     private void KuroButtonSeleccion_Pressed()
     {
@@ -223,19 +164,80 @@ public partial class WindowEditorRuntimeTerrain : Window
 
     private void KuroButtonBuscar_Pressed()
     {
-        var w = RuntimeServices.NodeRegistry.Create<RuntimeEditorWindowMaterial>();
-        w.OnSelection += W_OnSelection;
+        AnyWindowOpen = true;
+        WindowDataEditor w = RuntimeServices.NodeRegistry.Create<WindowDataEditor>();
+        w.OnItemSelected += W_OnItemSelectedTerrain;
+        w.CloseRequested += W_CloseRequested;
         AddChild(w);
-        w.SetTipoTexturas(GodotEcsArch.sources.WindowsDataBase.Materials.MaterialType.TERRENO);
         w.Popup();
+
+        var layerSelected = (BlackyRenderLayer)KuroOptionButtonCapa.GetSelectedData();
+        switch (layerSelected)
+        {
+            case BlackyRenderLayer.TerrenoBase:                
+                w.LoadData<TerrainBaseData>();
+                break;
+            case BlackyRenderLayer.Rampas:
+                w.LoadData<MaterialData>();
+                break;
+            case BlackyRenderLayer.Superficie:
+                break;
+            case BlackyRenderLayer.Caminos:
+                break;
+            case BlackyRenderLayer.Adornos:
+                w.LoadData<MaterialData>();
+                break;            
+        }        
     }
 
-    private void W_OnSelection(MaterialData materialData, ModInfo modInfo)
+    private void W_CloseRequested()
+    {
+        AnyWindowOpen = false;
+    }
+
+    TerrainBaseData terrainBaseDataSelected;
+    private void W_OnItemSelectedTerrain(object obj)
+    {
+        var layerSelected = (BlackyRenderLayer)KuroOptionButtonCapa.GetSelectedData();
+        switch (layerSelected)
+        {
+            case BlackyRenderLayer.TerrenoBase:
+                terrainBaseDataSelected = (TerrainBaseData)obj;
+                var dual = AtlasModsManager.Get<DualTileTemplate>(terrainBaseDataSelected.nameMod, terrainBaseDataSelected.idDualTemplate);
+                DualTemplateSelection(dual);
+                break;
+            case BlackyRenderLayer.Rampas:
+                var mat = (MaterialData)obj;
+                TextureSelection(mat);
+                break;
+            case BlackyRenderLayer.Superficie:
+                break;
+            case BlackyRenderLayer.Caminos:
+                break;
+            case BlackyRenderLayer.Adornos:
+                break;
+        }
+
+    }
+    private void TextureSelection(MaterialData materialData)
     {
         modeEditorTerrain = ModeEditorTerrain.CREACION;
         SetMaterial(materialData);
         ConfigModePaint(ModePaint.NORMAL);
+        AnyWindowOpen = false;
     }
+    private void DualTemplateSelection(GodotEcsArch.sources.WindowsDataBase.TilesTexture.DualTileTemplate objeto)
+    {
+        TexturaDual.Texture = objeto.textureVisual;
+        LabelDualName.Text = objeto.name;
+        modeEditorTerrain = ModeEditorTerrain.CREACION;
+        dualTileTemplate = objeto;
+        ConfigModePaint(ModePaint.AUTO_DUAL);
+        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), objeto.GetSlot(1).GetData(0).GetPart(0).IdMod, objeto.GetSlot(15).GetData(0).GetPart(0).TileIndex);
+        AnyWindowOpen = false;
+    }
+
+
 
     private void ConfigModePaint(ModePaint mode)
     {
@@ -309,8 +311,11 @@ public partial class WindowEditorRuntimeTerrain : Window
             case ModeEditorTerrain.CREACION:
                 if (leftPressed)
                 {
-                    
-                    if (matrixCurrent==null && dualTileTemplate==null)
+                    if (modePaint == ModePaint.AUTO_DUAL && dualTileTemplate == null)
+                    {
+                        return;
+                    }
+                    if (modePaint == ModePaint.NORMAL && matrixCurrent == null)
                     {
                         return;
                     }
@@ -356,9 +361,13 @@ public partial class WindowEditorRuntimeTerrain : Window
                 break;
         }
     }
-
+    
     private bool IsMouseBlockedByUI()
     {
+        if (AnyWindowOpen)
+        {
+            return true;
+        }
         bool leftPressed = Input.IsMouseButtonPressed(MouseButton.Left);
         bool rightPressed = Input.IsMouseButtonPressed(MouseButton.Right);
 
@@ -439,6 +448,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                   brush);
                 break;
             case BlackyRenderLayer.Rampas:
+                BlackyWorldContext.PintarRampas.RemoveTile(currentMouseTile.X, currentMouseTile.Y, altura);
                 break;
             case BlackyRenderLayer.Superficie:
                 break;
@@ -504,9 +514,8 @@ public partial class WindowEditorRuntimeTerrain : Window
 
         switch (capa)
         {
-            case BlackyRenderLayer.TerrenoBase:
-                BlackyWorldContext.PintarTerreno.SetDualTemplate(dualTileTemplate);
-                BlackyWorldContext.PintarTerreno.SetTerrain(currentMouseTile.X,currentMouseTile.Y,altura,1,brush);
+            case BlackyRenderLayer.TerrenoBase:                
+                BlackyWorldContext.PintarTerreno.SetTerrain(currentMouseTile.X,currentMouseTile.Y,altura,terrainBaseDataSelected,brush);
                 break;
             case BlackyRenderLayer.Rampas:
                 PaintNormal(altura, capa, tiles, brush);

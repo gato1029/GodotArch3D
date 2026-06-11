@@ -56,7 +56,13 @@ namespace GodotEcsArch.sources.WindowsDataBase
             );
             return mapper;
         }
-
+        internal void CloseDataBase()
+        {
+            if (db != null)
+            {
+                db.Dispose();
+            }
+        }
         public void LoadCurrentDataBase()
         {
             if (db != null)
@@ -1312,5 +1318,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
                 throw;
             }
         }
+
+
     }
 }

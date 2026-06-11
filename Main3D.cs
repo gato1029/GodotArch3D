@@ -68,6 +68,22 @@ public partial class Main3D : Node3D
         //NormalizeMods();
 
     }
+    public override void _Notification(int what)
+    {
+        if (what == NotificationWMCloseRequest)
+        {
+            GD.Print("Cerrando juego...");
+
+            CloseDatabaseConnections();
+
+            GetTree().Quit();
+        }
+    }
+
+    private void CloseDatabaseConnections()
+    {
+        DataBaseManager.Instance.CloseDataBase();
+    }
 
     private void NormalizeMods()
     {

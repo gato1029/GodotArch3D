@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 public class TerrainBaseData: IdDataLong
 {
-    public long idDualTemplate { get; set; }        
-    public int materialTemplate { get; set; }
+    public long idDualTemplate { get; set; }
+    public List<long> rampas { get; set; } = new();
 }
 
 public class SurfaceBaseData : IdDataLong
