@@ -30,7 +30,6 @@ public class MaterialModData
 
     internal void CreateTexture(string pathComplete)
     {        
-        textureVisual = (Texture2D)TextureHelper.LoadTextureLocal(pathComplete);
-        int t = 0;
+        textureVisual = (Texture2D)TextureHelper.LoadTextureLocal(pathComplete);        
     }
 }

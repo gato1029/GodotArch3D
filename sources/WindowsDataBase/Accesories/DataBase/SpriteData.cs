@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using LiteDB;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ public class SpriteData {
     }
 
     [BsonCtor]
-    public SpriteData(string colorString, float offsetX, float offsetY,float yDepthRender, GeometricShape2D[] listCollisionBody)
+    public SpriteData(string colorString, float offsetX, float offsetY,float yDepthRender,string idModMaterial, float xFormat, float yFormat, float widhtFormat, float heightFormat,  GeometricShape2D[] listCollisionBody)
     {
         offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
         yDepthRenderFormat = MeshCreator.PixelsToUnits(yDepthRender);
@@ -61,6 +62,17 @@ public class SpriteData {
                        .ToArray();
             color = new Color(components[0], components[1], components[2], components[3]);
         }
+
+        if (ModHelper.AllMods)
+        {
+            MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(idModMaterial);
+            uv = AtlasModsManager.Instance.CalculateUVFromId(mat,xFormat, yFormat,widhtFormat,heightFormat);
+        }
+        else
+        {
+
+        }
+
         if (listCollisionBody!=null)
         {
             foreach (var item in listCollisionBody)

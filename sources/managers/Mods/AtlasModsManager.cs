@@ -2,7 +2,9 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
@@ -16,6 +18,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using static Flecs.NET.Core.Ecs.Units;
+using static Flecs.NET.Core.Ecs.Units.Masses;
 
 
 namespace GodotEcsArch.sources.managers.Mods;
@@ -34,7 +37,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
     // Datos solo cacheados nunca en disco, resueltos de otra forma
     private readonly AtlasMods<int, MaterialData> materiales = new(); // estos nunca se guardan en disco solo en memoria, resuelto de otra forma
-    private readonly AtlasMods<long, TileSpriteData> spriteData = new(); // estos nunca se guardan en disco solo en memoria
+    private readonly AtlasMods<long, TileSpriteData> tileSpriteData = new(); // estos nunca se guardan en disco solo en memoria
     private readonly AtlasMods<long, AutoTileSpriteData> autoSpriteData = new(); // estos nunca se guardan en disco solo en memoria
     private readonly AtlasMods<long, DualTileTemplate> dualTileTemplate = new();
 
@@ -72,26 +75,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             Atlas = atlas
         };
     }
-    //private void RegisterAtlas<T>(AtlasMods<long, T> atlas) where T : class
-    //{
-    //    _atlases[typeof(T)] = atlas;
-    //}
 
-    //private void RegisterAtlas<T>(AtlasMods<int, T> atlas) where T : class
-    //{
-    //    _atlases[typeof(T)] = atlas;
-    //}
-
-
-    //private void RegisterAtlas<T>(AtlasMods<ushort, T> atlas) where T : class
-    //{
-    //    _atlases[typeof(T)] = atlas;
-    //}
-
-    //private void RegisterAtlas<T>(AtlasMods<string, T> atlas) where T : class
-    //{
-    //    _atlases[typeof(T)] = atlas;
-    //}
     private AtlasMods<TKey, T> GetAtlas<TKey, T>()
         where T : class
         where TKey : notnull
@@ -232,6 +216,10 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         return atlas != null && atlas.TryGet(modId, id, out value);
     }
 
+    // 
+
+    
+
     // =========================================================
     // 🟡 TILE TEXTURE (STRING KEY ATLAS)
     // =========================================================
@@ -299,12 +287,12 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
     private void CargarPorModGenerico(ushort idMod, string name)
     {
-        CargarDatosBase(spriteData, idMod, name);
+        CargarDatosBaseTileSprite(tileSpriteData, idMod, name);
         CargarDatosBase(autoSpriteData, idMod, name);
         CargarDatosBase(dualTileTemplate, idMod, name);
     }
 
-    
+ 
 
     private void CargarPorMod(ushort idMod, string name)
     {
@@ -337,6 +325,78 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             tilesTextureData.Register(idMod, item.name, item);
             index.Add(item.idMaterial, item);
         }
+    }
+    private void CargarDatosBaseTileSprite(AtlasMods<long, TileSpriteData> atlas, ushort idMod, string nameMod) 
+    {
+        var data = DataBaseManager.Instance.FindAll<TileSpriteData>();
+
+        foreach (var item in data)
+        {
+            var tileSprite = item as TileSpriteData;
+            tileSprite.idMod = idMod;
+            tileSprite.nameMod = nameMod;
+            //
+
+            ActualizarUvsTileSprite(tileSprite);            
+            atlas.Register(idMod, tileSprite.id, tileSprite);
+        }
+    }
+    private void ActualizarUvsTileSprite(TileSpriteData tileSprite)
+    {
+        //string textureKey = "";        
+        //switch (tileSprite.tileSpriteType)
+        //{
+        //    case TileSpriteType.Static :                
+        //        textureKey = tileSprite.spriteData.idModMaterial;
+        //        MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(textureKey);
+        //        tileSprite.spriteData.uv = CalculateUVFromId(mat, tileSprite.spriteData);
+        //        break;
+        //    case TileSpriteType.Animated:
+        //        textureKey = tileSprite.animationData.idModMaterial;
+        //        MaterialModData mat2 = AtlasTexturesModsManager.Instance.GetMaterialTexture(textureKey);
+        //        tileSprite.animationData.uvFramesArray = CalculateUVFromId(mat2, tileSprite.animationData).ToArray();
+        //        break;
+        //    case TileSpriteType.AnimatedDirectionMultiple:
+        //        textureKey = tileSprite.spriteMultipleAnimationDirection.idModMaterial;
+        //        MaterialModData mat3 = AtlasTexturesModsManager.Instance.GetMaterialTexture(textureKey);
+        //        tileSprite.animationData.uvFramesArray = CalculateUVFromId(mat2, tileSprite.animationData).ToArray();
+        //        break;
+        //    case TileSpriteType.AnimatedMultiple:
+        //        break;
+        //    case TileSpriteType.Single:
+        //        break;
+        //    default:
+        //        break;
+        //}
+    }
+    public List<Godot.Color> CalculateUVFromId(MaterialModData data,bool mirrorX, bool mirrorY, FrameData[] framesArray)
+    {        
+        var offset = new Vector2(data.xInAtlas, data.yInAtlas);
+        List<Godot.Color> uvList = new List<Godot.Color>();
+        foreach (var spriteData in framesArray)
+        {
+            // Calcular nueva posición y tamaño
+            float newX = offset.X + spriteData.x;
+            float newY = offset.Y + spriteData.y;
+
+            Godot.Color uvColor = new Godot.Color();
+            uvColor.R = newX;
+            uvColor.G = newY;
+            uvColor.B = mirrorX ? -spriteData.widht : spriteData.widht;
+            uvColor.A = mirrorY ? -spriteData.height : spriteData.height;
+
+            uvList.Add(uvColor);
+        }
+        return uvList;
+    }
+    public Godot.Color CalculateUVFromId(MaterialModData data, float xFormat, float yFormat, float widhtFormat, float heightFormat)
+    {                
+        return new Godot.Color(
+            data.xInAtlas + (xFormat),
+            data.yInAtlas + (yFormat),
+            widhtFormat,
+            heightFormat
+        );
     }
     private void CargarDatosBase<T>(AtlasMods<long, T> atlas, ushort idMod, string nameMod) where T : IdDataLong
     {
@@ -443,7 +503,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         // ================================
         materiales.Clear();
         fuenteRecursos.Clear();
-        spriteData.Clear();
+        tileSpriteData.Clear();
         autoSpriteData.Clear();
         terrainData.Clear();
         terrainDataTransicion.Clear();
@@ -470,7 +530,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     {
         
         RegisterAtlas(fuenteRecursos);
-        RegisterAtlas(spriteData);
+        RegisterAtlas(tileSpriteData);
         RegisterAtlas(autoSpriteData);
         RegisterAtlas(terrainData);
         RegisterAtlas(terrainDataTransicion);

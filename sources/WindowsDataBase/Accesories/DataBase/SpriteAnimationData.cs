@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using LiteDB;
@@ -46,7 +47,7 @@ public class SpriteAnimationData {
 
     }
     [BsonCtor]
-    public SpriteAnimationData(string colorString, float offsetX, float offsetY, int idMaterial, bool mirrorX, bool mirrorY, FrameData[] framesArray, float yDepthRender, List<GeometricShape2D> collisionBodyArray)
+    public SpriteAnimationData(string colorString, float offsetX, float offsetY, int idMaterial,string idModMaterial, bool mirrorX, bool mirrorY, FrameData[] framesArray, float yDepthRender, List<GeometricShape2D> collisionBodyArray)
     {
         yDepthRenderFormat = MeshCreator.PixelsToUnits(yDepthRender);
         offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
@@ -58,7 +59,16 @@ public class SpriteAnimationData {
                        .ToArray();
             color = new Color(components[0], components[1], components[2], components[3]);
         }
-        uvFramesArray = TextureHelper.GetUvAllFormatFromFrames(idMaterial, mirrorX, mirrorY, framesArray).ToArray();
+        if (ModHelper.AllMods)
+        {            
+            MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(idModMaterial);
+            uvFramesArray = AtlasModsManager.Instance.CalculateUVFromId(mat, mirrorX, mirrorY, framesArray).ToArray();
+        }
+        else
+        {
+            uvFramesArray = TextureHelper.GetUvAllFormatFromFrames(idMaterial, mirrorX, mirrorY, framesArray).ToArray();
+        }
+        
         this.yDepthRenderFormat = yDepthRenderFormat;
 
         if (collisionBodyArray!=null)

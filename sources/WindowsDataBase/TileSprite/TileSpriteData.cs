@@ -52,6 +52,7 @@ public enum TileSpriteType
     Animated = 1,
     AnimatedDirectionMultiple = 2,
     AnimatedMultiple = 3,
+    Single = 4
 }
 
 public class SpriteAnimationMultiple
@@ -113,13 +114,13 @@ public class SpriteAnimationDirection
 
 }
 public class TileSpriteData:IdDataLong
-{
-    //public ushort idSave { get; set; }
+{    
+    public int tileIndex { get; set; }    
     public TileSpriteType tileSpriteType { get; set; }
     public SpriteData spriteData { get; set; }
     public SpriteAnimationData animationData { set; get; }
 
-    public SpriteAnimationMultiple spriteAnimationMultiple { get; set; }
+    public SpriteAnimationMultiple spriteAnimationMultiple { get; set; } // aun no se usa
 
     public SpriteMultipleAnimationDirection spriteMultipleAnimationDirection { get; set; }
     public List<KuroTile> tilesOcupancy { get; set; } = new List<KuroTile>();

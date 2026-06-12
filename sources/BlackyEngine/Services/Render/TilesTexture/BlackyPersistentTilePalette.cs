@@ -71,6 +71,10 @@ public abstract class BlackyTilePaletteBase
         // Buscar metadata del tile
         string keyMod = modName + ":" + indexTexture;
 
+        //
+
+        AtlasModsManager.Get<TileSpriteData>(modName, indexTexture);
+        // 
         bool existsInMod = AtlasModsManager.TryGetTileTexture(
             modName,
             keyMod,
