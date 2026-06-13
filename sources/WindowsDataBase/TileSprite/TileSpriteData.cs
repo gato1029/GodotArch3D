@@ -52,7 +52,9 @@ public enum TileSpriteType
     Animated = 1,
     AnimatedDirectionMultiple = 2,
     AnimatedMultiple = 3,
-    Single = 4
+    SingleStatic = 4,
+    SingleAnimated = 5,
+
 }
 
 public class SpriteAnimationMultiple

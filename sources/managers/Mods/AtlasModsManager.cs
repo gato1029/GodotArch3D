@@ -59,6 +59,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // =========================================================
 
     private readonly Dictionary<ushort, MultiIndex<int, TileTextureData>> _tilesByMaterialIndex = new();
+    private readonly Dictionary<ushort, MultiIndex<int, TileSpriteData>> _tilesSpriteByMaterialIndex = new();
 
     // =========================================================
     // TYPE REGISTRY (interno seguro)
@@ -335,10 +336,22 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             var tileSprite = item as TileSpriteData;
             tileSprite.idMod = idMod;
             tileSprite.nameMod = nameMod;
-            //
+            //          
+            if (tileSprite.tileSpriteType == TileSpriteType.SingleStatic || tileSprite.tileSpriteType == TileSpriteType.SingleAnimated)
+            {
+                if (!_tilesSpriteByMaterialIndex.ContainsKey(idMod))
+                {
+                    _tilesSpriteByMaterialIndex[idMod] = new MultiIndex<int, TileSpriteData>();
+                }
 
-            ActualizarUvsTileSprite(tileSprite);            
-            atlas.Register(idMod, tileSprite.id, tileSprite);
+                MultiIndex<int, TileSpriteData> indexMod = _tilesSpriteByMaterialIndex[idMod];
+                indexMod.Add(tileSprite.tileIndex, tileSprite);
+            }
+            else
+            {
+                atlas.Register(idMod, tileSprite.id, tileSprite);
+            }
+            
         }
     }
     private void ActualizarUvsTileSprite(TileSpriteData tileSprite)

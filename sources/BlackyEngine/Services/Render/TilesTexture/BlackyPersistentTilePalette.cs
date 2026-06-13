@@ -48,6 +48,9 @@ public abstract class BlackyTilePaletteBase
     protected Dictionary<ushort, TileDataMod> palette = new();
     protected Dictionary<(int subTextureId, ushort index), ushort> lookup = new();
 
+    protected Dictionary<ushort, TileSpriteData> paletteSprite = new();
+    protected Dictionary<(int subTextureId, ushort index), ushort> lookupSprite = new();
+
     /// <summary>
     /// Crea o retorna un tile ya cacheado.
     /// </summary>
@@ -75,20 +78,12 @@ public abstract class BlackyTilePaletteBase
 
         AtlasModsManager.Get<TileSpriteData>(modName, indexTexture);
         // 
-        bool existsInMod = AtlasModsManager.TryGetTileTexture(
-            modName,
-            keyMod,
-            out TileTextureData modTileData);
+        bool existsInMod = AtlasModsManager.TryGetTileTexture(modName,keyMod, out TileTextureData modTileData);
 
-        bool hasAnim =
-            existsInMod &&
-            modTileData.indexAnimation != null &&
-            modTileData.indexAnimation.Length > 0;
+        bool hasAnim = existsInMod && modTileData.indexAnimation != null && modTileData.indexAnimation.Length > 0;
 
         // UV base
-        Color baseUV = CalculateUVFromId(
-            data.idSubTexture,
-            indexTexture);
+        Color baseUV = CalculateUVFromId(data.idSubTexture,indexTexture);
 
         // UVs animados
         Color[] animatedUVs = null;
