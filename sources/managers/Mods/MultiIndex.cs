@@ -29,6 +29,17 @@ public class MultiIndex<TKey, TValue> where TKey : notnull
     {
         return _index.TryGetValue(key, out list);
     }
+    public bool TryGetFirst(TKey key, out TValue value)
+    {
+        if (_index.TryGetValue(key, out var list) && list.Count > 0)
+        {
+            value = list[0];
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
     public void Clear()
     {
         foreach (var kv in _index)

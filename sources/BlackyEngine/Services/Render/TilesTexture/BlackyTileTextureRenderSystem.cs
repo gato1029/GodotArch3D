@@ -277,15 +277,27 @@ public class BlackyTileTextureRenderSystem
         // =====================================================
         // OBTENER NUEVA DATA
         // =====================================================
-        region.TryGetTileDataMod(tileId, out TileDataMod tileDataMod,isPersistent);
+        region.TryGetTileDataMod(tileId, out TileSpriteData tileDataMod,isPersistent);
 
         // =====================================================
         // SI YA EXISTE Y ES LA MISMA TEXTURA -> IGNORAR
         // =====================================================
         if (instance != null)
         {
-            if (instance.SubTextureId == tileDataMod.SubTextureId &&
-                instance.Index == tileDataMod.Index)
+            int subTextureId = 0;
+            switch (tileDataMod.tileSpriteType)
+            {
+                case TileSpriteType.SingleStatic:
+                    subTextureId = tileDataMod.spriteData.subIdMaterial;
+                    break;
+                case TileSpriteType.SingleAnimated:                    
+                    subTextureId = tileDataMod.animationData.subIdMaterial;
+                    break;
+                default:
+                    break;
+            }
+            if (instance.SubTextureId == subTextureId &&
+                instance.Index == tileDataMod.tileIndex)
             {
                 return;
             }

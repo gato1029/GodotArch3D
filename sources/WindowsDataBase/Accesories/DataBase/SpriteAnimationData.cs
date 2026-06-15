@@ -38,6 +38,9 @@ public class SpriteAnimationData {
     public string idModMaterial { get; set; }
 
     [BsonIgnore]
+    public int subIdMaterial { get; set; }
+
+    [BsonIgnore]
     public Color[] uvFramesArray { get; set; }
 
     [BsonIgnore]
@@ -62,6 +65,7 @@ public class SpriteAnimationData {
         if (ModHelper.AllMods)
         {            
             MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(idModMaterial);
+            subIdMaterial = mat.idSubTexture;
             uvFramesArray = AtlasModsManager.Instance.CalculateUVFromId(mat, mirrorX, mirrorY, framesArray).ToArray();
         }
         else

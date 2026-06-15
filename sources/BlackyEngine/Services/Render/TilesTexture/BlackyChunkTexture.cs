@@ -53,11 +53,6 @@ public class BlackyChunkTexture
     /// Devuelve los datos de textura (UVs y dimensiones) para un tile ID específico.
     /// Este ID debe ser el ushort que está guardado en las capas de este chunk.
     /// </summary>
-    public Color GetTileUV(ushort tileId)
-    {
-        // El chunk no sabe qué es el "ID 5", pero su región sí.
-        return ParentRegion.GetTileUV(tileId);
-    }
 
     /// <summary>
     /// Devuelve la paleta completa de la región si el renderizador 

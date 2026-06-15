@@ -5,6 +5,7 @@ using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
     public readonly int layer;
     public readonly int x;
     public readonly int y;
-    public readonly TileDataMod tileDataMod;
+    public readonly TileSpriteData tileDataMod;
     private readonly BlackyChunkRenderTiles chunkRender;
     private readonly bool dualOffset;
-    public CreateTileInstanceTextureCommand(int height, int layer, int x, int y, bool dualOffset, TileDataMod tileDataMod, BlackyChunkRenderTiles chunkRender)
+    public CreateTileInstanceTextureCommand(int height, int layer, int x, int y, bool dualOffset, TileSpriteData tileDataMod, BlackyChunkRenderTiles chunkRender)
     {
         this.dualOffset = dualOffset;
         this.height = height;
@@ -39,67 +40,77 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
     {
         if (chunkRender.IsDestroyed)
             return;
-
         //cuando es solo tile simple visual, no hay entidad
-
-        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(tileDataMod.ModName);
-        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
-        Vector2 offset = new Vector2(0, 0);
-        if (dualOffset)
-        {
-            offset = new Vector2(0.25f, 0.25f);
+        switch (tileDataMod.tileSpriteType)
+        {         
+            case TileSpriteType.SingleStatic:
+                CreateSpriteSingle(tileDataMod.spriteData);
+                break;
+            case TileSpriteType.SingleAnimated:
+                CreateSpriteAnimated(tileDataMod.animationData);
+                break;
+            default:
+                break;
         }
-        //else
+
+        //var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(tileDataMod.ModName);
+        //Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
+        //Vector2 offset = new Vector2(0, 0);
+        //if (dualOffset)
         //{
         //    offset = new Vector2(0.25f, 0.25f);
         //}
+        ////else
+        ////{
+        ////    offset = new Vector2(0.25f, 0.25f);
+        ////}
 
-        float depthOffset = 0;
-        float depthValue = positionCenter.Y + depthOffset - height * CommonAtributes.HEIGHT_OFFSET ;
-        //float z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layer * CommonAtributes.LAYER_OFFSET;
+        //float depthOffset = 0;
+        //float depthValue = positionCenter.Y + depthOffset - height * CommonAtributes.HEIGHT_OFFSET ;
+        ////float z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layer * CommonAtributes.LAYER_OFFSET;
 
-        float z = CommonAtributes.Calculate(depthOffset, height, layer, positionCenter); // debemos usar esto apartir de ahora
-        //GD.Print("depthValue:  " + depthValue);
-        //GD.Print("Z:  " + z);
+        //float z = CommonAtributes.Calculate(depthOffset, height, layer, positionCenter); // debemos usar esto apartir de ahora
+        ////GD.Print("depthValue:  " + depthValue);
+        ////GD.Print("Z:  " + z);
 
-        Vector3 worldPosition = new(positionCenter.X+offset.X, positionCenter.Y+offset.Y, z);
+        //Vector3 worldPosition = new(positionCenter.X+offset.X, positionCenter.Y+offset.Y, z);
 
-        Transform3D transform = new(Basis.Identity, worldPosition);
-        transform = transform.ScaledLocal(new Vector3(1,1,1));
+        //Transform3D transform = new(Basis.Identity, worldPosition);
+        //transform = transform.ScaledLocal(new Vector3(1,1,1));
 
-        RenderingServer.MultimeshInstanceSetTransform(
-            RenderInstance.rid,
-            RenderInstance.instance,
-            transform
-        );
+        //RenderingServer.MultimeshInstanceSetTransform(
+        //    RenderInstance.rid,
+        //    RenderInstance.instance,
+        //    transform
+        //);
 
-        RenderingServer.MultimeshInstanceSetCustomData(
-            RenderInstance.rid,
-            RenderInstance.instance,
-            tileDataMod.BaseUV
-        );
+        //RenderingServer.MultimeshInstanceSetCustomData(
+        //    RenderInstance.rid,
+        //    RenderInstance.instance,
+        //    tileDataMod.BaseUV
+        //);
 
-        RenderingServer.MultimeshInstanceSetColor(
-            RenderInstance.rid,
-            RenderInstance.instance,
-            new Godot.Color(0, 0, 0, RenderInstance.layerTexture)
-        );
+        //RenderingServer.MultimeshInstanceSetColor(
+        //    RenderInstance.rid,
+        //    RenderInstance.instance,
+        //    new Godot.Color(0, 0, 0, RenderInstance.layerTexture)
+        //);
 
 
 
-        var tileRender = new TileRenderTextureInstance
-        {
-            Rid = RenderInstance.rid,
-            InstanceId = RenderInstance.instance,
-            SubTextureId = tileDataMod.SubTextureId,
-            Index = tileDataMod.Index
-        };
-        chunkRender.AddOrReplace((height, layer, x, y), tileRender);
+        //var tileRender = new TileRenderTextureInstance
+        //{
+        //    Rid = RenderInstance.rid,
+        //    InstanceId = RenderInstance.instance,
+        //    SubTextureId = tileDataMod.SubTextureId,
+        //    Index = tileDataMod.Index
+        //};
+        //chunkRender.AddOrReplace((height, layer, x, y), tileRender);
 
-        if (tileDataMod.IsAnimated)
-        {
+        //if (tileDataMod.IsAnimated)
+        //{
 
-        }
+        //}
         //var renderData = new BlackyTileRenderInstance(
         //    dataInstance.rid,
         //    dataInstance.instance,
@@ -147,5 +158,68 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         //entity.Add<TileSpriteAnimationTag>();
 
 
+    }
+
+    private void CreateSpriteAnimated(SpriteAnimationData animationData)
+    {
+      
+    }
+
+    private void CreateSpriteSingle(SpriteData spriteData)
+    {
+        
+        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
+        Vector2 offset = new Vector2(0, 0);
+        if (dualOffset)
+        {
+            offset = new Vector2(0.25f, 0.25f);
+        }
+        //else
+        //{
+        //    offset = new Vector2(0.25f, 0.25f);
+        //}
+
+        float depthOffset = 0;
+        float depthValue = positionCenter.Y + depthOffset - height * CommonAtributes.HEIGHT_OFFSET;
+        //float z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layer * CommonAtributes.LAYER_OFFSET;
+
+        float z = CommonAtributes.Calculate(depthOffset, height, layer, positionCenter); // debemos usar esto apartir de ahora
+        //GD.Print("depthValue:  " + depthValue);
+        //GD.Print("Z:  " + z);
+
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+
+        Transform3D transform = new(Basis.Identity, worldPosition);
+        transform = transform.ScaledLocal(new Vector3(1, 1, 1));
+
+        RenderingServer.MultimeshInstanceSetTransform(
+            RenderInstance.rid,
+            RenderInstance.instance,
+            transform
+        );
+
+        RenderingServer.MultimeshInstanceSetCustomData(
+            RenderInstance.rid,
+            RenderInstance.instance,
+            spriteData.uv
+        );
+
+        RenderingServer.MultimeshInstanceSetColor(
+            RenderInstance.rid,
+            RenderInstance.instance,
+            new Godot.Color(0, 0, 0, RenderInstance.layerTexture)
+        );
+
+
+
+        var tileRender = new TileRenderTextureInstance
+        {
+            Rid = RenderInstance.rid,
+            InstanceId = RenderInstance.instance,
+            //SubTextureId = tileDataMod.SubTextureId,
+            //Index = tileDataMod.Index
+        };
+        chunkRender.AddOrReplace((height, layer, x, y), tileRender);
     }
 }

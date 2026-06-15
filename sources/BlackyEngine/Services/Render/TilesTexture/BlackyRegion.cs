@@ -87,19 +87,19 @@ public class BlackyRegion
     /// <summary>
     /// Devuelve la información de textura (UVs) para un ID local.
     /// </summary>
-    public Color GetTileUV(ushort tileId, bool isPersistent = true)
-    {
-        if (isPersistent)
-        {
-            return Palette.GetTileUV(tileId);
-        }
-        else
-        {
-            return RuntimeTilePalette.GetTileUV(tileId);
-        }        
-    }
+    //public Color GetTileUV(ushort tileId, bool isPersistent = true)
+    //{
+    //    if (isPersistent)
+    //    {
+    //        return Palette.GetTileUV(tileId);
+    //    }
+    //    else
+    //    {
+    //        return RuntimeTilePalette.GetTileUV(tileId);
+    //    }        
+    //}
 
-    public void TryGetTileDataMod(ushort tileId, out TileDataMod tileDataMod, bool isPersistent = true)
+    public void TryGetTileDataMod(ushort tileId, out TileSpriteData tileDataMod, bool isPersistent = true)
     {
         if (isPersistent)
         {

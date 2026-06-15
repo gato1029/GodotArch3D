@@ -32,6 +32,8 @@ public class SpriteData {
     
     public string idModMaterial { get; set; }
     [BsonIgnore]
+    public int subIdMaterial { get; set; }
+    [BsonIgnore]
     public Vector2 offsetInternal { get; set; }
     [BsonIgnore]
     public Color color { get; set; }
@@ -66,7 +68,9 @@ public class SpriteData {
         if (ModHelper.AllMods)
         {
             MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(idModMaterial);
+            subIdMaterial = mat.idSubTexture;
             uv = AtlasModsManager.Instance.CalculateUVFromId(mat,xFormat, yFormat,widhtFormat,heightFormat);
+
         }
         else
         {

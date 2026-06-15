@@ -1,7 +1,7 @@
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
-
+using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
@@ -30,14 +30,18 @@ public static class TilesEntityTextureCreatorHelper
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);        
         transform = transform.ScaledLocal(new Godot.Vector3(1, 1, 1));                
         var world  = flecsManager.WorldFlecs.GetCtx<BlackyWorld>();
-        var pallete = world.State.TilePalette;
+        BlackyPersistentTilePalette pallete = world.State.TilePalette;
+        ushort idInternal = pallete.GetOrCreateTile(idMod, (ushort)index);
+        pallete.TryGetTileDataMod(idInternal, out TileSpriteData tileSpriteData);
+
+
 
         // aqui necesito la paleta por region y de acuerdo a eso creamos tile simple o animado
         var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
         entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance,0, instanceRender.layerTexture, renderLayer, 0, 1, Vector2.Zero));
-        ushort idInternal = pallete.GetOrCreateTile(idMod, (ushort)index);        
-        entity.Set(new RenderFrameDataComponent { uvMap = pallete.GetTileUV(idInternal)});
+        
+        entity.Set(new RenderFrameDataComponent { uvMap = tileSpriteData.spriteData.uv});
         entity.Set(new PositionComponent { tilePosition = tilePosition, height = 10 });
         entity.Add<DirtyTileRenderTag>();
         entity.Set(new TileTextureComponent { indexTile = idInternal, isAnimated = false });

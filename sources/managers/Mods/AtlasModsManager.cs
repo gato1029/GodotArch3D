@@ -232,6 +232,19 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     
     public static bool TryGetTileTexture(string modName, string name, out TileTextureData value)
         => Instance.InternalTryGetTileTexture(modName, name, out value);
+
+    public static bool TryGetTileSprite(string modName, int index, out TileSpriteData value)
+        => Instance.InternalTryGetTileSprite(modName, index, out value);
+
+    private bool InternalTryGetTileSprite(string modName, int index, out TileSpriteData value)
+    {
+        value = null;
+        if (!TryGetModId(modName, out var modId))
+            return false;
+        bool resp = _tilesSpriteByMaterialIndex.TryGetValue(modId, out var multiIndex);        
+        return multiIndex.TryGetFirst(index, out value);
+    }
+
     private bool InternalTryGetTileTexture(string modName, string name, out TileTextureData value)
     {
         value = null;
