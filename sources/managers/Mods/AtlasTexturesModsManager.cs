@@ -211,7 +211,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         }
     }
 
-    public  void CreateAllMaterials()
+    public  void  CreateAllMaterials()
     {
         foreach (var item in mods)
         {

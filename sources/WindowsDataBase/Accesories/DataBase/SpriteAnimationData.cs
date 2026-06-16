@@ -52,6 +52,10 @@ public class SpriteAnimationData {
     [BsonCtor]
     public SpriteAnimationData(string colorString, float offsetX, float offsetY, int idMaterial,string idModMaterial, bool mirrorX, bool mirrorY, FrameData[] framesArray, float yDepthRender, List<GeometricShape2D> collisionBodyArray)
     {
+        if (idMaterial ==0)
+        {
+            return;
+        }
         yDepthRenderFormat = MeshCreator.PixelsToUnits(yDepthRender);
         offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
         if (colorString != null)
@@ -65,8 +69,12 @@ public class SpriteAnimationData {
         if (ModHelper.AllMods)
         {            
             MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(idModMaterial);
-            subIdMaterial = mat.idSubTexture;
-            uvFramesArray = AtlasModsManager.Instance.CalculateUVFromId(mat, mirrorX, mirrorY, framesArray).ToArray();
+            if (mat!=null)
+            {
+                subIdMaterial = mat.idSubTexture;
+                uvFramesArray = AtlasModsManager.Instance.CalculateUVFromId(mat, mirrorX, mirrorY, framesArray).ToArray();
+            }
+            
         }
         else
         {
