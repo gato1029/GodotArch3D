@@ -352,13 +352,15 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             //          
             if (tileSprite.tileSpriteType == TileSpriteType.SingleStatic || tileSprite.tileSpriteType == TileSpriteType.SingleAnimated)
             {
+                var sprite = tileSprite.spriteData;
+
                 if (!_tilesSpriteByMaterialIndex.ContainsKey(idMod))
                 {
                     _tilesSpriteByMaterialIndex[idMod] = new MultiIndex<int, TileSpriteData>();
                 }
 
                 MultiIndex<int, TileSpriteData> indexMod = _tilesSpriteByMaterialIndex[idMod];
-                indexMod.Add(tileSprite.tileIndex, tileSprite);
+                indexMod.Add(sprite.idMaterial, tileSprite);
             }
             else
             {
