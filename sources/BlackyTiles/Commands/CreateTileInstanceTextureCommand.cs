@@ -43,10 +43,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         //cuando es solo tile simple visual, no hay entidad
         switch (tileDataMod.tileSpriteType)
         {         
-            case TileSpriteType.SingleStatic:
+            case TileSpriteType.DualStatic:
                 CreateSpriteSingle(tileDataMod.spriteData);
                 break;
-            case TileSpriteType.SingleAnimated:
+            case TileSpriteType.DualAnimated:
                 CreateSpriteAnimated(tileDataMod.animationData);
                 break;
             default:

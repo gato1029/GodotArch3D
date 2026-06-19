@@ -52,8 +52,8 @@ public enum TileSpriteType
     Animated = 1,
     AnimatedDirectionMultiple = 2,
     AnimatedMultiple = 3,
-    SingleStatic = 4,
-    SingleAnimated = 5,
+    DualStatic = 4,
+    DualAnimated = 5,
 
 }
 
@@ -117,7 +117,8 @@ public class SpriteAnimationDirection
 }
 public class TileSpriteData:IdDataLong
 {    
-    public int tileIndex { get; set; }    
+    public int tileIndex { get; set; }  // solo cuando es dual  
+    public int idMaterial { get; set; } // solo cuando es dual
     public TileSpriteType tileSpriteType { get; set; }
     public SpriteData spriteData { get; set; }
     public SpriteAnimationData animationData { set; get; }

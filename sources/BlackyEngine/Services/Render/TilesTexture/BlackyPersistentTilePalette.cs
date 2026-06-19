@@ -74,11 +74,14 @@ public abstract class BlackyTilePaletteBase
         ushort newId = idIncremental++;
 
         //// Buscar metadata del tile
-        //string keyMod = modName + ":" + indexTexture;
+        string keyMod = modName + ":" + indexTexture;
 
         //
         //  bool existsInMod = AtlasModsManager.TryGetTileTexture(modName,keyMod, out TileTextureData modTileData);
-        bool existInMod = AtlasModsManager.TryGetTileSprite(modName, indexTexture, out TileSpriteData modTileSpriteData);
+
+        string onlyModName = modName.Split(':')[0];
+        
+        bool existInMod = AtlasModsManager.TryGetTileSprite(onlyModName, keyMod, indexTexture, out TileSpriteData modTileSpriteData);
         
 
         if (existInMod)
@@ -100,7 +103,7 @@ public abstract class BlackyTilePaletteBase
             paletteSprite[newId] = new TileSpriteData
             {
                 tileIndex = indexTexture,
-                tileSpriteType = TileSpriteType.SingleStatic,
+                tileSpriteType = TileSpriteType.DualStatic,
                 spriteData = spriteData,
                 animationData = null,
                 spriteAnimationMultiple = null,
@@ -239,7 +242,7 @@ public class BlackyPersistentTilePalette: BlackyTilePaletteBase
         foreach (var kv in persistedPalette)
         {
             ushort tileId = kv.Key;
-            var persisted = kv.Value;
+            TileDataPersisted persisted = kv.Value;
 
             var atlasData =
                 AtlasTexturesModsManager.Instance
@@ -248,7 +251,10 @@ public class BlackyPersistentTilePalette: BlackyTilePaletteBase
             if (atlasData == null)
                 continue;
 
-            bool existInMod = AtlasModsManager.TryGetTileSprite(persisted.ModName, persisted.TextureIndex, out TileSpriteData modTileSpriteData);
+            string keyMod = persisted.ModName + ":" + persisted.TextureIndex;
+
+            string onlyModName = persisted.ModName.Split(':')[0];
+            bool existInMod = AtlasModsManager.TryGetTileSprite(onlyModName, keyMod, persisted.TextureIndex, out TileSpriteData modTileSpriteData);
 
 
 
@@ -273,12 +279,12 @@ public class BlackyPersistentTilePalette: BlackyTilePaletteBase
                 paletteSprite[tileId] = new TileSpriteData
                 {
                     tileIndex = persisted.TextureIndex,
-                    tileSpriteType = TileSpriteType.SingleStatic,
+                    tileSpriteType = TileSpriteType.DualStatic,
                     spriteData = spriteData,
                     animationData = null,
                     spriteAnimationMultiple = null,
                     spriteMultipleAnimationDirection = null,
-                    tilesOcupancy = null
+                    tilesOcupancy = null,                    
                 };
             }
          

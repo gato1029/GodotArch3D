@@ -287,10 +287,10 @@ public class BlackyTileTextureRenderSystem
             int subTextureId = 0;
             switch (tileDataMod.tileSpriteType)
             {
-                case TileSpriteType.SingleStatic:
+                case TileSpriteType.DualStatic:
                     subTextureId = tileDataMod.spriteData.subIdMaterial;
                     break;
-                case TileSpriteType.SingleAnimated:                    
+                case TileSpriteType.DualAnimated:                    
                     subTextureId = tileDataMod.animationData.subIdMaterial;
                     break;
                 default:

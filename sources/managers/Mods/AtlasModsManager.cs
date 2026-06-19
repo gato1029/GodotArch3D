@@ -53,6 +53,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
     // string-key atlas
     private readonly AtlasMods<string, TileTextureData> tilesTextureData = new();
+    private readonly AtlasMods<string, TileSpriteData> tilesSpriteDataDual = new();
 
     // =========================================================
     // INDEXES (RELACIONES / QUERIES)
@@ -233,16 +234,17 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     public static bool TryGetTileTexture(string modName, string name, out TileTextureData value)
         => Instance.InternalTryGetTileTexture(modName, name, out value);
 
-    public static bool TryGetTileSprite(string modName, int index, out TileSpriteData value)
-        => Instance.InternalTryGetTileSprite(modName, index, out value);
+    public static bool TryGetTileSprite(string modName, string key, int index, out TileSpriteData value)
+        => Instance.InternalTryGetTileSprite(modName, key, out value);
 
-    private bool InternalTryGetTileSprite(string modName, int index, out TileSpriteData value)
+    private bool InternalTryGetTileSprite(string modName,string key, out TileSpriteData value)
     {
         value = null;
         if (!TryGetModId(modName, out var modId))
             return false;
-        bool resp = _tilesSpriteByMaterialIndex.TryGetValue(modId, out var multiIndex);        
-        return multiIndex.TryGetFirst(index, out value);
+
+        bool resp = tilesSpriteDataDual.TryGet(modId,key, out value);
+        return resp;
     }
 
     private bool InternalTryGetTileTexture(string modName, string name, out TileTextureData value)
@@ -350,17 +352,18 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             tileSprite.idMod = idMod;
             tileSprite.nameMod = nameMod;
             //          
-            if (tileSprite.tileSpriteType == TileSpriteType.SingleStatic || tileSprite.tileSpriteType == TileSpriteType.SingleAnimated)
+            if (tileSprite.tileSpriteType == TileSpriteType.DualStatic || tileSprite.tileSpriteType == TileSpriteType.DualAnimated)
             {
-                var sprite = tileSprite.spriteData;
 
+                string key = nameMod+":"+ item.idMaterial + ":" + item.tileIndex;
                 if (!_tilesSpriteByMaterialIndex.ContainsKey(idMod))
                 {
                     _tilesSpriteByMaterialIndex[idMod] = new MultiIndex<int, TileSpriteData>();
                 }
 
                 MultiIndex<int, TileSpriteData> indexMod = _tilesSpriteByMaterialIndex[idMod];
-                indexMod.Add(sprite.idMaterial, tileSprite);
+                indexMod.Add(item.idMaterial, tileSprite);
+                tilesSpriteDataDual.Register(idMod, key, item);
             }
             else
             {
