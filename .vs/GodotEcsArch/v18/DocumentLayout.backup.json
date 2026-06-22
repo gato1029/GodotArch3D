@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "D:\\GitKraken\\GodotFlecs3D\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlasmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\atlasmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\services\\render\\tilestexture\\blackypersistenttilepalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\services\\render\\tilestexture\\blackypersistenttilepalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlasmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\managers\\mods\\atlasmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\managers\\mods\\atlastexturesmodsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -102,7 +102,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 822,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 17,
           "Children": [
             {
               "$type": "Document",
@@ -115,8 +115,7 @@
               "ViewState": "AgIAABcAAAAAAAAAAAD4vy4AAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-03T17:46:55.85Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -129,8 +128,7 @@
               "ViewState": "AgIAADYCAAAAAAAAAAAWwE0CAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-04T05:05:19.476Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -143,8 +141,7 @@
               "ViewState": "AgIAAAEAAAAAAAAAAAAtwA8AAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-14T19:53:28.904Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Bookmark",
@@ -152,13 +149,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "AtlasModsManager.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasModsManager.cs",
               "RelativeDocumentMoniker": "sources\\managers\\Mods\\AtlasModsManager.cs",
               "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\managers\\Mods\\AtlasModsManager.cs",
               "RelativeToolTip": "sources\\managers\\Mods\\AtlasModsManager.cs",
-              "ViewState": "AgIAAEABAAAAAAAAAAAgwFMBAAArAAAAAAAAAA==",
+              "ViewState": "AgIAAFABAAAAAAAAAAD4v2UBAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-18T19:10:59.683Z",
               "EditorCaption": ""
@@ -173,8 +170,7 @@
               "RelativeToolTip": "sources\\managers\\Mods\\AtlasTexturesModsManager.cs",
               "ViewState": "AgIAAPUAAAAAAAAAAAAwwAQBAABPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-16T18:21:12.44Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-16T18:21:12.44Z"
             },
             {
               "$type": "Document",
@@ -186,8 +182,7 @@
               "RelativeToolTip": "sources\\WindowsDataBase\\Accesories\\DataBase\\SpriteAnimationData.cs",
               "ViewState": "AgIAADAAAAAAAAAAAAAYwEkAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-16T20:00:08.287Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-16T20:00:08.287Z"
             },
             {
               "$type": "Document",
@@ -199,8 +194,7 @@
               "RelativeToolTip": "sources\\WindowsDataBase\\DataBaseManager.cs",
               "ViewState": "AgIAADAEAAAAAAAAAADgvz4EAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-16T18:20:59.699Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-16T18:20:59.699Z"
             },
             {
               "$type": "Document",
@@ -212,8 +206,7 @@
               "RelativeToolTip": "sources\\utils\\TilesEntityTextureCreatorHelper.cs",
               "ViewState": "AgIAABMAAAAAAAAAAAAAwCQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-15T00:20:24.717Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-15T00:20:24.717Z"
             },
             {
               "$type": "Document",
@@ -225,8 +218,7 @@
               "RelativeToolTip": "sources\\WindowsDataBase\\Accesories\\DataBase\\SpriteData.cs",
               "ViewState": "AgIAADQAAAAAAAAAAAAqwEYAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-15T00:15:17.369Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-15T00:15:17.369Z"
             },
             {
               "$type": "Document",
@@ -238,8 +230,7 @@
               "RelativeToolTip": "sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyTileTextureRenderSystem.cs",
               "ViewState": "AgIAAA0BAAAAAAAAAAAAACoBAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-15T00:06:55.374Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-15T00:06:55.374Z"
             },
             {
               "$type": "Document",
@@ -251,8 +242,7 @@
               "RelativeToolTip": "sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyChunkTexture.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAowHAAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-15T00:00:40.334Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-15T00:00:40.334Z"
             },
             {
               "$type": "Document",
@@ -264,8 +254,7 @@
               "RelativeToolTip": "sources\\WindowsDataBase\\TileSprite\\TileSpriteData.cs",
               "ViewState": "AgIAAGsAAAAAAAAAAAAEwHkAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-13T21:08:31.254Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-13T21:08:31.254Z"
             },
             {
               "$type": "Document",
@@ -277,8 +266,7 @@
               "RelativeToolTip": "sources\\WindowsDataBase\\TerrainBase\\RuntimeTerrainControl.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-08T01:39:20.376Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-08T01:39:20.376Z"
             },
             {
               "$type": "Document",
@@ -290,8 +278,7 @@
               "RelativeToolTip": "sources\\WindowsDataBase\\TileSprite\\WindowTileSprite.cs",
               "ViewState": "AgIAAO8BAAAAAAAAAAAIwAECAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-08T01:31:34.378Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-08T01:31:34.378Z"
             },
             {
               "$type": "Document",
@@ -303,8 +290,7 @@
               "RelativeToolTip": "sources\\RuntimeEditor\\Editor\\MainEditor.cs",
               "ViewState": "AgIAAB8AAAAAAAAAAADgvywAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-07T20:19:55.58Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-07T20:19:55.58Z"
             },
             {
               "$type": "Document",
@@ -316,18 +302,17 @@
               "RelativeToolTip": "sources\\BlackyTiles\\Commands\\RenderCommandQueue.cs",
               "ViewState": "AgIAABEAAAAAAAAAAAAMwCAAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-05T17:42:57.607Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-05T17:42:57.607Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "BlackyPersistentTilePalette.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyPersistentTilePalette.cs",
               "RelativeDocumentMoniker": "sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyPersistentTilePalette.cs",
               "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyPersistentTilePalette.cs",
               "RelativeToolTip": "sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyPersistentTilePalette.cs",
-              "ViewState": "AgIAAEkAAAAAAAAAAAAAwFAAAAA7AAAAAAAAAA==",
+              "ViewState": "AgIAADcAAAAAAAAAAAArwDwAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-02T17:14:41.827Z",
               "EditorCaption": ""
@@ -342,8 +327,7 @@
               "RelativeToolTip": "sources\\BlackyEngine\\Data\\RegionSaveData.cs",
               "ViewState": "AgIAAFUAAAAAAAAAAAAYwLIBAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-02T17:04:33.261Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-02T17:04:33.261Z"
             },
             {
               "$type": "Document",
@@ -355,8 +339,7 @@
               "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackyTerrainWorldData.cs",
               "ViewState": "AgIAAAcAAAAAAAAAAAAAABUAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-02T17:02:01.52Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-02T17:02:01.52Z"
             },
             {
               "$type": "Document",
@@ -368,8 +351,7 @@
               "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackyRampVisualWorld.cs",
               "ViewState": "AgIAAC0AAAAAAAAAAAAewDgAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-02T16:59:19.326Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-02T16:59:19.326Z"
             },
             {
               "$type": "Document",
@@ -381,8 +363,7 @@
               "RelativeToolTip": "sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyChunkCacheTextureMap.cs",
               "ViewState": "AgIAANEAAAAAAAAAAAD4v+0AAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-01T19:21:39.233Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-01T19:21:39.233Z"
             },
             {
               "$type": "Document",
@@ -394,8 +375,7 @@
               "RelativeToolTip": "sources\\BlackyTiles\\Commands\\CreateTileInstanceTextureCommand.cs",
               "ViewState": "AgIAABgAAAAAAAAAAAAswG0AAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-01T19:09:07.751Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-06-01T19:09:07.751Z"
             },
             {
               "$type": "Document",
@@ -407,8 +387,7 @@
               "RelativeToolTip": "Main3D.cs",
               "ViewState": "AgIAADEAAAAAAAAAAAAgwFQAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T20:50:17.722Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-10T20:50:17.722Z"
             }
           ]
         }

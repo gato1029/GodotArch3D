@@ -208,10 +208,11 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
 
     private void ControlListTexturesAnimated_OnNotifyChangued(ControlListTextures objectControl)
     {
+        
         var tipe = (TileSpriteType)OptionButtonType.Selected;
-
         var datalist=objectControl.GetData();
         List<FrameData> framesArray = new();
+        
         foreach (var item in datalist)
         {
             framesArray.Add(new FrameData() { x= item.x, y= item.y, widht= item.width, height= item.height });
@@ -222,6 +223,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
             case TileSpriteType.Static:
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 objectData.animationData.idMaterial = datalist[0].idMaterial;
                 objectData.animationData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + datalist[0].idMaterial;
                 objectData.animationData.framesArray = framesArray.ToArray();
@@ -248,6 +250,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         switch (selectedType)
         {
             case TileSpriteType.Static:
+            case TileSpriteType.DualStatic:
                 ControlTile.Visible = true;
                 ControlListTexturesAnimated.Visible = false;
                 objectData.animationData = null;
@@ -257,6 +260,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 GridContainerTile.Visible = true;
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 ControlTile.Visible = false;
                 ControlListTexturesAnimated.Visible = true;
                 objectData.animationData = new SpriteAnimationData();
@@ -306,6 +310,8 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.animationData.frameDuration =  (float)SpinBoxFps.Value;
         objectData.animationData.loop = CheckBoxLoop.ButtonPressed;      
         objectData.animationData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + objectData.animationData.idMaterial;
+        objectData.idMaterial = objectData.spriteData.idMaterial;
+
     }
     private void SaveSprite()
     {
@@ -317,6 +323,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.spriteData.offsetY = (float)SpinBoxOffsetY.Value;
         objectData.spriteData.yDepthRender = (float)SpinBoxDepht.Value;       
         objectData.spriteData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + objectData.spriteData.idMaterial;
+        objectData.idMaterial = objectData.spriteData.idMaterial;
 
     }
 
@@ -334,9 +341,11 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         switch (objectData.tileSpriteType)
         {
             case TileSpriteType.Static:
+            case TileSpriteType.DualStatic:
                 SaveSprite();
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 SaveAnimation();
                 break;
             default:
@@ -525,6 +534,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         switch (objectData.tileSpriteType)
         {
             case TileSpriteType.Static:
+            case TileSpriteType.DualStatic:
                 SetDataSprite();
                 ControlTile.Visible = true;
                 ControlListTexturesAnimated.Visible = false;
@@ -533,6 +543,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 GridContainerTile.Visible = true;
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 SetDataSpriteAnimated();
                 ControlTile.Visible = false;
                 ControlListTexturesAnimated.Visible = true;
@@ -561,9 +572,11 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         switch (objectData.tileSpriteType)
         {
             case TileSpriteType.Static:
+            case TileSpriteType.DualStatic:
                 SaveSprite();
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 SaveAnimation();
                 break;
             case TileSpriteType.AnimatedDirectionMultiple:
@@ -628,9 +641,11 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         switch ((TileSpriteType)OptionButtonType.Selected)
         {
             case TileSpriteType.Static:
+            case TileSpriteType.DualStatic:
                 objectData.spriteData.listCollisionBody = geometricShape2Ds;
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 objectData.animationData.collisionBodyArray = geometricShape2Ds.ToList();
                 break;
             case TileSpriteType.AnimatedDirectionMultiple:
@@ -682,9 +697,11 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
             switch ((TileSpriteType)OptionButtonType.Selected)
             {
                 case TileSpriteType.Static:
+                case TileSpriteType.DualStatic:
                     objectData.spriteData.listCollisionBody = data.ToArray();
                     break;
                 case TileSpriteType.Animated:
+                case TileSpriteType.DualAnimated:
                     objectData.animationData.collisionBodyArray = data;
                     break;
                 case TileSpriteType.AnimatedDirectionMultiple:
