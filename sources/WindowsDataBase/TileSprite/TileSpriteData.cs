@@ -39,6 +39,7 @@ public class IdDataLong
 public struct TileInfoKuro
 {
     public int idMaterial;
+    public int index;
     public int x;
     public int y;
     public int width;
@@ -139,6 +140,7 @@ public class TileSpriteData:IdDataLong
         switch (tileSpriteType)
         {
             case TileSpriteType.Static:
+            case TileSpriteType.DualStatic:
                 raw = $"{tileSpriteType}-" +
                     $"{spriteData.idMaterial}-" +
                     $"{spriteData.x:F3}-" +
@@ -149,6 +151,7 @@ public class TileSpriteData:IdDataLong
                     $"{spriteData.mirrorY}";
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 raw = $"{tileSpriteType}-" +
                     $"{animationData.idMaterial}-" +
                     $"{animationData.framesArray[0].x:F3}-" +
@@ -189,9 +192,11 @@ public class TileSpriteData:IdDataLong
         switch (tileSpriteType)
         {
             case TileSpriteType.Static:
+            case TileSpriteType.DualStatic:
                 textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(spriteData);
                 break;
             case TileSpriteType.Animated:
+            case TileSpriteType.DualAnimated:
                 textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(
                     animationData.idMaterial,
                     animationData.framesArray[0].x,

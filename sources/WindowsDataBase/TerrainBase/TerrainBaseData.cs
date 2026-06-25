@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 public class TerrainBaseData: IdDataLong
 {
-    public long idDualTemplate { get; set; }
-    public List<long> rampas { get; set; } = new();
+    // aqui se guard todo en base el idSAVE
+    public long idDualTemplate { get; set; } // de la clase dualtileTemplate
+    //public List<long> rampas { get; set; } = new(); // de la clase TileSpriteData, para las rampas que se pueden poner sobre este terreno
 }
 
-public class SurfaceBaseData : IdDataLong
+public class TerrainRamp : IdDataLong
+{
+    // aqui se guard todo en base el idSAVE
+    public long idTileSpriteData { get; set; } // de la clase TileSpriteData, para las rampas que se pueden poner sobre este terreno
+}
+    public class SurfaceBaseData : IdDataLong
 {
     public long idDuaTemplate { get; set; }
 

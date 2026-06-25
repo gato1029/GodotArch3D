@@ -9,7 +9,7 @@ public partial class WindowKuroTiles : MarginContainer
 
     Vector2 sizeTexture = Vector2.Zero;
     int idCurrentMaterial = -1;
-    public delegate void EventNotifySelection(float x, float y, float width, float height);
+    public delegate void EventNotifySelection(float x, float y, float width, float height,int index);
     public event EventNotifySelection OnNotifySelection;
 
     public delegate void EventNotifyMultiSelection(List<TileInfoKuro> tiles);
@@ -61,9 +61,9 @@ public partial class WindowKuroTiles : MarginContainer
         Grid.SetSizeLineGrid(zoom);
     }
 
-    private void Grid_OnNotifySelection(float x, float y, float width, float height)
+    private void Grid_OnNotifySelection(float x, float y, float width, float height, int index)
     {
-        OnNotifySelection?.Invoke(x, y, width, height);
+        OnNotifySelection?.Invoke(x, y, width, height, index);
     }
     internal void SetTextureEmpty()
     {

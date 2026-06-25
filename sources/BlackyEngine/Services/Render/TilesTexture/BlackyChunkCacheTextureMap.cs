@@ -3,6 +3,7 @@ using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
 using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Generic;
@@ -212,6 +213,40 @@ public class BlackyChunkCacheTextureMap
         return tileId;
 
     }
+
+    public void SetTileDualInternalSprite(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex, bool dual = false)
+    {
+        // 1. Resolvemos el chunk y las coordenadas locales
+        var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
+
+        //AtlasModsManager.Get<TileSpriteData>(modName,)
+        // 2. Le pedimos a la región del chunk que nos dé un ID de su paleta
+        ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex, false);
+         
+        // 3. Guardamos el ID en el chunk
+        // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);
+        tileLayer.SetTile(localX, localY, tileId);
+
+        OnTileChanged?.Invoke(new TileChange
+        {
+            WorldX = worldX,
+            WorldY = worldY,
+            Height = height,
+            Layer = layer,
+            TileId = tileId,
+            region = chunk.ParentRegion,
+            remove = false,
+            dual = dual,
+            isPersistent = false
+
+        });
+
+        chunk.MarkDirty();
+
+
+    }
+
     public void SetTileDualInternal(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex, bool dual = false)
     {
         // 1. Resolvemos el chunk y las coordenadas locales

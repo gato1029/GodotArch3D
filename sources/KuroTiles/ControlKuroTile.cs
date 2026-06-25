@@ -21,6 +21,7 @@ public partial class ControlKuroTile : MarginContainer
     public int width { get; set; } = 0;
     public int height { get; set; } = 0;
 
+    public int index { get; set; } = -1;
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
 	{
@@ -68,13 +69,14 @@ public partial class ControlKuroTile : MarginContainer
 
     
 
-    private void WindowLocal_OnNotifySelection(MaterialData materialData, float x, float y, float width, float height)
+    private void WindowLocal_OnNotifySelection(MaterialData materialData, float x, float y, float width, float height, int index)
     {
         idMaterial = materialData.id;
         this.x = (int)x;
         this.y = (int)y;
         this.width = (int)width;
         this.height = (int)height;
+        this.index = index;
         TextureImage.Texture = MaterialManager.Instance.GetAtlasTextureInternal(materialData.id, x, y, width, height);
         OnNotifyChangued?.Invoke(this);
     }
@@ -105,6 +107,7 @@ public partial class ControlKuroTile : MarginContainer
         {
             idMaterial = idMaterial,
             x = x,
+            index = index,
             y = y,
             width = width,
             height = height,

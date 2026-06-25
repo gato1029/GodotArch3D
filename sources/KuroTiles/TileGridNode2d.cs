@@ -24,7 +24,7 @@ public partial class TileGridNode2d : Node2D
     private bool hasSingleSelection = false;
     Color lineColor = Colors.Red;
 
-    public delegate void EventNotifySelection(float x, float y, float width, float height);
+    public delegate void EventNotifySelection(float x, float y, float width, float height, int index);
     public event EventNotifySelection OnNotifySelection;
 
     public delegate void EventNotifyMultiSelection(List<TileInfoKuro> tiles);
@@ -494,15 +494,15 @@ public partial class TileGridNode2d : Node2D
                     float py = startY * cellSize.Y;
                     float w = (endX - startX + 1) * cellSize.X;
                     float h = (endY - startY + 1) * cellSize.Y;
-
-                    OnNotifySelection?.Invoke(px, py, w, h);
+                    int index = CellToIndex(dragStartCell);
+                    OnNotifySelection?.Invoke(px, py, w, h,index);
 
                     // 🔥 NUEVA MATRIZ LOCAL
                     OnNotifySelectionMatrix?.Invoke(BuildSelectionMatrix(dragStartCell, dragEndCell));
 
                     if (dragStartCell == dragEndCell)
                     {
-                        int index = CellToIndex(dragStartCell);
+                       
                         OnNotifySelectionIndex?.Invoke(index);
                     }
                 }
@@ -650,6 +650,7 @@ public partial class TileGridNode2d : Node2D
 
         foreach (var cell in multiSelectedTiles)
         {
+            int index =CellToIndex(cell);
             int px = cell.X * cellSize.X;
             int py = cell.Y * cellSize.Y;
 
@@ -662,6 +663,7 @@ public partial class TileGridNode2d : Node2D
             TileInfoKuro tile = new TileInfoKuro
             {
                 idMaterial = this.idMaterial,
+                index = index,
                 x = px,
                 y = py,
                 width = cellSize.X,
@@ -716,7 +718,7 @@ public partial class TileGridNode2d : Node2D
         float w = cellSize.X;
         float h = cellSize.Y;
 
-        OnNotifySelection?.Invoke(px, py, w, h);
+        OnNotifySelection?.Invoke(px, py, w, h,index);
         OnNotifySelectionIndex?.Invoke(index);
         OnNotifySelectionMatrix?.Invoke(BuildSelectionMatrix(cell, cell));
         hasSingleSelection = true;

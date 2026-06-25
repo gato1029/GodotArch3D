@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public partial class WindowSearchTileMaterial : Window
 {
-    public delegate void EventNotifySelection(MaterialData materialData,float x, float y, float width, float height);
+    public delegate void EventNotifySelection(MaterialData materialData,float x, float y, float width, float height,int index);
     public event EventNotifySelection OnNotifySelection;
 
     public delegate void EventNotifyMultiSelection(List<TileInfoKuro> tiles);
@@ -134,10 +134,10 @@ public partial class WindowSearchTileMaterial : Window
         ControlKuroTiles.SetTexture((Texture2D)materialData.textureMaterial, materialData.id);
         ControlKuroTiles.SetSelectionMultiple(tiles);
     }
-    private void ControlKuroTiles_OnNotifySelection(float x, float y, float width, float height)
+    private void ControlKuroTiles_OnNotifySelection(float x, float y, float width, float height,int index)
     {
         keepOpen = false;
-        OnNotifySelection?.Invoke(materialData,x, y, width, height);
+        OnNotifySelection?.Invoke(materialData,x, y, width, height,index);
     }
 
     private void ButtonSearch_Pressed()

@@ -227,6 +227,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 objectData.animationData.idMaterial = datalist[0].idMaterial;
                 objectData.animationData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + datalist[0].idMaterial;
                 objectData.animationData.framesArray = framesArray.ToArray();
+                objectData.tileIndex = datalist[0].index;
                 break;
             case TileSpriteType.AnimatedDirectionMultiple:
                 //selectionControlItemAnimation.GetData().sprite.idMaterial = datalist[0].idMaterial;
@@ -839,7 +840,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.spriteData.height = tileData.height;
         objectData.spriteData.idMaterial = tileData.idMaterial;
         objectData.spriteData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + tileData.idMaterial;
-
+        objectData.tileIndex = tileData.index;
         ControlSpriteEdit.SetCellSize(tileData.width, tileData.height);
     }
 
