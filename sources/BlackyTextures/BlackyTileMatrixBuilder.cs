@@ -26,8 +26,8 @@ public static class BlackyTileMatrixBuilder
         int width = endX - startX + 1;
         int height = endY - startY + 1;
 
-        data.width = width;
-        data.height = height;
+        data.width = width * context.CellSize.X;
+        data.height = height * context.CellSize.Y;
         data.atlasStartCell = new Vector2I(startX, startY);
         data.idMaterial = context.IdMaterial;
         data.idMod = context.IdMod;

@@ -52,7 +52,7 @@ public class SpriteData {
     }
 
     [BsonCtor]
-    public SpriteData(string colorString, float offsetX, float offsetY,float yDepthRender,string idModMaterial, float xFormat, float yFormat, float widhtFormat, float heightFormat,  GeometricShape2D[] listCollisionBody)
+    public SpriteData(string colorString, float offsetX, float offsetY,float yDepthRender,string idModMaterial, float x, float y, float widht, float height, bool mirrorX, bool mirrorY, GeometricShape2D[] listCollisionBody)
     {
         offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
         yDepthRenderFormat = MeshCreator.PixelsToUnits(yDepthRender);
@@ -69,8 +69,7 @@ public class SpriteData {
         {
             MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(idModMaterial);
             subIdMaterial = mat.idSubTexture;
-            uv = AtlasModsManager.Instance.CalculateUVFromId(mat,xFormat, yFormat,widhtFormat,heightFormat);
-
+            uv = AtlasModsManager.Instance.CalculateUVFromId(mat,x, y,widht,height,mirrorX, mirrorY);
         }
         else
         {

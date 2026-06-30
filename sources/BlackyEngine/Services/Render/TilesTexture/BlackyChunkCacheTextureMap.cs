@@ -20,7 +20,7 @@ public struct TileChange
     public int WorldY;
     public int Height;
     public int Layer;
-    public ushort TileId;
+    public int SpriteId;
     public BlackyRegion region;
     public bool remove;
     public bool dual; 
@@ -202,7 +202,7 @@ public class BlackyChunkCacheTextureMap
             WorldY = worldY,
             Height = height,
             Layer = layer,
-            TileId = tileId,
+            SpriteId = tileId,
             region = chunk.ParentRegion,
             remove = false,
             dual = DualOffset,
@@ -214,14 +214,14 @@ public class BlackyChunkCacheTextureMap
 
     }
 
-    public void SetTileDualInternalSprite(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex, bool dual = false)
+    public void SetTileDualInternalSprite(int worldX, int worldY, int height, int layer, long idTileSprite)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
 
-        //AtlasModsManager.Get<TileSpriteData>(modName,)
+
         // 2. Le pedimos a la región del chunk que nos dé un ID de su paleta
-        ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex, false);
+        int tileId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);
          
         // 3. Guardamos el ID en el chunk
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
@@ -234,10 +234,10 @@ public class BlackyChunkCacheTextureMap
             WorldY = worldY,
             Height = height,
             Layer = layer,
-            TileId = tileId,
+            SpriteId = tileId,
             region = chunk.ParentRegion,
             remove = false,
-            dual = dual,
+            dual = true,
             isPersistent = false
 
         });
@@ -266,7 +266,7 @@ public class BlackyChunkCacheTextureMap
             WorldY = worldY,
             Height = height,
             Layer = layer,
-            TileId = tileId,
+            SpriteId = tileId,
             region = chunk.ParentRegion,
             remove = false,
             dual = dual,
@@ -637,14 +637,15 @@ public class BlackyChunkCacheTextureMap
             }
             else
             {
-                SetTileDualInternal(
-                     vx,
-                     vy - i,
-                     height,
-                     layer,
-                     item.IdMod,
-                     (ushort)item.TileIndex, true
-                 );
+                SetTileDualInternalSprite(vx,vy - i,height,layer,item.IdTileSpriteData);
+                //SetTileDualInternal(
+                //     vx,
+                //     vy - i,
+                //     height,
+                //     layer,
+                //     item.IdMod,
+                //     (ushort)item.TileIndex, true
+                // );
             }
          
         }

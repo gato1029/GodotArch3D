@@ -7,7 +7,7 @@ using GodotFlecs.sources.Flecs.Systems;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Transforms;
 
-internal class TileTextureTransformSystem : FlecsSystemBase
+internal class TileSpriteTextureTransformSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
@@ -16,7 +16,7 @@ internal class TileTextureTransformSystem : FlecsSystemBase
         qb.With<PositionComponent>()
           .With<RenderGPUComponent>()
           .With<RenderTransformComponent>()
-          .With<TileTextureComponent>()
+          .With<TileSpriteTextureComponent>()
           .With<DirtyTransformTag>();          
     }
 
@@ -33,12 +33,6 @@ internal class TileTextureTransformSystem : FlecsSystemBase
             ref var t = ref trans[i];
 
             float depthOffset = (r.zOrdering);
-            //float depthValue = p.position.Y
-            //       + depthOffset
-            //        - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
-
-            //float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
-
             float renderZ = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position);
 
             Vector2 newWorldPos = TilesHelper.TilePositionToWorldPosition(p.tilePosition);

@@ -19,7 +19,7 @@ public partial class ControlArrayTileDual : PanelContainer
 
     private void ButtonRemoverTodo_Pressed()
     {
-        if (dualTileData.Height>0)
+        //if (dualTileData.Height>0)
         {
             OnControlArrayTileDualRemoved?.Invoke(this);
         }

@@ -95,7 +95,7 @@ public sealed class BlackyWorldServices
         // Runtime authoring services
         // ============================
 
-        TerrainTextureRenderSystem = new BlackyTileTextureRenderSystem(TerrainTexturePainter, stream.chunkManagerLocal);
+        TerrainTextureRenderSystem = new BlackyTileTextureRenderSystem(TerrainTexturePainter, stream.chunkManagerLocal,sim.Flecs);
 
         Characters = new BlackyCharacterCreator(
             sim.Flecs,

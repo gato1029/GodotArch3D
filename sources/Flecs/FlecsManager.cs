@@ -183,7 +183,7 @@ public class FlecsManager
        // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
         RegisterSystem<SpriteTransformSystem>();
         RegisterSystem<SpriteTransformLayerSystem>();
-        RegisterSystem<TileTextureTransformSystem>();
+        RegisterSystem<TileSpriteTextureTransformSystem>();
 
         // estados
         RegisterSystem<CharacterStateLayerSystem>();        
@@ -198,7 +198,7 @@ public class FlecsManager
         RegisterSystem<RenderSpriteTileSystem>();
         RegisterSystem<RenderSpriteSystem>();
         RegisterSystem<LayeredSpriteRenderSystem>();
-        RegisterSystem<RenderTileTextureSystem> ();
+        RegisterSystem<RenderTileSpriteTextureSystem> ();
         RegisterSystem<HumanCameraMoveSystem>();
         
         //RegisterSystem<RvoDebugSystem>();

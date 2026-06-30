@@ -28,7 +28,7 @@ public partial class RuntimeTerrainControl : PanelContainer
         var dual = MasterDataManager.GetData<DualTileTemplate>(data.idDualTemplate);
         LineEditName.Text = data.name;
         ButtonDual.IconTexture = dual.textureVisual;
-        ControlSprites.SetIdTiles(data.rampas);
+        //ControlSprites.SetIdTiles(data.rampas);
     }
 
     private void ButtonDual_Pressed()
@@ -70,7 +70,7 @@ public partial class RuntimeTerrainControl : PanelContainer
     private void ButtonGuardar_Pressed()
     {
         data.name = LineEditName.Text;
-        data.rampas = ControlSprites.GetIdTiles();
+        //data.rampas = ControlSprites.GetIdTiles();
         DataBaseManager.Instance.InsertUpdate(data);
         KuroItems.RefreshObject(data);
     }

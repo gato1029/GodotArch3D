@@ -1,6 +1,7 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotFlecs.sources.Flecs.Components;
@@ -35,8 +36,8 @@ internal class AnimationTileSpriteSystem : FlecsSystemBase
         {
             ref var a = ref animation[i];       
             ref var f = ref frame[i];
-
-            var dataAnim = MasterDataManager.GetData<TileSpriteData>(a.idSpriteOrAnimation).animationData;
+            AtlasModsManager.TryGetTileSprite((int)a.idSpriteOrAnimation, out TileSpriteData tileSpriteData);
+            var dataAnim = tileSpriteData.animationData;   // MasterDataManager.GetData<TileSpriteData>(a.idSpriteOrAnimation).animationData;
             a.TimeSinceLastFrame += delta;
             if (a.TimeSinceLastFrame >= a.frameDuration && a.active)
             {

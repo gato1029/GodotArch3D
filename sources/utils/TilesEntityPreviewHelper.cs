@@ -3,11 +3,14 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
 using GodotEcsArch.sources.BlackyTiles.Commands;
+using GodotEcsArch.sources.Flecs.Creators;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
 
 namespace GodotEcsArch.sources.utils;
 
@@ -28,7 +31,12 @@ public struct TilePreviewData
     public int idMaterial;
     public string idMod;
     public int index;
+    public long idSprite;
 
+    public TilePreviewData(long idSprite)
+    {
+        this.idSprite = idSprite;
+    }
     public TilePreviewData(int idMaterial, string idMod, int index, bool isEmpty = false)
     {
         this.idMaterial = idMaterial;
@@ -65,6 +73,22 @@ public static class TilesEntityPreviewHelper
     // =========================================================
     // CREATE SIMPLE RECTANGLE (MISMO TILE)
     // =========================================================
+
+    internal static void Create(Vector2I size, long idTileSpriteData)
+    {
+        Clear();
+        TilePreviewData[,] matrixData = new TilePreviewData[size.X, size.Y];
+
+        for (int x = 0; x < size.X; x++)
+        {
+            for (int y = 0; y < size.Y; y++)
+            {
+                matrixData[x, y] = new TilePreviewData(idTileSpriteData);
+            }
+        }
+
+        Create(matrixData);
+    }
 
     public static void Create(Vector2I size, string NameMod_IDMaterial, int index)
     {
@@ -152,13 +176,8 @@ public static class TilesEntityPreviewHelper
 
                 Vector2I localOffset = new Vector2I(x, y);
 
-                var entity = TilesEntityTextureCreatorHelper.CreateSingle(
-                    BlackyWorldContext.Flecs,
-                    tileData.idMaterial,
-                    tileData.idMod,
-                    tileData.index,
-                    localOffset
-                );
+
+                var entity = TilesEntityTextureCreatorHelper.CreateSingle(BlackyWorldContext.Flecs,tileData.idSprite,localOffset);
 
                 _previewEntities[x, y] = entity;
             }
@@ -328,5 +347,6 @@ public static class TilesEntityPreviewHelper
     {
         return _pivot;
     }
-    
+
+
 }

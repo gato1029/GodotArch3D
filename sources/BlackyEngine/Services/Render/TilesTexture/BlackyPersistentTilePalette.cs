@@ -47,15 +47,40 @@ public abstract class BlackyTilePaletteBase
 {
     protected ushort idIncremental = 1;
 
+    
     //protected Dictionary<ushort, TileDataMod> palette = new();
     //protected Dictionary<(int subTextureId, ushort index), ushort> lookup = new();
 
     protected Dictionary<ushort, TileSpriteData> paletteSprite = new();
     protected Dictionary<(int subTextureId, ushort index), ushort> lookupSprite = new();
 
+    protected int idIncrementalHard = 1;
+    protected Dictionary<long, TileSpriteData> paletteSpriteHard = new();
+    protected Dictionary<(int subTextureId, long idTileSprite), int> lookupSpriteHard = new();
+
     /// <summary>
     /// Crea o retorna un tile ya cacheado.
     /// </summary>
+    /// 
+    protected int CreateSprite(string modName, long idTileSprite)
+    {
+        var data = AtlasTexturesModsManager.Instance.GetMaterialTexture(modName);                
+        if (data == null)
+        {
+            GD.PrintErr($"Mod no encontrado: {modName}");
+            return 0;
+        }
+
+        var key = (data.idSubTexture, idTileSprite);
+        if (lookupSpriteHard.TryGetValue(key, out int existingId))
+            return existingId;
+
+        TileSpriteData tileSpriteData = AtlasModsManager.Get<TileSpriteData>(modName, idTileSprite);
+
+        int newId = idIncrementalHard++;
+        lookupSpriteHard[key] = newId;
+        return newId;
+    }
     protected ushort CreateTileInternal(string modName, ushort indexTexture)
     {
         var data = AtlasTexturesModsManager.Instance.GetMaterialTexture(modName);

@@ -173,7 +173,7 @@ public record struct RenderDisabledTag();
 
 
 [RegisterComponentFlecs]
-public record struct DirtyTileRenderTag();
+public record struct DirtyTileSpriteTextureRenderTag();
 
 [RegisterComponentFlecs]
 public record struct DirtyTransformTag();
@@ -359,10 +359,9 @@ public record struct ColliderDebugComponent
 
 
 [RegisterComponentFlecs]
-public record struct TileTextureComponent
+public record struct TileSpriteTextureComponent
 (
-    ushort indexTile,
-    bool isAnimated
+    int idSpriteInternal
 );
 
 // El componente que se añade a cualquier entidad que necesite colisiones

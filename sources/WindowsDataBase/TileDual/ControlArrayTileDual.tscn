@@ -40,6 +40,7 @@ size_flags_vertical = 3
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=518757674]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0

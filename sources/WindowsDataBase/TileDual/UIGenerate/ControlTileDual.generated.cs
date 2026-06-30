@@ -7,10 +7,12 @@ public partial class ControlTileDual : PanelContainer
     public delegate void EventNotifyChangued(ControlTileDual objectControl);
     public event EventNotifyChangued OnNotifyChangued;
 
-    private TextureRect TileTexture;
+    private Button ButtonRemove;
+    private ControlListTileSprite ControlTileSprite;
 
     public void InitializeUI()
     {
-        TileTexture = GetNode<TextureRect>("TileTexture");
+        ButtonRemove = GetNode<Button>("Panel/ButtonRemove");
+        ControlTileSprite = GetNode<ControlListTileSprite>("ControlTileSprite");
     }
 }

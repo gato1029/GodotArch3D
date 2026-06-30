@@ -42,8 +42,8 @@ public class DestroyTileInstanceTextureCommand : IRenderCommand
             textureInstance.InstanceId
         );
         if (textureInstance.HasEntity)
-        {
-            // aqui se debe liberar entidad
+        {            
+            textureInstance.Entity.Destruct();
         }
         chunkRender.Remove((height, layer, x, y));
     }

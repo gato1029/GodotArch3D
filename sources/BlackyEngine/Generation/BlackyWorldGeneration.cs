@@ -69,7 +69,7 @@ public  class BlackyWorldGeneration
     }
     private void OnChunkPreloadRequested(Vector2I chunk)
     {
-        GenerateChunk(chunk);
+        //GenerateChunk(chunk);
     }
     private void ConfigureResourceRules()
     {

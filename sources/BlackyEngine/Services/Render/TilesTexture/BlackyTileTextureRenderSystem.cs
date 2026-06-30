@@ -7,6 +7,8 @@ using GodotEcsArch.sources.managers.Chunks;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
 using Flecs.NET.Core;
+using GodotEcsArch.sources.managers.Mods;
+using GodotFlecs.sources.Flecs;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
@@ -19,7 +21,7 @@ public class TileRenderTextureInstance
 
     // esta para comparacion 
     public int SubTextureId;
-    public ushort Index;
+    public int idSprite;
 
     public TileRenderTextureInstance() { }
     public TileRenderTextureInstance(Rid rid, int instanceId)
@@ -88,20 +90,16 @@ public class BlackyTileTextureRenderSystem
 
     private readonly BlackyChunkCacheTextureMap chunkMap;
     private readonly ChunkManagerBase chunkManager;
+    private readonly FlecsManager flecsManager;
 
-    // chunk → instances
-    //private readonly Dictionary<Vector2I,
-    //    Dictionary<(int height, int layer, int x, int y), BlackyTileRenderInstance>>
-    //    chunkRenderInstances = new();
 
     private readonly Dictionary<Vector2I, BlackyChunkRenderTiles> chunkRenderInstances = new Dictionary<Vector2I, BlackyChunkRenderTiles>();
 
-    public BlackyTileTextureRenderSystem(
-        BlackyChunkCacheTextureMap chunkMap,
-        ChunkManagerBase chunkManager)
+    public BlackyTileTextureRenderSystem(BlackyChunkCacheTextureMap chunkMap,ChunkManagerBase chunkManager,FlecsManager flecsManager)
     {
         this.chunkMap = chunkMap;
         this.chunkManager = chunkManager;
+        this.flecsManager = flecsManager;
         chunkMap.OnTileChanged += HandleTileChanged;
         chunkManager.OnChunkLoad += OnChunkLoad;
         chunkManager.OnChunkUnload += OnChunkUnload;
@@ -238,7 +236,7 @@ public class BlackyTileTextureRenderSystem
         // aqui notifica cuando un tile cambio y debemos repintarlo
         var chunkCoord = chunkMap.WorldToChunkCoord(change.WorldX, change.WorldY);
         Vector2I pos = new(chunkCoord.X, chunkCoord.Y);
-        RenderTile(pos, change.Height, change.Layer, change.WorldX, change.WorldY, change.TileId, change.region,change.remove,change.dual,change.isPersistent);
+        RenderTile(pos, change.Height, change.Layer, change.WorldX, change.WorldY, change.SpriteId, change.region,change.remove,change.dual,change.isPersistent);
     }
 
     private void RenderTile(
@@ -247,7 +245,7 @@ public class BlackyTileTextureRenderSystem
         int layer,
         int worldX,
         int worldY,
-        ushort tileId,
+        int tileId,
         BlackyRegion region, bool remove, bool dual, bool isPersistent)
     {
         
@@ -277,27 +275,15 @@ public class BlackyTileTextureRenderSystem
         // =====================================================
         // OBTENER NUEVA DATA
         // =====================================================
-        region.TryGetTileDataMod(tileId, out TileSpriteData tileDataMod,isPersistent);
+        AtlasModsManager.TryGetTileSprite(tileId, out TileSpriteData tileDataMod);
+        //region.TryGetTileDataMod(tileId, out TileSpriteData tileDataMod,isPersistent);
 
         // =====================================================
         // SI YA EXISTE Y ES LA MISMA TEXTURA -> IGNORAR
         // =====================================================
         if (instance != null)
-        {
-            int subTextureId = 0;
-            switch (tileDataMod.tileSpriteType)
-            {
-                case TileSpriteType.DualStatic:
-                    subTextureId = tileDataMod.spriteData.subIdMaterial;
-                    break;
-                case TileSpriteType.DualAnimated:                    
-                    subTextureId = tileDataMod.animationData.subIdMaterial;
-                    break;
-                default:
-                    break;
-            }
-            if (instance.SubTextureId == subTextureId &&
-                instance.Index == tileDataMod.tileIndex)
+        {        
+            if (instance.idSprite == tileId)
             {
                 return;
             }
@@ -312,7 +298,7 @@ public class BlackyTileTextureRenderSystem
         // CREAR NUEVA
         // =====================================================
         RenderCommandQueue.Enqueue(
-            new CreateTileInstanceTextureCommand(height, layer, worldX, worldY, dual, tileDataMod, chunkRender));
+            new CreateTileInstanceTextureCommand(tileId, height, layer, worldX, worldY, dual, tileDataMod, chunkRender,flecsManager));
     }
    
 

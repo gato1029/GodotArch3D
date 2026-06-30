@@ -1,12 +1,13 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
-
+using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,16 +43,17 @@ internal class SpriteTransformSystem : FlecsSystemBase
             ref var t = ref trans[i];
 
             float depthOffset = (r.zOrdering);
-            float depthValue = p.position.Y 
-                   + depthOffset
-                    - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
+            
+            float z = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
 
-            float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
+            //float depthValue = p.position.Y + depthOffset - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
+
+            //float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
             
             //r.originOffset.Y 
             //float renderZ = ((p.position.Y + r.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + r.layerRender;
             var tt = t.transform;
-            tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, renderZ);
+            tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, z);
             t.transform = tt; 
         }
     }
@@ -87,11 +89,14 @@ internal class SpriteTransformLayerSystem : FlecsSystemBase
                 ref var t = ref l.Transforms[j];
 
                 float depthOffset = (gpu.zOrdering);
-                float depthValue = p.position.Y 
-                        + depthOffset
-                        - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
+                //float depthValue = p.position.Y 
+                //        + depthOffset
+                //        - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
 
-                float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + gpu.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
+                //float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + gpu.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
+                
+                float z = CommonAtributes.Calculate(depthOffset, p.height, gpu.layerRender, p.position); // debemos usar esto apartir de ahora
+
                 //GD.Print("character:"+renderZ);
                 //float renderZ = (p.position.Y + gpu.zOrdering)
                 //    * CommonAtributes.LAYER_MULTIPLICATOR + gpu.layerRender;
@@ -100,7 +105,7 @@ internal class SpriteTransformLayerSystem : FlecsSystemBase
                 tt.Origin = new Vector3(
                     p.position.X + gpu.originOffset.X,
                     p.position.Y + gpu.originOffset.Y,
-                    renderZ
+                    z
                 );
                 t.transform = tt;
             }
@@ -135,16 +140,17 @@ internal class SpriteTransformStaticSystem : FlecsSystemBase
             ref var t = ref trans[i];
 
             float depthOffset = (r.zOrdering);
-            float depthValue = p.position.Y
-                    + depthOffset
-                    - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
+            //float depthValue = p.position.Y
+            //        + depthOffset
+            //        - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
 
-            float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
+            //float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
             //float renderZ = (p.position.Y  + r.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender;
 
+            float z = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
 
             var tt = t.transform;
-            tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, renderZ);
+            tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, z);
             t.transform = tt;           
         }
     }

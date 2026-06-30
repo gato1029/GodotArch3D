@@ -13,6 +13,7 @@ using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
+using SadRogue.Primitives;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,6 +35,10 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // =========================================================
     // ATLASES (ID -> DATA)
     // =========================================================
+
+    int palleteCount = 0;
+    private readonly Dictionary<long, int> spriteLookup = new();
+    private readonly Dictionary<int, TileSpriteData> spritePallete = new();
 
     // Datos solo cacheados nunca en disco, resueltos de otra forma
     private readonly AtlasMods<int, MaterialData> materiales = new(); // estos nunca se guardan en disco solo en memoria, resuelto de otra forma
@@ -85,8 +90,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         if (!_atlases.TryGetValue(typeof(T), out var meta))
             return null;
 
-        GD.Print($"Buscando: {typeof(T).Name}<{typeof(TKey).Name}>");
-        GD.Print($"Encontrado: {meta.Atlas.GetType()}");
+
 
         return meta.Atlas as AtlasMods<TKey, T>;
     }
@@ -121,6 +125,31 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     // =========================================================
     // 🟢 API PRINCIPAL (NORMAL - modName)
     // =========================================================
+    public static int GetSpriteUniqueId(long tileSpriteId)
+    {
+        return Instance.IdSpriteUniqueId(tileSpriteId, out _);
+    }
+    public static int GetSpriteUniqueId(long tileSpriteId, out TileSpriteData tileSpriteData)
+    {
+        return Instance.IdSpriteUniqueId(tileSpriteId, out tileSpriteData);        
+    }
+    public static bool TryGetTileSprite(int idSpriteInternal, out TileSpriteData tileSpriteData)
+    {
+        return Instance.GetTileSprite(idSpriteInternal, out tileSpriteData);
+    }
+    private bool GetTileSprite(int idSpriteInternal, out TileSpriteData tileSpriteData)
+    {
+        if (spritePallete.TryGetValue(idSpriteInternal, out tileSpriteData))            
+            return true;
+        tileSpriteData = null;
+        return false;
+    }
+    private int IdSpriteUniqueId(long tileSpriteId, out TileSpriteData tileSpriteData)
+    {
+        var key = spriteLookup[tileSpriteId];
+        tileSpriteData = spritePallete[key];
+        return key;        
+    }
 
     public static T Get<T>(string modName, int id) where T : class
         => Instance.InternalGet<T, int>(modName, id);
@@ -351,26 +380,41 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             var tileSprite = item as TileSpriteData;
             tileSprite.idMod = idMod;
             tileSprite.nameMod = nameMod;
-            //          
-            if (tileSprite.tileSpriteType == TileSpriteType.DualStatic || tileSprite.tileSpriteType == TileSpriteType.DualAnimated)
-            {
 
-                string key = nameMod+":"+ item.idMaterial + ":" + item.tileIndex;
-                if (!_tilesSpriteByMaterialIndex.ContainsKey(idMod))
-                {
-                    _tilesSpriteByMaterialIndex[idMod] = new MultiIndex<int, TileSpriteData>();
-                }
+            GetOrCreateSpriteId(tileSprite.id, tileSprite);
 
-                MultiIndex<int, TileSpriteData> indexMod = _tilesSpriteByMaterialIndex[idMod];
-                indexMod.Add(item.idMaterial, tileSprite);
-                tilesSpriteDataDual.Register(idMod, key, item);
-            }
-            else
-            {
-                atlas.Register(idMod, tileSprite.id, tileSprite);
-            }
+            ////          
+            //if (tileSprite.tileSpriteType == TileSpriteType.DualStatic || tileSprite.tileSpriteType == TileSpriteType.DualAnimated)
+            //{
+
+            //    string key = nameMod+":"+ item.idMaterial + ":" + item.tileIndex;
+            //    if (!_tilesSpriteByMaterialIndex.ContainsKey(idMod))
+            //    {
+            //        _tilesSpriteByMaterialIndex[idMod] = new MultiIndex<int, TileSpriteData>();
+            //    }
+
+            //    MultiIndex<int, TileSpriteData> indexMod = _tilesSpriteByMaterialIndex[idMod];
+            //    indexMod.Add(item.idMaterial, tileSprite);
+            //    tilesSpriteDataDual.Register(idMod, key, item);
+            //}
+            //else
+            //{
+            //    atlas.Register(idMod, tileSprite.id, tileSprite);
+                
+            //}
             
         }
+    }
+    
+    int GetOrCreateSpriteId(long tileSpriteId, TileSpriteData tileSpriteData)
+    {        
+        if (spriteLookup.TryGetValue(tileSpriteId, out int id))
+            return id;
+
+        int newId = palleteCount++;        
+        spriteLookup[tileSpriteId] = newId;
+        spritePallete[newId] = tileSpriteData;  
+        return newId;
     }
     private void ActualizarUvsTileSprite(TileSpriteData tileSprite)
     {
@@ -420,14 +464,22 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         }
         return uvList;
     }
-    public Godot.Color CalculateUVFromId(MaterialModData data, float xFormat, float yFormat, float widhtFormat, float heightFormat)
-    {                
-        return new Godot.Color(
-            data.xInAtlas + (xFormat),
-            data.yInAtlas + (yFormat),
-            widhtFormat,
-            heightFormat
-        );
+    public Godot.Color CalculateUVFromId(MaterialModData data, float xFormat, float yFormat, float widhtFormat, float heightFormat, bool mirrorX, bool mirrorY)
+    {
+
+        
+        var offset = new Vector2(data.xInAtlas, data.yInAtlas);
+
+        // Calcular nueva posición y tamaño
+        float newX = offset.X + xFormat;
+        float newY = offset.Y + yFormat;
+
+        Godot.Color uvColor = new Godot.Color();
+        uvColor.R = newX;
+        uvColor.G = newY;
+        uvColor.B = mirrorX ? -widhtFormat : widhtFormat;
+        uvColor.A = mirrorY ? -heightFormat : heightFormat;
+        return uvColor;        
     }
     private void CargarDatosBase<T>(AtlasMods<long, T> atlas, ushort idMod, string nameMod) where T : IdDataLong
     {

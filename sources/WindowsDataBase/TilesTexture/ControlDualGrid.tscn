@@ -83,6 +83,7 @@ size_flags_vertical = 3
 columns = 16
 
 [node name="PanelContainer" type="PanelContainer" parent="HBoxContainer2/VBoxContainer/HBoxContainer" unique_id=1110221428]
+visible = false
 layout_mode = 2
 
 [node name="ControlVisualizadorTexture" parent="HBoxContainer2/VBoxContainer/HBoxContainer/PanelContainer" unique_id=434538793 instance=ExtResource("1_hyn27")]

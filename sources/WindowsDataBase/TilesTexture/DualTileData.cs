@@ -51,6 +51,7 @@ public class DualTileData
 // Parte inferior del dual tile
 public class DualTilePart
 {
+    public long IdTileSpriteData { get; set; } // de la clase TileSpriteData
     public int TileIndex { get; set; }
 
     public string IdMod { get; set; } = "";    
@@ -149,7 +150,7 @@ public class DualTileTemplate:IdDataLong
     [BsonCtor]
     public DualTileTemplate(DualTileSlot[] slots) 
     {
-        var  data =slots[1].GetGeneric(); // Asegurar que el slot 0 tenga un dato genérico
+        var  data =slots[2].GetGeneric(); // Asegurar que el slot 0 tenga un dato genérico
         var  part = data.GetPart(0);
         var temp = AtlasModsManager.GetAtlasTexture(part.IdMod, part.TileIndex, out bool isAnimated, out TileTextureData tileTextureData);
         if (!isAnimated)

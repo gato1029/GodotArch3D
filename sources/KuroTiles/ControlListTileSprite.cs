@@ -24,12 +24,23 @@ public partial class ControlListTileSprite : MarginContainer
 
     public long GetidTile()
     {
-        return GetIdTiles().First(); 
+        if (HBoxContainerTiles.GetChildCount()>0)
+        {
+            return GetIdTiles().First();
+        }
+        else
+        {
+            return -1;
+        }
+        
     }
     public void SetIdTile(long id)
     {
-        var dataTile = TileSpriteManager.Instance.GetData(id);
-        WindowTile_OnNotifySelected(dataTile);
+        if (id !=-1)
+        {
+            var dataTile = TileSpriteManager.Instance.GetData(id);
+            WindowTile_OnNotifySelected(dataTile);
+        }        
     }
     public List<long> GetIdTiles()
     {

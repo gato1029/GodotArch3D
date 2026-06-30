@@ -95,7 +95,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                         
                         break;
                     case ModePaint.AUTO_DUAL:
-                        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), dualTileTemplate.GetSlot(1).GetData(0).GetPart(0).IdMod, dualTileTemplate.GetSlot(15).GetData(0).GetPart(0).TileIndex);
+                        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), dualTileTemplate.GetSlot(15).GetData(0).GetPart(0).IdTileSpriteData);
 
                         break;
                 }
@@ -233,7 +233,10 @@ public partial class WindowEditorRuntimeTerrain : Window
         modeEditorTerrain = ModeEditorTerrain.CREACION;
         dualTileTemplate = objeto;
         ConfigModePaint(ModePaint.AUTO_DUAL);
-        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), objeto.GetSlot(1).GetData(0).GetPart(0).IdMod, objeto.GetSlot(15).GetData(0).GetPart(0).TileIndex);
+        // aqui debes cambiarlo por sprite
+        //TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), objeto.GetSlot(1).GetData(0).GetPart(0).IdMod, objeto.GetSlot(15).GetData(0).GetPart(0).TileIndex);
+        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush),objeto.GetSlot(1).GetData(0).GetPart(0).IdTileSpriteData);
+
         AnyWindowOpen = false;
     }
 

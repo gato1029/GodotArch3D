@@ -6,7 +6,7 @@ using GodotFlecs.sources.Flecs.Systems;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Rendering;
 
-internal class RenderTileTextureSystem : FlecsSystemBase
+internal class RenderTileSpriteTextureSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
@@ -15,8 +15,8 @@ internal class RenderTileTextureSystem : FlecsSystemBase
         qb.With<RenderGPUComponent>()
            .With<RenderFrameDataComponent>()
            .With<RenderTransformComponent>()
-           .With<TileTextureComponent>()
-           .With<DirtyTileRenderTag>() // solo si esta sucio volvemos a dibujar
+           .With<TileSpriteTextureComponent>()
+           .With<DirtyTileSpriteTextureRenderTag>() // solo si esta sucio volvemos a dibujar
            .Without<RenderDisabledTag>();
     }
 
@@ -34,7 +34,7 @@ internal class RenderTileTextureSystem : FlecsSystemBase
            // RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform);
             RenderingServer.MultimeshInstanceSetCustomData(r.rid, r.instance, f.uvMap);
             RenderingServer.MultimeshInstanceSetColor(r.rid, r.instance, new Color(0, 0, 0, r.layerTextureMaterial));
-            it.Entity(i).Remove<DirtyTileRenderTag>();
+            it.Entity(i).Remove<DirtyTileSpriteTextureRenderTag>();
         }
     }
 }
