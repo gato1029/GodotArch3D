@@ -162,6 +162,7 @@ public class ChunkManagerBase
 
         foreach (var chunk in newVisible)
         {
+            GD.Print($"RequestLoadChunk {chunk}");
             if (!activeChunks.Contains(chunk))
             {
                 activeChunks.Add(chunk);
@@ -175,6 +176,7 @@ public class ChunkManagerBase
 
         foreach (var chunk in new List<Vector2I>(activeChunks))
         {
+             
             if (!newVisible.Contains(chunk))
             {
                 activeChunks.Remove(chunk);

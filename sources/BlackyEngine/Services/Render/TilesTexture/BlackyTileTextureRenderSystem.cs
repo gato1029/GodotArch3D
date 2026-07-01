@@ -1,14 +1,16 @@
+
+using Flecs.NET.Core;
+using Godot;
+using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
+using GodotEcsArch.sources.BlackyTiles.Commands;
+using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.managers.Tilemap;
+using GodotFlecs.sources.Flecs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GodotEcsArch.sources.BlackyTiles.Commands;
-
-using GodotEcsArch.sources.managers.Chunks;
-using Godot;
-using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
-using Flecs.NET.Core;
-using GodotEcsArch.sources.managers.Mods;
-using GodotFlecs.sources.Flecs;
+using System.Reflection.Emit;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
@@ -103,6 +105,7 @@ public class BlackyTileTextureRenderSystem
         chunkMap.OnTileChanged += HandleTileChanged;
         chunkManager.OnChunkLoad += OnChunkLoad;
         chunkManager.OnChunkUnload += OnChunkUnload;
+        
     }
 
 
@@ -112,29 +115,23 @@ public class BlackyTileTextureRenderSystem
     // ===============================
 
     private void OnChunkUnload(Vector2I coord)
-    {
+    { 
+        //GD.Print($"OnChunkUnload {coord}");
         if (!chunkRenderInstances.TryGetValue(coord, out var dict))
             return;
 
         foreach (var instance in dict.GetAll())
-        {
-            
-
-            instance.MarkDestroyed();
-            //mejorar
-
-            //RenderCommandQueue.Enqueue(new RemoveInstanceCommand(instance));
-
-            //if (instance.HasEntityReference)
-            //    RenderCommandQueue.Enqueue(new DestroyTileEntityCommand(instance));
+        {                        
+            instance.MarkDestroyed();            
+            RenderCommandQueue.Enqueue(new DestroyTileInstanceTextureCommand(instance));         
         }
-
         dict.Clear();
         chunkRenderInstances.Remove(coord);
     }
 
     private void OnChunkLoad(Vector2I coord)
     {
+        //GD.Print($"OnChunkLoad {coord}");
         if (!chunkMap.TryGetChunk(coord.X, coord.Y, out var chunk))
             return;
 
@@ -142,12 +139,6 @@ public class BlackyTileTextureRenderSystem
         {
             BuildChunk(chunk);
         }
-
-        //if (chunk.HasDirtyTiles())
-        //{
-        //    RebuildDirty(chunk);
-        //}
-
         if (chunk.IsDirty)
         {
             //OnRefreshDirtyChunk?.Invoke(chunk);
@@ -178,10 +169,8 @@ public class BlackyTileTextureRenderSystem
                         bool isDual = layer.GetDualMask(x, y) != 0;
                         if (tileId == 0)
                             continue;
-
-                        //RemoveTile(coord, height.Height, layer.LayerIndex, x, y);
-
-                        //RenderTile(coord, height.Height, layer.LayerIndex, x, y, tileId, chunk);
+                        var (worldX, worldY) = LocalToWorld(coord.X, coord.Y, x, y);
+                        RenderTile(coord, height.Height, layer.LayerIndex, worldX, worldY, tileId, null, false, true, false);
                     }
                 }
             }
@@ -248,7 +237,8 @@ public class BlackyTileTextureRenderSystem
         int tileId,
         BlackyRegion region, bool remove, bool dual, bool isPersistent)
     {
-        
+        GD.Print($"RenderTile {chunkCoord} {height} {layer} {worldX} {worldY} {tileId}");
+
         if (!chunkRenderInstances.TryGetValue(chunkCoord, out var chunkRender))
         {
             chunkRender = new();
@@ -300,7 +290,17 @@ public class BlackyTileTextureRenderSystem
         RenderCommandQueue.Enqueue(
             new CreateTileInstanceTextureCommand(tileId, height, layer, worldX, worldY, dual, tileDataMod, chunkRender,flecsManager));
     }
-   
+    public (int worldX, int worldY) LocalToWorld(
+     int chunkX,
+     int chunkY,
+     int localX,
+     int localY)
+    {
+        return (
+            chunkX * chunkManager.chunkDimencion.X + localX,
+            chunkY * chunkManager.chunkDimencion.Y + localY
+        );
+    }
 
 
 }

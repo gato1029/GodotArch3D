@@ -3,14 +3,14 @@
   "profiles": {
 	"Godot Debug": {
 	  "commandName": "Executable",
-	  "executablePath": "D:/godot/Godot_v4.6.3-stable_mono_win64/Godot_v4.6.3-stable_mono_win64/Godot_v4.6.3-stable_mono_win64.exe",
+	  "executablePath": "D:/godot/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64.exe",
 	  "commandLineArgs": "--path . --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
 	"Godot Debug MainEditor": {
 	  "commandName": "Executable",
-	  "executablePath": "D:/godot/Godot_v4.6.3-stable_mono_win64/Godot_v4.6.3-stable_mono_win64/Godot_v4.6.3-stable_mono_win64.exe",
+	  "executablePath": "D:/godot/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64.exe",
 	  "commandLineArgs": "--upwards ./sources/RuntimeEditor/Editor/MainEditor.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
