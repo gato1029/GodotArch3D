@@ -36,6 +36,11 @@ public abstract class BlackyChunkTilemapTextureBase : IBlackyChunkTilemapTexture
 
     public abstract void SetDualMask(int x, int y, byte mask);
     public abstract byte GetDualMask(int x, int y);
+
+    public abstract void SetRender(int x, int y, bool value);
+    public abstract bool IsRender(int x, int y);
+
+
     protected BlackyChunkTilemapTextureBase(int layerIndex, int size, int worldX, int worldY)
     {
         LayerIndex = layerIndex;

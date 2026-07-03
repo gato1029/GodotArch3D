@@ -166,11 +166,14 @@ public class BlackyTileTextureRenderSystem
                     for (int x = 0; x < layer.Size; x++)
                     {
                         int tileId = layer.GetTile(x, y);
-                        bool isDual = layer.GetDualMask(x, y) != 0;
-                        if (tileId == 0)
+                        bool isRender = layer.IsRender(x, y);                        
+                        if (tileId == 0 || isRender == false)
+                        { 
                             continue;
+                        }
+                        bool isDual = layer.GetDualMask(x, y) != 0;
                         var (worldX, worldY) = LocalToWorld(coord.X, coord.Y, x, y);
-                        RenderTile(coord, height.Height, layer.LayerIndex, worldX, worldY, tileId, null, false, true, false);
+                        RenderTile(coord, height.Height, layer.LayerIndex, worldX, worldY, tileId, null, false, isDual, false);                                                
                     }
                 }
             }
@@ -237,7 +240,7 @@ public class BlackyTileTextureRenderSystem
         int tileId,
         BlackyRegion region, bool remove, bool dual, bool isPersistent)
     {
-        GD.Print($"RenderTile {chunkCoord} {height} {layer} {worldX} {worldY} {tileId}");
+        //GD.Print($"RenderTile {chunkCoord} {height} {layer} {worldX} {worldY} {tileId}");
 
         if (!chunkRenderInstances.TryGetValue(chunkCoord, out var chunkRender))
         {

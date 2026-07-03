@@ -9,29 +9,31 @@ namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
 public class BlackyChunkTilemapTextureUShort : BlackyChunkTilemapTextureBase
 {
-    private readonly ushort[] _tiles;
+    private readonly int[] _tiles;
     // NUEVO
     private readonly byte[] _solid;
     private readonly byte[] _dualMask;
+    private readonly bool[] _render;
     public BlackyChunkTilemapTextureUShort(int layer, int size, int wx, int wy)
         : base(layer, size, wx, wy)
     {
-        _tiles = new ushort[size * size];
+        _tiles = new int[size * size];
         _solid = new byte[size * size];
         _dualMask = new byte[size * size];
+        _render = new bool[size * size];
     }
 
     public override void SetTile(int x, int y, int tileId, bool isDirty = true)
     {
         int i = GetIndex(x, y);
-        _tiles[i] = (ushort)tileId;
+        _tiles[i] = tileId;
 
         if (isDirty) MarkDirty(x, y);
     }
 
     protected override void SetTileUnsafe(int index, int tileId)
     {
-        _tiles[index] = (ushort)tileId;
+        _tiles[index] = tileId;
     }
 
     public override int GetTile(int x, int y)
@@ -46,7 +48,7 @@ public class BlackyChunkTilemapTextureUShort : BlackyChunkTilemapTextureBase
         _tiles[i] = 0;
         MarkDirty(x, y);
     }
-
+    
     // ==========================================
     // SOLID MAP
     // ==========================================
@@ -81,5 +83,16 @@ public class BlackyChunkTilemapTextureUShort : BlackyChunkTilemapTextureBase
     public override byte GetDualMask(int x, int y)
     {
         return _dualMask[GetIndex(x, y)];
+    }
+
+    public override void SetRender(int x, int y, bool value)
+    {
+        int i = GetIndex(x, y);
+        _render[i] = value;
+    }
+
+    public override bool IsRender(int x, int y)
+    {
+       return _render[GetIndex(x, y)];
     }
 }

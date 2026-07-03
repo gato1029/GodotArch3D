@@ -44,6 +44,11 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
 
     public void Execute()
     {
+        if (idSprite==0)
+        {
+            //error
+            int e=1;
+        }
         if (chunkRender.IsDestroyed)
             return;
         //cuando es solo tile simple visual, no hay entidad

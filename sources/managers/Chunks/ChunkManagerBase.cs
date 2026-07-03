@@ -162,7 +162,7 @@ public class ChunkManagerBase
 
         foreach (var chunk in newVisible)
         {
-            GD.Print($"RequestLoadChunk {chunk}");
+            
             if (!activeChunks.Contains(chunk))
             {
                 activeChunks.Add(chunk);

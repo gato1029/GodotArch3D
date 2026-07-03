@@ -79,4 +79,14 @@ public class BlackyChunkTilemapTextureByte : BlackyChunkTilemapTextureBase
     {
         return _dualMask[GetIndex(x, y)];
     }
+
+    public override void SetRender(int x, int y, bool value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override bool IsRender(int x, int y)
+    {
+        throw new NotImplementedException();
+    }
 }

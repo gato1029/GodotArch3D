@@ -31,6 +31,8 @@ public interface IBlackyChunkTilemapTexture
 
     void SetDualMask(int x, int y, byte mask);
     byte GetDualMask(int x, int y);
+    void SetRender(int x, int y, bool value);
+    bool IsRender(int x, int y);
 
     // ===============================
     // BULK (IMPORTANTE)

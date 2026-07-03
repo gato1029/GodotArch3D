@@ -383,25 +383,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
             GetOrCreateSpriteId(tileSprite.id, tileSprite);
 
-            ////          
-            //if (tileSprite.tileSpriteType == TileSpriteType.DualStatic || tileSprite.tileSpriteType == TileSpriteType.DualAnimated)
-            //{
-
-            //    string key = nameMod+":"+ item.idMaterial + ":" + item.tileIndex;
-            //    if (!_tilesSpriteByMaterialIndex.ContainsKey(idMod))
-            //    {
-            //        _tilesSpriteByMaterialIndex[idMod] = new MultiIndex<int, TileSpriteData>();
-            //    }
-
-            //    MultiIndex<int, TileSpriteData> indexMod = _tilesSpriteByMaterialIndex[idMod];
-            //    indexMod.Add(item.idMaterial, tileSprite);
-            //    tilesSpriteDataDual.Register(idMod, key, item);
-            //}
-            //else
-            //{
-            //    atlas.Register(idMod, tileSprite.id, tileSprite);
-                
-            //}
+   
             
         }
     }
@@ -410,8 +392,8 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     {        
         if (spriteLookup.TryGetValue(tileSpriteId, out int id))
             return id;
-
-        int newId = palleteCount++;        
+        palleteCount++;
+        int newId = palleteCount;        
         spriteLookup[tileSpriteId] = newId;
         spritePallete[newId] = tileSpriteData;  
         return newId;
