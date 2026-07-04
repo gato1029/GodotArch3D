@@ -173,27 +173,27 @@ public class BlackyChunkCacheTextureMap
             Layer = layer,
             remove = true
         });
-        if (height-1 >= 0)
-        {
-            var LayerDown = chunk.GetOrCreateLayer(height-1, layer);
-            var tileDown = LayerDown.GetTile(localX,localY);
-            if (tileDown!=0 && LayerDown.IsRender(localX, localY)==false)
-            {
-                LayerDown.SetRender(localX, localY, true);
-                OnTileChanged?.Invoke(new TileChange
-                {
-                    WorldX = worldX,
-                    WorldY = worldY,
-                    Height = height-1,
-                    Layer = layer,
-                    SpriteId = tileDown,
-                    region = chunk.ParentRegion,
-                    remove = false,
-                    dual = true,
-                    isPersistent = false,
-                });
-            }            
-        }
+        //if (height-1 >= 0)
+        //{
+        //    var LayerDown = chunk.GetOrCreateLayer(height-1, layer);
+        //    var tileDown = LayerDown.GetTile(localX,localY);
+        //    if (tileDown!=0 && LayerDown.IsRender(localX, localY)==false)
+        //    {
+        //        LayerDown.SetRender(localX, localY, true);
+        //        OnTileChanged?.Invoke(new TileChange
+        //        {
+        //            WorldX = worldX,
+        //            WorldY = worldY,
+        //            Height = height-1,
+        //            Layer = layer,
+        //            SpriteId = tileDown,
+        //            region = chunk.ParentRegion,
+        //            remove = false,
+        //            dual = true,
+        //            isPersistent = false,
+        //        });
+        //    }            
+        //}
     }
 
 
@@ -236,7 +236,7 @@ public class BlackyChunkCacheTextureMap
 
     public void SetTileDualInternalSprite(int worldX, int worldY, int height, int layer, long idTileSprite, bool isBorder)
     {
-        GD.Print("pos:",worldX,",",worldY);
+        
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
         
@@ -498,6 +498,7 @@ public class BlackyChunkCacheTextureMap
     Brush brush,
     DualTileTemplate dualTileTemplate)
     {
+        
         HashSet<(int x, int y)> affected = new();
 
         foreach (var offset in brush.Cells)
@@ -514,7 +515,36 @@ public class BlackyChunkCacheTextureMap
 
         foreach (var p in affected)
         {
+            GD.Print("pos:", p.x,",", p.y);
             RebuildDualCell(p.x, p.y, altura, capa, dualTileTemplate);
+            RefreshTileUnder(p.x, p.y, altura, capa);
+        }
+    }
+
+    private void RefreshTileUnder(int worldX, int worldY, int height, int layer)
+    {
+        // 1. Resolvemos el chunk y las coordenadas locales
+        var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);    
+        if (height - 1 >= 0)
+        {
+            var LayerDown = chunk.GetOrCreateLayer(height - 1, layer);
+            var tileDown = LayerDown.GetTile(localX, localY);
+            if (tileDown != 0 && LayerDown.IsRender(localX, localY) == false)
+            {
+                LayerDown.SetRender(localX, localY, true);
+                OnTileChanged?.Invoke(new TileChange
+                {
+                    WorldX = worldX,
+                    WorldY = worldY,
+                    Height = height - 1,
+                    Layer = layer,
+                    SpriteId = tileDown,
+                    region = chunk.ParentRegion,
+                    remove = false,
+                    dual = true,
+                    isPersistent = false,
+                });
+            }
         }
     }
 

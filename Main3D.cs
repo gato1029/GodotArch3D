@@ -75,7 +75,7 @@ public partial class Main3D : Node3D
             GD.Print("Cerrando juego...");
 
             CloseDatabaseConnections();
-
+            GD.Print("Copiando Informacion de Editor...");
             GetTree().Quit();
         }
     }

@@ -34,8 +34,32 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
     }
     internal void SetTerrain(int x, int y, int altura, TerrainBaseData terrainBaseDataSelected, Brush brush)
     {
-        SetTerrain(x, y, altura, terrainBaseDataSelected.nameMod, terrainBaseDataSelected.idSave, brush);
+        if(DiferentPosition(x,y,altura,(int)RenderLayer,brush,terrainBaseDataSelected.idSave))
+        {
+            SetTerrain(x, y, altura, terrainBaseDataSelected.nameMod, terrainBaseDataSelected.idSave, brush);
+        }
+        
     }
+
+
+    int lastX = 0;
+    int lastY = 0;
+    int lastAltura = -1;
+    int lastCapa = -1;
+    int lastTerrain = -1;
+    private bool DiferentPosition(int baseX, int baseY,
+    int altura,
+    int capa,
+    Brush brush,
+    int terrainBaseDataId)
+    {
+        if (baseX != lastX || baseY != lastY || altura != lastAltura || capa != lastCapa || terrainBaseDataId != lastTerrain)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void SetTerrain(int worldX, int worldY, int height,string modName, ushort terrainId, Brush brush)
     {
         // 1. GUARDAR LÓGICA
@@ -71,7 +95,11 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
 
     public void RemoveTerrain(int worldX,int worldY,int height, Brush brush)
     {
-        ushort lastId = 0;
+        if (!DiferentPosition(worldX, worldY, height, (int)RenderLayer, brush, 0))
+        {
+            return;
+        }
+            ushort lastId = 0;
         foreach (var offset in brush.Cells)
         {
             int x = worldX + offset.x;

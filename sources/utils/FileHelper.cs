@@ -146,5 +146,30 @@ using static Godot.HttpRequest;
         string fullPath = Path.Combine(gameDirectory, pathTexture);
         return fullPath;
     }
+
+    public static void CopiarCarpeta(string carpetaOrigen, string carpetaDestino)
+    {
+        var dirOrigen = new DirectoryInfo(carpetaOrigen);
+
+        if (!dirOrigen.Exists)
+            throw new DirectoryNotFoundException($"No existe el directorio origen: {carpetaOrigen}");
+
+        // Crea la carpeta destino si no existe
+        Directory.CreateDirectory(carpetaDestino);
+
+        // Copia todos los archivos del nivel actual, sobrescribiendo si ya existen
+        foreach (FileInfo archivo in dirOrigen.GetFiles())
+        {
+            string rutaDestino = Path.Combine(carpetaDestino, archivo.Name);
+            archivo.CopyTo(rutaDestino, overwrite: true); // <- aquí está el "chanque"
+        }
+
+        // Recorre subcarpetas de forma recursiva
+        foreach (DirectoryInfo subDir in dirOrigen.GetDirectories())
+        {
+            string subCarpetaDestino = Path.Combine(carpetaDestino, subDir.Name);
+            CopiarCarpeta(subDir.FullName, subCarpetaDestino);
+        }
+    }
 }
 
