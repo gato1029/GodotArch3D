@@ -27,7 +27,11 @@ public partial class RuntimeTerrainControl : PanelContainer
         data = (TerrainBaseData)obj;
         var dual = MasterDataManager.GetData<DualTileTemplate>(data.idDualTemplate);
         LineEditName.Text = data.name;
-        ButtonDual.IconTexture = dual.textureVisual;
+        if (dual!=null)
+        {
+            ButtonDual.IconTexture = dual.textureVisual;
+        }
+        
         //ControlSprites.SetIdTiles(data.rampas);
     }
 
@@ -65,6 +69,8 @@ public partial class RuntimeTerrainControl : PanelContainer
     private void ButtonEliminar_Pressed()
     {
         KuroItems.RemoveObject(data);
+        DataBaseManager.Instance.RemoveDirectById<TerrainBaseData>(data.id);
+        
     }
 
     private void ButtonGuardar_Pressed()

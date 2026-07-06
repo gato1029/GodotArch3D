@@ -48,7 +48,8 @@ public partial class ControlDualGrid : PanelContainer
 
     private void ButtonEliminar_Pressed()
     {
-        
+        DataBaseManager.Instance.RemoveDirectById<DualTileTemplate>(dualTileTemplate.id);
+        KuroItems.RemoveObject(dualTileTemplate);
     }
 
     private void ButtonNuevo_Pressed()

@@ -150,13 +150,11 @@ public class DualTileTemplate:IdDataLong
     [BsonCtor]
     public DualTileTemplate(DualTileSlot[] slots) 
     {
-        var  data =slots[2].GetGeneric(); // Asegurar que el slot 0 tenga un dato genérico
+        var  data =slots[1].GetGeneric(); // Asegurar que el slot 0 tenga un dato genérico
         var  part = data.GetPart(0);
-        var temp = AtlasModsManager.GetAtlasTexture(part.IdMod, part.TileIndex, out bool isAnimated, out TileTextureData tileTextureData);
-        if (!isAnimated)
-        {
-            textureVisual = temp[0];            
-        }
+        var temp = AtlasModsManager.GetSpriteUniqueId(part.IdTileSpriteData, out var tileSpriteData);
+        textureVisual = tileSpriteData.textureVisual;
+
     }
     public DualTileSlot GetSlot(int slot)
     {

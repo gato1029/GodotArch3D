@@ -89,7 +89,9 @@ public partial class ControlListTileSprite : MarginContainer
         }
         TextureRect textureRect = new TextureRect();
         textureRect.SetMeta("id", objectSelected.id);
-        textureRect.ExpandMode = TextureRect.ExpandModeEnum.FitWidth;
+        textureRect.ExpandMode = TextureRect.ExpandModeEnum.FitWidthProportional;
+        
+
 
         switch (objectSelected.tileSpriteType)
         {

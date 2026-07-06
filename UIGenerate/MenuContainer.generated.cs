@@ -18,6 +18,7 @@ public partial class MenuContainer : VBoxContainer
     private PopupMenu Componentes;
     private PopupMenu Armamento;
     private PopupMenu Mapas;
+    private KuroButton ButtonGuardarMod;
     private PanelContainer ContenedorEditor;
     private VBoxContainer VBoxContainerRidht;
     private EditorPanel AnimatedPanelContainer;
@@ -41,6 +42,7 @@ public partial class MenuContainer : VBoxContainer
         Componentes = GetNode<PopupMenu>("Menu/hbox/MenuBar/Componentes");
         Armamento = GetNode<PopupMenu>("Menu/hbox/MenuBar/Armamento");
         Mapas = GetNode<PopupMenu>("Menu/hbox/MenuBar/Mapas");
+        ButtonGuardarMod = GetNode<KuroButton>("Menu/hbox/ButtonGuardarMod");
         ContenedorEditor = GetNode<PanelContainer>("ContenedorEditor");
         VBoxContainerRidht = GetNode<VBoxContainer>("HBoxContainer/HSplitContainer/VBoxContainerRidht");
         AnimatedPanelContainer = GetNode<EditorPanel>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/AnimatedPanelContainer");

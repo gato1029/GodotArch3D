@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.Helpers;
+using GodotEcsArch.sources.WindowsDataBase;
 using System;
 
 public partial class MenuContainer : VBoxContainer
@@ -10,6 +11,15 @@ public partial class MenuContainer : VBoxContainer
         InitializeUI(); // Insertado por el generador de UI
         ButtonDualGrid.Pressed += ButtonDualGrid_Pressed;
         ButtonTerreno.Pressed += ButtonTerreno_Pressed;
+        ButtonGuardarMod.Pressed += ButtonGuardarMod_Pressed;
+    }
+
+    private void ButtonGuardarMod_Pressed()
+    {
+        DataBaseManager.Instance.CloseDataBase();
+        string carpetaMod = "Base";
+        FileHelper.CopiarCarpeta("D:\\GitKraken/AssetExternals/NuevosMods/"+carpetaMod, "D:\\GitKraken\\ModsGame\\Mods/"+carpetaMod);
+        DataBaseManager.Instance.LoadCurrentDataBase();
     }
 
     private void ButtonTerreno_Pressed()

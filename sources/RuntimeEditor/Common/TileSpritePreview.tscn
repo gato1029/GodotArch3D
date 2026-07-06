@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://63mooil1786r"]
+
+[ext_resource type="Texture2D" uid="uid://dfpd8shulwupv" path="res://resources/Textures/Emerald Treasure/images/item_corners.png" id="1_dbx0n"]
+[ext_resource type="Script" uid="uid://f5uli5o3e7dq" path="res://sources/RuntimeEditor/Common/TileSpritePreview.cs" id="2_3yrbl"]
+
+[node name="TileSprite" type="TextureRect" unique_id=1018904121]
+texture = ExtResource("1_dbx0n")
+script = ExtResource("2_3yrbl")
+
+[node name="SpriteTexture" type="TextureRect" parent="." unique_id=85955583]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 3
+stretch_mode = 5

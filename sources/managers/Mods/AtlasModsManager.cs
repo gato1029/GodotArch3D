@@ -39,6 +39,8 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     int palleteCount = 0;
     private readonly Dictionary<long, int> spriteLookup = new();
     private readonly Dictionary<int, TileSpriteData> spritePallete = new();
+    
+    private readonly Dictionary<ushort, MultiIndex<int, int>> materialIdSprites = new();
 
     // Datos solo cacheados nunca en disco, resueltos de otra forma
     private readonly AtlasMods<int, MaterialData> materiales = new(); // estos nunca se guardan en disco solo en memoria, resuelto de otra forma
@@ -136,6 +138,21 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     public static bool TryGetTileSprite(int idSpriteInternal, out TileSpriteData tileSpriteData)
     {
         return Instance.GetTileSprite(idSpriteInternal, out tileSpriteData);
+    }
+    public static List<int> GetAllSpriteByMaterial(string nameMod,int idMaterial)
+    {
+        return Instance.GetSpriteByMaterial(nameMod, idMaterial);
+    }
+    private List<int> GetSpriteByMaterial(string nameMod, int idMaterial)
+    {
+        if (!TryGetModId(nameMod, out var modId))
+            return null;
+        if (materialIdSprites.TryGetValue(modId, out var multiIndex))
+        {
+            multiIndex.TryGet(idMaterial, out var list);
+            return list;
+        }
+        return null;        
     }
     private bool GetTileSprite(int idSpriteInternal, out TileSpriteData tileSpriteData)
     {
@@ -375,16 +392,18 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     {
         var data = DataBaseManager.Instance.FindAll<TileSpriteData>();
 
+        if (!materialIdSprites.ContainsKey(idMod))
+            materialIdSprites[idMod] = new MultiIndex<int, int>();
+
+        var indexMod = materialIdSprites[idMod];
+
         foreach (var item in data)
         {
             var tileSprite = item as TileSpriteData;
             tileSprite.idMod = idMod;
             tileSprite.nameMod = nameMod;
-
-            GetOrCreateSpriteId(tileSprite.id, tileSprite);
-
-   
-            
+            int id = GetOrCreateSpriteId(tileSprite.id, tileSprite);               
+            indexMod.Add(tileSprite.idMaterial, id);
         }
     }
     
@@ -398,34 +417,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         spritePallete[newId] = tileSpriteData;  
         return newId;
     }
-    private void ActualizarUvsTileSprite(TileSpriteData tileSprite)
-    {
-        //string textureKey = "";        
-        //switch (tileSprite.tileSpriteType)
-        //{
-        //    case TileSpriteType.Static :                
-        //        textureKey = tileSprite.spriteData.idModMaterial;
-        //        MaterialModData mat = AtlasTexturesModsManager.Instance.GetMaterialTexture(textureKey);
-        //        tileSprite.spriteData.uv = CalculateUVFromId(mat, tileSprite.spriteData);
-        //        break;
-        //    case TileSpriteType.Animated:
-        //        textureKey = tileSprite.animationData.idModMaterial;
-        //        MaterialModData mat2 = AtlasTexturesModsManager.Instance.GetMaterialTexture(textureKey);
-        //        tileSprite.animationData.uvFramesArray = CalculateUVFromId(mat2, tileSprite.animationData).ToArray();
-        //        break;
-        //    case TileSpriteType.AnimatedDirectionMultiple:
-        //        textureKey = tileSprite.spriteMultipleAnimationDirection.idModMaterial;
-        //        MaterialModData mat3 = AtlasTexturesModsManager.Instance.GetMaterialTexture(textureKey);
-        //        tileSprite.animationData.uvFramesArray = CalculateUVFromId(mat2, tileSprite.animationData).ToArray();
-        //        break;
-        //    case TileSpriteType.AnimatedMultiple:
-        //        break;
-        //    case TileSpriteType.Single:
-        //        break;
-        //    default:
-        //        break;
-        //}
-    }
+ 
     public List<Godot.Color> CalculateUVFromId(MaterialModData data,bool mirrorX, bool mirrorY, FrameData[] framesArray)
     {        
         var offset = new Vector2(data.xInAtlas, data.yInAtlas);

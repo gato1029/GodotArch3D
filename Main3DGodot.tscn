@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://bnwmpmtuqvith" path="res://sources/Editor/ViewPortContainerEditor.cs" id="6_yxrc8"]
 [ext_resource type="Texture2D" uid="uid://bp52u8828v1rk" path="res://resources/Textures/iconos/terrain.png" id="7_y4g3r"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="7_yxrc8"]
+[ext_resource type="Texture2D" uid="uid://dunatko0dk4n3" path="res://sources/WindowsDataBase/Common/icons/TwitterLogo.svg" id="10_o4f64"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_namcl"]
 
@@ -140,7 +141,7 @@ auto_translate_mode = 2
 oversampling_override = 1.0
 title = "Menu Tiles"
 size = Vector2i(127, 100)
-item_count = 4
+item_count = 5
 item_0/text = "TileSprite"
 item_0/id = 0
 item_1/text = "AutoTileSprite"
@@ -149,6 +150,8 @@ item_2/text = "AutoMapperTexture"
 item_2/id = 2
 item_3/text = "TileTextureAnimacionCollider"
 item_3/id = 3
+item_4/text = "Tiles por Material"
+item_4/id = 4
 
 [node name="Editor" type="PopupMenu" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox/MenuBar" unique_id=1127058186]
 auto_translate_mode = 1
@@ -201,9 +204,16 @@ item_0/id = 0
 item_1/text = "Cargar Mapa"
 item_1/id = 1
 
-[node name="FoldableContainer" type="FoldableContainer" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=1633491136]
+[node name="ButtonGuardarMod" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=3373412]
+custom_minimum_size = Vector2(48, 81.5)
 layout_mode = 2
-folded = true
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("10_o4f64")
+ButtonText = "Guardar Mod"
+Padding = 8
+FontSize = 12
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="ContenedorEditor" type="PanelContainer" parent="Editor/MainWindows/Control/Panel/MenuContainer" unique_id=2067458146]
 layout_mode = 2

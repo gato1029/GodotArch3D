@@ -193,6 +193,11 @@ public partial class HerramientaMenuBar : MenuBar
                 FacadeWindowDataSearch<TileTextureData> wtco = new FacadeWindowDataSearch<TileTextureData>(KuroWindowFactory.GetPath<TileTextureConfigControl>(), this);
                 break;
             default:
+            case 4:
+                WindowMaterialTiles wmt = RuntimeServices.NodeRegistry.Create<WindowMaterialTiles>();                
+                this.AddChild(wmt);
+                wmt.EnableEditionMode();
+                wmt.Show();
                 break;
         }
     }
