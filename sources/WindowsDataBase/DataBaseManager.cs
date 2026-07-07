@@ -117,8 +117,10 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<TileTextureData>("TileTextureData");
             RegisterCollection<DualTileTemplate>("DualTileTemplate");
             RegisterCollection<TerrainBaseData>("TerrainBaseData");
+            RegisterCollection<DecorationData>("DecorationData");
+            RegisterCollection<RampsData>("RampsData");
 
-            
+
 
             ILiteCollection<TextureMasterData> TextureMasterDataCollection =
                 db.GetCollection<TextureMasterData>("TextureMasterData");

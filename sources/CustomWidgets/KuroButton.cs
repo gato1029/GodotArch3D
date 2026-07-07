@@ -100,6 +100,7 @@ public partial class KuroButton : TextureButton
 
     public override void _Ready()
     {
+        InitializeUI(); // Insertado por el generador de UI
         MouseEntered += OnMouseEntered;
         MouseExited += OnMouseExited;
         ButtonDown += OnButtonDown;

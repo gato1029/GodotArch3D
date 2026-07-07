@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://ckwoyhgb501je" path="res://sources/Editor/Controls/EditorPanel.tscn" id="5_namcl"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="5_ong74"]
 [ext_resource type="Script" uid="uid://bnwmpmtuqvith" path="res://sources/Editor/ViewPortContainerEditor.cs" id="6_yxrc8"]
+[ext_resource type="Texture2D" uid="uid://cvj3r076kmbgl" path="res://resources/Textures/Emerald Treasure/images/unitframe_character_lowhealth.png" id="7_jssc5"]
 [ext_resource type="Texture2D" uid="uid://bp52u8828v1rk" path="res://resources/Textures/iconos/terrain.png" id="7_y4g3r"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="7_yxrc8"]
 [ext_resource type="Texture2D" uid="uid://dunatko0dk4n3" path="res://sources/WindowsDataBase/Common/icons/TwitterLogo.svg" id="10_o4f64"]
@@ -106,6 +107,28 @@ script = ExtResource("4_kc28b")
 IconTexture = ExtResource("5_hq8xv")
 ButtonText = "Dual Grid"
 Padding = 8
+FontSize = 12
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonDecoration" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=1356633671]
+custom_minimum_size = Vector2(68, 88.75)
+layout_mode = 2
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("7_jssc5")
+ButtonText = "Decoracion"
+Padding = 18
+FontSize = 12
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonRamps" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=113680956]
+custom_minimum_size = Vector2(68, 88.75)
+layout_mode = 2
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("7_jssc5")
+ButtonText = "Decoracion"
+Padding = 18
 FontSize = 12
 IconExpand = true
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

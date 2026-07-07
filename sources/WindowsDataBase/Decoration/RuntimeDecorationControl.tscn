@@ -1,0 +1,91 @@
+[gd_scene format=3 uid="uid://bsk2t7p4gqpec"]
+
+[ext_resource type="Script" uid="uid://bqokqwle16krw" path="res://sources/WindowsDataBase/Decoration/RuntimeDecorationControl.cs" id="1_yt77g"]
+[ext_resource type="PackedScene" uid="uid://bor51mewublcc" path="res://sources/WindowsDataBase/Common/KuroSearchItems.tscn" id="2_wl8po"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="3_ojjas"]
+[ext_resource type="Texture2D" uid="uid://e4igfbbvdqym" path="res://resources/Textures/iconos/file.png" id="4_njl1f"]
+[ext_resource type="PackedScene" uid="uid://63mooil1786r" path="res://sources/RuntimeEditor/Common/TileSpritePreview.tscn" id="5_yt77g"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="7_aiakw"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="8_1gili"]
+
+[node name="RuntimeDecorationControl" type="PanelContainer" unique_id=680472044]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yt77g")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=1827780703]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="KuroItems" parent="HBoxContainer2" unique_id=1075427436 instance=ExtResource("2_wl8po")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer2" unique_id=517929566]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_top = 40
+
+[node name="CenterContainer" type="CenterContainer" parent="HBoxContainer2/MarginContainer" unique_id=248713410]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer" unique_id=339966517]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=622360495]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+script = ExtResource("3_ojjas")
+IconTexture = ExtResource("4_njl1f")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=1033748176]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=307848035]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=759916794]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=571904244]
+layout_mode = 2
+text = "Sprite:"
+
+[node name="TileSpriteSelector" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1018904121 instance=ExtResource("5_yt77g")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+isSelectorEnabled = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=1942224493]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=116552285]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+script = ExtResource("3_ojjas")
+IconTexture = ExtResource("7_aiakw")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=1447995048]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+script = ExtResource("3_ojjas")
+IconTexture = ExtResource("8_1gili")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

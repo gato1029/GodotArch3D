@@ -10,6 +10,8 @@ public partial class MenuContainer : VBoxContainer
     private MarginContainer Menu;
     private HBoxContainer hbox;
     private KuroButton ButtonDualGrid;
+    private KuroButton ButtonDecoration;
+    private KuroButton ButtonRamps;
     private KuroButton ButtonTerreno;
     private HerramientaMenuBar MenuBar;
     private PopupMenu Atlas;
@@ -34,6 +36,8 @@ public partial class MenuContainer : VBoxContainer
         Menu = GetNode<MarginContainer>("Menu");
         hbox = GetNode<HBoxContainer>("Menu/hbox");
         ButtonDualGrid = GetNode<KuroButton>("Menu/hbox/ButtonDualGrid");
+        ButtonDecoration = GetNode<KuroButton>("Menu/hbox/ButtonDecoration");
+        ButtonRamps = GetNode<KuroButton>("Menu/hbox/ButtonRamps");
         ButtonTerreno = GetNode<KuroButton>("Menu/hbox/ButtonTerreno");
         MenuBar = GetNode<HerramientaMenuBar>("Menu/hbox/MenuBar");
         Atlas = GetNode<PopupMenu>("Menu/hbox/MenuBar/Atlas");

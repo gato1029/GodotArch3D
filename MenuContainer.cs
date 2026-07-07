@@ -12,6 +12,22 @@ public partial class MenuContainer : VBoxContainer
         ButtonDualGrid.Pressed += ButtonDualGrid_Pressed;
         ButtonTerreno.Pressed += ButtonTerreno_Pressed;
         ButtonGuardarMod.Pressed += ButtonGuardarMod_Pressed;
+        ButtonDecoration.Pressed += ButtonDecoration_Pressed;
+        ButtonRamps.Pressed += ButtonRamps_Pressed;
+    }
+
+    private void ButtonRamps_Pressed()
+    {
+        ContenedorEditor.ClearChildrens();
+        var control = RuntimeServices.NodeRegistry.Create<RuntimeRampsControl>();
+        ContenedorEditor.AddChild(control);
+    }
+
+    private void ButtonDecoration_Pressed()
+    {
+        ContenedorEditor.ClearChildrens();
+        var control = RuntimeServices.NodeRegistry.Create<RuntimeDecorationControl>();
+        ContenedorEditor.AddChild(control);
     }
 
     private void ButtonGuardarMod_Pressed()

@@ -6,6 +6,8 @@ public partial class TileSpritePreview : TextureRect
     public event Action<TileSpriteData> OnItemSelected;
 
     TileSpriteData tileSpriteData;
+    [Export]
+    public bool isSelectorEnabled = false;
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
@@ -19,6 +21,11 @@ public partial class TileSpritePreview : TextureRect
 	{
 
 	}
+    
+    public void EnableSelector()
+    {
+        isSelectorEnabled = true;
+    }
     public void LoadData(TileSpriteData data)
     {
         tileSpriteData = data;
@@ -33,11 +40,29 @@ public partial class TileSpritePreview : TextureRect
         if (@event is InputEventMouseButton mouseEvent)
         {
             if (mouseEvent.ButtonIndex == MouseButton.Left && mouseEvent.Pressed)
-            {            
-                OnSingleClick();                
+            {
+                if (isSelectorEnabled)
+                {
+                    OnSelectionClick();
+                }
+                else
+                {
+                    OnSingleClick();
+                }                
             }
         }
     }
+    private void OnSelectionClick()
+    {
+        WindowMaterialTiles wm = RuntimeServices.NodeRegistry.Create<WindowMaterialTiles>();
+        AddChild(wm);  
+        wm.OnItemSelected += (TileSpriteData obj) =>
+        {
+            tileSpriteData = obj;
+            SpriteTexture.Texture = obj.textureVisual;
+        };
+        wm.Show();
+    }    
 
     private void OnSingleClick()
     {

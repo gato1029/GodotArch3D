@@ -195,7 +195,48 @@ public class BlackyChunkCacheTextureMap
         //    }            
         //}
     }
+    public int SetTileSprite(int worldX, int worldY, int height, int layer, long idTileSprite)
+    {
+        // 1. Resolvemos el chunk y las coordenadas locales
+        var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
 
+        // 2. Le pedimos a la región del chunk que nos dé un ID de su paleta
+        //ushort tileId = chunk.ParentRegion.GetOrCreateTile(modName, textureIndex);
+
+        int tileId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);
+        // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
+        
+
+
+        // 3. Guardamos el ID en el chunk
+        // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);
+        tileLayer.SetTile(localX, localY, tileId);
+        tileLayer.SetRender(localX, localY, true);
+
+        //if (tileLayer.GetDualMask(localX, localY) != 0)
+        //{
+        //    tileLayer.SetSolid(localX, localY, false);
+
+        //}
+
+        OnTileChanged?.Invoke(new TileChange
+        {
+            WorldX = worldX,
+            WorldY = worldY,
+            Height = height,
+            Layer = layer,
+            SpriteId = tileId,
+            region = chunk.ParentRegion,
+            remove = false,
+            dual = false,
+            isPersistent = false
+        });
+
+        chunk.MarkDirty();
+        return tileId;
+
+    }
 
     public ushort SetTile(int worldX, int worldY, int height, int layer, string modName, ushort textureIndex, bool DualOffset)
     {
@@ -515,7 +556,7 @@ public class BlackyChunkCacheTextureMap
 
         foreach (var p in affected)
         {
-            GD.Print("pos:", p.x,",", p.y);
+        
             RebuildDualCell(p.x, p.y, altura, capa, dualTileTemplate);
             RefreshTileUnder(p.x, p.y, altura, capa);
         }
