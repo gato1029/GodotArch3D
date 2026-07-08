@@ -53,6 +53,8 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<ushort, TerrainData> terrainData = new();    
     private readonly AtlasMods<ushort, TerrainDataTransition> terrainDataTransicion = new();
     private readonly AtlasMods<ushort, TerrainBaseData> terrenos = new ();
+    private readonly AtlasMods<ushort, RampsData> rampsData = new();
+    private readonly AtlasMods<ushort, DecorationData> decorationData = new();
 
     private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a ushort
     private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a ushort
@@ -362,8 +364,9 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(terrainData, idMod, name);
         CargarDatos(terrainDataTransicion, idMod, name);                
         CargarDatos(terrenos, idMod, name);
+        CargarDatos(rampsData, idMod, name);
+        CargarDatos(decorationData, idMod, name);
 
-        
     }
 
     private void CargarPorModEspecial(ushort idMod)
@@ -570,6 +573,8 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         tilesTextureData.Clear();
         dualTileTemplate.Clear();
         terrenos.Clear();
+        rampsData.Clear();
+        decorationData.Clear();
         // ================================
         // CLEAR INDEXES
         // ================================
@@ -597,6 +602,8 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(tilesTextureData);
         RegisterAtlas(dualTileTemplate);
         RegisterAtlas(terrenos);
+        RegisterAtlas(rampsData);
+        RegisterAtlas(decorationData);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {

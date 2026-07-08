@@ -39,6 +39,11 @@ size_flags_vertical = 0
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=196489073]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Rampas"
+
 [node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=622360495]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
@@ -64,7 +69,7 @@ layout_mode = 2
 layout_mode = 2
 text = "Sprite:"
 
-[node name="TileSpriteSelector" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1018904121 instance=ExtResource("5_cvpdn")]
+[node name="PreviewSprite" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1018904121 instance=ExtResource("5_cvpdn")]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

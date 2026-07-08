@@ -48,6 +48,7 @@ IconTexture = ExtResource("3_r3egx")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="KuroButtonBuscarAutomatico" type="TextureButton" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=1638795865]
+visible = false
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
@@ -123,11 +124,11 @@ script = ExtResource("9_ptgif")
 metadata/_custom_type_script = "uid://d4g3outtemvav"
 
 [node name="EditorTextura" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=434538793 instance=ExtResource("1_rp5y2")]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="ContenedorDual" type="CenterContainer" parent="PanelContainer/ScrollContainer/VBoxContainer" unique_id=1611950290]
-visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2

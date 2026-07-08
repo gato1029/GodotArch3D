@@ -10,7 +10,7 @@ public partial class RuntimeRampsControl : PanelContainer
     private KuroSearchItems KuroItems;
     private KuroButton ButtonNuevo;
     private LineEdit LineEditName;
-    private TileSpritePreview TileSpriteSelector;
+    private TileSpritePreview PreviewSprite;
     private KuroButton ButtonGuardar;
     private KuroButton ButtonEliminar;
 
@@ -19,7 +19,7 @@ public partial class RuntimeRampsControl : PanelContainer
         KuroItems = GetNode<KuroSearchItems>("HBoxContainer2/KuroItems");
         ButtonNuevo = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/ButtonNuevo");
         LineEditName = GetNode<LineEdit>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/LineEditName");
-        TileSpriteSelector = GetNode<TileSpritePreview>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/TileSpriteSelector");
+        PreviewSprite = GetNode<TileSpritePreview>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/PreviewSprite");
         ButtonGuardar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonGuardar");
         ButtonEliminar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonEliminar");
     }

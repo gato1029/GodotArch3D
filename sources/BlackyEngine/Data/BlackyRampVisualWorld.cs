@@ -1,5 +1,7 @@
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using System;
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
@@ -23,6 +25,7 @@ public struct VisualTileCell
 public class BlackyRampVisualWorld
     : BlackyWorldDataMap<VisualTileCell>
 {
+    public BlackyGenericPalette<RampsData> rampsPalette { get; } = new();
     public BlackyRampVisualWorld(
         int chunkSize,
         BlackyChunkCacheTextureMap textureMap,
@@ -40,13 +43,17 @@ public class BlackyRampVisualWorld
     // =====================================================
     // SET TILE
     // =====================================================
+    public void SetRamp(int worldX, int worldY, int height, RampsData rampsData)
+    {
+        ref var cell = ref ResolveOrCreateCell(worldX,worldY, height);
+        //cell.TileId = rampsPalette.GetIdPersistence(,rampsData);
+        cell.TileId = rampsPalette.GetIdPersistence(rampsData.nameMod,rampsData.idSave, out var rampDataPersist);
+        
+        _textureMap.SetTileSprite(worldX, worldY, height, (int)RenderLayer, rampDataPersist.idTileSprite);
 
-    public void SetTile(
-        int worldX,
-        int worldY,
-        int height,
-        string modName,
-        ushort textureIndex)
+    }
+
+    public void SetTile(int worldX,int worldY,int height,string modName, ushort textureIndex)
     {  
         ref var cell =
             ref ResolveOrCreateCell(

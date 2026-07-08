@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug Main3dGodotModsConfig": {
+	"Godot Debug MainEditor": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./Main3DGodot.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/RuntimeEditor/Editor/MainEditor.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

@@ -64,7 +64,7 @@ public partial class WindowMaterialTiles : Window
         var node = RuntimeServices.NodeRegistry.Create<TileSpritePreview>();        
         GridContainerItems.AddChild(node);
         node.LoadData(tileSpriteData);
-        node.OnItemSelected += Node_OnItemSelected;
+        node.OnItemSelectedChanged += Node_OnItemSelected;
     }
 
     private void Node_OnItemSelected(TileSpriteData obj)

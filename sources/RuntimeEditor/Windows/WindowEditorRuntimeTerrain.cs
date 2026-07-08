@@ -178,7 +178,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                 w.LoadData<TerrainBaseData>();
                 break;
             case BlackyRenderLayer.Rampas:
-                w.LoadData<MaterialData>();
+                w.LoadData<RampsData>();
                 break;
             case BlackyRenderLayer.Superficie:
                 break;
@@ -207,8 +207,8 @@ public partial class WindowEditorRuntimeTerrain : Window
                 DualTemplateSelection(dual);
                 break;
             case BlackyRenderLayer.Rampas:
-                var mat = (MaterialData)obj;
-                TextureSelection(mat);
+                var rampsDataSelected = (RampsData)obj;
+                SpriteSelection(rampsDataSelected.idTileSprite);
                 break;
             case BlackyRenderLayer.Superficie:
                 break;
@@ -218,6 +218,15 @@ public partial class WindowEditorRuntimeTerrain : Window
                 break;
         }
 
+    }
+    private void SpriteSelection(long idTileSprite)
+    {
+        modeEditorTerrain = ModeEditorTerrain.CREACION;        
+        ConfigModePaint(ModePaint.NORMAL);
+        AnyWindowOpen = false;
+        AtlasModsManager.GetSpriteUniqueId(idTileSprite, out TileSpriteData tileSpriteData);
+        TexturaDual.Texture = tileSpriteData.textureVisual;
+        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush),idTileSprite);
     }
     private void TextureSelection(MaterialData materialData)
     {

@@ -15,7 +15,7 @@ public partial class RuntimeDecorationControl : PanelContainer
         ButtonGuardar.Pressed += ButtonGuardar_Pressed;
         ButtonEliminar.Pressed += ButtonEliminar_Pressed;
         ButtonNuevo.Pressed += ButtonNuevo_Pressed;
-        TileSpriteSelector.OnItemSelected += TileSpriteSelector_OnItemSelected;               
+        TileSpriteSelector.OnItemSelectedChanged += TileSpriteSelector_OnItemSelected;               
 	}
 
     private void TileSpriteSelector_OnItemSelected(TileSpriteData obj)

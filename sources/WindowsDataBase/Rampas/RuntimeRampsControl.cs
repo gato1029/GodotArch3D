@@ -1,5 +1,9 @@
 using Godot;
+using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 
 public partial class RuntimeRampsControl : PanelContainer
@@ -14,12 +18,12 @@ public partial class RuntimeRampsControl : PanelContainer
         ButtonGuardar.Pressed += ButtonGuardar_Pressed;
         ButtonEliminar.Pressed += ButtonEliminar_Pressed;
         ButtonNuevo.Pressed += ButtonNuevo_Pressed;
-        TileSpriteSelector.OnItemSelected += TileSpriteSelector_OnItemSelected;
+        PreviewSprite.OnItemSelectedChanged += TileSpriteSelector_OnItemSelectedChanged;                
     }
 
-    private void TileSpriteSelector_OnItemSelected(TileSpriteData obj)
-    {
-        data.idTileSprite = obj.id;
+    private void TileSpriteSelector_OnItemSelectedChanged(TileSpriteData objectControl)
+    {       
+        data.idTileSprite = objectControl.id;
     }
 
     private void ClearAll()
@@ -50,7 +54,14 @@ public partial class RuntimeRampsControl : PanelContainer
     }
     private void KuroItems_OnObjectPressed(object obj)
     {
-        data = (RampsData)obj;
+        data = (RampsData)obj;        
+        LineEditName.Text = data.name;
+        if (data.idTileSprite==0)
+        {
+            return;
+        }
+        AtlasModsManager.GetSpriteUniqueId(data.idTileSprite,out TileSpriteData tileSpriteData);
+        PreviewSprite.LoadData(tileSpriteData);        
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

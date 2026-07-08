@@ -2,18 +2,20 @@ using Godot;
 using System;
 
 public partial class TileSpritePreview : TextureRect
-{
-    public event Action<TileSpriteData> OnItemSelected;
-
+{   
     TileSpriteData tileSpriteData;
     [Export]
     public bool isSelectorEnabled = false;
+
+    public delegate void OnItemSelected(TileSpriteData objectControl);
+    public event OnItemSelected OnItemSelectedChanged;
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
         InitializeUI(); // Insertado por el generador de UI
         // Aseguramos que el control pueda recibir eventos de mouse
-        MouseFilter = MouseFilterEnum.Stop;
+        MouseFilter = MouseFilterEnum.Stop;        
     }
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -60,12 +62,15 @@ public partial class TileSpritePreview : TextureRect
         {
             tileSpriteData = obj;
             SpriteTexture.Texture = obj.textureVisual;
-        };
+            OnNotifyChangued?.Invoke(this);
+            OnItemSelectedChanged?.Invoke(tileSpriteData);
+        };        
         wm.Show();
     }    
 
     private void OnSingleClick()
     {
-        OnItemSelected?.Invoke(tileSpriteData);
+        OnNotifyChangued?.Invoke(this);
+        OnItemSelectedChanged?.Invoke(tileSpriteData);        
     }    
 }
