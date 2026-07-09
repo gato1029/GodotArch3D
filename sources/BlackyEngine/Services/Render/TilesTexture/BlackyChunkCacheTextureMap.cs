@@ -140,11 +140,11 @@ public class BlackyChunkCacheTextureMap
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
 
-        if (tileLayer.GetDualMask(localX, localY) != 0)
-        {
-            tileLayer.SetSolid(localX,localY,false);
+        //if (tileLayer.GetDualMask(localX, localY) != 0)
+        //{
+        //    tileLayer.SetSolid(localX,localY,false);
             
-        }
+        //}
         tileLayer.ClearTile(localX, localY);
         
         OnTileChanged?.Invoke(new TileChange
@@ -195,7 +195,7 @@ public class BlackyChunkCacheTextureMap
         //    }            
         //}
     }
-    public int SetTileSprite(int worldX, int worldY, int height, int layer, long idTileSprite)
+    public int SetTileSprite(int worldX, int worldY, int height, int layer, long idTileSprite, bool offsetDual)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
@@ -229,7 +229,7 @@ public class BlackyChunkCacheTextureMap
             SpriteId = tileId,
             region = chunk.ParentRegion,
             remove = false,
-            dual = false,
+            dual = offsetDual,
             isPersistent = false
         });
 

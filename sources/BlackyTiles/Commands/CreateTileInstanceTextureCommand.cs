@@ -178,7 +178,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         Vector2 offset = animationData.offsetInternal;
         if (dualOffset)
         {
-            offset = new Vector2(0.25f, 0.25f);
+            offset = offset+new Vector2(0.25f, 0.25f);
         }
         float depthOffset = animationData.yDepthRenderFormat;
         float z = CommonAtributes.Calculate(depthOffset, height, layer, positionCenter); // debemos usar esto apartir de ahora

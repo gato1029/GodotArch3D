@@ -1,6 +1,9 @@
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
+using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using System;
 
@@ -43,13 +46,32 @@ public class BlackyRampVisualWorld
     // =====================================================
     // SET TILE
     // =====================================================
-    public void SetRamp(int worldX, int worldY, int height, RampsData rampsData)
+    public void SetRamp(int worldX, int worldY, int height, RampsData rampsData, Brush brush)
     {
-        ref var cell = ref ResolveOrCreateCell(worldX,worldY, height);
-        //cell.TileId = rampsPalette.GetIdPersistence(,rampsData);
-        cell.TileId = rampsPalette.GetIdPersistence(rampsData.nameMod,rampsData.idSave, out var rampDataPersist);
+        ushort id = rampsPalette.GetIdPersistence(rampsData.nameMod, rampsData.idSave, out var rampDataPersist);
+        foreach (var offset in brush.Cells)
+        {
+            int x = worldX + offset.x;
+            int y = worldY + offset.y;
+
+            ref var cell = ref ResolveOrCreateCell(x, y, height);
+
+            cell.TileId = id;
+        }
+
+        AtlasModsManager.GetSpriteUniqueId(rampsData.idTileSprite, out TileSpriteData tileSpriteData);
+
+        foreach (var item in tileSpriteData.tilesOcupancy)
+        {
+            int x = worldX + item.x;
+            int y = worldY + item.y;
+            BlackyWorldContext.PintarTerreno.RemoveTerrain(x,y,height,brush);
+        }
         
-        _textureMap.SetTileSprite(worldX, worldY, height, (int)RenderLayer, rampDataPersist.idTileSprite);
+        //cell.TileId = rampsPalette.GetIdPersistence(,rampsData);
+       
+        
+        _textureMap.SetTileSprite(worldX, worldY, height, (int)RenderLayer, rampDataPersist.idTileSprite,true);
 
     }
 

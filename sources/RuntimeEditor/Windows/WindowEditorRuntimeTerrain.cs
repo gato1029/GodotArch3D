@@ -34,6 +34,9 @@ public partial class WindowEditorRuntimeTerrain : Window
     private RuntimeWindowDockController dockController;
     private DualTileTemplate dualTileTemplate;
 
+    private long idTileSpriteCurrent=0;
+    private RampsData rampsDataSelected;
+
     ModeEditorTerrain modeEditorTerrain = ModeEditorTerrain.SELECCION;
     ModePaint modePaint = ModePaint.NORMAL;
 
@@ -82,17 +85,9 @@ public partial class WindowEditorRuntimeTerrain : Window
                 switch (modePaint)
                 {
                     case ModePaint.NORMAL:
-                        if (TilesEntityPreviewHelper.GetOnlyValidTiles().Count== 1)
-                        {
-                            var item =TilesEntityPreviewHelper.GetOnlyValidTiles()[0];
                             
-                            TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush),item.data.idMod, item.data.index);
-                        }
-                        else
-                        {
-                            TilesEntityPreviewHelper.Create(materialSelected, matrixCurrent);
-                        }
-                        
+                        TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush),idTileSpriteCurrent);
+                                             
                         break;
                     case ModePaint.AUTO_DUAL:
                         TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), dualTileTemplate.GetSlot(15).GetData(0).GetPart(0).IdTileSpriteData);
@@ -138,7 +133,7 @@ public partial class WindowEditorRuntimeTerrain : Window
         switch (modePaint)
         {
             case ModePaint.NORMAL:
-                TilesEntityPreviewHelper.Create(materialSelected, matrixCurrent);
+                TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush, sizeBrush), idTileSpriteCurrent);
                 break;
             case ModePaint.AUTO_DUAL:
                 TilesEntityPreviewHelper.Create(new Vector2I(sizeBrush,sizeBrush), dualTileTemplate.GetSlot(1).GetData(0).GetPart(0).IdMod, dualTileTemplate.GetSlot(15).GetData(0).GetPart(0).TileIndex);
@@ -207,7 +202,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                 DualTemplateSelection(dual);
                 break;
             case BlackyRenderLayer.Rampas:
-                var rampsDataSelected = (RampsData)obj;
+                rampsDataSelected = (RampsData)obj;
                 SpriteSelection(rampsDataSelected.idTileSprite);
                 break;
             case BlackyRenderLayer.Superficie:
@@ -221,6 +216,7 @@ public partial class WindowEditorRuntimeTerrain : Window
     }
     private void SpriteSelection(long idTileSprite)
     {
+        idTileSpriteCurrent = idTileSprite;
         modeEditorTerrain = ModeEditorTerrain.CREACION;        
         ConfigModePaint(ModePaint.NORMAL);
         AnyWindowOpen = false;
@@ -254,19 +250,19 @@ public partial class WindowEditorRuntimeTerrain : Window
     private void ConfigModePaint(ModePaint mode)
     {
         modePaint = mode;
-        switch (mode)
-        {
-            case ModePaint.NORMAL:
-                ContenedorDual.Visible = false;
-                EditorTextura.Visible = true;
-                break;
-            case ModePaint.AUTO_DUAL:
-                ContenedorDual.Visible = true;
-                EditorTextura.Visible = false;
-                break;
-            default:
-                break;
-        }
+        //switch (mode)
+        //{
+        //    case ModePaint.NORMAL:
+        //        ContenedorDual.Visible = false;
+        //        EditorTextura.Visible = true;
+        //        break;
+        //    case ModePaint.AUTO_DUAL:
+        //        ContenedorDual.Visible = true;
+        //        EditorTextura.Visible = false;
+        //        break;
+        //    default:
+        //        break;
+        //}
     }
     private void SetMaterial(MaterialData materialData)
     {
@@ -327,7 +323,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                     {
                         return;
                     }
-                    if (modePaint == ModePaint.NORMAL && matrixCurrent == null)
+                    if (modePaint == ModePaint.NORMAL && idTileSpriteCurrent ==0) 
                     {
                         return;
                     }
@@ -530,15 +526,15 @@ public partial class WindowEditorRuntimeTerrain : Window
                 BlackyWorldContext.PintarTerreno.SetTerrain(currentMouseTile.X,currentMouseTile.Y,altura,terrainBaseDataSelected,brush);
                 break;
             case BlackyRenderLayer.Rampas:
-                PaintNormal(altura, capa, tiles, brush);
+                BlackyWorldContext.PintarRampas.SetRamp(currentMouseTile.X, currentMouseTile.Y, altura, rampsDataSelected, brush);
+                
                 break;
             case BlackyRenderLayer.Superficie:
                 break;
             case BlackyRenderLayer.Caminos:
                 break;
             case BlackyRenderLayer.Adornos:
-                PaintNormal(altura, capa, tiles, brush);
-                break;
+                 break;
             default:
                 break;
         }
@@ -568,46 +564,46 @@ public partial class WindowEditorRuntimeTerrain : Window
     //    );
     //}
 
-    private void PaintNormal(int altura, BlackyRenderLayer capa, List<TilePreviewWithPosition> tiles, Brush brush)
+    private void PaintNormal(int altura, BlackyRenderLayer capa, Brush brush)
     {
 
-        if (tiles.Count == 1) // Si solo hay una celda seleccionada, aplicamos el pincel
-        {
-            var item = tiles[0];
-            foreach (var offset in brush.Cells)
-            {
-                int x = item.tilePosition.X + offset.x;
-                int y = item.tilePosition.Y + offset.y;
+        //if (tiles.Count == 1) // Si solo hay una celda seleccionada, aplicamos el pincel
+        //{
+            //var item = tiles[0];
+            //foreach (var offset in brush.Cells)
+            //{
+            //    int x = item.tilePosition.X + offset.x;
+            //    int y = item.tilePosition.Y + offset.y;
 
-                switch (capa)
-                {
-                    case BlackyRenderLayer.Rampas:
-                        BlackyWorldContext.PintarRampas.SetTile(x, y, altura, item.data.idMod, (ushort)item.data.index);
-                        break;                    
-                    case BlackyRenderLayer.Adornos:
-                        break;
-                    default:
-                        break;
-                }                
-            }
-        }
-        else
-        { //
-          // si hay varias celdas seleccionadas, aplicamos el pincel a cada una de ellas sin importar el tipo de pincel, para evitar complicaciones
-            foreach (var item in tiles)
-            {
-                switch (capa)
-                {                    
-                    case BlackyRenderLayer.Rampas:
-                        BlackyWorldContext.PintarRampas.SetTile(item.tilePosition.X, item.tilePosition.Y, altura, item.data.idMod, (ushort)item.data.index);
-                        break;                 
-                    case BlackyRenderLayer.Adornos:
-                        break;
-                    default:
-                        break;
-                }                
-            }
-        }
+            //    switch (capa)
+            //    {
+            //        case BlackyRenderLayer.Rampas:
+            //            BlackyWorldContext.PintarRampas.SetTile(x, y, altura, item.data.idMod, (ushort)item.data.index);
+            //            break;                    
+            //        case BlackyRenderLayer.Adornos:
+            //            break;
+            //        default:
+            //            break;
+            //    }                
+            //}
+        //}
+        //else
+        //{ //
+        //  // si hay varias celdas seleccionadas, aplicamos el pincel a cada una de ellas sin importar el tipo de pincel, para evitar complicaciones
+        //    foreach (var item in tiles)
+        //    {
+        //        switch (capa)
+        //        {                    
+        //            case BlackyRenderLayer.Rampas:
+        //                BlackyWorldContext.PintarRampas.SetTile(item.tilePosition.X, item.tilePosition.Y, altura, item.data.idMod, (ushort)item.data.index);
+        //                break;                 
+        //            case BlackyRenderLayer.Adornos:
+        //                break;
+        //            default:
+        //                break;
+        //        }                
+        //    }
+        //}
 
     }
 }
