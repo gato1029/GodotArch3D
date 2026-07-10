@@ -12,16 +12,3 @@ public class TerrainBaseData: IdDataLong
     //public List<long> rampas { get; set; } = new(); // de la clase TileSpriteData, para las rampas que se pueden poner sobre este terreno
 }
 
-public class TerrainRamp : IdDataLong
-{
-    // aqui se guard todo en base el idSAVE
-    public long idTileSpriteData { get; set; } // de la clase TileSpriteData, para las rampas que se pueden poner sobre este terreno
-}
-    public class SurfaceBaseData : IdDataLong
-{
-    public long idDuaTemplate { get; set; }
-
-    // luego agregar costo materiales etc
-    //public int costo {  get; set; }
-
-}

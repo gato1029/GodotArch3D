@@ -122,12 +122,34 @@ FontSize = 12
 IconExpand = true
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
+[node name="ButtonSuperficie" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=2027907589]
+custom_minimum_size = Vector2(68, 88.75)
+layout_mode = 2
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("7_jssc5")
+ButtonText = "Superficie"
+Padding = 18
+FontSize = 12
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
 [node name="ButtonRamps" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=113680956]
 custom_minimum_size = Vector2(68, 88.75)
 layout_mode = 2
 script = ExtResource("4_kc28b")
 IconTexture = ExtResource("7_jssc5")
 ButtonText = "Rampas"
+Padding = 18
+FontSize = 12
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonCaminos" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=899864231]
+custom_minimum_size = Vector2(68, 88.75)
+layout_mode = 2
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("7_jssc5")
+ButtonText = "Caminos"
 Padding = 18
 FontSize = 12
 IconExpand = true

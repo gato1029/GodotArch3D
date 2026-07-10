@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.Helpers;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using System;
 
 public partial class MenuContainer : VBoxContainer
@@ -14,6 +15,23 @@ public partial class MenuContainer : VBoxContainer
         ButtonGuardarMod.Pressed += ButtonGuardarMod_Pressed;
         ButtonDecoration.Pressed += ButtonDecoration_Pressed;
         ButtonRamps.Pressed += ButtonRamps_Pressed;
+        ButtonCaminos.Pressed += ButtonCaminos_Pressed;
+        ButtonSuperficie.Pressed += ButtonSuperficie_Pressed;
+    }
+
+    private void ButtonSuperficie_Pressed()
+    {
+        ContenedorEditor.ClearChildrens();
+        var control = RuntimeServices.NodeRegistry.Create<RuntimeSuperficieControl>();
+        ContenedorEditor.AddChild(control);
+
+    }
+
+    private void ButtonCaminos_Pressed()
+    {
+        ContenedorEditor.ClearChildrens();
+        var control = RuntimeServices.NodeRegistry.Create<RuntimeCaminosControl>();
+        ContenedorEditor.AddChild(control);
     }
 
     private void ButtonRamps_Pressed()

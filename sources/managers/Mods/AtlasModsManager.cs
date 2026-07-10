@@ -54,6 +54,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<ushort, TerrainDataTransition> terrainDataTransicion = new();
     private readonly AtlasMods<ushort, TerrainBaseData> terrenos = new ();
     private readonly AtlasMods<ushort, RampsData> rampsData = new();
+    private readonly AtlasMods<ushort, CaminosData> caminosData = new();
     private readonly AtlasMods<ushort, DecorationData> decorationData = new();
 
     private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a ushort
@@ -366,6 +367,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(terrenos, idMod, name);
         CargarDatos(rampsData, idMod, name);
         CargarDatos(decorationData, idMod, name);
+        CargarDatos(caminosData, idMod, name);
 
     }
 
@@ -575,6 +577,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         terrenos.Clear();
         rampsData.Clear();
         decorationData.Clear();
+        caminosData.Clear();
         // ================================
         // CLEAR INDEXES
         // ================================
@@ -604,6 +607,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(terrenos);
         RegisterAtlas(rampsData);
         RegisterAtlas(decorationData);
+        RegisterAtlas(caminosData);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {

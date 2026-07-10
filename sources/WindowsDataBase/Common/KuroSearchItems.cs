@@ -73,7 +73,7 @@ public partial class KuroSearchItems : PanelContainer
             button.IconTexture = icon;
         }
 
-        button.ButtonText = name;
+        button.ButtonText = name;        
         button.TextPosition = KuroButton.TextPlacement.Left;
         button.TextHorizontalAlignment = KuroButton.CaptionHAlign.Left;
         button.IconMinSize = new Vector2(32, 32);
