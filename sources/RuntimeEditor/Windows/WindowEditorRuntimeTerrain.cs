@@ -474,10 +474,13 @@ public partial class WindowEditorRuntimeTerrain : Window
                 BlackyWorldContext.PintarRampas.RemoveTile(currentMouseTile.X, currentMouseTile.Y, altura);
                 break;
             case BlackyRenderLayer.Superficie:
+                BlackyWorldContext.PintarSuperficies.RemoveSuperficie(currentMouseTile.X, currentMouseTile.Y, altura,brush);
                 break;
             case BlackyRenderLayer.Caminos:
+                BlackyWorldContext.PintarCaminos.RemovePath(currentMouseTile.X, currentMouseTile.Y, altura, brush);
                 break;
             case BlackyRenderLayer.Adornos:
+                BlackyWorldContext.PintarAdornos.RemoveDecoration(currentMouseTile.X, currentMouseTile.Y, altura);
                 break;            
         }
         //switch (modePaint)
@@ -541,15 +544,17 @@ public partial class WindowEditorRuntimeTerrain : Window
                 BlackyWorldContext.PintarTerreno.SetTerrain(currentMouseTile.X,currentMouseTile.Y,altura,terrainBaseDataSelected,brush);
                 break;
             case BlackyRenderLayer.Rampas:
-                BlackyWorldContext.PintarRampas.SetRamp(currentMouseTile.X, currentMouseTile.Y, altura, rampsDataSelected, brush);
-                
+                BlackyWorldContext.PintarRampas.SetRamp(currentMouseTile.X, currentMouseTile.Y, altura, rampsDataSelected, brush);                
                 break;
             case BlackyRenderLayer.Superficie:
+                BlackyWorldContext.PintarSuperficies.SetSuperficie(currentMouseTile.X, currentMouseTile.Y, altura, superficieDataSelected, brush);
                 break;
             case BlackyRenderLayer.Caminos:
+                BlackyWorldContext.PintarCaminos.SetPath(currentMouseTile.X, currentMouseTile.Y, altura, caminosDataSelected, brush);
                 break;
             case BlackyRenderLayer.Adornos:
-                 break;
+                BlackyWorldContext.PintarAdornos.SetDecoration(currentMouseTile.X, currentMouseTile.Y, altura, decorationDataSelected, brush);
+                break;
             default:
                 break;
         }

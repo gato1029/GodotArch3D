@@ -16,7 +16,7 @@
 oversampling_override = 1.0
 title = "Terreno"
 position = Vector2i(0, 36)
-size = Vector2i(600, 800)
+size = Vector2i(620, 800)
 script = ExtResource("1_1tbo3")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=1298628343]
@@ -99,6 +99,7 @@ script = ExtResource("9_ptgif")
 metadata/_custom_type_script = "uid://d4g3outtemvav"
 
 [node name="SpinBoxSizeBrush" type="SpinBox" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=310327887]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 min_value = 1.0
 value = 1.0

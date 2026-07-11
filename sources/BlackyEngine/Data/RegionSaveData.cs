@@ -86,7 +86,15 @@ public class RegionSaveData
 
     [Key(3)]
     public List<GenericChunkSave> RampChunks { get; set; } = new();
+    
+    [Key(4)]
+    public List<GenericChunkSave> SurfaceChunks { get; set; } = new();
 
+    [Key(5)]
+    public List<GenericChunkSave> DecorationChunks { get; set; } = new();
+
+    [Key(6)]
+    public List<GenericChunkSave> PathChunks { get; set; } = new();
 }
 
 // =====================================================
@@ -103,11 +111,13 @@ public class BlackyWorldPersistence
     string path = "D:\\GitKraken\\MapsGame";
     string rootPath;
     string nameMap;
+
     private readonly BlackyWorldRegions _regions;
-
     private readonly BlackyTerrainWorldData _terrainWorld;
-
     private readonly BlackyRampVisualWorld _rampWorld;
+    private readonly BlackySurfaceWorldData _superficiesData;
+    private readonly BlackyDecorationWorldData _adornosData;
+    private readonly BlackyPathWorldData _caminosData;
 
     // aun me faltan agregar el de los caminos, decoraciones, superficies
 
@@ -117,13 +127,18 @@ public class BlackyWorldPersistence
         BlackyWorldRegions regions,
         BlackyTerrainWorldData terrainWorld,
         BlackyRampVisualWorld rampWorld,
+        BlackySurfaceWorldData superficiesData,
+        BlackyDecorationWorldData adornosData,
+        BlackyPathWorldData caminosData,
         SaveFormat format = SaveFormat.Binary)
     {
         this.nameMap = nameMap;
         _regions = regions;
         _terrainWorld = terrainWorld;
         _rampWorld = rampWorld;
-
+        _superficiesData = superficiesData;
+        _adornosData = adornosData;
+        _caminosData = caminosData;
         _format = format;
 
         rootPath = path + "\\ " + nameMap;
@@ -167,6 +182,9 @@ public class BlackyWorldPersistence
     {
         _terrainWorld.terrainPalette.Save(rootPath, _format);
         _rampWorld.rampsPalette.Save(rootPath, _format);
+        _superficiesData.pallete.Save(rootPath, _format);
+        _adornosData.palette.Save(rootPath, _format);
+        _caminosData.pallete.Save(rootPath, _format);
     }
     public void SaveAllDirtyRegions()
     {
@@ -281,12 +299,19 @@ public class BlackyWorldPersistence
         save.TerrainChunks =  SaveTerrainRegion(region);
 
         save.RampChunks = SaveVisualRegion(region, _rampWorld);
+        save.SurfaceChunks = SaveVisualRegion(region, _superficiesData);
+        save.DecorationChunks = SaveVisualRegion(region, _adornosData);
+        save.PathChunks = SaveVisualRegion(region, _caminosData);
 
         _regions.ClearDirtyRegion(regionX, regionY);
 
         _terrainWorld.ClearDirtyRegion(region);
 
         _rampWorld.ClearDirtyRegion(region);
+
+        _adornosData.ClearDirtyRegion(region);
+        _caminosData.ClearDirtyRegion(region);
+        _superficiesData.ClearDirtyRegion(region);
 
         return save;
     }
@@ -297,7 +322,7 @@ public class BlackyWorldPersistence
 
     private List<GenericChunkSave> SaveVisualRegion(
         BlackyRegion region,
-        BlackyWorldDataMap<VisualTileCell> world)
+        BlackyWorldDataMap<ushort> world)
     {
         List<GenericChunkSave> result = new();
 
@@ -335,10 +360,7 @@ public class BlackyWorldPersistence
                 {
                     for (int x = 0; x < world.ChunkSize; x++)
                     {
-                        ushort tile =
-                            heightData
-                                .GetCell(x, y)
-                                .TileId;
+                        ushort tile = heightData.GetCell(x, y);
 
                         tiles[
                             y * world.ChunkSize + x]

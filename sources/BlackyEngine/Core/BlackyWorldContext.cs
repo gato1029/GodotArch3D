@@ -68,6 +68,9 @@ public static class BlackyWorldContext
     //public static BlackyChunkCacheTextureMap PintarTerreno => Services.TerrainTexturePainter;
     public static BlackyRampVisualWorld PintarRampas => Services.RampasData;
     public static BlackyTerrainWorldData PintarTerreno => Services.TerrainData;
+    public static BlackySurfaceWorldData PintarSuperficies => Services.SuperficiesData;
+    public static BlackyPathWorldData PintarCaminos => Services.CaminosData;
+    public static BlackyDecorationWorldData PintarAdornos => Services.AdornosData;
 
 
     // ================================

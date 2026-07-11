@@ -1,6 +1,9 @@
 using Godot;
 using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 
 public partial class RuntimeSuperficieControl : PanelContainer
@@ -15,12 +18,25 @@ public partial class RuntimeSuperficieControl : PanelContainer
         ButtonGuardar.Pressed += ButtonGuardar_Pressed;
         ButtonEliminar.Pressed += ButtonEliminar_Pressed;
         ButtonNuevo.Pressed += ButtonNuevo_Pressed;
-        PreviewSprite.OnItemSelectedChanged += TileSpriteSelector_OnItemSelectedChanged;
+        ButtonDual.Pressed += ButtonDual_Pressed;
+        
     }
 
-    private void TileSpriteSelector_OnItemSelectedChanged(TileSpriteData objectControl)
+
+    private void ButtonDual_Pressed()
     {
-        data.idDualTemplate = objectControl.id;
+        var w = RuntimeServices.NodeRegistry.Create<WindowDataGenericMod>();
+        AddChild(w);
+        w.PopupCentered();
+        w.LoadData<DualTileTemplate>();
+        w.OnItemSelected += W_OnItemSelected;
+    }
+
+    private void W_OnItemSelected(object obj)
+    {
+        var dualTileTemplate = (DualTileTemplate)obj;
+        ButtonDual.IconTexture = dualTileTemplate.textureVisual;
+        data.idDualTemplate = dualTileTemplate.id;
     }
 
     private void ClearAll()
@@ -51,13 +67,13 @@ public partial class RuntimeSuperficieControl : PanelContainer
     }
     private void KuroItems_OnObjectPressed(object obj)
     {
-        //data = (SuperficieData)obj;
-        //LineEditName.Text = data.name;
-        //if (data.idTileSprite == 0)
-        //{
-        //    return;
-        //}
-        //AtlasModsManager.GetSpriteUniqueId(data.idTileSprite, out TileSpriteData tileSpriteData);
-        //PreviewSprite.LoadData(tileSpriteData);
+        data = (SuperficieData)obj;
+        var dual = MasterDataManager.GetData<DualTileTemplate>(data.idDualTemplate);
+        LineEditName.Text = data.name;
+        if (dual != null)
+        {
+            ButtonDual.IconTexture = dual.textureVisual;
+        }
+      
     }
 }

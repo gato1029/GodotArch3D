@@ -132,7 +132,7 @@ public class BlackyChunkCacheTextureMap
     // TILE ACCESS
     // ===============================
 
-    public void RemoveTile(int worldX, int worldY, int height, int layer)
+    public void RemoveTileSprite(int worldX, int worldY, int height, int layer)
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);

@@ -10,7 +10,7 @@ public partial class RuntimeCaminosControl : PanelContainer
     private KuroSearchItems KuroItems;
     private KuroButton ButtonNuevo;
     private LineEdit LineEditName;
-    private TileSpritePreview PreviewSprite;
+    private KuroButton ButtonDual;
     private KuroButton ButtonGuardar;
     private KuroButton ButtonEliminar;
 
@@ -19,7 +19,7 @@ public partial class RuntimeCaminosControl : PanelContainer
         KuroItems = GetNode<KuroSearchItems>("HBoxContainer2/KuroItems");
         ButtonNuevo = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/ButtonNuevo");
         LineEditName = GetNode<LineEdit>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/LineEditName");
-        PreviewSprite = GetNode<TileSpritePreview>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/PreviewSprite");
+        ButtonDual = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ButtonDual");
         ButtonGuardar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonGuardar");
         ButtonEliminar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonEliminar");
     }

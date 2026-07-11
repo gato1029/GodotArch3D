@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bor51mewublcc" path="res://sources/WindowsDataBase/Common/KuroSearchItems.tscn" id="2_ldtth"]
 [ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="3_q48dk"]
 [ext_resource type="Texture2D" uid="uid://e4igfbbvdqym" path="res://resources/Textures/iconos/file.png" id="4_vtar4"]
-[ext_resource type="PackedScene" uid="uid://63mooil1786r" path="res://sources/RuntimeEditor/Common/TileSpritePreview.tscn" id="5_eas8h"]
+[ext_resource type="Texture2D" uid="uid://cqt3q1wbbj08m" path="res://resources/Textures/iconos/Clone Figure.png" id="5_uvck1"]
 [ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="6_87v5g"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="7_q68mj"]
 
@@ -70,11 +70,14 @@ layout_mode = 2
 layout_mode = 2
 text = "Sprite:"
 
-[node name="PreviewSprite" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1018904121 instance=ExtResource("5_eas8h")]
+[node name="ButtonDual" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1503452927]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-isSelectorEnabled = true
+size_flags_horizontal = 0
+script = ExtResource("3_q48dk")
+IconTexture = ExtResource("5_uvck1")
+IconMinSize = Vector2(64, 64)
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=1942224493]
 layout_mode = 2

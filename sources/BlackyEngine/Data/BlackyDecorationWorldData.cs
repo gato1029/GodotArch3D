@@ -4,38 +4,24 @@ using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
 using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers.Mods;
-using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
-/// <summary>
-/// Mundo visual autoritativo para rampas.
-/// 
-/// A diferencia del terreno:
-/// - NO usa dual tiles.
-/// - NO genera visuales proceduralmente.
-/// - Los tiles visuales SON persistentes.
-/// - Guarda IDs locales regionales.
-/// </summary>
-public struct VisualTileCell
-{
-    /// <summary>
-    /// ID local dentro de la palette regional.
-    /// </summary>
-    public ushort TileId;
-}
 
-public class BlackyRampVisualWorld
-    : BlackyWorldDataMap<ushort>
+public class BlackyDecorationWorldData: BlackyWorldDataMap<ushort>
 {
-    public BlackyGenericPalette<RampsData> rampsPalette { get; } = new("Rampas");
-    public BlackyRampVisualWorld(
+    public BlackyGenericPalette<DecorationData> palette { get; } = new("Decoracion");
+    public BlackyDecorationWorldData(
         int chunkSize,
         BlackyChunkCacheTextureMap textureMap,
         BlackyWorldRegions regions)
         : base(
             chunkSize,
-            BlackyRenderLayer.Rampas,
+            BlackyRenderLayer.Adornos,
             textureMap,
             false,
             regions)
@@ -46,9 +32,9 @@ public class BlackyRampVisualWorld
     // =====================================================
     // SET TILE
     // =====================================================
-    public void SetRamp(int worldX, int worldY, int height, RampsData rampsData, Brush brush)
+    public void SetDecoration(int worldX, int worldY, int height, DecorationData decorationData, Brush brush)
     {
-        ushort id = rampsPalette.GetIdPersistence(rampsData.nameMod, rampsData.idSave, out var rampDataPersist);
+        ushort id = palette.GetIdPersistence(decorationData.nameMod, decorationData.idSave, out var decorationDataPersist);
         foreach (var offset in brush.Cells)
         {
             int x = worldX + offset.x;
@@ -59,39 +45,19 @@ public class BlackyRampVisualWorld
             cell = id;
         }
 
-        AtlasModsManager.GetSpriteUniqueId(rampsData.idTileSprite, out TileSpriteData tileSpriteData);
-
-        foreach (var item in tileSpriteData.tilesOcupancy)
-        {
-            int x = worldX + item.x;
-            int y = worldY + item.y;
-            BlackyWorldContext.PintarTerreno.RemoveTerrain(x,y,height,brush);
-        }
-        
-        //cell.TileId = rampsPalette.GetIdPersistence(,rampsData);
-       
-        
-        _textureMap.SetTileSprite(worldX, worldY, height, (int)RenderLayer, rampDataPersist.idTileSprite,true);
+        AtlasModsManager.GetSpriteUniqueId(decorationDataPersist.idTileSprite, out TileSpriteData tileSpriteData);
+                
+        _textureMap.SetTileSprite(worldX, worldY, height, (int)RenderLayer, decorationDataPersist.idTileSprite, true);
 
     }
 
-    public void SetTile(int worldX,int worldY,int height,string modName, ushort textureIndex)
-    {  
-        ref var cell =
-            ref ResolveOrCreateCell(
-                worldX,
-                worldY,
-                height);
 
-        cell = _textureMap.SetTile( worldX,  worldY,  height, (int)RenderLayer, modName, textureIndex,true);
-
-    }
 
     // =====================================================
     // REMOVE TILE
     // =====================================================
 
-    public void RemoveTile(
+    public void RemoveDecoration(
         int worldX,
         int worldY,
         int height)
@@ -102,7 +68,7 @@ public class BlackyRampVisualWorld
                 worldY,
                 height);
 
-        cell = 0;
+        cell= 0;
 
         _textureMap.RemoveTileSprite(
             worldX,
@@ -115,7 +81,7 @@ public class BlackyRampVisualWorld
     // GET
     // =====================================================
 
-    public bool HasTile(
+    public bool HasDecoration(
         int worldX,
         int worldY,
         int height)
@@ -132,7 +98,7 @@ public class BlackyRampVisualWorld
         return cell != 0;
     }
 
-    public ushort GetTile(
+    public ushort GetDecoration(
         int worldX,
         int worldY,
         int height)
@@ -145,6 +111,7 @@ public class BlackyRampVisualWorld
         {
             return 0;
         }
+
         return cell;
     }
 }
