@@ -56,6 +56,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<ushort, RampsData> rampsData = new();
     private readonly AtlasMods<ushort, CaminosData> caminosData = new();
     private readonly AtlasMods<ushort, DecorationData> decorationData = new();
+    private readonly AtlasMods<ushort, SuperficieData> superficieData = new();
 
     private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a ushort
     private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a ushort
@@ -368,6 +369,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(rampsData, idMod, name);
         CargarDatos(decorationData, idMod, name);
         CargarDatos(caminosData, idMod, name);
+        CargarDatos(superficieData,idMod, name);
 
     }
 
@@ -578,6 +580,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         rampsData.Clear();
         decorationData.Clear();
         caminosData.Clear();
+        superficieData.Clear();
         // ================================
         // CLEAR INDEXES
         // ================================
@@ -608,6 +611,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(rampsData);
         RegisterAtlas(decorationData);
         RegisterAtlas(caminosData);
+        RegisterAtlas(superficieData);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {

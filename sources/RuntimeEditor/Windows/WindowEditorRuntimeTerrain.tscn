@@ -103,6 +103,7 @@ layout_mode = 2
 min_value = 1.0
 value = 1.0
 alignment = 2
+prefix = "Brocha:"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/ScrollContainer/VBoxContainer/HBoxContainer" unique_id=938363571]
 layout_mode = 2

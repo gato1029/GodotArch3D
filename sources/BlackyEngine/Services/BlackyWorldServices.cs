@@ -19,6 +19,7 @@ public sealed class BlackyWorldServices
     // Terreno
     // ==============================
 
+    public BlackyWorldPersistence persistenceData { get; }
     public BlackyWorldRegions regionsRender { get; } = new BlackyWorldRegions();
     public BlackyTerrainWorldData TerrainData { get; } // para pintar el terreno, el ushort es el id del terreno que se pintara en ese lugar
     public BlackyRampVisualWorld RampasData { get; } // para pintar rampas y similares, el ushort es el id del tile que se pintara en ese lugar
@@ -76,6 +77,9 @@ public sealed class BlackyWorldServices
 
         TerrainData = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
         RampasData = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender);
+
+
+        persistenceData = new BlackyWorldPersistence(world.Name,regionsRender,TerrainData,RampasData, SaveFormat.Binary);
 
         TileRenderer = new BlackyTileRenderSystem(
             sim.Flecs,

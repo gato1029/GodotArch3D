@@ -119,6 +119,8 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<TerrainBaseData>("TerrainBaseData");
             RegisterCollection<DecorationData>("DecorationData");
             RegisterCollection<RampsData>("RampsData");
+            RegisterCollection<CaminosData>("CaminosData");
+            RegisterCollection<SuperficieData>("SuperficieData");
 
 
 

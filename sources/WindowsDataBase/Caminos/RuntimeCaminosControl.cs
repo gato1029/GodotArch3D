@@ -20,7 +20,7 @@ public partial class RuntimeCaminosControl : PanelContainer
 
     private void TileSpriteSelector_OnItemSelectedChanged(TileSpriteData objectControl)
     {
-        data.idTileSprite = objectControl.id;
+        data.idDualTemplate = objectControl.id;
     }
 
     private void ClearAll()
@@ -51,14 +51,14 @@ public partial class RuntimeCaminosControl : PanelContainer
     }
     private void KuroItems_OnObjectPressed(object obj)
     {
-        data = (CaminosData)obj;
-        LineEditName.Text = data.name;
-        if (data.idTileSprite == 0)
-        {
-            return;
-        }
-        AtlasModsManager.GetSpriteUniqueId(data.idTileSprite, out TileSpriteData tileSpriteData);
-        PreviewSprite.LoadData(tileSpriteData);
+        //data = (CaminosData)obj;
+        //LineEditName.Text = data.name;
+        //if (data.idTileSprite == 0)
+        //{
+        //    return;
+        //}
+        //AtlasModsManager.GetSpriteUniqueId(data.idTileSprite, out TileSpriteData tileSpriteData);
+        //PreviewSprite.LoadData(tileSpriteData);
     }
 
 }

@@ -1,4 +1,4 @@
-using Arch.Core;
+
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
@@ -6,18 +6,13 @@ using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Flecs.NET.Core.Ecs.Units;
+
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
 
 public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
 {
-    public BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new();
+    public BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new("Terreno");
 
     private DualTileTemplate _dualTemplate;
     public BlackyTerrainWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions) : base(chunkSize, BlackyRenderLayer.TerrenoBase, textureMap, true, regions)
@@ -69,11 +64,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
             int x = worldX + offset.x;
             int y = worldY + offset.y;
 
-            ref var cell =
-                ref ResolveOrCreateCell(
-                    x,
-                    y,
-                    height);
+            ref var cell = ref ResolveOrCreateCell(x, y, height);
 
             cell.id = terrainPalette.GetIdPersistence(modName, terrainId, out  data);
         }

@@ -36,6 +36,9 @@ public static class BlackyWorldContext
 
     public static BlackyWorld World => BlackyWorldRegistry.Instance.ActiveWorld;
 
+
+
+
     // ================================
     // Core Modules
     // ================================
@@ -65,6 +68,7 @@ public static class BlackyWorldContext
     //public static BlackyChunkCacheTextureMap PintarTerreno => Services.TerrainTexturePainter;
     public static BlackyRampVisualWorld PintarRampas => Services.RampasData;
     public static BlackyTerrainWorldData PintarTerreno => Services.TerrainData;
+
 
     // ================================
     // Render Services
@@ -102,4 +106,5 @@ public static class BlackyWorldContext
     // ================================
 
     public static bool HasWorld => BlackyWorldRegistry.Instance.ActiveWorld != null;
+    public static BlackyWorldPersistence Persistence => Services.persistenceData;
 }

@@ -3,5 +3,5 @@ using System;
 
 public class CaminosData :IdDataLong
 {
-	public long idTileSprite { get; set; }
+    public long idDualTemplate { get; set; } // de la clase dualtileTemplate
 }

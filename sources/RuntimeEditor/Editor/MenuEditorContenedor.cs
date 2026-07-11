@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using System;
 using System.ComponentModel.Design;
 
@@ -26,7 +27,7 @@ public partial class MenuEditorContenedor : HBoxContainer
 
     private void ButtonGuardarMapa_Pressed()
     {
-        
+        BlackyWorldContext.Persistence.SaveAllDirtyRegions();
     }
 
     private void ButtonNuevoMapa_Pressed()

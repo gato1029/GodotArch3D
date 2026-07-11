@@ -1,3 +1,4 @@
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyTiles.Data;
 using MessagePack;
@@ -36,21 +37,23 @@ public class TerrainChunkSave
 }
 
 // =====================================================
-// VISUAL
+// Generico
+// Aqui solo guardamos, el identificador del tipo de dato que guardamos
+// por que estos datos o existen o no existe, no hay intermedios, y no se guarda mas informacion
 // =====================================================
 
 [MessagePackObject]
-public class VisualHeightSave
+public class GenericHeightSave
 {
     [Key(0)]
     public int Height { get; set; }
 
     [Key(1)]
-    public ushort[] Tiles { get; set; }
+    public ushort[] idData { get; set; } // representa su identificador de dato de lo que estamos guardando
 }
 
 [MessagePackObject]
-public class VisualChunkSave
+public class GenericChunkSave
 {
     [Key(0)]
     public int ChunkX { get; set; }
@@ -59,8 +62,11 @@ public class VisualChunkSave
     public int ChunkY { get; set; }
 
     [Key(2)]
-    public List<VisualHeightSave> Heights { get; set; } = new();
+    public List<GenericHeightSave> Heights { get; set; } = new();
 }
+
+
+
 
 // =====================================================
 // REGION
@@ -76,13 +82,11 @@ public class RegionSaveData
     public int RegionY { get; set; }
 
     [Key(2)]
-    public Dictionary<ushort, TileDataPersisted> Palette { get; set; } = new();
-
-    [Key(3)]
     public List<TerrainChunkSave> TerrainChunks { get; set; } = new();
 
-    [Key(4)]
-    public List<VisualChunkSave> RampChunks { get; set; } = new();
+    [Key(3)]
+    public List<GenericChunkSave> RampChunks { get; set; } = new();
+
 }
 
 // =====================================================
@@ -95,25 +99,34 @@ public enum SaveFormat
 }
 public class BlackyWorldPersistence
 {
+
+    string path = "D:\\GitKraken\\MapsGame";
+    string rootPath;
+    string nameMap;
     private readonly BlackyWorldRegions _regions;
 
     private readonly BlackyTerrainWorldData _terrainWorld;
 
     private readonly BlackyRampVisualWorld _rampWorld;
 
+    // aun me faltan agregar el de los caminos, decoraciones, superficies
+
     private readonly SaveFormat _format;
 
-    public BlackyWorldPersistence(
+    public BlackyWorldPersistence(string nameMap,
         BlackyWorldRegions regions,
         BlackyTerrainWorldData terrainWorld,
         BlackyRampVisualWorld rampWorld,
         SaveFormat format = SaveFormat.Binary)
     {
+        this.nameMap = nameMap;
         _regions = regions;
         _terrainWorld = terrainWorld;
         _rampWorld = rampWorld;
 
         _format = format;
+
+        rootPath = path + "\\ " + nameMap;
     }
 
     // =====================================================
@@ -145,22 +158,29 @@ public class BlackyWorldPersistence
             .Deserialize<RegionSaveData>(data);
     }
 
+    
     // =====================================================
     // SAVE ALL DIRTY
     // =====================================================
 
-    public void SaveAllDirtyRegions(string rootPath)
+    public void SavePalletes(string rootPath)
     {
+        _terrainWorld.terrainPalette.Save(rootPath, _format);
+        _rampWorld.rampsPalette.Save(rootPath, _format);
+    }
+    public void SaveAllDirtyRegions()
+    {
+        
+
+        SavePalletes(rootPath);
+
         foreach (var region in _regions.GetDirtyRegions())
         {
             // ============================================
             // BUILD SAVE
             // ============================================
 
-            RegionSaveData save =
-                SaveRegion(
-                    region.X,
-                    region.Y);
+            RegionSaveData save = SaveRegion( region.X, region.Y);
 
             // ============================================
             // PATH
@@ -249,35 +269,20 @@ public class BlackyWorldPersistence
                 regionX,
                 regionY);
 
-        RegionSaveData save =
-            new RegionSaveData
-            {
+        RegionSaveData save =new RegionSaveData  {
                 RegionX = regionX,
-                RegionY = regionY,
-
-                Palette =
-                    region.GetSavePaletteData()
+                RegionY = regionY
             };
 
         // =================================================
-        // TERRAIN
+        // maps layers
         // =================================================
 
-        save.TerrainChunks =
-            SaveTerrainRegion(region);
+        save.TerrainChunks =  SaveTerrainRegion(region);
 
-        // =================================================
-        // RAMPS
-        // =================================================
+        save.RampChunks = SaveVisualRegion(region, _rampWorld);
 
-        save.RampChunks =
-            SaveVisualRegion(
-                region,
-                _rampWorld);
-
-        _regions.ClearDirtyRegion(
-            regionX,
-            regionY);
+        _regions.ClearDirtyRegion(regionX, regionY);
 
         _terrainWorld.ClearDirtyRegion(region);
 
@@ -290,11 +295,11 @@ public class BlackyWorldPersistence
     // SAVE VISUAL
     // =====================================================
 
-    private List<VisualChunkSave> SaveVisualRegion(
+    private List<GenericChunkSave> SaveVisualRegion(
         BlackyRegion region,
         BlackyWorldDataMap<VisualTileCell> world)
     {
-        List<VisualChunkSave> result = new();
+        List<GenericChunkSave> result = new();
 
         foreach (var coord in world.GetDirtyChunksForRegion(region))
         {
@@ -306,7 +311,7 @@ public class BlackyWorldPersistence
                 continue;
             }
 
-            VisualChunkSave chunkSave =
+            GenericChunkSave chunkSave =
                 new()
                 {
                     ChunkX = coord.X,
@@ -348,10 +353,10 @@ public class BlackyWorldPersistence
                     continue;
 
                 chunkSave.Heights.Add(
-                    new VisualHeightSave
+                    new GenericHeightSave
                     {
                         Height = height,
-                        Tiles = tiles
+                        idData = tiles
                     });
             }
 

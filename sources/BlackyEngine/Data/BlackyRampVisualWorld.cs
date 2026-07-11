@@ -28,7 +28,7 @@ public struct VisualTileCell
 public class BlackyRampVisualWorld
     : BlackyWorldDataMap<VisualTileCell>
 {
-    public BlackyGenericPalette<RampsData> rampsPalette { get; } = new();
+    public BlackyGenericPalette<RampsData> rampsPalette { get; } = new("Rampas");
     public BlackyRampVisualWorld(
         int chunkSize,
         BlackyChunkCacheTextureMap textureMap,

@@ -36,6 +36,10 @@ public partial class WindowEditorRuntimeTerrain : Window
 
     private long idTileSpriteCurrent=0;
     private RampsData rampsDataSelected;
+    private DecorationData decorationDataSelected;
+    private SuperficieData superficieDataSelected;
+    private CaminosData caminosDataSelected;
+
 
     ModeEditorTerrain modeEditorTerrain = ModeEditorTerrain.SELECCION;
     ModePaint modePaint = ModePaint.NORMAL;
@@ -176,11 +180,13 @@ public partial class WindowEditorRuntimeTerrain : Window
                 w.LoadData<RampsData>();
                 break;
             case BlackyRenderLayer.Superficie:
+                w.LoadData<SuperficieData>();
                 break;
             case BlackyRenderLayer.Caminos:
+                w.LoadData<CaminosData>();
                 break;
             case BlackyRenderLayer.Adornos:
-                w.LoadData<MaterialData>();
+                w.LoadData<DecorationData>();
                 break;            
         }        
     }
@@ -194,11 +200,12 @@ public partial class WindowEditorRuntimeTerrain : Window
     private void W_OnItemSelectedTerrain(object obj)
     {
         var layerSelected = (BlackyRenderLayer)KuroOptionButtonCapa.GetSelectedData();
+        DualTileTemplate dual = null;
         switch (layerSelected)
         {
             case BlackyRenderLayer.TerrenoBase:
                 terrainBaseDataSelected = (TerrainBaseData)obj;
-                var dual = AtlasModsManager.Get<DualTileTemplate>(terrainBaseDataSelected.nameMod, terrainBaseDataSelected.idDualTemplate);
+                dual = AtlasModsManager.Get<DualTileTemplate>(terrainBaseDataSelected.nameMod, terrainBaseDataSelected.idDualTemplate);
                 DualTemplateSelection(dual);
                 break;
             case BlackyRenderLayer.Rampas:
@@ -206,10 +213,18 @@ public partial class WindowEditorRuntimeTerrain : Window
                 SpriteSelection(rampsDataSelected.idTileSprite);
                 break;
             case BlackyRenderLayer.Superficie:
+                superficieDataSelected = (SuperficieData)obj;
+                dual = AtlasModsManager.Get<DualTileTemplate>(superficieDataSelected.nameMod, superficieDataSelected.idDualTemplate);
+                DualTemplateSelection(dual);
                 break;
             case BlackyRenderLayer.Caminos:
+                caminosDataSelected = (CaminosData)obj;
+                dual = AtlasModsManager.Get<DualTileTemplate>(caminosDataSelected.nameMod, caminosDataSelected.idDualTemplate);
+                DualTemplateSelection(dual);
                 break;
             case BlackyRenderLayer.Adornos:
+                decorationDataSelected = (DecorationData)obj;
+                SpriteSelection(decorationDataSelected.idTileSprite);
                 break;
         }
 
