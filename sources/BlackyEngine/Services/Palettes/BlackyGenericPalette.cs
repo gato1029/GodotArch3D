@@ -15,12 +15,12 @@ public struct GenericPersistenceData
     public string ModName { get; set; }
 
     [Key(1)]
-    public ushort id { get; set; }
+    public long id { get; set; }
 }
 
 public readonly record struct PairCacheData(
     string ModName,
-    ushort Id
+    long Id
 );
 
 public class BlackyGenericPalette<T> where T : class
@@ -44,7 +44,7 @@ public class BlackyGenericPalette<T> where T : class
         }
         return null;
     }
-    public ushort GetIdPersistence(string modName, ushort originalId, out T data)
+    public ushort GetIdPersistence(string modName, long originalId, out T data)
     {
         data = AtlasModsManager.Get<T>(modName, originalId);
 

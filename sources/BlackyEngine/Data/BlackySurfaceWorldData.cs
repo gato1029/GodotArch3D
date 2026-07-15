@@ -32,9 +32,9 @@ public class BlackySurfaceWorldData: BlackyWorldDataMap<ushort>
     }
     internal void SetSuperficie(int x, int y, int altura, SuperficieData superficieData, Brush brush)
     {
-        if (DiferentPosition(x, y, altura, (int)RenderLayer, brush, superficieData.idSave))
+        if (DiferentPosition(x, y, altura, (int)RenderLayer, brush, superficieData.id))
         {
-            SetSuperficie(x, y, altura, superficieData.nameMod, superficieData.idSave, brush);
+            SetSuperficie(x, y, altura, superficieData.nameMod, superficieData.id, brush);
         }
 
     }
@@ -44,12 +44,12 @@ public class BlackySurfaceWorldData: BlackyWorldDataMap<ushort>
     int lastY = 0;
     int lastAltura = -1;
     int lastCapa = -1;
-    int lastTerrain = -1;
+    long lastTerrain = -1;
     private bool DiferentPosition(int baseX, int baseY,
     int altura,
     int capa,
     Brush brush,
-    int terrainBaseDataId)
+    long terrainBaseDataId)
     {
         if (baseX != lastX || baseY != lastY || altura != lastAltura || capa != lastCapa || terrainBaseDataId != lastTerrain)
         {
@@ -58,7 +58,7 @@ public class BlackySurfaceWorldData: BlackyWorldDataMap<ushort>
         return false;
     }
 
-    public void SetSuperficie(int worldX, int worldY, int height, string modName, ushort terrainId, Brush brush)
+    public void SetSuperficie(int worldX, int worldY, int height, string modName, long terrainId, Brush brush)
     {
         // 1. GUARDAR LÓGICA
         SuperficieData data = null;

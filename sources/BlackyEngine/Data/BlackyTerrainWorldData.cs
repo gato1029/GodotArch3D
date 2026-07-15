@@ -29,9 +29,9 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
     }
     internal void SetTerrain(int x, int y, int altura, TerrainBaseData terrainBaseDataSelected, Brush brush)
     {
-        if(DiferentPosition(x,y,altura,(int)RenderLayer,brush,terrainBaseDataSelected.idSave))
+        if(DiferentPosition(x,y,altura,(int)RenderLayer,brush,terrainBaseDataSelected.id))
         {
-            SetTerrain(x, y, altura, terrainBaseDataSelected.nameMod, terrainBaseDataSelected.idSave, brush);
+            SetTerrain(x, y, altura, terrainBaseDataSelected.nameMod, terrainBaseDataSelected.id, brush);
         }
         
     }
@@ -41,12 +41,12 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
     int lastY = 0;
     int lastAltura = -1;
     int lastCapa = -1;
-    int lastTerrain = -1;
+    long lastTerrain = -1;
     private bool DiferentPosition(int baseX, int baseY,
     int altura,
     int capa,
     Brush brush,
-    int terrainBaseDataId)
+    long terrainBaseDataId)
     {
         if (baseX != lastX || baseY != lastY || altura != lastAltura || capa != lastCapa || terrainBaseDataId != lastTerrain)
         {
@@ -55,7 +55,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
         return false;
     }
 
-    public void SetTerrain(int worldX, int worldY, int height,string modName, ushort terrainId, Brush brush)
+    public void SetTerrain(int worldX, int worldY, int height,string modName, long terrainId, Brush brush)
     {
         // 1. GUARDAR LÓGICA
         TerrainBaseData data = null;

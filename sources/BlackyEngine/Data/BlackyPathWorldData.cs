@@ -31,9 +31,9 @@ public class BlackyPathWorldData: BlackyWorldDataMap<ushort>
     }
     internal void SetPath(int x, int y, int altura, CaminosData pathData, Brush brush)
     {
-        if (DiferentPosition(x, y, altura, (int)RenderLayer, brush, pathData.idSave))
+        if (DiferentPosition(x, y, altura, (int)RenderLayer, brush, pathData.id))
         {
-            SetPath(x, y, altura, pathData.nameMod, pathData.idSave, brush);
+            SetPath(x, y, altura, pathData.nameMod, pathData.id, brush);
         }
 
     }
@@ -43,12 +43,12 @@ public class BlackyPathWorldData: BlackyWorldDataMap<ushort>
     int lastY = 0;
     int lastAltura = -1;
     int lastCapa = -1;
-    int lastTerrain = -1;
+    long lastTerrain = -1;
     private bool DiferentPosition(int baseX, int baseY,
     int altura,
     int capa,
     Brush brush,
-    int terrainBaseDataId)
+    long terrainBaseDataId)
     {
         if (baseX != lastX || baseY != lastY || altura != lastAltura || capa != lastCapa || terrainBaseDataId != lastTerrain)
         {
@@ -57,7 +57,7 @@ public class BlackyPathWorldData: BlackyWorldDataMap<ushort>
         return false;
     }
 
-    public void SetPath(int worldX, int worldY, int height, string modName, ushort id, Brush brush)
+    public void SetPath(int worldX, int worldY, int height, string modName, long id, Brush brush)
     {
         // 1. GUARDAR LÓGICA
         CaminosData data = null;

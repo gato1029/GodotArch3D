@@ -48,7 +48,7 @@ public class BlackyRampVisualWorld
     // =====================================================
     public void SetRamp(int worldX, int worldY, int height, RampsData rampsData, Brush brush)
     {
-        ushort id = rampsPalette.GetIdPersistence(rampsData.nameMod, rampsData.idSave, out var rampDataPersist);
+        ushort id = rampsPalette.GetIdPersistence(rampsData.nameMod, rampsData.id, out var rampDataPersist);
         foreach (var offset in brush.Cells)
         {
             int x = worldX + offset.x;

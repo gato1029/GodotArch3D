@@ -49,18 +49,18 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<long, DualTileTemplate> dualTileTemplate = new();
 
     // si requieren persistencia
-    private readonly AtlasMods<ushort, ResourceSourceData> fuenteRecursos = new();    
-    private readonly AtlasMods<ushort, TerrainData> terrainData = new();    
-    private readonly AtlasMods<ushort, TerrainDataTransition> terrainDataTransicion = new();
-    private readonly AtlasMods<ushort, TerrainBaseData> terrenos = new ();
-    private readonly AtlasMods<ushort, RampsData> rampsData = new();
-    private readonly AtlasMods<ushort, CaminosData> caminosData = new();
-    private readonly AtlasMods<ushort, DecorationData> decorationData = new();
-    private readonly AtlasMods<ushort, SuperficieData> superficieData = new();
+    private readonly AtlasMods<long, ResourceSourceData> fuenteRecursos = new();    
+    private readonly AtlasMods<long, TerrainData> terrainData = new();     // ya se usan quitarlos luego
+    private readonly AtlasMods<long, TerrainDataTransition> terrainDataTransicion = new(); // ya no se usan quitarlos luego
+    private readonly AtlasMods<long, TerrainBaseData> terrenos = new ();
+    private readonly AtlasMods<long, RampsData> rampsData = new();
+    private readonly AtlasMods<long, CaminosData> caminosData = new();
+    private readonly AtlasMods<long, DecorationData> decorationData = new();
+    private readonly AtlasMods<long, SuperficieData> superficieData = new();
 
-    private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a ushort
-    private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a ushort
-    private readonly AtlasMods<int, CharacterModelBaseData> characterData = new(); // deben cambiar a ushort
+    private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a long
+    private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a long
+    private readonly AtlasMods<int, CharacterModelBaseData> characterData = new(); // deben cambiar a long
 
     // string-key atlas
     private readonly AtlasMods<string, TileTextureData> tilesTextureData = new();
@@ -473,7 +473,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             atlas.Register(idMod, item.id, item);
         }
     }
-    private void CargarDatos<T>(AtlasMods<ushort, T> atlas, ushort idMod, string nameMod) where T : IdDataLong
+    private void CargarDatos<T>(AtlasMods<long, T> atlas, ushort idMod, string nameMod) where T : IdDataLong
     {
         var data = DataBaseManager.Instance.FindAll<T>();
 
@@ -481,7 +481,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         {
             item.idMod = idMod;
             item.nameMod = nameMod;
-            atlas.Register(idMod, item.idSave, item);
+            atlas.Register(idMod, item.id, item);
         }
     }
 

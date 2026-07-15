@@ -1,3 +1,4 @@
+using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ public class BiomaData:IdDataLong
 {
     public long idTerreno;
     public long idSuperficie;
-    public List<long> idRecursos;
+    public List<ResourceEntry> idRecursos;
     public long idCamino;
     public List<long> idDecoracion;
 }

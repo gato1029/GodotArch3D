@@ -34,7 +34,7 @@ public class BlackyDecorationWorldData: BlackyWorldDataMap<ushort>
     // =====================================================
     public void SetDecoration(int worldX, int worldY, int height, DecorationData decorationData, Brush brush)
     {
-        ushort id = palette.GetIdPersistence(decorationData.nameMod, decorationData.idSave, out var decorationDataPersist);
+        ushort id = palette.GetIdPersistence(decorationData.nameMod, decorationData.id, out var decorationDataPersist);
         foreach (var offset in brush.Cells)
         {
             int x = worldX + offset.x;

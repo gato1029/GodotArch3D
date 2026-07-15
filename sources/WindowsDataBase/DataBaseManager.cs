@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
@@ -121,6 +122,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<RampsData>("RampsData");
             RegisterCollection<CaminosData>("CaminosData");
             RegisterCollection<SuperficieData>("SuperficieData");
+            RegisterCollection<BiomaData>("BiomaData");
 
 
 

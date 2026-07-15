@@ -1,0 +1,131 @@
+[gd_scene format=3 uid="uid://dbu4ax3prbwac"]
+
+[ext_resource type="Script" uid="uid://d0yicfg0h5cd" path="res://sources/WindowsDataBase/Biomas/RuntimeBiomasControl.cs" id="1_ltobp"]
+[ext_resource type="PackedScene" uid="uid://bor51mewublcc" path="res://sources/WindowsDataBase/Common/KuroSearchItems.tscn" id="2_4v6mp"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="3_3r3wu"]
+[ext_resource type="Texture2D" uid="uid://e4igfbbvdqym" path="res://resources/Textures/iconos/file.png" id="4_u1lm5"]
+[ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="5_asx2t"]
+[ext_resource type="PackedScene" uid="uid://60m1n5h6qfwg" path="res://sources/KuroTiles/ControlListResourcesSources.tscn" id="6_3crfo"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="6_08ln4"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="7_3e5p6"]
+
+[node name="RuntimeBiomasControl" type="PanelContainer" unique_id=680472044]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ltobp")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=1827780703]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="KuroItems" parent="HBoxContainer2" unique_id=1075427436 instance=ExtResource("2_4v6mp")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 1
+_startExpanded = true
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer2" unique_id=517929566]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_top = 40
+
+[node name="CenterContainer" type="CenterContainer" parent="HBoxContainer2/MarginContainer" unique_id=248713410]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer" unique_id=339966517]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=196489073]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Biomas"
+
+[node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=622360495]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+script = ExtResource("3_3r3wu")
+IconTexture = ExtResource("4_u1lm5")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=1033748176]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=307848035]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=759916794]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=571904244]
+layout_mode = 2
+text = "Terreno:"
+
+[node name="ButtonTerreno" type="Button" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=144739597]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Terreno"
+icon = ExtResource("5_asx2t")
+alignment = 0
+
+[node name="Label3" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=265565082]
+layout_mode = 2
+text = "Superficie:"
+
+[node name="ButtonSuperficie" type="Button" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1353535611]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Superficie"
+icon = ExtResource("5_asx2t")
+alignment = 0
+
+[node name="Label4" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1786404816]
+layout_mode = 2
+text = "Caminos:"
+
+[node name="ButtonCaminos" type="Button" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=213089964]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Caminos"
+icon = ExtResource("5_asx2t")
+alignment = 0
+
+[node name="Label5" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1179606051]
+layout_mode = 2
+text = "Caminos:"
+
+[node name="ListaRecursos" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1906146476 instance=ExtResource("6_3crfo")]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=1942224493]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=116552285]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+script = ExtResource("3_3r3wu")
+IconTexture = ExtResource("6_08ln4")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=1447995048]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+script = ExtResource("3_3r3wu")
+IconTexture = ExtResource("7_3e5p6")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
