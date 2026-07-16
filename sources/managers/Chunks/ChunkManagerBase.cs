@@ -17,13 +17,15 @@ public class ChunkManagerBase
     {
         Load,
         Unload,
-        GeneratorPreload
+        GeneratorPreload,
+        GeneratorUnload 
     }
 
     public event Action<Vector2I> OnChunkLoad;
     public event Action<Vector2I> OnChunkPreLoad;
     public event Action<Vector2I> OnChunkUnload;
     public event Action<Vector2I> OnChunkPreLoadGenerator;
+    public event Action<Vector2I> OnChunkUnloadGenerator; 
     public event Action OnChunkProcessingCompleted;
 
     private ConcurrentQueue<(Vector2I, ChunkTaskType)> chunkQueue =
@@ -31,7 +33,8 @@ public class ChunkManagerBase
 
     private Thread workerThread;
     private bool isRunning = true;
-
+    // Variable para alternar el modo de trabajo
+    public bool UseParallelProcessing { get; set; } = true;
     public Vector2I ViewDistance { get; private set; }
 
     public int GeneratorPreloadDistance { get; set; } = 2;
@@ -185,7 +188,7 @@ public class ChunkManagerBase
         }
 
         // ======================
-        // GENERADOR
+        // GENERADOR (Carga y Descarga)
         // ======================
 
         foreach (var chunk in newGenerator)
@@ -197,11 +200,14 @@ public class ChunkManagerBase
             }
         }
 
+        // Aquí es donde detectamos si un chunk estaba en el generador 
+        // pero ya no está en el nuevo rango
         foreach (var chunk in new List<Vector2I>(generatorChunks))
         {
             if (!newGenerator.Contains(chunk))
             {
                 generatorChunks.Remove(chunk);
+                RequestGeneratorUnload(chunk); // <--- Nueva petición
             }
         }
     }
@@ -290,7 +296,10 @@ public class ChunkManagerBase
     // ================================
     // QUEUE REQUESTS
     // ================================
-
+    public void RequestGeneratorUnload(Vector2I chunkPos)
+    {
+        chunkQueue.Enqueue((chunkPos, ChunkTaskType.GeneratorUnload));
+    }
     public void RequestLoadChunk(Vector2I chunkPos)
     {
         chunkQueue.Enqueue((chunkPos, ChunkTaskType.Load));
@@ -310,6 +319,8 @@ public class ChunkManagerBase
     // WORKER THREAD
     // ================================
 
+   
+
     private void ProcessChunkQueue()
     {
         bool hasPendingNotification = false;
@@ -321,20 +332,15 @@ public class ChunkManagerBase
                 Vector2I chunkPos = chunkTask.Item1;
                 ChunkTaskType taskType = chunkTask.Item2;
 
-                switch (taskType)
+                if (UseParallelProcessing)
                 {
-                    case ChunkTaskType.GeneratorPreload:
-                        OnChunkPreLoadGenerator?.Invoke(chunkPos);
-                        break;
-
-                    case ChunkTaskType.Load:
-                        OnChunkPreLoad?.Invoke(chunkPos);
-                        OnChunkLoad?.Invoke(chunkPos);
-                        break;
-
-                    case ChunkTaskType.Unload:
-                        OnChunkUnload?.Invoke(chunkPos);
-                        break;
+                    // MODO PARALELO: Lanza tareas al Pool de Hilos
+                    Task.Run(() => ExecuteTask(chunkPos, taskType));
+                }
+                else
+                {
+                    // MODO SECUENCIAL: Lo hace el mismo hilo (como tenías antes)
+                    ExecuteTask(chunkPos, taskType);
                 }
 
                 hasPendingNotification = true;
@@ -344,17 +350,91 @@ public class ChunkManagerBase
                 if (hasPendingNotification)
                 {
                     hasPendingNotification = false;
-
-                    MainThreadDispatcher.Instance.Enqueue(() =>
-                    {
+                    MainThreadDispatcher.Instance.Enqueue(() => {
                         OnChunkProcessingCompleted?.Invoke();
                     });
                 }
-
                 Thread.Sleep(10);
             }
         }
     }
+
+    // Método auxiliar para limpiar el código y evitar duplicados
+    private void ExecuteTask(Vector2I chunkPos, ChunkTaskType taskType)
+    {
+        switch (taskType)
+        {
+            case ChunkTaskType.GeneratorPreload:
+                OnChunkPreLoadGenerator?.Invoke(chunkPos);
+                break;
+
+            case ChunkTaskType.GeneratorUnload: // Asumiendo que añadiste este tipo
+                OnChunkUnloadGenerator?.Invoke(chunkPos);
+                break;
+
+            case ChunkTaskType.Load:
+                OnChunkPreLoad?.Invoke(chunkPos);
+                OnChunkLoad?.Invoke(chunkPos);
+                // Si el OnChunkLoad implica nodos de Godot, usa el Dispatcher:
+                //MainThreadDispatcher.Instance.Enqueue(() => {
+                //    OnChunkLoad?.Invoke(chunkPos);
+                //});
+                break;
+
+            case ChunkTaskType.Unload:
+                OnChunkUnload?.Invoke(chunkPos);
+                break;
+        }
+    }
+
+    //private void ProcessChunkQueue()
+    //{
+    //    bool hasPendingNotification = false;
+
+    //    while (isRunning)
+    //    {
+    //        if (chunkQueue.TryDequeue(out var chunkTask))
+    //        {
+    //            Vector2I chunkPos = chunkTask.Item1;
+    //            ChunkTaskType taskType = chunkTask.Item2;
+
+    //            switch (taskType)
+    //            {
+    //                case ChunkTaskType.GeneratorPreload:
+    //                    OnChunkPreLoadGenerator?.Invoke(chunkPos);
+    //                    break;
+
+    //                case ChunkTaskType.Load:
+    //                    OnChunkPreLoad?.Invoke(chunkPos);
+    //                    OnChunkLoad?.Invoke(chunkPos);
+    //                    break;
+
+    //                case ChunkTaskType.Unload:
+    //                    OnChunkUnload?.Invoke(chunkPos);
+    //                    break;
+    //                case ChunkTaskType.GeneratorUnload:
+    //                    OnChunkUnloadGenerator?.Invoke(chunkPos);
+    //                    break;
+    //            }
+
+    //            hasPendingNotification = true;
+    //        }
+    //        else
+    //        {
+    //            if (hasPendingNotification)
+    //            {
+    //                hasPendingNotification = false;
+
+    //                MainThreadDispatcher.Instance.Enqueue(() =>
+    //                {
+    //                    OnChunkProcessingCompleted?.Invoke();
+    //                });
+    //            }
+
+    //            Thread.Sleep(10);
+    //        }
+    //    }
+    //}
 
     // ================================
     // UTILS

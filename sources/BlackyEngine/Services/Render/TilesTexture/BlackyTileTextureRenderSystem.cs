@@ -8,6 +8,7 @@ using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotFlecs.sources.Flecs;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -59,7 +60,7 @@ public class BlackyChunkRenderTiles
     {
         IsDestroyed = true;
     }
-    private readonly Dictionary<(int h, int l, int x, int y), TileRenderTextureInstance> instances = new();
+    private readonly ConcurrentDictionary<(int h, int l, int x, int y), TileRenderTextureInstance> instances = new();
 
     public void AddOrReplace((int h, int l, int x, int y) key, TileRenderTextureInstance instance)
     {
@@ -73,7 +74,7 @@ public class BlackyChunkRenderTiles
 
     public bool Remove((int h, int l, int x, int y) key)
     {
-        return instances.Remove(key);
+        return instances.TryRemove(key, out var d);
     }
 
     public IEnumerable<TileRenderTextureInstance> GetAll()
@@ -95,7 +96,7 @@ public class BlackyTileTextureRenderSystem
     private readonly FlecsManager flecsManager;
 
 
-    private readonly Dictionary<Vector2I, BlackyChunkRenderTiles> chunkRenderInstances = new Dictionary<Vector2I, BlackyChunkRenderTiles>();
+    private readonly ConcurrentDictionary<Vector2I, BlackyChunkRenderTiles> chunkRenderInstances = new ConcurrentDictionary<Vector2I, BlackyChunkRenderTiles>();
 
     public BlackyTileTextureRenderSystem(BlackyChunkCacheTextureMap chunkMap,ChunkManagerBase chunkManager,FlecsManager flecsManager)
     {
@@ -115,18 +116,26 @@ public class BlackyTileTextureRenderSystem
     // ===============================
 
     private void OnChunkUnload(Vector2I coord)
-    { 
-        //GD.Print($"OnChunkUnload {coord}");
-        if (!chunkRenderInstances.TryGetValue(coord, out var dict))
+    {
+        // 1. Intentamos removerlo del diccionario de forma atómica.
+        // Esto asegura que NINGÚN otro hilo pueda obtener este dict a partir de ahora.
+        if (!chunkRenderInstances.TryRemove(coord, out var dict))
             return;
 
+        // 2. Ahora que somos los únicos "dueños" de este dict, podemos trabajar con él 
+        // sin preocuparnos de que otros hilos lo sigan llenando.
+        // 2. Marcamos el chunk como destruido para que los comandos pendientes sepan que no deben tocarlo
+        dict.MarkDestroyed();
+        // IMPORTANTE: Si dict.GetAll() devuelve una copia o una enumeración,
+        // asegúrate de que no sea afectada por modificaciones externas.
         foreach (var instance in dict.GetAll())
-        {                        
-            instance.MarkDestroyed();            
-            RenderCommandQueue.Enqueue(new DestroyTileInstanceTextureCommand(instance));         
+        {
+            instance.MarkDestroyed();
+            RenderCommandQueue.Enqueue(new DestroyTileInstanceTextureCommand(instance));
         }
-        dict.Clear();
-        chunkRenderInstances.Remove(coord);
+
+        // 3. Ya no es necesario hacer dict.Clear() porque el dict ya fue 
+        // removido de la estructura principal y eventualmente será recolectado por el GC.
     }
 
     private void OnChunkLoad(Vector2I coord)
@@ -240,13 +249,9 @@ public class BlackyTileTextureRenderSystem
         int tileId,
         BlackyRegion region, bool remove, bool dual, bool isPersistent)
     {
-        //GD.Print($"RenderTile {chunkCoord} {height} {layer} {worldX} {worldY} {tileId}");
+        // GetOrAdd es atómico: garantiza que solo se cree una vez
+        var chunkRender = chunkRenderInstances.GetOrAdd(chunkCoord, _ => new BlackyChunkRenderTiles());
 
-        if (!chunkRenderInstances.TryGetValue(chunkCoord, out var chunkRender))
-        {
-            chunkRender = new();
-            chunkRenderInstances[chunkCoord] = chunkRender;
-        }
 
         chunkRender.TryGet((height, layer, worldX, worldY), out TileRenderTextureInstance instance);
 
@@ -269,7 +274,7 @@ public class BlackyTileTextureRenderSystem
         // OBTENER NUEVA DATA
         // =====================================================
         AtlasModsManager.TryGetTileSprite(tileId, out TileSpriteData tileDataMod);
-        //region.TryGetTileDataMod(tileId, out TileSpriteData tileDataMod,isPersistent);
+       
 
         // =====================================================
         // SI YA EXISTE Y ES LA MISMA TEXTURA -> IGNORAR

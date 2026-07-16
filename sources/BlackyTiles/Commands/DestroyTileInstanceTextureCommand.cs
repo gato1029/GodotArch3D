@@ -52,10 +52,12 @@ public class DestroyTileInstanceTextureCommand : IRenderCommand
         {            
             textureInstance.Entity.Destruct();
         }
-        if (!isMarkFreeChunk) // si no esta marcado para liberar el chunk, lo eliminamos de la lista de renderizado de forma directa
+        // 3. Eliminación del diccionario de forma defensiva
+        // Agregamos la comprobación chunkRender != null y !IsDestroyed
+        if (!isMarkFreeChunk && chunkRender != null && !chunkRender.IsDestroyed)
         {
             chunkRender.Remove((height, layer, x, y));
         }
-        
+
     }
 }

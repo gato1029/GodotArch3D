@@ -44,13 +44,14 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
 
     public void Execute()
     {
-        if (idSprite==0)
-        {
-            //error
-            int e=1;
-        }
+        
         if (chunkRender.IsDestroyed)
             return;
+        if (idSprite == 0)
+        {
+            GD.PushError("Intentando crear una instancia de tile con idSprite 0.");
+            return;
+        }
         //cuando es solo tile simple visual, no hay entidad
         switch (tileDataMod.tileSpriteType)
         {         
@@ -64,110 +65,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
                 break;
         }
 
-        //var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(tileDataMod.ModName);
-        //Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
-        //Vector2 offset = new Vector2(0, 0);
-        //if (dualOffset)
-        //{
-        //    offset = new Vector2(0.25f, 0.25f);
-        //}
-        ////else
-        ////{
-        ////    offset = new Vector2(0.25f, 0.25f);
-        ////}
-
-        //float depthOffset = 0;
-        //float depthValue = positionCenter.Y + depthOffset - height * CommonAtributes.HEIGHT_OFFSET ;
-        ////float z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layer * CommonAtributes.LAYER_OFFSET;
-
-        //float z = CommonAtributes.Calculate(depthOffset, height, layer, positionCenter); // debemos usar esto apartir de ahora
-        ////GD.Print("depthValue:  " + depthValue);
-        ////GD.Print("Z:  " + z);
-
-        //Vector3 worldPosition = new(positionCenter.X+offset.X, positionCenter.Y+offset.Y, z);
-
-        //Transform3D transform = new(Basis.Identity, worldPosition);
-        //transform = transform.ScaledLocal(new Vector3(1,1,1));
-
-        //RenderingServer.MultimeshInstanceSetTransform(
-        //    RenderInstance.rid,
-        //    RenderInstance.instance,
-        //    transform
-        //);
-
-        //RenderingServer.MultimeshInstanceSetCustomData(
-        //    RenderInstance.rid,
-        //    RenderInstance.instance,
-        //    tileDataMod.BaseUV
-        //);
-
-        //RenderingServer.MultimeshInstanceSetColor(
-        //    RenderInstance.rid,
-        //    RenderInstance.instance,
-        //    new Godot.Color(0, 0, 0, RenderInstance.layerTexture)
-        //);
-
-
-
-        //var tileRender = new TileRenderTextureInstance
-        //{
-        //    Rid = RenderInstance.rid,
-        //    InstanceId = RenderInstance.instance,
-        //    SubTextureId = tileDataMod.SubTextureId,
-        //    Index = tileDataMod.Index
-        //};
-        //chunkRender.AddOrReplace((height, layer, x, y), tileRender);
-
-        //if (tileDataMod.IsAnimated)
-        //{
-
-        //}
-        //var renderData = new BlackyTileRenderInstance(
-        //    dataInstance.rid,
-        //    dataInstance.instance,
-        //    data.idMaterial, height, layer, localX, localY
-        //);
-
-        //var world = flecsManager.WorldFlecs;
-        //var entity = world.Entity();
-
-        //entity.Set(new RenderTransformComponent(transform));
-
-        //entity.Set(new RenderGPUComponent(
-        //    renderData.rid,
-        //    renderData.Instance,
-        //    renderData.MaterialId,
-        //    dataInstance.layerTexture,
-        //    layer,
-        //    depth,
-        //    scale,
-        //    offset));
-
-        //entity.Set(new AnimationComponent(
-        //    animationId,
-        //    EntityType.TILESPRITE,
-        //    AnimationType.PARADO,
-        //    AnimationType.NINGUNA,
-        //    1,
-        //    0,
-        //    frameDuration,
-        //    false,
-        //    true,
-        //    true));
-
-        //entity.Set(new RenderFrameDataComponent
-        //{
-        //    uvMap = data.uvFramesArray[0]
-        //});
-
-        //entity.Set(new PositionComponent
-        //{
-        //    position = new Vector2(worldPosition.X, worldPosition.Y),
-        //    tilePosition = new Vector2I(localX, localY)
-        //});
-
-        //entity.Add<TileSpriteAnimationTag>();
-
+      
 
     }
 

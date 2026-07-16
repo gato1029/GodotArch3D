@@ -3,6 +3,7 @@ using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
 using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
@@ -33,7 +34,7 @@ public class BlackyChunkCacheTextureMap
     public event Action<TileChange> OnTileChanged;
     private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly BlackyWorldRegions _regions;
-
+    private readonly ChunkManagerBase chunkManager;
     public int ChunkSize { get; }
     public int HeightCount { get; }
     public int MaxLayers { get; }
@@ -47,35 +48,31 @@ public class BlackyChunkCacheTextureMap
     private BlackyChunkCoord _lastCoord;
     private BlackyChunkTexture _lastChunk;
 
-    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions)
+    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager)
     {
         ChunkSize = chunkSize;
         HeightCount = heightCount;
         MaxLayers = maxLayers;
         _regions = regions;
+        this.chunkManager = chunkManager;
+        chunkManager.OnChunkUnloadGenerator += ChunkManager_OnChunkUnloadGenerator;
     }
 
-    // ===============================
-    // GESTIÓN DE REGIONES
-    // ===============================
+    private void ChunkManager_OnChunkUnloadGenerator(Vector2I obj)
+    {
+        BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
+        if (_chunks.TryGetValue(coord, out var chunkCurrent))
+        {
+            _chunks.Remove(coord);
+        }
+    }
 
-    //public BlackyRegion GetOrCreateRegion(int regX, int regY)
-    //{
-    //    var key = (regX, regY);
-    //    if (!_regions.TryGetValue(key, out var region))
-    //    {
-    //        region = new BlackyRegion(regX, regY);
-    //        _regions[key] = region;
-    //        // Aquí podrías disparar la carga desde disco si el archivo existe
-    //    }
-    //    return region;
-    //}
 
     // ===============================
     // GESTIÓN DE CHUNKS
     // ===============================
 
-    
+
     public BlackyChunkTexture GetOrCreateChunk(int chunkX, int chunkY)
     {
         var coord = new BlackyChunkCoord(chunkX, chunkY);

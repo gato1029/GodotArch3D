@@ -73,7 +73,7 @@ public sealed class BlackyWorldServices
         // Render infra first
         // ============================
        
-        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender);
+        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal);
 
         TerrainData = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
         RampasData = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender);
