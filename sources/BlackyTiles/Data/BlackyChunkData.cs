@@ -9,10 +9,10 @@ public class BlackyChunkData<T>
        where T : struct
 {
     private readonly Dictionary<int, BlackyChunkHeightData<T>>  _heights = new();
-
+    public Dictionary<int, BlackyChunkHeightData<T>> Heights => _heights;
     private readonly int _chunkSize;
     private bool _dirty;
-
+    
     public void MarkDirty()
     {
         _dirty = true;
@@ -31,7 +31,7 @@ public class BlackyChunkData<T>
         _chunkSize = chunkSize;
     }
 
-    public Dictionary<int, BlackyChunkHeightData<T>> Heights => _heights;
+    
 
     public BlackyChunkHeightData<T>
         GetOrCreateHeight(int height)
@@ -53,5 +53,9 @@ public class BlackyChunkData<T>
         out BlackyChunkHeightData<T> h)
     {
         return Heights.TryGetValue(height, out h);
+    }
+    public IEnumerable<KeyValuePair<int, BlackyChunkHeightData<T>>> GetHeights()
+    {
+        return _heights;
     }
 }

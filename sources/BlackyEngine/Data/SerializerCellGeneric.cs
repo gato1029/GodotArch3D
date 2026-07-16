@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
 
-public struct SerializerCellTerrain
+public struct SerializerCellGeneric
 {
+    public bool isBorder;
     public ushort id;
 }

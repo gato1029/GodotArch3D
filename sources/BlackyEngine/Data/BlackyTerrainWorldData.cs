@@ -1,24 +1,59 @@
 
+using Arch.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
+using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
+using System;
+using static Flecs.NET.Core.Ecs.Units;
 
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
 
-public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellTerrain>
+public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
 {
     public BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new("Terreno");
-
+    private ChunkManagerBase _chunkManager;
     private DualTileTemplate _dualTemplate;
-    public BlackyTerrainWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions) : base(chunkSize, BlackyRenderLayer.TerrenoBase, textureMap, true, regions)
+    public BlackyTerrainWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager) : base(chunkSize, BlackyRenderLayer.TerrenoBase, textureMap, true, regions)
     {
-
+        _chunkManager = chunkManager;
+        _chunkManager.OnChunkPreLoadGenerator += _chunkManager_OnChunkPreLoadGenerator;
     }
+    private void _chunkManager_OnChunkPreLoadGenerator(Godot.Vector2I obj)
+    {
+        BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
+        if (!_chunks.TryGetValue(coord, out BlackyChunkData<SerializerCellGeneric> chunk))
+            return; // ver punto 3
+
+        foreach (var (height, heightData) in chunk.GetHeights())
+        {
+            ReadOnlySpan<SerializerCellGeneric> cells = heightData.GetCells().Span;
+
+            for (int y = 0; y < ChunkSize; y++)
+            {
+                int row = y * ChunkSize;
+                for (int x = 0; x < ChunkSize; x++)
+                {
+                    ref readonly SerializerCellGeneric cell = ref cells[row + x];
+                    if (cell.id == 0) continue; // probablemente quieras saltar celdas vacías también
+
+                    int worldX = coord.X * ChunkSize + x;
+                    int worldY = coord.Y * ChunkSize + y;
+
+                    var data = terrainPalette.GetData(cell.id);
+                    var dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate); // LOCAL                    
+                    _textureMap.SetTileDualConcurrent(worldX, worldY, height, (int)RenderLayer, dualTemplate,cell.isBorder);
+                }
+            }
+        }
+    }
+
     // =====================================================
     // SET TERRAIN
     // =====================================================

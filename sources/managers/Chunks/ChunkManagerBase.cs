@@ -368,17 +368,14 @@ public class ChunkManagerBase
                 OnChunkPreLoadGenerator?.Invoke(chunkPos);
                 break;
 
-            case ChunkTaskType.GeneratorUnload: // Asumiendo que añadiste este tipo
+            case ChunkTaskType.GeneratorUnload:
                 OnChunkUnloadGenerator?.Invoke(chunkPos);
                 break;
 
             case ChunkTaskType.Load:
                 OnChunkPreLoad?.Invoke(chunkPos);
                 OnChunkLoad?.Invoke(chunkPos);
-                // Si el OnChunkLoad implica nodos de Godot, usa el Dispatcher:
-                //MainThreadDispatcher.Instance.Enqueue(() => {
-                //    OnChunkLoad?.Invoke(chunkPos);
-                //});
+
                 break;
 
             case ChunkTaskType.Unload:

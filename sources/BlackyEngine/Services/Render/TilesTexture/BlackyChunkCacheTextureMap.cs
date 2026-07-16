@@ -1,3 +1,4 @@
+using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
@@ -8,6 +9,7 @@ using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Tilemap;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +18,23 @@ using static Flecs.NET.Core.Ecs.Units;
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
 
+public static class DualMask
+{
+    // Orden visual:
+    //
+    // TL TR
+    // BL BR
+    //
+    // Bits:
+    //
+    // 8 4
+    // 2 1
+
+    public const byte BottomRight = 1;
+    public const byte BottomLeft = 2;
+    public const byte TopRight = 4;
+    public const byte TopLeft = 8;
+}
 public struct TileChange
 {
     public int WorldX;
@@ -32,7 +51,7 @@ public struct TileChange
 public class BlackyChunkCacheTextureMap
 {
     public event Action<TileChange> OnTileChanged;
-    private readonly Dictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
+    private readonly ConcurrentDictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly BlackyWorldRegions _regions;
     private readonly ChunkManagerBase chunkManager;
     public int ChunkSize { get; }
@@ -44,9 +63,13 @@ public class BlackyChunkCacheTextureMap
     private const int RegionShift = 4;
     private const int ChunksPerRegionSide = 16; // no se usa por el momento
 
-    // 🔥 CACHE SECUENCIAL
-    private BlackyChunkCoord _lastCoord;
-    private BlackyChunkTexture _lastChunk;
+    [ThreadStatic]
+    private static BlackyChunkCoord _lastCoord;
+
+    [ThreadStatic]
+    private static BlackyChunkTexture _lastChunk;
+    
+    public object SyncRoot { get; } = new();
 
     public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager)
     {
@@ -63,7 +86,7 @@ public class BlackyChunkCacheTextureMap
         BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
         if (_chunks.TryGetValue(coord, out var chunkCurrent))
         {
-            _chunks.Remove(coord);
+            _chunks.TryRemove(coord, out _);
         }
     }
 
@@ -77,30 +100,25 @@ public class BlackyChunkCacheTextureMap
     {
         var coord = new BlackyChunkCoord(chunkX, chunkY);
 
-        if (!_chunks.TryGetValue(coord, out var chunk))
+        return _chunks.GetOrAdd(coord, c =>
         {
-            //// 1. Calcular a qué región pertenece este chunk
-            //int regX = chunkX >> RegionShift;
-            //int regY = chunkY >> RegionShift;
+            var region =
+                _regions.GetOrCreateRegionByChunk(
+                    c.X,
+                    c.Y);
 
-            // 2. Obtener o crear la región
-            var region = _regions.GetOrCreateRegionByChunk(chunkX, chunkY);
+            var chunk =
+                new BlackyChunkTexture(
+                    c,
+                    region,
+                    ChunkSize,
+                    HeightCount,
+                    MaxLayers);
 
-            // 3. Crear el chunk pasándole su región padre
-            chunk = new BlackyChunkTexture(
-                coord,
-                region, // <--- El chunk ahora sabe a qué región pertenece
-                ChunkSize,
-                HeightCount,
-                MaxLayers);
+            region.RegisterChunk(c);
 
-            _chunks[coord] = chunk;
-
-            // 4. Registrar el chunk en la región (para saber qué guardar luego)
-            region.RegisterChunk(coord);
-        }
-
-        return chunk;
+            return chunk;
+        });
     }
 
     public bool TryGetChunk(int chunkX, int chunkY, out BlackyChunkTexture chunk)
@@ -170,27 +188,7 @@ public class BlackyChunkCacheTextureMap
             Layer = layer,
             remove = true
         });
-        //if (height-1 >= 0)
-        //{
-        //    var LayerDown = chunk.GetOrCreateLayer(height-1, layer);
-        //    var tileDown = LayerDown.GetTile(localX,localY);
-        //    if (tileDown!=0 && LayerDown.IsRender(localX, localY)==false)
-        //    {
-        //        LayerDown.SetRender(localX, localY, true);
-        //        OnTileChanged?.Invoke(new TileChange
-        //        {
-        //            WorldX = worldX,
-        //            WorldY = worldY,
-        //            Height = height-1,
-        //            Layer = layer,
-        //            SpriteId = tileDown,
-        //            region = chunk.ParentRegion,
-        //            remove = false,
-        //            dual = true,
-        //            isPersistent = false,
-        //        });
-        //    }            
-        //}
+
     }
     public int SetTileSprite(int worldX, int worldY, int height, int layer, long idTileSprite, bool offsetDual)
     {
@@ -613,6 +611,93 @@ public class BlackyChunkCacheTextureMap
             RebuildDualCell(p.x, p.y, altura, capa, dualTileTemplate);
         }
     }
+
+    public void SetTileDualConcurrent(int worldX,int worldY, int height, int layer, DualTileTemplate dualTileTemplate, bool isborder=false)
+    {
+        
+        
+        if (isborder)
+        {
+            for (int oy = -1; oy <= 1; oy++)
+            {
+                for (int ox = -1; ox <= 1; ox++)
+                {
+                    var (chunk, lx, ly) = ResolveOrCreate(worldX+ox, worldY+oy);
+                    IBlackyChunkTilemapTexture tileLayer = chunk.GetOrCreateLayer(height, layer);
+                    if (ox==0 || oy==0)
+                    {
+                        tileLayer.SetSolid(lx, ly, true);
+                    }                                        
+                    RebuildDualCellConcurrent(worldX+ox, worldY+oy, lx, ly, height, layer, dualTileTemplate, tileLayer);
+                }
+            }
+            
+        }
+        else
+        {
+            var (chunk, lx, ly) = ResolveOrCreate(worldX, worldY);
+            IBlackyChunkTilemapTexture tileLayer = chunk.GetOrCreateLayer(height, layer);
+            tileLayer.SetSolid(lx, ly, true);
+            tileLayer.SetRender(lx, ly, true);
+
+            var slot = dualTileTemplate.GetSlot(15); // el 15 es el que representa que todos los tiles alrededor son sólidos, es decir, no hay borde
+            var slotHeight = slot.GetGeneric();
+            var item = slotHeight.Parts[0];
+            int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData); // esto existe y solo se lee en modo lectura, no se modifica      
+            tileLayer.SetTile(lx, ly, tileId);
+        }
+        
+    }
+
+    public void RebuildDualCellConcurrent(int vx, int vy,int lx,int ly, int height,int layer, DualTileTemplate dualTileTemplate,  IBlackyChunkTilemapTexture tileLayer)
+    {   // El tile visual NO existe
+        byte mask = 0;
+        // TL
+        if (IsSolidGlobal(vx, vy + 1, height, layer))
+            mask |= DualMask.TopLeft;
+        // TR
+        if (IsSolidGlobal(vx + 1, vy + 1, height, layer))
+            mask |= DualMask.TopRight;
+        // BL
+        if (IsSolidGlobal(vx, vy, height, layer))
+            mask |= DualMask.BottomLeft;
+        // BR
+        if (IsSolidGlobal(vx + 1, vy, height, layer))
+            mask |= DualMask.BottomRight;
+              
+        byte lastMask = tileLayer.GetDualMask(lx, ly);
+        tileLayer.SetDualMask(lx, ly, mask);
+
+        bool markDelete = false;
+        if (mask == 0)
+        {            
+            markDelete = true;
+        }
+
+        var slot = dualTileTemplate.GetSlot(mask);
+        
+        if (markDelete)
+        {
+            slot = dualTileTemplate.GetSlot(lastMask);            
+        }
+
+        var slotHeight = slot.GetGeneric();
+
+        var item = slotHeight.Parts[0];
+
+        if (markDelete)
+        {                     
+            tileLayer.ClearTile(lx, ly);
+        }
+        else
+        {
+            int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData); // esto existe y solo se lee en modo lectura, no se modifica      
+            tileLayer.SetTile(lx, ly, tileId);
+            tileLayer.SetRender(lx, ly, true);
+        }
+      
+    }
+
     public void SetTileDual(
     int worldX,
     int worldY,
@@ -620,42 +705,13 @@ public class BlackyChunkCacheTextureMap
     int layer,
     DualTileTemplate dualTileTemplate, bool isInternal=false)
     {
-        var (chunk, lx, ly) =
-            ResolveOrCreate(worldX, worldY);
+        var (chunk, lx, ly) =  ResolveOrCreate(worldX, worldY);
 
-        var tileLayer =
-            chunk.GetOrCreateLayer(height, layer);
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);
 
-        tileLayer.SetSolid(lx, ly, true);
-        //if (!isInternal)
-        //{
-        //    RebuildDualNeighborhood(
-        //    worldX,
-        //    worldY,
-        //    height,
-        //    layer,
-        //    dualTileTemplate);
-        //}
-        
+        tileLayer.SetSolid(lx, ly, true);       
     }
 
-    public static class DualMask
-    {
-        // Orden visual:
-        //
-        // TL TR
-        // BL BR
-        //
-        // Bits:
-        //
-        // 8 4
-        // 2 1
-
-        public const byte BottomRight = 1;
-        public const byte BottomLeft = 2;
-        public const byte TopRight = 4;
-        public const byte TopLeft = 8;
-    }
     public void RebuildDualNeighborhood(
     int x,
     int y,

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.BlackyTiles.Data;
@@ -21,7 +22,10 @@ public class BlackyChunkHeightData<T>
     {
         return ref _cells[Index(x, y)];
     }
-
+    public ReadOnlyMemory<T> GetCells()
+    {
+        return _cells;
+    }
     private int Index(int x, int y)
     {
         return x + y * _chunkSize;

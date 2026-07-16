@@ -1,5 +1,6 @@
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace GodotEcsArch.sources.BlackyTiles.Data;
 
 public class BlackyWorldRegions
 {
-    private readonly Dictionary<(int x, int y), BlackyRegion>
+    private readonly ConcurrentDictionary<(int x, int y), BlackyRegion>
         _regions = new();
 
     public const int RegionShift = 4;
@@ -81,23 +82,11 @@ public class BlackyWorldRegions
     {
         _dirtyRegions.Clear();
     }
-    public BlackyRegion GetOrCreateRegionByChunk(
-        int chunkX,
-        int chunkY)
+    public BlackyRegion GetOrCreateRegionByChunk(int chunkX, int chunkY)
     {
         int regX = chunkX >> RegionShift;
         int regY = chunkY >> RegionShift;
-
-        var key = (regX, regY);
-
-        if (!_regions.TryGetValue(key, out var region))
-        {
-            region = new BlackyRegion(regX, regY);
-
-            _regions[key] = region;
-        }
-
-        return region;
+        return _regions.GetOrAdd((regX, regY), key => new BlackyRegion(key.Item1, key.Item2));
     }
     public BlackyRegion GetOrCreateRegion(
        int regionX,

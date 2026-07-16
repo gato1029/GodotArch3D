@@ -75,7 +75,7 @@ public sealed class BlackyWorldServices
        
         TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal);
 
-        TerrainData = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
+        TerrainData = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal);
         RampasData = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender);
         SuperficiesData = new BlackySurfaceWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
         AdornosData = new BlackyDecorationWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
