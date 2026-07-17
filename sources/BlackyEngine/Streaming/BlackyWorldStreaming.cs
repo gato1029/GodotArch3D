@@ -25,16 +25,16 @@ public sealed class BlackyWorldStreaming
         chunkManagerLocal = ChunkManager.Instance.tiles16X16;
         chunkManagerLocal.SetBounds(config.MinChunk, config.MaxChunk);
 
-        chunkManagerLocal.OnChunkPreLoadGenerator += HandleChunkPreloadRequest;
+        //chunkManagerLocal.OnChunkPreLoadGenerator += HandleChunkPreloadRequest;
     }
 
-    private void HandleChunkPreloadRequest(Vector2I chunk)
-    {
-        if (!config.IsChunkInsideBounds(chunk))
-            return;
+    //private void HandleChunkPreloadRequest(Vector2I chunk)
+    //{
+    //    if (!config.IsChunkInsideBounds(chunk))
+    //        return;
 
-        OnChunkPreloadRequested?.Invoke(chunk);
-    }
+    //    OnChunkPreloadRequested?.Invoke(chunk);
+    //}
 
     public bool IsChunkInsideBounds(Vector2I chunk)
     {

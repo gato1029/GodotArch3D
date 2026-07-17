@@ -20,6 +20,7 @@ public struct ForceUpdateChunksCommand : IRenderCommand
 
     public void Execute()
     {
-        chunkManager.ForcedUpdateChunks(position);
+        chunkManager.UpdatePlayerPosition(position);
+        //chunkManager.ForcedUpdateChunks(position);
     }
 }

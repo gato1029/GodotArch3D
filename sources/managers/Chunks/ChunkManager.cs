@@ -60,7 +60,7 @@ public class ChunkManager
     }
     public void ForcedUpdate()
     {
-        tiles16X16.ForcedUpdateChunks(new Vector2I(0, 0));
+        tiles16X16.Teleport(new Vector2(0, 0));
         //tiles32X32.ForcedUpdateChunks(new Vector2(0, 0));
     }
 

@@ -140,10 +140,11 @@ public class BlackyTileTextureRenderSystem
 
     private void OnChunkLoad(Vector2I coord)
     {
-        //GD.Print($"OnChunkLoad {coord}");
+        
         if (!chunkMap.TryGetChunk(coord.X, coord.Y, out var chunk))
             return;
-
+        
+        GD.Print($"OnChunkLoad Render {coord}");
         if (!chunkRenderInstances.ContainsKey(coord))
         {
             BuildChunk(chunk);

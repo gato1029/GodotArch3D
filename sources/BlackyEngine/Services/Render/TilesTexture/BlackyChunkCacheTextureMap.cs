@@ -1,3 +1,4 @@
+using Arch.Core;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
@@ -13,13 +14,26 @@ using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using static Flecs.NET.Core.Ecs.Units;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
-
+public struct DirtyTile
+{
+    public int X;
+    public int Y;
+    public ushort Id;
+    public DirtyTile(int x, int y, ushort id)
+    {
+        X = x;
+        Y = y;
+        Id = id;
+    }
+}
 public static class DualMask
 {
     // Orden visual:
@@ -80,14 +94,16 @@ public class BlackyChunkCacheTextureMap
         MaxLayers = maxLayers;
         _regions = regions;
         this.chunkManager = chunkManager;
-        chunkManager.OnChunkUnloadGenerator += ChunkManager_OnChunkUnloadGenerator;
+        chunkManager.OnChunkDataUnload += ChunkManager_OnChunkDataUnload;
     }
 
-    private void ChunkManager_OnChunkUnloadGenerator(Vector2I obj)
+    private void ChunkManager_OnChunkDataUnload(Vector2I obj)
     {
+        
         BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
         if (_chunks.TryGetValue(coord, out var chunkCurrent))
         {
+            GD.Print($"[BlackyChunkCacheTextureMap] Unloading chunk at {coord.X}, {coord.Y}");
             _chunks.TryRemove(coord, out _);
         }
     }
@@ -613,27 +629,74 @@ public class BlackyChunkCacheTextureMap
             RebuildDualCell(p.x, p.y, altura, capa, dualTileTemplate);
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static long MakeKey(int x, int y)
+    {
+        return ((long)x << 32) | (uint)y;
+    }
+    private int Index(int x, int y)
+    {
+        return x + y * ChunkSize;
+    }
     public void ApplyChunkBatch(int chunkX, int chunkY, int height, int layer, SerializerCellGeneric[] cells)
     {
         var chunk = GetOrCreateChunk(chunkX, chunkY);
         DualTileTemplate ultimoTemplate = null;
         lock (chunk.SyncRoot)
         {
+            HashSet<long> visited = new();
+            List<DirtyTile> dirtyTiles = new();
+
             var tileLayer = chunk.GetOrCreateLayer(height, layer);
 
-            // Optimización: Si ChunkSize es 16, el compilador puede optimizar esto muy bien.
+            
             for (int y = 0; y < ChunkSize; y++)
-            {
-                int rowOffset = y * ChunkSize;
+            {                
                 for (int x = 0; x < ChunkSize; x++)
                 {
-                    ref readonly var cell = ref cells[rowOffset + x];
-                    if (cell.id == 0) continue;
+                    int i = Index(x, y);
+                    ref readonly var cell = ref cells[i];
 
-                    // Marcamos sólido
+                    if (cell.id == 0)
+                        continue;
+
                     tileLayer.SetSolid(x, y, true);
+
+                    int worldX = chunkX * ChunkSize + x;
+                    int worldY = chunkY * ChunkSize + y;
+
+                    for (int oy = -1; oy <= 1; oy++)
+                    {
+                        for (int ox = -1; ox <= 1; ox++)
+                        {
+                            int nx = worldX + ox;
+                            int ny = worldY + oy;
+
+                            long key = MakeKey(nx, ny);
+
+                            if (visited.Add(key))
+                            {
+                                dirtyTiles.Add(new DirtyTile(nx, ny, cell.id));
+                                GD.Print($"Pos: {nx}, {ny}");
+                            }
+                        }
+                    }
                 }
             }
+            // Optimización: Si ChunkSize es 16, el compilador puede optimizar esto muy bien.
+            //for (int y = 0; y < ChunkSize; y++)
+            //{
+            //    int rowOffset = y * ChunkSize;
+            //    for (int x = 0; x < ChunkSize; x++)
+            //    {
+            //        ref readonly var cell = ref cells[rowOffset + x];
+            //        if (cell.id == 0) continue;
+
+            //        // Marcamos sólido
+            //        tileLayer.SetSolid(x, y, true);
+            //    }
+            //}
 
             //// Fase B: Dual
             //for (int y = 0; y < ChunkSize; y++)
@@ -660,38 +723,47 @@ public class BlackyChunkCacheTextureMap
             // Fase B: Dual (Incluyendo vecinos de borde)
             // Recorremos desde -1 hasta ChunkSize para abarcar el borde exterior
             // Fase B: Dual
-            for (int y = 0; y < ChunkSize; y++)
+
+            foreach (ref readonly var tile in CollectionsMarshal.AsSpan(dirtyTiles))
             {
-                for (int x = 0; x < ChunkSize; x++)
-                {
-                    int index = y * ChunkSize + x;
-                    var cell = cells[index];
-
-                    if (cell.id != 0)
-                    {
-                        // Es sólido: calculamos visual normal
-                        var data = BlackyPalletesPersistence.terrainPalette.GetData(cell.id);
-                        ultimoTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
-
-                        int worldX = (chunkX * ChunkSize) + x;
-                        int worldY = (chunkY * ChunkSize) + y;
-
-                        UpdateDualVisualInternal(worldX, worldY, x, y, height, layer, ultimoTemplate, tileLayer, false);
-                    }
-                    else if (ultimoTemplate != null)
-                    {
-                        // Es vacío pero tiene template previo: calculamos borde
-                        int worldX = (chunkX * ChunkSize) + x;
-                        int worldY = (chunkY * ChunkSize) + y;
-
-                        UpdateDualVisualInternal(worldX, worldY, x, y, height, layer, ultimoTemplate, tileLayer, true);
-                    }
-                }
+                var data = BlackyPalletesPersistence.terrainPalette.GetData(tile.Id);
+                ultimoTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
+                var (targetChunk, lx, ly) = ResolveOrCreate(tile.X, tile.Y);
+                
+                UpdateDualVisualInternal(tile.X, tile.Y, lx, ly, height, layer, ultimoTemplate, targetChunk.GetOrCreateLayer(height, layer), true);
             }
-            if (ultimoTemplate != null)
-            {
-                ProcesarBordes(chunkX, chunkY, height, layer, ultimoTemplate);
-            }
+            //for (int y = 0; y < ChunkSize; y++)
+            //{
+            //    for (int x = 0; x < ChunkSize; x++)
+            //    {
+            //        int index = y * ChunkSize + x;
+            //        var cell = cells[index];
+
+            //        if (cell.id != 0)
+            //        {
+            //            // Es sólido: calculamos visual normal
+            //            var data = BlackyPalletesPersistence.terrainPalette.GetData(cell.id);
+            //            ultimoTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
+
+            //            int worldX = (chunkX * ChunkSize) + x;
+            //            int worldY = (chunkY * ChunkSize) + y;
+
+            //            UpdateDualVisualInternal(worldX, worldY, x, y, height, layer, ultimoTemplate, tileLayer, false);
+            //        }
+            //        else if (ultimoTemplate != null)
+            //        {
+            //            // Es vacío pero tiene template previo: calculamos borde
+            //            int worldX = (chunkX * ChunkSize) + x;
+            //            int worldY = (chunkY * ChunkSize) + y;
+
+            //            UpdateDualVisualInternal(worldX, worldY, x, y, height, layer, ultimoTemplate, tileLayer, true);
+            //        }
+            //    }
+            //}
+            //if (ultimoTemplate != null)
+            //{
+            //    ProcesarBordes(chunkX, chunkY, height, layer, ultimoTemplate);
+            //}
             chunk.MarkDirty();
         }
     }
@@ -723,7 +795,7 @@ public class BlackyChunkCacheTextureMap
 
         // Solo nos importa si es un tile vacío que necesita borde
         // Si ya es sólido (id != 0), ya se procesó o se procesará en su propio ApplyChunkBatch
-        if (!IsSolidGlobal(worldX, worldY, height, layer))
+        //if (!IsSolidGlobal(worldX, worldY, height, layer))
         {
             lock (targetChunk.SyncRoot)
             {
@@ -737,8 +809,8 @@ public class BlackyChunkCacheTextureMap
     {
         byte mask = 0;
         // Usamos IsSolidGlobal (que es lectura pura, segura en multihilo)
-        if (verificarVecindad)
-        {
+        //if (verificarVecindad)
+        //{
  
             if (IsSolidGlobal(vx, vy + 1, height, layer)) mask |= DualMask.TopLeft;
             if (IsSolidGlobal(vx + 1, vy + 1, height, layer)) mask |= DualMask.TopRight;
@@ -746,10 +818,14 @@ public class BlackyChunkCacheTextureMap
             if (IsSolidGlobal(vx + 1, vy, height, layer)) mask |= DualMask.BottomRight;
 
             
-        }
-        else
+        //}
+        //else
+        //{
+        //    mask = 15;
+        //}
+        if (mask==0)
         {
-            mask = 15;
+            return; // no hacer nada
         }
         tileLayer.SetDualMask(lx, ly, mask);
         // ... aquí tu lógica de obtener slot y SetTile ...

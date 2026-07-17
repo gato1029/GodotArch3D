@@ -1,5 +1,6 @@
 
 using Arch.Core;
+using Godot;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
@@ -23,17 +24,17 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
     public BlackyTerrainWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager) : base(chunkSize, BlackyRenderLayer.TerrenoBase, textureMap, true, regions)
     {
         _chunkManager = chunkManager;
-        _chunkManager.OnChunkPreLoadGenerator += _chunkManager_OnChunkPreLoadGenerator;
+        _chunkManager.OnChunkDataPreload += _chunkManager_OnChunkDataPreload;
     }
-    private void _chunkManager_OnChunkPreLoadGenerator(Godot.Vector2I obj)
+    private void _chunkManager_OnChunkDataPreload(Godot.Vector2I obj)
     {
         BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
         if (!_chunks.TryGetValue(coord, out BlackyChunkData<SerializerCellGeneric> chunk))
             return; 
-
+        GD.Print($"[BlackyTerrainWorldData] OnChunkDataPreload coord: {coord.X},{coord.Y} ");
         foreach (var (height, heightData) in chunk.GetHeights())
         {
-            ReadOnlySpan<SerializerCellGeneric> cells = heightData.GetCells().Span;
+            //ReadOnlySpan<SerializerCellGeneric> cells = heightData.GetCells().Span;
 
             var allcells = heightData.GetCells().ToArray();
             _textureMap.ApplyChunkBatch(coord.X, coord.Y, height, (int)RenderLayer, allcells);
