@@ -17,7 +17,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Data;
 
 public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
 {
-    public BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new("Terreno");
+    
     private ChunkManagerBase _chunkManager;
     private DualTileTemplate _dualTemplate;
     public BlackyTerrainWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager) : base(chunkSize, BlackyRenderLayer.TerrenoBase, textureMap, true, regions)
@@ -29,28 +29,30 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
     {
         BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
         if (!_chunks.TryGetValue(coord, out BlackyChunkData<SerializerCellGeneric> chunk))
-            return; // ver punto 3
+            return; 
 
         foreach (var (height, heightData) in chunk.GetHeights())
         {
             ReadOnlySpan<SerializerCellGeneric> cells = heightData.GetCells().Span;
 
-            for (int y = 0; y < ChunkSize; y++)
-            {
-                int row = y * ChunkSize;
-                for (int x = 0; x < ChunkSize; x++)
-                {
-                    ref readonly SerializerCellGeneric cell = ref cells[row + x];
-                    if (cell.id == 0) continue; // probablemente quieras saltar celdas vacías también
+            var allcells = heightData.GetCells().ToArray();
+            _textureMap.ApplyChunkBatch(coord.X, coord.Y, height, (int)RenderLayer, allcells);
+            //for (int y = 0; y < ChunkSize; y++)
+            //{
+            //    int row = y * ChunkSize;
+            //    for (int x = 0; x < ChunkSize; x++)
+            //    {
+            //        ref readonly SerializerCellGeneric cell = ref cells[row + x];
+            //        if (cell.id == 0) continue; 
 
-                    int worldX = coord.X * ChunkSize + x;
-                    int worldY = coord.Y * ChunkSize + y;
+            //        int worldX = coord.X * ChunkSize + x;
+            //        int worldY = coord.Y * ChunkSize + y;
 
-                    var data = terrainPalette.GetData(cell.id);
-                    var dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate); // LOCAL                    
-                    _textureMap.SetTileDualConcurrent(worldX, worldY, height, (int)RenderLayer, dualTemplate,cell.isBorder);
-                }
-            }
+            //        var data = terrainPalette.GetData(cell.id);
+            //        var dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate); // LOCAL                    
+            //        _textureMap.SetTileDualConcurrent(worldX, worldY, height, (int)RenderLayer, dualTemplate,cell.isBorder);
+            //    }
+            //}
         }
     }
 
@@ -101,7 +103,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
 
             ref var cell = ref ResolveOrCreateCell(x, y, height);
 
-            cell.id = terrainPalette.GetIdPersistence(modName, terrainId, out  data);
+            cell.id = BlackyPalletesPersistence.terrainPalette.GetIdPersistence(modName, terrainId, out  data);
         }
         _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
 
@@ -147,7 +149,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
             return; // es vacio 
         }
 
-        var data = terrainPalette.GetData(lastId);
+        var data = BlackyPalletesPersistence.terrainPalette.GetData(lastId);
 
         _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod,data.idDualTemplate);
         

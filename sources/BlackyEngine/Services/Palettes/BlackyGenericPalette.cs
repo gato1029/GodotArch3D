@@ -1,5 +1,6 @@
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using MessagePack;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,11 @@ public readonly record struct PairCacheData(
     string ModName,
     long Id
 );
+
+public class BlackyPalletesPersistence
+{
+    public static BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new("Terreno");
+}
 
 public class BlackyGenericPalette<T> where T : class
 {

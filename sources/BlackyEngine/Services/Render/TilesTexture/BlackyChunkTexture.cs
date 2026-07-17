@@ -10,6 +10,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
 public class BlackyChunkTexture
 {
+    public readonly object SyncRoot = new();
     public BlackyRegion ParentRegion { get; }
     public BlackyChunkCoord Coord { get; }
 
@@ -58,11 +59,7 @@ public class BlackyChunkTexture
     /// Devuelve la paleta completa de la región si el renderizador 
     /// necesita procesar múltiples tiles de forma masiva.
     /// </summary>
-    public BlackyPersistentTilePalette GetPalette()
-    {
-        return ParentRegion.Palette;
-    }
-
+   
     #region Heights
 
     public bool HasHeight(int height)
@@ -89,15 +86,16 @@ public class BlackyChunkTexture
 
     public BlackyHeightLevelTexture GetOrCreateHeight(int height)
     {
-        var h = _heights[height];
-
-        if (h == null)
+        lock (SyncRoot) // Protegemos la creación del objeto
         {
-            h = new BlackyHeightLevelTexture(height, _maxLayers);
-            _heights[height] = h;
+            var h = _heights[height];
+            if (h == null)
+            {
+                h = new BlackyHeightLevelTexture(height, _maxLayers);
+                _heights[height] = h;
+            }
+            return h;
         }
-
-        return h;
     }
 
     public IEnumerable<BlackyHeightLevelTexture> GetHeights()

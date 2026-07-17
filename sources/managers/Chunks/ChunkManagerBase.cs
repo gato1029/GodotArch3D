@@ -34,7 +34,7 @@ public class ChunkManagerBase
     private Thread workerThread;
     private bool isRunning = true;
     // Variable para alternar el modo de trabajo
-    public bool UseParallelProcessing { get; set; } = true;
+    public bool UseParallelProcessing { get; set; } = false;
     public Vector2I ViewDistance { get; private set; }
 
     public int GeneratorPreloadDistance { get; set; } = 2;

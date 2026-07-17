@@ -180,7 +180,7 @@ public class BlackyWorldPersistence
 
     public void SavePalletes(string rootPath)
     {
-        _terrainWorld.terrainPalette.Save(rootPath, _format);
+        BlackyPalletesPersistence.terrainPalette.Save(rootPath, _format);
         _rampWorld.rampsPalette.Save(rootPath, _format);
         _superficiesData.pallete.Save(rootPath, _format);
         _adornosData.palette.Save(rootPath, _format);
