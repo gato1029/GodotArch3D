@@ -38,22 +38,6 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
 
             var allcells = heightData.GetCells().ToArray();
             _textureMap.ApplyChunkBatch(coord.X, coord.Y, height, (int)RenderLayer, allcells);
-            //for (int y = 0; y < ChunkSize; y++)
-            //{
-            //    int row = y * ChunkSize;
-            //    for (int x = 0; x < ChunkSize; x++)
-            //    {
-            //        ref readonly SerializerCellGeneric cell = ref cells[row + x];
-            //        if (cell.id == 0) continue; 
-
-            //        int worldX = coord.X * ChunkSize + x;
-            //        int worldY = coord.Y * ChunkSize + y;
-
-            //        var data = terrainPalette.GetData(cell.id);
-            //        var dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate); // LOCAL                    
-            //        _textureMap.SetTileDualConcurrent(worldX, worldY, height, (int)RenderLayer, dualTemplate,cell.isBorder);
-            //    }
-            //}
         }
     }
 
@@ -93,82 +77,50 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
         return false;
     }
 
-    public void SetTerrain(int worldX, int worldY, int height,string modName, long terrainId, Brush brush)
+    public void SetTerrain(int worldX, int worldY, int height, string modName, long terrainId, Brush brush)
     {
-        // 1. GUARDAR LÓGICA
+        // 1. PRIMERA PASADA: Guardar los IDs
         TerrainBaseData data = null;
         foreach (var offset in brush.Cells)
         {
             int x = worldX + offset.x;
             int y = worldY + offset.y;
-
             ref var cell = ref ResolveOrCreateCell(x, y, height);
-
-            cell.id = BlackyPalletesPersistence.terrainPalette.GetIdPersistence(modName, terrainId, out  data);
+            cell.id = BlackyPalletesPersistence.terrainPalette.GetIdPersistence(modName, terrainId, out data);
         }
-        _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
 
-        _textureMap.ApplyBrushCreateDual(
-            worldX,
-            worldY,
-            height,
-            (int)RenderLayer,
-            brush,
-            _dualTemplate);
-
-    }
-
-    // =====================================================
-    // REMOVE
-    // =====================================================
-
-    public void RemoveTerrain(int worldX,int worldY,int height, Brush brush)
-    {
-        if (!DiferentPosition(worldX, worldY, height, (int)RenderLayer, brush, 0))
+        // 2. SEGUNDA PASADA: Calcular si es borde
+        // Debemos expandir la revisión un poco más allá del pincel (el área +1)
+        // porque los vecinos de lo que pintaste también pueden haber cambiado su estado de borde
+        for (int oy = -1; oy <= 1; oy++)
         {
-            return;
-        }
-            ushort lastId = 0;
-        foreach (var offset in brush.Cells)
-        {
-            int x = worldX + offset.x;
-            int y = worldY + offset.y;
-
-            ref var cell =
-                ref ResolveOrCreateCell(
-                    x,
-                    y,
-                    height);
-            if (cell.id!=0)
+            for (int ox = -1; ox <= 1; ox++)
             {
-                lastId = cell.id;
-            }            
-            cell.id = 0;
+                // Recorremos el área del pincel expandida en 1 para actualizar bordes vecinos
+                foreach (var offset in brush.Cells)
+                {
+                    int x = worldX + offset.x + ox;
+                    int y = worldY + offset.y + oy;
+
+                    ref var cell = ref ResolveOrCreateCell(x, y, height);
+                    {
+                        // Solo calculamos si tiene ID
+                        if (cell.id != 0)
+                        {
+                            cell.isBorder = CalculateIsBorder(x, y, height);
+                        }
+                    }
+                }
+            }
         }
-        if (lastId==0)
-        {
-            return; // es vacio 
-        }
 
-        var data = BlackyPalletesPersistence.terrainPalette.GetData(lastId);
-
-        _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod,data.idDualTemplate);
-        
-        _textureMap.ApplyBrushRemoveDual(
-          worldX,
-          worldY,
-          height,
-          (int)RenderLayer,
-          brush,
-          _dualTemplate);
-
+        _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
+        _textureMap.ApplyBrushCreateDual(worldX, worldY, height, (int)RenderLayer, brush, _dualTemplate);
     }
-
-   
     public bool HasTerrain(
-        int worldX,
-        int worldY,
-        int height)
+     int worldX,
+     int worldY,
+     int height)
     {
         if (!TryGetCell(
             worldX,
@@ -182,5 +134,84 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
         return cell.id != 0;
     }
 
-  
+    private bool CalculateIsBorder(int worldX, int worldY, int height)
+    {
+        // Revisar los 8 vecinos (o 4 si solo consideras ortogonales)
+        for (int oy = -1; oy <= 1; oy++)
+        {
+            for (int ox = -1; ox <= 1; ox++)
+            {
+                if (ox == 0 && oy == 0) continue;
+
+                // Si el vecino está vacío, entonces el tile actual es un borde
+                if (!HasTerrain(worldX + ox, worldY + oy, height))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    // =====================================================
+    // REMOVE
+    // =====================================================
+
+    public void RemoveTerrain(int worldX, int worldY, int height, Brush brush)
+    {
+        if (!DiferentPosition(worldX, worldY, height, (int)RenderLayer, brush, 0))
+        {
+            return;
+        }
+
+        ushort lastId = 0;
+
+        // 1. PRIMERA PASADA: Borrar los terrenos y capturar lastId para el renderizado
+        foreach (var offset in brush.Cells)
+        {
+            int x = worldX + offset.x;
+            int y = worldY + offset.y;
+
+            ref var cell = ref ResolveOrCreateCell(x, y, height);
+            if (cell.id != 0)
+            {
+                lastId = cell.id;
+            }
+            cell.id = 0;
+            cell.isBorder = false; // Al estar vacío, ya no es un borde
+        }
+
+        if (lastId == 0) return;
+
+        // 2. SEGUNDA PASADA: Actualizar bordes de los vecinos afectados
+        // Cuando borras, los bloques alrededor que quedaron en pie ahora pueden haberse vuelto "borde"
+        for (int oy = -1; oy <= 1; oy++)
+        {
+            for (int ox = -1; ox <= 1; ox++)
+            {
+                foreach (var offset in brush.Cells)
+                {
+                    int x = worldX + offset.x + ox;
+                    int y = worldY + offset.y + oy;
+
+                    ref var cell = ref ResolveOrCreateCell(x, y, height);
+                    {
+                        // Solo recalculamos los que tienen un ID válido
+                        if (cell.id != 0)
+                        {
+                            cell.isBorder = CalculateIsBorder(x, y, height);
+                        }
+                    }
+                }
+            }
+        }
+
+        var data = BlackyPalletesPersistence.terrainPalette.GetData(lastId);
+        _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
+
+        _textureMap.ApplyBrushRemoveDual(worldX, worldY, height, (int)RenderLayer, brush, _dualTemplate);
+    }
+
+
+
+
 }
