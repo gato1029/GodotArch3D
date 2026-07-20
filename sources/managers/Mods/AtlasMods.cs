@@ -7,18 +7,27 @@ namespace GodotEcsArch.sources.managers.Mods;
 public class AtlasMods<TKey, TValue> where TKey : notnull
 {
     private readonly Dictionary<ushort, Dictionary<TKey, TValue>> _data = new();
-
+    private readonly Dictionary<TKey, TValue> _dataDirect = new();
     public void Register(ushort modId, TKey id, TValue value)
     {
         if (!_data.TryGetValue(modId, out var dict))
         {
             dict = new Dictionary<TKey, TValue>();
             _data[modId] = dict;
+            
         }
 
+        _dataDirect[id] = value;
         dict[id] = value;
     }
-
+    public TValue GetDirect(TKey id)
+    {
+        if (_dataDirect.TryGetValue(id, out var value))
+        {
+            return value;
+        }
+        return default;
+    }
     public TValue Get(ushort modId, TKey id)
     {
         return _data.TryGetValue(modId, out var dict) &&
@@ -60,7 +69,7 @@ public class AtlasMods<TKey, TValue> where TKey : notnull
         {
             kv.Value.Clear();
         }
-
+        _dataDirect.Clear();
         _data.Clear();
     }
 }

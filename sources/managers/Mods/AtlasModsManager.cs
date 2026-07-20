@@ -3,6 +3,7 @@ using Godot;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
@@ -57,6 +58,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<long, CaminosData> caminosData = new();
     private readonly AtlasMods<long, DecorationData> decorationData = new();
     private readonly AtlasMods<long, SuperficieData> superficieData = new();
+    private readonly AtlasMods<long, BiomaData> biomaData = new();
 
     private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a long
     private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a long
@@ -172,6 +174,11 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         return key;        
     }
 
+    public static T GetDirect<T>(int id) where T : class
+        => Instance.InternalGetDirect<T, int>(id);
+    public static T GetDirect<T>(long id) where T : class
+    => Instance.InternalGetDirect<T, long>(id);
+
     public static T Get<T>(string modName, int id) where T : class
         => Instance.InternalGet<T, int>(modName, id);
 
@@ -183,6 +190,13 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
     public static bool TryGet<T>(string modName, int id, out T value) where T : class
         => Instance.InternalTryGet<T, int>(modName, id, out value);
+
+    private T InternalGetDirect<T, TKey>( TKey id)
+        where T : class where TKey : notnull
+    {        
+        var atlas = GetAtlas<TKey, T>();
+        return atlas?.GetDirect(id);
+    }
 
     private T InternalGet<T, TKey>(string modName, TKey id)
         where T : class where TKey : notnull
@@ -581,6 +595,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         decorationData.Clear();
         caminosData.Clear();
         superficieData.Clear();
+        biomaData.Clear();
         // ================================
         // CLEAR INDEXES
         // ================================
@@ -612,6 +627,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(decorationData);
         RegisterAtlas(caminosData);
         RegisterAtlas(superficieData);
+        RegisterAtlas(biomaData);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {

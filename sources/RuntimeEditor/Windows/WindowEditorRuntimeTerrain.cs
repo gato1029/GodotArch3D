@@ -477,10 +477,10 @@ public partial class WindowEditorRuntimeTerrain : Window
                 BlackyWorldContext.PintarSuperficies.RemoveSuperficie(currentMouseTile.X, currentMouseTile.Y, altura,brush);
                 break;
             case BlackyRenderLayer.Caminos:
-                BlackyWorldContext.PintarCaminos.RemovePath(currentMouseTile.X, currentMouseTile.Y, altura, brush);
+                BlackyWorldContext.PintarCaminos.RemoveCamino(currentMouseTile.X, currentMouseTile.Y, altura, brush);
                 break;
             case BlackyRenderLayer.Adornos:
-                BlackyWorldContext.PintarAdornos.RemoveDecoration(currentMouseTile.X, currentMouseTile.Y, altura);
+                BlackyWorldContext.PintarAdornos.RemoveAdorno(currentMouseTile.X, currentMouseTile.Y, altura);
                 break;            
         }
         //switch (modePaint)
@@ -550,7 +550,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                 BlackyWorldContext.PintarSuperficies.SetSuperficie(currentMouseTile.X, currentMouseTile.Y, altura, superficieDataSelected, brush);
                 break;
             case BlackyRenderLayer.Caminos:
-                BlackyWorldContext.PintarCaminos.SetPath(currentMouseTile.X, currentMouseTile.Y, altura, caminosDataSelected, brush);
+                BlackyWorldContext.PintarCaminos.SetCamino(currentMouseTile.X, currentMouseTile.Y, altura, caminosDataSelected, brush);
                 break;
             case BlackyRenderLayer.Adornos:
                 BlackyWorldContext.PintarAdornos.SetDecoration(currentMouseTile.X, currentMouseTile.Y, altura, decorationDataSelected, brush);

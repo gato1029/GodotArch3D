@@ -21,11 +21,11 @@ public sealed class BlackyWorldServices
 
     public BlackyWorldPersistence persistenceData { get; }
     public BlackyWorldRegions regionsRender { get; } = new BlackyWorldRegions();
-    public BlackyTerrainWorldData TerrainData { get; } // para pintar el terreno, el ushort es el id del terreno que se pintara en ese lugar
-    public BlackyRampVisualWorld RampasData { get; } // para pintar rampas y similares, el ushort es el id del tile que se pintara en ese lugar
-    public BlackySurfaceWorldData SuperficiesData { get; } // para pintar superficies, el ushort es el id del tile que se pintara en ese lugar
-    public BlackyPathWorldData CaminosData { get; } // para pintar caminos, el ushort es el id del tile que se pintara en ese lugar
-    public BlackyDecorationWorldData AdornosData { get; } // para pintar adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades, el ushort es el id del tile que se pintara en ese lugar
+    public BlackyTerrainWorldData TerrainDataLienzo { get; } // para pintar el terreno, el ushort es el id del terreno que se pintara en ese lugar
+    public BlackyRampVisualWorld RampasDataLienzo { get; } // para pintar rampas y similares, el ushort es el id del tile que se pintara en ese lugar
+    public BlackySurfaceWorldData SuperficiesDataLienzo { get; } // para pintar superficies, el ushort es el id del tile que se pintara en ese lugar
+    public BlackyPathWorldData CaminosDataLienzo { get; } // para pintar caminos, el ushort es el id del tile que se pintara en ese lugar
+    public BlackyDecorationWorldData AdornosDataLienzo { get; } // para pintar adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades, el ushort es el id del tile que se pintara en ese lugar
 
 
     // ============================
@@ -75,13 +75,13 @@ public sealed class BlackyWorldServices
        
         TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal);
 
-        TerrainData = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal);
-        RampasData = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender);
-        SuperficiesData = new BlackySurfaceWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
-        AdornosData = new BlackyDecorationWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
-        CaminosData = new BlackyPathWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender);
+        TerrainDataLienzo = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
+        RampasDataLienzo = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender,world.Streaming.chunkManagerLocal,world);
+        SuperficiesDataLienzo = new BlackySurfaceWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
+        AdornosDataLienzo = new BlackyDecorationWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
+        CaminosDataLienzo = new BlackyPathWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal, world);
 
-        persistenceData = new BlackyWorldPersistence(world.Name,regionsRender,TerrainData,RampasData,SuperficiesData,AdornosData,CaminosData, SaveFormat.Binary);
+        persistenceData = new BlackyWorldPersistence(world.Name,regionsRender,TerrainDataLienzo,RampasDataLienzo,SuperficiesDataLienzo,AdornosDataLienzo,CaminosDataLienzo, SaveFormat.Binary);
 
         TileRenderer = new BlackyTileRenderSystem(
             sim.Flecs,

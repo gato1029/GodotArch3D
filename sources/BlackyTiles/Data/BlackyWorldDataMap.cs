@@ -1,7 +1,9 @@
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +17,7 @@ public enum BlackyRenderLayer
     Caminos = 3, // para caminos, esto es para que se renderice por encima de la superficie pero debajo de las entidades    
     Adornos = 4, // para adornos sobre la superficie, como flores, piedritas, partes de edificios, etc, pero no tienen entidad, esto es para que se renderice por encima de la superficie pero debajo de las entidades
                  // los recursos edificios, personajes, entidades se renderizaran por encima de todo esto, en su propia capa de renderizado, para que se rendericen por encima de todo esto, y asi no se vean tapados por nada del terreno
+    
 }
 
 public abstract class BlackyWorldDataMap<T>
@@ -45,7 +48,7 @@ public abstract class BlackyWorldDataMap<T>
     public int ChunkSize { get; }
 
     public BlackyRenderLayer  RenderLayer { get; }
-
+    public BlackyWorld world { get; }
     // =====================================================
     // CACHE
     // =====================================================
@@ -63,7 +66,7 @@ public abstract class BlackyWorldDataMap<T>
     protected BlackyWorldDataMap(
         int chunkSize,
         BlackyRenderLayer renderLayer,
-        BlackyChunkCacheTextureMap textureMap, bool isDual, BlackyWorldRegions regions)
+        BlackyChunkCacheTextureMap textureMap, bool isDual, BlackyWorldRegions regions, BlackyWorld blackyWorld)
     {
         ChunkSize = chunkSize;
 
@@ -71,6 +74,7 @@ public abstract class BlackyWorldDataMap<T>
         _regions = regions;
         this.isDual = isDual;
         _textureMap = textureMap;
+        world = blackyWorld;
     }
     public void ClearDirtyRegion(
     BlackyRegion region)
@@ -371,5 +375,90 @@ public abstract class BlackyWorldDataMap<T>
             result += b;
 
         return result;
+    }
+    // =====================================================
+    // COORDS
+    // =====================================================
+
+    public Godot.Vector2I LocalToWorld(
+        BlackyChunkCoord chunkCoord,
+        int localX,
+        int localY)
+    {
+        return new Godot.Vector2I(
+            chunkCoord.X * ChunkSize + localX,
+            chunkCoord.Y * ChunkSize + localY
+        );
+    }
+
+    public (int worldX, int worldY) LocalToWorld(
+        int chunkX,
+        int chunkY,
+        int localX,
+        int localY)
+    {
+        return (
+            chunkX * ChunkSize + localX,
+            chunkY * ChunkSize + localY
+        );
+    }
+    public ref T ResolveOrCreateCellLocal(
+        BlackyChunkCoord coord,
+        int localX,
+        int localY,
+        int height)
+    {
+        var (chunk, lx, ly) =
+            ResolveOrCreateLocal(
+                coord,
+                localX,
+                localY);
+
+        var h =
+            chunk.GetOrCreateHeight(
+                height);
+
+        MarkChunkDirty(coord, chunk);
+        _regions.MarkRegionDirtyByChunk(coord.X, coord.Y);
+
+        return ref h.GetCell(lx, ly);
+    }
+
+    public (
+        BlackyChunkData<T> chunk,
+        int lx,
+        int ly)
+        ResolveOrCreateLocal(
+            BlackyChunkCoord coord,
+            int localX,
+            int localY)
+    {
+        if (_lastChunk != null &&
+            coord.Equals(_lastCoord))
+        {
+            return (
+                _lastChunk,
+                localX,
+                localY);
+        }
+
+        if (!_chunks.TryGetValue(
+            coord,
+            out var chunk))
+        {
+            chunk =
+                new BlackyChunkData<T>(
+                    ChunkSize);
+
+            _chunks[coord] = chunk;
+        }
+
+        _lastCoord = coord;
+        _lastChunk = chunk;
+
+        return (
+            chunk,
+            localX,
+            localY);
     }
 }

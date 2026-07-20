@@ -181,10 +181,10 @@ public class BlackyWorldPersistence
     public void SavePalletes(string rootPath)
     {
         BlackyPalletesPersistence.terrainPalette.Save(rootPath, _format);
-        _rampWorld.rampsPalette.Save(rootPath, _format);
-        _superficiesData.pallete.Save(rootPath, _format);
-        _adornosData.palette.Save(rootPath, _format);
-        _caminosData.pallete.Save(rootPath, _format);
+        BlackyPalletesPersistence.rampsPalette.Save(rootPath, _format);
+        BlackyPalletesPersistence.surfacesPalette.Save(rootPath, _format);
+        BlackyPalletesPersistence.decorationsPalette.Save(rootPath, _format);
+        BlackyPalletesPersistence.pathsPalette.Save(rootPath, _format);        
     }
     public void SaveAllDirtyRegions()
     {
@@ -320,9 +320,7 @@ public class BlackyWorldPersistence
     // SAVE VISUAL
     // =====================================================
 
-    private List<GenericChunkSave> SaveVisualRegion(
-        BlackyRegion region,
-        BlackyWorldDataMap<ushort> world)
+    private List<GenericChunkSave> SaveVisualRegion( BlackyRegion region, BlackyWorldDataMap<SerializerCellGeneric> world)
     {
         List<GenericChunkSave> result = new();
 
@@ -360,11 +358,9 @@ public class BlackyWorldPersistence
                 {
                     for (int x = 0; x < world.ChunkSize; x++)
                     {
-                        ushort tile = heightData.GetCell(x, y);
+                        ushort tile = heightData.GetCell(x, y).id;
 
-                        tiles[
-                            y * world.ChunkSize + x]
-                                = tile;
+                        tiles[y * world.ChunkSize + x] = tile;
 
                         if (tile != 0)
                             hasData = true;
@@ -395,8 +391,7 @@ public class BlackyWorldPersistence
     // SAVE TERRAIN
     // =====================================================
 
-    private List<TerrainChunkSave> SaveTerrainRegion(
-        BlackyRegion region)
+    private List<TerrainChunkSave> SaveTerrainRegion(BlackyRegion region)
     {
         List<TerrainChunkSave> result = new();
 

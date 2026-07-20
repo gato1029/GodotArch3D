@@ -66,11 +66,11 @@ public static class BlackyWorldContext
     public static BlackyBuildingSystem Buildings => Services.BuildingPainter;
     public static BlackyHeightSystem Heights => Services.HeightTool;
     //public static BlackyChunkCacheTextureMap PintarTerreno => Services.TerrainTexturePainter;
-    public static BlackyRampVisualWorld PintarRampas => Services.RampasData;
-    public static BlackyTerrainWorldData PintarTerreno => Services.TerrainData;
-    public static BlackySurfaceWorldData PintarSuperficies => Services.SuperficiesData;
-    public static BlackyPathWorldData PintarCaminos => Services.CaminosData;
-    public static BlackyDecorationWorldData PintarAdornos => Services.AdornosData;
+    public static BlackyRampVisualWorld PintarRampas => Services.RampasDataLienzo;
+    public static BlackyTerrainWorldData PintarTerreno => Services.TerrainDataLienzo;
+    public static BlackySurfaceWorldData PintarSuperficies => Services.SuperficiesDataLienzo;
+    public static BlackyPathWorldData PintarCaminos => Services.CaminosDataLienzo;
+    public static BlackyDecorationWorldData PintarAdornos => Services.AdornosDataLienzo;
 
 
     // ================================

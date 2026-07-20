@@ -12,7 +12,7 @@ public class BlackyChunkData<T>
     public Dictionary<int, BlackyChunkHeightData<T>> Heights => _heights;
     private readonly int _chunkSize;
     private bool _dirty;
-    
+  
     public void MarkDirty()
     {
         _dirty = true;

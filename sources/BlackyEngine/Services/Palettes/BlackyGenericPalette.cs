@@ -1,7 +1,10 @@
+using Godot;
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using MessagePack;
+using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
 
@@ -27,20 +30,75 @@ public readonly record struct PairCacheData(
 public class BlackyPalletesPersistence
 {
     public static BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new("Terreno");
+    public static BlackyGenericPalette<RampsData> rampsPalette { get; } = new("Rampas");
+    public static BlackyGenericPalette<DecorationData> decorationsPalette { get; } = new("Adornos");
+    public static BlackyGenericPalette<CaminosData> pathsPalette { get; } = new("Caminos");
+    public static BlackyGenericPalette<SuperficieData> surfacesPalette { get; } = new("Superficies");
+    public static BlackyGenericPalette<BiomaData> biomePalette { get; } = new("Biomas");
 }
 
 public class BlackyGenericPalette<T> where T : class
 {
     private ushort _nextId = 1;
     private bool isDirty = false;
-    private readonly string _paletteName; // "terrain", "ramps", "decorations", "paths", "surfaces"
+    private readonly string _paletteName; // "terrain", "ramps", "decorations", "paths", "surfaces", etc
 
 
     private readonly Dictionary<PairCacheData, ushort> _cache = new();
     private Dictionary<ushort, GenericPersistenceData> _persistent = new();
-    public BlackyGenericPalette(string paletteName)
+    public BlackyGenericPalette(string paletteName, bool LoadAll=false)
     {
         _paletteName = paletteName;
+        if (LoadAll)
+        {
+            LoadAllData();
+        }
+    }
+    private void LoadAllData()
+    {            
+        Dictionary<ushort, Dictionary<long, T>> allInfo = AtlasModsManager.GetDictionaryAll<T, long>();
+        foreach (var item in allInfo)
+        {
+            var modName = TableMods.Instance.ObtenerNombre(item.Key); 
+
+            foreach (var bucket in item.Value)
+            {
+                var data = bucket.Value;
+                if (_nextId == ushort.MaxValue)
+                    throw new InvalidOperationException("Palette limit reached.");
+                
+               ushort paletteId = _nextId++;
+               var key = new PairCacheData(modName, bucket.Key);
+               _cache[key] = paletteId;
+
+                _persistent[paletteId] = new GenericPersistenceData
+                {
+                    ModName = modName,
+                    id = bucket.Key
+                };
+            }
+        }
+    }
+    /// <summary>
+    /// Devuelve un diccionario con todos los IDs de la paleta y sus respectivos datos deserializados/cargados en memoria.
+    /// </summary>
+    public Dictionary<ushort, T> GetAllPallete()
+    {
+        var result = new Dictionary<ushort, T>();
+
+        foreach (var kvp in _persistent)
+        {
+            ushort paletteId = kvp.Key;
+            T data = GetData(paletteId);
+
+            // Opcional: Validar si el dato no es nulo antes de agregarlo
+            if (data != null)
+            {
+                result[paletteId] = data;
+            }
+        }
+
+        return result;
     }
     public T GetData(ushort id)
     {

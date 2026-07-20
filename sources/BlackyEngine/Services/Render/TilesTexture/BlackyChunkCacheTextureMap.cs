@@ -602,13 +602,7 @@ public class BlackyChunkCacheTextureMap
         }
     }
 
-    public void ApplyBrushCreateDual(
-    int baseX,
-    int baseY,
-    int altura,
-    int capa,
-    Brush brush,
-    DualTileTemplate dualTileTemplate)
+    public void ApplyBrushCreateDual(int baseX,int baseY,int altura,int capa,Brush brush, DualTileTemplate dualTileTemplate)
     {
         HashSet<(int x, int y)> affected = new();
 
@@ -643,11 +637,32 @@ public class BlackyChunkCacheTextureMap
     {
         return ((long)x << 32) | (uint)y;
     }
-    private int Index(int x, int y)
+
+    public void AplyChunkBatchSingleSprite(int chunkX, int chunkY, int height, int layer, SerializerCellGeneric[] cells)
     {
-        return x + y * ChunkSize;
+        var chunk = GetOrCreateChunk(chunkX, chunkY);
+
+        lock (chunk.SyncRoot)
+        {
+            var tileLayer = chunk.GetOrCreateLayer(height, layer);
+            for (int i = 0; i < cells.Length; i++)
+            {
+                ref readonly var cell = ref cells[i];
+                if (cell.id == 0) continue;
+                int x = i % ChunkSize;
+                int y = i / ChunkSize;
+                int worldX = chunkX * ChunkSize + x;
+                int worldY = chunkY * ChunkSize + y;
+
+                
+                int tileId = GetIdTileSprite((BlackyRenderLayer)layer, cell.id);
+                tileLayer.SetTile(x, y, tileId);
+                tileLayer.SetRender(x, y, true);
+            }
+            //var (targetChunk, lx, ly) = ResolveOrCreate(nx, ny);                                                
+        }
     }
-    public void ApplyChunkBatch(int chunkX, int chunkY, int height, int layer, SerializerCellGeneric[] cells)
+    public void ApplyChunkBatchDualTiles(int chunkX, int chunkY, int height, int layer, SerializerCellGeneric[] cells)
     {
         var chunk = GetOrCreateChunk(chunkX, chunkY);
     
@@ -655,190 +670,158 @@ public class BlackyChunkCacheTextureMap
         {
             // Usamos un Dictionary para consolidar actualizaciones por coordenada
             // Key: coordenada (long), Value: el ID del tile que debe dictar la apariencia
-            Dictionary<long, ushort> tilesToUpdate = new();
+            // Estructuras de almacenamiento
+            Dictionary<long, ushort> tilesToUpdateSolid = new();
+            Dictionary<long, ushort> tilesToUpdateBorder = new();
+
+            // Optimizacion 1: Lista para no volver a recorrer toda la grilla
+            List<int> borderIndices = new List<int>();
+
             var tileLayer = chunk.GetOrCreateLayer(height, layer);
 
-            // 1. PRIMERA PASADA: Identificar tiles sólidos y sus necesidades de borde
-            for (int y = 0; y < ChunkSize; y++)
+            // 1. PRIMERA PASADA: Identificar sólidos y recolectar bordes
+            for (int i = 0; i < cells.Length; i++)
             {
-                for (int x = 0; x < ChunkSize; x++)
+                ref readonly var cell = ref cells[i];
+                if (cell.id == 0) continue;
+
+                int x = i % ChunkSize;
+                int y = i / ChunkSize;
+                tileLayer.SetSolid(x, y, true);
+
+                long centerKey = MakeKey(chunkX * ChunkSize + x, chunkY * ChunkSize + y);
+                // Verificamos si es un borde definido por lógica O si es un borde de chunk
+                bool isBorderLogic = cell.isBorder;
+                bool isChunkEdge = (x == 0 || x == ChunkSize - 1 || y == 0 || y == ChunkSize - 1);
+
+                if (isBorderLogic || isChunkEdge)
                 {
-                    int i = Index(x, y);
-                    ref readonly var cell = ref cells[i];
+                    borderIndices.Add(i);
+                }
+                else
+                {
+                    tilesToUpdateSolid[centerKey] = cell.id;
+                }
+            }
 
-                    if (cell.id == 0) continue;
+            // 2. SEGUNDA PASADA (Optimizada): Solo iteramos los bordes encontrados
+            foreach (int i in borderIndices)
+            {
+                int x = i % ChunkSize;
+                int y = i / ChunkSize;
+                int worldX = chunkX * ChunkSize + x;
+                int worldY = chunkY * ChunkSize + y;
 
-                    tileLayer.SetSolid(x, y, true);
+                // Obtenemos el ID del borde actual una sola vez
+                ushort borderId = cells[i].id;
 
-                    int worldX = chunkX * ChunkSize + x;
-                    int worldY = chunkY * ChunkSize + y;
-                    long centerKey = MakeKey(worldX, worldY);
-
-                    // Siempre agregamos el tile central para actualizar su visual
-                    tilesToUpdate[centerKey] = cell.id;
-
-                    // Si es borde, forzamos la actualización de todo su entorno 3x3 
-                    // para que los vecinos reconozcan el cambio
-                    if (cell.isBorder)
+                for (int oy = -1; oy <= 1; oy++)
+                {
+                    for (int ox = -1; ox <= 1; ox++)
                     {
-                        for (int oy = -1; oy <= 1; oy++)
+                        // Omitimos el centro
+                        //if (ox == 0 && oy == 0) continue;
+
+                        long neighborKey = MakeKey(worldX + ox, worldY + oy);
+
+                        // Optimizacion 2: Usamos TryAdd para evitar el ContainsKey previo
+                        // Solo se agrega si la clave no existe en tilesToUpdateSolid
+                        if (!tilesToUpdateSolid.ContainsKey(neighborKey))
                         {
-                            for (int ox = -1; ox <= 1; ox++)
-                            {
-                                // Omitimos el centro (ya fue agregado)
-                                if (ox == 0 && oy == 0) continue;
-
-                                int nx = worldX + ox;
-                                int ny = worldY + oy;
-                                long neighborKey = MakeKey(nx, ny);
-
-                                // Solo agregamos si el vecino no ha sido procesado como un ID sólido
-                                // o si queremos asegurar que detecte al nuevo vecino.
-                                if (!tilesToUpdate.ContainsKey(neighborKey))
-                                {
-                                    GD.Print("Borde",nx,",",ny);
-                                    // Aquí guardamos el ID del central porque el vecino 
-                                    // necesita saber que tiene un "borde" colindante
-                                    tilesToUpdate[neighborKey] = cell.id;
-                                }
-                            }
+                            tilesToUpdateBorder.TryAdd(neighborKey, borderId);
                         }
                     }
                 }
             }
-
             // 2. SEGUNDA PASADA: Aplicar las actualizaciones visuales
-            foreach (var entry in tilesToUpdate)
+            foreach (var entry in tilesToUpdateSolid)
             {
                 long key = entry.Key;
                 ushort id = entry.Value;
                 DecodeKey(key, out int nx, out int ny);
-
-                var data = BlackyPalletesPersistence.terrainPalette.GetData(id);
-                var template = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
-
+                var template = GetTemplate((BlackyRenderLayer)layer, id);
                 var (targetChunk, lx, ly) = ResolveOrCreate(nx, ny);
                 var targetLayer = targetChunk.GetOrCreateLayer(height, layer);
 
                 UpdateDualVisualInternal(nx, ny, lx, ly, height, layer, template, targetLayer);
             }
-
-            chunk.MarkDirty();
-            //HashSet<long> visited = new();
-            //List<DirtyTile> dirtyTiles = new();
-
-            //var tileLayer = chunk.GetOrCreateLayer(height, layer);
-
-
-            //for (int y = 0; y < ChunkSize; y++)
-            //{                
-            //    for (int x = 0; x < ChunkSize; x++)
-            //    {
-            //        int i = Index(x, y);
-            //        ref readonly var cell = ref cells[i];
-
-            //        if (cell.id == 0)
-            //            continue;
-
-            //        tileLayer.SetSolid(x, y, true);
-
-            //        int worldX = chunkX * ChunkSize + x;
-            //        int worldY = chunkY * ChunkSize + y;
-
-            //        for (int oy = -1; oy <= 1; oy++)
-            //        {
-            //            for (int ox = -1; ox <= 1; ox++)
-            //            {
-            //                int nx = worldX + ox;
-            //                int ny = worldY + oy;
-
-            //                long key = MakeKey(nx, ny);
-
-            //                if (visited.Add(key))
-            //                {
-            //                    dirtyTiles.Add(new DirtyTile(nx, ny, cell.id));
-            //                    GD.Print($"Pos: {nx}, {ny}");
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-
-
-            //foreach (ref readonly var tile in CollectionsMarshal.AsSpan(dirtyTiles))
-            //{
-            //    var data = BlackyPalletesPersistence.terrainPalette.GetData(tile.Id);
-            //    ultimoTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
-            //    var (targetChunk, lx, ly) = ResolveOrCreate(tile.X, tile.Y);
-
-            //    UpdateDualVisualInternal(tile.X, tile.Y, lx, ly, height, layer, ultimoTemplate, targetChunk.GetOrCreateLayer(height, layer));
-            //}
-
-            chunk.MarkDirty();
-        }
-    }
-    private void ProcesarBordes(int chunkX, int chunkY, int height, int layer, DualTileTemplate template)
-    {
-        // Definimos los rangos de borde: -1 y ChunkSize
-        int[] bordes = { -1, ChunkSize };
-
-        foreach (int bx in bordes)
-        {
-            for (int y = 0; y < ChunkSize; y++)
+            foreach (var entry in tilesToUpdateBorder)
             {
-                ProcesarBordeTile(chunkX * ChunkSize + bx, chunkY * ChunkSize + y, height, layer, template);
-            }
-        }
-        foreach (int by in bordes)
-        {
-            for (int x = 0; x < ChunkSize; x++)
-            {
-                ProcesarBordeTile(chunkX * ChunkSize + x, chunkY * ChunkSize + by, height, layer, template);
-            }
-        }
-    }
+                long key = entry.Key;
+                ushort id = entry.Value;
+                DecodeKey(key, out int nx, out int ny);
+                
+                var template = GetTemplate((BlackyRenderLayer)layer, id);
 
-    private void ProcesarBordeTile(int worldX, int worldY, int height, int layer, DualTileTemplate template)
-    {
-        var (targetChunk, lx, ly) = ResolveOrCreate(worldX, worldY);
-        if (targetChunk == null) return;
-
-        // Solo nos importa si es un tile vacío que necesita borde
-        // Si ya es sólido (id != 0), ya se procesó o se procesará en su propio ApplyChunkBatch
-        //if (!IsSolidGlobal(worldX, worldY, height, layer))
-        {
-            lock (targetChunk.SyncRoot)
-            {
+                var (targetChunk, lx, ly) = ResolveOrCreate(nx, ny);
                 var targetLayer = targetChunk.GetOrCreateLayer(height, layer);
-                UpdateDualVisualInternal(worldX, worldY, lx, ly, height, layer, template, targetLayer, true);
+
+                UpdateDualVisualInternal(nx, ny, lx, ly, height, layer, template, targetLayer,false);
             }
+                    
+            chunk.MarkDirty();
         }
+    }
+    
+    private int GetIdTileSprite(BlackyRenderLayer blackyRenderLayer, ushort id)
+    {
+        switch (blackyRenderLayer)
+        {
+            
+            case BlackyRenderLayer.Rampas:
+                var data2 = BlackyPalletesPersistence.rampsPalette.GetData(id);
+                return AtlasModsManager.GetSpriteUniqueId(data2.idTileSprite);
+                
+
+            case BlackyRenderLayer.Adornos:
+                var data5 = BlackyPalletesPersistence.decorationsPalette.GetData(id);
+                return AtlasModsManager.GetSpriteUniqueId(data5.idTileSprite);
+            default:
+                break;
+        }
+        return 0;
+    }
+    private DualTileTemplate GetTemplate(BlackyRenderLayer blackyRenderLayer, ushort id)
+    {
+        switch (blackyRenderLayer)
+        {
+            case BlackyRenderLayer.TerrenoBase:
+                var data = BlackyPalletesPersistence.terrainPalette.GetData(id);
+                return AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);            
+            case BlackyRenderLayer.Superficie:
+                var data3 = BlackyPalletesPersistence.surfacesPalette.GetData(id);
+                return AtlasModsManager.Get<DualTileTemplate>(data3.nameMod, data3.idDualTemplate);
+            case BlackyRenderLayer.Caminos:
+                var data4 = BlackyPalletesPersistence.pathsPalette.GetData(id);
+                return AtlasModsManager.Get<DualTileTemplate>(data4.nameMod, data4.idDualTemplate);
+            
+            default:
+                break;
+        }
+        return null;
     }
   
-    private void UpdateDualVisualInternal(int vx, int vy, int lx, int ly, int height, int layer, DualTileTemplate template, IBlackyChunkTilemapTexture tileLayer, bool verificarVecindad = false)
+    private void UpdateDualVisualInternal(int vx, int vy, int lx, int ly, int height, int layer, DualTileTemplate template, IBlackyChunkTilemapTexture tileLayer, bool esSolido = true)
     {
         byte mask = 0;
-        // Usamos IsSolidGlobal (que es lectura pura, segura en multihilo)
-        //if (verificarVecindad)
-        //{
+        if (esSolido) // si es solido no verfico vecindad
+        {
+            mask = 15;
+        }
+        else
+        { 
  
             if (IsSolidGlobal(vx, vy + 1, height, layer)) mask |= DualMask.TopLeft;
             if (IsSolidGlobal(vx + 1, vy + 1, height, layer)) mask |= DualMask.TopRight;
             if (IsSolidGlobal(vx, vy, height, layer)) mask |= DualMask.BottomLeft;
-            if (IsSolidGlobal(vx + 1, vy, height, layer)) mask |= DualMask.BottomRight;
-
-            
-        //}
-        //else
-        //{
-        //    mask = 15;
-        //}
+            if (IsSolidGlobal(vx + 1, vy, height, layer)) mask |= DualMask.BottomRight;            
+        }
         if (mask==0)
         {
             return; // no hacer nada
         }
         tileLayer.SetDualMask(lx, ly, mask);
-        // ... aquí tu lógica de obtener slot y SetTile ...
+        
         var slot = template.GetSlot(mask);
         var item = slot.GetGeneric().Parts[0];
         int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData);
@@ -846,92 +829,7 @@ public class BlackyChunkCacheTextureMap
         tileLayer.SetTile(lx, ly, tileId);
         tileLayer.SetRender(lx, ly, true);
     }
-    public void SetTileDualConcurrent(int worldX,int worldY, int height, int layer, DualTileTemplate dualTileTemplate, bool isborder=false)
-    {
-        
-        
-        if (isborder)
-        {
-            // revisar alrededores
-            for (int oy = -1; oy <= 1; oy++)
-            {
-                for (int ox = -1; ox <= 1; ox++)
-                {
-                    var (chunk, lx, ly) = ResolveOrCreate(worldX+ox, worldY+oy);
-                    IBlackyChunkTilemapTexture tileLayer = chunk.GetOrCreateLayer(height, layer);
-                    if (ox==0 || oy==0)
-                    {
-                        tileLayer.SetSolid(lx, ly, true);
-                    }                                        
-                    RebuildDualCellConcurrent(worldX+ox, worldY+oy, lx, ly, height, layer, dualTileTemplate, tileLayer);
-                }
-            }
-            
-        }
-        else
-        {
-            var (chunk, lx, ly) = ResolveOrCreate(worldX, worldY);
-            IBlackyChunkTilemapTexture tileLayer = chunk.GetOrCreateLayer(height, layer);
-            tileLayer.SetSolid(lx, ly, true);
-            tileLayer.SetRender(lx, ly, true);
-
-            var slot = dualTileTemplate.GetSlot(15); // el 15 es el que representa que todos los tiles alrededor son sólidos, es decir, no hay borde
-            var slotHeight = slot.GetGeneric();
-            var item = slotHeight.Parts[0];
-            int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData); // esto existe y solo se lee en modo lectura, no se modifica      
-            tileLayer.SetTile(lx, ly, tileId);
-        }
-        
-    }
-
-    public void RebuildDualCellConcurrent(int vx, int vy,int lx,int ly, int height,int layer, DualTileTemplate dualTileTemplate,  IBlackyChunkTilemapTexture tileLayer)
-    {   // El tile visual NO existe
-        byte mask = 0;
-        // TL
-        if (IsSolidGlobal(vx, vy + 1, height, layer))
-            mask |= DualMask.TopLeft;
-        // TR
-        if (IsSolidGlobal(vx + 1, vy + 1, height, layer))
-            mask |= DualMask.TopRight;
-        // BL
-        if (IsSolidGlobal(vx, vy, height, layer))
-            mask |= DualMask.BottomLeft;
-        // BR
-        if (IsSolidGlobal(vx + 1, vy, height, layer))
-            mask |= DualMask.BottomRight;
-              
-        byte lastMask = tileLayer.GetDualMask(lx, ly);
-        tileLayer.SetDualMask(lx, ly, mask);
-
-        bool markDelete = false;
-        if (mask == 0)
-        {            
-            markDelete = true;
-        }
-
-        var slot = dualTileTemplate.GetSlot(mask);
-        
-        if (markDelete)
-        {
-            slot = dualTileTemplate.GetSlot(lastMask);            
-        }
-
-        var slotHeight = slot.GetGeneric();
-
-        var item = slotHeight.Parts[0];
-
-        if (markDelete)
-        {                     
-            tileLayer.ClearTile(lx, ly);
-        }
-        else
-        {
-            int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData); // esto existe y solo se lee en modo lectura, no se modifica      
-            tileLayer.SetTile(lx, ly, tileId);
-            tileLayer.SetRender(lx, ly, true);
-        }
-      
-    }
+ 
 
     public void SetTileDual(
     int worldX,

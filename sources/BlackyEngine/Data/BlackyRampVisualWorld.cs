@@ -1,11 +1,15 @@
+using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
+using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using System;
+using static Flecs.NET.Core.Ecs;
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
 /// <summary>
@@ -25,22 +29,26 @@ public struct VisualTileCell
     public ushort TileId;
 }
 
-public class BlackyRampVisualWorld
-    : BlackyWorldDataMap<ushort>
+public class BlackyRampVisualWorld : BlackyWorldDataMap<SerializerCellGeneric>
 {
-    public BlackyGenericPalette<RampsData> rampsPalette { get; } = new("Rampas");
-    public BlackyRampVisualWorld(
-        int chunkSize,
-        BlackyChunkCacheTextureMap textureMap,
-        BlackyWorldRegions regions)
-        : base(
-            chunkSize,
-            BlackyRenderLayer.Rampas,
-            textureMap,
-            false,
-            regions)
+    private readonly ChunkManagerBase _chunkManager;
+  
+    public BlackyRampVisualWorld(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
+        : base(chunkSize, BlackyRenderLayer.Rampas, textureMap, true, regions,blackyWorld)
     {
+        _chunkManager = chunkManager;
+        _chunkManager.OnChunkDataPreload += OnChunkDataPreload;
+    }
 
+    private void OnChunkDataPreload(Vector2I pos)
+    {
+        var coord = new BlackyChunkCoord(pos.X, pos.Y);
+        if (!_chunks.TryGetValue(coord, out var chunk)) return;
+
+        foreach (var (height, heightData) in chunk.GetHeights())
+        {
+            _textureMap.AplyChunkBatchSingleSprite(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
+        }
     }
 
     // =====================================================
@@ -48,7 +56,7 @@ public class BlackyRampVisualWorld
     // =====================================================
     public void SetRamp(int worldX, int worldY, int height, RampsData rampsData, Brush brush)
     {
-        ushort id = rampsPalette.GetIdPersistence(rampsData.nameMod, rampsData.id, out var rampDataPersist);
+        ushort id = BlackyPalletesPersistence.rampsPalette.GetIdPersistence(rampsData.nameMod, rampsData.id, out var rampDataPersist);
         foreach (var offset in brush.Cells)
         {
             int x = worldX + offset.x;
@@ -56,7 +64,7 @@ public class BlackyRampVisualWorld
 
             ref var cell = ref ResolveOrCreateCell(x, y, height);
 
-            cell = id;
+            cell.id = id;
         }
 
         AtlasModsManager.GetSpriteUniqueId(rampsData.idTileSprite, out TileSpriteData tileSpriteData);
@@ -83,7 +91,7 @@ public class BlackyRampVisualWorld
                 worldY,
                 height);
 
-        cell = _textureMap.SetTile( worldX,  worldY,  height, (int)RenderLayer, modName, textureIndex,true);
+        cell.id = _textureMap.SetTile( worldX,  worldY,  height, (int)RenderLayer, modName, textureIndex,true);
 
     }
 
@@ -102,7 +110,7 @@ public class BlackyRampVisualWorld
                 worldY,
                 height);
 
-        cell = 0;
+        cell.id = 0;
 
         _textureMap.RemoveTileSprite(
             worldX,
@@ -129,7 +137,7 @@ public class BlackyRampVisualWorld
             return false;
         }
 
-        return cell != 0;
+        return cell.id != 0;
     }
 
     public ushort GetTile(
@@ -145,6 +153,6 @@ public class BlackyRampVisualWorld
         {
             return 0;
         }
-        return cell;
+        return cell.id;
     }
 }

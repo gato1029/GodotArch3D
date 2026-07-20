@@ -4,6 +4,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Generation;
 using GodotEcsArch.sources.BlackyEngine.Generation.Biomes;
+using GodotEcsArch.sources.BlackyEngine.Generation.Procedural;
 using GodotEcsArch.sources.BlackyEngine.Generation.Resources;
 using GodotEcsArch.sources.BlackyEngine.Generation.Terrain;
 using GodotEcsArch.sources.BlackyEngine.Services;
@@ -47,7 +48,7 @@ public sealed class BlackyWorld : IDisposable
     public BlackyWorldServices Services { get; }
     public BlackyWorldGeneration Generation { get; }
     public BlackyWorldStreaming Streaming { get; }
-
+    public BlackyWorldProceduralGeneration Procedural { get; }
     // =========================================
     // Public Facade Shortcuts
     // =========================================
@@ -72,6 +73,7 @@ public sealed class BlackyWorld : IDisposable
     public BlackyWorldTileMapper TileMapper => Generation.TileMapper;
 
     public ChunkManagerBase ChunkManager => Streaming.chunkManagerLocal;
+
 
     // =========================================
     // Constructor
@@ -105,9 +107,11 @@ public sealed class BlackyWorld : IDisposable
 
         Services = new BlackyWorldServices(this);
 
-        Generation = new BlackyWorldGeneration(this, Services);
+        //Generation = new BlackyWorldGeneration(this, Services); esto ya no funcionara luego quitar 
 
         BlackyWorldRegistry.Instance.AddWorld(name, this, true);
+
+        Procedural = new BlackyWorldProceduralGeneration(Services, Config);
 
         //DebugBoot();
     }
