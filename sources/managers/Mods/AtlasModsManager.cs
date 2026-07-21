@@ -384,6 +384,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(decorationData, idMod, name);
         CargarDatos(caminosData, idMod, name);
         CargarDatos(superficieData,idMod, name);
+        CargarDatos(biomaData, idMod, name);
 
     }
 

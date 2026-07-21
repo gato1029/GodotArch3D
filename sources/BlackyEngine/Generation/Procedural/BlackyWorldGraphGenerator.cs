@@ -92,7 +92,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Procedural;
 
         private List<BlackyWorldNode> AssignBiomesAndRadius(List<Vector2> positions, Random rng)
         {
-            var biomes = BlackyPalletesPersistence.biomePalette.GetAllPallete();            
+            Dictionary<ushort, BiomaData> biomes = BlackyPalletesPersistence.biomePalette.GetAllPallete();            
             var nodes = new List<BlackyWorldNode>(positions.Count);
 
             // Radio generoso: bastante más que la distancia mínima entre nodos,
@@ -100,12 +100,16 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Procedural;
             // corresponde. Es solo optimización, no el borde real (ver BlackyWorldNode).
             float influenceRadius = MinDistanceBetweenNodes * 1.8f;
 
+            var biomeKeys = new List<ushort>(biomes.Keys);
+
             for (int i = 0; i < positions.Count; i++)
             {
-                var biome = biomes[(ushort)rng.Next(biomes.Count)];
+                // Seleccionamos una clave aleatoria válida del diccionario
+                ushort randomKey = biomeKeys[rng.Next(biomeKeys.Count)];
+                var biome = biomes[randomKey];
+
                 nodes.Add(new BlackyWorldNode(id: i, positions[i], biome, influenceRadius));
             }
-
             return nodes;
         }
 

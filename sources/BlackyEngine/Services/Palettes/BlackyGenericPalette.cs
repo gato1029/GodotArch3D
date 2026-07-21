@@ -34,13 +34,14 @@ public class BlackyPalletesPersistence
     public static BlackyGenericPalette<DecorationData> decorationsPalette { get; } = new("Adornos");
     public static BlackyGenericPalette<CaminosData> pathsPalette { get; } = new("Caminos");
     public static BlackyGenericPalette<SuperficieData> surfacesPalette { get; } = new("Superficies");
-    public static BlackyGenericPalette<BiomaData> biomePalette { get; } = new("Biomas");
+    public static BlackyGenericPalette<BiomaData> biomePalette { get; } = new("Biomas",true);
 }
 
 public class BlackyGenericPalette<T> where T : class
 {
     private ushort _nextId = 1;
     private bool isDirty = false;
+    private bool isfull = false;
     private readonly string _paletteName; // "terrain", "ramps", "decorations", "paths", "surfaces", etc
 
 
@@ -84,6 +85,11 @@ public class BlackyGenericPalette<T> where T : class
     /// </summary>
     public Dictionary<ushort, T> GetAllPallete()
     {
+        //if (!isfull)
+        //{
+        //    LoadAllData();
+        //    isfull = true;
+        //}
         var result = new Dictionary<ushort, T>();
 
         foreach (var kvp in _persistent)

@@ -105,7 +105,7 @@ alignment = 0
 
 [node name="Label5" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1179606051]
 layout_mode = 2
-text = "Caminos:"
+text = "Recursos:"
 
 [node name="ListaRecursos" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1906146476 instance=ExtResource("6_3crfo")]
 layout_mode = 2

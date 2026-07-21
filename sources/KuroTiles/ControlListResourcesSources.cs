@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.Helpers;
 using GodotEcsArch.sources.KuroTiles;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Generic.Facade;
@@ -18,6 +19,11 @@ public partial class ControlListResourcesSources : MarginContainer
 
     public List<ResourceSourceData> dataInfo = null;    
     WindowDataSearch windowLocal = null;
+
+    public void ClearAll()
+    {
+        HBoxContainerTiles.ClearChildrens();
+    }
 
     // 🔸 Devuelve la lista de ResourceEntry con su probabilidad
     public List<ResourceEntry> GetData()
@@ -47,6 +53,10 @@ public partial class ControlListResourcesSources : MarginContainer
     // 🔸 Carga los recursos desde la lista
     internal void SetData(List<ResourceEntry> entries)
     {
+        if (entries==null)
+        {
+            return;
+        }
         foreach (var entry in entries)
         {
             var data = MasterDataManager.GetData<ResourceSourceData>(entry.ResourceSourceId);

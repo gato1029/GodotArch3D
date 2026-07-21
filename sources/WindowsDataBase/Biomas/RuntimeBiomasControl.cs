@@ -83,7 +83,7 @@ public partial class RuntimeBiomasControl : PanelContainer
         ButtonSuperficie.Text = "Seleccione Uno";
         ButtonCaminos.Text = "Seleccione Uno";
         ButtonTerreno.Text = "Seleccione Uno";
-        ListaRecursos.ClearChildrens();
+        ListaRecursos.ClearAll();
     }
 
     private void ButtonNuevo_Pressed()
@@ -109,9 +109,22 @@ public partial class RuntimeBiomasControl : PanelContainer
     }
     private void KuroItems_OnObjectPressed(object obj)
     {
+        ClearAll();
         data = (BiomaData)obj;
-        ButtonCaminos.Text = AtlasModsManager.Get<CaminosData>(data.nameMod, data.idCamino).name;
-
+        if (data.idCamino!=0)
+        {
+            ButtonCaminos.Text = AtlasModsManager.Get<CaminosData>(data.nameMod, data.idCamino).name;
+        }
+        if (data.idSuperficie!=0)
+        {
+            ButtonSuperficie.Text = AtlasModsManager.Get<SuperficieData>(data.nameMod, data.idSuperficie).name;
+        }
+        if (data.idTerreno!=0)
+        {
+            ButtonTerreno.Text = AtlasModsManager.Get<TerrainBaseData>(data.nameMod, data.idTerreno).name;
+        }
+        ListaRecursos.SetData(data.idRecursos);
+        
         LineEditName.Text = data.name;       
     }
 }
