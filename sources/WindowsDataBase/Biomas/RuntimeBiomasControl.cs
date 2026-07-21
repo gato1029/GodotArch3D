@@ -113,15 +113,15 @@ public partial class RuntimeBiomasControl : PanelContainer
         data = (BiomaData)obj;
         if (data.idCamino!=0)
         {
-            ButtonCaminos.Text = AtlasModsManager.Get<CaminosData>(data.nameMod, data.idCamino).name;
+            ButtonCaminos.Text = AtlasModsManager.GetDirect<CaminosData>( data.idCamino).name;
         }
         if (data.idSuperficie!=0)
         {
-            ButtonSuperficie.Text = AtlasModsManager.Get<SuperficieData>(data.nameMod, data.idSuperficie).name;
+            ButtonSuperficie.Text = AtlasModsManager.GetDirect<SuperficieData>( data.idSuperficie).name;
         }
         if (data.idTerreno!=0)
         {
-            ButtonTerreno.Text = AtlasModsManager.Get<TerrainBaseData>(data.nameMod, data.idTerreno).name;
+            ButtonTerreno.Text = AtlasModsManager.GetDirect<TerrainBaseData>(data.idTerreno).name;
         }
         ListaRecursos.SetData(data.idRecursos);
         

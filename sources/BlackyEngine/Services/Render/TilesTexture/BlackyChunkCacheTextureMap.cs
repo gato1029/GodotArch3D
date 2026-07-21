@@ -103,7 +103,7 @@ public class BlackyChunkCacheTextureMap
         BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
         if (_chunks.TryGetValue(coord, out var chunkCurrent))
         {
-            GD.Print($"[BlackyChunkCacheTextureMap] Unloading chunk at {coord.X}, {coord.Y}");
+            //GD.Print($"[BlackyChunkCacheTextureMap] Unloading chunk at {coord.X}, {coord.Y}");
             _chunks.TryRemove(coord, out _);
         }
     }

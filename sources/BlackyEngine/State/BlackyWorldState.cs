@@ -45,13 +45,7 @@ public sealed class BlackyWorldState : IDisposable
 
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize);
 
-        WireShape.Instance.DrawGrid(
-            config.MapSize.X,
-            config.MapSize.Y,
-            16,
-            new Vector2(0, 0),
-            -50,
-            Colors.DarkCyan);
+        WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),-50,Colors.DarkCyan);
     }
 
     public void Dispose()

@@ -144,7 +144,7 @@ public class BlackyTileTextureRenderSystem
         if (!chunkMap.TryGetChunk(coord.X, coord.Y, out var chunk))
             return;
         
-        GD.Print($"OnChunkLoad Render {coord}");
+        //GD.Print($"OnChunkLoad Render {coord}");
         if (!chunkRenderInstances.ContainsKey(coord))
         {
             BuildChunk(chunk);

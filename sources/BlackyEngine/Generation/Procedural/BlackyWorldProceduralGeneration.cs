@@ -20,25 +20,26 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Procedural;
 
 public class BlackyWorldProceduralGeneration
 {
-    private readonly BlackyWorldServices _services;
+    private readonly BlackyWorld _world;
     private BlackyWorldSeed _worldSeed;
     private BlackyWorldGraphGenerator _graph;
     private BlackyWorldConfig _config;
     private List<BlackyWorldNode> _nodes;
     private BlackyWorldChunkNode _chunksNodes;
-    public BlackyWorldProceduralGeneration(BlackyWorldServices services, BlackyWorldConfig worldConfig)
-    {
-        _services = services;
+    public BlackyWorldProceduralGeneration(BlackyWorld world, BlackyWorldConfig worldConfig)
+    {        
+        _world = world;
         _config = worldConfig;
         _worldSeed = new BlackyWorldSeed(_config.WorldSeed);
-        _graph = new BlackyWorldGraphGenerator(_config.MapSize.X, _config.MapSize.Y, 20, 60f);
+        _graph = new BlackyWorldGraphGenerator(_config.MapSize.X, _config.MapSize.Y);
         _nodes = _graph.Generate(_worldSeed);
-        _chunksNodes = new BlackyWorldChunkNode(_config.ChunkSize);
+        _chunksNodes = new BlackyWorldChunkNode(_config);
         _chunksNodes.Build(_nodes);
 
         // llena todo el mapa de terreno
         GenerateMapTerrain();
         GenerateMapBordersOptimized();
+        world.Streaming.chunkManagerLocal.Teleport(new Vector2(0,0));
     }
 
     public BlackyWorldProceduralGeneration()
@@ -60,6 +61,7 @@ public class BlackyWorldProceduralGeneration
     {
         if (candidates.Count == 0)
         {
+            GD.PrintErr($"No candidates found for chunk {coord}. This chunk will remain unassigned.");
             // el chunk no tiene bioma asignado
             return;
         }
@@ -73,10 +75,10 @@ public class BlackyWorldProceduralGeneration
             for (int ly = 0; ly < _config.ChunkSize; ly++)
             {
                 
-                Vector2I worldPos = _services.TerrainDataLienzo.LocalToWorld(coord, lx, ly);
+                Vector2I worldPos = _world.Services.TerrainDataLienzo.LocalToWorld(coord, lx, ly);
                 var bioma = FindClosestBiome(candidates, worldPos);
                 var terreno = AtlasModsManager.GetDirect<TerrainBaseData>(bioma.idTerreno);
-                _services.TerrainDataLienzo.SetTerrainDirectNoRenderLocal(coord, lx,ly, 1, false, terreno);
+                _world.Services.TerrainDataLienzo.SetTerrainDirectNoRenderLocal(coord, lx,ly, 1, false, terreno);
                 
                
             }
@@ -108,7 +110,7 @@ public class BlackyWorldProceduralGeneration
             for (int ly = 0; ly < _config.ChunkSize; ly++)
             {
                 
-                _services.TerrainDataLienzo.SetTerrainDirectNoRenderLocal(coord, lx,ly, 1, false, terreno);
+                _world.Services.TerrainDataLienzo.SetTerrainDirectNoRenderLocal(coord, lx,ly, 1, false, terreno);
             }
         }
     }
@@ -144,15 +146,15 @@ public class BlackyWorldProceduralGeneration
         for (int i = 0; i < size; i++)
         {
             // Borde superior (fila 0) e inferior (fila last)
-            _services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, 0, 1, true);
-            _services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, last, 1, true);
+            _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, 0, 1, true);
+            _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, last, 1, true);
 
             // Borde izquierdo (columna 0) y derecho (columna last)
             // Evitamos repetir las esquinas si es necesario (0 y last ya se marcaron arriba)
             if (i > 0 && i < last)
             {
-                _services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, 0, i, 1, true);
-                _services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, last, i, 1, true);
+                _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, 0, i, 1, true);
+                _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, last, i, 1, true);
             }
         }
     }

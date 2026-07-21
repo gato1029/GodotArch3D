@@ -24,7 +24,7 @@ public partial class MapsWindow : Window
 
     private void ButtonSave_Pressed()
     {           
-        BlackyWorld blackyWorld = new BlackyWorld(LineEditName.Text, (BlackyWorldTypeDetail)OptionButtonType.Selected, 32, 5, 213, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value));
+        BlackyWorld blackyWorld = new BlackyWorld(LineEditName.Text, (BlackyWorldTypeDetail)OptionButtonType.Selected, 32, 5, 41245134, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value));
         QueueFree();
     }
 

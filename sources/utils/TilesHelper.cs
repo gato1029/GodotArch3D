@@ -38,6 +38,16 @@ namespace GodotEcsArch.sources.utils
             Vector2 positionCenter = positionNormalize + new Vector2(x, y);
             return positionCenter;
         }
+        public static float TilePositionToWorldPosition(int tilePosition)
+        {
+            float tileSizeUnits = MeshCreator.PixelsToUnits(16); // 16 px → units
+            return tilePosition * tileSizeUnits + tileSizeUnits / 2f; // Center of the tile
+        }
+        public static int WorldPositionToTile(float worldPosition)
+        {
+            float tileSizeUnits = MeshCreator.PixelsToUnits(16); // 16 px → units
+            return (int)MathF.Floor(worldPosition / tileSizeUnits);
+        }
 
         public static Vector2 TilePositionToWorldPosition(int xx, int yy)
         {

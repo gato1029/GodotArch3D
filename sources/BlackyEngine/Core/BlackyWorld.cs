@@ -111,7 +111,7 @@ public sealed class BlackyWorld : IDisposable
 
         BlackyWorldRegistry.Instance.AddWorld(name, this, true);
 
-        Procedural = new BlackyWorldProceduralGeneration(Services, Config);
+        Procedural = new BlackyWorldProceduralGeneration(this, Config);
 
         //DebugBoot();
     }

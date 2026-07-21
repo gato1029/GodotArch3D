@@ -1,4 +1,3 @@
-
 using Godot;
 using System;
 using System.Collections.Concurrent;
@@ -11,31 +10,33 @@ namespace GodotEcsArch.sources.managers.Chunks;
 
 public class ChunkManagerBase
 {
-    // Renombrado para reflejar que manejan el ciclo de vida de los datos (no solo generación)
     public enum ChunkTaskType { DataPreload, Load, Unload, DataUnload }
 
-    // Eventos renombrados para mayor claridad
     public event Action<Vector2I> OnChunkLoad;
     public event Action<Vector2I> OnChunkUnload;
-    public event Action<Vector2I> OnChunkDataPreload;   // Antes: GeneratorPreload
-    public event Action<Vector2I> OnChunkDataUnload;    // Antes: GeneratorUnload
+    public event Action<Vector2I> OnChunkDataPreload;
+    public event Action<Vector2I> OnChunkDataUnload;
     public event Action OnChunkProcessingCompleted;
 
-    private readonly ConcurrentDictionary<Vector2I, ChunkTaskType> _chunkStates = new();
-    private readonly ConcurrentQueue<(Vector2I, ChunkTaskType)> _chunkQueue = new();
+    // Diccionario de estado que almacena el tipo de tarea exacto y la generación a la que pertenece
+    private readonly ConcurrentDictionary<Vector2I, (ChunkTaskType Type, int Generation)> _chunkStates = new();
+
+    // Cola que incluye la posición, el tipo y la generación
+    private readonly ConcurrentQueue<(Vector2I Pos, ChunkTaskType Type, int Generation)> _chunkQueue = new();
 
     private Thread _workerThread;
     private bool _isRunning = true;
+    private int _currentGeneration = 0; // Incrementa en cada Teleport / Carga inicial
 
     public bool UseParallelProcessing { get; set; } = false;
     public Vector2I ViewDistance { get; private set; }
-    public int DataPreloadDistance { get; set; } = 2; // Distancia de buffer para datos
+    public int DataPreloadDistance { get; set; } = 2;
     public Vector2I chunkDimencion { get; }
     public Vector2I tileSize { get; }
 
     private Vector2I _playerChunkPosCurrent;
     private HashSet<Vector2I> _activeChunks = new();
-    private HashSet<Vector2I> _dataChunks = new(); // Antes: generatorChunks
+    private HashSet<Vector2I> _dataChunks = new();
 
     public Vector2I MinChunk { get; private set; }
     public Vector2I MaxChunk { get; private set; }
@@ -49,21 +50,19 @@ public class ChunkManagerBase
         _workerThread = new Thread(ProcessChunkQueue) { IsBackground = true };
         _workerThread.Start();
     }
+
     public void SetBounds(Vector2I min, Vector2I max)
     {
         MinChunk = min;
         MaxChunk = max;
     }
-    public IReadOnlyCollection<Vector2I> GetActiveChunks()
-    {
-        // Devuelve una copia para evitar que el HashSet interno sea modificado desde afuera
-        return _activeChunks.ToList().AsReadOnly();
-    }
+
+    public IReadOnlyCollection<Vector2I> GetActiveChunks() => _activeChunks.ToList().AsReadOnly();
+
     public List<Vector2I> GetVisibleChunks(Vector2 position)
     {
         var temp = WorldToChunkCoords(position);
         Vector2I centerChunk = new Vector2I(temp.X, temp.Y);
-
         List<Vector2I> visibleChunks = new();
 
         for (int x = -ViewDistance.X; x <= ViewDistance.X; x++)
@@ -73,13 +72,11 @@ public class ChunkManagerBase
                 visibleChunks.Add(centerChunk + new Vector2I(x, y));
             }
         }
-
         return visibleChunks;
     }
-    public IReadOnlyCollection<Vector2I> GetGeneratorChunks()
-    {
-        return _dataChunks.ToList().AsReadOnly();
-    }
+
+    public IReadOnlyCollection<Vector2I> GetGeneratorChunks() => _dataChunks.ToList().AsReadOnly();
+
     public IReadOnlyCollection<Vector2I> GetAllTrackedChunks()
     {
         HashSet<Vector2I> all = new HashSet<Vector2I>(_activeChunks);
@@ -93,21 +90,72 @@ public class ChunkManagerBase
         if (currentChunkPos == _playerChunkPosCurrent && _activeChunks.Count > 0) return;
 
         _playerChunkPosCurrent = currentChunkPos;
-        UpdateChunks();
+        UpdateChunks(); // Movimiento normal del jugador
     }
-    
+
     public void Teleport(Vector2 newPosition)
     {
-        // 1. Limpiamos la cola de tareas pendientes inmediatamente
-        while (_chunkQueue.TryDequeue(out _)) { }
+        // 1. Invalidamos instantáneamente todo lo anterior incrementando la generación
+        Interlocked.Increment(ref _currentGeneration);
 
-        // 2. Limpiamos el diccionario de estados para que las tareas viejas 
-        // en ejecución (si las hay) sean ignoradas por el validador en ProcessChunkQueue
+        // 2. Limpiamos cola y estados previos
+        while (_chunkQueue.TryDequeue(out _)) { }
         _chunkStates.Clear();
 
-        // 3. Forzamos la actualización completa
+        _activeChunks.Clear();
+        _dataChunks.Clear();
+
+        // 3. Forzamos la recarga total para la nueva posición
         _playerChunkPosCurrent = WorldToChunkCoords(newPosition);
-        UpdateChunks();
+        UpdateChunksFullReload();
+    }
+
+    private void UpdateChunksFullReload()
+    {
+        int extX = ViewDistance.X + DataPreloadDistance;
+        int extY = ViewDistance.Y + DataPreloadDistance;
+
+        HashSet<Vector2I> targetVisible = new();
+        HashSet<Vector2I> targetData = new();
+
+        for (int x = -extX; x <= extX; x++)
+        {
+            for (int y = -extY; y <= extY; y++)
+            {
+                Vector2I chunk = _playerChunkPosCurrent + new Vector2I(x, y);
+                if (chunk.X < MinChunk.X || chunk.X > MaxChunk.X || chunk.Y < MinChunk.Y || chunk.Y > MaxChunk.Y) continue;
+
+                if (Math.Abs(x) <= ViewDistance.X && Math.Abs(y) <= ViewDistance.Y)
+                    targetVisible.Add(chunk);
+                else
+                    targetData.Add(chunk);
+            }
+        }
+
+        int gen = _currentGeneration;
+
+        // FASE 1: Encolamos y registramos las precargas de datos
+        foreach (var chunk in targetData)
+        {
+            EnqueueTask(chunk, ChunkTaskType.DataPreload, gen);
+        }
+
+        foreach (var chunk in targetVisible)
+        {
+            // OJO: Aquí registramos temporalmente DataPreload en el diccionario para la fase 1
+            EnqueueTask(chunk, ChunkTaskType.DataPreload, gen);
+        }
+
+        // FASE 2: Inmediatamente después, actualizamos el diccionario al estado final "Load" 
+        // y encolamos la tarea Load para los visibles. 
+        // Como el hilo procesa la cola en orden FIFO, primero sacará el DataPreload y luego el Load.
+        foreach (var chunk in targetVisible)
+        {
+            EnqueueTask(chunk, ChunkTaskType.Load, gen);
+        }
+
+        _activeChunks = targetVisible;
+        _dataChunks = targetData;
     }
 
     private void UpdateChunks()
@@ -132,28 +180,30 @@ public class ChunkManagerBase
             }
         }
 
-        // Cargas
-        foreach (var chunk in targetVisible.Where(c => !_activeChunks.Contains(c)))
-            EnqueueTask(chunk, ChunkTaskType.Load);
+        int gen = _currentGeneration;
 
+        // Movimiento normal: Cargas y descargas dinámicas
         foreach (var chunk in targetData.Where(c => !_dataChunks.Contains(c)))
-            EnqueueTask(chunk, ChunkTaskType.DataPreload);
+            EnqueueTask(chunk, ChunkTaskType.DataPreload, gen);
 
-        // Descargas
+        foreach (var chunk in targetVisible.Where(c => !_activeChunks.Contains(c)))
+            EnqueueTask(chunk, ChunkTaskType.Load, gen);
+
         foreach (var chunk in _activeChunks.Where(c => !targetVisible.Contains(c)))
-            EnqueueTask(chunk, ChunkTaskType.Unload);
+            EnqueueTask(chunk, ChunkTaskType.Unload, gen);
 
         foreach (var chunk in _dataChunks.Where(c => !targetData.Contains(c) && !targetVisible.Contains(c)))
-            EnqueueTask(chunk, ChunkTaskType.DataUnload);
+            EnqueueTask(chunk, ChunkTaskType.DataUnload, gen);
 
         _activeChunks = targetVisible;
         _dataChunks = targetData;
     }
 
-    private void EnqueueTask(Vector2I pos, ChunkTaskType type)
+    private void EnqueueTask(Vector2I pos, ChunkTaskType type, int generation)
     {
-        _chunkStates[pos] = type;
-        _chunkQueue.Enqueue((pos, type));
+        // Actualizamos el diccionario con el estado exacto que este chunk DEBE tener al final
+        _chunkStates[pos] = (type, generation);
+        _chunkQueue.Enqueue((pos, type, generation));
     }
 
     private void ProcessChunkQueue()
@@ -162,12 +212,28 @@ public class ChunkManagerBase
         {
             if (_chunkQueue.TryDequeue(out var task))
             {
-                // Validación de relevancia
-                if (_chunkStates.TryGetValue(task.Item1, out var currentState) && currentState != task.Item2)
+                // 1. Protección contra Teleport: Si la generación cambió, se descarta por completo
+                if (task.Generation != _currentGeneration)
                     continue;
 
-                if (UseParallelProcessing) Task.Run(() => ExecuteTask(task.Item1, task.Item2));
-                else ExecuteTask(task.Item1, task.Item2);
+                // 2. PROTECCIÓN CONTRA MOVIMIENTO RÁPIDO (Validación de relevancia de estado):
+                // Si el jugador se movió tan rápido que este chunk cambió de estado en el diccionario
+                // (por ejemplo, pasó de Load a Unload porque el jugador ya se alejó), descartamos la tarea vieja.
+                if (_chunkStates.TryGetValue(task.Pos, out var currentState))
+                {
+                    if (currentState.Generation == task.Generation && currentState.Type != task.Type)
+                    {
+                        // Excepción controlada para FullReload: Permitimos que pase DataPreload si el estado actual es Load,
+                        // ya que forman parte de la misma secuencia lógica de carga inicial.
+                        bool isAllowedSequence = (task.Type == ChunkTaskType.DataPreload && currentState.Type == ChunkTaskType.Load);
+
+                        if (!isAllowedSequence)
+                            continue; // Descartar tarea obsoleta por movimiento rápido
+                    }
+                }
+
+                if (UseParallelProcessing) Task.Run(() => ExecuteTask(task.Pos, task.Type));
+                else ExecuteTask(task.Pos, task.Type);
             }
             else
             {
@@ -178,15 +244,15 @@ public class ChunkManagerBase
 
     private void ExecuteTask(Vector2I pos, ChunkTaskType type)
     {
-        // Validación: Si el chunk está fuera del rango de datos + un margen extra, abortamos
         int maxDistX = ViewDistance.X + DataPreloadDistance + 1;
         int maxDistY = ViewDistance.Y + DataPreloadDistance + 1;
 
         if (Math.Abs(pos.X - _playerChunkPosCurrent.X) > maxDistX ||
             Math.Abs(pos.Y - _playerChunkPosCurrent.Y) > maxDistY)
         {
-            return; // El chunk ya no es relevante, no disparamos el evento
+            return;
         }
+
         switch (type)
         {
             case ChunkTaskType.DataPreload: OnChunkDataPreload?.Invoke(pos); break;
@@ -199,9 +265,12 @@ public class ChunkManagerBase
     private Vector2I WorldToChunkCoords(Vector2 worldPos)
     {
         float dd = MeshCreator.PixelsToUnits(tileSize.X);
+        float chunkWidth = chunkDimencion.X * dd;
+        float chunkHeight = chunkDimencion.Y * dd;
+
         return new Vector2I(
-            (int)Math.Floor(worldPos.X / (chunkDimencion.X * dd)),
-            (int)Math.Floor(worldPos.Y / (chunkDimencion.Y * dd))
+            (int)MathF.Floor(worldPos.X / chunkWidth),
+            (int)MathF.Floor(worldPos.Y / chunkHeight)
         );
     }
 
@@ -210,35 +279,30 @@ public class ChunkManagerBase
         Vector2I basePosition = chunkPositon * chunkDimencion;
         Vector2I local = TilePositionGlobal - basePosition;
 
-        // Asegurar que el resultado sea siempre positivo con módulo corregido
         int x = ((local.X % chunkDimencion.X) + chunkDimencion.X) % chunkDimencion.X;
         int y = ((local.Y % chunkDimencion.Y) + chunkDimencion.Y) % chunkDimencion.Y;
 
         return new Vector2I(x, y);
     }
+
     public Vector2I TilePositionGlobal(Vector2I chunkPosition, Vector2I tilePositionLocal)
     {
-        // La posición base del chunk en coordenadas globales
         Vector2I basePosition = chunkPosition * chunkDimencion;
-
-        // La posición global es simplemente la base más el offset local
         return basePosition + tilePositionLocal;
     }
+
     private int FloorDiv(int a, int b)
     {
         return (a >= 0) ? (a / b) : ((a - b + 1) / b);
     }
+
     public Vector2I ChunkPosition(Vector2I TilePositionGlobal)
     {
-        //return new Vector2I(
-        //    (int)Mathf.Floor(TilePositionGlobal.X / chunkDimencion.X),
-        //    (int)MathF.Floor(TilePositionGlobal.Y / chunkDimencion.Y));
         return new Vector2I(
-        FloorDiv(TilePositionGlobal.X, chunkDimencion.X),
-        FloorDiv(TilePositionGlobal.Y, chunkDimencion.Y)
+            FloorDiv(TilePositionGlobal.X, chunkDimencion.X),
+            FloorDiv(TilePositionGlobal.Y, chunkDimencion.Y)
         );
     }
-
 
     public void Stop()
     {
@@ -246,584 +310,3 @@ public class ChunkManagerBase
         _workerThread.Join();
     }
 }
-
-
-//using Arch.Core;
-//using Godot;
-//using System;
-//using System.Collections.Concurrent;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Runtime.CompilerServices;
-//using System.Text;
-//using System.Threading;
-//using System.Threading.Tasks;
-
-//namespace GodotEcsArch.sources.managers.Chunks;
-
-//public class ChunkManagerBase
-//{
-//    public enum ChunkTaskType
-//    {
-//        Load,
-//        Unload,
-//        GeneratorPreload,
-//        GeneratorUnload 
-//    }
-
-//    public event Action<Vector2I> OnChunkLoad;
-//    public event Action<Vector2I> OnChunkPreLoad;
-//    public event Action<Vector2I> OnChunkUnload;
-//    public event Action<Vector2I> OnChunkPreLoadGenerator;
-//    public event Action<Vector2I> OnChunkUnloadGenerator; 
-//    public event Action OnChunkProcessingCompleted;
-
-//    private ConcurrentQueue<(Vector2I, ChunkTaskType)> chunkQueue =
-//        new ConcurrentQueue<(Vector2I, ChunkTaskType)>();
-
-//    private Thread workerThread;
-//    private bool isRunning = true;
-//    // Variable para alternar el modo de trabajo
-//    public bool UseParallelProcessing { get; set; } = false;
-//    public Vector2I ViewDistance { get; private set; }
-
-//    public int GeneratorPreloadDistance { get; set; } = 2;
-
-//    private Vector2I playerChunkPosCurrent;
-//    private Vector2I playerChunkPosPrevious;
-
-//    public Vector2I chunkDimencion { get; }
-//    public Vector2I tileSize { get; }
-
-//    private HashSet<Vector2I> activeChunks = new HashSet<Vector2I>();
-//    private HashSet<Vector2I> generatorChunks = new HashSet<Vector2I>();
-
-//    public Vector2I MinChunk { get; private set; }
-//    public Vector2I MaxChunk { get; private set; }
-
-//    public void SetBounds(Vector2I min, Vector2I max)
-//    {
-//        MinChunk = min;
-//        MaxChunk = max;
-//    }
-//    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-//    private bool IsInsideBounds(Vector2I chunk)
-//    {
-//        return chunk.X >= MinChunk.X &&
-//               chunk.X <= MaxChunk.X &&
-//               chunk.Y >= MinChunk.Y &&
-//               chunk.Y <= MaxChunk.Y;
-//    }
-//    public ChunkManagerBase(Vector2I totalViewChunks, Vector2I chunkSize, Vector2I tileSize)
-//    {
-//        chunkDimencion = chunkSize;
-
-//        ViewDistance = new Vector2I(
-//            totalViewChunks.X / 2,
-//            totalViewChunks.Y / 2
-//        );
-
-//        workerThread = new Thread(ProcessChunkQueue);
-//        workerThread.Start();
-
-//        this.tileSize = tileSize;
-//    }
-//    private bool initialized = false;
-//    public void UpdatePlayerPosition(Vector2 playerPosition)
-//    {
-//        Vector2I currentChunkPos = WorldToChunkCoords(playerPosition);
-
-//        if (!initialized)
-//        {
-//            initialized = true;
-
-//            playerChunkPosCurrent = currentChunkPos;
-//            playerChunkPosPrevious = currentChunkPos;
-
-//            UpdateChunksFull();
-//            return;
-//        }
-
-//        if (currentChunkPos != playerChunkPosCurrent)
-//        {
-//            playerChunkPosPrevious = playerChunkPosCurrent;
-//            playerChunkPosCurrent = currentChunkPos;
-
-//            UpdateChunksOptimized();
-//        }
-//    }
-//    public IReadOnlyCollection<Vector2I> GetActiveChunks()
-//    {
-//        // Devuelve una copia para evitar que el HashSet interno sea modificado desde afuera
-//        return activeChunks.ToList().AsReadOnly();
-//    }
-
-//    public IReadOnlyCollection<Vector2I> GetGeneratorChunks()
-//    {
-//        return generatorChunks.ToList().AsReadOnly();
-//    }
-//    public IReadOnlyCollection<Vector2I> GetAllTrackedChunks()
-//    {
-//        HashSet<Vector2I> all = new HashSet<Vector2I>(activeChunks);
-//        all.UnionWith(generatorChunks);
-//        return all.ToList().AsReadOnly();
-//    }
-//    public void ForcedUpdateChunks(Vector2I position)
-//    {
-//        playerChunkPosPrevious = position;
-//        playerChunkPosCurrent = position;
-
-//        UpdateChunksFull();
-//    }
-
-//    // ================================
-//    // OPTIMIZED UPDATE
-//    // ================================
-
-//    private void UpdateChunksOptimized()
-//    {
-//        int extX = ViewDistance.X + GeneratorPreloadDistance;
-//        int extY = ViewDistance.Y + GeneratorPreloadDistance;
-
-//        HashSet<Vector2I> newVisible = new HashSet<Vector2I>();
-//        HashSet<Vector2I> newGenerator = new HashSet<Vector2I>();
-
-//        for (int x = -extX; x <= extX; x++)
-//        {
-//            for (int y = -extY; y <= extY; y++)
-//            {
-//                Vector2I chunk = playerChunkPosCurrent + new Vector2I(x, y);
-//                if (!IsInsideBounds(chunk))
-//                    continue;
-//                int dx = Math.Abs(x);
-//                int dy = Math.Abs(y);
-
-//                bool insideVisible =
-//                    dx <= ViewDistance.X &&
-//                    dy <= ViewDistance.Y;
-
-//                if (insideVisible)
-//                    newVisible.Add(chunk);
-//                else
-//                    newGenerator.Add(chunk);
-//            }
-//        }
-
-//        // ======================
-//        // CARGAR VISIBLES NUEVOS
-//        // ======================
-
-//        foreach (var chunk in newVisible)
-//        {
-
-//            if (!activeChunks.Contains(chunk))
-//            {
-//                activeChunks.Add(chunk);
-//                RequestLoadChunk(chunk);
-//            }
-//        }
-
-//        // ======================
-//        // DESCARGAR VISIBLES
-//        // ======================
-
-//        foreach (var chunk in new List<Vector2I>(activeChunks))
-//        {
-
-//            if (!newVisible.Contains(chunk))
-//            {
-//                activeChunks.Remove(chunk);
-//                RequestUnloadChunk(chunk);
-//            }
-//        }
-
-//        // ======================
-//        // GENERADOR (Carga y Descarga)
-//        // ======================
-
-//        foreach (var chunk in newGenerator)
-//        {
-//            if (!generatorChunks.Contains(chunk))
-//            {
-//                generatorChunks.Add(chunk);
-//                RequestGeneratorPreload(chunk);
-//            }
-//        }
-
-//        // Aquí es donde detectamos si un chunk estaba en el generador 
-//        // pero ya no está en el nuevo rango
-//        foreach (var chunk in new List<Vector2I>(generatorChunks))
-//        {
-//            if (!newGenerator.Contains(chunk))
-//            {
-//                generatorChunks.Remove(chunk);
-//                RequestGeneratorUnload(chunk); // <--- Nueva petición
-//            }
-//        }
-//    }
-
-//    // ================================
-//    // FULL UPDATE (inicio o teleport)
-//    // ================================
-
-//    private void UpdateChunksFull()
-//    {
-//        int extX = ViewDistance.X + GeneratorPreloadDistance;
-//        int extY = ViewDistance.Y + GeneratorPreloadDistance;
-
-//        activeChunks.Clear();
-//        generatorChunks.Clear();
-
-//        for (int x = -extX; x <= extX; x++)
-//        {
-//            for (int y = -extY; y <= extY; y++)
-//            {
-//                Vector2I chunk = playerChunkPosCurrent + new Vector2I(x, y);
-//                if (!IsInsideBounds(chunk))
-//                    continue;
-//                bool insideVisible =
-//                    Math.Abs(x) <= ViewDistance.X &&
-//                    Math.Abs(y) <= ViewDistance.Y;
-
-//                if (insideVisible)
-//                {
-//                    activeChunks.Add(chunk);
-//                    RequestLoadChunk(chunk);
-//                }
-//                else
-//                {
-//                    generatorChunks.Add(chunk);
-//                    RequestGeneratorPreload(chunk);
-//                }
-//            }
-//        }
-//    }
-
-//    // ================================
-//    // CHUNK HANDLING
-//    // ================================
-
-//    private void HandleChunkAddition(Vector2I chunk)
-//    {
-//        Vector2I diff = chunk - playerChunkPosCurrent;
-
-//        bool insideVisible =
-//            Math.Abs(diff.X) <= ViewDistance.X &&
-//            Math.Abs(diff.Y) <= ViewDistance.Y;
-
-//        if (insideVisible)
-//        {
-//            if (!activeChunks.Contains(chunk))
-//            {
-//                activeChunks.Add(chunk);
-//                RequestLoadChunk(chunk);
-//            }
-//        }
-//        else
-//        {
-//            if (!generatorChunks.Contains(chunk))
-//            {
-//                generatorChunks.Add(chunk);
-//                RequestGeneratorPreload(chunk);
-//            }
-//        }
-//    }
-
-//    private void HandleChunkRemoval(Vector2I chunk)
-//    {
-//        if (activeChunks.Contains(chunk))
-//        {
-//            activeChunks.Remove(chunk);
-//            RequestUnloadChunk(chunk);
-//        }
-
-//        if (generatorChunks.Contains(chunk))
-//        {
-//            generatorChunks.Remove(chunk);
-//        }
-//    }
-
-//    // ================================
-//    // QUEUE REQUESTS
-//    // ================================
-//    public void RequestGeneratorUnload(Vector2I chunkPos)
-//    {
-//        chunkQueue.Enqueue((chunkPos, ChunkTaskType.GeneratorUnload));
-//    }
-//    public void RequestLoadChunk(Vector2I chunkPos)
-//    {
-//        chunkQueue.Enqueue((chunkPos, ChunkTaskType.Load));
-//    }
-
-//    public void RequestUnloadChunk(Vector2I chunkPos)
-//    {
-//        chunkQueue.Enqueue((chunkPos, ChunkTaskType.Unload));
-//    }
-
-//    public void RequestGeneratorPreload(Vector2I chunkPos)
-//    {
-//        chunkQueue.Enqueue((chunkPos, ChunkTaskType.GeneratorPreload));
-//    }
-
-//    // ================================
-//    // WORKER THREAD
-//    // ================================
-
-
-
-//    private void ProcessChunkQueue()
-//    {
-//        bool hasPendingNotification = false;
-
-//        while (isRunning)
-//        {
-//            if (chunkQueue.TryDequeue(out var chunkTask))
-//            {
-//                Vector2I chunkPos = chunkTask.Item1;
-//                ChunkTaskType taskType = chunkTask.Item2;
-
-//                if (UseParallelProcessing)
-//                {
-//                    // MODO PARALELO: Lanza tareas al Pool de Hilos
-//                    Task.Run(() => ExecuteTask(chunkPos, taskType));
-//                }
-//                else
-//                {
-//                    // MODO SECUENCIAL: Lo hace el mismo hilo (como tenías antes)
-//                    ExecuteTask(chunkPos, taskType);
-//                }
-
-//                hasPendingNotification = true;
-//            }
-//            else
-//            {
-//                if (hasPendingNotification)
-//                {
-//                    hasPendingNotification = false;
-//                    MainThreadDispatcher.Instance.Enqueue(() => {
-//                        OnChunkProcessingCompleted?.Invoke();
-//                    });
-//                }
-//                Thread.Sleep(10);
-//            }
-//        }
-//    }
-
-//    // Método auxiliar para limpiar el código y evitar duplicados
-//    private void ExecuteTask(Vector2I chunkPos, ChunkTaskType taskType)
-//    {
-//        switch (taskType)
-//        {
-//            case ChunkTaskType.GeneratorPreload:
-//                OnChunkPreLoadGenerator?.Invoke(chunkPos);
-//                break;
-
-//            case ChunkTaskType.GeneratorUnload:
-//                OnChunkUnloadGenerator?.Invoke(chunkPos);
-//                break;
-
-//            case ChunkTaskType.Load:
-//                OnChunkPreLoad?.Invoke(chunkPos);
-//                OnChunkLoad?.Invoke(chunkPos);
-
-//                break;
-
-//            case ChunkTaskType.Unload:
-//                OnChunkUnload?.Invoke(chunkPos);
-//                break;
-//        }
-//    }
-
-//    //private void ProcessChunkQueue()
-//    //{
-//    //    bool hasPendingNotification = false;
-
-//    //    while (isRunning)
-//    //    {
-//    //        if (chunkQueue.TryDequeue(out var chunkTask))
-//    //        {
-//    //            Vector2I chunkPos = chunkTask.Item1;
-//    //            ChunkTaskType taskType = chunkTask.Item2;
-
-//    //            switch (taskType)
-//    //            {
-//    //                case ChunkTaskType.GeneratorPreload:
-//    //                    OnChunkPreLoadGenerator?.Invoke(chunkPos);
-//    //                    break;
-
-//    //                case ChunkTaskType.Load:
-//    //                    OnChunkPreLoad?.Invoke(chunkPos);
-//    //                    OnChunkLoad?.Invoke(chunkPos);
-//    //                    break;
-
-//    //                case ChunkTaskType.Unload:
-//    //                    OnChunkUnload?.Invoke(chunkPos);
-//    //                    break;
-//    //                case ChunkTaskType.GeneratorUnload:
-//    //                    OnChunkUnloadGenerator?.Invoke(chunkPos);
-//    //                    break;
-//    //            }
-
-//    //            hasPendingNotification = true;
-//    //        }
-//    //        else
-//    //        {
-//    //            if (hasPendingNotification)
-//    //            {
-//    //                hasPendingNotification = false;
-
-//    //                MainThreadDispatcher.Instance.Enqueue(() =>
-//    //                {
-//    //                    OnChunkProcessingCompleted?.Invoke();
-//    //                });
-//    //            }
-
-//    //            Thread.Sleep(10);
-//    //        }
-//    //    }
-//    //}
-
-//    // ================================
-//    // UTILS
-//    // ================================
-
-//    private Vector2I WorldToChunkCoords(Vector2 worldPos)
-//    {
-//        var dd = MeshCreator.PixelsToUnits(tileSize.X);
-
-//        return new Vector2I(
-//            (int)Math.Floor(worldPos.X / (chunkDimencion.X * dd)),
-//            (int)Math.Floor(worldPos.Y / (chunkDimencion.Y * dd))
-//        );
-//    }
-
-//    public List<Vector2I> GetVisibleChunks(Vector2 position)
-//    {
-//        var temp = WorldToChunkCoords(position);
-//        Vector2I centerChunk = new Vector2I(temp.X, temp.Y);
-
-//        List<Vector2I> visibleChunks = new();
-
-//        for (int x = -ViewDistance.X; x <= ViewDistance.X; x++)
-//        {
-//            for (int y = -ViewDistance.Y; y <= ViewDistance.Y; y++)
-//            {
-//                visibleChunks.Add(centerChunk + new Vector2I(x, y));
-//            }
-//        }
-
-//        return visibleChunks;
-//    }
-//    public List<Vector2I> GetGeneratorChunks(Vector2 position)
-//    {
-//        var temp = WorldToChunkCoords(position);
-//        Vector2I centerChunk = new Vector2I(temp.X, temp.Y);
-
-//        List<Vector2I> chunks = new();
-
-//        int extX = ViewDistance.X + GeneratorPreloadDistance;
-//        int extY = ViewDistance.Y + GeneratorPreloadDistance;
-
-//        for (int x = -extX; x <= extX; x++)
-//        {
-//            for (int y = -extY; y <= extY; y++)
-//            {
-//                bool insideVisible =
-//                    Math.Abs(x) <= ViewDistance.X &&
-//                    Math.Abs(y) <= ViewDistance.Y;
-
-//                if (!insideVisible)
-//                {
-//                    chunks.Add(centerChunk + new Vector2I(x, y));
-//                }
-//            }
-//        }
-
-//        return chunks;
-//    }
-//    public List<Vector2I> GetExtendedChunksWithContext(Vector2 position, int extraBorder = 1)
-//    {
-//        var temp = WorldToChunkCoords(position);
-//        Vector2I centerChunk = new Vector2I(temp.X, temp.Y);
-
-//        List<Vector2I> chunks = new();
-
-//        int extX = ViewDistance.X + GeneratorPreloadDistance + extraBorder;
-//        int extY = ViewDistance.Y + GeneratorPreloadDistance + extraBorder;
-
-//        for (int x = -extX; x <= extX; x++)
-//        {
-//            for (int y = -extY; y <= extY; y++)
-//            {
-//                chunks.Add(centerChunk + new Vector2I(x, y));
-//            }
-//        }
-
-//        return chunks;
-//    }
-
-//    public List<Vector2I> GetExtendedChunks(Vector2 position)
-//    {
-//        var temp = WorldToChunkCoords(position);
-//        Vector2I centerChunk = new Vector2I(temp.X, temp.Y);
-
-//        List<Vector2I> chunks = new();
-
-//        int extX = ViewDistance.X + GeneratorPreloadDistance;
-//        int extY = ViewDistance.Y + GeneratorPreloadDistance;
-
-//        for (int x = -extX; x <= extX; x++)
-//        {
-//            for (int y = -extY; y <= extY; y++)
-//            {
-//                var chunk = centerChunk + new Vector2I(x, y);   
-//                if (!IsInsideBounds(chunk))
-//                    continue;
-//                chunks.Add(chunk);                
-
-//            }
-//        }
-
-//        return chunks;
-//    }
-
-//    public Vector2I TilePositionInChunk(Vector2I chunkPositon, Vector2I TilePositionGlobal)
-//    {
-//        Vector2I basePosition = chunkPositon * chunkDimencion;
-//        Vector2I local = TilePositionGlobal - basePosition;
-
-//        // Asegurar que el resultado sea siempre positivo con módulo corregido
-//        int x = ((local.X % chunkDimencion.X) + chunkDimencion.X) % chunkDimencion.X;
-//        int y = ((local.Y % chunkDimencion.Y) + chunkDimencion.Y) % chunkDimencion.Y;
-
-//        return new Vector2I(x, y);
-//    }
-//    public Vector2I TilePositionGlobal(Vector2I chunkPosition, Vector2I tilePositionLocal)
-//    {
-//        // La posición base del chunk en coordenadas globales
-//        Vector2I basePosition = chunkPosition * chunkDimencion;
-
-//        // La posición global es simplemente la base más el offset local
-//        return basePosition + tilePositionLocal;
-//    }
-//    private int FloorDiv(int a, int b)
-//    {
-//        return (a >= 0) ? (a / b) : ((a - b + 1) / b);
-//    }
-//    public Vector2I ChunkPosition(Vector2I TilePositionGlobal)
-//    {
-//        //return new Vector2I(
-//        //    (int)Mathf.Floor(TilePositionGlobal.X / chunkDimencion.X),
-//        //    (int)MathF.Floor(TilePositionGlobal.Y / chunkDimencion.Y));
-//        return new Vector2I(
-//        FloorDiv(TilePositionGlobal.X, chunkDimencion.X),
-//        FloorDiv(TilePositionGlobal.Y, chunkDimencion.Y)
-//);
-//    }
-
-//    public void Stop()
-//    {
-//        isRunning = false;
-//        workerThread.Join();
-//    }
-//}

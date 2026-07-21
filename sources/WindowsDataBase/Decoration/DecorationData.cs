@@ -1,8 +1,13 @@
 using Godot;
+using GodotEcsArch.sources.utils;
 using System;
 
 public class DecorationData :IdDataLong
 {
     public long idTileSprite { get; set; }
-    // luego poner el costo
+
+    public DecorationData()
+    {
+        id = EpochIdGenerator.NewId();
+    }
 }
