@@ -13,9 +13,9 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         public float radiusMove { get; set; }
         public float radiusSearch { get; set; }
     }
-    public class CharacterModelBaseData : IdData
+    public class CharacterModelBaseData : IdDataLong
     {
-        public int idAnimationCharacterBaseData { get; set; }
+        public int idAnimationCharacterBaseData { get; set; }// queda obsoleto, se reemplaza por idTileSpriteData
         public long idTileSpriteData { get; set; }
         public CharacterBehaviorType characterBehaviorType { get; set; }
         public CharacterType characterType { get; set; }
@@ -26,15 +26,15 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
 
         public string colorBase { set; get; }
         public string description { set; get; }
-        public float scale { set; get; }
+        public float scale { set; get; } // si
         public BonusData[] bonusDataArray { get; set; }
         public ElementsData[] damageDataArray { get; set; }
         public ElementsData[] defenseDataArray { get; set; }
         public StatsData[] statsDataArray { get; set; }
-        public GeometricShape2D collisionMove { get; set; }
-        public GeometricShape2D collisionBody { get; set; }
+        public GeometricShape2D collisionMove { get; set; } // ya no se usa
+        public GeometricShape2D collisionBody { get; set; } // ya no se usa
         [BsonIgnore]
-        public AnimationCharacterBaseData animationCharacterBaseData { get; set; }
+        public AnimationCharacterBaseData animationCharacterBaseData { get; set; } // tampoco se usa
         public CharacterModelBaseData()
         {
         }

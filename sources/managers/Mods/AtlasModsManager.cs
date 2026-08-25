@@ -51,7 +51,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
 
     // si requieren persistencia
     private readonly AtlasMods<long, ResourceSourceData> fuenteRecursos = new();    
-    private readonly AtlasMods<long, TerrainData> terrainData = new();     // ya se usan quitarlos luego
+    private readonly AtlasMods<long, TerrainData> terrainData = new();     // ya no se usan quitarlos luego
     private readonly AtlasMods<long, TerrainDataTransition> terrainDataTransicion = new(); // ya no se usan quitarlos luego
     private readonly AtlasMods<long, TerrainBaseData> terrenos = new ();
     private readonly AtlasMods<long, RampsData> rampsData = new();
@@ -59,10 +59,11 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<long, DecorationData> decorationData = new();
     private readonly AtlasMods<long, SuperficieData> superficieData = new();
     private readonly AtlasMods<long, BiomaData> biomaData = new();
+    private readonly AtlasMods<long, CharacterModelBaseData> characterData = new(); // deben cambiar a long
 
     private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a long
     private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a long
-    private readonly AtlasMods<int, CharacterModelBaseData> characterData = new(); // deben cambiar a long
+    
 
     // string-key atlas
     private readonly AtlasMods<string, TileTextureData> tilesTextureData = new();
@@ -385,14 +386,14 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(caminosData, idMod, name);
         CargarDatos(superficieData,idMod, name);
         CargarDatos(biomaData, idMod, name);
-
+        //CargarDatos(characterData, idMod,name);
     }
 
     private void CargarPorModEspecial(ushort idMod)
     {
         CargarDatosEspecial(buildingData, idMod);
         CargarDatosEspecial(bulletData, idMod);
-        CargarDatosEspecial(characterData, idMod);
+        
     }
 
     private void CargarTilesTextureData(ushort idMod)
@@ -499,6 +500,8 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             atlas.Register(idMod, item.id, item);
         }
     }
+
+ 
 
     private void CargarDatosEspecial<T>(AtlasMods<int, T> atlas, ushort idMod) where T : IdData
     {

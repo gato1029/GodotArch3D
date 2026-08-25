@@ -113,7 +113,7 @@ public sealed class BlackyWorld : IDisposable
 
         Procedural = new BlackyWorldProceduralGeneration(this, Config);
 
-        //DebugBoot();
+        DebugBoot();
     }
  
     // =========================================
@@ -151,10 +151,10 @@ public sealed class BlackyWorld : IDisposable
 
     private void DebugBoot()
     {
-        var e = Characters.Create(1, new Vector2(10, 0));
+        //var e = Characters.Create(1, new Vector2(10, 0));
 
-        var ee = Characters.Create(2, new Vector2(5, 0));
-        ee.Set(new MoveTargetComponent(new Vector2(20, 0)));
+        //var ee = Characters.Create(2, new Vector2(5, 0));
+        //ee.Set(new MoveTargetComponent(new Vector2(20, 0)));
     }
 }
 

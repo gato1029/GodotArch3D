@@ -68,7 +68,6 @@ public class SpriteMultipleAnimationDirection
     public Dictionary<string, SpriteAnimationDirection> animations { get; set; } = new Dictionary<string, SpriteAnimationDirection>();
     public Dictionary<AnimationType, SpriteAnimationDirection> animationsTypes { get; set; } = new Dictionary<AnimationType, SpriteAnimationDirection>();
 
-
 }
 public class SpriteAnimationDirection
 {

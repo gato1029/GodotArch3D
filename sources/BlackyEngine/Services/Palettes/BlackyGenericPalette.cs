@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.Biomas;
+using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using MessagePack;
 using SadRogue.Primitives;
@@ -35,6 +36,7 @@ public class BlackyPalletesPersistence
     public static BlackyGenericPalette<CaminosData> pathsPalette { get; } = new("Caminos");
     public static BlackyGenericPalette<SuperficieData> surfacesPalette { get; } = new("Superficies");
     public static BlackyGenericPalette<BiomaData> biomePalette { get; } = new("Biomas",true);
+    public static BlackyGenericPalette<CharacterModelBaseData> characterPalette { get; } = new("Personajes", true);
 }
 
 public class BlackyGenericPalette<T> where T : class

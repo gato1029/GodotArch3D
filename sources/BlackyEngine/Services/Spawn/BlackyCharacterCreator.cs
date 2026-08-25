@@ -1,10 +1,12 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.Flecs.Components;
 using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
@@ -170,6 +172,14 @@ public class BlackyCharacterCreator
     }
     private Entity CreateMain(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
     {
+        BlackyPalletesPersistence.characterPalette.GetIdPersistence("Base", characterBaseData.id, out CharacterModelBaseData charModel);
+        var idTileSprite = charModel.idTileSpriteData; // información del sprite del personaje y colliders ID
+        int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite
+        AtlasModsManager.TryGetTileSprite(spriteId, out var sprite); // Obtén el sprite del personaje
+
+        var animationDir = sprite.spriteMultipleAnimationDirection; // Obtén las animación de caminar del personaje
+
+
         var tileData = MasterDataManager.GetData<TileSpriteData>(characterBaseData.idTileSpriteData);
         var MoveData =tileData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 

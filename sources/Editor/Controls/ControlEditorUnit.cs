@@ -101,7 +101,7 @@ public partial class ControlEditorUnit : MarginContainer
         if (objectSelected != null && objectSelected.id != 0)
         {
             Vector2I mouseTile = (Vector2I)PositionsManager.Instance.positionMouseCamera;
-            CharacterCreatorManager.Instance.CreateNewCharacter(objectSelected.id, mouseTile);
+            //CharacterCreatorManager.Instance.CreateNewCharacter(objectSelected.id, mouseTile);
             SpinBoxTotalUnits.Value = CharacterCreatorManager.Instance.totalUnits;
         }
     }

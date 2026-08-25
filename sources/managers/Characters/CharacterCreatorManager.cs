@@ -201,18 +201,18 @@ internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
         {
             GD.PrintErr("Erro Id 0 base data");
         }
-        if (baseData.animationCharacterBaseData.hasCompositeAnimation)
-        {
-            entity.Add(new HealthComponent { current = 1000 });
-            int[] accessoryArray = new int[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
-            accessoryArray[(int)AccesoryAvatarType.WEAPON] = 2;// AccesoryManager.Instance.GetAccesory(2);
-            entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 1000000, speedAtackBase = 0.1f, accessoryArray = accessoryArray, behaviorType= baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE  });
-        }
-        else
-        {
-            entity.Add(new HealthComponent { current = 200 });
-            entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 10000, speedAtackBase = 0.0f, accessoryArray = null, behaviorType = baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE });
-        }                       
+        //if (baseData.animationCharacterBaseData.hasCompositeAnimation)
+        //{
+        //    entity.Add(new HealthComponent { current = 1000 });
+        //    int[] accessoryArray = new int[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+        //    accessoryArray[(int)AccesoryAvatarType.WEAPON] = 2;// AccesoryManager.Instance.GetAccesory(2);
+        //    entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 1000000, speedAtackBase = 0.1f, accessoryArray = accessoryArray, behaviorType= baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE  });
+        //}
+        //else
+        //{
+        //    entity.Add(new HealthComponent { current = 200 });
+        //    entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 10000, speedAtackBase = 0.0f, accessoryArray = null, behaviorType = baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE });
+        //}                       
     }
     private void AddMove(Entity entity, Vector2 positionInitial, CharacterModelBaseData characterBaseData)
     {
