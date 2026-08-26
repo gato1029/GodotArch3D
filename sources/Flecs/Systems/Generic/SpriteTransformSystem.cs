@@ -42,7 +42,7 @@ internal class SpriteTransformSystem : FlecsSystemBase
             ref var r = ref ren[i];
             ref var t = ref trans[i];
 
-            float depthOffset = (r.zOrdering);
+            float depthOffset = (r.depthOffset);
             
             float z = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
 
@@ -88,7 +88,7 @@ internal class SpriteTransformLayerSystem : FlecsSystemBase
                 ref var gpu = ref l.GPUData[j];
                 ref var t = ref l.Transforms[j];
 
-                float depthOffset = (gpu.zOrdering);
+                float depthOffset = (gpu.depthOffset);
                 //float depthValue = p.position.Y 
                 //        + depthOffset
                 //        - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
@@ -139,7 +139,7 @@ internal class SpriteTransformStaticSystem : FlecsSystemBase
             ref var r = ref ren[i];
             ref var t = ref trans[i];
 
-            float depthOffset = (r.zOrdering);
+            float depthOffset = (r.depthOffset);
             //float depthValue = p.position.Y
             //        + depthOffset
             //        - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;

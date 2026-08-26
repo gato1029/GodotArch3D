@@ -285,42 +285,42 @@ public partial class WindowAutoTileItem : HBoxContainer
 
     public void LoadData(TileRuleData tileRuleData)
 	{
-        this.tileRuleData = tileRuleData;
+        //this.tileRuleData = tileRuleData;
 
-        Texture2D texture2DNull = GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
-        Texture2D texture2DSome = GD.Load<Texture2D>("res://resources/Textures/internal/check-64.png");
-        Texture2D texture2DNullCheck = GD.Load<Texture2D>("res://resources/Textures/internal/exclamation.PNG");
+        //Texture2D texture2DNull = GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
+        //Texture2D texture2DSome = GD.Load<Texture2D>("res://resources/Textures/internal/check-64.png");
+        //Texture2D texture2DNullCheck = GD.Load<Texture2D>("res://resources/Textures/internal/exclamation.PNG");
 
-        for (int i = 0; i <= 7; i++)
-        {
-            var condition = tileRuleData.neighborConditions[i];
+        //for (int i = 0; i <= 7; i++)
+        //{
+        //    var condition = tileRuleData.neighborConditions[i];
 
-            if (condition.State == NeighborState.Filled && condition.SpecificTileId > 0)
-            {
-                var tile = TilesManager.Instance.GetTileData(condition.SpecificTileId);
-                if (tile != null)
-                {
-                    arrayButton[i].Icon = tile.textureVisual;
-                    continue;
-                }
-            }
+        //    if (condition.State == NeighborState.Filled && condition.SpecificTileId > 0)
+        //    {
+        //        //var tile = TilesManager.Instance.GetTileData(condition.SpecificTileId);
+        //        if (tile != null)
+        //        {
+        //            arrayButton[i].Icon = tile.textureVisual;
+        //            continue;
+        //        }
+        //    }
 
-            switch (condition.State)
-            {
-                case NeighborState.Filled:
-                    arrayButton[i].Icon = texture2DSome;
-                    break;
-                case NeighborState.Empty:
-                    arrayButton[i].Icon = texture2DNull;
-                    break;
-                case NeighborState.Any:
-                default:
-                    arrayButton[i].Icon = texture2DNullCheck;
-                    break;
-            }
-        }
+        //    switch (condition.State)
+        //    {
+        //        case NeighborState.Filled:
+        //            arrayButton[i].Icon = texture2DSome;
+        //            break;
+        //        case NeighborState.Empty:
+        //            arrayButton[i].Icon = texture2DNull;
+        //            break;
+        //        case NeighborState.Any:
+        //        default:
+        //            arrayButton[i].Icon = texture2DNullCheck;
+        //            break;
+        //    }
+        //}
 
-        centralButton.Icon = tileRuleData.tileDataCentral?.textureVisual ?? GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
+        //centralButton.Icon = tileRuleData.tileDataCentral?.textureVisual ?? GD.Load<Texture2D>("res://resources/Textures/internal/cancel.png");
 
 
     }

@@ -232,12 +232,13 @@ public record struct LayerRenderComponent
 [RegisterComponentFlecs]
 public record struct RenderGPUComponent
 (      
+    // ojo idMaterial ya no se usa
     Rid rid,
     int instance,        
     int idMaterial,
     int layerTextureMaterial,
     int layerRender,
-    float zOrdering,
+    float depthOffset,
     float scale,
     Vector2 originOffset       
 );

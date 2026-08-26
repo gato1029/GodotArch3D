@@ -39,6 +39,7 @@
     <Folder Include="resources\" />
     <Folder Include="sources\managers\Generic\" />
     <Folder Include="sources\managers\Sprite3D\" />
+    <Folder Include="sources\systems\Collisions\" />
     <Folder Include="sources\WindowsDataBase\Accesories\UIGenerate\" />
   </ItemGroup>
 </Project>

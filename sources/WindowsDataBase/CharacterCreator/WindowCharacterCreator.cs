@@ -68,7 +68,7 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
     
     private void Window_OnNotifySelected(AnimationCharacterBaseData objectSelected)
     {
-        objectData.idAnimationCharacterBaseData = objectSelected.id;    
+        //objectData.idAnimationCharacterBaseData = objectSelected.id;    
         FrameData iFrame = objectSelected.animationDataArray[0].animationData[0].frameDataArray[0];
         var dataTexture = MaterialManager.Instance.GetAtlasTextureInternal(objectSelected.animationDataArray[0].idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
         Sprite2DView.Texture = dataTexture;

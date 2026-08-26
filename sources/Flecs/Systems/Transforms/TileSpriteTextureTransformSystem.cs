@@ -32,7 +32,7 @@ internal class TileSpriteTextureTransformSystem : FlecsSystemBase
             ref var r = ref ren[i];
             ref var t = ref trans[i];
 
-            float depthOffset = (r.zOrdering);
+            float depthOffset = (r.depthOffset);
             float renderZ = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position);
 
             Vector2 newWorldPos = TilesHelper.TilePositionToWorldPosition(p.tilePosition);

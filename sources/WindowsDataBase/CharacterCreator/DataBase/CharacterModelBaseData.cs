@@ -14,8 +14,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         public float radiusSearch { get; set; }
     }
     public class CharacterModelBaseData : IdDataLong
-    {
-        public int idAnimationCharacterBaseData { get; set; }// queda obsoleto, se reemplaza por idTileSpriteData
+    {        
         public long idTileSpriteData { get; set; }
         public CharacterBehaviorType characterBehaviorType { get; set; }
         public CharacterType characterType { get; set; }
@@ -31,16 +30,13 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         public ElementsData[] damageDataArray { get; set; }
         public ElementsData[] defenseDataArray { get; set; }
         public StatsData[] statsDataArray { get; set; }
-        public GeometricShape2D collisionMove { get; set; } // ya no se usa
-        public GeometricShape2D collisionBody { get; set; } // ya no se usa
-        [BsonIgnore]
-        public AnimationCharacterBaseData animationCharacterBaseData { get; set; } // tampoco se usa
         public CharacterModelBaseData()
         {
+            id = EpochIdGenerator.NewId();
         }
 
         [BsonCtor]
-        public CharacterModelBaseData( int idAnimationCharacterBaseData, long idTileSpriteData) : base()
+        public CharacterModelBaseData(long idTileSpriteData) : base()
         {
             if (idTileSpriteData!=0)
             {

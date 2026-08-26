@@ -50,67 +50,67 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
 
     private void Move(Entity entity, ref CharacterComponent characterComponent, ref CharacterUnitMovementFixedComponent unitMovementComponent, ref PositionComponent positionComponent, ref DirectionComponent directionComponent, ref CharacterCommonBehaviorComponent characterBehaviorComponent, float delta, int batchIndex, int numBatches)
     {
-        ref VelocityComponent velocityComponent = ref entity.Get<VelocityComponent>();
-        ColliderComponent colliderComponent = entity.Get<ColliderComponent>();
-        var dataModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
-        GeometricShape2D collisionMove = dataModel.collisionMove;
+        //ref VelocityComponent velocityComponent = ref entity.Get<VelocityComponent>();
+        //ColliderComponent colliderComponent = entity.Get<ColliderComponent>();
+        //var dataModel = CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
+        //GeometricShape2D collisionMove = dataModel.collisionMove;
 
-        Vector2 startPos = positionComponent.lastPosition;   // ← NUEVO
-        Vector2 movement = directionComponent.value * velocityComponent.velocity * delta;
-        Vector2 endPos = positionComponent.position + movement;
-        Vector2 pointNextCollision = positionComponent.position + movement + collisionMove.OriginCurrent;
+        //Vector2 startPos = positionComponent.lastPosition;   // ← NUEVO
+        //Vector2 movement = directionComponent.value * velocityComponent.velocity * delta;
+        //Vector2 endPos = positionComponent.position + movement;
+        //Vector2 pointNextCollision = positionComponent.position + movement + collisionMove.OriginCurrent;
 
-        bool existCollision = false;
+        //bool existCollision = false;
 
-        //-------------------------
-        // 🔹 Estrategia híbrida:
-        // 1) Batching → repartimos entidades por lotes
-        // 2) Cooldown → no chequeamos colisión cada frame
-        //-------------------------        
-        // Asigna batch según el Id del collider (o entity.Id si prefieres)
-        int batchId = (colliderComponent.idCollider % numBatches);
+        ////-------------------------
+        //// 🔹 Estrategia híbrida:
+        //// 1) Batching → repartimos entidades por lotes
+        //// 2) Cooldown → no chequeamos colisión cada frame
+        ////-------------------------        
+        //// Asigna batch según el Id del collider (o entity.Id si prefieres)
+        //int batchId = (colliderComponent.idCollider % numBatches);
 
-        // Cooldown local para cada unidad
-        if (characterBehaviorComponent.collisionCheckCooldown <= 0f && batchId == batchIndex)
-        {
-            //existCollision = CollisionManager.CheckAnyCollisionMoveUnitOnly(entity, pointNextCollision, collisionMove);
-            if (!existCollision)
-            {
-                existCollision = CollisionManager.CheckSegmentCollision(startPos, endPos, collisionMove);
-            }
-            characterBehaviorComponent.collisionCheckCooldown = 0.05f; // 50ms entre checks por unidad
-        }
-        else
-        {
-            characterBehaviorComponent.collisionCheckCooldown -= delta;
-        }
-        // Estáticos: siempre se chequean (más barato porque son pocos y no cambian)
-        if (!existCollision)
-        {
-            existCollision = CollisionManager.CheckAnyCollisionStatic(entity, pointNextCollision, collisionMove);
-        }
-        if (!existCollision)
-        {
+        //// Cooldown local para cada unidad
+        //if (characterBehaviorComponent.collisionCheckCooldown <= 0f && batchId == batchIndex)
+        //{
+        //    //existCollision = CollisionManager.CheckAnyCollisionMoveUnitOnly(entity, pointNextCollision, collisionMove);
+        //    if (!existCollision)
+        //    {
+        //        existCollision = CollisionManager.CheckSegmentCollision(startPos, endPos, collisionMove);
+        //    }
+        //    characterBehaviorComponent.collisionCheckCooldown = 0.05f; // 50ms entre checks por unidad
+        //}
+        //else
+        //{
+        //    characterBehaviorComponent.collisionCheckCooldown -= delta;
+        //}
+        //// Estáticos: siempre se chequean (más barato porque son pocos y no cambian)
+        //if (!existCollision)
+        //{
+        //    existCollision = CollisionManager.CheckAnyCollisionStatic(entity, pointNextCollision, collisionMove);
+        //}
+        //if (!existCollision)
+        //{
 
-            float distanceToTarget = (unitMovementComponent.nextDestination - positionComponent.position).Length();
-            float movementDistance = velocityComponent.velocity * delta;
-            if (movementDistance >= distanceToTarget)
-            {
-                unitMovementComponent.arriveDestination = true;
-                positionComponent.lastPosition = positionComponent.position;   // ← GUARDAR antes de mover
-                positionComponent.position = unitMovementComponent.nextDestination;
-                characterComponent.characterStateType = CharacterStateType.IDLE;
-            }
-            else
-            {
-                characterComponent.characterStateType = CharacterStateType.MOVING;
-                positionComponent.lastPosition = positionComponent.position;   // ← GUARDAR antes de mover
-                positionComponent.position += movement;
-            }
-        }
-        else
-        {
-            characterComponent.characterStateType = CharacterStateType.IDLE;
-        }
+        //    float distanceToTarget = (unitMovementComponent.nextDestination - positionComponent.position).Length();
+        //    float movementDistance = velocityComponent.velocity * delta;
+        //    if (movementDistance >= distanceToTarget)
+        //    {
+        //        unitMovementComponent.arriveDestination = true;
+        //        positionComponent.lastPosition = positionComponent.position;   // ← GUARDAR antes de mover
+        //        positionComponent.position = unitMovementComponent.nextDestination;
+        //        characterComponent.characterStateType = CharacterStateType.IDLE;
+        //    }
+        //    else
+        //    {
+        //        characterComponent.characterStateType = CharacterStateType.MOVING;
+        //        positionComponent.lastPosition = positionComponent.position;   // ← GUARDAR antes de mover
+        //        positionComponent.position += movement;
+        //    }
+        //}
+        //else
+        //{
+        //    characterComponent.characterStateType = CharacterStateType.IDLE;
+        //}
     }
 }

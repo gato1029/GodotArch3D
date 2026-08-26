@@ -15,10 +15,10 @@ public partial class ControlAnimationMultipleDirection : PanelContainer
         ButtonAdd.Pressed += ButtonAdd_Pressed;
         foreach (DirectionAnimationType item in Enum.GetValues(typeof(DirectionAnimationType)))
         {
-            if (item == DirectionAnimationType.OCHO)
-            {
-                continue;
-            }
+            //if (item == DirectionAnimationType.OCHO)
+            //{
+            //    continue;
+            //}
             OptionButtonType.AddItem(item.ToString());
         }
         OptionButtonType.ItemSelected += OptionButtonType_ItemSelected;

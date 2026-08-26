@@ -134,265 +134,265 @@ public struct CharacterCommonBehaviorComponent
     
 }
 
-internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
-{
+//internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>
+//{
 
-    private int layerRenderCharacters = 20;
-    public int totalUnits { get; set; } = 0;
-    protected override void Initialize()
-    {
+//    private int layerRenderCharacters = 20;
+//    public int totalUnits { get; set; } = 0;
+//    protected override void Initialize()
+//    {
     
-    }
-    public void CreateNewCharacter(int idCharacterBase, Vector2 positionInitial)
-    {
-        CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(idCharacterBase);
-        int idMaterial = characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial;
+//    }
+//    public void CreateNewCharacter(int idCharacterBase, Vector2 positionInitial)
+//    {
+//        CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(idCharacterBase);
+//        int idMaterial = characterBaseData.animationCharacterBaseData.animationDataArray[0].idMaterial;
 
         
 
-        Entity entity = EcsManager.Instance.World.Create();
-        AddBase(entity, characterBaseData);
-        AddRender(entity, characterBaseData, idMaterial, positionInitial);
-        AddMove(entity, positionInitial, characterBaseData);
-        AddAnimations(entity, characterBaseData);
-        AddSoulCharacter(entity, characterBaseData, positionInitial);
+//        Entity entity = EcsManager.Instance.World.Create();
+//        AddBase(entity, characterBaseData);
+//        AddRender(entity, characterBaseData, idMaterial, positionInitial);
+//        AddMove(entity, positionInitial, characterBaseData);
+//        AddAnimations(entity, characterBaseData);
+//        AddSoulCharacter(entity, characterBaseData, positionInitial);
 
-        if (characterBaseData.animationCharacterBaseData.collisionBody != null || characterBaseData.animationCharacterBaseData.collisionMove != null)
-        {
-            AddColliderBody(entity, characterBaseData, positionInitial);
-        }
-        totalUnits++;
+//        if (characterBaseData.animationCharacterBaseData.collisionBody != null || characterBaseData.animationCharacterBaseData.collisionMove != null)
+//        {
+//            AddColliderBody(entity, characterBaseData, positionInitial);
+//        }
+//        totalUnits++;
         
-    }
+//    }
 
-    private void AddRender(Entity entity, CharacterModelBaseData characterBaseData, int idMaterial, Vector2 positionInitial)
-    {
-        var inst = MultimeshManager.Instance.CreateInstance(idMaterial);
+//    private void AddRender(Entity entity, CharacterModelBaseData characterBaseData, int idMaterial, Vector2 positionInitial)
+//    {
+//        var inst = MultimeshManager.Instance.CreateInstance(idMaterial);
 
         
-        GeometricShape2D colliderB = characterBaseData.animationCharacterBaseData.collisionMove.Multiplicity(characterBaseData.scale);
+//        GeometricShape2D colliderB = characterBaseData.animationCharacterBaseData.collisionMove.Multiplicity(characterBaseData.scale);
 
-        Vector2 originOffset = colliderB.OriginCurrent;
+//        Vector2 originOffset = colliderB.OriginCurrent;
 
-        Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
-        transform.Origin = new Vector3(positionInitial.X, positionInitial.Y, (positionInitial.Y * CommonAtributes.LAYER_MULTIPLICATOR) + 0);
-        transform = transform.ScaledLocal(new Vector3(characterBaseData.scale, characterBaseData.scale, 1));
-        entity.Add(new RenderGPUComponent { rid = inst.rid, instance = inst.instance, idMaterial= idMaterial, layerRender = layerRenderCharacters, originOffset = originOffset, transform = transform, zOrdering = (int)characterBaseData.animationCharacterBaseData.zOrderingOrigin } );
+//        Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
+//        transform.Origin = new Vector3(positionInitial.X, positionInitial.Y, (positionInitial.Y * CommonAtributes.LAYER_MULTIPLICATOR) + 0);
+//        transform = transform.ScaledLocal(new Vector3(characterBaseData.scale, characterBaseData.scale, 1));
+//        entity.Add(new RenderGPUComponent { rid = inst.rid, instance = inst.instance, idMaterial= idMaterial, layerRender = layerRenderCharacters, originOffset = originOffset, transform = transform, zOrdering = (int)characterBaseData.animationCharacterBaseData.zOrderingOrigin } );
 
 
-        if (characterBaseData.animationCharacterBaseData.hasCompositeAnimation)
-        {
-            GpuInstance[] instancedLinked = new GpuInstance[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
-            //instancedLinked[(int)AccesoryAvatarType.WEAPON] = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, 2);
-            //for (int i = 1; i < instancedLinked.Length; i++)
-            //{
-            //    instancedLinked[i] = default;
-            //}
+//        if (characterBaseData.animationCharacterBaseData.hasCompositeAnimation)
+//        {
+//            GpuInstance[] instancedLinked = new GpuInstance[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+//            //instancedLinked[(int)AccesoryAvatarType.WEAPON] = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, 2);
+//            //for (int i = 1; i < instancedLinked.Length; i++)
+//            //{
+//            //    instancedLinked[i] = default;
+//            //}
 
-            //crear cada rid
-            entity.Add(new RenderGPULinkedComponent { instancedLinked = instancedLinked });
-        }
+//            //crear cada rid
+//            entity.Add(new RenderGPULinkedComponent { instancedLinked = instancedLinked });
+//        }
 
-    }
+//    }
 
-    private void AddBase(Entity entity, CharacterModelBaseData baseData)
-    {
-        if (baseData.id == 0)
-        {
-            GD.PrintErr("Erro Id 0 base data");
-        }
-        //if (baseData.animationCharacterBaseData.hasCompositeAnimation)
-        //{
-        //    entity.Add(new HealthComponent { current = 1000 });
-        //    int[] accessoryArray = new int[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
-        //    accessoryArray[(int)AccesoryAvatarType.WEAPON] = 2;// AccesoryManager.Instance.GetAccesory(2);
-        //    entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 1000000, speedAtackBase = 0.1f, accessoryArray = accessoryArray, behaviorType= baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE  });
-        //}
-        //else
-        //{
-        //    entity.Add(new HealthComponent { current = 200 });
-        //    entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 10000, speedAtackBase = 0.0f, accessoryArray = null, behaviorType = baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE });
-        //}                       
-    }
-    private void AddMove(Entity entity, Vector2 positionInitial, CharacterModelBaseData characterBaseData)
-    {
-        float velocity = 3;
+//    private void AddBase(Entity entity, CharacterModelBaseData baseData)
+//    {
+//        if (baseData.id == 0)
+//        {
+//            GD.PrintErr("Erro Id 0 base data");
+//        }
+//        //if (baseData.animationCharacterBaseData.hasCompositeAnimation)
+//        //{
+//        //    entity.Add(new HealthComponent { current = 1000 });
+//        //    int[] accessoryArray = new int[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+//        //    accessoryArray[(int)AccesoryAvatarType.WEAPON] = 2;// AccesoryManager.Instance.GetAccesory(2);
+//        //    entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 1000000, speedAtackBase = 0.1f, accessoryArray = accessoryArray, behaviorType= baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE  });
+//        //}
+//        //else
+//        //{
+//        //    entity.Add(new HealthComponent { current = 200 });
+//        //    entity.Add(new CharacterComponent { idCharacterBaseData = baseData.id, damageBase = 10, healthBase = 10000, speedAtackBase = 0.0f, accessoryArray = null, behaviorType = baseData.characterBehaviorType, characterStateType = CharacterStateType.IDLE });
+//        //}                       
+//    }
+//    private void AddMove(Entity entity, Vector2 positionInitial, CharacterModelBaseData characterBaseData)
+//    {
+//        float velocity = 3;
         
-        foreach (var item in characterBaseData.bonusDataArray)
-        {
-            switch (item.type)
-            {
-                case BonusType.DURABILITY:
-                    break;
-                case BonusType.VELOCITY_ATTACK:
-                    break;
-                case BonusType.SPACE_BAG:
-                    break;
-                case BonusType.VELOCITY_MOVE:
-                    velocity = item.value;
-                    break;
-                case BonusType.RANGO_ATAQUE_EDIFICIOS:
-                    break;
-                case BonusType.VELOCIDAD_PROYECTIL:
-                    break;
-                default:
-                    break;
-            }
-        }
+//        foreach (var item in characterBaseData.bonusDataArray)
+//        {
+//            switch (item.type)
+//            {
+//                case BonusType.DURABILITY:
+//                    break;
+//                case BonusType.VELOCITY_ATTACK:
+//                    break;
+//                case BonusType.SPACE_BAG:
+//                    break;
+//                case BonusType.VELOCITY_MOVE:
+//                    velocity = item.value;
+//                    break;
+//                case BonusType.RANGO_ATAQUE_EDIFICIOS:
+//                    break;
+//                case BonusType.VELOCIDAD_PROYECTIL:
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
 
 
-        entity.Add(new PositionComponent { position = positionInitial, positionFuture = positionInitial });
-        entity.Add(new DirectionComponent { animationDirection = AnimationDirection.LEFT });
-        entity.Add(new VelocityComponent { velocity = velocity });
+//        entity.Add(new PositionComponent { position = positionInitial, positionFuture = positionInitial });
+//        entity.Add(new DirectionComponent { animationDirection = AnimationDirection.LEFT });
+//        entity.Add(new VelocityComponent { velocity = velocity });
         
-    }
+//    }
 
-    private void AddSoulCharacter(Entity entity , CharacterModelBaseData characterBaseData, Vector2 positionInitial)
-    {
+//    private void AddSoulCharacter(Entity entity , CharacterModelBaseData characterBaseData, Vector2 positionInitial)
+//    {
 
-        switch (characterBaseData.characterBehaviorType)
-        {
-            case CharacterBehaviorType.NINGUNO:
-                break;
-            case CharacterBehaviorType.PERSONAJE_PRINCIPAL:
-                entity.Add(new PlayerInputComponent());
-                entity.Add(new TeamComponent { team = 1 });
-                entity.Add(new CharacterAtackComponent { isAttack = false });
-                //CharacterBehaviorComponent behaviorCharacterComponent;
+//        switch (characterBaseData.characterBehaviorType)
+//        {
+//            case CharacterBehaviorType.NINGUNO:
+//                break;
+//            case CharacterBehaviorType.PERSONAJE_PRINCIPAL:
+//                entity.Add(new PlayerInputComponent());
+//                entity.Add(new TeamComponent { team = 1 });
+//                entity.Add(new CharacterAtackComponent { isAttack = false });
+//                //CharacterBehaviorComponent behaviorCharacterComponent;
 
-                //behaviorCharacterComponent.characterBehavior = BehaviorManager.Instance.GetBehavior(1);
-                //entity.Add(behaviorCharacterComponent);
-                //entity.Add(characterAtackComponent);
+//                //behaviorCharacterComponent.characterBehavior = BehaviorManager.Instance.GetBehavior(1);
+//                //entity.Add(behaviorCharacterComponent);
+//                //entity.Add(characterAtackComponent);
 
-                break;
-            case CharacterBehaviorType.GENERICO:
-                entity.Add(new TeamComponent { team = 2 });
-                entity.Add(new AttackDamageComponent { damage = 10 });
-                //entity.Add(new TargetingComponent { targetEntity = Entity.Null });
-                //teamComponent.team = 2;
-                //entity.Add(teamComponent);
-                //CharacterCommonBehaviorComponent characterCommonBehaviorComponent =  new CharacterCommonBehaviorComponent();
-                //characterCommonBehaviorComponent.collisionCheckCooldown = 0;
-                AddMoveType(entity,characterBaseData, positionInitial);
-                AddAtackType(entity, characterBaseData, positionInitial);
+//                break;
+//            case CharacterBehaviorType.GENERICO:
+//                entity.Add(new TeamComponent { team = 2 });
+//                entity.Add(new AttackDamageComponent { damage = 10 });
+//                //entity.Add(new TargetingComponent { targetEntity = Entity.Null });
+//                //teamComponent.team = 2;
+//                //entity.Add(teamComponent);
+//                //CharacterCommonBehaviorComponent characterCommonBehaviorComponent =  new CharacterCommonBehaviorComponent();
+//                //characterCommonBehaviorComponent.collisionCheckCooldown = 0;
+//                AddMoveType(entity,characterBaseData, positionInitial);
+//                AddAtackType(entity, characterBaseData, positionInitial);
                 
-                //entity.Add(characterCommonBehaviorComponent);
+//                //entity.Add(characterCommonBehaviorComponent);
 
-                break;
-            default:
-                break;
-        }
+//                break;
+//            default:
+//                break;
+//        }
        
-    }
+//    }
 
-    private void AddAtackType(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
-    {
-        switch (characterBaseData.unitType)
-        {
-            case UnitType.TERRESTRE:
-                entity.Add(new MeleeAttackComponent{ attackType= MeleeAttackType.Physics, attackRange =0.3f, damage=10 } );
-                entity.Add(new EnemySearchRadiusComponent { radius = 5 });
-                break;
-            case UnitType.AEREO:
-                break;
-            case UnitType.ACUATICO:
-                break;
-            default:
-                break;
-        }
-    }
+//    private void AddAtackType(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
+//    {
+//        switch (characterBaseData.unitType)
+//        {
+//            case UnitType.TERRESTRE:
+//                entity.Add(new MeleeAttackComponent{ attackType= MeleeAttackType.Physics, attackRange =0.3f, damage=10 } );
+//                entity.Add(new EnemySearchRadiusComponent { radius = 5 });
+//                break;
+//            case UnitType.AEREO:
+//                break;
+//            case UnitType.ACUATICO:
+//                break;
+//            default:
+//                break;
+//        }
+//    }
 
-    private void AddMoveType(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
-    {
+//    private void AddMoveType(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
+//    {
 
-        switch (characterBaseData.unitMoveType)
-        {
-            case UnitMoveType.ALERTA: //No se mueve pero puede atacar desde su punto fijo
-                break;
-            case UnitMoveType.MOVIMIENTO_RADIO_FIJO: // se mueve en un radio fijo, basando su punto de origen
-                entity.Add(new RadiusMovementComponent {
-                     movementCooldown= 2, center = positionInitial, desiredRadius = characterBaseData.unitMoveData.radiusMove, mode = MovementMode.FreeWander });
-                //characterCommonBehaviorComponent.idMoveBehavior = 1;
-                //characterCommonBehaviorComponent.idStateBehavior = 1;                          
-                //CharacterUnitMovementFixedComponent characterUnitSearchFixedComponent = new CharacterUnitMovementFixedComponent
-                //{
-                //    nextDestination = Vector2.Zero, postionOrigin = positionInitial, radiusMovement = characterBaseData.unitMoveData.radiusMove, arriveDestination = true
-                //};
-                //entity.Add(characterUnitSearchFixedComponent);
-                break;
-            case UnitMoveType.BUSQUEDA_RADIO_FIJO:
-                break;
-            case UnitMoveType.MOVIMIENTO_RADIO_VARIABLE:
-                entity.Add(new RadiusMovementComponent { center = positionInitial, desiredRadius = characterBaseData.unitMoveData.radiusMove, mode = MovementMode.PointToPoint });
-                break;
-            case UnitMoveType.BUSQUEDA_RADIO_VARIBLE:
-                break;
-            default:
-                break;
-        }
-    }
+//        switch (characterBaseData.unitMoveType)
+//        {
+//            case UnitMoveType.ALERTA: //No se mueve pero puede atacar desde su punto fijo
+//                break;
+//            case UnitMoveType.MOVIMIENTO_RADIO_FIJO: // se mueve en un radio fijo, basando su punto de origen
+//                entity.Add(new RadiusMovementComponent {
+//                     movementCooldown= 2, center = positionInitial, desiredRadius = characterBaseData.unitMoveData.radiusMove, mode = MovementMode.FreeWander });
+//                //characterCommonBehaviorComponent.idMoveBehavior = 1;
+//                //characterCommonBehaviorComponent.idStateBehavior = 1;                          
+//                //CharacterUnitMovementFixedComponent characterUnitSearchFixedComponent = new CharacterUnitMovementFixedComponent
+//                //{
+//                //    nextDestination = Vector2.Zero, postionOrigin = positionInitial, radiusMovement = characterBaseData.unitMoveData.radiusMove, arriveDestination = true
+//                //};
+//                //entity.Add(characterUnitSearchFixedComponent);
+//                break;
+//            case UnitMoveType.BUSQUEDA_RADIO_FIJO:
+//                break;
+//            case UnitMoveType.MOVIMIENTO_RADIO_VARIABLE:
+//                entity.Add(new RadiusMovementComponent { center = positionInitial, desiredRadius = characterBaseData.unitMoveData.radiusMove, mode = MovementMode.PointToPoint });
+//                break;
+//            case UnitMoveType.BUSQUEDA_RADIO_VARIBLE:
+//                break;
+//            default:
+//                break;
+//        }
+//    }
 
-    private void AddAnimations(Entity entity, CharacterModelBaseData characterBaseData)
-    {
-        CharacterAnimationComponent characterAnimationComponent = default;
-        if (characterBaseData.animationCharacterBaseData.hasCompositeAnimation)
-        {
-            characterAnimationComponent.currentframeData = new Color();
-            characterAnimationComponent.currentframeDataAccesorys = new Color[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
+//    private void AddAnimations(Entity entity, CharacterModelBaseData characterBaseData)
+//    {
+//        CharacterAnimationComponent characterAnimationComponent = default;
+//        if (characterBaseData.animationCharacterBaseData.hasCompositeAnimation)
+//        {
+//            characterAnimationComponent.currentframeData = new Color();
+//            characterAnimationComponent.currentframeDataAccesorys = new Color[Enum.GetNames(typeof(AccesoryAvatarType)).Length];
             
-        }
-        else
-        {
-            characterAnimationComponent.currentframeData = new Color();
-        }
+//        }
+//        else
+//        {
+//            characterAnimationComponent.currentframeData = new Color();
+//        }
 
-        characterAnimationComponent.stateAnimation = 0;
-        characterAnimationComponent.lastStateAnimation = -1;
-        characterAnimationComponent.currentFrameIndex = 0;
-        characterAnimationComponent.active = true;
-        characterAnimationComponent.frameDuration = 0;
+//        characterAnimationComponent.stateAnimation = 0;
+//        characterAnimationComponent.lastStateAnimation = -1;
+//        characterAnimationComponent.currentFrameIndex = 0;
+//        characterAnimationComponent.active = true;
+//        characterAnimationComponent.frameDuration = 0;
         
-        characterAnimationComponent.animationComplete = false;
-        characterAnimationComponent.TimeSinceLastFrame = 0;
+//        characterAnimationComponent.animationComplete = false;
+//        characterAnimationComponent.TimeSinceLastFrame = 0;
 
-        entity.Add<CharacterAnimationComponent>(characterAnimationComponent);
-    }
+//        entity.Add<CharacterAnimationComponent>(characterAnimationComponent);
+//    }
 
-    private void AddColliderBody(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
-    {
-        //int idCollider = CollisionManager.Instance.characterCollidersEntities.AddColliderObject(entity, characterBaseData.collisionMove, positionInitial);
+//    private void AddColliderBody(Entity entity, CharacterModelBaseData characterBaseData, Vector2 positionInitial)
+//    {
+//        //int idCollider = CollisionManager.Instance.characterCollidersEntities.AddColliderObject(entity, characterBaseData.collisionMove, positionInitial);
 
-        //entity.Add<ColliderComponent>(new ColliderComponent { idCollider = idCollider });
-    }
+//        //entity.Add<ColliderComponent>(new ColliderComponent { idCollider = idCollider });
+//    }
 
-    public void RemoveCharacter(Entity entity, CharacterComponent characterComponent, Rid rid, int instance)
-    {
-        if (entity.Has<RenderGPUComponent>())
-        {
-            ref var sprite = ref entity.Get<RenderGPUComponent>();
-            MultimeshManager.Instance.FreeInstance(sprite.rid, sprite.instance, sprite.idMaterial);
-            RenderingServer.MultimeshInstanceSetCustomData(sprite.rid, sprite.instance, new Color(-1, -1, -1, -1));
-        }
+//    public void RemoveCharacter(Entity entity, CharacterComponent characterComponent, Rid rid, int instance)
+//    {
+//        if (entity.Has<RenderGPUComponent>())
+//        {
+//            ref var sprite = ref entity.Get<RenderGPUComponent>();
+//            MultimeshManager.Instance.FreeInstance(sprite.rid, sprite.instance, sprite.idMaterial);
+//            RenderingServer.MultimeshInstanceSetCustomData(sprite.rid, sprite.instance, new Color(-1, -1, -1, -1));
+//        }
 
-        if (entity.Has<CharacterComponent>())
-        {
-            CollisionManager.Instance.characterCollidersEntities.RemoveCollider(entity.Get<ColliderComponent>().idCollider);
-        }
-        EcsManager.Instance.World.Destroy(entity);
-        //var dataModel =  CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
-        //int idMaterial = dataModel.animationCharacterBaseData.animationDataArray[0].idMaterial;
-        //MultimeshManager.Instance.FreeInstance(rid, instance,idMaterial);        
-        //RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Color(-1, -1, -1, -1));
+//        if (entity.Has<CharacterComponent>())
+//        {
+//            CollisionManager.Instance.characterCollidersEntities.RemoveCollider(entity.Get<ColliderComponent>().idCollider);
+//        }
+//        EcsManager.Instance.World.Destroy(entity);
+//        //var dataModel =  CharacterModelManager.Instance.GetCharacterModel(characterComponent.idCharacterBaseData);
+//        //int idMaterial = dataModel.animationCharacterBaseData.animationDataArray[0].idMaterial;
+//        //MultimeshManager.Instance.FreeInstance(rid, instance,idMaterial);        
+//        //RenderingServer.MultimeshInstanceSetCustomData(rid, instance, new Color(-1, -1, -1, -1));
 
-        //CollisionManager.Instance.characterCollidersEntities.RemoveItem(entity.Reference());
+//        //CollisionManager.Instance.characterCollidersEntities.RemoveItem(entity.Reference());
         
-        //CollisionManager.Instance.characterCollidersEntities.RemoveCollider(entity.Get<ColliderComponent>().idCollider);
-        totalUnits--;
-    }
+//        //CollisionManager.Instance.characterCollidersEntities.RemoveCollider(entity.Get<ColliderComponent>().idCollider);
+//        totalUnits--;
+//    }
  
 
-    protected override void Destroy()
-    {
-        throw new NotImplementedException();
-    }
-}
+//    protected override void Destroy()
+//    {
+//        throw new NotImplementedException();
+//    }
+//}

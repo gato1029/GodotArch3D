@@ -111,7 +111,7 @@ public sealed class BlackyWorld : IDisposable
 
         BlackyWorldRegistry.Instance.AddWorld(name, this, true);
 
-        Procedural = new BlackyWorldProceduralGeneration(this, Config);
+        //Procedural = new BlackyWorldProceduralGeneration(this, Config);
 
         DebugBoot();
     }
@@ -151,7 +151,7 @@ public sealed class BlackyWorld : IDisposable
 
     private void DebugBoot()
     {
-        //var e = Characters.Create(1, new Vector2(10, 0));
+        var e = Characters.Create(1787768744605000, new Vector2(0, 0));
 
         //var ee = Characters.Create(2, new Vector2(5, 0));
         //ee.Set(new MoveTargetComponent(new Vector2(20, 0)));

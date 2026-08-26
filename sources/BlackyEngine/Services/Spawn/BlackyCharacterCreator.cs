@@ -36,25 +36,26 @@ public class BlackyCharacterCreator
         this.dynamicHash = dynamicHash;
     }
 
-    public Entity Create(int id, Godot.Vector2 position)
+    public Entity Create(long id, Godot.Vector2 position)
     {
+        BlackyPalletesPersistence.characterPalette.GetIdPersistence("Base", id, out CharacterModelBaseData charModel);
         _characterCount++;
-        CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(id);
+        //CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(id);
         var entity = flecsManager.WorldFlecs.Entity();
 
-        
 
-        switch (characterBaseData.characterType)
+
+        switch (charModel.characterType)
         {
             case CharacterType.MAIN:
-                return CreateMain(entity, characterBaseData, position);
+                return CreateGeneric(entity, charModel, position);
                 break;
 
             case CharacterType.NPC:
                 break;
 
             case CharacterType.ENEMIGO:
-                return CreateEnemy(entity, characterBaseData,position);
+                return CreateEnemy(entity, charModel, position);
                 break;
 
             default:
@@ -170,10 +171,83 @@ public class BlackyCharacterCreator
 
 
     }
+    private Entity CreateGeneric(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
+    {
+        int height = 5; // altura en el mundo
+
+        var idTileSprite = characterBaseData.idTileSpriteData; // información del sprite del personaje y colliders ID
+        int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite
+        AtlasModsManager.TryGetTileSprite(spriteId, out var sprite); // Obtén el sprite del personaje
+        var animationDir = sprite.spriteMultipleAnimationDirection; // Obtén las animación de caminar del personaje
+      
+
+        var MoveData = animationDir.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+
+        GeometricShape2D colliderMove = MoveData.collisionBodyDictionary["Base"].Multiplicity(characterBaseData.scale);        
+        GeometricShape2D colliderBody = MoveData.collisionBodyDictionary["Cuerpo"].Multiplicity(characterBaseData.scale);
+        //correcion aqui
+        var instance = AtlasTexturesModsManager.Instance.CreateInstanceRender(MoveData.idModMaterial);
+
+        Godot.Vector2 originOffset = new Vector2(MoveData.offsetInternal.X * characterBaseData.scale, MoveData.offsetInternal.Y * characterBaseData.scale);
+
+        float depthOffset = MoveData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, height, layer, position); // debemos usar esto apartir de ahora
+
+        Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
+        transform.Origin = new Godot.Vector3(position.X, position.Y, z);
+        transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
+
+        // render
+        entity.Set(new RenderTransformComponent(transform));
+        entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));
+        entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
+        entity.Set(new RenderFrameDataComponent { uvMap = MoveData.uvFramesArray[0] });
+
+        // comportamiento
+        entity.Set(new GodotFlecs.sources.Flecs.Components.CharacterComponent
+        {
+            characterStateType = CharacterStateType.IDLE,
+            characterBehaviorType = CharacterBehaviorType.PERSONAJE_PRINCIPAL
+        });
+                
+        entity.Set(new TeamComponent(1));
+        entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));
+
+        entity.Set(new PositionComponent(position, Vector2I.Zero, height));
+        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.CUATRO, GodotEcsArch.sources.components.AnimationDirection.LEFT));      
+        entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
+        entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0));
+        entity.Set(new PlayerInputComponent());
+
+        // este collider component tiene que salir luego
+        //int idCollider = CollisionManager.Instance.characterEntitiesFlecs.AddColliderObject(entity, colliderBody, position,1,colliderMove);
+        entity.Set(new ColliderComponent(0, new Rect2(), colliderBody.OriginCurrent, new Rect2(position - (colliderMove.GetSizeQuad() / 2), colliderMove.GetSizeQuad()), colliderMove.OriginCurrent, 0));
+
+        entity.Set(new HumanAttackComponent(10, 1f, 0.0f, 0.2f, 0));
+        entity.Set(new HealthComponent(6000));
+
+        float rvoRadius = MeshCreator.PixelsToUnits(12);
+        entity.Set(new MeleeAttackComponent(20, 1, 0f, 0));
+        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero));
+        //entity.Set(new StuckComponent(position, 0, false));
+
+        AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);
+
+        if (DEBUG_COLLIDERS)
+        {
+            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, 0));
+        }
+
+
+        entity.Add<UseBoidTag>();
+
+
+        return entity;
+    }
     private Entity CreateMain(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
     {
-        BlackyPalletesPersistence.characterPalette.GetIdPersistence("Base", characterBaseData.id, out CharacterModelBaseData charModel);
-        var idTileSprite = charModel.idTileSpriteData; // información del sprite del personaje y colliders ID
+      
+        var idTileSprite = characterBaseData.idTileSpriteData; // información del sprite del personaje y colliders ID
         int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite
         AtlasModsManager.TryGetTileSprite(spriteId, out var sprite); // Obtén el sprite del personaje
 
