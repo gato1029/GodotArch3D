@@ -185,7 +185,7 @@ public class BlackyCharacterCreator
 
         GeometricShape2D colliderMove = MoveData.collisionBodyDictionary["Base"].Multiplicity(characterBaseData.scale);        
         GeometricShape2D colliderBody = MoveData.collisionBodyDictionary["Cuerpo"].Multiplicity(characterBaseData.scale);
-        //correcion aqui
+        
         var instance = AtlasTexturesModsManager.Instance.CreateInstanceRender(MoveData.idModMaterial);
 
         Godot.Vector2 originOffset = new Vector2(MoveData.offsetInternal.X * characterBaseData.scale, MoveData.offsetInternal.Y * characterBaseData.scale);
