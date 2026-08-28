@@ -229,6 +229,7 @@ public class BlackyCharacterCreator
         float rvoRadius = MeshCreator.PixelsToUnits(12);
         entity.Set(new MeleeAttackComponent(20, 1, 0f, 0));
         entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero));
+        entity.Set(new WeaponComponent(1, false));
         //entity.Set(new StuckComponent(position, 0, false));
 
         AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);

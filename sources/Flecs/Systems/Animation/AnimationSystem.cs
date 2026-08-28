@@ -39,11 +39,11 @@ internal class AnimationSystem : FlecsSystemBase
         {
             ref var id = ref idGen[i];
             ref var anim = ref animation[i];
-            ref var d = ref dir[i];
+            ref var direction = ref dir[i];
             ref var f = ref frame[i];
 
             AnimationType stateAnimation = anim.stateAnimation;
-            var  animationData = AnimationCache.GetAnimation(anim.idSpriteOrAnimation, anim.entityType, anim.stateAnimation,  d);
+            var  animationData = AnimationCache.GetAnimation(anim.idSpriteOrAnimation, anim.entityType, anim.stateAnimation,  direction);
 
             //var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(id.id);
             //AnimationStateData animationStateData = dataCharacterModel.animationCharacterBaseData.animationDataArray[stateAnimation];

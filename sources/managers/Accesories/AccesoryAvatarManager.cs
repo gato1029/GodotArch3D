@@ -81,12 +81,12 @@ internal class AccesoryAvatarManager : SingletonBase<AccesoryAvatarManager>
         WeaponComponent weaponComponent = new WeaponComponent();
         weaponComponent.idWeapon = idAccesory;
         weaponComponent.isRanged = false;
-        weaponComponent.collidersDirection = new Dictionary<AnimationDirection, Collision.GeometricShape2D>();
-        foreach (var item in sp.animations)
-        {
-           var collider =  item.Value.collisionBodyArray[0].Multiplicity(scale);
-           weaponComponent.collidersDirection.Add(item.Key, collider);
-        }
+        //weaponComponent.collidersDirection = new Dictionary<AnimationDirection, Collision.GeometricShape2D>();
+        //foreach (var item in sp.animations)
+        //{
+        //   var collider =  item.Value.collisionBodyArray[0].Multiplicity(scale);
+        //   weaponComponent.collidersDirection.Add(item.Key, collider);
+        //}
 
         //
         return (instanceDict[accesoryAvatarType],idTile,weaponComponent);

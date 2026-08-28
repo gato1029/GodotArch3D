@@ -105,9 +105,8 @@ public record struct RangedAttackComponent
 public record struct WeaponComponent
 (
     int idWeapon,
-
-    bool isRanged,
-    Dictionary< AnimationDirection,GeometricShape2D> collidersDirection
+    bool isRanged
+    //Dictionary< AnimationDirection,GeometricShape2D> collidersDirection
     
 );
 [RegisterComponentFlecs]

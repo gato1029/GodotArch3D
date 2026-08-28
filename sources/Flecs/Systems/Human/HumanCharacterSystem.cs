@@ -22,6 +22,8 @@ using static System.Net.WebRequestMethods;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Human;
+
+// aqui esto lo dejaremos por si acaso, en un futuro queremos manejar multiple rendering 
 internal class HumanCharacterSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
@@ -167,55 +169,55 @@ internal class HumanCharacterSystem : FlecsSystemBase
     private void ExecuteAttack(Entity entity, PositionComponent pos, MeleeAttackComponent melle, WeaponComponent weapon, TeamComponent team, DirectionComponent direction, ColliderComponent col)
     {
 
-        var collider = weapon.collidersDirection[direction.animationDirection];
+        //var collider = weapon.collidersDirection[direction.animationDirection];
 
-        Godot.Vector2 posf = pos.position - (collider.GetSizeQuad() / 2) + collider.OriginCurrent;
-        var rectangle = new Rect2(posf, collider.GetSizeQuad());
+        //Godot.Vector2 posf = pos.position - (collider.GetSizeQuad() / 2) + collider.OriginCurrent;
+        //var rectangle = new Rect2(posf, collider.GetSizeQuad());
 
-        var nearby = CollisionManager.Instance.characterEntitiesFlecs.QueryAABBBrute(rectangle,col.idCollider);
+        //var nearby = CollisionManager.Instance.characterEntitiesFlecs.QueryAABBBrute(rectangle,col.idCollider);
 
-        //var nearby = CollisionManager.Instance.characterEntitiesFlecs.QueryCirclePoints(pos.position, melle.Range, col.idCollider);
-        foreach (var target in nearby)
-        {
+        ////var nearby = CollisionManager.Instance.characterEntitiesFlecs.QueryCirclePoints(pos.position, melle.Range, col.idCollider);
+        //foreach (var target in nearby)
+        //{
 
-            if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)
-            {
-                continue; // mismo equipo, ignorar
-            }
-            else
-            {
-                if (target.Owner != default && target.Owner.IsAlive() && !target.Owner.Has<DeadTag>())
-                {
-                    GlobalData.EventsDamage.Enqueue(new DamageEvent
-                    {
-                        Source = entity,
-                        Target = target.Owner,
-                        Amount = melle.Damage
-                    });
-                    GD.Print("Aplicando danio");
-                }
-            }
-        }
+        //    if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)
+        //    {
+        //        continue; // mismo equipo, ignorar
+        //    }
+        //    else
+        //    {
+        //        if (target.Owner != default && target.Owner.IsAlive() && !target.Owner.Has<DeadTag>())
+        //        {
+        //            GlobalData.EventsDamage.Enqueue(new DamageEvent
+        //            {
+        //                Source = entity,
+        //                Target = target.Owner,
+        //                Amount = melle.Damage
+        //            });
+        //            GD.Print("Aplicando danio");
+        //        }
+        //    }
+        //}
 
       
-        nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryAABBBInCirclePoints(pos.position, melle.Range, 0, 1);
+        //nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryAABBBInCirclePoints(pos.position, melle.Range, 0, 1);
 
-        foreach (var target in nearby)
-        {
-            if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)
-            {
-                continue; // mismo equipo, ignorar
-            }
-            else
-            {
-                if (target.Owner != default && target.Owner.IsAlive() && !target.Owner.Has<DestroyRequestTag>())
-                {
+        //foreach (var target in nearby)
+        //{
+        //    if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)
+        //    {
+        //        continue; // mismo equipo, ignorar
+        //    }
+        //    else
+        //    {
+        //        if (target.Owner != default && target.Owner.IsAlive() && !target.Owner.Has<DestroyRequestTag>())
+        //        {
 
-                    melle.Timer = melle.Cooldown; // resetear cooldown
+        //            melle.Timer = melle.Cooldown; // resetear cooldown
 
-                }
-            }
-        }
+        //        }
+        //    }
+        //}
     }
     private void HandleMovement(
        ref PlayerInputComponent input,

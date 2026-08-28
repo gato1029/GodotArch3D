@@ -150,7 +150,8 @@ public class FlecsManager
 
         //update
         RegisterSystem<HumanInputSystem>();
-        RegisterSystem<HumanCharacterSystem>();
+        //RegisterSystem<HumanCharacterSystem>();
+        RegisterSystem<HumanCharacterSimpleSystem>();
         RegisterSystem<UnitEnemySearchSystem>();
         RegisterSystem<MoveTargetSystem>(); 
                                                                              
