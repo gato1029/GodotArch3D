@@ -37,11 +37,12 @@ public enum AnimationType
     NINGUNA = -1,
     PARADO = 0,
     CAMINANDO = 1,
-    ATACANDO = 2,
+    ATACANDO_CUERPO = 2,
     RECIBE_DANIO = 3,
     STUNEADO = 4,
-    MUERTO = 5,
-    ARMA_ATACANDO = 6
+    MUERTO = 5,    
+    ATACANDO_DISTANCIA = 6,
+    ATACANDO_DISTANCIA_MAGIA = 7
 }
 
 

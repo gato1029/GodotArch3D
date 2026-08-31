@@ -181,7 +181,7 @@ public class BlackyCharacterCreator
         var animationDir = sprite.spriteMultipleAnimationDirection; // Obtén las animación de caminar del personaje
       
 
-        var MoveData = animationDir.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+        var MoveData = animationDir.animationsTypes[AnimationType.PARADO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 
         GeometricShape2D colliderMove = MoveData.collisionBodyDictionary["Base"].Multiplicity(characterBaseData.scale);        
         GeometricShape2D colliderBody = MoveData.collisionBodyDictionary["Cuerpo"].Multiplicity(characterBaseData.scale);
@@ -214,7 +214,7 @@ public class BlackyCharacterCreator
         entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));
 
         entity.Set(new PositionComponent(position, Vector2I.Zero, height));
-        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.CUATRO, GodotEcsArch.sources.components.AnimationDirection.LEFT));      
+        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.OCHO, GodotEcsArch.sources.components.AnimationDirection.LEFT));      
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0));
         entity.Set(new PlayerInputComponent());
@@ -223,7 +223,7 @@ public class BlackyCharacterCreator
         //int idCollider = CollisionManager.Instance.characterEntitiesFlecs.AddColliderObject(entity, colliderBody, position,1,colliderMove);
         entity.Set(new ColliderComponent(0, new Rect2(), colliderBody.OriginCurrent, new Rect2(position - (colliderMove.GetSizeQuad() / 2), colliderMove.GetSizeQuad()), colliderMove.OriginCurrent, 0));
 
-        entity.Set(new HumanAttackComponent(10, 1f, 0.0f, 0.2f, 0));
+      //  entity.Set(new HumanAttackComponent(10, 1f, 0.0f, 0.2f, 0));
         entity.Set(new HealthComponent(6000));
 
         float rvoRadius = MeshCreator.PixelsToUnits(12);
@@ -356,7 +356,7 @@ public class BlackyCharacterCreator
         int idWeapon = 2; // Aquí deberías obtener el ID del arma que deseas equipar
         var weaponBase = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, idWeapon, characterBaseData.scale);
 
-        animations[1] = new AnimationComponent(weaponBase.idTileSprite, EntityType.ACCESORIO, AnimationType.ARMA_ATACANDO, AnimationType.NINGUNA, 0, 0, 0, false, true,false);
+        animations[1] = new AnimationComponent(weaponBase.idTileSprite, EntityType.ACCESORIO, AnimationType.ATACANDO_DISTANCIA, AnimationType.NINGUNA, 0, 0, 0, false, true,false);
         GPUData[1] = new RenderGPUComponent(weaponBase.gpu.rid, weaponBase.gpu.instance, 0, 0, layer, MoveData.yDepthRenderFormat, characterBaseData.scale, originOffset);
         frames[1] = new RenderFrameDataComponent { uvMap = new Godot.Color(0, 0, 0, 0) };
         transforms[1] = new RenderTransformComponent(transform);

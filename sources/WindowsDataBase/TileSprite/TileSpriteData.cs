@@ -65,7 +65,7 @@ public class SpriteAnimationMultiple
 public class SpriteMultipleAnimationDirection
 {
     public DirectionAnimationType directionAnimationType { get; set; }
-    public Dictionary<string, SpriteAnimationDirection> animations { get; set; } = new Dictionary<string, SpriteAnimationDirection>();
+    public Dictionary<string, SpriteAnimationDirection> animations { get; set; } = new Dictionary<string, SpriteAnimationDirection>(); // esto deberiamos quitarlo luego y usar el otro diccionario que es mas eficiente, pero por ahora lo dejamos para no romper la compatibilidad
     public Dictionary<AnimationType, SpriteAnimationDirection> animationsTypes { get; set; } = new Dictionary<AnimationType, SpriteAnimationDirection>();
 
 }

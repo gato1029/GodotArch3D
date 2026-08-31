@@ -4,8 +4,9 @@
 [ext_resource type="Texture2D" uid="uid://cvyv7b7e0avlu" path="res://resources/Textures/iconos/Eye.png" id="2_48phy"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="2_ib582"]
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_ib582"]
+[ext_resource type="Script" uid="uid://d4g3outtemvav" path="res://sources/CustomWidgets/KuroOptionButton.cs" id="5_obdxl"]
 
-[node name="Panel" type="VBoxContainer" unique_id=1797296521 node_paths=PackedStringArray("buttonRemove", "buttonPreview", "spinBoxWidth", "spinBoxHeight", "spinBoxOffsetX", "spinBoxOffsetY", "optionButtonType", "spinBoxRotation", "hBoxContainerShapeNormal", "lineEditName")]
+[node name="Panel" type="VBoxContainer" unique_id=1797296521 node_paths=PackedStringArray("buttonRemove", "buttonPreview", "spinBoxWidth", "spinBoxHeight", "spinBoxOffsetX", "spinBoxOffsetY", "optionButtonType", "spinBoxRotation", "hBoxContainerShapeNormal", "lineEditName", "comboBoxType")]
 offset_right = 356.0
 offset_bottom = 93.0
 size_flags_horizontal = 2
@@ -21,6 +22,7 @@ optionButtonType = NodePath("HBoxContainer/OptionButton")
 spinBoxRotation = NodePath("HBoxContainer2/SpinBoxRotation")
 hBoxContainerShapeNormal = NodePath("HBoxContainer3")
 lineEditName = NodePath("HBoxContainer4/LineEditName")
+comboBoxType = NodePath("HBoxContainer4/KuroOptionButton")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1814244839]
 layout_mode = 2
@@ -75,8 +77,15 @@ layout_mode = 2
 text = "Nombre:"
 
 [node name="LineEditName" type="LineEdit" parent="HBoxContainer4" unique_id=1334783728]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="KuroOptionButton" type="OptionButton" parent="HBoxContainer4" unique_id=9503179]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("5_obdxl")
+metadata/_custom_type_script = "uid://d4g3outtemvav"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=320807625]
 visible = false

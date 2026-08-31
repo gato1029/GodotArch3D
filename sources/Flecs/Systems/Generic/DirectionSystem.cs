@@ -73,6 +73,7 @@ public class DirectionSystem : FlecsSystemBase
                         dir.animationDirection = CommonOperations.GetDirectionAnimation(dir.normalized);
                         break;
                     case DirectionAnimationType.OCHO:
+                        dir.animationDirection = CommonOperations.GetDirectionAnimationEight(dir.normalized);
                         break;
                     default:
                         break;

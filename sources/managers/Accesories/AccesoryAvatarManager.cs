@@ -30,7 +30,7 @@ internal class AccesoryAvatarManager : SingletonBase<AccesoryAvatarManager>
         {
             var data = MasterDataManager.GetData<AccessoryData>(idAccesory); // AccesoryManager.Instance.GetAccesory(idAccesory);
             var tileSpriteData = MasterDataManager.GetData<TileSpriteData>(data.idTileSpriteData);
-            var sp = tileSpriteData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.ARMA_ATACANDO];
+            var sp = tileSpriteData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.ATACANDO_DISTANCIA];
             var spriteData = sp.animations[AnimationDirection.LEFT];
             MultimeshMaterial multimeshMaterial = new MultimeshMaterial(MaterialManager.Instance.GetMaterial(spriteData.idMaterial),1);            
             multimeshMaterialDict.Add(accesoryAvatarType, multimeshMaterial);
@@ -64,7 +64,7 @@ internal class AccesoryAvatarManager : SingletonBase<AccesoryAvatarManager>
 
                 var data = MasterDataManager.GetData<AccessoryData>(idAccesory);
                 var tileSpriteData = MasterDataManager.GetData<TileSpriteData>(data.idTileSpriteData);
-                sp = tileSpriteData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.ARMA_ATACANDO];
+                sp = tileSpriteData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.ATACANDO_DISTANCIA];
                 var spriteData = sp.animations[AnimationDirection.LEFT];
                 var dataMaterial = DataBaseManager.Instance.FindById<MaterialSimpleData>(spriteData.idMaterial);
                 idTile = tileSpriteData.id;

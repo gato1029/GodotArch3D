@@ -29,7 +29,7 @@ internal static class AnimationCache
             case EntityType.ACCESORIO:
                 {
                     var model = MasterDataManager.GetData<TileSpriteData>(idLong).spriteMultipleAnimationDirection;
-                    var animState = model.animationsTypes[ AnimationType.ARMA_ATACANDO];  // model.animationCharacterBaseData.animationDataArray[stateAnimation];
+                    var animState = model.animationsTypes[ AnimationType.ATACANDO_DISTANCIA];  // model.animationCharacterBaseData.animationDataArray[stateAnimation];
                     var animData = animState.animations[dir.animationDirection];
                     return animData;
 

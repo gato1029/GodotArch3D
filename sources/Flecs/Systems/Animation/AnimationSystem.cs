@@ -53,12 +53,12 @@ internal class AnimationSystem : FlecsSystemBase
             if (anim.lastStateAnimation != stateAnimation)
             {
                 anim.TimeSinceLastFrame = 0f;
-                anim.animationComplete = false;
-                anim.currentFrameIndex = 1;
+                anim.animationComplete = false;                
                 anim.active = true;
                 anim.lastStateAnimation = stateAnimation;
                 anim.frameDuration = animationData.frameDuration;
-                f.uvMap =animationData.uvFramesArray[0];                
+                f.uvMap =animationData.uvFramesArray[0];
+                anim.currentFrameIndex = 1;
             }
 
             anim.TimeSinceLastFrame += delta;
@@ -70,9 +70,8 @@ internal class AnimationSystem : FlecsSystemBase
                     if (animationData.loop)
                     {
                         f.uvMap = animationData.uvFramesArray[0];
-
                         anim.animationComplete = true;
-                        anim.currentFrameIndex = 0;
+                        anim.currentFrameIndex = 1;
                         anim.active = true;
                     }
                     else
@@ -86,7 +85,7 @@ internal class AnimationSystem : FlecsSystemBase
                     f.uvMap = animationData.uvFramesArray[anim.currentFrameIndex];                  
                     anim.currentFrameIndex++;
                 }
-
+                
             }
         }
     }

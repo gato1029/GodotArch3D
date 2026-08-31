@@ -81,6 +81,33 @@ internal class CommonOperations
             return value.Y > 0 ? AnimationDirection.UP : AnimationDirection.DOWN;
         }
     }
+    public static AnimationDirection GetDirectionAnimationEight(Vector2 normalized)
+    {
+        if (normalized == Vector2.Zero)
+            return AnimationDirection.RIGHT; // o conserva la última dirección
+
+        float absX = Math.Abs(normalized.X);
+        float absY = Math.Abs(normalized.Y);
+
+        // Límite de 22.5° para decidir entre cardinal y diagonal
+        const float cardinalThreshold = 2.41421356f; // tan(67.5°)
+
+        if (absX > absY * cardinalThreshold)
+            return normalized.X > 0 ? AnimationDirection.RIGHT : AnimationDirection.LEFT;
+
+        if (absY > absX * cardinalThreshold)
+            return normalized.Y > 0 ? AnimationDirection.UP : AnimationDirection.DOWN;
+
+        // Diagonales
+        if (normalized.X > 0)
+            return normalized.Y > 0
+                ? AnimationDirection.RIGHTUP
+                : AnimationDirection.RIGHTDOWN;
+
+        return normalized.Y > 0
+            ? AnimationDirection.LEFTUP
+            : AnimationDirection.LEFTDOWN;
+    }
     public static Vector2 NewPointInCircle(Vector2 origin, float radius)
     {
         Vector2 newPoint;
@@ -152,5 +179,5 @@ internal class CommonOperations
         return pointDirection;
     }
 
-    
+
 }

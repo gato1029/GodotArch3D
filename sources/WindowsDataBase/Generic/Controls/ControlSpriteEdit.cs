@@ -72,7 +72,15 @@ public partial class ControlSpriteEdit : MarginContainer
         currentfps += (float)delta;        
         // Actualizar animación si existe
         if (animationData != null && animationData.Count > 0)
-		{			
+		{	
+            if (indexFrame >= animationData.Count)
+            {
+                indexFrame = 0;
+            }
+            if (isloopAnimation==false)
+            {
+                indexFrame = 0;
+            }
             if (currentfps >= frameDuration)
             {
                 currentfps = 0;
@@ -80,10 +88,7 @@ public partial class ControlSpriteEdit : MarginContainer
                 TextureImage.Texture = currentTileInfo.texture;
                 indexFrame++;
             }
-            if (indexFrame >= animationData.Count && isloopAnimation)
-            {
-                indexFrame = 0;
-            }            		
+                     		
         }
     }
     public void SetBlockedTile(int x, int y)

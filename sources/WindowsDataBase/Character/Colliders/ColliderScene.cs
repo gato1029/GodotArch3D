@@ -1,3 +1,5 @@
+using CommunityToolkit.HighPerformance.Helpers;
+using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
@@ -18,6 +20,7 @@ public partial class ColliderScene : VBoxContainer
     [Export] SpinBox spinBoxRotation;
     [Export] HBoxContainer hBoxContainerShapeNormal;
     [Export] LineEdit lineEditName;
+    [Export] KuroOptionButton comboBoxType;
     public GeometricShape2D data { get; set; }
 
     ColliderType type = ColliderType.RECTANGLE;
@@ -36,6 +39,7 @@ public partial class ColliderScene : VBoxContainer
         {
             lineEditName.Text = data.name;
         }
+        comboBoxType.SelectByData(data.collisionUseType);
         switch (data)
         {
             case Rectangle rect1:
@@ -90,11 +94,24 @@ public partial class ColliderScene : VBoxContainer
         spinBoxOffsetY.ValueChanged += SpinBox_ValueChanged;
         spinBoxRotation.ValueChanged += SpinBoxRotation_ValueChanged;
         lineEditName.TextChanged += LineEditName_TextChanged;
-        
+
+        comboBoxType.OnDataSelected += ComboBoxType_OnDataSelected;
+        foreach (var item in Enum.GetValues<CollisionUseType>())
+        {
+            comboBoxType.AddItemWithData(item.ToString(), item);            
+        }
+
+
         flag = true;
         createCollider();
     }
 
+    private void ComboBoxType_OnDataSelected(object obj)
+    {
+        var item = (CollisionUseType)obj;
+        data.collisionUseType = item;
+    }
+    
     private void LineEditName_TextChanged(string newText)
     {
         data.name = newText;

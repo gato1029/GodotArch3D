@@ -43,7 +43,7 @@ public static class CharacterStateConfig
                 {
                     { CharacterStateType.IDLE,  AnimationType.PARADO  },
                     { CharacterStateType.MOVING, AnimationType.CAMINANDO },
-                    { CharacterStateType.ATTACK, AnimationType.ATACANDO },               
+                    { CharacterStateType.ATTACK, AnimationType.ATACANDO_CUERPO },               
                     { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
                     { CharacterStateType.TAKE_STUN, AnimationType.STUNEADO },
                     { CharacterStateType.DIE, AnimationType.MUERTO },
@@ -69,8 +69,8 @@ public static class CharacterStateConfig
                 {
                     { CharacterStateType.IDLE,  AnimationType.PARADO  },
                     { CharacterStateType.MOVING, AnimationType.CAMINANDO },
-                    { CharacterStateType.ATTACK, AnimationType.ATACANDO },
-                    { CharacterStateType.EXECUTE_ATTACK, AnimationType.ATACANDO }, // opcional: animación especial // revisar luego para quitarlo
+                    { CharacterStateType.ATTACK, AnimationType.ATACANDO_CUERPO },
+                    { CharacterStateType.EXECUTE_ATTACK, AnimationType.ATACANDO_CUERPO }, // opcional: animación especial // revisar luego para quitarlo
                     { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
                     { CharacterStateType.DIE, AnimationType.MUERTO },
                 }
