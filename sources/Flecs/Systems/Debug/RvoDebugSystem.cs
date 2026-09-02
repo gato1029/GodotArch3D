@@ -33,14 +33,21 @@ internal class RvoDebugSystem : FlecsSystemBase
             ref var pos = ref posArray[i];
             ref var age = ref ageArray[i];
             ref var col = ref colArray[i];
-  //          ref var colBody = ref colBodyArray[i];
+            Entity entity = it.Entity(i);
+
             WireShape.Instance.UpdatePosition(age.idShapeRadius, pos.position+col.Offset);
             if (age.idShapeRadiusAttack!=0)
             {
-                WireShape.Instance.UpdatePosition(age.idShapeRadiusAttack, pos.position);
+                var colMelle = entity.Get<MeleeAttackComponent>();
+                WireShape.Instance.UpdatePosition(age.idShapeRadiusAttack, pos.position+ colMelle.OffSetRange);
             }
             
-           // WireShape.Instance.UpdatePosition(age.idShapeBody, pos.position + colBody.Shapes[0].Offset);
+            if (entity.Has<BodyColliderComponent>())
+            {
+                var colBody = entity.Get<BodyColliderComponent>();
+                WireShape.Instance.UpdatePosition(age.idShapeBody, pos.position + colBody.Shapes[0].Offset);
+            }
+           
         }
     }
 }

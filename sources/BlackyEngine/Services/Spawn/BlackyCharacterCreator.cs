@@ -29,7 +29,7 @@ public class BlackyCharacterCreator
     private int layer =4;
     private readonly FlecsManager flecsManager;
     private readonly FastSpatialHash dynamicHash;
-    private bool DEBUG_COLLIDERS = false;
+    private bool DEBUG_COLLIDERS = true;
     public BlackyCharacterCreator(FlecsManager flecsManager, FastSpatialHash dynamicHash)
     {
         this.flecsManager = flecsManager;
@@ -232,16 +232,19 @@ public class BlackyCharacterCreator
         entity.Set(new HealthComponent(6000));
 
         float rvoRadius = MeshCreator.PixelsToUnits(12);
-        entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, 0f, 0));
+ 
+        entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 0f, 0));
         entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero));
         entity.Set(new WeaponComponent(1, false));
         //entity.Set(new StuckComponent(position, 0, false));
 
         AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);
 
+        int idDebugRangeMelle = CollisionShapeDraw.Instance.DrawCircleShape(colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, Colors.Blue);
+
         if (DEBUG_COLLIDERS)
         {
-            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, 0));
+            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle));
         }
 
 
@@ -312,7 +315,7 @@ public class BlackyCharacterCreator
         entity.Set(new HealthComponent(6000));
         
         float rvoRadius = MeshCreator.PixelsToUnits(12);
-        entity.Set(new MeleeAttackComponent(20, 1, 0f, 0));
+        //entity.Set(new MeleeAttackComponent(20, radiusAttack, MoveData.offsetInternal, 0f, 0));
         entity.Set(new SteeringComponent(rvoRadius,4, Vector2.Zero));
         //entity.Set(new StuckComponent(position, 0, false));
 
@@ -381,22 +384,40 @@ public class BlackyCharacterCreator
     }
     private Entity CreateEnemy(Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position)
     {
-        var tileData = MasterDataManager.GetData<TileSpriteData>(characterBaseData.idTileSpriteData);
+        int height = 5; // altura en el mundo
 
-        var MoveData = tileData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+        var idTileSprite = characterBaseData.idTileSpriteData; // información del sprite del personaje y colliders ID
+        int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite
+        AtlasModsManager.TryGetTileSprite(spriteId, out var sprite); // Obtén el sprite del personaje
+        var animationDir = sprite.spriteMultipleAnimationDirection; // Obtén las animación de caminar del personaje
+        
+
+        var MoveData = animationDir.animationsTypes[AnimationType.PARADO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+
+        GeometricShape2D colliderMove = MoveData.collisionDictionary[CollisionUseType.BASE_PIES].Multiplicity(characterBaseData.scale);
+        GeometricShape2D colliderBody = MoveData.collisionDictionary[CollisionUseType.CUERPO].Multiplicity(characterBaseData.scale);
+
+        var AtackData = animationDir.animationsTypes[AnimationType.ATACANDO_CUERPO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+
+        Circle colliderAtackMelle = (Circle)AtackData.collisionDictionary[CollisionUseType.RADIO_ATAQUE_CUERPO].Multiplicity(characterBaseData.scale);
 
 
-        int idMaterial = MoveData.idMaterial;
-        var instance = MultimeshManager.Instance.CreateInstance(idMaterial);
-        GeometricShape2D colliderMove = MoveData.collisionBodyDictionary["Base"].Multiplicity(characterBaseData.scale);
-        Circle circle = (Circle)colliderMove;
-        GeometricShape2D colliderBody = MoveData.collisionBodyDictionary["Cuerpo"].Multiplicity(characterBaseData.scale);
- 
-        Godot.Vector2 originOffset = new Vector2(MoveData.offsetInternal.X * characterBaseData.scale, MoveData.offsetInternal.Y* characterBaseData.scale);
+        var instance = AtlasTexturesModsManager.Instance.CreateInstanceRender(MoveData.idModMaterial);
+
+        Godot.Vector2 originOffset = new Vector2(MoveData.offsetInternal.X * characterBaseData.scale, MoveData.offsetInternal.Y * characterBaseData.scale);
+
+        float depthOffset = MoveData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, height, layer, position); // debemos usar esto apartir de ahora
 
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
-        transform.Origin = new Godot.Vector3(position.X, position.Y, (position.Y * CommonAtributes.LAYER_MULTIPLICATOR) + 0);
+        transform.Origin = new Godot.Vector3(position.X, position.Y, z);
         transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
+
+        // render
+        entity.Set(new RenderTransformComponent(transform));
+        entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));
+        entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
+        entity.Set(new RenderFrameDataComponent { uvMap = MoveData.uvFramesArray[0] });
 
         entity.Set(new GodotFlecs.sources.Flecs.Components.CharacterComponent
         {
@@ -405,33 +426,29 @@ public class BlackyCharacterCreator
             characterBehaviorType = CharacterBehaviorType.GENERICO
             
         });
-        entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new TeamComponent(2));
-        entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));
-        entity.Set(new RenderGPUComponent( instance.rid, instance.instance, instance.material, instance.layerTexture, layer,MoveData.yDepthRenderFormat, characterBaseData.scale, originOffset));
-        entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0,0,0,false,true, true));
-        entity.Set(new RenderFrameDataComponent{uvMap = new Godot.Color(0,0,0,0)});
-        entity.Set(new PositionComponent(position,Vector2I.Zero,1));
-        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.DOS, GodotEcsArch.sources.components.AnimationDirection.LEFT));
         
+        entity.Set(new TeamComponent(2));
+        entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));                        
+        entity.Set(new PositionComponent(position,Vector2I.Zero,1));
+        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, animationDir.directionAnimationType, GodotEcsArch.sources.components.AnimationDirection.LEFT));        
         entity.Set(new VelocityComponent(new Vector2(0,0),3f,new Vector2(0,0)));
         entity.Set(new MoveResolutorComponent(false,0, position,0  ,0 ));
-        
-
-     //   int idCollider = CollisionManager.Instance.characterEntitiesFlecs.AddColliderObject(entity, colliderBody, position,2, colliderMove);
-        //entity.Set(new ColliderComponent(idCollider, new Rect2(), colliderBody.OriginCurrent,new Rect2((colliderMove.GetSizeQuad() / 2) , colliderMove.GetSizeQuad()), colliderMove.OriginCurrent, 0));
-
+             
         // circle.Radius
         
         entity.Add<UseBoidTag>();
 
         entity.Set(new HealthComponent(10000));
+
+
+        float rvoRadius = MeshCreator.PixelsToUnits(12);
+        float radiusAttack = MeshCreator.PixelsToUnits(colliderAtackMelle.Radius);
+
         //entity.Set(new RangedAttackComponent(1,20,5f,0.5f,0,true,6));
-        entity.Set(new MeleeAttackComponent(20, MeshCreator.PixelsToUnits(colliderBody.widthPixel*4), 1f, 0));
+        entity.Set(new MeleeAttackComponent(20, radiusAttack, colliderAtackMelle.OriginCurrent, 1f, 0));
         entity.Set(new AttackPendingComponent(false, default));
-        entity.Set(new EnemySearchComponent(5, 2, 0));
-        float dd = MeshCreator.PixelsToUnits(12);
-        entity.Set(new SteeringComponent(dd,2, Vector2.Zero));
+        entity.Set(new EnemySearchComponent(5, 2, 0));        
+        entity.Set(new SteeringComponent(rvoRadius, 2, Vector2.Zero));
         //entity.Set(new StuckComponent(position,0,false));
 
         AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);

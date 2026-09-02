@@ -69,7 +69,7 @@ internal class AttackHitSystem : FlecsSystemBase
                     {
                         var colliderBuilder = atk.Target.Get<ColliderComponent>().aabb;
 
-                        Rect2 rect2 = new Rect2(pos.position - new Vector2(mel.Range,mel.Range)/2, new Vector2(mel.Range,mel.Range));
+                        Rect2 rect2 = new Rect2(pos.position - new Vector2(mel.RangeAttack,mel.RangeAttack)/2, new Vector2(mel.RangeAttack,mel.RangeAttack));
                         //rect2.Position = pos.position - rect2.Size / 2 + col.offset;
 
                         if (rect2.Intersects(colliderBuilder))
@@ -97,7 +97,7 @@ internal class AttackHitSystem : FlecsSystemBase
                         // Dirección hacia el objetivo
                         Vector2 dif = targetPos - attackerPos;
                         float dist = dif.Length();
-                        if (dist <= mel.Range)
+                        if (dist <= mel.RangeAttack)
                         {
                             if (atk.Target != default && atk.Target.IsAlive() && !atk.Target.Has<DeadTag>() && !atk.Target.Has<DestroyRequestTag>())
                             {

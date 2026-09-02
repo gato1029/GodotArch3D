@@ -71,7 +71,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
            
 
             // obtener posibles enemigos cercanos usando spatial hash
-            var nearby = CollisionManager.Instance.characterEntitiesFlecs.QueryCirclePoints(pos.position, melle.Range, col.idCollider);
+            var nearby = CollisionManager.Instance.characterEntitiesFlecs.QueryCirclePoints(pos.position, melle.RangeAttack, col.idCollider);
             bool existTarget = false;
             foreach (var target in nearby)
             {
@@ -102,7 +102,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
             }
             // para buscar estructuras cercanas
             if (existTarget) continue;
-            nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryBruteShape( melle.Range, pos.position, 0);
+            nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryBruteShape( melle.RangeAttack, pos.position, 0);
             
             foreach (var target in nearby)
             {

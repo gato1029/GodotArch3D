@@ -67,7 +67,7 @@ public class FastSpatialHash
     // Configuración
     public readonly int TotalCells;
     public readonly int MaxNodes;
-    public static float CellSize = 64f; // Ajusta según tu escala (píxeles o unidades)
+    public static float CellSize = 32f; // Ajusta según tu escala (píxeles o unidades)
     public static float tileSizeUnits = MeshCreator.PixelsToUnits(CellSize);
 
     // Estructura de Lista Ligada Estática (Data-Oriented)

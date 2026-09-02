@@ -10,6 +10,7 @@ namespace GodotEcsArch.sources.managers.Collision;
 
 public enum CollisionUseType
 {
+    NINGUNO = 0,
     BASE_PIES = 1,
     CUERPO = 2,
     RADIO_ATAQUE_CUERPO = 3,    

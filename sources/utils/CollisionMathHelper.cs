@@ -52,6 +52,80 @@ public static class CollisionMathHelper
         return false;
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckAttackHalfCircle(
+    float attackerX,
+    float attackerY,
+    float lookDirectionX,
+    float lookDirectionY,
+    float attackRadius,
+    float targetX,
+    float targetY,
+    ref FastCollider targetCollider)
+    {
+        if (attackRadius <= 0f)
+            return false;
+
+        // No se puede definir un semicírculo sin dirección.
+        float lookLengthSq = (lookDirectionX * lookDirectionX) +
+                             (lookDirectionY * lookDirectionY);
+
+        if (lookLengthSq <= 0f)
+            return false;
+
+        // Centro real del collider objetivo, considerando su Offset.
+        float targetCenterX = targetX + targetCollider.Offset.X;
+        float targetCenterY = targetY + targetCollider.Offset.Y;
+
+        // 1. ¿El collider objetivo toca el círculo de alcance?
+        bool isInsideAttackRadius = targetCollider.Shape switch
+        {
+            ShapeType.Circle => CircleToCircle(
+                attackerX, attackerY, attackRadius,
+                targetCenterX, targetCenterY, targetCollider.Width),
+
+            ShapeType.Rect => CircleToRect(
+                attackerX, attackerY, attackRadius,
+                targetCenterX, targetCenterY,
+                targetCollider.Width, targetCollider.Height),
+
+            ShapeType.Slope => CircleToSlope(
+                attackerX, attackerY, attackRadius,
+                targetCenterX, targetCenterY,
+                targetCollider.Width, targetCollider.Height,
+                targetCollider.Slope),
+
+            _ => false
+        };
+
+        if (!isInsideAttackRadius)
+            return false;
+
+        // 2. ¿Al menos una parte del collider está delante del atacante?
+        float toTargetX = targetCenterX - attackerX;
+        float toTargetY = targetCenterY - attackerY;
+
+        float dot = (toTargetX * lookDirectionX) +
+                    (toTargetY * lookDirectionY);
+
+        // Margen del collider hacia la dirección de ataque.
+        // Así no se descarta un enemigo cuyo centro esté detrás,
+        // pero cuyo collider sí entra en el semicírculo.
+        float frontMargin = targetCollider.Shape switch
+        {
+            ShapeType.Circle =>
+                targetCollider.Width * MathF.Sqrt(lookLengthSq),
+
+            ShapeType.Rect or ShapeType.Slope =>
+                (targetCollider.Width * 0.5f * MathF.Abs(lookDirectionX)) +
+                (targetCollider.Height * 0.5f * MathF.Abs(lookDirectionY)),
+
+            _ => 0f
+        };
+
+        return dot + frontMargin >= 0f;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool RectToSlope(float rx, float ry, float rw, float rh, float sx, float sy, float sw, float sh, SlopeType type)
     {
         // 1. AABB rápido: ¿Se tocan siquiera los cuadros?

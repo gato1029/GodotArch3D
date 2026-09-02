@@ -202,7 +202,7 @@ public class FlecsManager
         RegisterSystem<RenderTileSpriteTextureSystem> ();
         RegisterSystem<HumanCameraMoveSystem>();
         
-        //RegisterSystem<RvoDebugSystem>();
+        RegisterSystem<RvoDebugSystem>();
 
         //post
 

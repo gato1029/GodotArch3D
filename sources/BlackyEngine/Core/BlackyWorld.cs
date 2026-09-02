@@ -152,8 +152,8 @@ public sealed class BlackyWorld : IDisposable
     private void DebugBoot()
     {
         var e = Characters.Create(1787768744605000, new Vector2(0, 0));
-
-        //var ee = Characters.Create(2, new Vector2(5, 0));
+        //
+        var ee = Characters.Create(1788369074799000, new Vector2(5, 0));
         //ee.Set(new MoveTargetComponent(new Vector2(20, 0)));
     }
 }

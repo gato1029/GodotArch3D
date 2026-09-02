@@ -114,7 +114,8 @@ public record struct WeaponComponent
 public record struct MeleeAttackComponent
 (
     int Damage,
-    float Range,           // Rango de ataque melee (ej. 1.5m)
+    float RangeAttack,           // Rango de ataque melee (ej. 1.5m)
+    Vector2 OffSetRange,   // Offset del rango de ataque (ej. 0.5m hacia adelante)
     float Cooldown,        // Tiempo entre ataques
     float Timer           // Temporizador interno
 );
