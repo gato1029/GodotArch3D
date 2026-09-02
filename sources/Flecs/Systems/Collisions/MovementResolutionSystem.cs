@@ -58,6 +58,10 @@ public class MovementResolutionSystem : FlecsSystemBase
             ref var move = ref moveArray[i];
             ref var cha = ref chaArray[i];
 
+            if (cha.characterStateType != CharacterStateType.MOVING) //solo mover si el estado es MOVING
+            {
+                continue;
+            }
             // 🎨 movimiento suave
             pos.position += vel.desiredVel * dt;
             pos.height = 4;

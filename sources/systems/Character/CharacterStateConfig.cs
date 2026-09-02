@@ -58,7 +58,7 @@ public static class CharacterStateConfig
             {
                 return character.characterStateType switch
                 {
-                    CharacterStateType.ATTACK => CharacterStateType.ATTACK,
+                    CharacterStateType.ATTACK => CharacterStateType.EXECUTE_ATTACK,
                     CharacterStateType.EXECUTE_ATTACK => CharacterStateType.ATTACK,
                     CharacterStateType.TAKE_HIT => CharacterStateType.IDLE,
                     CharacterStateType.DIE => CharacterStateType.DIE, // se queda en DIE, se destruye luego
@@ -70,7 +70,7 @@ public static class CharacterStateConfig
                     { CharacterStateType.IDLE,  AnimationType.PARADO  },
                     { CharacterStateType.MOVING, AnimationType.CAMINANDO },
                     { CharacterStateType.ATTACK, AnimationType.ATACANDO_CUERPO },
-                    { CharacterStateType.EXECUTE_ATTACK, AnimationType.ATACANDO_CUERPO }, // opcional: animación especial // revisar luego para quitarlo
+                    { CharacterStateType.EXECUTE_ATTACK, AnimationType.NINGUNA }, // opcional: animación especial // revisar luego para quitarlo
                     { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
                     { CharacterStateType.DIE, AnimationType.MUERTO },
                 }

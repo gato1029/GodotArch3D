@@ -36,18 +36,36 @@ internal class StateCharacterSystem : FlecsSystemBase
             ref var ani = ref aniArray[i];
 
             CharacterStateRules rules = CharacterStateConfig.GetRules(cha.characterBehaviorType);
+
         
             if (rules.StateToAnimation.TryGetValue(cha.characterStateType, out AnimationType newAnim))
             {
-            
-                if (newAnim != ani.stateAnimation)
+                if (newAnim == AnimationType.NINGUNA)
                 {
-                    ani.lastStateAnimation = ani.stateAnimation;
-                    ani.stateAnimation = newAnim;
+                    ani.stateAnimation = ani.lastStateAnimation;
+                    ani.lastStateAnimation = AnimationType.NINGUNA;
                     ani.currentFrameIndex = 0;       // reset animación
                     ani.TimeSinceLastFrame = 0f;     // reset timer
                     ani.animationComplete = false;   // empezar de nuevo
+                    var newState = rules.OnAnimationComplete?.Invoke(cha, ani);
+                    if (newState.HasValue && newState.Value != cha.characterStateType)
+                    {
+                        cha.characterStateType = newState.Value;
+                    }
                 }
+                else
+                {
+                    if (newAnim != ani.stateAnimation)
+                    {
+                        GD.Print($"[StateCharacterSystem] Entity {e.Id} - State: {cha.characterStateType} -> Animation: {newAnim}");
+                        ani.lastStateAnimation = ani.stateAnimation;
+                        ani.stateAnimation = newAnim;
+                        ani.currentFrameIndex = 0;       // reset animación
+                        ani.TimeSinceLastFrame = 0f;     // reset timer
+                        ani.animationComplete = false;   // empezar de nuevo
+                    }
+                }
+                
             }
             // transicion
             if (ani.animationComplete)
@@ -56,8 +74,9 @@ internal class StateCharacterSystem : FlecsSystemBase
                 if (newState.HasValue && newState.Value != cha.characterStateType)
                 {
                     cha.characterStateType = newState.Value;
-
                 }
+           
+
             }
 
            

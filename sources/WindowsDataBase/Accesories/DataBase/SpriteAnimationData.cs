@@ -45,6 +45,9 @@ public class SpriteAnimationData {
 
     [BsonIgnore]
     public Dictionary<string, GeometricShape2D> collisionBodyDictionary { get; set; } = new Dictionary<string, GeometricShape2D>(); // esto es para darle un tag a la animacion
+
+    [BsonIgnore]
+    public Dictionary<CollisionUseType, GeometricShape2D> collisionDictionary { get; set; } = new Dictionary<CollisionUseType, GeometricShape2D>();  // esto ya esta normalizado
     public SpriteAnimationData()
     {
 
@@ -91,6 +94,7 @@ public class SpriteAnimationData {
                 {
                     collisionBodyDictionary.Add(item.name, item);
                 }
+                collisionDictionary.Add(item.collisionUseType, item);
             }
         }
         

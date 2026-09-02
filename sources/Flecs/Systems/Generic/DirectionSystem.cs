@@ -37,10 +37,12 @@ public class DirectionSystem : FlecsSystemBase
             ref var dir = ref dirArray[i];
             ref var cha = ref chaArray[i];
             ref var steer = ref steerArray[i];
-
             // Dentro del loop de DirectionSystem
             ref var steering = ref steerArray[i];
-
+            if (cha.characterStateType != CharacterStateType.MOVING)
+            {
+                continue;
+            }
             // PRIORIDAD: 
             // 1. ¿A dónde quiero ir? (DesiredDir)
             // 2. Si no hay deseo, ¿A dónde miraba antes? (dir.value)
