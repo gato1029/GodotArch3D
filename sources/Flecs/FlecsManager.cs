@@ -174,8 +174,8 @@ public class FlecsManager
         //RegisterSystem<AttackHitSystem>();
         //RegisterSystem<ProjectileMoveSystem>(); 
 
-        //RegisterSystem<ApplyDamageSystem>(); // aplica el daño a las unidades/buildings single thread
-        //RegisterSystem<UnitDamageApplySystem>(); // aplica efectos de daño a las unidades
+        RegisterSystem<ApplyDamageSystem>(); // aplica el daño a las unidades/buildings single thread
+        RegisterSystem<UnitDamageApplySystem>(); // aplica efectos de daño a las unidades
         //RegisterSystem<BuildDamageApplySystem>(); // aplica efectos de daño a los edificios
 
 

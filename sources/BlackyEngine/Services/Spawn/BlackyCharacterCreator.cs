@@ -438,7 +438,7 @@ public class BlackyCharacterCreator
         
         entity.Add<UseBoidTag>();
 
-        entity.Set(new HealthComponent(10000));
+        entity.Set(new HealthComponent(100));
 
 
         float rvoRadius = MeshCreator.PixelsToUnits(12);

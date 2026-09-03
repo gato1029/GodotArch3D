@@ -11,6 +11,10 @@ namespace GodotEcsArch.sources.managers.Collision;
 internal class CollisionShapeDraw:SingletonBase<CollisionShapeDraw> 
 {
     private readonly int LayerRender = 30;
+    public void FreeDraw(int id)
+    {
+        WireShape.Instance.FreeShape(id);
+    }
     public int DrawCircleShape(float radius, Vector2 position, Godot.Color color)
     {
         return WireShape.Instance.DrawCircle(radius, position, LayerRender, color, 32, WireShape.TypeDraw.NORMAL);     

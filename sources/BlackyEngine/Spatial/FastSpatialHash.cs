@@ -160,7 +160,16 @@ public class FastSpatialHash
     }
 
     // --- MÉTODOS DE UNREGISTER (LIMPIEZA) ---
+    public void UnregisterDirect(int sid)
+    {
+        if (!_spatialIDToNodeIndex.TryGetValue(sid, out int nodeIdx))
+            return;
 
+        int cell = _nodeCellIndexes[nodeIdx];
+
+        RemoveFromCell(cell, sid);
+        _spatialIDToNodeIndex.Remove(sid);
+    }
     public void UnregisterDirect(int sid, int tx, int ty)
     {
         int cell = GetHashDirect(tx, ty, TotalCells);
