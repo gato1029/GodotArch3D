@@ -39,6 +39,10 @@ project/assembly_name="GodotEcsArch"
 
 enabled=PackedStringArray("res://addons/UIGenCS/plugin.cfg", "res://addons/animated_box_container_cs/plugin.cfg", "res://addons/animated_panel_container_cs/plugin.cfg", "res://addons/debug_drawing/plugin.cfg", "res://addons/debug_menu/plugin.cfg", "res://addons/dockable_container/plugin.cfg", "res://addons/godot_visualstudio_debugger/plugin.cfg", "res://addons/grid_display/plugin.cfg", "res://addons/simpletexturebutton/plugin.cfg", "res://addons/spanning_table/plugin.cfg", "res://addons/tnowe_extra_controls/plugin.cfg")
 
+[global_group]
+
+BloqueaMundo=""
+
 [input]
 
 move_up={

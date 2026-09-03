@@ -116,20 +116,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
             character.characterStateType = CharacterStateType.ATTACK;
             return true;
         }
-        
-        // --- Durante el ataque ---
-        if (input.isAttack)
-        {
-            //// Si la animación de ataque termina, volvemos al idle
-            //if (animation.animationComplete)
-            //{
-            //    input.isAttack = false;
-            //    character.characterStateType = CharacterStateType.IDLE;
-            ////    animationWeapon.visible = false;
-           
-            //    //ExecuteAttack(entity, position, attack, weapon, teamComponent, direction, colliderComponent);
-            //}
-        }
+      
         return false;
     }
 

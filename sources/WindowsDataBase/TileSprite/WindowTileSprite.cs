@@ -687,8 +687,9 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
                 case Circle:
                     ControlSpriteEdit.DrawCircle(position, (float)itemData.widthPixel);
                     break;
-                case Polygon:
-                    ControlSpriteEdit.EnablePaintDrawPolygon();
+                case Slope:
+                    var slopeData = (Slope)itemData;
+                    ControlSpriteEdit.DrawSlope(position, new Vector2((float)itemData.widthPixel, (float)itemData.heightPixel), slopeData.slopeType);
                     break;
                 default:
                     break;

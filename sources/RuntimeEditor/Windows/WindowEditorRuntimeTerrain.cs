@@ -412,7 +412,7 @@ public partial class WindowEditorRuntimeTerrain : Window
 
         return false;
     }
-
+   
     private bool IsMouseOverUI()
     {
         var hoveredLocal = GetViewport().GuiGetHoveredControl();
@@ -423,15 +423,22 @@ public partial class WindowEditorRuntimeTerrain : Window
         var parentViewport = GetParent()?.GetViewport();
         if (parentViewport != null)
         {
-            var hoveredParent = parentViewport.GuiGetHoveredControl();
-            if (hoveredParent != null)
-                return true;
+            //var hoveredParent = parentViewport.GuiGetHoveredControl();
+            Control hovered = parentViewport.GuiGetHoveredControl();
+
+            while (hovered != null)
+            {
+                if (hovered.IsInGroup("BloqueaMundo"))
+                    return true;
+
+                hovered = hovered.GetParent() as Control;
+            }
         }
 
         return false;
     }
 
-    
+
     private void ApplyErase()
     {
         int altura = (int)SpinBoxAltura.Value;

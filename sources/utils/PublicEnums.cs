@@ -83,6 +83,7 @@ public enum ColliderType
     RECTANGLE,
     CIRCLE,
     POLYGON,
+    SLOPE,
 }
 
 public enum AccesoryBodyPartType

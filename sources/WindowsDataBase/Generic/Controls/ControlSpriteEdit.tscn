@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://sv8lb7mas3mp"]
+[gd_scene format=3 uid="uid://sv8lb7mas3mp"]
 
 [ext_resource type="Script" uid="uid://gfd3b4q0oawa" path="res://sources/KuroTiles/TilesSubViewport.cs" id="1_ewqsh"]
 [ext_resource type="Script" uid="uid://balh3aasff1dp" path="res://sources/WindowsDataBase/Generic/Controls/ControlSpriteEdit.cs" id="1_idlvs"]
@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://x40mwcijbixr" path="res://sources/WindowsDataBase/Generic/Controls/ShapesForm.cs" id="6_0fhse"]
 [ext_resource type="Script" uid="uid://c6mr578pqdbji" path="res://sources/WindowsDataBase/Generic/Controls/TileOcupancy.cs" id="6_7gh1m"]
 
-[node name="ControlSpriteEdit" type="MarginContainer"]
+[node name="ControlSpriteEdit" type="MarginContainer" unique_id=220671044]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -20,30 +20,30 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 script = ExtResource("1_idlvs")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=58645854]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=398719400]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=485151437]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer" unique_id=1161157857]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=1691689929]
 layout_mode = 2
 text = "Tamaño Tile:"
 
-[node name="SpinBoxX" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="SpinBoxX" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=236244335]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 min_value = 1.0
@@ -51,7 +51,7 @@ max_value = 512.0
 value = 64.0
 prefix = "Pix X:"
 
-[node name="SpinBoxY" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="SpinBoxY" type="SpinBox" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=1960014299]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 min_value = 1.0
@@ -59,17 +59,17 @@ max_value = 512.0
 value = 64.0
 prefix = "Pix Y:"
 
-[node name="CheckButtonModeGrid" type="CheckButton" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="CheckButtonModeGrid" type="CheckButton" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=2057311317]
 layout_mode = 2
 text = "Grid Lineas"
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer" unique_id=684234536]
 layout_mode = 2
 size_flags_vertical = 3
 stretch = true
 mouse_target = true
 
-[node name="SubViewport" type="SubViewport" parent="VBoxContainer/SubViewportContainer" node_paths=PackedStringArray("tilesCamera2d")]
+[node name="SubViewport" type="SubViewport" parent="VBoxContainer/SubViewportContainer" unique_id=495266497 node_paths=PackedStringArray("tilesCamera2d")]
 transparent_bg = true
 handle_input_locally = false
 size = Vector2i(1260, 825)
@@ -77,15 +77,15 @@ size_2d_override_stretch = true
 render_target_update_mode = 4
 script = ExtResource("1_ewqsh")
 minZoom = Vector2(0.4, 0.4)
-maxZoom = Vector2(2.5, 2.5)
+maxZoom = Vector2(8, 8)
 tilesCamera2d = NodePath("Camera2D")
 edgeScrollSpeed = 400.0
 
-[node name="Camera2D" type="Camera2D" parent="VBoxContainer/SubViewportContainer/SubViewport"]
+[node name="Camera2D" type="Camera2D" parent="VBoxContainer/SubViewportContainer/SubViewport" unique_id=699007141]
 position = Vector2(400, 400)
 zoom = Vector2(0.9, 0.9)
 
-[node name="Panel" type="Panel" parent="VBoxContainer/SubViewportContainer/SubViewport"]
+[node name="Panel" type="Panel" parent="VBoxContainer/SubViewportContainer/SubViewport" unique_id=1156801647]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -96,7 +96,7 @@ grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 
-[node name="TextureImage" type="TextureRect" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel"]
+[node name="TextureImage" type="TextureRect" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1085664839]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -111,7 +111,7 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch_mode = 5
 
-[node name="center" type="TextureRect" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel"]
+[node name="center" type="TextureRect" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=314343565]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -127,20 +127,20 @@ grow_vertical = 2
 texture = ExtResource("2_ewqsh")
 stretch_mode = 5
 
-[node name="TileOcupancy" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" node_paths=PackedStringArray("checkEnable")]
+[node name="TileOcupancy" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1478519490 node_paths=PackedStringArray("checkEnable")]
 script = ExtResource("6_7gh1m")
 tileColor = Color(0.72156864, 0.1254902, 0.43529412, 0.3882353)
 outlineColor = Color(0.5882353, 0.35686275, 0.4745098, 1)
 checkEnable = NodePath("../../../../MarginContainer/HBoxContainer/CheckButtonModeGrid")
 
-[node name="GridGeneric" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" node_paths=PackedStringArray("spinBoxX", "spinBoxY", "subViewport")]
+[node name="GridGeneric" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1222916001 node_paths=PackedStringArray("spinBoxX", "spinBoxY", "subViewport")]
 script = ExtResource("3_ewqsh")
 cellSize = Vector2i(32, 32)
 spinBoxX = NodePath("../../../../MarginContainer/HBoxContainer/SpinBoxX")
 spinBoxY = NodePath("../../../../MarginContainer/HBoxContainer/SpinBoxY")
 subViewport = NodePath("../..")
 
-[node name="ShapesForm" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" node_paths=PackedStringArray("checkEnableTileOcupancy")]
+[node name="ShapesForm" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=548601947 node_paths=PackedStringArray("checkEnableTileOcupancy")]
 script = ExtResource("6_0fhse")
 shapeColor = Color(0.35686275, 0.54901963, 0.827451, 0.61960787)
 checkEnableTileOcupancy = NodePath("../../../../MarginContainer/HBoxContainer/CheckButtonModeGrid")

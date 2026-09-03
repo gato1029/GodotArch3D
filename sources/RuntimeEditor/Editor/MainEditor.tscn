@@ -82,7 +82,7 @@ theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 20
 
-[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer2" unique_id=309976312]
+[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer2" unique_id=309976312 groups=["BloqueaMundo"]]
 layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer" unique_id=2069281643]
@@ -103,6 +103,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 tooltip_text = "Nuevo Mapa"
+focus_mode = 1
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("4_x58t3")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
@@ -111,6 +112,7 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 tooltip_text = "Guardar Mapa"
+focus_mode = 1
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("4_ktcb6")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
@@ -119,6 +121,7 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 tooltip_text = "Guardar Como"
+focus_mode = 1
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("6_0x4a8")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
@@ -127,6 +130,7 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 tooltip_text = "Eliminar Mapa"
+focus_mode = 1
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("7_8qgvi")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
@@ -145,7 +149,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=2081333398]
+[node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=2081333398 groups=["BloqueaMundo"]]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -215,7 +219,7 @@ IconTexture = ExtResource("11_qdd1k")
 ButtonText = "Edificios"
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="EditorPanelPosiciones" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=1326400082]
+[node name="EditorPanelPosiciones" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=1326400082 groups=["BloqueaMundo"]]
 material = SubResource("ShaderMaterial_mkeog")
 custom_minimum_size = Vector2(350, 170)
 layout_mode = 2

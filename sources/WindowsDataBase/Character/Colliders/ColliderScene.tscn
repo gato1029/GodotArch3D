@@ -5,8 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="2_ib582"]
 [ext_resource type="Script" uid="uid://cfssnqjjiwmy1" path="res://sources/CustomWidgets/KuroTextureButton.cs" id="3_ib582"]
 [ext_resource type="Script" uid="uid://d4g3outtemvav" path="res://sources/CustomWidgets/KuroOptionButton.cs" id="5_obdxl"]
+[ext_resource type="Script" uid="uid://ce5005tpxrd60" path="res://addons/ComboBox/ComboBox.cs" id="6_xsx6m"]
 
-[node name="Panel" type="VBoxContainer" unique_id=1797296521 node_paths=PackedStringArray("buttonRemove", "buttonPreview", "spinBoxWidth", "spinBoxHeight", "spinBoxOffsetX", "spinBoxOffsetY", "optionButtonType", "spinBoxRotation", "hBoxContainerShapeNormal", "lineEditName", "comboBoxType")]
+[node name="Panel" type="VBoxContainer" unique_id=1797296521 node_paths=PackedStringArray("buttonRemove", "buttonPreview", "spinBoxWidth", "spinBoxHeight", "spinBoxOffsetX", "spinBoxOffsetY", "optionButtonType", "spinBoxRotation", "hBoxContainerShapeNormal", "lineEditName", "comboBoxType", "ComboBoxColliderTriangulos", "SpinBoxStep")]
 offset_right = 356.0
 offset_bottom = 93.0
 size_flags_horizontal = 2
@@ -23,6 +24,8 @@ spinBoxRotation = NodePath("HBoxContainer2/SpinBoxRotation")
 hBoxContainerShapeNormal = NodePath("HBoxContainer3")
 lineEditName = NodePath("HBoxContainer4/LineEditName")
 comboBoxType = NodePath("HBoxContainer4/KuroOptionButton")
+ComboBoxColliderTriangulos = NodePath("HBoxContainer4/ComboBoxColliderTriangulos")
+SpinBoxStep = NodePath("HBoxContainer/SpinBox")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1814244839]
 layout_mode = 2
@@ -39,7 +42,7 @@ popup/item_0/text = "Rectangle"
 popup/item_0/id = 0
 popup/item_1/text = "Circle"
 popup/item_1/id = 1
-popup/item_2/text = "Poligono"
+popup/item_2/text = "Pendiente"
 popup/item_2/id = 2
 
 [node name="Button" type="Button" parent="HBoxContainer" unique_id=37476459]
@@ -69,6 +72,14 @@ texture_normal = ExtResource("2_ib582")
 script = ExtResource("3_ib582")
 metadata/_custom_type_script = "uid://cfssnqjjiwmy1"
 
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer" unique_id=7263153]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.1
+step = 0.1
+value = 16.0
+prefix = "Paso:"
+
 [node name="HBoxContainer4" type="HBoxContainer" parent="." unique_id=1742037802]
 layout_mode = 2
 
@@ -86,6 +97,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("5_obdxl")
 metadata/_custom_type_script = "uid://d4g3outtemvav"
+
+[node name="ComboBoxColliderTriangulos" type="OptionButton" parent="HBoxContainer4" unique_id=1108277473]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("6_xsx6m")
+metadata/_custom_type_script = "uid://ce5005tpxrd60"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=320807625]
 visible = false

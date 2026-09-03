@@ -105,7 +105,7 @@ public partial class KuroButton : TextureButton
         MouseExited += OnMouseExited;
         ButtonDown += OnButtonDown;
         ButtonUp += OnButtonUp;
-
+        FocusMode = FocusModeEnum.Click;
         RefreshControl();
     }
     public void SetInternalData(Object data) => _internalData = data;
@@ -427,7 +427,7 @@ public partial class KuroButton : TextureButton
     }
 
     private void OnMouseEntered() { if (_animatedScale) _targetScale = new Vector2(_hoverScale, _hoverScale); }
-    private void OnMouseExited() { if (_animatedScale) _targetScale = Vector2.One; }
+    private void OnMouseExited() { if (_animatedScale) _targetScale = Vector2.One; GetViewport().GuiReleaseFocus(); }
     private void OnButtonDown() { if (_animatedScale) _targetScale = new Vector2(_pressScale, _pressScale); }
     private void OnButtonUp() { if (_animatedScale) _targetScale = new Vector2(_hoverScale, _hoverScale); }
 }

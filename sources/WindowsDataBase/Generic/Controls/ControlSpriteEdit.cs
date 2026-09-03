@@ -1,8 +1,10 @@
 using Godot;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 public partial class ControlSpriteEdit : MarginContainer
 {
@@ -195,8 +197,14 @@ public partial class ControlSpriteEdit : MarginContainer
 		ShapesForm.positionShape = center;
 		ShapesForm.radiusShape = radius;
     }
-
-	public void DrawSquare(Vector2 center, Vector2 size)
+    internal void DrawSlope(Vector2 center, Vector2 size, SlopeType slopeType)
+    {
+        ShapesForm.shapeType = ShapesForm.ShapeType.Pendiente;
+        ShapesForm.slopeType = slopeType;
+        ShapesForm.positionShape = center;
+        ShapesForm.sizeShape = size;
+    }
+    public void DrawSquare(Vector2 center, Vector2 size)
 	{
 		ShapesForm.shapeType = ShapesForm.ShapeType.Cuadrado;
 		ShapesForm.positionShape = center;

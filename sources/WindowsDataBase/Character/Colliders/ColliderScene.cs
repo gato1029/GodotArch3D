@@ -3,6 +3,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
+using GodotFlecs.sources.Flecs.Components;
 using System;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -21,6 +22,8 @@ public partial class ColliderScene : VBoxContainer
     [Export] HBoxContainer hBoxContainerShapeNormal;
     [Export] LineEdit lineEditName;
     [Export] KuroOptionButton comboBoxType;
+    [Export] ComboBox ComboBoxColliderTriangulos;
+    [Export] SpinBox SpinBoxStep;
     public GeometricShape2D data { get; set; }
 
     ColliderType type = ColliderType.RECTANGLE;
@@ -62,10 +65,15 @@ public partial class ColliderScene : VBoxContainer
                 hBoxContainerShapeNormal.Visible = true;
                 break;
 
-            case Polygon polygon1:
-                type = ColliderType.POLYGON;
+            case Slope slope1:
+                type = ColliderType.SLOPE;
                 optionButtonType.Select(2);
-                hBoxContainerShapeNormal.Visible = false;
+                spinBoxHeight.Visible = true;
+                spinBoxHeight.Value = data.heightPixel;
+                spinBoxWidth.Value = data.widthPixel;
+                spinBoxOffsetX.Value = data.originPixelX;
+                spinBoxOffsetY.Value = data.originPixelY;
+                hBoxContainerShapeNormal.Visible = true;
                 break;
             default:
                 break;
@@ -94,16 +102,33 @@ public partial class ColliderScene : VBoxContainer
         spinBoxOffsetY.ValueChanged += SpinBox_ValueChanged;
         spinBoxRotation.ValueChanged += SpinBoxRotation_ValueChanged;
         lineEditName.TextChanged += LineEditName_TextChanged;
-
+        SpinBoxStep.ValueChanged += SpinBoxStep_ValueChanged;
         comboBoxType.OnDataSelected += ComboBoxType_OnDataSelected;
         foreach (var item in Enum.GetValues<CollisionUseType>())
         {
             comboBoxType.AddItemWithData(item.ToString(), item);            
         }
 
-
+        ComboBoxColliderTriangulos.Clear();
+        foreach (SlopeType item in Enum.GetValues(typeof(SlopeType)))
+        {
+            ComboBoxColliderTriangulos.AddItem(item.ToString());
+        }
+        ComboBoxColliderTriangulos.ItemSelected += ComboBoxColliderTriangulos_ItemSelected;
         flag = true;
         createCollider();
+    }
+    private void SpinBoxStep_ValueChanged(double value)
+    {
+        spinBoxWidth.Step = value;
+        spinBoxHeight.Step = value;
+        spinBoxOffsetX.Step = value;
+        spinBoxOffsetY.Step = value;
+    }
+    private void ComboBoxColliderTriangulos_ItemSelected(long index)
+    {
+        createCollider();
+        OnNotifyPreview?.Invoke(data, this);
     }
 
     private void ComboBoxType_OnDataSelected(object obj)
@@ -131,16 +156,19 @@ public partial class ColliderScene : VBoxContainer
                 type = ColliderType.RECTANGLE; 
                 spinBoxHeight.Visible = true;
                 hBoxContainerShapeNormal.Visible = true;
+                ComboBoxColliderTriangulos.Visible = false;
                 break;
             case 1:
                 type = ColliderType.CIRCLE; 
                 spinBoxHeight.Visible = false;
                 hBoxContainerShapeNormal.Visible = true;
+                ComboBoxColliderTriangulos.Visible = false;
                 break;
             case 2:
-                type = ColliderType.POLYGON;
-                hBoxContainerShapeNormal.Visible = false;
-
+                type = ColliderType.SLOPE;
+                spinBoxHeight.Visible = true;
+                hBoxContainerShapeNormal.Visible = true;
+                ComboBoxColliderTriangulos.Visible = true;
 
                 break;
             default:
@@ -164,18 +192,18 @@ public partial class ColliderScene : VBoxContainer
             {
                 case ColliderType.RECTANGLE:
                     data = new Rectangle((float)spinBoxWidth.Value, (float)spinBoxHeight.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
-                    data.scale = 1;
-                    data.name = lineEditName.Text;
+                    data.scale = 1;                   
+                    data.collisionUseType = (CollisionUseType)comboBoxType.GetSelectedData();
                     break;
                 case ColliderType.CIRCLE:
                     data = new Circle((float)spinBoxWidth.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
                     data.scale = 1;
-                    data.name = lineEditName.Text;
+                    data.collisionUseType = (CollisionUseType)comboBoxType.GetSelectedData();
                     break;
-                case ColliderType.POLYGON:
-                    data = new Polygon();
+                case ColliderType.SLOPE:
+                    data = new Slope((SlopeType)ComboBoxColliderTriangulos.GetSelectedId(), (float)spinBoxWidth.Value, (float)spinBoxHeight.Value, (float)spinBoxOffsetX.Value, (float)spinBoxOffsetY.Value);
                     data.scale = 1;
-                    data.name = lineEditName.Text;
+                    data.collisionUseType = (CollisionUseType)comboBoxType.GetSelectedData();
                     break;
                 default:
                     break;

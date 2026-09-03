@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.managers.Collision;
+using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +56,8 @@ public partial class ShapesForm : Node2D
         Ninguno,
         Circulo,
         Cuadrado,
-        Poligono
+        Poligono,
+        Pendiente
     }
     public ShapeType shapeType
     {
@@ -69,6 +71,8 @@ public partial class ShapesForm : Node2D
         }
     }
     private ShapeType _shapeType;
+    internal GodotFlecs.sources.Flecs.Components.SlopeType slopeType;
+
     public override void _Ready()
 	{
         
@@ -176,36 +180,7 @@ public partial class ShapesForm : Node2D
         }
     }
 
-    //private void HandleCircleInput(InputEvent @event)
-    //{
-    //    Vector2 mouse = GetViewport().GetMousePosition();
-    //    Vector2 localPos = GetGlobalTransformWithCanvas().AffineInverse() * mouse;
-
-    //    float distanceToCenter = localPos.DistanceTo(positionShape);
-
-    //    if (@event is InputEventMouseButton mb)
-    //    {
-    //        if (mb.ButtonIndex == MouseButton.Left)
-    //        {
-    //            if (mb.Pressed && distanceToCenter <= radiusShape)
-    //            {
-    //                draggingCircle = true;
-    //                circleDragOffset = positionShape - localPos;
-    //            }
-    //            else if (!mb.Pressed)
-    //            {
-    //                draggingCircle = false;
-    //            }
-    //        }
-    //    }
-
-    //    if (@event is InputEventMouseMotion && draggingCircle)
-    //    {
-    //        positionShape = localPos + circleDragOffset;
-    //        QueueRedraw();
-    //        OnNotifyPositionShape?.Invoke(positionShape, sizeShape);
-    //    }
-    //}
+  
     private void HandleSquareInput(InputEvent @event)
     {
         Vector2 mouse = GetViewport().GetMousePosition();
@@ -395,12 +370,69 @@ public partial class ShapesForm : Node2D
             case ShapeType.Poligono:
                 DrawPolygonShape();
                 break;
+            case ShapeType.Pendiente:
+                DrawSlope(positionShape, sizeShape, slopeType);
+                break;
 
             default:
                 break;
         }
      
     }
+
+    private void DrawSlope(Vector2 positionShape, Vector2 sizeShape, GodotFlecs.sources.Flecs.Components.SlopeType slopeType)
+    {
+        Vector2 half = sizeShape / 2f;
+
+        Vector2 topLeft = positionShape + new Vector2(-half.X, -half.Y);
+        Vector2 topRight = positionShape + new Vector2(half.X, -half.Y);
+        Vector2 bottomLeft = positionShape + new Vector2(-half.X, half.Y);
+        Vector2 bottomRight = positionShape + new Vector2(half.X, half.Y);
+
+        //Vector2[] points = slopeType switch
+        //{
+        //    // ty >= 1 - tx
+        //    GodotFlecs.sources.Flecs.Components.SlopeType.BottomLeft =>
+        //        new[] { bottomLeft, bottomRight, topRight },
+
+        //    // ty <= 1 - tx
+        //    GodotFlecs.sources.Flecs.Components.SlopeType.TopRight =>
+        //        new[] { topLeft, topRight, bottomLeft },
+
+        //    // ty <= tx
+        //    GodotFlecs.sources.Flecs.Components.SlopeType.TopLeft =>
+        //        new[] { topLeft, topRight, bottomRight },
+
+        //    // ty >= tx
+        //    GodotFlecs.sources.Flecs.Components.SlopeType.BottomRight =>
+        //        new[] { topLeft, bottomLeft, bottomRight },
+
+        //    _ => Array.Empty<Vector2>()
+        //};
+        Vector2[] points = slopeType switch
+        {
+            SlopeType.BottomLeft => new[] { topLeft, bottomLeft, bottomRight },
+            SlopeType.BottomRight => new[] { bottomLeft, bottomRight, topRight },
+            SlopeType.TopLeft => new[] { topLeft, topRight, bottomLeft },
+            SlopeType.TopRight => new[] { topLeft, topRight, bottomRight },
+            _ => Array.Empty<Vector2>()
+        };
+        if (points.Length != 3)
+            return;
+
+        
+        var colors = new Color[3];
+        colors[0] = shapeColor;
+        colors[1] = shapeColor;
+        colors[2] = shapeColor;
+
+        DrawPolygon(points, colors);
+
+        DrawLine(points[0], points[1], Colors.Yellow, 2f);
+        DrawLine(points[1], points[2], Colors.Yellow, 2f);
+        DrawLine(points[2], points[0], Colors.Yellow, 2f);
+    }
+
     private void DrawSquare()
     {
         // Dibujar rectángulo
