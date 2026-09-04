@@ -59,7 +59,7 @@ namespace GodotEcsArch.sources.utils
             Vector2 positionCenter = positionNormalize + new Vector2(x, y);
             return positionCenter;
         }
-        public static Vector2I WorldToTile(Vector2 worldPosition)
+        public static Vector2I WorldPositionToTile(Vector2 worldPosition)
         {
             float tileSizeUnits = MeshCreator.PixelsToUnits(16); // 16 px → units
 
@@ -68,7 +68,7 @@ namespace GodotEcsArch.sources.utils
 
             return new Vector2I(tileX, tileY);
         }
-        public static Vector2I WorldToTile(float x, float y)
+        public static Vector2I WorldPositionToTile(float x, float y)
         {
             float tileSizeUnits = MeshCreator.PixelsToUnits(16); // 16 px → units
 

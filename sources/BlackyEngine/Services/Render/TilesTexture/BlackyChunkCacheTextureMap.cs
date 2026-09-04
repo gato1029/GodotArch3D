@@ -3,6 +3,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Data;
+using GodotEcsArch.sources.BlackyEngine.Services.Paint;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
 using GodotEcsArch.sources.BlackyTiles;
@@ -70,6 +71,7 @@ public class BlackyChunkCacheTextureMap
     private readonly ConcurrentDictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly BlackyWorldRegions _regions;
     private readonly ChunkManagerBase chunkManager;
+    private readonly BlackyHeightSystem _heightMapWorld;
     public int ChunkSize { get; }
     public int HeightCount { get; }
     public int MaxLayers { get; }
@@ -87,12 +89,13 @@ public class BlackyChunkCacheTextureMap
     
     public object SyncRoot { get; } = new();
 
-    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager)
+    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager, Paint.BlackyHeightSystem heightMapWorld)
     {
         ChunkSize = chunkSize;
         HeightCount = heightCount;
         MaxLayers = maxLayers;
         _regions = regions;
+        _heightMapWorld = heightMapWorld;
         this.chunkManager = chunkManager;
         chunkManager.OnChunkDataUnload += ChunkManager_OnChunkDataUnload;
     }
@@ -194,7 +197,8 @@ public class BlackyChunkCacheTextureMap
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
-
+        RemoverCollider(worldX, worldY);
+        _heightMapWorld.SetTopHeight(worldX, worldY, height-1);
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);        
         tileLayer.ClearTile(localX, localY);     
@@ -294,7 +298,11 @@ public class BlackyChunkCacheTextureMap
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
         
-        int tileId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);         
+        int tileId = AtlasModsManager.GetSpriteUniqueId(idTileSprite,out TileSpriteData tileSpriteData);
+        AsignarCollider(worldX, worldY, idTileSprite, tileSpriteData);
+        
+        _heightMapWorld.SetTopHeight(worldX, worldY, height);
+
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
         tileLayer.SetTile(localX, localY, tileId);
@@ -818,18 +826,31 @@ public class BlackyChunkCacheTextureMap
         }
         if (mask==0)
         {
-            return; // no hacer nada
+            RemoverCollider(vx,vy);
+            _heightMapWorld.SetTopHeight(vx, vy, height-1);
+            return; // no hacer nada            
         }
         tileLayer.SetDualMask(lx, ly, mask);
         
         var slot = template.GetSlot(mask);
         var item = slot.GetGeneric().Parts[0];
-        int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData);
+        int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData,out TileSpriteData tileSpriteData);
+        AsignarCollider(vx,vy,tileId,tileSpriteData);
+        _heightMapWorld.SetTopHeight(vx, vy, height);
 
         tileLayer.SetTile(lx, ly, tileId);
         tileLayer.SetRender(lx, ly, true);
     }
- 
+
+    private void RemoverCollider(int vx, int vy)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void AsignarCollider(int Mundo_x, int Mundo_y, long idTileSpriteData, TileSpriteData tileSpriteData)
+    {
+        
+    }
 
     public void SetTileDual(
     int worldX,
@@ -932,14 +953,7 @@ public class BlackyChunkCacheTextureMap
             else
             {
                 SetTileDualInternalSprite(vx,vy - i,height,layer,item.IdTileSpriteData,isBorder);
-                //SetTileDualInternal(
-                //     vx,
-                //     vy - i,
-                //     height,
-                //     layer,
-                //     item.IdMod,
-                //     (ushort)item.TileIndex, true
-                // );
+               
             }
          
         }

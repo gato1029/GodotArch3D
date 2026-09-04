@@ -490,34 +490,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                 BlackyWorldContext.PintarAdornos.RemoveAdorno(currentMouseTile.X, currentMouseTile.Y, altura);
                 break;            
         }
-        //switch (modePaint)
-        //{
-        //    case ModePaint.NORMAL:
-        //        foreach (var offset in brush.Cells)
-        //        {
-        //            int x = currentMouseTile.X + offset.x;
-        //            int y = currentMouseTile.Y + offset.y;
-        //            BlackyWorldContext.PintarTerreno.RemoveTerrain(
-        //                    x,
-        //                    y,
-        //                    altura                            
-        //                );
-        //        }
-                 
-        //        break;
 
-        //    case ModePaint.AUTO_DUAL:
-
-        //        BlackyWorldContext.PintarTerreno.ApplyBrushRemoveDual(
-        //            currentMouseTile.X,
-        //            currentMouseTile.Y,
-        //            altura,
-        //            capa,
-        //            brush,
-        //            dualTileTemplate
-        //        );
-        //        break;
-        //}
     }
 
     private void ApplyPaint()

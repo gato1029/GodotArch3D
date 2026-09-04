@@ -34,13 +34,13 @@ public sealed class BlackyWorldServices
 
     public BlackyCharacterCreator Characters { get; }
 
-    public BlackyTerrainSystem TerrainPainter { get; }
+    public BlackyTerrainSystem TerrainPainter { get; } // ya no se usa , pero lo dejo por compatibilidad, ahora se usa TerrainPainter y ResourcePainter luego se eliminara
 
     public BlackyResourcesSourceSystem ResourcePainter { get; }
 
     public BlackyBuildingSystem BuildingPainter { get; }
 
-    public BlackyHeightSystem HeightTool { get; }
+    public BlackyHeightSystem HeightMapWorld { get; }
 
     // ============================
     // Cache para renderizado
@@ -72,8 +72,9 @@ public sealed class BlackyWorldServices
         // ============================
         // Render infra first
         // ============================
-       
-        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal);
+        HeightMapWorld = new BlackyHeightSystem();
+
+        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal, HeightMapWorld);
 
         TerrainDataLienzo = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
         RampasDataLienzo = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender,world.Streaming.chunkManagerLocal,world);
@@ -103,9 +104,7 @@ public sealed class BlackyWorldServices
 
         TerrainTextureRenderSystem = new BlackyTileTextureRenderSystem(TerrainTexturePainter, stream.chunkManagerLocal,sim.Flecs);
 
-        Characters = new BlackyCharacterCreator(
-            sim.Flecs,
-            state.DynamicHash);
+        Characters = new BlackyCharacterCreator(sim.Flecs,state.DynamicHash);
 
         TerrainPainter = new BlackyTerrainSystem(
             state.RenderData,
@@ -127,6 +126,6 @@ public sealed class BlackyWorldServices
             EntityRenderer,
             TerrainPainter);
 
-        HeightTool = new BlackyHeightSystem(TerrainPainter);
+        
     }
 }

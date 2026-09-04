@@ -57,7 +57,7 @@ public  class BlackyWorldGeneration
             services.TerrainPainter);
 
         ResourceGenerator = new BlackyResourcesGenerator(
-            services.HeightTool,
+            services.HeightMapWorld,
             TerrainGenerator,
             services.ResourcePainter,
             ResourcePostProcessor,

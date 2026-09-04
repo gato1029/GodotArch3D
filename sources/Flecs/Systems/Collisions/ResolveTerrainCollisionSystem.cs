@@ -54,16 +54,19 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
             float cy = pos.position.Y + col.Offset.Y;
 
          
-            var tilePositionMin = TilesHelper.WorldToTile(cx - col.Radius * 0.5f, cy - col.Radius * 0.5f);
-            var tilePositionMax = TilesHelper.WorldToTile(cx + col.Radius * 0.5f, cy + col.Radius * 0.5f);
+            var tilePositionMin = TilesHelper.WorldPositionToTile(cx - col.Radius * 0.5f, cy - col.Radius * 0.5f);
+            var tilePositionMax = TilesHelper.WorldPositionToTile(cx + col.Radius * 0.5f, cy + col.Radius * 0.5f);
 
             // 2️⃣ Bucle de Tiles
             for (int tx = tilePositionMin.X; tx <= tilePositionMax.X; tx++)
             {
                 for (int ty = tilePositionMin.Y; ty <= tilePositionMax.Y; ty++)
                 {
-                    var height = blackyWorld.Services.HeightTool.GetTopHeight(tx, ty);
+                    
+                    var height = blackyWorld.Services.HeightMapWorld.GetTopHeight(tx, ty);
                     var tile = blackyWorld.Services.TerrainPainter.GetTileTop(tx, ty, height);
+
+               //     var idTile = blackyWorld.Services.TerrainTexturePainter.GetTile(tx, ty, height,0);
 
                     if (tile.CollisionId == 0) continue;
 

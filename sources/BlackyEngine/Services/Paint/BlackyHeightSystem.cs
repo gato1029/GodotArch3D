@@ -10,15 +10,13 @@ namespace GodotEcsArch.sources.BlackyEngine.Services.Paint;
 
 public sealed class BlackyHeightSystem : IDisposable
 {
-    private readonly BlackyTerrainSystem terrainSystem;
+    
     private readonly Dictionary<Vector2I, BlackyHeightChunkData> chunks = new();
 
     private bool disposed;
 
-    public BlackyHeightSystem(BlackyTerrainSystem terrainSystem)
-    {
-        this.terrainSystem = terrainSystem ?? throw new ArgumentNullException(nameof(terrainSystem));
-        this.terrainSystem.OnTopHeightChanged += OnTerrainTopHeightChanged;
+    public BlackyHeightSystem()
+    {    
     }
 
     #region ===== PUBLIC API =====
@@ -69,42 +67,6 @@ public sealed class BlackyHeightSystem : IDisposable
     public void SetTopHeight(Vector2I worldPos, int height)
     {
         SetTopHeight(worldPos.X, worldPos.Y, height);
-    }
-
-    public void UpdateCell(int worldX, int worldY)
-    {
-        int topHeight = terrainSystem.GetTopHeight(worldX, worldY);
-        SetTopHeight(worldX, worldY, topHeight);
-    }
-
-    public void UpdateCell(Vector2I worldPos)
-    {
-        UpdateCell(worldPos.X, worldPos.Y);
-    }
-
-    public void RebuildChunk(Vector2I chunkCoord)
-    {
-        var chunkData = GetOrCreateChunkData(chunkCoord);
-
-        int baseWorldX = chunkCoord.X * ChunkHelper.ChunkSize;
-        int baseWorldY = chunkCoord.Y * ChunkHelper.ChunkSize;
-
-        for (int localX = 0; localX < ChunkHelper.ChunkSize; localX++)
-        {
-            for (int localY = 0; localY < ChunkHelper.ChunkSize; localY++)
-            {
-                int worldX = baseWorldX + localX;
-                int worldY = baseWorldY + localY;
-
-                int topHeight = terrainSystem.GetTopHeight(worldX, worldY);
-                chunkData.Set(localX, localY, (short)topHeight);
-            }
-        }
-    }
-
-    public void RebuildChunk(int chunkX, int chunkY)
-    {
-        RebuildChunk(new Vector2I(chunkX, chunkY));
     }
 
     public void RemoveChunk(Vector2I chunkCoord)
@@ -166,7 +128,6 @@ public sealed class BlackyHeightSystem : IDisposable
         if (disposed)
             return;
 
-        terrainSystem.OnTopHeightChanged -= OnTerrainTopHeightChanged;
         chunks.Clear();
         disposed = true;
         GC.SuppressFinalize(this);
