@@ -15,6 +15,11 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.State;
 
+public enum ModeGrid
+{
+    DUAL,
+    NORMAL
+}
 public sealed class BlackyWorldState : IDisposable
 {
     public FastSpatialHash DynamicHash { get; }
@@ -28,6 +33,8 @@ public sealed class BlackyWorldState : IDisposable
 
     public BlackyChunkOccupancyMap OccupancyMap { get; }
 
+    private int idGridDraw { get; set; }
+    private ModeGrid modeGrid { get; set; } = ModeGrid.NORMAL;
     private readonly BlackyWorld world;
     private readonly BlackyWorldConfig config;
 
@@ -47,8 +54,35 @@ public sealed class BlackyWorldState : IDisposable
 
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize);
 
-        WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),-50,Colors.DarkCyan);
+        idGridDraw= WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),-50,Colors.DarkCyan);
     }
+    public void SetModeGrid(ModeGrid modeGrid)
+    {
+        this.modeGrid = modeGrid;
+        switch (modeGrid)
+        {
+            case ModeGrid.DUAL:
+                idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X, config.MapSize.Y, 16, new Vector2(0.25f, 0.25f), -50, Colors.DarkCyan);
+                break;
+            case ModeGrid.NORMAL:
+                idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X, config.MapSize.Y, 16, new Vector2(0, 0), -50, Colors.DarkCyan);
+                break;
+            default:
+                break;
+        }
+    }
+    public void SetGridDrawVisible(bool visible)
+    {
+        if (visible)
+        {
+            SetModeGrid(modeGrid);
+        }
+        else
+        {
+            WireShape.Instance.FreeShape(idGridDraw);
+        }                
+    }
+
 
     public void Dispose()
     {

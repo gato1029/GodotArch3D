@@ -131,7 +131,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
                         ref var cell = ref ResolveOrCreateCell(x, y, h);
 
                         // Ahora sí, la modificación afectará a la data del chunk
-                        cell.isBorder = CalculateIsBorder(x, y, h);
+                        cell.isBorder = CalculateIsBorder(x, y, h);                        
                     }
                 }
             }

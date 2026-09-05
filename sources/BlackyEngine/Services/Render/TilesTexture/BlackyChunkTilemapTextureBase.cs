@@ -39,6 +39,8 @@ public abstract class BlackyChunkTilemapTextureBase : IBlackyChunkTilemapTexture
 
     public abstract void SetRender(int x, int y, bool value);
     public abstract bool IsRender(int x, int y);
+    public abstract void SetIdCollider(int x, int y, int value);   
+    public abstract int GetIdCollider(int x, int y);
 
 
     protected BlackyChunkTilemapTextureBase(int layerIndex, int size, int worldX, int worldY)
@@ -117,7 +119,7 @@ public abstract class BlackyChunkTilemapTextureBase : IBlackyChunkTilemapTexture
     // API
     // ===============================
 
-    public abstract void SetTile(int x, int y, int tileId, bool isDirty = true);
+    public abstract void SetTile(int x, int y, int tileId, int idCollider, bool isDirty = true);
     public abstract int GetTile(int x, int y);
     public abstract bool IsEmpty(int x, int y);
     public abstract void ClearTile(int x, int y);

@@ -25,13 +25,15 @@ internal class CollisionShapeDraw:SingletonBase<CollisionShapeDraw>
         {
             case Rectangle rectangle:
                 return WireShape.Instance.DrawSquare(rectangle.widthPixel, rectangle.heightPixel, position + rectangle.OriginCurrent, LayerRender, color, WireShape.TypeDraw.PIXEL);
-                break;
+                
             case Circle circle:
                 return WireShape.Instance.DrawCircle(circle.widthPixel, position + circle.OriginCurrent, LayerRender, color, 32, WireShape.TypeDraw.PIXEL);
-                break;
+                
             case Polygon polygon:
                 return WireShape.Instance.DrawPolygon(polygon.VerticesPixels, position, LayerRender, color, WireShape.TypeDraw.PIXEL);
-                break;
+            
+            case Slope slope:                
+                return WireShape.Instance.DrawSlope(slope.widthPixel,slope.heightPixel,slope.slopeType, position, LayerRender, color, WireShape.TypeDraw.PIXEL);
             default:
                 break;
         }

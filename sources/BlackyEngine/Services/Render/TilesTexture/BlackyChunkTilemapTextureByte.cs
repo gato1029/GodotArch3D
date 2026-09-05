@@ -19,7 +19,7 @@ public class BlackyChunkTilemapTextureByte : BlackyChunkTilemapTextureBase
         _tiles = new byte[size * size];
     }
 
-    public override void SetTile(int x, int y, int tileId, bool isDirty = true)
+    public override void SetTile(int x, int y, int tileId,int idCollider,  bool isDirty = true)
     {
         int i = GetIndex(x, y);
         _tiles[i] = (byte)tileId;
@@ -86,6 +86,16 @@ public class BlackyChunkTilemapTextureByte : BlackyChunkTilemapTextureBase
     }
 
     public override bool IsRender(int x, int y)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void SetIdCollider(int x, int y, int value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override int GetIdCollider(int x, int y)
     {
         throw new NotImplementedException();
     }

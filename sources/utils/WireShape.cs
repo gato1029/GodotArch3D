@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.utils;
+using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Collections.Generic;
 
@@ -855,4 +856,64 @@ public class WireShape : SingletonBase<WireShape>
 
     protected override void Initialize() { }
     protected override void Destroy() { FreeAll(); }
+
+    internal int DrawSlope(
+    float widthPixel,
+    float heightPixel,
+    SlopeType slopeType,
+    Vector2 position,
+    int layerRender,
+    Color color,
+    TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        List<Vector2> points = slopeType switch
+        {
+            // Triángulo inferior-derecho
+            SlopeType.BottomLeft => new()
+        {
+            new Vector2(0, 0),
+            new Vector2(0, heightPixel),
+            new Vector2(widthPixel, 0),
+            
+        },
+
+            // Triángulo superior-izquierdo
+            SlopeType.TopRight => new()
+        {
+            new Vector2(0, 0),
+            new Vector2(widthPixel, heightPixel),
+            new Vector2(0, heightPixel)
+        },
+
+            // Triángulo superior-derecho
+            SlopeType.TopLeft => new()
+        {
+            new Vector2(0, 0),
+            new Vector2(widthPixel, 0),
+            new Vector2(widthPixel, heightPixel)
+        },
+
+            // Triángulo inferior-izquierdo
+            SlopeType.BottomRight => new()
+        {
+            new Vector2(-widthPixel, 0),
+            new Vector2(0, heightPixel),
+            new Vector2(0,0),
+                        
+            
+        },
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(slopeType),
+                slopeType,
+                null)
+        };
+
+        return DrawPolygon(
+            points,
+            position,
+            layerRender,
+            color,
+            typeDraw);
+    }
 }

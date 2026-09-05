@@ -14,6 +14,7 @@ public class BlackyChunkTilemapTextureUShort : BlackyChunkTilemapTextureBase
     private readonly byte[] _solid;
     private readonly byte[] _dualMask;
     private readonly bool[] _render;
+    private readonly int[] _idCollider;
     public BlackyChunkTilemapTextureUShort(int layer, int size, int wx, int wy)
         : base(layer, size, wx, wy)
     {
@@ -21,12 +22,14 @@ public class BlackyChunkTilemapTextureUShort : BlackyChunkTilemapTextureBase
         _solid = new byte[size * size];
         _dualMask = new byte[size * size];
         _render = new bool[size * size];
+        _idCollider = new int[size * size];
     }
 
-    public override void SetTile(int x, int y, int tileId, bool isDirty = true)
+    public override void SetTile(int x, int y, int tileId, int idCollider, bool isDirty = true)
     {
         int i = GetIndex(x, y);
         _tiles[i] = tileId;
+        _idCollider[i] = idCollider;
 
         if (isDirty) MarkDirty(x, y);
     }
@@ -94,5 +97,17 @@ public class BlackyChunkTilemapTextureUShort : BlackyChunkTilemapTextureBase
     public override bool IsRender(int x, int y)
     {
        return _render[GetIndex(x, y)];
+    }
+
+    public override void SetIdCollider(int x, int y, int value)
+    {
+        int i = GetIndex(x, y);
+        _idCollider[i] = value;
+    }
+
+    public override int GetIdCollider(int x, int y)
+    {
+        int i = GetIndex(x, y);
+        return _idCollider[i];
     }
 }

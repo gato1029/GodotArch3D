@@ -46,6 +46,10 @@ public class SpriteData {
 
     [BsonIgnore]
     public Dictionary<string, GeometricShape2D> collisionBodyDictionary { get; set; } = new Dictionary<string, GeometricShape2D>(); // esto es para darle un tag a la animacion
+
+
+    [BsonIgnore]
+    public Dictionary<CollisionUseType, GeometricShape2D> collisionDictionary { get; set; } = new Dictionary<CollisionUseType, GeometricShape2D>();  // esto ya esta normalizado
     public SpriteData()
     {
 
@@ -80,9 +84,9 @@ public class SpriteData {
         {
             foreach (var item in listCollisionBody)
             {
-                if (item.name!=null)
+                if (item.collisionUseType!=CollisionUseType.NINGUNO)
                 {
-                    collisionBodyDictionary.Add(item.name, item);
+                    collisionDictionary.Add(item.collisionUseType, item);
                 }
                 
             }

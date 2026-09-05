@@ -74,7 +74,7 @@ public sealed class BlackyWorldServices
         // ============================
         HeightMapWorld = new BlackyHeightSystem();
 
-        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal, HeightMapWorld);
+        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal, HeightMapWorld,state.StaticSpatialTerrain);
 
         TerrainDataLienzo = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
         RampasDataLienzo = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender,world.Streaming.chunkManagerLocal,world);

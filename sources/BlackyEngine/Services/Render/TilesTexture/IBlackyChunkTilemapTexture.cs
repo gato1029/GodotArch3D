@@ -19,7 +19,7 @@ public interface IBlackyChunkTilemapTexture
     // SINGLE TILE
     // ===============================
 
-    void SetTile(int x, int y, int tileId, bool isDirty = true);
+    void SetTile(int x, int y, int tileId, int idCollider, bool isDirty = true);
     int GetTile(int x, int y);
 
     void ClearTile(int x, int y);
@@ -33,6 +33,9 @@ public interface IBlackyChunkTilemapTexture
     byte GetDualMask(int x, int y);
     void SetRender(int x, int y, bool value);
     bool IsRender(int x, int y);
+
+    void SetIdCollider(int x, int y, int id);
+    int GetIdCollider(int x, int y);
 
     // ===============================
     // BULK (IMPORTANTE)

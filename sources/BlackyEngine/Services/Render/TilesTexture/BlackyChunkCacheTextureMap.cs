@@ -6,12 +6,16 @@ using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Services.Paint;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyTiles;
 using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Tilemap;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
+using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -67,11 +71,14 @@ public struct TileChange
 
 public class BlackyChunkCacheTextureMap
 {
+    private const bool DEBUG_COLLIDER =true;
+    private Dictionary<int,int> _colliderDebugMap = new();
     public event Action<TileChange> OnTileChanged;
     private readonly ConcurrentDictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly BlackyWorldRegions _regions;
     private readonly ChunkManagerBase chunkManager;
     private readonly BlackyHeightSystem _heightMapWorld;
+    private readonly StaticSpatialGridOptimizedGeneric<int> _staticSpatialTerrain;
     public int ChunkSize { get; }
     public int HeightCount { get; }
     public int MaxLayers { get; }
@@ -89,7 +96,7 @@ public class BlackyChunkCacheTextureMap
     
     public object SyncRoot { get; } = new();
 
-    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager, Paint.BlackyHeightSystem heightMapWorld)
+    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager, Paint.BlackyHeightSystem heightMapWorld, StaticSpatialGridOptimizedGeneric<int> staticSpatialTerrain)
     {
         ChunkSize = chunkSize;
         HeightCount = heightCount;
@@ -97,7 +104,9 @@ public class BlackyChunkCacheTextureMap
         _regions = regions;
         _heightMapWorld = heightMapWorld;
         this.chunkManager = chunkManager;
+        this._staticSpatialTerrain = staticSpatialTerrain;
         chunkManager.OnChunkDataUnload += ChunkManager_OnChunkDataUnload;
+        
     }
 
     private void ChunkManager_OnChunkDataUnload(Vector2I obj)
@@ -197,11 +206,26 @@ public class BlackyChunkCacheTextureMap
     {
         // 1. Resolvemos el chunk y las coordenadas locales
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
-        RemoverCollider(worldX, worldY);
+        
         _heightMapWorld.SetTopHeight(worldX, worldY, height-1);
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
-        var tileLayer = chunk.GetOrCreateLayer(height, layer);        
-        tileLayer.ClearTile(localX, localY);     
+        var tileLayer = chunk.GetOrCreateLayer(height, layer);                          
+        tileLayer.ClearTile(localX, localY);
+
+        RemoverCollider(tileLayer, localX, localY);
+
+        //tileLayer.SetIdCollider(localX, localY, 0);
+        if (DEBUG_COLLIDER)
+        {
+            int idCollider = tileLayer.GetIdCollider(localX, localY);
+            if (idCollider != 0)
+            {
+                int idDebugBody = _colliderDebugMap[idCollider];
+                CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
+                _colliderDebugMap.Remove(idCollider);
+            }
+        }
+
         OnTileChanged?.Invoke(new TileChange
         {
             WorldX = worldX,
@@ -211,6 +235,21 @@ public class BlackyChunkCacheTextureMap
             remove = true
         });
 
+    }
+    private void RemoverCollider(IBlackyChunkTilemapTexture tileLayer, int localX, int localY)
+    {
+       
+        if (DEBUG_COLLIDER)
+        {
+            int idCollider = tileLayer.GetIdCollider(localX, localY);
+            if (idCollider!=0)
+            {
+                int idDebugBody = _colliderDebugMap[idCollider];
+                CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
+                _colliderDebugMap.Remove(idCollider);
+            }            
+            tileLayer.SetIdCollider(localX, localY, 0);
+        }
     }
     public int SetTileSprite(int worldX, int worldY, int height, int layer, long idTileSprite, bool offsetDual)
     {
@@ -228,7 +267,7 @@ public class BlackyChunkCacheTextureMap
         // 3. Guardamos el ID en el chunk
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-        tileLayer.SetTile(localX, localY, tileId);
+        tileLayer.SetTile(localX, localY, tileId, 0);
         tileLayer.SetRender(localX, localY, true);
 
         //if (tileLayer.GetDualMask(localX, localY) != 0)
@@ -266,7 +305,7 @@ public class BlackyChunkCacheTextureMap
         // 3. Guardamos el ID en el chunk
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-        tileLayer.SetTile(localX, localY, tileId);
+        tileLayer.SetTile(localX, localY, tileId, 0);
 
         if (tileLayer.GetDualMask(localX, localY) != 0)
         {
@@ -299,13 +338,18 @@ public class BlackyChunkCacheTextureMap
         var (chunk, localX, localY) = ResolveOrCreate(worldX, worldY);
         
         int tileId = AtlasModsManager.GetSpriteUniqueId(idTileSprite,out TileSpriteData tileSpriteData);
-        AsignarCollider(worldX, worldY, idTileSprite, tileSpriteData);
-        
+
+       
+
         _heightMapWorld.SetTopHeight(worldX, worldY, height);
 
         // (Asumiendo que tu BlackyChunkTexture tiene GetOrCreateLayer)
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-        tileLayer.SetTile(localX, localY, tileId);
+
+        RemoverCollider(tileLayer, localX, localY);
+
+        int idCollider = AsignarCollider(worldX, worldY, tileId, tileSpriteData);
+        tileLayer.SetTile(localX, localY, tileId,idCollider);
         tileLayer.SetRender(localX, localY, true);
         
         if (height-1 >=0 && isBorder==false) // solo si no es borde y la altura inferior es mayor a 0 no se marca para renderizar
@@ -357,7 +401,7 @@ public class BlackyChunkCacheTextureMap
 
         // 3. Guardamos el ID en el chunk        
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
-        tileLayer.SetTile(localX, localY, tileId);
+        tileLayer.SetTile(localX, localY, tileId, 0);
 
         OnTileChanged?.Invoke(new TileChange
         {
@@ -664,7 +708,7 @@ public class BlackyChunkCacheTextureMap
 
                 
                 int tileId = GetIdTileSprite((BlackyRenderLayer)layer, cell.id);
-                tileLayer.SetTile(x, y, tileId);
+                tileLayer.SetTile(x, y, tileId, 0);
                 tileLayer.SetRender(x, y, true);
             }
             //var (targetChunk, lx, ly) = ResolveOrCreate(nx, ny);                                                
@@ -825,8 +869,8 @@ public class BlackyChunkCacheTextureMap
             if (IsSolidGlobal(vx + 1, vy, height, layer)) mask |= DualMask.BottomRight;            
         }
         if (mask==0)
-        {
-            RemoverCollider(vx,vy);
+        {           
+            tileLayer.SetIdCollider(lx, ly, 0);
             _heightMapWorld.SetTopHeight(vx, vy, height-1);
             return; // no hacer nada            
         }
@@ -835,21 +879,120 @@ public class BlackyChunkCacheTextureMap
         var slot = template.GetSlot(mask);
         var item = slot.GetGeneric().Parts[0];
         int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData,out TileSpriteData tileSpriteData);
-        AsignarCollider(vx,vy,tileId,tileSpriteData);
+      //  int iIdCollider = AsignarCollider(vx,vy,tileId,tileSpriteData);
         _heightMapWorld.SetTopHeight(vx, vy, height);
-
-        tileLayer.SetTile(lx, ly, tileId);
+        
+        //tileLayer.SetTile(lx, ly, tileId, iIdCollider);
         tileLayer.SetRender(lx, ly, true);
     }
 
-    private void RemoverCollider(int vx, int vy)
+    private int AsignarCollider(int Mundo_x, int Mundo_y, int idTileSpriteData, TileSpriteData tileSpriteData)
     {
-        throw new NotImplementedException();
-    }
+        // cuerpo
+        ShapeType shapeType = ShapeType.Rect;
+        float width = 0;
+        float height = 0;
+        float offsetX = 0;
+        float offsetY = 0;
+        GeometricShape2D collisionBody = null;
+        bool hasCollider = false;
+        switch (tileSpriteData.tileSpriteType)
+        {
+            case TileSpriteType.Static:
+                var spriteData = tileSpriteData.spriteData;
+                if (spriteData.haveCollider)
+                {
+                    collisionBody = spriteData.collisionDictionary[CollisionUseType.CUERPO];
+                    hasCollider = true;
+                }
+                
+                break;
+            case TileSpriteType.Animated:
+                var animatedData = tileSpriteData.animationData;
+                if (animatedData.haveCollider)
+                {
+                    collisionBody = animatedData.collisionDictionary[CollisionUseType.CUERPO];
+                    hasCollider = true;
+                }
+                
+                break;            
+            default:
+                break;
+        }
+        if (!hasCollider)
+        {
+            return 0;
+        }
 
-    private void AsignarCollider(int Mundo_x, int Mundo_y, long idTileSpriteData, TileSpriteData tileSpriteData)
-    {
-        
+        switch (collisionBody)
+        {
+            case Circle circle:
+                shapeType = ShapeType.Circle;
+                width = circle.Radius;
+                height = circle.Radius;
+                offsetX = circle.OriginCurrent.X;
+                offsetY = circle.OriginCurrent.Y;
+                break;
+            case Rectangle rectangle:
+                shapeType = ShapeType.Rect;
+                width = rectangle.Width;
+                height = rectangle.Height;
+                offsetX = rectangle.OriginCurrent.X;
+                offsetY = rectangle.OriginCurrent.Y;
+                break;
+                case Slope slope:
+                shapeType = ShapeType.Slope;
+                width = slope.Width;
+                height = slope.Height;
+                offsetX = slope.OriginCurrent.X;
+                offsetY = slope.OriginCurrent.Y;
+                break;
+            default:
+                break;
+        }
+        int idCollider = _staticSpatialTerrain.GetNewEntityId();
+
+        //FastCollider[] bodyColliders = new FastCollider[1]
+        //{
+        //    new FastCollider
+        //    {
+        //        Shape = shapeType,
+        //        Width = width,
+        //        Height = height,
+        //        Offset = new Vector2(offsetX, offsetY)
+        //    }
+        //};
+
+
+        if (collisionBody is Circle)
+        {
+            width = width * 2;
+            height = height * 2;
+        }
+        // 2. REGISTRO DIRECTO AL STATIC HASH
+        // Como es estático, lo anotamos una sola vez ahora mismo.
+
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(Mundo_x, Mundo_y);
+
+        float actualX = positionCenter.X + offsetX;
+        float actualY = positionCenter.Y + offsetY;
+
+        var tilePositionMin = new Vector2(actualX - (width * 0.5f) - 0.01f, actualY - (width * 0.5f) - 0.01f); // quito un poco para asegurar que cubre el tile correcto aunque esté justo en el borde
+        var tilePositionMax = new Vector2(actualX + (width * 0.5f) - 0.01f, actualY + (height * 0.5f) - 0.01f);
+        _staticSpatialTerrain.RegisterStatic(idCollider, idTileSpriteData, tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
+
+   
+
+        if (DEBUG_COLLIDER)
+        {
+            int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(collisionBody, positionCenter, Godot.Colors.OrangeRed);
+            _colliderDebugMap.Add(idCollider, idDebugBody);
+        }
+
+
+
+        return idCollider;
+
     }
 
     public void SetTileDual(

@@ -74,12 +74,18 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
         Vector2 offset = animationData.offsetInternal;
+        float depthOffset = animationData.yDepthRenderFormat;
+        int heightRender = this.height;
         if (dualOffset)
         {
-            offset = offset+new Vector2(0.25f, 0.25f);
+            //if (depthOffset<0)
+            //{
+            //    heightRender = height - 1;
+            //}
+            offset = offset;// +new Vector2(0.25f, 0.25f);
         }
-        float depthOffset = animationData.yDepthRenderFormat;
-        float z = CommonAtributes.Calculate(depthOffset, height, layer, positionCenter); // debemos usar esto apartir de ahora
+        
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
         Transform3D transform = new(Basis.Identity, worldPosition);
@@ -162,12 +168,22 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
         Vector2 offset = spriteData.offsetInternal;
+
+        // hago esto para la altura de los muros de terreno solo para los duales 
+        int heightRender = this.height;
+        float depthOffset = spriteData.yDepthRenderFormat;
+
         if (dualOffset)
         {
-            offset = offset + new Vector2(0.25f, 0.25f);
+            //offset = offset; //+ new Vector2(0.25f, 0.25f);
+            //if (depthOffset < 0)
+            //{
+            //    heightRender = this.height - 1;
+            //}
         }
-        float depthOffset = spriteData.yDepthRenderFormat;
-        float z = CommonAtributes.Calculate(depthOffset, height, layer, positionCenter); // debemos usar esto apartir de ahora
+                      
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
+
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
         Transform3D transform = new(Basis.Identity, worldPosition);

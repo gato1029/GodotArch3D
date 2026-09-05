@@ -2,6 +2,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture.Brushes;
+using GodotEcsArch.sources.BlackyEngine.State;
 using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Mods;
@@ -65,12 +66,16 @@ public partial class WindowEditorRuntimeTerrain : Window
         KuroButtonCrear.Pressed += KuroButtonCrear_Pressed;
         KuroButtonSeleccion.Pressed += KuroButtonSeleccion_Pressed;
         TipoBrush.OnDataSelected += TipoBrush_OnDataSelected;
-        SpinBoxSizeBrush.ValueChanged += SpinBoxSizeBrush_ValueChanged;        
+        SpinBoxSizeBrush.ValueChanged += SpinBoxSizeBrush_ValueChanged;
+        MouseEntered += WindowEditorRuntimeTerrain_MouseEntered;
         LoadCapas();
         LoadBrushs();
     }
 
-    
+    private void WindowEditorRuntimeTerrain_MouseEntered()
+    {
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+    }
 
     private void LoadCapas()
     {
@@ -207,24 +212,34 @@ public partial class WindowEditorRuntimeTerrain : Window
                 terrainBaseDataSelected = (TerrainBaseData)obj;
                 dual = AtlasModsManager.Get<DualTileTemplate>(terrainBaseDataSelected.nameMod, terrainBaseDataSelected.idDualTemplate);
                 DualTemplateSelection(dual);
+                Input.MouseMode = Input.MouseModeEnum.Hidden;
+                //    BlackyWorldContext.State.SetModeGrid(ModeGrid.DUAL);
                 break;
             case BlackyRenderLayer.Rampas:
                 rampsDataSelected = (RampsData)obj;
                 SpriteSelection(rampsDataSelected.idTileSprite);
+                Input.MouseMode = Input.MouseModeEnum.Visible;
+                //  BlackyWorldContext.State.SetModeGrid(ModeGrid.NORMAL);
                 break;
             case BlackyRenderLayer.Superficie:
                 superficieDataSelected = (SuperficieData)obj;
                 dual = AtlasModsManager.Get<DualTileTemplate>(superficieDataSelected.nameMod, superficieDataSelected.idDualTemplate);
                 DualTemplateSelection(dual);
+                Input.MouseMode = Input.MouseModeEnum.Hidden;
+                //   BlackyWorldContext.State.SetModeGrid(ModeGrid.DUAL);
                 break;
             case BlackyRenderLayer.Caminos:
                 caminosDataSelected = (CaminosData)obj;
                 dual = AtlasModsManager.Get<DualTileTemplate>(caminosDataSelected.nameMod, caminosDataSelected.idDualTemplate);
                 DualTemplateSelection(dual);
+                Input.MouseMode = Input.MouseModeEnum.Hidden;
+                //  BlackyWorldContext.State.SetModeGrid(ModeGrid.DUAL);
                 break;
             case BlackyRenderLayer.Adornos:
                 decorationDataSelected = (DecorationData)obj;
                 SpriteSelection(decorationDataSelected.idTileSprite);
+                Input.MouseMode = Input.MouseModeEnum.Visible;
+                //  BlackyWorldContext.State.SetModeGrid(ModeGrid.NORMAL);
                 break;
         }
 
@@ -311,10 +326,10 @@ public partial class WindowEditorRuntimeTerrain : Window
         {
             case ModePaint.NORMAL:
 
-                offsetVisual = new Vector2(0.25f,0.25f);
+               // offsetVisual = new Vector2(0.25f,0.25f);
                 break;
             case ModePaint.AUTO_DUAL:
-
+                offsetVisual = new Vector2(-0.25f, -0.25f);
                 //TilesEntityPreviewHelper.Move(currentMouseTile, new Vector2(0.25f, 0.25f));                                
                 break;
             default:
