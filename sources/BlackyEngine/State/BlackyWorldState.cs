@@ -24,7 +24,7 @@ public sealed class BlackyWorldState : IDisposable
 {
     public FastSpatialHash DynamicHash { get; }
     public StaticSpatialGridOptimized StaticSpatial { get; }
-    public StaticSpatialGridOptimizedGeneric<int> StaticSpatialTerrain { get; }
+    public StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> StaticSpatialTerrain { get; }
     public BlackyChunkedBitGrid GridMove { get; }
 
     public BlackyChunkRenderData RenderData { get; }
@@ -45,7 +45,7 @@ public sealed class BlackyWorldState : IDisposable
 
         DynamicHash = new FastSpatialHash(config.MapSize.X, config.MapSize.Y, 11000);
         StaticSpatial = new StaticSpatialGridOptimized(config.MapSize.X, config.MapSize.Y, 32, 65536);
-        StaticSpatialTerrain = new StaticSpatialGridOptimizedGeneric<int>(config.MapSize.X, config.MapSize.Y, 32, 100_000,50_000);
+        StaticSpatialTerrain = new StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData>(config.MapSize.X, config.MapSize.Y, 32, 100_000,50_000);
         GridMove = new BlackyChunkedBitGrid(config.MapSize.X, config.MapSize.Y, 16);
 
         RenderData = new BlackyChunkRenderData(config.ChunkSize, config.HeightCount);

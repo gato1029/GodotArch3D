@@ -1,13 +1,17 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
+using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +28,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
           .With<MoveColliderComponent>()
           .With<SpatialIDComponent>()
           .With<SteeringComponent>()
+          .With<VelocityComponent>()
           .With<UnitTag>()
           .Without<SleepTag>();
           
@@ -35,10 +40,13 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
         if (blackyWorld == null) return;
 
+        var staticSpatialGrid = blackyWorld.State.StaticSpatialTerrain;
+
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
         var sidArray = it.Field<SpatialIDComponent>(2);
         var steeringArray = it.Field<SteeringComponent>(3);
+        var velArray = it.Field<VelocityComponent>(4);
 
         for (int i = 0; i < it.Count(); i++)
         {
@@ -47,73 +55,47 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
             ref var pos = ref posArray[i];
             ref var col = ref colArray[i];
             ref var steering = ref steeringArray[i];
-
-            bool collided = false;
-
-            float cx = pos.position.X + col.Offset.X;
-            float cy = pos.position.Y + col.Offset.Y;
-
-         
-            var tilePositionMin = TilesHelper.WorldPositionToTile(cx - col.Radius * 0.5f, cy - col.Radius * 0.5f);
-            var tilePositionMax = TilesHelper.WorldPositionToTile(cx + col.Radius * 0.5f, cy + col.Radius * 0.5f);
-
-            // 2️⃣ Bucle de Tiles
-            for (int tx = tilePositionMin.X; tx <= tilePositionMax.X; tx++)
-            {
-                for (int ty = tilePositionMin.Y; ty <= tilePositionMax.Y; ty++)
-                {
-                    
-                    var height = blackyWorld.Services.HeightMapWorld.GetTopHeight(tx, ty);
-                    var tile = blackyWorld.Services.TerrainPainter.GetTileTop(tx, ty, height);
-
-               //     var idTile = blackyWorld.Services.TerrainTexturePainter.GetTile(tx, ty, height,0);
-
-                    if (tile.CollisionId == 0) continue;
-
-                    int currentRecipeIdx = tile.CollisionId;
-                    while (currentRecipeIdx != -1)
-                    {
-                        ref readonly var recipe = ref TerrainCollisionLibrary.Get(currentRecipeIdx);
-
-                        if ((sid.Mask & recipe.Layer) != 0)
-                        {
-                            var tileCol = new FastCollider
-                            {
-                                Shape = recipe.Shape,
-                                Width = recipe.Width,
-                                Height = recipe.Height,
-                                Offset = new Godot.Vector2( recipe.OffsetX, recipe.OffsetY)
-                            };
-
-                            var colUnit = new FastCollider
-                            {
-                                Shape = ShapeType.Circle,
-                                Width = col.Radius,
-                                Height = col.Radius,
-                                Offset = new Godot.Vector2(col.Offset.X, col.Offset.Y)
-                            };
-                            var posTile =TilesHelper.TilePositionToWorldPosition(new Godot.Vector2I(tx, ty));
-
-                            if (CollisionMathHelper.Check(pos.position.X, pos.position.Y, ref colUnit,
-                                                        posTile.X, posTile.Y, ref tileCol))
-                            {
-                                collided = true;
-                                break; // Salir del while de recetas
-                            }
-                        }
-                        currentRecipeIdx = recipe.NextIndex;
-                    }
-                    if (collided) break; // Salir del for de ty
-                }
-                if (collided) break; // Salir del for de tx
-            }
-            
-            if (collided) // no hay collision
+            ref var vel = ref velArray[i];
+            Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime()*1.5f);            
+            bool collided = CheckAgainstStaticGrid(posFuture, ref col, staticSpatialGrid);                     
+            if (collided)
             {
                 steering.DesiredDir = Godot.Vector2.Zero;                
             }
-
         }
     }
-}
 
+
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool CheckAgainstStaticGrid(
+    Vector2 pos,
+    ref MoveColliderComponent col,
+    StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> grid)
+    {
+        int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
+        bool existCollision = false;
+        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
+        {
+            if (grid.TryGetValue(id, out var infoSpriteCollider))
+            {
+                AtlasModsManager.TryGetTileSprite(infoSpriteCollider.TileId, out var tileSprite);
+             
+                foreach (var fast in tileSprite.fastCollidersBody)
+                {
+                    FastCollider fastCollider = fast;
+                    if (!CollisionMathHelper.CheckCircle(pos.X, pos.Y, col.Radius, col.Offset, infoSpriteCollider.Position.X, infoSpriteCollider.Position.Y, ref fastCollider))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        existCollision = true;
+                        break;
+                    }
+                }
+            }                        
+        }
+
+        return existCollision;
+    }
+}

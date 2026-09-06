@@ -1,6 +1,8 @@
+using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotFlecs.sources.Flecs.Components;
@@ -127,7 +129,9 @@ public class TileSpriteData:IdDataLong
 
     public SpriteMultipleAnimationDirection spriteMultipleAnimationDirection { get; set; }
     public List<KuroTile> tilesOcupancy { get; set; } = new List<KuroTile>();
-
+    
+    [BsonIgnore]
+     public List<FastCollider> fastCollidersBody { get; } = new List<FastCollider>();
     public TileSpriteData()
     {
         id = EpochIdGenerator.NewId();
@@ -193,6 +197,7 @@ public class TileSpriteData:IdDataLong
             case TileSpriteType.Static:
             case TileSpriteType.DualStatic:
                 textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(spriteData);
+                CrearFastCollider(spriteData);
                 break;
             case TileSpriteType.Animated:
             case TileSpriteType.DualAnimated:
@@ -202,6 +207,7 @@ public class TileSpriteData:IdDataLong
                     animationData.framesArray[0].y,
                     animationData.framesArray[0].widht,
                     animationData.framesArray[0].height);
+                CrearFastCollider(animationData);
                 break;
             case TileSpriteType.AnimatedDirectionMultiple:
                 SpriteAnimationData data =null;
@@ -225,6 +231,87 @@ public class TileSpriteData:IdDataLong
                 break;
         }
 
+    }
+
+    private void CrearFastCollider(SpriteAnimationData animationData)
+    {
+        if (!animationData.haveCollider)
+        {
+            return;
+        }
+        foreach (var item in animationData.collisionBodyArray)
+        {
+            if (item.collisionUseType == CollisionUseType.CUERPO)
+            {
+                FastCollider fastCollider = new FastCollider();
+                switch (item)
+                {
+                    case Circle circle:
+                        fastCollider.Shape = ShapeType.Circle;
+                        fastCollider.Width = circle.Radius;
+                        fastCollider.Height = circle.Radius;
+                        fastCollider.Offset = new Vector2(circle.OriginCurrent.X, circle.OriginCurrent.Y);
+                        break;
+                    case Rectangle rectangle:
+                        fastCollider.Shape = ShapeType.Rect;
+                        fastCollider.Width = rectangle.Width;
+                        fastCollider.Height = rectangle.Height;
+                        fastCollider.Offset = new Vector2(rectangle.OriginCurrent.X, rectangle.OriginCurrent.Y);
+                        break;
+                    case Slope slope:
+                        fastCollider.Shape = ShapeType.Slope;
+                        fastCollider.Slope = slope.slopeType;
+                        fastCollider.Width = slope.Width;
+                        fastCollider.Height = slope.Height;
+                        fastCollider.Offset = new Vector2(slope.OriginCurrent.X, slope.OriginCurrent.Y);
+                        break;
+                    default:
+                        break;
+                }
+                fastCollidersBody.Add(fastCollider);
+            }
+        }
+    }
+
+    private void CrearFastCollider(SpriteData spriteData)
+    {
+        if (!spriteData.haveCollider)
+        {
+            return;
+        }
+        foreach (var item in spriteData.listCollisionBody)
+        {
+            if (item.collisionUseType == CollisionUseType.CUERPO)
+            {
+                FastCollider fastCollider = new FastCollider();
+                switch (item)
+                {
+                    case Circle circle:
+                        fastCollider.Shape = ShapeType.Circle;
+                        fastCollider.Width = circle.Radius;
+                        fastCollider.Height = circle.Radius;
+                        fastCollider.Offset = new Vector2(circle.OriginCurrent.X, circle.OriginCurrent.Y);
+                        break;
+                    case Rectangle rectangle:
+                        fastCollider.Shape = ShapeType.Rect;
+                        fastCollider.Width = rectangle.Width;
+                        fastCollider.Height = rectangle.Height;
+                        fastCollider.Offset = new Vector2(rectangle.OriginCurrent.X, rectangle.OriginCurrent.Y);
+                        break;
+                    case Slope slope:
+                        fastCollider.Shape = ShapeType.Slope;
+                        fastCollider.Slope = slope.slopeType;
+                        fastCollider.Width = slope.Width;
+                        fastCollider.Height = slope.Height;
+                        fastCollider.Offset = new Vector2(slope.OriginCurrent.X, slope.OriginCurrent.Y);
+                        break;
+                    default:
+                        break;
+                }
+                fastCollidersBody.Add(fastCollider);
+            }
+        }
+        
     }
 }
 

@@ -78,7 +78,7 @@ public class BlackyChunkCacheTextureMap
     private readonly BlackyWorldRegions _regions;
     private readonly ChunkManagerBase chunkManager;
     private readonly BlackyHeightSystem _heightMapWorld;
-    private readonly StaticSpatialGridOptimizedGeneric<int> _staticSpatialTerrain;
+    private readonly StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> _staticSpatialTerrain;
     public int ChunkSize { get; }
     public int HeightCount { get; }
     public int MaxLayers { get; }
@@ -96,7 +96,7 @@ public class BlackyChunkCacheTextureMap
     
     public object SyncRoot { get; } = new();
 
-    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager, Paint.BlackyHeightSystem heightMapWorld, StaticSpatialGridOptimizedGeneric<int> staticSpatialTerrain)
+    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager, Paint.BlackyHeightSystem heightMapWorld, StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> staticSpatialTerrain)
     {
         ChunkSize = chunkSize;
         HeightCount = heightCount;
@@ -238,18 +238,19 @@ public class BlackyChunkCacheTextureMap
     }
     private void RemoverCollider(IBlackyChunkTilemapTexture tileLayer, int localX, int localY)
     {
-       
-        if (DEBUG_COLLIDER)
+        int idCollider = tileLayer.GetIdCollider(localX, localY);
+        if (idCollider != 0)
         {
-            int idCollider = tileLayer.GetIdCollider(localX, localY);
-            if (idCollider!=0)
+            if (DEBUG_COLLIDER)
             {
                 int idDebugBody = _colliderDebugMap[idCollider];
                 CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
-                _colliderDebugMap.Remove(idCollider);
-            }            
+                _colliderDebugMap.Remove(idCollider);                
+            }
             tileLayer.SetIdCollider(localX, localY, 0);
+            _staticSpatialTerrain.FreeCollider(idCollider);
         }
+        
     }
     public int SetTileSprite(int worldX, int worldY, int height, int layer, long idTileSprite, bool offsetDual)
     {
@@ -979,7 +980,7 @@ public class BlackyChunkCacheTextureMap
 
         var tilePositionMin = new Vector2(actualX - (width * 0.5f) - 0.01f, actualY - (width * 0.5f) - 0.01f); // quito un poco para asegurar que cubre el tile correcto aunque esté justo en el borde
         var tilePositionMax = new Vector2(actualX + (width * 0.5f) - 0.01f, actualY + (height * 0.5f) - 0.01f);
-        _staticSpatialTerrain.RegisterStatic(idCollider, idTileSpriteData, tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
+        _staticSpatialTerrain.RegisterStatic(idCollider, new ColliderSpriteInstanceData(idTileSpriteData, positionCenter), tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
 
    
 

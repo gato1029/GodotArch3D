@@ -47,10 +47,34 @@ public static class CollisionMathHelper
 
         if (c1.Shape == ShapeType.Slope && c2.Shape == ShapeType.Circle)
             return CircleToSlope(cx2, cy2, c2.Width, cx1, cy1, c1.Width, c1.Height, c1.Slope);
-
-
         return false;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckCircle(float x1,float y1,float radius, Godot.Vector2 offset1, float x2, float y2,ref FastCollider c2)
+    {
+        float cx1 = x1 + offset1.X;
+        float cy1 = y1 + offset1.Y;
+
+        float cx2 = x2 + c2.Offset.X;
+        float cy2 = y2 + c2.Offset.Y;
+
+        switch (c2.Shape)
+        {
+            case ShapeType.Circle:
+                return CircleToCircle(cx1,cy1, radius, cx2, cy2,c2.Width);
+
+            case ShapeType.Rect:
+                return CircleToRect(cx1,cy1,radius,cx2, cy2,c2.Width,c2.Height);
+
+            case ShapeType.Slope:
+                return CircleToSlope( cx1, cy1, radius, cx2, cy2,c2.Width,c2.Height, c2.Slope);
+            default:
+                return false;
+        }
+    }
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckAttackHalfCircle(
     float attackerX,

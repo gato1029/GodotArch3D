@@ -5,8 +5,32 @@ using System.Runtime.CompilerServices;
 
 namespace GodotEcsArch.sources.BlackyEngine.Spatial;
 
+public readonly struct ColliderSpriteInstanceData
+{
+    public readonly int TileId;
+    public readonly Vector2 Position;
+
+    public ColliderSpriteInstanceData(
+        int tileId,
+        Vector2 cellPosition)
+    {
+        TileId = tileId;
+        Position = cellPosition;
+    }
+}
+
 public class StaticSpatialGridOptimizedGeneric<T>
 {
+    private struct EntityCellBounds
+    {
+        public int MinX;
+        public int MinY;
+
+        public int MaxX;
+        public int MaxY;
+
+        public bool Active;
+    }
     private readonly int _widthInCells;
     private readonly int _heightInCells;
 
@@ -40,7 +64,7 @@ public class StaticSpatialGridOptimizedGeneric<T>
     //
     // _values[0] nunca representa una entidad válida.
     private readonly List<T> _values = new();
-
+    private readonly List<EntityCellBounds> _entityBounds = new();
     private readonly float _originX;
     private readonly float _originY;
 
@@ -102,6 +126,7 @@ public class StaticSpatialGridOptimizedGeneric<T>
 
         // Reservamos el índice 0.
         _values.Add(default!);
+        _entityBounds.Add(default);
     }
 
     // ============================================================
@@ -211,28 +236,98 @@ public class StaticSpatialGridOptimizedGeneric<T>
             maxX,
             maxY);
     }
-
-    private void RegisterInternal(
-        int id,
-        T value,
-        float minX,
-        float minY,
-        float maxX,
-        float maxY)
+    public void FreeCollider(int colliderId)
     {
-        // Aseguramos que exista el índice.
+        if (colliderId <= 0 ||
+            colliderId >= _entityBounds.Count)
+        {
+            return;
+        }
+
+        EntityCellBounds bounds =
+            _entityBounds[colliderId];
+
+        // Ya fue eliminado o nunca existió.
+        if (!bounds.Active)
+            return;
+
+        // Recorremos únicamente las celdas que sabemos
+        // que ocupa este collider.
+        for (int x = bounds.MinX; x <= bounds.MaxX; x++)
+        {
+            for (int y = bounds.MinY; y <= bounds.MaxY; y++)
+            {
+                int cell = GetCellIndex(x, y);
+
+                if (cell == -1)
+                    continue;
+
+                int current = _heads[cell];
+                int previous = -1;
+
+                // Buscamos el node que pertenece
+                // a este collider dentro de la celda.
+                while (current != -1)
+                {
+                    if (_entityIDs[current] == colliderId)
+                    {
+                        // Si es el primer node.
+                        if (previous == -1)
+                        {
+                            _heads[cell] =
+                                _next[current];
+                        }
+                        else
+                        {
+                            _next[previous] =
+                                _next[current];
+                        }
+
+                        // Liberamos el node.
+                        _next[current] = -1;
+                        _entityIDs[current] = -1;
+
+                        _freeNodes.Push(current);
+
+                        break;
+                    }
+
+                    previous = current;
+                    current = _next[current];
+                }
+            }
+        }
+
+        // Liberamos el valor.
+        _values[colliderId] = default!;
+
+        // Marcamos el collider como eliminado.
+        bounds.Active = false;
+
+        _entityBounds[colliderId] = bounds;
+
+        // El ID puede reutilizarse.
+        _freeEntityIds.Push(colliderId);
+    }
+    private void RegisterInternal(
+      int id,
+      T value,
+      float minX,
+      float minY,
+      float maxX,
+      float maxY)
+    {
         while (_values.Count <= id)
+        {
             _values.Add(default!);
+            _entityBounds.Add(default);
+        }
 
         _values[id] = value;
 
-        Vector2I min =
-            WorldToCell(minX, minY);
+        Vector2I min = WorldToCell(minX, minY);
+        Vector2I max = WorldToCell(maxX, maxY);
 
-        Vector2I max =
-            WorldToCell(maxX, maxY);
-
-        // Clamp al tamaño de la grid.
         min.X = Math.Max(0, min.X);
         min.Y = Math.Max(0, min.Y);
 
@@ -244,14 +339,23 @@ public class StaticSpatialGridOptimizedGeneric<T>
             _heightInCells - 1,
             max.Y);
 
-        // Registrar la entidad en todas
-        // las celdas que ocupa.
+        // Guardamos las celdas ocupadas por el collider.
+        _entityBounds[id] = new EntityCellBounds
+        {
+            MinX = min.X,
+            MinY = min.Y,
+
+            MaxX = max.X,
+            MaxY = max.Y,
+
+            Active = true
+        };
+
         for (int x = min.X; x <= max.X; x++)
         {
             for (int y = min.Y; y <= max.Y; y++)
             {
-                int cell =
-                    GetCellIndex(x, y);
+                int cell = GetCellIndex(x, y);
 
                 if (cell == -1)
                     continue;
@@ -260,14 +364,12 @@ public class StaticSpatialGridOptimizedGeneric<T>
 
                 _entityIDs[node] = id;
 
-                _next[node] =
-                    _heads[cell];
+                _next[node] = _heads[cell];
 
                 _heads[cell] = node;
             }
         }
     }
-
     // ============================================================
     // UNREGISTER
     // ============================================================
@@ -436,11 +538,18 @@ public class StaticSpatialGridOptimizedGeneric<T>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryGetValue(
-        int id,
-        out T value)
+    int id,
+    out T value)
     {
         if (id <= 0 ||
-            id >= _values.Count)
+            id >= _values.Count ||
+            id >= _entityBounds.Count)
+        {
+            value = default!;
+            return false;
+        }
+
+        if (!_entityBounds[id].Active)
         {
             value = default!;
             return false;
@@ -508,8 +617,9 @@ public class StaticSpatialGridOptimizedGeneric<T>
         _freeEntityIds.Clear();
 
         _values.Clear();
-
+        _entityBounds.Clear();
         // ID 0 reservado como inválido.
         _values.Add(default!);
+        _entityBounds.Add(default);
     }
 }

@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
+using GodotFlecs.sources.Flecs.Components;
 using LiteDB;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,8 +88,7 @@ public class SpriteData {
                 if (item.collisionUseType!=CollisionUseType.NINGUNO)
                 {
                     collisionDictionary.Add(item.collisionUseType, item);
-                }
-                
+                }                          
             }
         }
         

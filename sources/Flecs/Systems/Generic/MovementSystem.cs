@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+// ya no se usa, borrar luego
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
 public class MovementSystem : FlecsSystemBase
 {
