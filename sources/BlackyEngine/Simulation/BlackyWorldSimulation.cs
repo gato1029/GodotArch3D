@@ -18,7 +18,9 @@ public sealed class BlackyWorldSimulation
     {
         Flecs = new FlecsManager(NodeMainHelper.node3DMain);
         Tick = new SimulationTick();
-
+        //Tick.FixedDelta = 1f/ 60; // 60 ticks por segundo
+        //Tick.FixedDelta = 1f / 50; // 50 ticks por segundo
+        Tick.FixedDelta = 1f / 30; // 30 ticks por segundo
         Flecs.WorldFlecs.SetCtx(world);       
     }
 

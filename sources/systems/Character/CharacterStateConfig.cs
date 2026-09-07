@@ -30,8 +30,8 @@ public static class CharacterStateConfig
             {
                 return character.characterStateType switch
                 {
-                    CharacterStateType.ATTACK => CharacterStateType.IDLE,
-                    CharacterStateType.EXECUTE_ATTACK => CharacterStateType.IDLE,
+                    CharacterStateType.ATTACK => CharacterStateType.EXECUTE_ATTACK,
+                    CharacterStateType.EXECUTE_ATTACK => CharacterStateType.ATTACK,
                     CharacterStateType.TAKE_HIT => CharacterStateType.IDLE,
                     CharacterStateType.TAKE_STUN => CharacterStateType.IDLE,
                     CharacterStateType.DIE => CharacterStateType.DIE,
@@ -45,6 +45,7 @@ public static class CharacterStateConfig
                     { CharacterStateType.MOVING, AnimationType.CAMINANDO },
                     { CharacterStateType.ATTACK, AnimationType.ATACANDO_CUERPO },               
                     { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
+                     { CharacterStateType.EXECUTE_ATTACK, AnimationType.NINGUNA }, 
                     { CharacterStateType.TAKE_STUN, AnimationType.STUNEADO },
                     { CharacterStateType.DIE, AnimationType.MUERTO },
                 }

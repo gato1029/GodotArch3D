@@ -59,7 +59,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<long, DecorationData> decorationData = new();
     private readonly AtlasMods<long, SuperficieData> superficieData = new();
     private readonly AtlasMods<long, BiomaData> biomaData = new();
-    private readonly AtlasMods<long, CharacterModelBaseData> characterData = new(); // deben cambiar a long
+    private readonly AtlasMods<long, CharacterModelBaseData> characterData = new();
 
     private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a long
     private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a long
@@ -640,8 +640,9 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
             FileHelper.SetModsPath(info.FolderPath);
             DataBaseManager.Instance.LoadCustomDataBase(info.DbPath);
 
-            CargarPorMod(idMod, info.Name);
+            
             CargarPorModGenerico(idMod, info.Name);
+            CargarPorMod(idMod, info.Name);
 
             CargarPorModEspecial(idMod);            
             CargarTilesTextureData(idMod);            

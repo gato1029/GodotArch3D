@@ -48,6 +48,8 @@ public class SpriteAnimationData {
 
     [BsonIgnore]
     public Dictionary<CollisionUseType, GeometricShape2D> collisionDictionary { get; set; } = new Dictionary<CollisionUseType, GeometricShape2D>();  // esto ya esta normalizado
+    [BsonIgnore]
+    public List<GeometricShape2D> collisionBodyList { get; set; } = new List<GeometricShape2D>();
     public SpriteAnimationData()
     {
 
@@ -95,6 +97,10 @@ public class SpriteAnimationData {
                     collisionBodyDictionary.Add(item.name, item);
                 }
                 collisionDictionary.Add(item.collisionUseType, item);
+                if (item.collisionUseType == CollisionUseType.CUERPO)
+                {
+                    collisionBodyList.Add(item);
+                }
             }
         }
         

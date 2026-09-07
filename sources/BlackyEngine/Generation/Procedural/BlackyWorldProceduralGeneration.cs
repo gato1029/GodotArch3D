@@ -39,7 +39,10 @@ public class BlackyWorldProceduralGeneration
         // llena todo el mapa de terreno
         GenerateMapTerrain();
         GenerateMapBordersOptimized();
-        world.Streaming.chunkManagerLocal.Teleport(new Vector2(0,0));
+        
+        //_world.Services.TerrainDataLienzo.DrawAllMapTxt(); // debug: genera un txt con el mapa de terreno generado
+
+        world.Streaming.chunkManagerLocal.Teleport(new Vector2(0,0)); // esto hace que se renderice el chunk central y se carguen los chunks alrededor
     }
 
     public BlackyWorldProceduralGeneration()
@@ -49,12 +52,14 @@ public class BlackyWorldProceduralGeneration
     public void GenerateMapTerrain()
     {
         var allChunks = _chunksNodes.GetAllChunksWithCandidates();
-
+     
         for (int i = 0; i < allChunks.Count; i++)
         {
+
             BlackyChunkCoord chunkCandidate = allChunks[i];
             IReadOnlyList<BlackyWorldNode> candidates = _chunksNodes.GetCandidates(chunkCandidate);
             ProcessCandidate(chunkCandidate,candidates);
+            //GD.Print($"Coordenada {chunkCandidate.X}, {chunkCandidate.Y} procesada. Biomas asignados.");
         }        
     }
     private void ProcessCandidate(BlackyChunkCoord coord, IReadOnlyList<BlackyWorldNode> candidates)
@@ -121,39 +126,54 @@ public class BlackyWorldProceduralGeneration
         int minY = _config.MinChunk.Y;
         int maxY = _config.MaxChunk.Y;
 
-        // Recorremos el perímetro del rango de chunks
+        // Recorremos únicamente los chunks que están en los bordes extremos del mapa global
         for (int cx = minX; cx <= maxX; cx++)
         {
             for (int cy = minY; cy <= maxY; cy++)
             {
-                // Solo procesamos si el chunk está en el perímetro (borde de mapa)
-                bool isPerimeter = (cx == minX || cx == maxX || cy == minY || cy == maxY);
+                // Verificamos qué caras de este chunk dan hacia el exterior absoluto del mapa
+                bool isLeftBorderChunk = (cx == minX);
+                bool isRightBorderChunk = (cx == maxX);
+                bool isTopBorderChunk = (cy == minY);
+                bool isBottomBorderChunk = (cy == maxY);
 
-                if (isPerimeter)
+                // Si el chunk toca al menos un borde exterior, procesamos solo sus caras externas
+                if (isLeftBorderChunk || isRightBorderChunk || isTopBorderChunk || isBottomBorderChunk)
                 {
-                    ProcessChunkAsBorder(new BlackyChunkCoord(cx, cy));
+                    ProcessChunkOuterBorderOnly(new BlackyChunkCoord(cx, cy), isLeftBorderChunk, isRightBorderChunk, isTopBorderChunk, isBottomBorderChunk);
                 }
             }
         }
     }
 
-
-    private void ProcessChunkAsBorder(BlackyChunkCoord coord)
+    private void ProcessChunkOuterBorderOnly(BlackyChunkCoord coord, bool isLeft, bool isRight, bool isTop, bool isBottom)
     {
         int size = _config.ChunkSize;
         int last = size - 1;
 
         for (int i = 0; i < size; i++)
         {
-            // Borde superior (fila 0) e inferior (fila last)
-            _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, 0, 1, true);
-            _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, last, 1, true);
+            // Borde superior absoluto del mapa
+            if (isTop)
+            {
+                _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, 0, 1, true);
+            }
 
-            // Borde izquierdo (columna 0) y derecho (columna last)
-            // Evitamos repetir las esquinas si es necesario (0 y last ya se marcaron arriba)
-            if (i > 0 && i < last)
+            // Borde inferior absoluto del mapa
+            if (isBottom)
+            {
+                _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, i, last, 1, true);
+            }
+
+            // Borde izquierdo absoluto del mapa
+            if (isLeft)
             {
                 _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, 0, i, 1, true);
+            }
+
+            // Borde derecho absoluto del mapa
+            if (isRight)
+            {
                 _world.Services.TerrainDataLienzo.SetTerrainBorderDirectNoRenderLocal(coord, last, i, 1, true);
             }
         }

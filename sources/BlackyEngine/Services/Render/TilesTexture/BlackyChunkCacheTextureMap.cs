@@ -72,7 +72,7 @@ public struct TileChange
 public class BlackyChunkCacheTextureMap
 {
     private const bool DEBUG_COLLIDER =true;
-    private Dictionary<int,int> _colliderDebugMap = new();
+    private Dictionary<int,List <int>> _colliderDebugMap = new();
     public event Action<TileChange> OnTileChanged;
     private readonly ConcurrentDictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly BlackyWorldRegions _regions;
@@ -215,16 +215,7 @@ public class BlackyChunkCacheTextureMap
         RemoverCollider(tileLayer, localX, localY);
 
         //tileLayer.SetIdCollider(localX, localY, 0);
-        if (DEBUG_COLLIDER)
-        {
-            int idCollider = tileLayer.GetIdCollider(localX, localY);
-            if (idCollider != 0)
-            {
-                int idDebugBody = _colliderDebugMap[idCollider];
-                CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
-                _colliderDebugMap.Remove(idCollider);
-            }
-        }
+
 
         OnTileChanged?.Invoke(new TileChange
         {
@@ -243,9 +234,12 @@ public class BlackyChunkCacheTextureMap
         {
             if (DEBUG_COLLIDER)
             {
-                int idDebugBody = _colliderDebugMap[idCollider];
-                CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
-                _colliderDebugMap.Remove(idCollider);                
+                foreach (var idDebugBody in _colliderDebugMap[idCollider])
+                {
+                    CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
+                 
+                }
+                _colliderDebugMap.Remove(idCollider);
             }
             tileLayer.SetIdCollider(localX, localY, 0);
             _staticSpatialTerrain.FreeCollider(idCollider);
@@ -745,9 +739,9 @@ public class BlackyChunkCacheTextureMap
                 long centerKey = MakeKey(chunkX * ChunkSize + x, chunkY * ChunkSize + y);
                 // Verificamos si es un borde definido por lógica O si es un borde de chunk
                 bool isBorderLogic = cell.isBorder;
-                bool isChunkEdge = (x == 0 || x == ChunkSize - 1 || y == 0 || y == ChunkSize - 1);
+                //bool isChunkEdge = (x == 0 || x == ChunkSize - 1 || y == 0 || y == ChunkSize - 1);
 
-                if (isBorderLogic || isChunkEdge)
+                if (isBorderLogic)// || isChunkEdge)
                 {
                     borderIndices.Add(i);
                 }
@@ -855,10 +849,10 @@ public class BlackyChunkCacheTextureMap
     }
   
     private void UpdateDualVisualInternal(int vx, int vy, int lx, int ly, int height, int layer, DualTileTemplate template, IBlackyChunkTilemapTexture tileLayer, bool esSolido = true)
-    {
+    {        
         byte mask = 0;
         if (esSolido) // si es solido no verfico vecindad
-        {
+        {            
             mask = 15;
         }
         else
@@ -870,8 +864,7 @@ public class BlackyChunkCacheTextureMap
             if (IsSolidGlobal(vx + 1, vy, height, layer)) mask |= DualMask.BottomRight;            
         }
         if (mask==0)
-        {           
-            tileLayer.SetIdCollider(lx, ly, 0);
+        {                       
             _heightMapWorld.SetTopHeight(vx, vy, height-1);
             return; // no hacer nada            
         }
@@ -879,119 +872,79 @@ public class BlackyChunkCacheTextureMap
         
         var slot = template.GetSlot(mask);
         var item = slot.GetGeneric().Parts[0];
-        int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData,out TileSpriteData tileSpriteData);
-      //  int iIdCollider = AsignarCollider(vx,vy,tileId,tileSpriteData);
+
+        int idCollider = 0;
+        int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData, out TileSpriteData tileSpriteData);
+        RemoverCollider(tileLayer, lx, ly);
+        if (!esSolido)
+        { 
+            
+            idCollider = AsignarCollider(vx, vy, tileId, tileSpriteData);
+        }
+                
         _heightMapWorld.SetTopHeight(vx, vy, height);
         
-        //tileLayer.SetTile(lx, ly, tileId, iIdCollider);
+        tileLayer.SetTile(lx, ly, tileId, idCollider);
         tileLayer.SetRender(lx, ly, true);
+
     }
 
     private int AsignarCollider(int Mundo_x, int Mundo_y, int idTileSpriteData, TileSpriteData tileSpriteData)
     {
-        // cuerpo
-        ShapeType shapeType = ShapeType.Rect;
-        float width = 0;
-        float height = 0;
-        float offsetX = 0;
-        float offsetY = 0;
-        GeometricShape2D collisionBody = null;
-        bool hasCollider = false;
-        switch (tileSpriteData.tileSpriteType)
-        {
-            case TileSpriteType.Static:
-                var spriteData = tileSpriteData.spriteData;
-                if (spriteData.haveCollider)
-                {
-                    collisionBody = spriteData.collisionDictionary[CollisionUseType.CUERPO];
-                    hasCollider = true;
-                }
-                
-                break;
-            case TileSpriteType.Animated:
-                var animatedData = tileSpriteData.animationData;
-                if (animatedData.haveCollider)
-                {
-                    collisionBody = animatedData.collisionDictionary[CollisionUseType.CUERPO];
-                    hasCollider = true;
-                }
-                
-                break;            
-            default:
-                break;
-        }
-        if (!hasCollider)
+        if (tileSpriteData.fastCollidersBody.Count == 0)
         {
             return 0;
         }
-
-        switch (collisionBody)
-        {
-            case Circle circle:
-                shapeType = ShapeType.Circle;
-                width = circle.Radius;
-                height = circle.Radius;
-                offsetX = circle.OriginCurrent.X;
-                offsetY = circle.OriginCurrent.Y;
-                break;
-            case Rectangle rectangle:
-                shapeType = ShapeType.Rect;
-                width = rectangle.Width;
-                height = rectangle.Height;
-                offsetX = rectangle.OriginCurrent.X;
-                offsetY = rectangle.OriginCurrent.Y;
-                break;
-                case Slope slope:
-                shapeType = ShapeType.Slope;
-                width = slope.Width;
-                height = slope.Height;
-                offsetX = slope.OriginCurrent.X;
-                offsetY = slope.OriginCurrent.Y;
-                break;
-            default:
-                break;
-        }
         int idCollider = _staticSpatialTerrain.GetNewEntityId();
-
-        //FastCollider[] bodyColliders = new FastCollider[1]
-        //{
-        //    new FastCollider
-        //    {
-        //        Shape = shapeType,
-        //        Width = width,
-        //        Height = height,
-        //        Offset = new Vector2(offsetX, offsetY)
-        //    }
-        //};
-
-
-        if (collisionBody is Circle)
-        {
-            width = width * 2;
-            height = height * 2;
-        }
-        // 2. REGISTRO DIRECTO AL STATIC HASH
-        // Como es estático, lo anotamos una sola vez ahora mismo.
-
+        _colliderDebugMap.Add(idCollider, new List<int>());
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(Mundo_x, Mundo_y);
 
-        float actualX = positionCenter.X + offsetX;
-        float actualY = positionCenter.Y + offsetY;
+        float minX = float.MaxValue;
+        float minY = float.MaxValue;
+        float maxX = float.MinValue;
+        float maxY = float.MinValue;
 
-        var tilePositionMin = new Vector2(actualX - (width * 0.5f) - 0.01f, actualY - (width * 0.5f) - 0.01f); // quito un poco para asegurar que cubre el tile correcto aunque esté justo en el borde
-        var tilePositionMax = new Vector2(actualX + (width * 0.5f) - 0.01f, actualY + (height * 0.5f) - 0.01f);
-        _staticSpatialTerrain.RegisterStatic(idCollider, new ColliderSpriteInstanceData(idTileSpriteData, positionCenter), tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
-
-   
-
-        if (DEBUG_COLLIDER)
+        foreach (var collider in tileSpriteData.fastCollidersBody)
         {
-            int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(collisionBody, positionCenter, Godot.Colors.OrangeRed);
-            _colliderDebugMap.Add(idCollider, idDebugBody);
+            FastCollider fast = collider;
+
+            // Nota: Si el offset es individual por collider, usa fast.Offset.X y fast.Offset.Y en su lugar
+            float actualX = positionCenter.X + fast.Offset.X;
+            float actualY = positionCenter.Y + fast.Offset.Y;
+
+            float width = fast.Width;
+            float height = fast.Height;
+
+            if (fast.Shape == ShapeType.Circle) // esto por que es el radio, y queremos diametro para el collider
+            {
+                width = width * 2;
+                height = height * 2;
+            }
+
+            // Se usa height para el eje Y (en tu código original tenías width por error en el eje Y)
+            float currentMinX = actualX - (width * 0.5f) - 0.01f;
+            float currentMinY = actualY - (height * 0.5f) - 0.01f;
+            float currentMaxX = actualX + (width * 0.5f) + 0.01f;
+            float currentMaxY = actualY + (height * 0.5f) + 0.01f;
+
+            // Acumular mínimos y máximos globales
+            if (currentMinX < minX) minX = currentMinX;
+            if (currentMinY < minY) minY = currentMinY;
+            if (currentMaxX > maxX) maxX = currentMaxX;
+            if (currentMaxY > maxY) maxY = currentMaxY;
+
+            if (DEBUG_COLLIDER)
+            {
+                int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
+                _colliderDebugMap[idCollider].Add(idDebugBody);                
+            }
         }
 
-
-
+        var tilePositionMin = new Vector2(minX, minY);
+        var tilePositionMax = new Vector2(maxX, maxY);        
+        
+        _staticSpatialTerrain.RegisterStatic(idCollider, new ColliderSpriteInstanceData(idTileSpriteData, positionCenter), tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
+   
         return idCollider;
 
     }

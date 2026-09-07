@@ -1,10 +1,16 @@
+using Flecs.NET.Core;
+using Godot;
 using GodotEcsArch.sources.managers.Animations;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotFlecs.sources.Flecs.Components;
 using LiteDB;
+using SadRogue.Primitives;
+using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
 {
@@ -30,39 +36,64 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         public ElementsData[] damageDataArray { get; set; }
         public ElementsData[] defenseDataArray { get; set; }
         public StatsData[] statsDataArray { get; set; }
+
+        [BsonIgnore]
+        public List<FastCollider> bodyColliders { get; set; }
+
         public CharacterModelBaseData()
         {
             id = EpochIdGenerator.NewId();
         }
-
+        public void SetBodyCollider(GeometricShape2D shape2D)
+        {
+            FastCollider fastCollider = new FastCollider();            
+            switch (shape2D)
+            {
+                case Circle circle:
+                    fastCollider.Shape = ShapeType.Circle;
+                    fastCollider.Width = circle.Radius;
+                    fastCollider.Height = circle.Radius;
+                    fastCollider.Offset = new Vector2(circle.OriginCurrent.X, circle.OriginCurrent.Y);
+                    break;
+                case managers.Collision.Rectangle rectangle:
+                    fastCollider.Shape = ShapeType.Rect;
+                    fastCollider.Width = rectangle.Width;
+                    fastCollider.Height = rectangle.Height;
+                    fastCollider.Offset = new Vector2(rectangle.OriginCurrent.X, rectangle.OriginCurrent.Y);
+                    break;
+                case Slope slope:
+                    fastCollider.Shape = ShapeType.Slope;
+                    fastCollider.Slope = slope.slopeType;
+                    fastCollider.Width = slope.Width;
+                    fastCollider.Height = slope.Height;
+                    fastCollider.Offset = new Vector2(slope.OriginCurrent.X, slope.OriginCurrent.Y);
+                    break;
+                default:
+                    break;
+            }
+            if (bodyColliders == null)
+            {
+                bodyColliders = new List<FastCollider>();
+            }
+            bodyColliders.Add(fastCollider);
+        }
         [BsonCtor]
-        public CharacterModelBaseData(long idTileSpriteData) : base()
+        public CharacterModelBaseData(long idTileSpriteData,float scale) : base()
         {
             if (idTileSpriteData!=0)
             {
-                var data = MasterDataManager.GetData<TileSpriteData>(idTileSpriteData);
+                AtlasModsManager.GetSpriteUniqueId(idTileSpriteData, out var data);
                 textureVisual = data.textureVisual;
-            }
-            
-
-            //animationCharacterBaseData = AnimationCharacterManager.Instance.GetCharacterBaseData(idAnimationCharacterBaseData); 
-
-            //AnimationStateData[] animationDataArray = animationCharacterBaseData.animationDataArray;
-            //if (animationDataArray != null && animationDataArray.Length > 0)
-            //{
-            //    if (animationDataArray != null)
-            //    {
-            //        AnimationStateData dataAnim = animationDataArray[0];
-            //        if (dataAnim.animationData[0].frameDataArray != null)
-            //        {
-            //            FrameData iFrame = dataAnim.animationData[0].frameDataArray[0];
-            //            textureVisual = MaterialManager.Instance.GetAtlasTextureInternal(dataAnim.idMaterial, iFrame.x, iFrame.y, iFrame.widht, iFrame.height);
-            //        }
-
-            //    }
-            //}
-
-
+                var MoveData = data.spriteMultipleAnimationDirection.animationsTypes[AnimationType.PARADO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+                foreach (var item in MoveData.collisionBodyArray)
+                {
+                    if (item.collisionUseType == CollisionUseType.CUERPO)
+                    {
+                        SetBodyCollider(item.Multiplicity(scale));
+                    }
+                }
+                
+            }            
         }
     }
 }

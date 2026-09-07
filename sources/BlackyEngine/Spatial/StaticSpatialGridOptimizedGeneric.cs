@@ -60,8 +60,6 @@ public class StaticSpatialGridOptimizedGeneric<T>
     private readonly Stack<int> _freeNodes = new();
     private readonly Stack<int> _freeEntityIds = new();
 
-    // Entity ID -> Value.
-    //
     // _values[0] nunca representa una entidad válida.
     private readonly List<T> _values = new();
     private readonly List<EntityCellBounds> _entityBounds = new();

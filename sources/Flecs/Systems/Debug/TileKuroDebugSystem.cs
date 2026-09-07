@@ -30,7 +30,7 @@ internal class TileKuroDebugSystem : FlecsSystemBase
             ref var pos = ref posArray[i];
             ref var age = ref ageArray[i];
             ref var col = ref colArray[i];
-            WireShape.Instance.UpdatePosition(age.idShapeRadius, pos.position + col.offsetMove);
+            WireShape.Instance.UpdatePosition(age.idShapeMove, pos.position + col.offsetMove);
             if (age.idShapeRadiusAttack != 0)
             {
                 WireShape.Instance.UpdatePosition(age.idShapeRadiusAttack, pos.position);

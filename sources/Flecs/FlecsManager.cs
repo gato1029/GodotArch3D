@@ -166,7 +166,7 @@ public class FlecsManager
         //RegisterSystem<MovementFreeUnitTargetSytem>(); // libera el target de movimiento si la unidad está bloqueada o no puede llegar al target
 
         RegisterSystem<DirectionSystem>();
-        //RegisterSystem<UnitMeleeAttackSystem>();
+        RegisterSystem<UnitMeleeAttackSystem>();
         //RegisterSystem<UnitRangedAttackSystem>();
 
         //RegisterSystem<BuildRangedAttackSystem>();

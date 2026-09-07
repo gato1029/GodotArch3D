@@ -3,6 +3,7 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.utils;
@@ -145,31 +146,37 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
             if (targetEntity.IsAlive() && !targetEntity.Has<DeadTag>())
             {
                 var targetPosition =targetEntity.Get<PositionComponent>();
-                var targetBody =  targetEntity.GetMut<BodyColliderComponent>();
+                ushort idTemplate= targetEntity.Get<UnitDefinitionComponent>().idTemplate;
+                var template = BlackyPalletesPersistence.characterPalette.GetData(idTemplate);
 
-                GD.Print("En rango de verificacion");
+            
 
-                //if (IsInsideAttackHalfCircle(originAttackCenter,targetPosition.position,direction.normalized,melle.RangeAttack))
-                if (CollisionMathHelper.CheckAttackHalfCircle(
-                    originAttackCenter.X,
-                    originAttackCenter.Y,
-                    direction.normalized.X,
-                    direction.normalized.Y,
-                    melle.RangeAttack,
-                    targetPosition.position.X,
-                    targetPosition.position.Y,
-                    ref targetBody.Shapes[0]
-                ))
+                foreach (var item in template.bodyColliders)
                 {
-                    GlobalData.EventsDamage.Enqueue(new DamageEvent
+                    FastCollider fast = item;
+                    if (CollisionMathHelper.CheckAttackHalfCircle(
+                        originAttackCenter.X,
+                        originAttackCenter.Y,
+                        direction.normalized.X,
+                        direction.normalized.Y,
+                        melle.RangeAttack,
+                        targetPosition.position.X,
+                        targetPosition.position.Y,
+                        ref fast
+                    ))
                     {
-                        Source = entity,
-                        Target = targetEntity,
-                        Amount = melle.Damage
-                    });
-
-                    GD.Print("Aplicando danio");  
+                        GlobalData.EventsDamage.Enqueue(new DamageEvent
+                        {
+                            Source = entity,
+                            Target = targetEntity,
+                            Amount = melle.Damage
+                        });
+                        GD.Print("Aplicando danio");
+                        break;                        
+                    }
                 }
+
+          
                             
             }
         }

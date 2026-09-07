@@ -51,7 +51,7 @@ public sealed class BlackyWorldServices
     // ============================
     // Render helpers
     // ============================
-    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; } // para renderizar pintar Terreno // esto luego se eliminara
+    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; } 
 
     public BlackyTileRenderSystem TileRenderer { get; } // eliminar luego
 
@@ -104,7 +104,7 @@ public sealed class BlackyWorldServices
 
         TerrainTextureRenderSystem = new BlackyTileTextureRenderSystem(TerrainTexturePainter, stream.chunkManagerLocal,sim.Flecs);
 
-        Characters = new BlackyCharacterCreator(sim.Flecs,state.DynamicHash);
+        Characters = new BlackyCharacterCreator(sim.Flecs,state.DynamicHash,world);
 
         TerrainPainter = new BlackyTerrainSystem(
             state.RenderData,

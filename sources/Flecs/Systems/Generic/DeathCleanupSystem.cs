@@ -52,12 +52,15 @@ internal class DeathCleanupSystem : FlecsSystemBase
                 dynGrid.UnregisterDirect(spatial.Value);
                 e.Destruct();
                 Entity entity = it.Entity(i);
+                world.Tick.TotalUnits--;
+                world.Tick.UpdateGroupCount();
                 if (entity.Has<RvoAgentDebugComponent>())
                 {
                     var agentDebug= entity.Get<RvoAgentDebugComponent>();
-                    CollisionShapeDraw.Instance.FreeDraw(agentDebug.idShapeRadius);
+                    CollisionShapeDraw.Instance.FreeDraw(agentDebug.idShapeMove);
                     CollisionShapeDraw.Instance.FreeDraw(agentDebug.idShapeBody);
                     CollisionShapeDraw.Instance.FreeDraw(agentDebug.idShapeRadiusAttack);
+                    CollisionShapeDraw.Instance.FreeDraw(agentDebug.idShapeRadiusRangeSearch);                    
                 }
             }
         }

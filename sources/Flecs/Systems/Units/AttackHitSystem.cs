@@ -18,7 +18,7 @@ namespace GodotFlecs.sources.Flecs.Systems.Units;
 internal class AttackHitSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => true; //antes true;
+    protected override bool MultiThreaded => true;
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<AttackPendingComponent>()

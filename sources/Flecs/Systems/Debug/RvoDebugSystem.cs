@@ -1,5 +1,6 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
@@ -17,8 +18,8 @@ internal class RvoDebugSystem : FlecsSystemBase
     {
         qb.With<RvoAgentDebugComponent>()
             .With<PositionComponent>()
-            .With<MoveColliderComponent>();
-          //  .With<BodyColliderComponent>();
+            .With<MoveColliderComponent>()
+            .With<UnitDefinitionComponent>();
     }
 
     protected override void OnIter(Iter it)
@@ -26,26 +27,31 @@ internal class RvoDebugSystem : FlecsSystemBase
         var ageArray = it.Field<RvoAgentDebugComponent>(0);
         var posArray = it.Field<PositionComponent>(1);
         var colArray = it.Field<MoveColliderComponent>(2);
-      //  var colBodyArray = it.Field<BodyColliderComponent>(3);
+        var unitArray = it.Field<UnitDefinitionComponent>(3);
 
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
             ref var age = ref ageArray[i];
             ref var col = ref colArray[i];
+            ref var unit = ref unitArray[i];
             Entity entity = it.Entity(i);
 
-            WireShape.Instance.UpdatePosition(age.idShapeRadius, pos.position+col.Offset);
+            WireShape.Instance.UpdatePosition(age.idShapeMove, pos.position+col.Offset);
             if (age.idShapeRadiusAttack!=0)
             {
                 var colMelle = entity.Get<MeleeAttackComponent>();
                 WireShape.Instance.UpdatePosition(age.idShapeRadiusAttack, pos.position+ colMelle.OffSetRange);
             }
-            
-            if (entity.Has<BodyColliderComponent>())
+            if (age.idShapeRadiusRangeSearch!=0)
             {
-                var colBody = entity.Get<BodyColliderComponent>();
-                WireShape.Instance.UpdatePosition(age.idShapeBody, pos.position + colBody.Shapes[0].Offset);
+                WireShape.Instance.UpdatePosition(age.idShapeRadiusRangeSearch, pos.position);
+            }
+            if (age.idShapeBody!=0)
+            {
+                var template = BlackyPalletesPersistence.characterPalette.GetData(unit.idTemplate);
+                var colBody = template.bodyColliders[0];                
+                WireShape.Instance.UpdatePosition(age.idShapeBody, pos.position + colBody.Offset);
             }
            
         }

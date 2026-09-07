@@ -223,7 +223,9 @@ public class TileSpriteData:IdDataLong
                       data.framesArray[0].y,
                       data.framesArray[0].widht,
                       data.framesArray[0].height);
-                }                           
+                      CrearFastCollider(data);
+                }
+                
                 break;
             case TileSpriteType.AnimatedMultiple:
                 break;
@@ -244,7 +246,8 @@ public class TileSpriteData:IdDataLong
             if (item.collisionUseType == CollisionUseType.CUERPO)
             {
                 FastCollider fastCollider = new FastCollider();
-                switch (item)
+                GeometricShape2D shape = item.Multiplicity(animationData.scale);
+                switch (shape)
                 {
                     case Circle circle:
                         fastCollider.Shape = ShapeType.Circle;
@@ -283,8 +286,9 @@ public class TileSpriteData:IdDataLong
         {
             if (item.collisionUseType == CollisionUseType.CUERPO)
             {
+                GeometricShape2D shape = item.Multiplicity(spriteData.scale);
                 FastCollider fastCollider = new FastCollider();
-                switch (item)
+                switch (shape)
                 {
                     case Circle circle:
                         fastCollider.Shape = ShapeType.Circle;

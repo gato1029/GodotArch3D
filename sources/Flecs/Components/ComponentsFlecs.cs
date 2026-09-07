@@ -179,6 +179,11 @@ public record struct DirtyTileSpriteTextureRenderTag();
 [RegisterComponentFlecs]
 public record struct DirtyTransformTag();
 
+[RegisterComponentFlecs]
+public record struct UnitDefinitionComponent
+(
+    ushort idTemplate // id Template de la unidad, para buscar en la base de datos
+);
 
 [RegisterComponentFlecs]
 public record struct IdGenericComponent
@@ -318,9 +323,10 @@ public record struct RvoAgentIdComponent(
 
 [RegisterComponentFlecs]
 public record struct RvoAgentDebugComponent(
-    int idShapeRadius,
+    int idShapeMove,
     int idShapeBody,
-    int idShapeRadiusAttack
+    int idShapeRadiusAttack,
+    int idShapeRadiusRangeSearch
     );
 [RegisterComponentFlecs]
 public struct SpatialComponent

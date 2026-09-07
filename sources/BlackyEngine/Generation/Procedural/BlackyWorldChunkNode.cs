@@ -36,6 +36,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Procedural
                     if (!_candidatesByChunk.ContainsKey(coord))
                     {
                         _candidatesByChunk[coord] = new List<BlackyWorldNode>();
+                        GD.Print($"[BlackyWorldChunkNode] Initialized chunk {coord.X}, {coord.Y} with empty candidate list.");
                     }
                 }
             }
@@ -60,16 +61,13 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Procedural
                         var coord = new BlackyChunkCoord(cx, cy);
 
                         // Si el chunk está dentro del rango del mapa, aseguramos la lista y agregamos el nodo
-                        if (!_candidatesByChunk.TryGetValue(coord, out var list))
+                        if (_candidatesByChunk.TryGetValue(coord, out var list))
                         {
-                            list = new List<BlackyWorldNode>();
-                            _candidatesByChunk[coord] = list;
-                        }
-
-                        if (!list.Contains(node))
-                        {
-                            list.Add(node);
-                        }
+                            if (!list.Contains(node))
+                            {
+                                list.Add(node);
+                            }
+                        }                      
                     }
                 }
             }
@@ -102,7 +100,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Procedural
         }
 
         public List<BlackyChunkCoord> GetAllChunksWithCandidates()
-        {
+        {            
             return _candidatesByChunk.Keys.ToList();
         }
 

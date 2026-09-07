@@ -15,8 +15,7 @@ namespace GodotFlecs.sources.Flecs.Systems.Units;
 public class UnitEnemySearchSystem: FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => true;
-    const int GROUP_COUNT = 2; // 🔥 ajusta según cantidad de unidades
+    protected override bool MultiThreaded => true;    
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
@@ -53,6 +52,7 @@ public class UnitEnemySearchSystem: FlecsSystemBase
 
         // 🔥 tiempo acumulado correcto
         float totalTime = sim.TickCount * sim.FixedDelta;
+        int mask = sim.GetGroupMask();
 
         for (int i = 0; i < it.Count(); i++)
         {
@@ -75,8 +75,8 @@ public class UnitEnemySearchSystem: FlecsSystemBase
                 // 🔥 conservar excedente (CLAVE)
                 search.Timer -= times * search.Interval;
                 // 🔥 👇 AQUI VA EL STAGGERING 👇
-                int group = spatial.Value & (GROUP_COUNT - 1);
-                int frame = sim.FrameIndex & (GROUP_COUNT - 1);
+                int group = spatial.Value & mask;
+                int frame = sim.FrameIndex & mask;
 
                 if (group != frame)
                     continue;

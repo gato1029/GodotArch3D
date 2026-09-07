@@ -17,6 +17,29 @@ public class SimulationTick
     public float FixedDelta;
     public int TickCount; // 🔥 cuantos ticks ocurrieron este frame
     public int FrameIndex; // 🔥 índice del frame actual, para sistemas que quieran hacer algo cada N frames
+    public int TotalUnits; // lo usare para luego dividir la carga de búsqueda de enemigos entre frames, para no hacer todo en un frame y que se note el lag
+    public int GruposDivisionUnidades = 1;
+
+    /// <summary>
+    /// Ajusta automáticamente la cantidad de grupos en función de las unidades totales
+    /// para balancear el rendimiento de la CPU (staggering).
+    /// </summary>
+    public void UpdateGroupCount()
+    {
+        if (TotalUnits > 1000)
+            GruposDivisionUnidades = 8;
+        else if (TotalUnits > 300)
+            GruposDivisionUnidades = 4;
+        else if (TotalUnits > 50)
+            GruposDivisionUnidades = 2;
+        else
+            GruposDivisionUnidades = 1; // Sin escalonamiento para grupos pequeños
+    }
+
+    /// <summary>
+    /// Devuelve la máscara binaria segura para usar con el operador bitwise (&).
+    /// </summary>
+    public int GetGroupMask() => Math.Max(1, GruposDivisionUnidades) - 1;
 }
 
 public class SimulationTickSystem : FlecsSystemBase

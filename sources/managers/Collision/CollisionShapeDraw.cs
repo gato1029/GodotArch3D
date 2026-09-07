@@ -19,6 +19,24 @@ internal class CollisionShapeDraw:SingletonBase<CollisionShapeDraw>
     {
         return WireShape.Instance.DrawCircle(radius, position, LayerRender, color, 32, WireShape.TypeDraw.NORMAL);     
     }
+    public int DrawCollisionShapes(FastCollider fastCollider, Vector2 position, Godot.Color color)
+    {
+        switch (fastCollider.Shape)
+        {
+            case ShapeType.Rect:
+                return WireShape.Instance.DrawSquare(fastCollider.Width, fastCollider.Height, position + fastCollider.Offset, LayerRender, color, WireShape.TypeDraw.NORMAL);
+
+            case ShapeType.Circle:
+                return WireShape.Instance.DrawCircle(fastCollider.Width, position + fastCollider.Offset, LayerRender, color, 32, WireShape.TypeDraw.NORMAL);            
+
+            case ShapeType.Slope:
+                return WireShape.Instance.DrawSlope(fastCollider.Width, fastCollider.Height, fastCollider.Slope, position, LayerRender, color, WireShape.TypeDraw.NORMAL);
+            default:
+                break;
+        }
+        return 0;
+        // Lógica para dibujar las formas de colisión
+    }
     public int DrawCollisionShapes(GeometricShape2D geometricShape2D, Vector2 position, Godot.Color color)
     {
         switch (geometricShape2D)

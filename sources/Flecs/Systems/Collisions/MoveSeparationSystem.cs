@@ -3,6 +3,7 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 
 using GodotEcsArch.sources.utils;
@@ -41,6 +42,7 @@ public class MoveSeparationSystem : FlecsSystemBase
           .With<MoveResolutorComponent>()
           .With<SteeringComponent>()
           .With<VelocityComponent>()
+          .With<UnitDefinitionComponent>()
           .Without<SleepTag>();
           
     }
@@ -66,6 +68,7 @@ public class MoveSeparationSystem : FlecsSystemBase
         var resArray = it.Field<MoveResolutorComponent>(3);
         var steeringArray = it.Field<SteeringComponent>(4);
         var velArray = it.Field<VelocityComponent>(5);
+        var unitArray = it.Field<UnitDefinitionComponent>(6);
 
         var dynGrid = blackyWorld.State.DynamicHash;
         var staGrid = blackyWorld.State.StaticSpatial;
@@ -166,10 +169,14 @@ public class MoveSeparationSystem : FlecsSystemBase
             var other = grid.GetEntity(id);
             if (!other.HasValue || !other.Value.IsAlive()) continue;
 
-            var bodyCollider = other.Value.Get<BodyColliderComponent>();
+            ushort idTemplate = other.Value.Get<UnitDefinitionComponent>().idTemplate; // 🔹 para asegurar que es una entidad con collider
+            var template =BlackyPalletesPersistence.characterPalette.GetData(idTemplate);
+            
+            //var bodyCollider = other.Value.Get<BodyColliderComponent>();
+
             var posOther = other.Value.Get<PositionComponent>();
 
-            foreach (var shape in bodyCollider.Shapes)
+            foreach (var shape in template.bodyColliders)
             {
                 var shapeInternal = shape;
                 if (!CollisionMathHelper.Check(

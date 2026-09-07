@@ -20,8 +20,7 @@ internal class AnimationSystem : FlecsSystemBase
     protected override bool MultiThreaded => true;
     protected override void BuildQuery(ref QueryBuilder qb)
     {
-        qb.With<IdGenericComponent>()
-           .With<AnimationComponent>()
+        qb.With<AnimationComponent>()
            .With<DirectionComponent>()
            .With<RenderFrameDataComponent>();
 
@@ -29,15 +28,14 @@ internal class AnimationSystem : FlecsSystemBase
 
     protected override void OnIter(Iter it)
     {
-        var idGen = it.Field<IdGenericComponent>(0);
-        var animation = it.Field<AnimationComponent>(1);
-        var dir = it.Field<DirectionComponent>(2);
-        var frame = it.Field<RenderFrameDataComponent>(3);
+        
+        var animation = it.Field<AnimationComponent>(0);
+        var dir = it.Field<DirectionComponent>(1);
+        var frame = it.Field<RenderFrameDataComponent>(2);
         float delta = it.DeltaTime();
 
         for (int i = 0; i < it.Count(); i++)
-        {
-            ref var id = ref idGen[i];
+        {            
             ref var anim = ref animation[i];
             ref var direction = ref dir[i];
             ref var f = ref frame[i];
@@ -45,9 +43,7 @@ internal class AnimationSystem : FlecsSystemBase
             AnimationType stateAnimation = anim.stateAnimation;
             var  animationData = AnimationCache.GetAnimation(anim.idSpriteOrAnimation, anim.entityType, anim.stateAnimation,  direction);
 
-            //var dataCharacterModel = CharacterModelManager.Instance.GetCharacterModel(id.id);
-            //AnimationStateData animationStateData = dataCharacterModel.animationCharacterBaseData.animationDataArray[stateAnimation];
-            //AnimationData animationData = animationStateData.animationData[(int)d.animationDirection];
+
 
 
             if (anim.lastStateAnimation != stateAnimation)

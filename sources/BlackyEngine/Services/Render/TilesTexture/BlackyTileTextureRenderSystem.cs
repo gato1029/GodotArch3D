@@ -190,46 +190,7 @@ public class BlackyTileTextureRenderSystem
         }
     }
 
-    // ===============================
-    // DIRTY
-    // ===============================
-
-    //private void RebuildDirty(BlackyChunkTexture chunk)
-    //{
-    //    Vector2I coord = new(chunk.Coord.X, chunk.Coord.Y);
-
-    //    foreach (var height in chunk.GetHeights())
-    //    {
-    //        foreach (var layer in height.GetAllLayers())
-    //        {
-    //            if (layer == null || !layer.HasDirtyTiles)
-    //                continue;
-
-    //            foreach (var tile in layer.ConsumeDirtyTiles())
-    //            {
-    //                int x = tile.x;
-    //                int y = tile.y;
-    //                int tileId = tile.tileId;
-
-    //                if (tileId == 0)
-    //                {
-    //                    RemoveTile(coord, height.Height, layer.LayerIndex, x, y);
-    //                    continue;
-    //                }
-
-    //                RemoveTile(coord, height.Height, layer.LayerIndex, x, y);
-
-    //                //RenderTile(coord, height.Height, layer.LayerIndex, x, y, tileId, chunk);
-
-    //                //OnRefreshDirtyTile?.Invoke(
-    //                //    layer.LayerIndex,
-    //                //    new Vector2I(tile.worldX, tile.worldY)
-    //                //);
-    //            }
-    //        }
-    //    }
-    //}
-
+    
     // ===============================
     // RENDER CORE
     // ===============================

@@ -1,3 +1,4 @@
+
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
@@ -29,17 +30,21 @@ public class BlackyCharacterCreator
     private int layer =4;
     private readonly FlecsManager flecsManager;
     private readonly FastSpatialHash dynamicHash;
+    private readonly Core.BlackyWorld world;
     private bool DEBUG_COLLIDERS = true;
-    public BlackyCharacterCreator(FlecsManager flecsManager, FastSpatialHash dynamicHash)
+    public BlackyCharacterCreator(FlecsManager flecsManager, FastSpatialHash dynamicHash, Core.BlackyWorld world)
     {
         this.flecsManager = flecsManager;
         this.dynamicHash = dynamicHash;
+        this.world = world;
     }
 
     public Entity Create(long id, Godot.Vector2 position)
     {
-        BlackyPalletesPersistence.characterPalette.GetIdPersistence("Base", id, out CharacterModelBaseData charModel);
-        _characterCount++;
+        world.Tick.TotalUnits++;
+        ushort characterId = BlackyPalletesPersistence.characterPalette.GetIdPersistence("Base", id, out CharacterModelBaseData charModel);
+      
+        
         //CharacterModelBaseData characterBaseData = CharacterLocalBase.Instance.GetCharacterBaseData(id);
         var entity = flecsManager.WorldFlecs.Entity();
 
@@ -48,14 +53,14 @@ public class BlackyCharacterCreator
         switch (charModel.characterType)
         {
             case CharacterType.MAIN:
-                return CreateGeneric(entity, charModel, position);
+                return CreateGeneric( characterId, entity, charModel, position);
                 break;
 
             case CharacterType.NPC:
                 break;
 
             case CharacterType.ENEMIGO:
-                return CreateEnemy(entity, charModel, position);
+                return CreateEnemy(characterId, entity, charModel, position);
                 break;
 
             default:
@@ -64,34 +69,34 @@ public class BlackyCharacterCreator
         return entity;
     }
 
-    private void AddCollider(Entity entity, Vector2 position, GeometricShape2D collisionBody, GeometricShape2D collisionFeet,    out int idDebugMove, out int idDebugBody)
+    private void AddCollider(Entity entity, Vector2 position, List<FastCollider> collisionBodys, GeometricShape2D collisionFeet,    out int idDebugMove, out int idDebugBody)
     {
-        // cuerpo
-        ShapeType shapeType = ShapeType.Rect;
-        float width = 0;
-        float height = 0;
-        float offsetX = 0;
-        float offsetY = 0;
+        //// cuerpo
+        //ShapeType shapeType = ShapeType.Rect;
+        //float width = 0;
+        //float height = 0;
+        //float offsetX = 0;
+        //float offsetY = 0;
 
-        switch (collisionBody)
-        {
-            case Circle circle:
-                shapeType = ShapeType.Circle;
-                width = circle.Radius;
-                height = circle.Radius;
-                offsetX = circle.OriginCurrent.X;
-                offsetY = circle.OriginCurrent.Y;
-                break;
-            case Rectangle rectangle:
-                shapeType = ShapeType.Rect;
-                width = rectangle.Width;
-                height = rectangle.Height;
-                offsetX = rectangle.OriginCurrent.X;
-                offsetY = rectangle.OriginCurrent.Y;
-                break;
-            default:
-                break;
-        }
+        //switch (collisionBody)
+        //{
+        //    case Circle circle:
+        //        shapeType = ShapeType.Circle;
+        //        width = circle.Radius;
+        //        height = circle.Radius;
+        //        offsetX = circle.OriginCurrent.X;
+        //        offsetY = circle.OriginCurrent.Y;
+        //        break;
+        //    case Rectangle rectangle:
+        //        shapeType = ShapeType.Rect;
+        //        width = rectangle.Width;
+        //        height = rectangle.Height;
+        //        offsetX = rectangle.OriginCurrent.X;
+        //        offsetY = rectangle.OriginCurrent.Y;
+        //        break;
+        //    default:
+        //        break;
+        //}
 
         // collider de los pies (huella física)
 
@@ -121,10 +126,7 @@ public class BlackyCharacterCreator
                 break;
         }
 
-        if (true)
-        {
-
-        }
+       
         var SpatialIDComponent = new SpatialIDComponent
         {
             Layer = CollisionConfig.TypePlayer ,
@@ -136,23 +138,23 @@ public class BlackyCharacterCreator
             widthPies,new Vector2(offsetXPies, offsetYPies), widthPies * 1.5f
         );
 
-        FastCollider[] bodyColliders = new FastCollider[1]
-        {
-            new FastCollider
-            {
-                Shape = shapeType,
-                Width = width,
-                Height = height,
-                Offset = new Vector2(offsetX, offsetY)
-            }
-        };
-        var BodyComponent = new BodyColliderComponent
-        (
-           bodyColliders
-        );
+        //FastCollider[] bodyColliders = new FastCollider[1]
+        //{
+        //    new FastCollider
+        //    {
+        //        Shape = shapeType,
+        //        Width = width,
+        //        Height = height,
+        //        Offset = new Vector2(offsetX, offsetY)
+        //    }
+        //};
+        //var BodyComponent = new BodyColliderComponent
+        //(
+        //   bodyColliders
+        //);
 
         entity.Set(SpatialIDComponent);
-        entity.Set(BodyComponent);
+        //entity.Set(BodyComponent);
         entity.Set(MoveComponent);
         entity.Add<UnitTag>();
 
@@ -161,7 +163,7 @@ public class BlackyCharacterCreator
         if (DEBUG_COLLIDERS)
         {
             idDebugMove = CollisionShapeDraw.Instance.DrawCircleShape(widthPies, position, Colors.IndianRed);
-            idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(collisionBody, position, Colors.Green);
+            idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(collisionBodys[0], position, Colors.Green);
         }
         else
         {
@@ -171,7 +173,7 @@ public class BlackyCharacterCreator
 
 
     }
-    private Entity CreateGeneric(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
+    private Entity CreateGeneric(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
     {
         int height = 5; // altura en el mundo
 
@@ -184,7 +186,7 @@ public class BlackyCharacterCreator
         var MoveData = animationDir.animationsTypes[AnimationType.PARADO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 
         GeometricShape2D colliderMove = MoveData.collisionDictionary[CollisionUseType.BASE_PIES].Multiplicity(characterBaseData.scale);        
-        GeometricShape2D colliderBody = MoveData.collisionDictionary[CollisionUseType.CUERPO].Multiplicity(characterBaseData.scale);
+        
 
         var AtackData = animationDir.animationsTypes[AnimationType.ATACANDO_CUERPO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 
@@ -216,8 +218,8 @@ public class BlackyCharacterCreator
         });
                 
         entity.Set(new TeamComponent(1));
-        entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));
-
+        entity.Set(new UnitDefinitionComponent(characterId));
+        
         entity.Set(new PositionComponent(position, Vector2I.Zero, height));
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.OCHO, GodotEcsArch.sources.components.AnimationDirection.LEFT));      
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
@@ -238,13 +240,13 @@ public class BlackyCharacterCreator
         entity.Set(new WeaponComponent(1, false));
         //entity.Set(new StuckComponent(position, 0, false));
 
-        AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);
+        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody);
 
         int idDebugRangeMelle = CollisionShapeDraw.Instance.DrawCircleShape(colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, Colors.Blue);
 
         if (DEBUG_COLLIDERS)
         {
-            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle));
+            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle,0));
         }
 
 
@@ -253,136 +255,136 @@ public class BlackyCharacterCreator
 
         return entity;
     }
-    private Entity CreateMain(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
-    {
+    //private Entity CreateMain(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
+    //{
       
-        var idTileSprite = characterBaseData.idTileSpriteData; // información del sprite del personaje y colliders ID
-        int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite
-        AtlasModsManager.TryGetTileSprite(spriteId, out var sprite); // Obtén el sprite del personaje
+    //    var idTileSprite = characterBaseData.idTileSpriteData; // información del sprite del personaje y colliders ID
+    //    int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite
+    //    AtlasModsManager.TryGetTileSprite(spriteId, out var sprite); // Obtén el sprite del personaje
 
-        var animationDir = sprite.spriteMultipleAnimationDirection; // Obtén las animación de caminar del personaje
+    //    var animationDir = sprite.spriteMultipleAnimationDirection; // Obtén las animación de caminar del personaje
 
 
-        var tileData = MasterDataManager.GetData<TileSpriteData>(characterBaseData.idTileSpriteData);
-        var MoveData =tileData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+    //    var tileData = MasterDataManager.GetData<TileSpriteData>(characterBaseData.idTileSpriteData);
+    //    var MoveData =tileData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 
         
 
-        //GeometricShape2D colliderMove = characterBaseData.animationCharacterBaseData.collisionMove.Multiplicity(characterBaseData.scale);
-        //Circle circle = (Circle)colliderMove;
-        //GeometricShape2D colliderBody = characterBaseData.animationCharacterBaseData.collisionBody.Multiplicity(characterBaseData.scale);
+    //    //GeometricShape2D colliderMove = characterBaseData.animationCharacterBaseData.collisionMove.Multiplicity(characterBaseData.scale);
+    //    //Circle circle = (Circle)colliderMove;
+    //    //GeometricShape2D colliderBody = characterBaseData.animationCharacterBaseData.collisionBody.Multiplicity(characterBaseData.scale);
 
 
-        GeometricShape2D colliderMove = MoveData.collisionBodyDictionary["Base"].Multiplicity(characterBaseData.scale);
-        //Circle circle = (Circle)colliderMove;
-        GeometricShape2D colliderBody = MoveData.collisionBodyDictionary["Cuerpo"].Multiplicity(characterBaseData.scale);
+    //    GeometricShape2D colliderMove = MoveData.collisionBodyDictionary["Base"].Multiplicity(characterBaseData.scale);
+    //    //Circle circle = (Circle)colliderMove;
+    //    GeometricShape2D colliderBody = MoveData.collisionBodyDictionary["Cuerpo"].Multiplicity(characterBaseData.scale);
 
        
 
-        entity.Set(new GodotFlecs.sources.Flecs.Components.CharacterComponent
-        {
-            characterStateType = CharacterStateType.IDLE,
-            characterBehaviorType = CharacterBehaviorType.PERSONAJE_PRINCIPAL
-        });
+    //    entity.Set(new GodotFlecs.sources.Flecs.Components.CharacterComponent
+    //    {
+    //        characterStateType = CharacterStateType.IDLE,
+    //        characterBehaviorType = CharacterBehaviorType.PERSONAJE_PRINCIPAL
+    //    });
 
-        CreateMainBodyWeapons(entity, characterBaseData, position);
+    //    CreateMainBodyWeapons(entity, characterBaseData, position);
 
-        //entity.Set(new RenderTransformComponent(transform));
-        //entity.Set(new RenderGPUComponent( instance.rid,   instance.instance, instance.material, instance.layerTexture, 20, 0, 1, originOffset));
-        //entity.Set(new AnimationComponent(characterBaseData.id, EntityType.PERSONAJE, 0, -1, 0, 0, 0, false, true));
-        //entity.Set(new RenderFrameDataComponent { uvMap = new Godot.Color(0, 0, 0, 0) });
+    //    //entity.Set(new RenderTransformComponent(transform));
+    //    //entity.Set(new RenderGPUComponent( instance.rid,   instance.instance, instance.material, instance.layerTexture, 20, 0, 1, originOffset));
+    //    //entity.Set(new AnimationComponent(characterBaseData.id, EntityType.PERSONAJE, 0, -1, 0, 0, 0, false, true));
+    //    //entity.Set(new RenderFrameDataComponent { uvMap = new Godot.Color(0, 0, 0, 0) });
 
-        entity.Set(new TeamComponent(1));
-        entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));
+    //    entity.Set(new TeamComponent(1));
+    //    entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));
    
         
 
-        entity.Set(new PositionComponent(position, Vector2I.Zero,4));
-        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero,DirectionAnimationType.CUATRO, GodotEcsArch.sources.components.AnimationDirection.LEFT));
+    //    entity.Set(new PositionComponent(position, Vector2I.Zero,4));
+    //    entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero,DirectionAnimationType.CUATRO, GodotEcsArch.sources.components.AnimationDirection.LEFT));
 
-       // int idAgent = RvoManager.Instance.RegisterAgent(position, circle.Radius, 3);
-       // entity.Set(new RvoAgentIdComponent(idAgent, circle.Radius));
+    //   // int idAgent = RvoManager.Instance.RegisterAgent(position, circle.Radius, 3);
+    //   // entity.Set(new RvoAgentIdComponent(idAgent, circle.Radius));
 
-        entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
-        entity.Set(new MoveResolutorComponent(false, 0, position,0,0));
-        entity.Set(new PlayerInputComponent());
+    //    entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
+    //    entity.Set(new MoveResolutorComponent(false, 0, position,0,0));
+    //    entity.Set(new PlayerInputComponent());
 
-        // este collider component tiene que salir luego
-        //int idCollider = CollisionManager.Instance.characterEntitiesFlecs.AddColliderObject(entity, colliderBody, position,1,colliderMove);
-        entity.Set(new ColliderComponent(0, new Rect2(), colliderBody.OriginCurrent, new Rect2(position -(colliderMove.GetSizeQuad() / 2), colliderMove.GetSizeQuad()), colliderMove.OriginCurrent,0));
+    //    // este collider component tiene que salir luego
+    //    //int idCollider = CollisionManager.Instance.characterEntitiesFlecs.AddColliderObject(entity, colliderBody, position,1,colliderMove);
+    //    entity.Set(new ColliderComponent(0, new Rect2(), colliderBody.OriginCurrent, new Rect2(position -(colliderMove.GetSizeQuad() / 2), colliderMove.GetSizeQuad()), colliderMove.OriginCurrent,0));
 
-        entity.Set(new HumanAttackComponent(10, 1f, 0.0f, 0.2f, 0));
-        entity.Set(new HealthComponent(6000));
+    //    entity.Set(new HumanAttackComponent(10, 1f, 0.0f, 0.2f, 0));
+    //    entity.Set(new HealthComponent(6000));
         
-        float rvoRadius = MeshCreator.PixelsToUnits(12);
-        //entity.Set(new MeleeAttackComponent(20, radiusAttack, MoveData.offsetInternal, 0f, 0));
-        entity.Set(new SteeringComponent(rvoRadius,4, Vector2.Zero));
-        //entity.Set(new StuckComponent(position, 0, false));
+    //    float rvoRadius = MeshCreator.PixelsToUnits(12);
+    //    //entity.Set(new MeleeAttackComponent(20, radiusAttack, MoveData.offsetInternal, 0f, 0));
+    //    entity.Set(new SteeringComponent(rvoRadius,4, Vector2.Zero));
+    //    //entity.Set(new StuckComponent(position, 0, false));
 
-        AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);
+    //    AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);
 
-        if (DEBUG_COLLIDERS)
-        {
-            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, 0));
-        }
+    //    if (DEBUG_COLLIDERS)
+    //    {
+    //        entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, 0,0));
+    //    }
         
        
-        entity.Add<UseBoidTag>();
+    //    entity.Add<UseBoidTag>();
         
 
         
 
-        return entity;
-    }
-    private void CreateMainBodyWeapons(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
-    {
-        var tileData = MasterDataManager.GetData<TileSpriteData>(characterBaseData.idTileSpriteData);
-        var MoveData = tileData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+    //    return entity;
+    //}
+    //private void CreateMainBodyWeapons(Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
+    //{
+    //    var tileData = MasterDataManager.GetData<TileSpriteData>(characterBaseData.idTileSpriteData);
+    //    var MoveData = tileData.spriteMultipleAnimationDirection.animationsTypes[AnimationType.CAMINANDO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 
-        Godot.Vector2 originOffset = new Vector2(MoveData.offsetInternal.X * characterBaseData.scale, MoveData.offsetInternal.Y * characterBaseData.scale);
-        int idMaterial = MoveData.idMaterial;
-        var instance = MultimeshManager.Instance.CreateInstance(idMaterial);
+    //    Godot.Vector2 originOffset = new Vector2(MoveData.offsetInternal.X * characterBaseData.scale, MoveData.offsetInternal.Y * characterBaseData.scale);
+    //    int idMaterial = MoveData.idMaterial;
+    //    var instance = MultimeshManager.Instance.CreateInstance(idMaterial);
 
-        Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
-        transform.Origin = new Godot.Vector3(position.X, position.Y, (position.Y * CommonAtributes.LAYER_MULTIPLICATOR) + 0);
-        transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
+    //    Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
+    //    transform.Origin = new Godot.Vector3(position.X, position.Y, (position.Y * CommonAtributes.LAYER_MULTIPLICATOR) + 0);
+    //    transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
 
-        int numLayers = 2; // Cuerpo + arma
-        AnimationComponent[] animations = new AnimationComponent[numLayers];
-        RenderGPUComponent[] GPUData = new RenderGPUComponent[numLayers];
-        RenderFrameDataComponent[] frames = new RenderFrameDataComponent [numLayers];
-        RenderTransformComponent[] transforms = new RenderTransformComponent [numLayers];
+    //    int numLayers = 2; // Cuerpo + arma
+    //    AnimationComponent[] animations = new AnimationComponent[numLayers];
+    //    RenderGPUComponent[] GPUData = new RenderGPUComponent[numLayers];
+    //    RenderFrameDataComponent[] frames = new RenderFrameDataComponent [numLayers];
+    //    RenderTransformComponent[] transforms = new RenderTransformComponent [numLayers];
 
-        // Capa del cuerpo principal
-        animations[0] = new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true,true);
-        GPUData[0] = new RenderGPUComponent(instance.rid, instance.instance, instance.material, instance.layerTexture, layer, MoveData.yDepthRenderFormat, characterBaseData.scale, originOffset);
-        frames[0] = new RenderFrameDataComponent { uvMap = new Godot.Color(0, 0, 0, 0) };
-        transforms[0] = new RenderTransformComponent(transform);
+    //    // Capa del cuerpo principal
+    //    animations[0] = new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true,true);
+    //    GPUData[0] = new RenderGPUComponent(instance.rid, instance.instance, instance.material, instance.layerTexture, layer, MoveData.yDepthRenderFormat, characterBaseData.scale, originOffset);
+    //    frames[0] = new RenderFrameDataComponent { uvMap = new Godot.Color(0, 0, 0, 0) };
+    //    transforms[0] = new RenderTransformComponent(transform);
 
-        // Capa del arma 
-        //var weaponBase =AccesoryManager.Instance.GetAccesory(2);
-        int idWeapon = 2; // Aquí deberías obtener el ID del arma que deseas equipar
-        var weaponBase = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, idWeapon, characterBaseData.scale);
+    //    // Capa del arma 
+    //    //var weaponBase =AccesoryManager.Instance.GetAccesory(2);
+    //    int idWeapon = 2; // Aquí deberías obtener el ID del arma que deseas equipar
+    //    var weaponBase = AccesoryAvatarManager.Instance.ChangueAccesory(AccesoryAvatarType.WEAPON, idWeapon, characterBaseData.scale);
 
-        animations[1] = new AnimationComponent(weaponBase.idTileSprite, EntityType.ACCESORIO, AnimationType.ATACANDO_DISTANCIA, AnimationType.NINGUNA, 0, 0, 0, false, true,false);
-        GPUData[1] = new RenderGPUComponent(weaponBase.gpu.rid, weaponBase.gpu.instance, 0, 0, layer, MoveData.yDepthRenderFormat, characterBaseData.scale, originOffset);
-        frames[1] = new RenderFrameDataComponent { uvMap = new Godot.Color(0, 0, 0, 0) };
-        transforms[1] = new RenderTransformComponent(transform);
+    //    animations[1] = new AnimationComponent(weaponBase.idTileSprite, EntityType.ACCESORIO, AnimationType.ATACANDO_DISTANCIA, AnimationType.NINGUNA, 0, 0, 0, false, true,false);
+    //    GPUData[1] = new RenderGPUComponent(weaponBase.gpu.rid, weaponBase.gpu.instance, 0, 0, layer, MoveData.yDepthRenderFormat, characterBaseData.scale, originOffset);
+    //    frames[1] = new RenderFrameDataComponent { uvMap = new Godot.Color(0, 0, 0, 0) };
+    //    transforms[1] = new RenderTransformComponent(transform);
 
-        entity.Set(weaponBase.weaponComponent);
+    //    entity.Set(weaponBase.weaponComponent);
         
-        entity.Set(new RenderLayerListComponent
-            {
-            Animations = animations,
-            GPUData = GPUData,
-            Frames = frames,
-            Transforms = transforms
-        });
+    //    entity.Set(new RenderLayerListComponent
+    //        {
+    //        Animations = animations,
+    //        GPUData = GPUData,
+    //        Frames = frames,
+    //        Transforms = transforms
+    //    });
 
-        // Aquí puedes agregar la lógica para crear las armas del personaje principal
-        // Por ejemplo, podrías agregar componentes relacionados con las armas
-    }
-    private Entity CreateEnemy(Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position)
+    //    // Aquí puedes agregar la lógica para crear las armas del personaje principal
+    //    // Por ejemplo, podrías agregar componentes relacionados con las armas
+    //}
+    private Entity CreateEnemy(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position)
     {
         int height = 5; // altura en el mundo
 
@@ -395,7 +397,7 @@ public class BlackyCharacterCreator
         var MoveData = animationDir.animationsTypes[AnimationType.PARADO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 
         GeometricShape2D colliderMove = MoveData.collisionDictionary[CollisionUseType.BASE_PIES].Multiplicity(characterBaseData.scale);
-        GeometricShape2D colliderBody = MoveData.collisionDictionary[CollisionUseType.CUERPO].Multiplicity(characterBaseData.scale);
+        //GeometricShape2D colliderBody = MoveData.collisionDictionary[CollisionUseType.CUERPO].Multiplicity(characterBaseData.scale);
 
         var AtackData = animationDir.animationsTypes[AnimationType.ATACANDO_CUERPO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
 
@@ -428,7 +430,8 @@ public class BlackyCharacterCreator
         });
         
         entity.Set(new TeamComponent(2));
-        entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));                        
+        //entity.Set(new IdGenericComponent(characterBaseData.id, EntityType.PERSONAJE));                        
+        entity.Set(new UnitDefinitionComponent(characterId));
         entity.Set(new PositionComponent(position,Vector2I.Zero,1));
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, animationDir.directionAnimationType, GodotEcsArch.sources.components.AnimationDirection.LEFT));        
         entity.Set(new VelocityComponent(new Vector2(0,0),3f,new Vector2(0,0)));
@@ -442,19 +445,21 @@ public class BlackyCharacterCreator
 
 
         float rvoRadius = MeshCreator.PixelsToUnits(12);
-        float radiusAttack = MeshCreator.PixelsToUnits(colliderAtackMelle.Radius);
+        float radiusSearchEnemy = MeshCreator.PixelsToUnits(64);
 
         //entity.Set(new RangedAttackComponent(1,20,5f,0.5f,0,true,6));
-        entity.Set(new MeleeAttackComponent(20, radiusAttack, colliderAtackMelle.OriginCurrent, 1f, 0));
+        entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 1f, 0));
         entity.Set(new AttackPendingComponent(false, default));
-        entity.Set(new EnemySearchComponent(5, 2, 0));        
+        entity.Set(new EnemySearchComponent(radiusSearchEnemy, 2, 0));        
         entity.Set(new SteeringComponent(rvoRadius, 2, Vector2.Zero));
         //entity.Set(new StuckComponent(position,0,false));
 
-        AddCollider(entity, position, colliderBody, colliderMove, out int idDebugMove, out int idDebugBody);
+        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody);
         if (DEBUG_COLLIDERS)
         {
-            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, 0));
+            int idDebugRangeMelle = CollisionShapeDraw.Instance.DrawCircleShape(colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, Colors.Blue);
+            int idDebugRangeSearch = CollisionShapeDraw.Instance.DrawCircleShape(radiusSearchEnemy, position, Colors.Yellow);
+            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle,idDebugRangeSearch));
         }
         return entity;
     }

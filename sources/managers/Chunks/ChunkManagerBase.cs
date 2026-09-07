@@ -123,7 +123,7 @@ public class ChunkManagerBase
             for (int y = -extY; y <= extY; y++)
             {
                 Vector2I chunk = _playerChunkPosCurrent + new Vector2I(x, y);
-                if (chunk.X < MinChunk.X || chunk.X > MaxChunk.X || chunk.Y < MinChunk.Y || chunk.Y > MaxChunk.Y) continue;
+              //  if (chunk.X < MinChunk.X || chunk.X > MaxChunk.X || chunk.Y < MinChunk.Y || chunk.Y > MaxChunk.Y) continue;
 
                 if (Math.Abs(x) <= ViewDistance.X && Math.Abs(y) <= ViewDistance.Y)
                     targetVisible.Add(chunk);
@@ -171,7 +171,7 @@ public class ChunkManagerBase
             for (int y = -extY; y <= extY; y++)
             {
                 Vector2I chunk = _playerChunkPosCurrent + new Vector2I(x, y);
-                if (chunk.X < MinChunk.X || chunk.X > MaxChunk.X || chunk.Y < MinChunk.Y || chunk.Y > MaxChunk.Y) continue;
+            //    if (chunk.X < MinChunk.X || chunk.X > MaxChunk.X || chunk.Y < MinChunk.Y || chunk.Y > MaxChunk.Y) continue;
 
                 if (Math.Abs(x) <= ViewDistance.X && Math.Abs(y) <= ViewDistance.Y)
                     targetVisible.Add(chunk);
