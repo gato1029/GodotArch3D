@@ -39,7 +39,19 @@ public partial class MainEditor : Node
 
         _terrainWindow.Popup();
     }
+    public override void _Notification(int what)
+    {
+        if (what == NotificationWMCloseRequest)
+        {
+            var worlds = BlackyWorldRegistry.Instance.GetAllWorlds();
 
+            foreach (var item in worlds)
+            {
+                item.Dispose();
+            }
+            GetTree().Quit();
+        }
+    }
     public override void _Process(double delta)
     {
         RenderCommandQueue.ExecuteFrame();

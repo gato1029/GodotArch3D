@@ -141,7 +141,7 @@ public sealed class BlackyWorld : IDisposable
     public void Dispose()
     {
         IsActive = false;
-
+        Flecs.Destroy();
         //Simulation.Dispose();
         State.Dispose();
     }

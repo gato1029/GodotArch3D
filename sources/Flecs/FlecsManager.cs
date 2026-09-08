@@ -49,14 +49,18 @@ public class FlecsManager
 
     public FlecsManager(Node3D node3D)
     {
+        //WorldFlecs.Reset();
         WorldFlecs = World.Create();
         WorldFlecs.SetThreads(15);
         WorldFlecs.App();
+      
 
-       FlecsComponentRegistry.RegisterAll(this);
-      //RegisterComponentsAssemblies();
+        FlecsComponentRegistry.RegisterAll(this);
+        RegisterComponentsAssemblies();
         RegisterSystems();
 
+        //WorldFlecs.Component<EnemySearchComponent>().Entity.Add(Ecs.CanToggle);
+        //WorldFlecs.Component<AttackPendingComponent>().Entity.Add(Ecs.CanToggle);
         WorldFlecs.Import<Ecs.Stats>();
         WorldFlecs.Set<flecs.EcsRest>(default);
         
@@ -85,6 +89,7 @@ public class FlecsManager
     public void Destroy()
     {
         WorldFlecs.Dispose();
+        //WorldFlecs.Quit();
         //WorldFlecs.DeleteWith();
     }
     public void SetNode3DMain(Node3D node3D)

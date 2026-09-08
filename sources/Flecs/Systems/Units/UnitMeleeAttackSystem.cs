@@ -1,4 +1,5 @@
 
+
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
@@ -31,6 +32,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
         .With<AttackPendingComponent>()
         .With<DirectionComponent>()
         .With<UnitDefinitionComponent>()
+        .With<AttackPendingTag>()
         .Without<PlayerInputComponent>()
         .Without<DeadTag>()
         .Without<DestroyRequestTag>();
@@ -62,18 +64,20 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
             ref var dir = ref dirArray[i];
             ref var unit = ref unitArray[i];
             Entity ent = it.Entity(i);
-
-            //if (input.attackPressed && character.characterStateType != CharacterStateType.EXECUTE_ATTACK)
-            //{
-            //    input.isAttack = true;
-            //    character.characterStateType = CharacterStateType.ATTACK;
-            //    return true;
-            //}
+            // Reducción del cooldown de ataque
+            if (melle.Timer > 0f)
+            {
+                melle.Timer -= it.DeltaTime();
+            }
             if (cha.characterStateType == CharacterStateType.EXECUTE_ATTACK)
             {
-                if (atp.Active) // tiene objetivo
+                if (atp.Active && atp.Target.IsAlive() && !atp.Target.Has<DeadTag>())
                 {
-                    if (atp.Target.IsAlive() && !atp.Target.Has<DeadTag>()) // verifica que no este marcado para morir
+                    Vector2 originAttackCenter = pos.position + melle.OffSetRange;
+                    var targetPos = atp.Target.Get<PositionComponent>();
+                    ushort targetTemplateId = atp.Target.Get<UnitDefinitionComponent>().idTemplate;
+
+                    if (CheckCollisionWithTarget(originAttackCenter, dir.normalized, melle.RangeAttack, targetPos.position, targetTemplateId))
                     {
                         GlobalData.EventsDamage.Enqueue(new DamageEvent
                         {
@@ -81,159 +85,92 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                             Target = atp.Target,
                             Amount = melle.Damage
                         });
-                    }                    
-                    atp.Active = false; // liberamos objetivo
-                    atp.Target = default;
+                    }
+                    else
+                    {
+                        //ent.Enable<EnemySearchComponent>();
+                        //ent.Disable<AttackPendingComponent>();
+                    }
                 }
+                
+                cha.characterStateType = CharacterStateType.IDLE;
+                atp.Active = false;
+                atp.Target = default;                
             }
-            if (melle.Timer > 0f)
+
+            if (melle.Timer <= 0f)
             {
-                melle.Timer -= it.DeltaTime();                
+                SearchEnemy(ent, ref cha, pos, ref melle, team, dir, dynGrid, spa, ref atp);
             }
-            else
-            {                                
-                ExecuteAttack(ent,ref cha, pos, ref melle, team, dir, dynGrid, spa, ref atp);                
-            }
-            //attack.Timer = attack.Cooldown; // inicia cooldown
-            
-
-            //    if (melle.Timer > 0f)
-            //    {
-            //        melle.Timer -= it.DeltaTime();
-            //        continue;
-            //    }
-
-            //    int batchId = (col.idCollider) % GlobalData.numBatchColliders;
-            //    if (batchId != GlobalData.batchIndexColliders) continue;
-
-            //    if (cha.characterStateType != GodotEcsArch.sources.managers.Characters.CharacterStateType.IDLE)
-            //    {
-            //        continue;
-            //    }
-            //    if (atp.Active)
-            //    {
-            //        continue;
-            //    }
-            //    // cooldown control
-
-
-            //    // obtener posibles enemigos cercanos usando spatial hash
-            //    var nearby = CollisionManager.Instance.characterEntitiesFlecs.QueryCirclePoints(pos.position, melle.RangeAttack, col.idCollider);
-            //    bool existTarget = false;
-            //    foreach (var target in nearby)
-            //    {
-
-            //        if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)
-            //        {
-            //            continue; // mismo equipo, ignorar
-            //        }
-            //        else
-            //        {
-            //            if (target.Owner != default && target.Owner.IsAlive() && !target.Owner.Has<DeadTag>())
-            //            {
-            //                atp.Target = target.Owner;
-            //                atp.Active = true;
-
-            //                melle.Timer = melle.Cooldown; // resetear cooldown
-
-
-
-            //                Vector2 dif = target.Owner.Get<PositionComponent>().position - pos.position;
-            //                dir.value = dif.Normalized();
-            //                dir.normalized = new Vector2(Math.Sign(dif.X), Math.Sign(dif.Y));
-            //                dir.animationDirection = CommonOperations.GetDirectionAnimationLeftRight(dir.normalized);
-
-            //                break;
-            //            }
-            //        }
-            //    }
-            //    // para buscar estructuras cercanas
-            //    if (existTarget) continue;
-            //    nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryBruteShape(melle.RangeAttack, pos.position, 0);
-
-            //    foreach (var target in nearby)
-            //    {
-            //        if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)
-            //        {
-            //            continue; // mismo equipo, ignorar
-            //        }
-            //        else
-            //        {
-            //            if (target.Owner != default && target.Owner.IsAlive() && !target.Owner.Has<DestroyRequestTag>())
-            //            {
-            //                atp.Target = target.Owner;
-            //                atp.Active = true;
-
-            //                melle.Timer = melle.Cooldown; // resetear cooldown
-
-            //                Vector2 dif = target.Owner.Get<PositionComponent>().position - pos.position;
-            //                dir.value = dif.Normalized();
-            //                dir.normalized = new Vector2(Math.Sign(dif.X), Math.Sign(dif.Y));
-            //                dir.animationDirection = CommonOperations.GetDirectionAnimationLeftRight(dir.normalized);
-            //                break;
-            //            }
-            //        }
-            //    }
         }
     }
 
-    private void ExecuteAttack(Entity entity, ref Components.CharacterComponent cha, PositionComponent pos, ref MeleeAttackComponent melle, TeamComponent team, DirectionComponent direction, FastSpatialHash dynGrid, SpatialIDComponent spatialId, ref AttackPendingComponent atp)
+
+
+    private void SearchEnemy(Entity entity, ref Components.CharacterComponent cha, PositionComponent pos, ref MeleeAttackComponent melle, TeamComponent team, DirectionComponent direction, FastSpatialHash dynGrid, SpatialIDComponent spatialId, ref AttackPendingComponent atp)
     {
         Span<int> neighbors = stackalloc int[8];
-
         Vector2 originAttackCenter = pos.position + melle.OffSetRange;
-        // 🔥 SOLO UNA QUERY (optimización crítica)
+
         int count = dynGrid.QueryNodesBounded(
             originAttackCenter.X,
             originAttackCenter.Y,
             melle.RangeAttack,
             neighbors
         );
-
+        bool existTarget = false;
         for (int ii = 0; ii < count; ii++)
         {
-            var targetEntity = dynGrid.GetEntity(neighbors[ii]);
+            int neighborId = neighbors[ii];
+            if (spatialId.Value == neighborId) continue;
 
-            if (spatialId.Value == neighbors[ii]) continue; // no nos atacamos a nosotros mismos
+            var targetEntity = dynGrid.GetEntity(neighborId);
+            if (!targetEntity.IsAlive() || targetEntity.Has<DeadTag>()) continue;
 
+            // Filtro rápido de equipo antes de buscar componentes pesados
             var otherTeam = targetEntity.Get<TeamComponent>();
-            if (team.TeamId == otherTeam.TeamId) continue; // mismo equipo, ignorar
+            if (team.TeamId == otherTeam.TeamId) continue;
 
-            if (targetEntity.IsAlive() && !targetEntity.Has<DeadTag>())
+            var targetPosition = targetEntity.Get<PositionComponent>();
+            ushort idTemplate = targetEntity.Get<UnitDefinitionComponent>().idTemplate;
+
+            if (CheckCollisionWithTarget(originAttackCenter, direction.normalized, melle.RangeAttack, targetPosition.position, idTemplate))
             {
-                var targetPosition = targetEntity.Get<PositionComponent>();
-                ushort idTemplate = targetEntity.Get<UnitDefinitionComponent>().idTemplate;
-                var template = BlackyPalletesPersistence.characterPalette.GetData(idTemplate);
-
-
-
-                foreach (var item in template.bodyColliders)
-                {
-                    FastCollider fast = item;
-                    if (CollisionMathHelper.CheckAttackHalfCircle(
-                        originAttackCenter.X,
-                        originAttackCenter.Y,
-                        direction.normalized.X,
-                        direction.normalized.Y,
-                        melle.RangeAttack,
-                        targetPosition.position.X,
-                        targetPosition.position.Y,
-                        ref fast
-                    ))
-                    {
-                        cha.characterStateType = CharacterStateType.ATTACK;
-                        melle.Timer = melle.Cooldown;
-                        atp.Target = targetEntity;
-                        atp.Active = true;
-                        break;
-                    }
-                }
-
-
-
+                cha.characterStateType = CharacterStateType.ATTACK;
+                melle.Timer = melle.Cooldown;
+                atp.Target = targetEntity;
+                atp.Active = true;
+                existTarget = true;
+                break;
+                
             }
         }
+        if (!existTarget)
+        {
+            cha.characterStateType = CharacterStateType.IDLE;
+            atp.Active = false;
+            atp.Target = default;
+            entity.Remove<AttackPendingTag>();
+        }
+    }
 
-
+    private bool CheckCollisionWithTarget(Vector2 origin, Vector2 dirNormalized, float range, Vector2 targetPos, ushort templateId)
+    {
+        var template = BlackyPalletesPersistence.characterPalette.GetData(templateId);
+        foreach (var item in template.bodyColliders)
+        {
+            FastCollider fast = item;
+            if (CollisionMathHelper.CheckAttackHalfCircle(
+                origin.X, origin.Y,
+                dirNormalized.X, dirNormalized.Y,
+                range,
+                targetPos.X, targetPos.Y,
+                ref fast
+            ))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

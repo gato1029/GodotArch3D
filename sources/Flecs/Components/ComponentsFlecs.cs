@@ -158,6 +158,8 @@ public record struct DestroyRequestTag();
 
 [RegisterComponentFlecs]
 public record struct DeadTag();
+[RegisterComponentFlecs]
+public struct AttackPendingTag { }
 
 [RegisterComponentFlecs]
 public record struct UseRvoTag();   // unidades controladas por RVO

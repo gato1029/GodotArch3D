@@ -439,6 +439,7 @@ public class BlackyCharacterCreator
              
         // circle.Radius
         
+        
         entity.Add<UseBoidTag>();
 
         entity.Set(new HealthComponent(100));
@@ -450,10 +451,18 @@ public class BlackyCharacterCreator
         //entity.Set(new RangedAttackComponent(1,20,5f,0.5f,0,true,6));
         entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 1f, 0));
         entity.Set(new AttackPendingComponent(false, default));
-        entity.Set(new EnemySearchComponent(radiusSearchEnemy, 2, 0));        
+        entity.Set(new EnemySearchComponent(radiusSearchEnemy, 2, 0));
+
+        //entity.Disable<AttackPendingComponent>();
+ 
+
         entity.Set(new SteeringComponent(rvoRadius, 2, Vector2.Zero));
         //entity.Set(new StuckComponent(position,0,false));
-
+        //var id= entity.Id.Value;
+        //if (entity.Enabled<AttackPendingComponent>())
+        //{
+        //    bool h = true;
+        //}
         AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody);
         if (DEBUG_COLLIDERS)
         {
