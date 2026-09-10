@@ -27,7 +27,7 @@ public class SimulationTick
     public void UpdateGroupCount()
     {
         if (TotalUnits > 1000)
-            GruposDivisionUnidades = 8;
+            GruposDivisionUnidades = 4;
         else if (TotalUnits > 300)
             GruposDivisionUnidades = 4;
         else if (TotalUnits > 50)

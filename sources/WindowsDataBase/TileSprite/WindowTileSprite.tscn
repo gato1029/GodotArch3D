@@ -245,6 +245,18 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Habilitado"
 
+[node name="Label12" type="Label" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=1687654212]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Sirve para los sprites que representan altura, como avismos y acantilados que se ven defrente, hace que la altura de render sea (-1)"
+mouse_filter = 0
+text = "Nivelar a Base:"
+
+[node name="CheckBoxHasNivelarBase" type="CheckBox" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform" unique_id=642698411]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Habilitado"
+
 [node name="GridContainerAnimated" type="GridContainer" parent="MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2" unique_id=1219682891]
 visible = false
 layout_mode = 2

@@ -43,7 +43,7 @@ public class MoveSeparationSystem : FlecsSystemBase
           .With<SteeringComponent>()
           .With<VelocityComponent>()
           .With<UnitDefinitionComponent>()
-          .Without<SleepTag>();
+          .Without<StoppedTag>();
           
     }
 

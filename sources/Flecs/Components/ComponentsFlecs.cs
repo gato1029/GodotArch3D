@@ -94,12 +94,13 @@ public record struct ProjectileComponent
 [RegisterComponentFlecs]
 public record struct RangedAttackComponent
 (
+    ushort idMod,
     int idProjectile,
     int Damage,
     float Range,           // Rango de ataque (ej. 1.5m)
     float Cooldown,        // Tiempo entre ataques
     float Timer,           // Temporizador interno
-    bool Homing,
+    bool Homing,           // misil auto dirigido
     float SpeedProjectile
 );
 [RegisterComponentFlecs]
@@ -146,6 +147,14 @@ public record struct TeamComponent
 
 [RegisterComponentFlecs]
 public record struct RvoDeltaTag();
+
+[RegisterComponentFlecs]
+public record struct ActiveProjectileTag();
+
+[RegisterComponentFlecs]
+public record struct ProjectileInitializedTag();
+
+
 
 [RegisterComponentFlecs]
 public record struct StaticTag();
@@ -343,6 +352,27 @@ public record struct PositionComponent
      Vector2I tilePosition,
      int height
 );
+public struct ProjectilePositionComponent
+{
+    public Vector2 Position;
+}
+[RegisterComponentFlecs]
+public struct ProjectileVelocityComponent
+{
+    public Vector2 Velocity;
+}
+[RegisterComponentFlecs]
+public struct ProjectileTargetComponent
+{
+    public ushort idMod;
+    public int idProjectile;
+    public Entity Target;
+    public int Damage;
+    public Vector2 Origin;
+    public Vector2 Destination;
+    public float TotalDistance;
+}
+
 [RegisterComponentFlecs]
 public record struct DirectionComponent
 (
@@ -419,7 +449,7 @@ public record struct UnitTag();
 
 
 [RegisterComponentFlecs]
-public record struct SleepTag();
+public record struct StoppedTag();
 
 [RegisterComponentFlecs]
 public record struct PlayerTag();

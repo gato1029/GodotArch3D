@@ -21,6 +21,11 @@ public enum CharacterBehaviorType
     PERSONAJE_PRINCIPAL,
     GENERICO
 }
+public enum UnitAttackType
+{
+    CUERPO,
+    RANGO
+}
 public enum UnitMoveType
 {
    ALERTA,

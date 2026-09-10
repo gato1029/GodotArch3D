@@ -9,8 +9,10 @@ using GodotEcsArch.sources.Flecs.Systems.Collisions;
 using GodotEcsArch.sources.Flecs.Systems.Debug;
 using GodotEcsArch.sources.Flecs.Systems.Generic;
 using GodotEcsArch.sources.Flecs.Systems.Human;
+using GodotEcsArch.sources.Flecs.Systems.Projectiles;
 using GodotEcsArch.sources.Flecs.Systems.Rendering;
 using GodotEcsArch.sources.Flecs.Systems.Transforms;
+using GodotEcsArch.sources.Flecs.Systems.Units;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -157,7 +159,9 @@ public class FlecsManager
         RegisterSystem<HumanInputSystem>();
         //RegisterSystem<HumanCharacterSystem>();
         RegisterSystem<HumanCharacterSimpleSystem>();
-        RegisterSystem<UnitEnemySearchSystem>();
+        RegisterSystem<UnitMelleEnemySearchSystem>();
+        RegisterSystem<UnitRangedEnemySearchSystem>();
+        
         RegisterSystem<MoveTargetSystem>(); 
                                                                              
         RegisterSystem<RegisterFastHashSystem>();
@@ -168,10 +172,13 @@ public class FlecsManager
         RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición                                                        
 
         RegisterSystem<MovementResolutionSystem>();
+        RegisterSystem<ProjectileMovementSystem>();
+
         //RegisterSystem<MovementFreeUnitTargetSytem>(); // libera el target de movimiento si la unidad está bloqueada o no puede llegar al target
 
         RegisterSystem<DirectionSystem>();
         RegisterSystem<UnitMeleeAttackSystem>();
+        RegisterSystem<UnitRangedAttackExecutionSystem>();
         //RegisterSystem<UnitRangedAttackSystem>();
 
         //RegisterSystem<BuildRangedAttackSystem>();
@@ -187,6 +194,7 @@ public class FlecsManager
 
         // transform
        // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
+        RegisterSystem<ProjectileTransformSystem>();
         RegisterSystem<SpriteTransformSystem>();
         RegisterSystem<SpriteTransformLayerSystem>();
         RegisterSystem<TileSpriteTextureTransformSystem>();
@@ -210,7 +218,7 @@ public class FlecsManager
         RegisterSystem<RvoDebugSystem>();
 
         //post
-
+        RegisterSystem<ArrowVisualSyncSystem>();
         RegisterSystem<ProjectileSpawnSystem>();        
         RegisterSystem<DeathCleanupSystem>();
         RegisterSystem<CleanupSystem>();

@@ -7,6 +7,7 @@ using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 
 using GodotEcsArch.sources.managers.Chunks;
+using GodotFlecs.sources.Flecs.Services.Spawn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,7 @@ public sealed class BlackyWorldState : IDisposable
     public BlackyPersistentTilePalette TilePalette { get; }
 
     public BlackyChunkOccupancyMap OccupancyMap { get; }
+ 
 
     private int idGridDraw { get; set; }
     private ModeGrid modeGrid { get; set; } = ModeGrid.NORMAL;
@@ -55,6 +57,7 @@ public sealed class BlackyWorldState : IDisposable
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize);
 
         idGridDraw= WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),-50,Colors.DarkCyan);
+   
     }
     public void SetModeGrid(ModeGrid modeGrid)
     {

@@ -13,8 +13,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotFlecs.sources.Flecs.Systems.Units;
-public class UnitEnemySearchSystem: FlecsSystemBase
+public class UnitMelleEnemySearchSystem: FlecsSystemBase
 {
+    // busca enemigos de las unidades que son melle, osea ataque cuerpo a cuerpo
+    // encuentra objetivo y automaticamente ya asigna destino y objetivo
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;    
     protected override void BuildQuery(ref QueryBuilder qb)
@@ -25,6 +27,7 @@ public class UnitEnemySearchSystem: FlecsSystemBase
           .With<CharacterComponent>()
           .With<EnemySearchComponent>()
           .With<MoveResolutorComponent>()
+          .With<MeleeAttackComponent>()
           .Without<MoveTargetComponent>()
           .Without<PlayerInputComponent>()
           .Without<DeadTag>()
@@ -103,10 +106,8 @@ public class UnitEnemySearchSystem: FlecsSystemBase
                         Vector2 targetPos = targetEntity.Get<PositionComponent>().position;
 
                         e.Set(new MoveTargetComponent(targetPos));
-                        e.Remove<SleepTag>();
-                        e.Add<AttackPendingTag>();
-                        //e.Disable<EnemySearchComponent>();
-                        //e.Enable<AttackPendingComponent>();
+                        e.Remove<StoppedTag>();
+                        e.Set(new AttackPendingComponent(true,targetEntity));                       
                         break;
                     }
                 }

@@ -22,7 +22,7 @@ public class DirectionSystem : FlecsSystemBase
           .With<CharacterComponent>()
           .With<SteeringComponent>() // <--- Añadimos esto
           .Without<DeadTag>()
-          .Without<SleepTag>();
+          .Without<StoppedTag>();
     }
 
     protected override void OnIter(Iter it)

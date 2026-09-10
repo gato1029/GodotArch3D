@@ -13,6 +13,6 @@ public partial class ControlProyectile : MarginContainer
     public void InitializeUI()
     {
         PanelBase = GetNode<Panel>("PanelBase");
-        TextureImage = GetNode<TextureRect>("PanelBase/TextureImage");
+        TextureImage = GetNode<TextureRect>("PanelBase/VBoxContainer/TextureImage");
     }
 }

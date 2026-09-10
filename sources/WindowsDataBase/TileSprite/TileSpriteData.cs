@@ -121,6 +121,7 @@ public class TileSpriteData:IdDataLong
 {    
     public int tileIndex { get; set; }  // solo cuando es dual  
     public int idMaterial { get; set; } // solo cuando es dual
+    public bool nivelarBase { get; set; }
     public TileSpriteType tileSpriteType { get; set; }
     public SpriteData spriteData { get; set; }
     public SpriteAnimationData animationData { set; get; }

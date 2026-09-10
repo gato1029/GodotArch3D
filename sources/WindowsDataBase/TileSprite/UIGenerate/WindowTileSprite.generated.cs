@@ -27,6 +27,7 @@ public partial class WindowTileSprite : Window
     private CheckBox CheckBoxMirrorHorizontal;
     private CheckBox CheckBoxMirrorVertical;
     private CheckBox CheckBoxHasCollider;
+    private CheckBox CheckBoxHasNivelarBase;
     private GridContainer GridContainerAnimated;
     private SpinBox SpinBoxFps;
     private CheckBox CheckBoxLoop;
@@ -62,6 +63,7 @@ public partial class WindowTileSprite : Window
         CheckBoxMirrorHorizontal = GetNode<CheckBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform/CheckBoxMirrorHorizontal");
         CheckBoxMirrorVertical = GetNode<CheckBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform/CheckBoxMirrorVertical");
         CheckBoxHasCollider = GetNode<CheckBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform/CheckBoxHasCollider");
+        CheckBoxHasNivelarBase = GetNode<CheckBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform/CheckBoxHasNivelarBase");
         GridContainerAnimated = GetNode<GridContainer>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerAnimated");
         SpinBoxFps = GetNode<SpinBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerAnimated/SpinBoxFps");
         CheckBoxLoop = GetNode<CheckBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerAnimated/CheckBoxLoop");

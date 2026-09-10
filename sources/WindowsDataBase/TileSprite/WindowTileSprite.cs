@@ -312,6 +312,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.animationData.loop = CheckBoxLoop.ButtonPressed;      
         objectData.animationData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + objectData.animationData.idMaterial;
         objectData.idMaterial = objectData.spriteData.idMaterial;
+        objectData.nivelarBase = CheckBoxHasNivelarBase.ButtonPressed;
 
     }
     private void SaveSprite()
@@ -325,6 +326,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.spriteData.yDepthRender = (float)SpinBoxDepht.Value;       
         objectData.spriteData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + objectData.spriteData.idMaterial;
         objectData.idMaterial = objectData.spriteData.idMaterial;
+        objectData.nivelarBase = CheckBoxHasNivelarBase.ButtonPressed;
 
     }
 
@@ -332,7 +334,8 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
     {
         ControlMultiple.SetNormalizeData((float)SpinBoxOffsetX.Value, (float)SpinBoxOffsetY.Value, (float)SpinBoxDepht.Value, (float)SpinBoxScale.Value);
         objectData.spriteMultipleAnimationDirection = ControlMultiple.GetData();
-        
+        objectData.nivelarBase = CheckBoxHasNivelarBase.ButtonPressed;
+
     }
     private void ButtonSaveSimilar_Pressed()
     {
@@ -398,6 +401,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
     {
         ControlTile.SetData(objectData.spriteData.idMaterial, objectData.spriteData.x,
         objectData.spriteData.y, objectData.spriteData.widht, objectData.spriteData.height);
+        CheckBoxHasNivelarBase.ButtonPressed = objectData.nivelarBase;
 
         ControlSpriteEdit.SetTexture(ControlTile.GetTileData().texture);
         ControlSpriteEdit.SetScaleTexture(objectData.spriteData.scale);

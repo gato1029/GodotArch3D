@@ -56,10 +56,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         switch (tileDataMod.tileSpriteType)
         {         
             case TileSpriteType.Static:
-                CreateSpriteSingle(idSprite,tileDataMod.spriteData);
+                CreateSpriteSingle(idSprite,tileDataMod.spriteData,tileDataMod.nivelarBase);
                 break;
             case TileSpriteType.Animated:
-                CreateSpriteAnimated(idSprite,tileDataMod.animationData);
+                CreateSpriteAnimated(idSprite,tileDataMod.animationData,tileDataMod.nivelarBase);
                 break;
             default:
                 break;
@@ -69,22 +69,25 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
 
     }
 
-    private void CreateSpriteAnimated(int id, SpriteAnimationData animationData)
+    private void CreateSpriteAnimated(int id, SpriteAnimationData animationData, bool nivelarBase)
     {
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
         Vector2 offset = animationData.offsetInternal;
         float depthOffset = animationData.yDepthRenderFormat;
         int heightRender = this.height;
-        if (dualOffset)
+        //if (dualOffset)
+        //{
+        //    //if (depthOffset<0)
+        //    //{
+        //    //    heightRender = height - 1;
+        //    //}
+        //    offset = offset;// +new Vector2(0.25f, 0.25f);
+        //}
+        if (nivelarBase)
         {
-            //if (depthOffset<0)
-            //{
-            //    heightRender = height - 1;
-            //}
-            offset = offset;// +new Vector2(0.25f, 0.25f);
+            heightRender = heightRender - 1;
         }
-        
         float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
@@ -163,7 +166,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         chunkRender.AddOrReplace((height, layer, x, y), tileRender);
     }
 
-    private void CreateSpriteSingle(int id, SpriteData spriteData)
+    private void CreateSpriteSingle(int id, SpriteData spriteData, bool nivelarBase)
     {        
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
@@ -173,15 +176,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         int heightRender = this.height;
         float depthOffset = spriteData.yDepthRenderFormat;
 
-        if (dualOffset)
+        if (nivelarBase)
         {
-            //offset = offset; //+ new Vector2(0.25f, 0.25f);
-            //if (depthOffset < 0)
-            //{
-            //    heightRender = this.height - 1;
-            //}
+            heightRender = heightRender - 1;
         }
-                      
         float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
 
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);

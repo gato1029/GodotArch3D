@@ -19,10 +19,12 @@ using GodotEcsArch.sources.BlackyTiles.Entities;
 using GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using System;
+using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.BlackyEngine.Core;
 
@@ -115,6 +117,7 @@ public sealed class BlackyWorld : IDisposable
 
         
         DebugBoot();
+      //  DebugBootStressTest(10000);
     }
  
     // =========================================
@@ -152,11 +155,62 @@ public sealed class BlackyWorld : IDisposable
 
     private void DebugBoot()
     {
-        var e = Characters.Create(1787768744605000, new Vector2(0, 0));
+        var e = Characters.Create(1787768744605000, new Vector2(0, 0)); // principal
         //
-        var ee = Characters.Create(1788369074799000, new Vector2(5, 0));
+        var ee = Characters.Create(1788369074799000, new Vector2(5, 0)); // enemigos
         ee.Set(new MoveTargetComponent(new Vector2(20, 0)));
-        var e2 = Characters.Create(1788369074799000, new Vector2(8, 0));
+        
+    }
+    private void DebugBootStressTest(int targetEnemies = 1000)
+    {
+        var player = Characters.Create(1787768744605000, new Vector2(0, 0)); // principal
+        Vector2 playerWorldPos = new Vector2(0, 0);
+
+        int playerTileX = 0;
+        int playerTileY = 0;
+
+        int spawned = 0;
+        int maxRadius = 490; // Radio inicial del anillo más grande
+        int minRadius = 40; // Radio límite del anillo más pequeño
+        int ringStep =10;   // Separación de 2 tiles entre anillos
+
+        HashSet<Vector2> occupiedTiles = new HashSet<Vector2>();
+
+        // Generar desde el anillo más grande hacia los más pequeños
+        for (int r = maxRadius; r >= minRadius && spawned < targetEnemies; r -= ringStep)
+        {
+            int pointsOnRing = r * 4; // Estimación de la circunferencia en tiles para el radio actual
+            for (int i = 0; i < pointsOnRing && spawned < targetEnemies; i++)
+            {
+                float angle = i * (2f * MathF.PI / pointsOnRing);
+                int tx = playerTileX + Mathf.RoundToInt(r * MathF.Cos(angle));
+                int ty = playerTileY + Mathf.RoundToInt(r * MathF.Sin(angle));
+
+                Vector2 tileCoord = new Vector2(tx, ty);
+                if (occupiedTiles.Contains(tileCoord)) continue;
+
+                // Validación estricta para garantizar una separación mínima de 2 tiles entre cualquier unidad
+                bool tooClose = false;
+                foreach (var occupied in occupiedTiles)
+                {
+                    if (MathF.Abs(occupied.X - tx) < 3 && MathF.Abs(occupied.Y - ty) < 3)
+                    {
+                        tooClose = true;
+                        break;
+                    }
+                }
+
+                if (tooClose) continue;
+
+                occupiedTiles.Add(tileCoord);
+                Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tx, ty);
+
+                var enemy = Characters.Create(1788369074799000, worldPos);
+                enemy.Set(new MoveTargetComponent(playerWorldPos));
+
+                spawned++;
+            }
+        }
     }
 }
 

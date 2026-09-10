@@ -30,7 +30,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
           .With<SteeringComponent>()
           .With<VelocityComponent>()
           .With<UnitTag>()
-          .Without<SleepTag>();
+          .Without<StoppedTag>();
           
     }
 

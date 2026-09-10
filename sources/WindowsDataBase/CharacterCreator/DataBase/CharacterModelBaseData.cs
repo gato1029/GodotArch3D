@@ -28,7 +28,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         public UnitType unitType { get; set; }
         public UnitMoveType unitMoveType { get; set; }
         public UnitMoveData unitMoveData { get; set; }
-
+        public UnitAttackType unitAttackType { get; set; }
+        public int idProjectile { get; set; }
         public string colorBase { set; get; }
         public string description { set; get; }
         public float scale { set; get; } // si

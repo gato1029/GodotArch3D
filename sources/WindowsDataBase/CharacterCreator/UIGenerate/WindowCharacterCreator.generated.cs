@@ -20,10 +20,12 @@ public partial class WindowCharacterCreator : Window
     private TextEdit TextEditDescription;
     private VBoxContainer VBoxContainerUnits;
     private OptionButton OptionButtonUnitType;
+    private OptionButton OptionButtonUnitAttackType;
     private OptionButton OptionButtonUnitMoveType;
     private OptionButton OptionButtonUnitDirectionType;
     private SpinBox SpinBoxRadiusMove;
     private SpinBox SpinBoxRadiusSearch;
+    private ControlProyectile ControlProyectileSelector;
     private Button ButtonSave;
     private BonusContainer PanelBonificaciones;
     private StatsContainer PanelEstadisticas;
@@ -49,12 +51,15 @@ public partial class WindowCharacterCreator : Window
         VBoxContainerUnits = GetNode<VBoxContainer>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits");
         OptionButtonUnitType = GetNode<OptionButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer/OptionButtonUnitType");
         OptionButtonUnitType.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
+        OptionButtonUnitAttackType = GetNode<OptionButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer/OptionButtonUnitAttackType");
+        OptionButtonUnitAttackType.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
         OptionButtonUnitMoveType = GetNode<OptionButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer/OptionButtonUnitMoveType");
         OptionButtonUnitMoveType.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
         OptionButtonUnitDirectionType = GetNode<OptionButton>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer/OptionButtonUnitDirectionType");
         OptionButtonUnitDirectionType.GetPopup().AlwaysOnTop = GetWindow().AlwaysOnTop;
         SpinBoxRadiusMove = GetNode<SpinBox>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer/SpinBoxRadiusMove");
         SpinBoxRadiusSearch = GetNode<SpinBox>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer/SpinBoxRadiusSearch");
+        ControlProyectileSelector = GetNode<ControlProyectile>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/ControlProyectileSelector");
         ButtonSave = GetNode<Button>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/ButtonSave");
         PanelBonificaciones = GetNode<BonusContainer>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/GridContainer/PanelBonificaciones");
         PanelEstadisticas = GetNode<StatsContainer>("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/GridContainer/PanelEstadisticas");

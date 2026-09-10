@@ -1,5 +1,6 @@
 using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
@@ -21,8 +22,8 @@ internal static class AnimationCache
         {
             case EntityType.PERSONAJE:
                 {
-                    var model = MasterDataManager.GetData<TileSpriteData>(idLong).spriteMultipleAnimationDirection;
-                    var animState = model.animationsTypes[animationType];  // model.animationCharacterBaseData.animationDataArray[stateAnimation];
+                    AtlasModsManager.GetSpriteUniqueId(idLong, out TileSpriteData model);
+                    var animState = model.spriteMultipleAnimationDirection.animationsTypes[animationType];  // model.animationCharacterBaseData.animationDataArray[stateAnimation];
                     var animData = animState.animations[dir.animationDirection];
                     return animData;
                 }

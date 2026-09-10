@@ -20,7 +20,7 @@ namespace GodotEcsArch.sources.Flecs.Systems.Generic
               .With<MoveResolutorComponent>()
               .With<UnitTag>()
               .Without<DeadTag>()
-              .Without<SleepTag>();
+              .Without<StoppedTag>();
         }
 
         protected override void OnIter(Iter it)
@@ -38,7 +38,7 @@ namespace GodotEcsArch.sources.Flecs.Systems.Generic
                 if (resolutor.Blocked)
                 {
                     entity.Remove<MoveTargetComponent>();
-                    entity.Add<SleepTag>();
+                    entity.Add<StoppedTag>();
                     resolutor.Blocked = false;
                     resolutor.BlockedTimer = 0;
                 }

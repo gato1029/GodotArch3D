@@ -15,7 +15,7 @@ public class RegisterFastHashSystem : FlecsSystemBase
         qb.With<PositionComponent>()
           .With<SpatialIDComponent>()
           .With<UnitTag>()
-          .Without<SleepTag>();// solo dinámicos que se mueven, no los que están quietos (aunque esto se podría cambiar según necesidades)
+          .Without<StoppedTag>();// solo dinámicos que se mueven, no los que están quietos (aunque esto se podría cambiar según necesidades)
     }
 
     protected override void OnIter(Iter it)

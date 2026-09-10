@@ -32,7 +32,7 @@ public class SteeringSystem : FlecsSystemBase
           .With<VelocityComponent>()
           .With<SteeringComponent>()
           .With<MoveResolutorComponent>()
-          .Without<SleepTag>();
+          .Without<StoppedTag>();
     }
     protected override void OnIter(Iter it)
     {

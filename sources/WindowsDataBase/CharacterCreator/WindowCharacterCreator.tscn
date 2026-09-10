@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://kma1fph6dbb6" path="res://sources/WindowsDataBase/Accesories/ContainerStats.tscn" id="2_y26u5"]
 [ext_resource type="PackedScene" uid="uid://c3ttigs8l4153" path="res://sources/KuroTiles/ControlListTileSprite.tscn" id="3_0d5rq"]
 [ext_resource type="PackedScene" uid="uid://c5l0xhw6ebiwl" path="res://sources/WindowsDataBase/Accesories/ContainerElements.tscn" id="3_o0s8w"]
+[ext_resource type="PackedScene" uid="uid://c7gcxynrth6ak" path="res://sources/KuroTiles/ControlProyectile.tscn" id="4_nowxj"]
 
 [node name="WindowCharacterCreator" type="Window" unique_id=874638961]
 auto_translate_mode = 2
@@ -141,7 +142,7 @@ size_flags_vertical = 0
 text = "Descripcion:"
 
 [node name="TextEditDescription" type="TextEdit" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerDown/GridContainer" unique_id=1190704599]
-custom_minimum_size = Vector2(0, 200)
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_vertical = 3
 wrap_mode = 1
@@ -158,6 +159,13 @@ layout_mode = 2
 text = "Tipo Unidad:"
 
 [node name="OptionButtonUnitType" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer" unique_id=1449044265]
+layout_mode = 2
+
+[node name="Label20" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer" unique_id=1577682192]
+layout_mode = 2
+text = "Tipo Ataque:"
+
+[node name="OptionButtonUnitAttackType" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer" unique_id=1895198049]
 layout_mode = 2
 
 [node name="Label16" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer" unique_id=23217680]
@@ -188,6 +196,11 @@ text = "Radio Busqueda:"
 
 [node name="SpinBoxRadiusSearch" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits/GridContainer" unique_id=1080914172]
 layout_mode = 2
+
+[node name="ControlProyectileSelector" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase/VBoxContainerUnits" unique_id=459502931 instance=ExtResource("4_nowxj")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
 
 [node name="ButtonSave" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainerBase" unique_id=393505062]
 layout_mode = 2

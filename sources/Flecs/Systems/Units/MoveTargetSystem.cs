@@ -9,6 +9,7 @@ using GodotFlecs.sources.Flecs.Systems;
 using RVO;
 using SadRogue.Primitives;
 using System;
+using CharacterComponent = GodotFlecs.sources.Flecs.Components.CharacterComponent;
 
 namespace GodotFlecs.sources.Flecs.Systems.Units;
 
@@ -24,6 +25,7 @@ public class MoveTargetSystem : FlecsSystemBase
           .With<Components.CharacterComponent>()
           .With<SteeringComponent>() // <-- Añadido
           .With<MoveResolutorComponent>()
+          .With<AttackPendingComponent>()
           .Without<DeadTag>();
     }
 
@@ -34,6 +36,7 @@ public class MoveTargetSystem : FlecsSystemBase
         var chaArray = it.Field<Components.CharacterComponent>(2);
         var steeringArray = it.Field<SteeringComponent>(3); // <-- Añadido
         var resolutorArray = it.Field<MoveResolutorComponent>(4);
+        var attackpendingArray = it.Field<AttackPendingComponent>(5);
 
         for (int i = 0; i < it.Count(); i++)
         {
@@ -42,6 +45,7 @@ public class MoveTargetSystem : FlecsSystemBase
             ref var cha = ref chaArray[i];
             ref var steering = ref steeringArray[i];
             ref var resolutor = ref resolutorArray[i];
+            ref var attackPending = ref attackpendingArray[i];
 
             if (resolutor.BlockedTimer>1)
             {
@@ -50,20 +54,39 @@ public class MoveTargetSystem : FlecsSystemBase
                 resolutor.Blocked = true;
                 cha.characterStateType = CharacterStateType.IDLE;
                 it.Entity(i).Remove<MoveTargetComponent>();
-                it.Entity(i).Add<SleepTag>();
+                it.Entity(i).Add<StoppedTag>();
                 continue;
             }
             Vector2 toTarget = target.Value - pos.position;
             float distSq = toTarget.LengthSquared();
 
-            if (distSq < 0.05f) // Umbral de llegada
+            float umbralLlegada = 0.05f;
+            if (attackPending.Active)
+            {
+                if (attackPending.Target.Has<CharacterComponent>())
+                {
+                    umbralLlegada = attackPending.Target.Get<MoveColliderComponent>().Radius;
+                }
+                else
+                {
+                    // es un edificio aqui me falta esto
+
+                }
+                
+            }
+
+            if (distSq <= umbralLlegada)//0.05f) // Umbral de llegada
             {
                 resolutor.BlockedTimer = 0;
                 steering.DesiredDir = Vector2.Zero;
                 resolutor.Blocked = true;
                 cha.characterStateType = CharacterStateType.IDLE;
                 it.Entity(i).Remove<MoveTargetComponent>();
-                it.Entity(i).Add<SleepTag>();
+                it.Entity(i).Add<StoppedTag>();
+                if (attackPending.Active)
+                {
+                    it.Entity(i).Add<AttackPendingTag>();
+                }                
                 continue;
             }
 

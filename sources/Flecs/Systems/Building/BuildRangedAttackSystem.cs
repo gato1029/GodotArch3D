@@ -18,8 +18,6 @@ internal class BuildRangedAttackSystem:FlecsSystemBase
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
-        .With<ColliderComponent>()
-        .With<BuildingComponent>()
         .With<RangedAttackComponent>() // Componente de ataque a distancia
         .With<TeamComponent>()
         .With<AttackPendingComponent>()
@@ -31,18 +29,14 @@ internal class BuildRangedAttackSystem:FlecsSystemBase
     protected override void OnIter(Iter it)
     {
         var posArray = it.Field<PositionComponent>(0);
-        var colArray = it.Field<ColliderComponent>(1);
-        var builArray = it.Field<BuildingComponent>(2);
-        var rangedArray = it.Field<RangedAttackComponent>(3);
-        var teamArray = it.Field<TeamComponent>(4);
-        var attackPendArray = it.Field<AttackPendingComponent>(5);
-        var dirArray = it.Field<DirectionComponent>(6);
+        var rangedArray = it.Field<RangedAttackComponent>(1);
+        var teamArray = it.Field<TeamComponent>(2);
+        var attackPendArray = it.Field<AttackPendingComponent>(3);
+        var dirArray = it.Field<DirectionComponent>(4);
 
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
-            ref var col = ref colArray[i];
-            ref var bui = ref builArray[i];
             ref var ranged = ref rangedArray[i];
             ref var team = ref teamArray[i];
             ref var atp = ref attackPendArray[i];

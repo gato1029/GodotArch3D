@@ -42,9 +42,28 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         {
             OptionButtonUnitMoveType.AddItem(type.ToString());
         }
+        foreach (UnitAttackType type in Enum.GetValues(typeof(UnitAttackType)))
+        {
+            OptionButtonUnitAttackType.AddItem(type.ToString());
+        }
 
+        OptionButtonUnitAttackType.ItemSelected += OptionButtonUnitAttackType_ItemSelected;
         OptionButtonBehavior.ItemSelected += OptionButtonBehavior_ItemSelected;
         OptionButtonBehavior_ItemSelected(0);
+    }
+
+    private void OptionButtonUnitAttackType_ItemSelected(long index)
+    {
+        UnitAttackType ua= (UnitAttackType)(int)index;
+        objectData.unitAttackType = ua; 
+        if (ua == UnitAttackType.RANGO)
+        {
+            ControlProyectileSelector.Visible = true;
+        }
+        else
+        {
+            ControlProyectileSelector.Visible = false;
+        }
     }
 
     private void OptionButtonBehavior_ItemSelected(long index)
@@ -97,6 +116,15 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
 
         objectData.idTileSpriteData = ControlTileSpriteData.GetidTile();
 
+        if (objectData.unitAttackType == UnitAttackType.CUERPO)
+        {            
+            objectData.idProjectile = 0;
+        }
+        else
+        {         
+            objectData.idProjectile = ControlProyectileSelector.GetData();
+        }
+
         //AnimationCharacterBaseData animationCharacterBaseDataSelected = AnimationCharacterManager.Instance.GetCharacterBaseData(objectData.idAnimationCharacterBaseData);
         //objectData.collisionMove = animationCharacterBaseDataSelected.collisionMove.Multiplicity(objectData.scale);
         //objectData.collisionBody = animationCharacterBaseDataSelected.collisionBody.Multiplicity(objectData.scale);
@@ -135,6 +163,12 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         OptionButtonUnitType.Select((int)objectData.unitType);
         OptionButtonUnitDirectionType.Select((int)objectData.unitDirectionType);
         OptionButtonUnitMoveType.Select((int)objectData.unitMoveType);
+        OptionButtonUnitAttackType.Select((int)objectData.unitAttackType);
+        if (objectData.unitAttackType== UnitAttackType.RANGO)
+        {
+            ControlProyectileSelector.Visible = true;
+            ControlProyectileSelector.SetData(objectData.idProjectile);
+        }
 
         SpinBoxRadiusMove.Value = objectData.unitMoveData.radiusMove;
         SpinBoxRadiusSearch.Value = objectData.unitMoveData.radiusSearch;

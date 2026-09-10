@@ -85,22 +85,42 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                             Target = atp.Target,
                             Amount = melle.Damage
                         });
+                        //cha.characterStateType = CharacterStateType.ATTACK;
                     }
                     else
                     {
-                        //ent.Enable<EnemySearchComponent>();
-                        //ent.Disable<AttackPendingComponent>();
+                        // si no hubo collision quiere decir que no hay objetivo y libero
+                        cha.characterStateType = CharacterStateType.IDLE;
+                        atp.Active = false;
+                        atp.Target = default;
                     }
+
+
                 }
-                
-                cha.characterStateType = CharacterStateType.IDLE;
-                atp.Active = false;
-                atp.Target = default;                
+                else
+                {
+                    // si esta muerto libero target
+                    cha.characterStateType = CharacterStateType.IDLE;
+                    atp.Active = false;
+                    atp.Target = default;
+                }
+                                
             }
 
             if (melle.Timer <= 0f)
             {
-                SearchEnemy(ent, ref cha, pos, ref melle, team, dir, dynGrid, spa, ref atp);
+                if (atp.Active && atp.Target.IsAlive() && !atp.Target.Has<DeadTag>())
+                {
+                    cha.characterStateType = CharacterStateType.ATTACK;
+                    melle.Timer = melle.Cooldown;
+                }
+                else
+                {
+                    cha.characterStateType = CharacterStateType.IDLE;
+                    atp.Active = false;
+                    atp.Target = default;
+                    ent.Remove<AttackPendingTag>();
+                }
             }
         }
     }

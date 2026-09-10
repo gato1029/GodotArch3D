@@ -22,6 +22,7 @@ internal class SpriteTransformSystem : FlecsSystemBase
         qb.With<PositionComponent>()
           .With<RenderGPUComponent>()
           .With<RenderTransformComponent>()
+          .Without<StoppedTag>()
           .Without<StaticRenderTag>()
           .Without<DeadTag>()
           .Without<DestroyRequestTag>()
@@ -45,13 +46,6 @@ internal class SpriteTransformSystem : FlecsSystemBase
             float depthOffset = (r.depthOffset);
             
             float z = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
-
-            //float depthValue = p.position.Y + depthOffset - p.height * GodotEcsArch.sources.utils.CommonAtributes.HEIGHT_OFFSET;
-
-            //float renderZ = depthValue * GodotEcsArch.sources.utils.CommonAtributes.LAYER_MULTIPLICATOR + r.layerRender * GodotEcsArch.sources.utils.CommonAtributes.LAYER_OFFSET;
-            
-            //r.originOffset.Y 
-            //float renderZ = ((p.position.Y + r.zOrdering) * CommonAtributes.LAYER_MULTIPLICATOR) + r.layerRender;
             var tt = t.transform;
             tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, z);
             t.transform = tt; 

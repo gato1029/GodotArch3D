@@ -28,7 +28,7 @@ public class MovementResolutionSystem : FlecsSystemBase
             .With<MoveResolutorComponent>()
             .With<CharacterComponent>()
             .With<UnitTag>()
-            .Without<SleepTag>();
+            .Without<StoppedTag>();
     }
     protected override void OnIter(Iter it)
     {

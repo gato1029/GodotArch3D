@@ -9,6 +9,7 @@ using global::GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotFlecs.sources.Flecs.Services.Spawn;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services;
 
@@ -59,6 +60,7 @@ public sealed class BlackyWorldServices
 
     public BlackyOccupancyRendererSystem OccupancyRenderer { get; }
 
+    public ArrowPoolService ArrowPool { get; }
     private readonly BlackyWorld world;
 
     public BlackyWorldServices(BlackyWorld world)
@@ -126,6 +128,6 @@ public sealed class BlackyWorldServices
             EntityRenderer,
             TerrainPainter);
 
-        
+        ArrowPool = new ArrowPoolService(sim.Flecs.WorldFlecs);
     }
 }

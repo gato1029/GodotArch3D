@@ -347,23 +347,23 @@ public class BlackyChunkCacheTextureMap
         tileLayer.SetTile(localX, localY, tileId,idCollider);
         tileLayer.SetRender(localX, localY, true);
         
-        if (height-1 >=0 && isBorder==false) // solo si no es borde y la altura inferior es mayor a 0 no se marca para renderizar
-        {
-            var layerDown = chunk.GetOrCreateLayer(height - 1, layer);
-            var tileDown = layerDown.GetTile(localX, localY);
-            if (tileDown!=0 && layerDown.IsRender(localX,localY))
-            {
-                layerDown.SetRender(localX, localY, false);
-                OnTileChanged?.Invoke(new TileChange
-                {
-                    WorldX = worldX,
-                    WorldY = worldY,
-                    Height = height - 1,
-                    Layer = layer,
-                    remove = true
-                });
-            }            
-        }
+        //if (height-1 >=0 && isBorder==false) // solo si no es borde y la altura inferior es mayor a 0 no se marca para renderizar
+        //{
+        //    var layerDown = chunk.GetOrCreateLayer(height - 1, layer);
+        //    var tileDown = layerDown.GetTile(localX, localY);
+        //    if (tileDown!=0 && layerDown.IsRender(localX,localY))
+        //    {
+        //        layerDown.SetRender(localX, localY, false);
+        //        OnTileChanged?.Invoke(new TileChange
+        //        {
+        //            WorldX = worldX,
+        //            WorldY = worldY,
+        //            Height = height - 1,
+        //            Layer = layer,
+        //            remove = true
+        //        });
+        //    }            
+        //}
         
 
 
@@ -618,7 +618,7 @@ public class BlackyChunkCacheTextureMap
         {
         
             RebuildDualCell(p.x, p.y, altura, capa, dualTileTemplate);
-            RefreshTileUnder(p.x, p.y, altura, capa);
+            //RefreshTileUnder(p.x, p.y, altura, capa);
         }
     }
 
