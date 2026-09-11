@@ -25,12 +25,13 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
             .With<PositionComponent>()
             .With<DirectionComponent>()
             .With<VelocityComponent>()
-            .With<MoveResolutorComponent>()                        
-            .With<TeamComponent>()            
+            .With<MoveResolutorComponent>()
+            .With<TeamComponent>()
             .With<WeaponComponent>()
             .With<SteeringComponent>()
             .With<SpatialIDComponent>()
-            .With<UseBoidTag>();
+            .With<UseBoidTag>()
+            .Without<DeadTag>();
 
     }
 
@@ -77,7 +78,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
                 // aqui ira el rango
             }
 
-            if (!isAtack)
+            if (!isAtack && chara.characterStateType != CharacterStateType.DIE)
             {
                 chara.characterStateType = CharacterStateType.IDLE;
                 HandleMovement(ref player, ref chara, ref pos, ref dir, ref vel, ref moveRes, it.DeltaTime(), ref steeringData);

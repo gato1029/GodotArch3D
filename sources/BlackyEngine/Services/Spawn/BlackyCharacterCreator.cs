@@ -193,7 +193,7 @@ public class BlackyCharacterCreator
       //  entity.Set(new ColliderComponent(0, new Rect2(), colliderBody.OriginCurrent, new Rect2(position - (colliderMove.GetSizeQuad() / 2), colliderMove.GetSizeQuad()), colliderMove.OriginCurrent, 0));
 
       //  entity.Set(new HumanAttackComponent(10, 1f, 0.0f, 0.2f, 0));
-        entity.Set(new HealthComponent(6000));
+        entity.Set(new HealthComponent(100));
 
         float rvoRadius = MeshCreator.PixelsToUnits(16);
  
@@ -292,7 +292,7 @@ public class BlackyCharacterCreator
         else
         {
             
-            entity.Set(new RangedAttackComponent(characterBaseData.idMod,characterBaseData.idProjectile,10,5f,0.5f,0,true,6));
+            entity.Set(new RangedAttackComponent(characterBaseData.idMod,characterBaseData.idProjectile,20,10f,1f,0,true,6));
         }
         entity.Set(new AttackPendingComponent(false, default));
 
