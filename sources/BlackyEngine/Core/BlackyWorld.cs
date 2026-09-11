@@ -156,10 +156,62 @@ public sealed class BlackyWorld : IDisposable
     private void DebugBoot()
     {
         var e = Characters.Create(1787768744605000, new Vector2(0, 0)); // principal
+
+        SpawnEnemiesAroundPlayer(50,10);
         //
-        var ee = Characters.Create(1788369074799000, new Vector2(5, 0)); // enemigos
-        ee.Set(new MoveTargetComponent(new Vector2(20, 0)));
+        //var ee = Characters.Create(1788369074799000, new Vector2(5, 0)); // enemigos
+        //ee.Set(new MoveTargetComponent(new Vector2(20, 0)));
         
+    }
+    private void SpawnEnemiesAroundPlayer(int targetEnemies, int baseRadius = 100, int minSpacing = 3)
+    {
+        Vector2 playerWorldPos = Vector2.Zero; // O la posición real de tu jugador
+        int playerTileX = 0;
+        int playerTileY = 0;
+
+        int spawned = 0;
+        int currentRadius = baseRadius;
+        int maxRadius = baseRadius + 400; // Límite máximo de expansión si faltan enemigos
+        int ringStep = 6;                 // Grosor de cada anillo de expansión
+
+        HashSet<Vector2> occupiedTiles = new HashSet<Vector2>();
+
+        // Generar desde el radio base hacia afuera en anillos concéntricos
+        for (int r = currentRadius; r <= maxRadius && spawned < targetEnemies; r += ringStep)
+        {
+            int pointsOnRing = Math.Max(12, r * 3); // Densidad proporcional a la circunferencia del anillo
+
+            for (int i = 0; i < pointsOnRing && spawned < targetEnemies; i++)
+            {
+                float angle = i * (2f * MathF.PI / pointsOnRing);
+                int tx = playerTileX + Mathf.RoundToInt(r * MathF.Cos(angle));
+                int ty = playerTileY + Mathf.RoundToInt(r * MathF.Sin(angle));
+
+                Vector2 tileCoord = new Vector2(tx, ty);
+                if (occupiedTiles.Contains(tileCoord)) continue;
+
+                // Validación estricta anti-solapamiento basada en la distancia mínima en tiles
+                bool tooClose = false;
+                foreach (var occupied in occupiedTiles)
+                {
+                    if (MathF.Abs(occupied.X - tx) < minSpacing && MathF.Abs(occupied.Y - ty) < minSpacing)
+                    {
+                        tooClose = true;
+                        break;
+                    }
+                }
+
+                if (tooClose) continue;
+
+                occupiedTiles.Add(tileCoord);
+                Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tx, ty);
+
+                var enemy = Characters.Create(1788369074799000, worldPos);
+                //enemy.Set(new MoveTargetComponent(playerWorldPos));
+
+                spawned++;
+            }
+        }
     }
     private void DebugBootStressTest(int targetEnemies = 1000)
     {

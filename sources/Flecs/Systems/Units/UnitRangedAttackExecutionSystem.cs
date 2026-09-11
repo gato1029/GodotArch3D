@@ -4,18 +4,13 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Units;
 
 internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => false;
+    protected override bool MultiThreaded => true;
 
     protected override void BuildQuery(ref QueryBuilder qb)
     {
@@ -32,6 +27,7 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
         if (world == null) return;
 
         var arrowPool = world.Services.ArrowPool;
+        float deltaTime = it.DeltaTime();
 
         var posArray = it.Field<PositionComponent>(0);
         var rangedArray = it.Field<RangedAttackComponent>(1);
@@ -47,38 +43,55 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
             // 1. Validar si el objetivo actual sigue vivo
             if (!atp.Target.IsAlive() || atp.Target.Has<DeadTag>())
             {
-                // El objetivo murió: liberamos para buscar uno nuevo
                 entity.Remove<AttackPendingTag>();
                 atp.Target = default;
                 atp.Active = false;
+                ranged.Timer = 0f;
                 continue;
             }
 
             var targetPos = atp.Target.Get<PositionComponent>();
 
-            // 2. Verificar rango usando el cuadrado de la distancia (sin raíces cuadradas)
+            // 2. Verificar rango
             float rangeSquared = ranged.Range * ranged.Range;
             float distanceSquared = pos.position.DistanceSquaredTo(targetPos.position);
 
             if (distanceSquared <= rangeSquared)
             {
-                // El objetivo sigue en rango: DISPARAR DIRECTAMENTE (Sin consultar grid)
-                if (arrowPool.TryGetAvailableArrow(out Entity arrowEntity))
+                // 3. Controlar la cadencia de fuego (Cooldown)
+                ranged.Timer += deltaTime;
+                if (ranged.Timer < ranged.Cooldown)
                 {
-                    Vector2 direction = (targetPos.position - pos.position).Normalized();
-                    float totalDist = pos.position.DistanceTo(targetPos.position);
-                    arrowEntity.Set(new ProjectilePositionComponent { Position = pos.position });
-                    arrowEntity.Set(new ProjectileVelocityComponent { Velocity = direction * ranged.SpeedProjectile });
-                    arrowEntity.Set(new ProjectileTargetComponent { Target = atp.Target, Damage = ranged.Damage, idMod = ranged.idMod, idProjectile = ranged.idProjectile, Origin =pos.position, Destination = targetPos.position , TotalDistance = totalDist });
-                    arrowEntity.Add<ActiveProjectileTag>();
+                    continue;
                 }
+
+                ranged.Timer -= ranged.Cooldown;
+
+                // 4. Delegar SIEMPRE al hilo principal de forma segura
+                Vector2 direction = (targetPos.position - pos.position).Normalized();
+                float totalDist = pos.position.DistanceTo(targetPos.position);
+
+                arrowPool.EnqueueSpawn(
+                    pos.position,
+                    direction * ranged.SpeedProjectile,
+                    new ProjectileTargetComponent
+                    {
+                        Target = atp.Target,
+                        Damage = ranged.Damage,
+                        idMod = ranged.idMod,
+                        idProjectile = ranged.idProjectile,
+                        Origin = pos.position,
+                        Destination = targetPos.position,
+                        TotalDistance = totalDist
+                    }
+                );
             }
             else
             {
-                // El objetivo se salió de rango: liberamos el tag para que el buscador lo reasigne o busque otro
                 entity.Remove<AttackPendingTag>();
                 atp.Target = default;
                 atp.Active = false;
+                ranged.Timer = 0f;
             }
         }
     }

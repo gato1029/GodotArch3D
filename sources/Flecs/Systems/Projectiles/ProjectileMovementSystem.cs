@@ -63,7 +63,7 @@ internal class ProjectileMovementSystem : FlecsSystemBase
                         Amount = projTarget.Damage
                     });
 
-                    RecycleArrow(arrowEntity, arrowPool);
+                    arrowPool.EnqueueRecycle(arrowEntity); // 🟢 Seguro en multihilo
                     continue;
                 }
             }
@@ -74,7 +74,7 @@ internal class ProjectileMovementSystem : FlecsSystemBase
 
             if (traveledDistSq >= totalDistSq)
             {
-                RecycleArrow(arrowEntity, arrowPool);
+                arrowPool.EnqueueRecycle(arrowEntity); // 🟢 Seguro en multihilo
             }
 
 

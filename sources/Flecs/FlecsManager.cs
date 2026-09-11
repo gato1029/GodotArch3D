@@ -218,8 +218,9 @@ public class FlecsManager
         RegisterSystem<RvoDebugSystem>();
 
         //post
+        
+        RegisterSystem<ProjectileSpawnSystem>();
         RegisterSystem<ArrowVisualSyncSystem>();
-        RegisterSystem<ProjectileSpawnSystem>();        
         RegisterSystem<DeathCleanupSystem>();
         RegisterSystem<CleanupSystem>();
         RegisterSystem<BuildCleanupSystem>();
