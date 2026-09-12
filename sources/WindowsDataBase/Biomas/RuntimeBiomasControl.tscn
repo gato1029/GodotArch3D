@@ -50,6 +50,7 @@ text = "Biomas"
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
+focus_mode = 1
 script = ExtResource("3_3r3wu")
 IconTexture = ExtResource("4_u1lm5")
 IconExpand = true
@@ -117,6 +118,7 @@ size_flags_horizontal = 4
 [node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=116552285]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+focus_mode = 1
 script = ExtResource("3_3r3wu")
 IconTexture = ExtResource("6_08ln4")
 IconExpand = true
@@ -125,6 +127,7 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 [node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=1447995048]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+focus_mode = 1
 script = ExtResource("3_3r3wu")
 IconTexture = ExtResource("7_3e5p6")
 IconExpand = true

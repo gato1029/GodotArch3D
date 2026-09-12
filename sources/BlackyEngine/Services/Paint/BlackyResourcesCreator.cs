@@ -1,5 +1,6 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
@@ -19,19 +20,19 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Paint;
 
-public class BlackyResourcesSourceSystem
+public class BlackyResourcesCreator
 {
     private readonly BlackyChunkOccupancyMap occupancyMap;
     private readonly BlackySpatialEntityMap spatialEntityMap;
     private readonly BlackyEntityRenderSystem renderSystem;
-    private readonly BlackyTerrainSystem terrain;
+    private readonly BlackyTerrainWorldData terrain;
     private readonly FlecsManager flecsManager;
     private readonly StaticSpatialGridOptimized staticHash; 
     private int _resourcesCount = 0;
 
     private const bool DEBUG_COLLIDERS = false;
-
-    public BlackyResourcesSourceSystem(StaticSpatialGridOptimized staticHash,FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainSystem terrain)
+    private int layer = 1;
+    public BlackyResourcesCreator(StaticSpatialGridOptimized staticHash,FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainWorldData terrain)
     {
         this.occupancyMap = occupancyMap;
         this.spatialEntityMap = spatialEntityMap;
@@ -39,6 +40,11 @@ public class BlackyResourcesSourceSystem
         this.terrain = terrain;
         this.flecsManager = flecsManager;
         this.staticHash = staticHash;
+    }
+    public Entity CreateResource(ushort idmod, int idResource, Vector2I tilePosition)
+    {
+        Vector2 position = TilesHelper.TilePositionToWorldPosition(tilePosition);
+        return default;
     }
 
     public void EnqueueCreate(ushort id, Vector2I positionTileWorld, bool renderForce = false)
@@ -136,7 +142,7 @@ public class BlackyResourcesSourceSystem
         }
         _resourcesCount++;
 
-        int height = terrain.GetTopHeight(positionTileWorld);
+        int height = 1;//
         if (height == 1)
         {
             height = 2;

@@ -13,10 +13,10 @@ public struct CreateResourceSourceCommand : IRenderCommand
     public ushort id;
     public Vector2I position;
     public bool renderForce;
-    public BlackyResourcesSourceSystem system;
+    public BlackyResourcesCreator system;
 
     public CreateResourceSourceCommand(
-        BlackyResourcesSourceSystem system,
+        BlackyResourcesCreator system,
         ushort id,
         Vector2I position,
         bool renderForce)

@@ -15,7 +15,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Resources;
 public sealed class BlackyResourcesGenerator : IDisposable
 {
     private readonly BlackyHeightSystem heightSystem;
-    private readonly BlackyResourcesSourceSystem resourcesSourceSystem;
+    private readonly BlackyResourcesCreator resourcesSourceSystem;
     private readonly BlackyResourcesPostProcessor postProcessor;  
     private readonly BlackyWorldTerrainGenerator terrainGenerator;
     private readonly ChunkGenerationState chunkGenerationState;
@@ -33,7 +33,7 @@ public sealed class BlackyResourcesGenerator : IDisposable
     public BlackyResourcesGenerator(
         BlackyHeightSystem heightSystem,        
         BlackyWorldTerrainGenerator terrainGenerator,
-        BlackyResourcesSourceSystem resourcesSourceSystem,
+        BlackyResourcesCreator resourcesSourceSystem,
         BlackyResourcesPostProcessor postProcessor,
         int seed = 12345)
     {

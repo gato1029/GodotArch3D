@@ -37,7 +37,7 @@ public sealed class BlackyWorldServices
 
     public BlackyTerrainSystem TerrainPainter { get; } // ya no se usa , pero lo dejo por compatibilidad, ahora se usa TerrainPainter y ResourcePainter luego se eliminara
 
-    public BlackyResourcesSourceSystem ResourcePainter { get; }
+    public BlackyResourcesCreator ResourcePainter { get; }
 
     public BlackyBuildingSystem BuildingPainter { get; }
 
@@ -113,13 +113,13 @@ public sealed class BlackyWorldServices
             state.OccupancyMap,
             TileRenderer);
 
-        ResourcePainter = new BlackyResourcesSourceSystem(
+        ResourcePainter = new BlackyResourcesCreator(
             state.StaticSpatial,
             sim.Flecs,
             state.OccupancyMap,
             state.SpatialEntityMap,
             EntityRenderer,
-            TerrainPainter);
+            TerrainDataLienzo);
 
         BuildingPainter = new BlackyBuildingSystem(
             sim.Flecs,

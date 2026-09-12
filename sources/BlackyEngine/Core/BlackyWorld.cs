@@ -60,7 +60,7 @@ public sealed class BlackyWorld : IDisposable
 
     public BlackyCharacterCreator Characters => Services.Characters;
     public BlackyTerrainSystem Terrain => Services.TerrainPainter;
-    public BlackyResourcesSourceSystem Resources => Services.ResourcePainter;
+    public BlackyResourcesCreator Resources => Services.ResourcePainter;
     public BlackyBuildingSystem Buildings => Services.BuildingPainter;
     public BlackyHeightSystem Heights => Services.HeightMapWorld;
 
