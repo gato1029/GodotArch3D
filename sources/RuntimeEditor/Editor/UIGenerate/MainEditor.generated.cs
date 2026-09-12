@@ -18,10 +18,12 @@ public partial class MainEditor : Node
     private KuroButton ButtonGuardarComoMapa;
     private KuroButton ButtonEliminarMapa;
     private KuroButton KuroButtonTerreno;
-    private KuroButton KuroButton2;
+    private KuroButton KuroButtonRecursos;
     private KuroButton KuroButton4;
     private KuroButton KuroButton5;
     private KuroButton KuroButton3;
+    private EditorPanelPosiciones EditorPanelPosiciones;
+    private VBoxContainer VBoxContainerPosiciones;
     private Node Render;
     private Camera3dGodot Camera3D;
     private InputHandler InputHandlerGame;
@@ -39,10 +41,12 @@ public partial class MainEditor : Node
         ButtonGuardarComoMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonGuardarComoMapa");
         ButtonEliminarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonEliminarMapa");
         KuroButtonTerreno = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButtonTerreno");
-        KuroButton2 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton2");
+        KuroButtonRecursos = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButtonRecursos");
         KuroButton4 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton4");
         KuroButton5 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton5");
         KuroButton3 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/CenterContainer/KuroButton3");
+        EditorPanelPosiciones = GetNode<EditorPanelPosiciones>("Editor/VBoxContainer/MarginContainer/HBoxContainer/EditorPanelPosiciones");
+        VBoxContainerPosiciones = GetNode<VBoxContainer>("Editor/VBoxContainer/MarginContainer/HBoxContainer/EditorPanelPosiciones/Panel/VBoxContainerPosiciones");
         Render = GetNode<Node>("Render");
         Camera3D = GetNode<Camera3dGodot>("Render/Camera3D");
         InputHandlerGame = GetNode<InputHandler>("Render/InputHandlerGame");

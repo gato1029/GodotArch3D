@@ -29,6 +29,6 @@ public struct CreateResourceSourceCommand : IRenderCommand
 
     public void Execute()
     {
-        system.Create(id, position, renderForce);
+        //system.Create(id, position, renderForce);
     }
 }

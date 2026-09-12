@@ -67,7 +67,7 @@ public partial class WindowMaterialTiles : Window
         node.OnItemSelectedChanged += Node_OnItemSelected;
     }
 
-    private void Node_OnItemSelected(TileSpriteData obj)
+    private void Node_OnItemSelected(TileSpriteData obj, object obje )
     {
         if (EditionMode)
         {

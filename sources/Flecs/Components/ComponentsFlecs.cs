@@ -200,7 +200,7 @@ public record struct UnitDefinitionComponent
 public record struct ResourceDefinitionComponent
 (
     ushort idTemplate, // id Template del recurso
-    int idSpriteTemplate // id template del sprite
+    int idSpriteTemplate // id template del sprite    
 );
 
 [RegisterComponentFlecs]

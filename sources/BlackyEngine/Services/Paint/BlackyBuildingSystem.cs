@@ -156,7 +156,7 @@ public class BlackyBuildingSystem
 
         if (renderForce)
         {
-            renderSystem.ForceRenderEntity(entity);
+            //renderSystem.ForceRenderEntity(entity);
         }
 
         occupancyMap.SetTiles(0, positionTileWorld.X, positionTileWorld.Y, tileSprite.tilesOcupancy, entity.Id.Value);
@@ -191,10 +191,9 @@ public class BlackyBuildingSystem
             }
 
             spatialEntityMap.Remove(entity);
-            renderSystem.ForceDisposeEntity(entity);
+            //renderSystem.ForceDisposeEntity(entity);
             RenderCommandQueue.Enqueue(new DestroyEntityCommand(entity));
         }
         occupancyMap.ClearByEntity(0, positionTileWorld.X, positionTileWorld.Y);
-
     }
 }

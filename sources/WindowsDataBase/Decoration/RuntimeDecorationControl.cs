@@ -18,7 +18,7 @@ public partial class RuntimeDecorationControl : PanelContainer
         TileSpriteSelector.OnItemSelectedChanged += TileSpriteSelector_OnItemSelected;               
 	}
 
-    private void TileSpriteSelector_OnItemSelected(TileSpriteData obj)
+    private void TileSpriteSelector_OnItemSelected(TileSpriteData obj, object obje)
     {
         data.idTileSprite = obj.id;
     }

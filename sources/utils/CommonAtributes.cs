@@ -19,8 +19,8 @@ public  class CommonAtributes
     public static Vector2I VIEW_DISTANCE_CHUNK_16 = new Vector2I(20, 4);
     public static string pathMaps = "AssetExternals/Mapas";
 
-    internal static float Calculate(float depthOffset, float height, float layer, Vector2 positionCenter)
+    internal static float Calculate(float depthOffsetY, float height, float layer, Vector2 positionCenter)
     {
-        return depthOffset + (height * 10f) + (layer * 0.1f) + (positionCenter.Y * 0.001f);
+        return depthOffsetY + (height * 10f) + (layer * 0.1f) + (positionCenter.Y * 0.001f);
     }
 }

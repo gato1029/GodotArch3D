@@ -21,7 +21,27 @@ public partial class MainEditor : Node
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();
         KuroButtonTerreno.Pressed += KuroButtonTerreno_Pressed;
+        KuroButtonRecursos.Pressed += KuroButtonRecursos_Pressed;
     }
+
+    private WindowEditorRuntimeResources _windowEditorRuntimeResources;
+    private void KuroButtonRecursos_Pressed()
+    {
+        if (IsInstanceValid(_windowEditorRuntimeResources))
+        {
+            _windowEditorRuntimeResources.Popup();
+            _windowEditorRuntimeResources.GrabFocus();
+            return;
+        }
+
+        _windowEditorRuntimeResources = RuntimeServices.NodeRegistry.Create<WindowEditorRuntimeResources>();
+        AddChild(_windowEditorRuntimeResources);
+
+        _windowEditorRuntimeResources.TreeExited += () => _windowEditorRuntimeResources = null;
+
+        _windowEditorRuntimeResources.Popup();
+    }
+
     private WindowEditorRuntimeTerrain _terrainWindow;
     private void KuroButtonTerreno_Pressed()
     {

@@ -3,6 +3,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
+using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.Flecs.Components;
 using GodotEcsArch.sources.managers.Accesories;
 using GodotEcsArch.sources.managers.Characters;
@@ -27,7 +28,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Services.Spawn;
 public class BlackyCharacterCreator 
 {
     private int _characterCount = 0;
-    private int layer =4;
+    private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
     private readonly FlecsManager flecsManager;
     private readonly FastSpatialHash dynamicHash;
     private readonly Core.BlackyWorld world;

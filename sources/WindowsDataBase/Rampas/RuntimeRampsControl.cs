@@ -21,7 +21,7 @@ public partial class RuntimeRampsControl : PanelContainer
         PreviewSprite.OnItemSelectedChanged += TileSpriteSelector_OnItemSelectedChanged;                
     }
 
-    private void TileSpriteSelector_OnItemSelectedChanged(TileSpriteData objectControl)
+    private void TileSpriteSelector_OnItemSelectedChanged(TileSpriteData objectControl, object obje)
     {       
         data.idTileSprite = objectControl.id;
     }

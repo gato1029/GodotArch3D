@@ -1,3 +1,5 @@
+
+using Flecs.NET.Core;
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Generation;
 using GodotEcsArch.sources.BlackyEngine.Generation.Biomes;
@@ -96,7 +98,7 @@ public static class BlackyWorldContext
     // ================================
 
     public static FastSpatialHash DynamicHash => State.DynamicHash;
-    public static StaticSpatialGridOptimized StaticSpatial => State.StaticSpatial;
+    public static StaticSpatialGridOptimizedGeneric<Entity> StaticSpatial => State.StaticSpatial;
     public static BlackyChunkedBitGrid GridMove => State.GridMove;
     public static BlackyChunkRenderData RenderData => State.RenderData;
     public static BlackySpatialEntityMap SpatialEntityMap => State.SpatialEntityMap;

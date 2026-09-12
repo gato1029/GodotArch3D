@@ -1,18 +1,12 @@
-
-
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
-using GodotEcsArch.sources.BlackyTiles.Commands;
+using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
-using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotFlecs.sources.Flecs.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace GodotEcsArch.sources.BlackyTiles.Entities;
 
@@ -21,6 +15,13 @@ public class BlackyEntityRenderSystem
     private readonly BlackySpatialEntityMap spatialMap;
     private readonly ChunkManagerBase chunkManager;
 
+    // Colas thread-safe para recibir los eventos desde cualquier hilo
+    private readonly ConcurrentQueue<Vector2I> _loadQueue = new();
+    private readonly ConcurrentQueue<Vector2I> _unloadQueue = new();
+
+    private const int MaxChunkOpsPerFrame = 2; // Presupuesto por frame para evitar tirones
+    private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
+
     public BlackyEntityRenderSystem(
         BlackySpatialEntityMap spatialMap,
         ChunkManagerBase chunkManager)
@@ -28,290 +29,141 @@ public class BlackyEntityRenderSystem
         this.spatialMap = spatialMap;
         this.chunkManager = chunkManager;
 
-        chunkManager.OnChunkLoad += OnChunkLoad;
-        chunkManager.OnChunkUnload += OnChunkUnload;
+        // Ahora solo encolamos cuando el gestor de chunks avisa
+        chunkManager.OnChunkLoad += OnChunkLoadRequested;
+        chunkManager.OnChunkUnload += OnChunkUnloadRequested;
     }
-    public void ForceDisposeEntity(Entity entity)
+
+    // --- MÉTODOS DE ENCOLADO (Seguros para hilos secundarios) ---
+
+    private void OnChunkLoadRequested(Vector2I chunkCoord)
     {
-        if (!entity.Has<SpatialComponent>())
-            return;
-        var spatial = entity.Get<SpatialComponent>();            
-        // Si el chunk está cargado, resolver el dispose del entity
-        // ❌ nunca tuvo render → ignorar
-        if (!entity.Has<RenderInstanceComponent>())
-            return;
-
-        var render = entity.Get<RenderInstanceComponent>();
-
-        // ❌ ya está desactivado → ignorar
-        if (!render.isActive)
-            return;
-
-        // 🔥 desactivar render (GPU)
-        RenderCommandQueue.Enqueue(
-            new DisableEntityRenderCommand(
-                entity,
-                render.rid,
-                render.instance,
-                render.materialId
-            )
-        );
+        _loadQueue.Enqueue(chunkCoord);
     }
-    public void ForceRenderEntity(Entity entity)
+
+    private void OnChunkUnloadRequested(Vector2I chunkCoord)
     {
-        if (!entity.Has<SpatialComponent>())
-            return;
-        var spatial = entity.Get<SpatialComponent>();
-        var chunkCoord = spatial.Chunk;            
-        // Si el chunk está cargado, resolver el render del entity
-        ResolveEntityRender_FirstTime(entity, chunkCoord);            
+        _unloadQueue.Enqueue(chunkCoord);
     }
-    private void OnChunkLoad(Vector2I chunkCoord)
+
+    // --- MÉTODO DE PROCESAMIENTO (Llamado por Flecs en el hilo principal) ---
+
+    public void ProcessPendingChunks()
+    {
+        int loaded = 0;
+        while (loaded < MaxChunkOpsPerFrame && _loadQueue.TryDequeue(out var chunkCoord))
+        {
+            InternalExecuteLoadChunk(chunkCoord);
+            loaded++;
+        }
+
+        int unloaded = 0;
+        while (unloaded < MaxChunkOpsPerFrame && _unloadQueue.TryDequeue(out var chunkCoord))
+        {
+            InternalExecuteUnloadChunk(chunkCoord);
+            unloaded++;
+        }
+    }
+
+    // --- LÓGICA REAL (Ejecución 100% segura en el hilo principal) ---
+
+    private void InternalExecuteUnloadChunk(Vector2I chunkCoord)
     {
         var bucket = spatialMap.GetBucket(chunkCoord);
         if (bucket == null) return;
 
-        for (int i = 0; i < bucket.Count; i++)
+        for (int i = 0; i < bucket.Exist.Length; i++)
         {
-            var entity = bucket.Entities[i];
-            bool hasRender = entity.Has<RenderInstanceComponent>();
-
-            if (!hasRender)
+            bool itemExist = bucket.Exist[i];
+            if (itemExist)
             {
-                // 🔥 PRIMERA VEZ → CREATE
-                ResolveEntityRender_FirstTime(entity, chunkCoord);
-            }
-            else
-            {
-                ref var render = ref entity.GetMut<RenderInstanceComponent>();
+                Entity ent = bucket.Entities[i];
+                var gpu = ent.Get<RenderGPUComponent>();
+                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
 
-                if (!render.isActive)
+                if (ent.Has<SpriteSimpleAnimationTag>())
                 {
-                    // 🔥 YA EXISTÍA → ENABLE
-                    ResolveEntityRender_ReEnable(entity, chunkCoord);
+                    ent.Remove<SpriteSimpleAnimationTag>();
                 }
-                // 🟢 ya activo → no hacer nada
             }
         }
     }
-    private void ResolveEntityRender_ReEnable(Entity entity, Vector2I chunkCoord)
-    {
-        int layerIndex = 4;
-        var tileSpriteComponent = entity.Get<TileSpriteComponent>();
-        var positionComponent = entity.Get<PositionComponent>();
 
-        var dataTemplate = MasterDataManager.GetData<TileSpriteData>(tileSpriteComponent.idTileSprite);
-
-
-        float x = MeshCreator.PixelsToUnits(16) / 2f;
-        float y = MeshCreator.PixelsToUnits(16) / 2f;
-
-        float offsetX = 0;
-        float offsetY = 0;
-
-        switch (dataTemplate.tileSpriteType)
-        {
-            case TileSpriteType.Static:
-                offsetX = dataTemplate.spriteData.offsetInternal.X * dataTemplate.spriteData.scale;
-                offsetY = dataTemplate.spriteData.offsetInternal.Y * dataTemplate.spriteData.scale;
-                break;
-            case TileSpriteType.Animated:
-                offsetX = dataTemplate.animationData.offsetInternal.X * dataTemplate.animationData.scale;
-                offsetY = dataTemplate.animationData.offsetInternal.Y * dataTemplate.animationData.scale;
-                break;
-            default:
-                break;
-        }
-
-
-
-        Vector2 positionNormalize = (positionComponent.tilePosition * new Vector2(MeshCreator.PixelsToUnits(16), MeshCreator.PixelsToUnits(16))) + new Vector2(x, y);
-        Vector2 positionCenter = positionNormalize+ new Vector2(offsetX, offsetY);
-        
-        Vector3 worldPosition = Vector3.Zero;
-
-        float depthOffset = 0;
-        float z = 0;
-        float depthValue = 0;
-
-
-        switch (dataTemplate.tileSpriteType)
-        {
-            case TileSpriteType.Static:
-                depthOffset = MeshCreator.PixelsToUnits(dataTemplate.spriteData.yDepthRender);
-                depthValue = positionNormalize.Y
-                        + depthOffset
-                        - positionComponent.height * CommonAtributes.HEIGHT_OFFSET
-                        ;
-
-                z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layerIndex * CommonAtributes.LAYER_OFFSET;
-
-                worldPosition = new(positionCenter.X, positionCenter.Y, z);
-
-                break;
-            case TileSpriteType.Animated:
-                depthOffset = MeshCreator.PixelsToUnits(dataTemplate.animationData.yDepthRender);
-                depthValue =
-                positionNormalize.Y
-               + depthOffset
-               - positionComponent.height * CommonAtributes.HEIGHT_OFFSET
-              ;
-
-                z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layerIndex * CommonAtributes.LAYER_OFFSET;
-
-                worldPosition = new(positionCenter.X, positionCenter.Y, z);
-                break;
-
-        }
-
-
-        if (dataTemplate.tileSpriteType == TileSpriteType.Animated)
-        {
-            RenderCommandQueue.Enqueue(
-                new EnableEntityRenderCommand(
-                    entity,
-                    worldPosition,
-                    dataTemplate.animationData
-                )
-            );
-        }
-        else
-        {
-            RenderCommandQueue.Enqueue(
-                new CreateEntityInstanceCommand(
-                    entity,
-                    worldPosition,
-                    dataTemplate.spriteData
-                )
-            );
-        }
-    }
-    private void ResolveEntityRender_FirstTime(Entity entity, Vector2I chunkCoord)
-    {
-        int layerIndex = 4;
-        var tileSpriteComponent = entity.Get<TileSpriteComponent>();
-        var positionComponent = entity.Get<PositionComponent>();
-
-        var dataTemplate = MasterDataManager.GetData<TileSpriteData>(tileSpriteComponent.idTileSprite);
-
-
-        float x = MeshCreator.PixelsToUnits(16) / 2f;
-        float y = MeshCreator.PixelsToUnits(16) / 2f;
-
-        float offsetX = 0;
-        float offsetY = 0;
-
-        switch (dataTemplate.tileSpriteType)
-        {
-            case TileSpriteType.Static:
-                offsetX = dataTemplate.spriteData.offsetInternal.X * dataTemplate.spriteData.scale;
-                offsetY = dataTemplate.spriteData.offsetInternal.Y * dataTemplate.spriteData.scale;
-                break;
-            case TileSpriteType.Animated:
-                offsetX = dataTemplate.animationData.offsetInternal.X * dataTemplate.animationData.scale;
-                offsetY = dataTemplate.animationData.offsetInternal.Y * dataTemplate.animationData.scale;
-                break;
-            default:
-                break;
-        }
-
-
-
-        Vector2 positionNormalize = (positionComponent.tilePosition * new Vector2(MeshCreator.PixelsToUnits(16), MeshCreator.PixelsToUnits(16))) + new Vector2(x, y);
-        Vector2 positionCenter = positionNormalize  + new Vector2(offsetX, offsetY);
-
-        Vector3 worldPosition = Vector3.Zero;
-
-        float depthOffset = 0;
-        float z = 0;
-        float depthValue = 0;
-
-
-        switch (dataTemplate.tileSpriteType)
-        {
-            case TileSpriteType.Static:
-                depthOffset = MeshCreator.PixelsToUnits(dataTemplate.spriteData.yDepthRender);
-                depthValue = positionNormalize.Y
-                        + depthOffset
-                        - positionComponent.height * CommonAtributes.HEIGHT_OFFSET
-                        ;
-
-                z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layerIndex * CommonAtributes.LAYER_OFFSET;
-
-                worldPosition = new(positionCenter.X, positionCenter.Y, z);
-
-                break;
-            case TileSpriteType.Animated:
-                depthOffset = MeshCreator.PixelsToUnits(dataTemplate.animationData.yDepthRender);
-                depthValue =
-                positionNormalize.Y
-                + depthOffset
-               - positionComponent.height * CommonAtributes.HEIGHT_OFFSET
-              ;
-
-                z = depthValue * CommonAtributes.LAYER_MULTIPLICATOR + layerIndex * CommonAtributes.LAYER_OFFSET;
-
-                worldPosition = new(positionCenter.X, positionCenter.Y, z);
-                break;
-
-        }
-    
-        if (dataTemplate.tileSpriteType == TileSpriteType.Animated)
-        {
-            RenderCommandQueue.Enqueue(
-                new CreateEntityAnimatedInstanceCommand(
-                    entity,
-                    worldPosition,
-                    dataTemplate.animationData,
-                    dataTemplate.id,
-                    dataTemplate.animationData.frameDuration,
-                    depthValue,
-                    dataTemplate.animationData.scale,
-                    new Vector2(offsetX, offsetY),
-                    layerIndex
-                )
-            );
-        }
-        else
-        {
-            RenderCommandQueue.Enqueue(
-                new CreateEntityInstanceCommand(
-                    entity,
-                    worldPosition,
-                    dataTemplate.spriteData
-                )
-            );
-        }
-    }
-
-    private void OnChunkUnload(Vector2I chunkCoord)
+    private void InternalExecuteLoadChunk(Vector2I chunkCoord)
     {
         var bucket = spatialMap.GetBucket(chunkCoord);
         if (bucket == null) return;
 
-        for (int i = 0; i < bucket.Count; i++)
+        for (int i = 0; i < bucket.Exist.Length; i++)
         {
-            var entity = bucket.Entities[i];
+            bool itemExist = bucket.Exist[i];
+            if (itemExist)
+            {
+                Entity ent = bucket.Entities[i];
+                var rd = ent.Get<ResourceDefinitionComponent>();
+                var pos = ent.Get<PositionComponent>();
+                int spriteId =rd.idSpriteTemplate;
 
-            // ❌ nunca tuvo render → ignorar
-            if (!entity.Has<RenderInstanceComponent>())
-                continue;
-
-            var render = entity.Get<RenderInstanceComponent>();
-
-            // ❌ ya está desactivado → ignorar
-            if (!render.isActive)
-                continue;
-
-            // 🔥 desactivar render (GPU)
-            RenderCommandQueue.Enqueue(
-                new DisableEntityRenderCommand(
-                    entity,
-                    render.rid,
-                    render.instance,
-                    render.materialId
-                )
-            );
+                AtlasModsManager.TryGetTileSprite(spriteId, out var sprite);
+                switch (sprite.tileSpriteType)
+                {
+                    case TileSpriteType.Static:
+                        CreateSprite(ent, sprite.spriteData, pos.height, pos.tilePosition);
+                        break;
+                    case TileSpriteType.Animated:
+                        CreateAnimation(ent, sprite.animationData, spriteId, pos.height, pos.tilePosition);
+                        break;
+                }
+            }
         }
+    }
+
+    private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile)
+    {
+        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
+        Vector2 offset = spriteData.offsetInternal;
+
+        float depthOffset = spriteData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
+
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+
+        Transform3D transform = new(Basis.Identity, worldPosition);
+        transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
+
+        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
+        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
+        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
+
+        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+                 layer, depthOffset, spriteData.scale, offset));
+    }
+
+    private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile)
+    {
+        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile);
+        Vector2 offset = animationData.offsetInternal;
+
+        float depthOffset = animationData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+
+        Transform3D transform = new(Basis.Identity, worldPosition);
+        transform = transform.ScaledLocal(new Vector3(animationData.scale, animationData.scale, 1));
+
+        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
+        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, animationData.uvFramesArray[0]);
+        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
+
+        entity.Set(new RenderTransformComponent(transform));
+        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+                 layer, depthOffset, animationData.scale, offset));
+
+        entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
+        entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
+        entity.Set(new PositionComponent { position = new Vector2(worldPosition.X, worldPosition.Y), tilePosition = positionTile });
+        entity.Add<SpriteSimpleAnimationTag>();
     }
 }

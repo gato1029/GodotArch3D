@@ -234,7 +234,7 @@ public static class TilesEntityPreviewHelper
                 pos.tilePosition = newPositionCenter + offset;
 
                 ref RenderGPUComponent renderComp = ref entity.GetMut<RenderGPUComponent>();
-                    renderComp.originOffset = offsetExternal;
+                    renderComp.originOffset = renderComp.originOffset+ offsetExternal;
 
                 entity.Add<DirtyTransformTag>();
             }

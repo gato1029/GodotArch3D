@@ -7,6 +7,7 @@ using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 using GodotEcsArch.sources.BlackyTiles.Commands;
+using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.BlackyTiles.Entities;
 using GodotEcsArch.sources.managers.Collision;
 using GodotEcsArch.sources.managers.Mods;
@@ -41,7 +42,7 @@ public class BlackyResourcesCreator
     private int _resourcesCount = 0;
 
     private const bool DEBUG_COLLIDERS = false;
-    private int layer = 6;
+    private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
     private Dictionary<int, List<int>> _colliderDebugMap = new();
     private readonly ConcurrentQueue<CreateResourceCommand> _commandQueue = new();
     private const int MaxPerFrame = 100;    
@@ -97,12 +98,12 @@ public class BlackyResourcesCreator
         {
             if (entity.Has<SpatialIDComponent>())
             {
-                SpatialIDComponent spatial = entity.Get<SpatialIDComponent>();
-                RenderGPUComponent gpu = entity.Get<RenderGPUComponent>();
-
-                staticHash.FreeCollider(spatial.Value);
-                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                SpatialIDComponent spatial = entity.Get<SpatialIDComponent>();                
+                staticHash.FreeCollider(spatial.Value);                
             }
+
+            RenderGPUComponent gpu = entity.Get<RenderGPUComponent>();
+            AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
 
             spatialEntityMap.Remove(entity);
             occupancyMap.ClearByEntity(0, tilePosition.X, tilePosition.Y);
@@ -170,7 +171,7 @@ public class BlackyResourcesCreator
                 CreateSprite(entity, sprite.spriteData, height, tilePosition);
                 break;
             case TileSpriteType.Animated:
-                CreateAnimation(sprite.animationData, spriteId, height, tilePosition);
+                CreateAnimation(entity, sprite.animationData, spriteId, height, tilePosition);
                 break;
         }
     }
@@ -197,7 +198,7 @@ public class BlackyResourcesCreator
                  layer, depthOffset, spriteData.scale, offset));
     }
 
-    private void CreateAnimation(WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile)
+    private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile)
     {
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile);
@@ -214,8 +215,7 @@ public class BlackyResourcesCreator
         RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, animationData.uvFramesArray[0]);
         RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
 
-        var world = flecsManager.WorldFlecs;
-        var entity = world.Entity();
+
 
         entity.Set(new RenderTransformComponent(transform));
         entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
@@ -223,7 +223,7 @@ public class BlackyResourcesCreator
 
         entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
-        entity.Set(new PositionComponent { position = new Vector2(worldPosition.X, worldPosition.Y), tilePosition = positionTile });
+        
         entity.Add<SpriteSimpleAnimationTag>();
     }
 

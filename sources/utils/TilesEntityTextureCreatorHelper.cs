@@ -42,7 +42,7 @@ public static class TilesEntityTextureCreatorHelper
         // aqui necesito la paleta por region y de acuerdo a eso creamos tile simple o animado
         var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.spriteData.yDepthRender, templateSprite.spriteData.scale, Vector2.Zero));
+        entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.spriteData.yDepthRender, templateSprite.spriteData.scale, templateSprite.spriteData.offsetInternal));
 
         entity.Set(new RenderFrameDataComponent { uvMap = templateSprite.spriteData.uv });
         entity.Set(new PositionComponent { tilePosition = tilePosition, height = 10 });

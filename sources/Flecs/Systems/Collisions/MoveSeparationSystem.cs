@@ -145,7 +145,7 @@ public class MoveSeparationSystem : FlecsSystemBase
     private  bool  CheckAgainstStaticGrid(
     ref Vector2 pos,
     ref MoveColliderComponent col,
-    StaticSpatialGridOptimized grid)
+    StaticSpatialGridOptimizedGeneric<Entity> grid)
     {
 
 
@@ -166,32 +166,36 @@ public class MoveSeparationSystem : FlecsSystemBase
         bool existCollision = false;
         foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
         {
-            var other = grid.GetEntity(id);
-            if (!other.HasValue || !other.Value.IsAlive()) continue;
-
-            ushort idTemplate = other.Value.Get<UnitDefinitionComponent>().idTemplate; // 🔹 para asegurar que es una entidad con collider
-            var template =BlackyPalletesPersistence.characterPalette.GetData(idTemplate);
-            
-            //var bodyCollider = other.Value.Get<BodyColliderComponent>();
-
-            var posOther = other.Value.Get<PositionComponent>();
-
-            foreach (var shape in template.bodyColliders)
+            if (grid.TryGetValue(id, out Entity other))
             {
-                var shapeInternal = shape;
-                if (!CollisionMathHelper.Check(
-                        pos.X, pos.Y, ref colUnit,
-                        posOther.position.X, posOther.position.Y, ref shapeInternal))
-                {
+                if (!other.IsAlive()) continue;
 
-                    continue;
-                }
-                else
+                ushort idTemplate = other.Get<UnitDefinitionComponent>().idTemplate; // 🔹 para asegurar que es una entidad con collider
+                var template = BlackyPalletesPersistence.characterPalette.GetData(idTemplate);
+
+                //var bodyCollider = other.Value.Get<BodyColliderComponent>();
+
+                var posOther = other.Get<PositionComponent>();
+
+                foreach (var shape in template.bodyColliders)
                 {
-                    existCollision = true;
-                    break;
+                    var shapeInternal = shape;
+                    if (!CollisionMathHelper.Check(
+                            pos.X, pos.Y, ref colUnit,
+                            posOther.position.X, posOther.position.Y, ref shapeInternal))
+                    {
+
+                        continue;
+                    }
+                    else
+                    {
+                        existCollision = true;
+                        break;
+                    }
                 }
             }
+            
+    
         }
 
         return existCollision;

@@ -22,5 +22,6 @@ internal class ResourceCreationSystem : FlecsSystemBase
         // Cada servicio procesa su propia cola respetando su propio presupuesto por frame
         world.Services.ResourcePainter.ProcessPendingCommands();
         world.Services.ResourcePainter.ProcessPendingRemovals();
+        world.Services.EntityRenderer.ProcessPendingChunks();
     }
 }

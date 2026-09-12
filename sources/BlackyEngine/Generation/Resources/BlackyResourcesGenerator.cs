@@ -441,11 +441,11 @@ public sealed class BlackyResourcesGenerator : IDisposable
 
         var data = single[0];
 
-        resourcesSourceSystem.Create(
-            data.ResourceId,
-            data.PositionTileWorld,
-            renderForce
-        );
+        //resourcesSourceSystem.Create(
+        //    data.ResourceId,
+        //    data.PositionTileWorld,
+        //    renderForce
+        //);
 
         return true;
     }
@@ -512,11 +512,11 @@ public sealed class BlackyResourcesGenerator : IDisposable
             if (pos.X < minWorldX || pos.X > maxWorldX || pos.Y < minWorldY || pos.Y > maxWorldY)
                 continue;
 
-            resourcesSourceSystem.EnqueueCreate(
-                data.ResourceId,
-                data.PositionTileWorld,
-                renderForce
-            );
+            //resourcesSourceSystem.EnqueueCreate(
+            //    data.ResourceId,
+            //    data.PositionTileWorld,
+            //    renderForce
+            //);
 
             createdCount++;
         }

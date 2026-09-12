@@ -20,6 +20,7 @@ public partial class KuroControlWindow : PanelContainer
     private Vector2I _startWindowSize;
 
     private string _nameWindow = "Kuro Window";
+    public event Action<object> OnCloseWindow;
 
     [Godot.Export]
     public string NameWindow
@@ -283,6 +284,7 @@ public partial class KuroControlWindow : PanelContainer
     // =========================================================
     private void ButtonClose_Pressed()
     {
+        OnCloseWindow?.Invoke(this);
         if (GetParent() is Window)
         {
             GetParent().QueueFree();

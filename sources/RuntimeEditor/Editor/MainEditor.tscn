@@ -174,7 +174,7 @@ IconTexture = ExtResource("7_wsd07")
 ButtonText = "Terreno"
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="KuroButton2" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=601592721]
+[node name="KuroButtonRecursos" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=601592721]
 custom_minimum_size = Vector2(44, 69.25)
 layout_mode = 2
 size_flags_horizontal = 4
