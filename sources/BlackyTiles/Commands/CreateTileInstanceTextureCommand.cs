@@ -76,14 +76,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         Vector2 offset = animationData.offsetInternal;
         float depthOffset = animationData.yDepthRenderFormat;
         int heightRender = this.height;
-        //if (dualOffset)
-        //{
-        //    //if (depthOffset<0)
-        //    //{
-        //    //    heightRender = height - 1;
-        //    //}
-        //    offset = offset;// +new Vector2(0.25f, 0.25f);
-        //}
+
         if (nivelarBase)
         {
             heightRender = heightRender - 1;
@@ -128,11 +121,8 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
             animationData.scale,
             offset));
 
-        entity.Set(new AnimationComponent(
+        entity.Set(new AnimationSimpleComponent(
             idSprite,
-            EntityType.TILESPRITE,
-            AnimationType.PARADO,
-            AnimationType.NINGUNA,
             1,
             0,
             animationData.frameDuration,
@@ -151,7 +141,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
             tilePosition = new Vector2I(x, y)
         });
 
-        entity.Add<TileSpriteAnimationTag>();
+        entity.Add<SpriteSimpleAnimationTag>();
 
         //renderData.SetEntityReference(entity);
 

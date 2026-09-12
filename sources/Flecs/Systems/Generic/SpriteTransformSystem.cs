@@ -26,7 +26,7 @@ internal class SpriteTransformSystem : FlecsSystemBase
           .Without<StaticRenderTag>()
           .Without<DeadTag>()
           .Without<DestroyRequestTag>()
-          .Without<TileSpriteAnimationTag>();
+          .Without<SpriteSimpleAnimationTag>();
 
 
     }

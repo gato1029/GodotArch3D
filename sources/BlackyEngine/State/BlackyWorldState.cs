@@ -1,3 +1,4 @@
+using Flecs.NET.Core;
 using Godot;
 
 using GodotEcsArch.sources.BlackyEngine.Core;
@@ -24,7 +25,7 @@ public enum ModeGrid
 public sealed class BlackyWorldState : IDisposable
 {
     public FastSpatialHash DynamicHash { get; }
-    public StaticSpatialGridOptimized StaticSpatial { get; }
+    public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatial { get; }
     public StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> StaticSpatialTerrain { get; }
     public BlackyChunkedBitGrid GridMove { get; }
 
@@ -46,7 +47,7 @@ public sealed class BlackyWorldState : IDisposable
         this.config = world.Config;
 
         DynamicHash = new FastSpatialHash(config.MapSize.X, config.MapSize.Y, 11000);
-        StaticSpatial = new StaticSpatialGridOptimized(config.MapSize.X, config.MapSize.Y, 32, 65536);
+        StaticSpatial = new StaticSpatialGridOptimizedGeneric<Entity>(config.MapSize.X, config.MapSize.Y, 32, 100_000, 50_000);
         StaticSpatialTerrain = new StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData>(config.MapSize.X, config.MapSize.Y, 32, 100_000,50_000);
         GridMove = new BlackyChunkedBitGrid(config.MapSize.X, config.MapSize.Y, 16);
 

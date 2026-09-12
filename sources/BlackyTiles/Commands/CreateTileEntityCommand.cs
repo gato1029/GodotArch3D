@@ -133,7 +133,7 @@ public class CreateTileEntityCommand : IRenderCommand
             tilePosition = new Vector2I(localX, localY)
         });
 
-        entity.Add<TileSpriteAnimationTag>();
+        entity.Add<SpriteSimpleAnimationTag>();
 
         renderData.SetEntityReference(entity);
 

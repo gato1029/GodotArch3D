@@ -22,7 +22,7 @@ internal class RenderSpriteSystem : FlecsSystemBase
         qb.With<RenderGPUComponent>()
            .With<RenderFrameDataComponent>()
            .With<RenderTransformComponent>()
-           .Without<TileSpriteAnimationTag>()
+           .Without<SpriteSimpleAnimationTag>()
            .Without<RenderDisabledTag>();
     }
 
@@ -43,7 +43,7 @@ internal class RenderSpriteSystem : FlecsSystemBase
         }
     }
 }
-internal class RenderSpriteTileSystem : FlecsSystemBase
+internal class RenderSimpleSpriteSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => false;
@@ -51,7 +51,7 @@ internal class RenderSpriteTileSystem : FlecsSystemBase
     {
         qb.With<RenderGPUComponent>()
            .With<RenderFrameDataComponent>()           
-           .With<TileSpriteAnimationTag>()
+           .With<SpriteSimpleAnimationTag>()
            .Without<RenderDisabledTag>();
     }
 

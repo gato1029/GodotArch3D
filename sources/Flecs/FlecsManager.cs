@@ -206,10 +206,10 @@ public class FlecsManager
         // animaciones
         RegisterSystem<AnimationLayerUpdateSystem>();
         RegisterSystem<GodotEcsArch.sources.Flecs.Systems.Animation.AnimationSystem>();
-        RegisterSystem<AnimationTileSpriteSystem>();
+        RegisterSystem<AnimationSimpleSpriteSystem>();
 
         // render
-        RegisterSystem<RenderSpriteTileSystem>();
+        RegisterSystem<RenderSimpleSpriteSystem>();
         RegisterSystem<RenderSpriteSystem>();
         RegisterSystem<LayeredSpriteRenderSystem>();
         RegisterSystem<RenderTileSpriteTextureSystem> ();
@@ -217,9 +217,12 @@ public class FlecsManager
         
         RegisterSystem<RvoDebugSystem>();
 
-        //post
         
+        // creadores y spawn
         RegisterSystem<ProjectileSpawnSystem>();
+        RegisterSystem<ResourceCreationSystem>();
+
+        //post
         RegisterSystem<ArrowVisualSyncSystem>();
         RegisterSystem<DeathCleanupSystem>();
         RegisterSystem<CleanupSystem>();

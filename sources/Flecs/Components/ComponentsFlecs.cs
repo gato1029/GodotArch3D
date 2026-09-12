@@ -177,7 +177,7 @@ public record struct UseBoidTag();  // unidades con avoidance simple
 
 
 [RegisterComponentFlecs]
-public record struct TileSpriteAnimationTag();
+public record struct SpriteSimpleAnimationTag();
 
 [RegisterComponentFlecs]
 public record struct RenderDisabledTag();
@@ -194,6 +194,13 @@ public record struct DirtyTransformTag();
 public record struct UnitDefinitionComponent
 (
     ushort idTemplate // id Template de la unidad, para buscar en la base de datos
+);
+
+[RegisterComponentFlecs]
+public record struct ResourceDefinitionComponent
+(
+    ushort idTemplate, // id Template del recurso
+    int idSpriteTemplate // id template del sprite
 );
 
 [RegisterComponentFlecs]
@@ -217,6 +224,18 @@ public record struct RenderLayerListComponent
     public RenderFrameDataComponent[] Frames;
     public RenderTransformComponent[] Transforms;
 }
+
+[RegisterComponentFlecs]
+public record struct AnimationSimpleComponent
+(
+   int idSprite,      
+   int currentFrameIndex,
+   float TimeSinceLastFrame,
+   float frameDuration,
+   bool animationComplete,
+   bool active,
+   bool visible
+);
 
 
 [RegisterComponentFlecs]
@@ -259,6 +278,7 @@ public record struct RenderGPUComponent
     float scale,
     Vector2 originOffset       
 );
+
 [RegisterComponentFlecs]
 public record struct RenderInstanceComponent
 (

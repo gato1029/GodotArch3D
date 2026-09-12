@@ -109,7 +109,7 @@ namespace GodotEcsArch.sources.BlackyTiles.Commands
                 uvMap = data.uvFramesArray[0]
             });
 
-            entity.Add<TileSpriteAnimationTag>();
+            entity.Add<SpriteSimpleAnimationTag>();
         }
     }
 }

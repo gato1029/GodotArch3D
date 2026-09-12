@@ -13,22 +13,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Animation;
-internal class AnimationTileSpriteSystem : FlecsSystemBase
+internal class AnimationSimpleSpriteSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
     protected override void BuildQuery(ref QueryBuilder qb)
     {
-        qb.With<AnimationComponent>()
+        qb.With<AnimationSimpleComponent>()
           .With<RenderFrameDataComponent>()
-          .With<TileSpriteAnimationTag>()
+          .With<SpriteSimpleAnimationTag>()
           .Without<RenderDisabledTag>();
 
     }
 
     protected override void OnIter(Iter it)
     {        
-        var animation = it.Field<AnimationComponent>(0);   
+        var animation = it.Field<AnimationSimpleComponent>(0);   
         var frame = it.Field<RenderFrameDataComponent>(1);
         float delta = it.DeltaTime();
 
@@ -36,8 +36,8 @@ internal class AnimationTileSpriteSystem : FlecsSystemBase
         {
             ref var a = ref animation[i];       
             ref var f = ref frame[i];
-            AtlasModsManager.TryGetTileSprite((int)a.idSpriteOrAnimation, out TileSpriteData tileSpriteData);
-            var dataAnim = tileSpriteData.animationData;   // MasterDataManager.GetData<TileSpriteData>(a.idSpriteOrAnimation).animationData;
+            AtlasModsManager.TryGetTileSprite(a.idSprite, out TileSpriteData tileSpriteData);
+            var dataAnim = tileSpriteData.animationData;   
             a.TimeSinceLastFrame += delta;
             if (a.TimeSinceLastFrame >= a.frameDuration && a.active)
             {

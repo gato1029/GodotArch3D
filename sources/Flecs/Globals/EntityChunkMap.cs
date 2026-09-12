@@ -71,9 +71,9 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
                 TileSpriteData data = MasterDataManager.GetData<TileSpriteData>(ts.idTileSprite);
                 MultimeshManager.Instance.FreeInstance(rgp.rid, rgp.instance, rgp.idMaterial);
 
-                if (item.entity.Has<TileSpriteAnimationTag>())
+                if (item.entity.Has<SpriteSimpleAnimationTag>())
                 {
-                    item.entity.Remove<TileSpriteAnimationTag>();
+                    item.entity.Remove<SpriteSimpleAnimationTag>();
                 }
                 if (item.entity.Has<AnimationComponent>())
                 {
@@ -162,7 +162,7 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
 
         var uv = data.animationData.uvFramesArray[0];
         item.entity.Set(new RenderFrameDataComponent { uvMap = uv });
-        item.entity.Add<TileSpriteAnimationTag>();
+        item.entity.Add<SpriteSimpleAnimationTag>();
         if (item.isTileSprite)
         {
             item.entity.Set(new PositionComponent { position = item.position, tilePosition = item.tilePosition });
@@ -171,9 +171,9 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
 
     private void CreateStatic(PendingInstance pending, TileSpriteData data)
     {
-        if (pending.entity.Has<TileSpriteAnimationTag>())
+        if (pending.entity.Has<SpriteSimpleAnimationTag>())
         {
-            pending.entity.Remove<TileSpriteAnimationTag>();    
+            pending.entity.Remove<SpriteSimpleAnimationTag>();    
         }
         if (pending.entity.Has<AnimationComponent>())
         {

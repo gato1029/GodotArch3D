@@ -1,25 +1,35 @@
+
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Data;
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 using GodotEcsArch.sources.BlackyTiles.Commands;
 using GodotEcsArch.sources.BlackyTiles.Entities;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
-using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
-using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Paint;
 
+public struct CreateResourceCommand
+{
+    public ushort IdResource;
+    public Vector2I TilePosition;
+    public int Height;
+}
+public struct RemoveResourceCommand
+{
+    public Vector2I TilePosition;
+    
+}
 public class BlackyResourcesCreator
 {
     private readonly BlackyChunkOccupancyMap occupancyMap;
@@ -27,12 +37,17 @@ public class BlackyResourcesCreator
     private readonly BlackyEntityRenderSystem renderSystem;
     private readonly BlackyTerrainWorldData terrain;
     private readonly FlecsManager flecsManager;
-    private readonly StaticSpatialGridOptimized staticHash; 
+    private readonly StaticSpatialGridOptimizedGeneric<Entity> staticHash;
     private int _resourcesCount = 0;
 
     private const bool DEBUG_COLLIDERS = false;
-    private int layer = 1;
-    public BlackyResourcesCreator(StaticSpatialGridOptimized staticHash,FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainWorldData terrain)
+    private int layer = 6;
+    private Dictionary<int, List<int>> _colliderDebugMap = new();
+    private readonly ConcurrentQueue<CreateResourceCommand> _commandQueue = new();
+    private const int MaxPerFrame = 100;    
+    private readonly ConcurrentQueue<RemoveResourceCommand> _removeCommandQueue = new();
+    private const int MaxRemovalsPerFrame = 100; // O el presupuesto que prefieras
+    public BlackyResourcesCreator(StaticSpatialGridOptimizedGeneric<Entity> staticHash, FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainWorldData terrain)
     {
         this.occupancyMap = occupancyMap;
         this.spatialEntityMap = spatialEntityMap;
@@ -41,235 +56,221 @@ public class BlackyResourcesCreator
         this.flecsManager = flecsManager;
         this.staticHash = staticHash;
     }
-    public Entity CreateResource(ushort idmod, int idResource, Vector2I tilePosition)
-    {
-        Vector2 position = TilesHelper.TilePositionToWorldPosition(tilePosition);
-        return default;
-    }
 
-    public void EnqueueCreate(ushort id, Vector2I positionTileWorld, bool renderForce = false)
-    {
-        RenderCommandQueue.Enqueue(
-            new CreateResourceSourceCommand(this, id, positionTileWorld, renderForce)
-        );
-    }
+ 
 
-    private void AddCollider(Entity entity, GeometricShape2D collisionBody)
+    // 1. Método público: Se llama desde cualquier hilo para solicitar la eliminación
+    public void RemoveResource(Vector2I tilePosition)
     {
-        // cuerpo
-        ShapeType shapeType = ShapeType.Rect;
-        float width = 0;
-        float height = 0;
-        float offsetX = 0;
-        float offsetY = 0;
-
-        switch (collisionBody)
+        _removeCommandQueue.Enqueue(new RemoveResourceCommand
         {
-            case Circle circle:
-                shapeType = ShapeType.Circle;
-                width = circle.Radius;
-                height = circle.Radius;
-                offsetX = circle.OriginCurrent.X ;
-                offsetY = circle.OriginCurrent.Y ;
+            TilePosition = tilePosition,
+            
+        });
+    }
+
+    // 2. Método llamado por tu sistema de Flecs en el hilo principal
+    public void ProcessPendingRemovals()
+    {
+        int executed = 0;
+        int limit = _removeCommandQueue.Count > 2000 ? MaxRemovalsPerFrame * 3 : MaxRemovalsPerFrame;
+
+        while (executed < limit && _removeCommandQueue.TryDequeue(out var cmd))
+        {
+            InternalExecuteRemoval(cmd.TilePosition);
+            executed++;
+        }
+    }
+    // 3. Lógica real que antes tenías en RemoveResource (ejecución segura en hilo principal)
+    private void InternalExecuteRemoval(Vector2I tilePosition)
+    {
+        //no necesitamos altura por que un recurso no puede estar sobre otro
+        //
+        // Asumiendo la capa 0 como en tu código original:
+        ulong idEntity = occupancyMap.Get(0, tilePosition.X, tilePosition.Y); // siempre cero por un recurso no esta sobre otro
+
+        if (idEntity == 0) return;
+
+        Entity entity = flecsManager.WorldFlecs.Entity(idEntity);
+
+        if (entity.IsAlive())
+        {
+            if (entity.Has<SpatialIDComponent>())
+            {
+                SpatialIDComponent spatial = entity.Get<SpatialIDComponent>();
+                RenderGPUComponent gpu = entity.Get<RenderGPUComponent>();
+
+                staticHash.FreeCollider(spatial.Value);
+                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+            }
+
+            spatialEntityMap.Remove(entity);
+            occupancyMap.ClearByEntity(0, tilePosition.X, tilePosition.Y);
+
+            // Destruye la entidad en Flecs de forma segura
+            entity.Destruct();
+        }
+    }
+    // Desde cualquier hilo (generación, red, etc.) encolan la orden
+    public void CreateResource(ushort idResource, Vector2I tilePosition, int height)
+    {
+        _commandQueue.Enqueue(new CreateResourceCommand
+        {
+            IdResource = idResource,
+            TilePosition = tilePosition,
+            Height = height
+        });
+    }
+
+    // Llamado exclusivamente por el sistema de Flecs en el hilo principal
+    public void ProcessPendingCommands()
+    {
+        int executed = 0;
+        int limit = _commandQueue.Count > 2000 ? MaxPerFrame * 3 : MaxPerFrame;
+
+        while (executed < limit && _commandQueue.TryDequeue(out var cmd))
+        {
+            InternalExecuteCreation(cmd.IdResource, cmd.TilePosition, cmd.Height, out _);
+            executed++;
+        }
+    }
+
+    // Método interno: Contiene la lógica real y se ejecuta de forma segura en el hilo principal
+    public void InternalExecuteCreation(ushort idResource, Vector2I tilePosition, int height, out Entity entity)
+    {
+        entity = default;
+        Vector2 position = TilesHelper.TilePositionToWorldPosition(tilePosition);
+
+        var templateResource = BlackyPalletesPersistence.resourcesPalette.GetData(idResource);
+        entity = flecsManager.WorldFlecs.Entity();
+
+        long idTileSprite = templateResource.listIdTileSpriteData[0];
+
+        int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);
+        AtlasModsManager.TryGetTileSprite(spriteId, out var sprite);
+
+        if (occupancyMap.IsOccupiedTiles(0, tilePosition.X, tilePosition.Y, sprite.tilesOcupancy))
+        {
+            return;
+        }
+
+        entity.Set(new PositionComponent { position = position, tilePosition = tilePosition, height = height });
+        entity.Set(new TeamComponent(0));
+        entity.Set(new ResourceDefinitionComponent(idResource, spriteId));
+        entity.Set(new HealthComponent(templateResource.health));
+
+        spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition));
+
+        AsignarCollider(tilePosition.X, tilePosition.Y, entity, sprite);
+        occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, sprite.tilesOcupancy, entity.Id.Value);
+
+        switch (sprite.tileSpriteType)
+        {
+            case TileSpriteType.Static:
+                CreateSprite(entity, sprite.spriteData, height, tilePosition);
                 break;
-            case Rectangle rectangle:
-                shapeType = ShapeType.Rect;
-                width = rectangle.Width;
-                height = rectangle.Height;
-                offsetX = rectangle.OriginCurrent.X;
-                offsetY = rectangle.OriginCurrent.Y;
-                break;
-            default:
+            case TileSpriteType.Animated:
+                CreateAnimation(sprite.animationData, spriteId, height, tilePosition);
                 break;
         }
-        var SpatialIDComponent = new SpatialIDComponent
+    }
+
+    private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile)
+    {
+        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
+        Vector2 offset = spriteData.offsetInternal;
+
+        float depthOffset = spriteData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
+
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+
+        Transform3D transform = new(Basis.Identity, worldPosition);
+        transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
+
+        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
+        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
+        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
+
+        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+                 layer, depthOffset, spriteData.scale, offset));
+    }
+
+    private void CreateAnimation(WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile)
+    {
+        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile);
+        Vector2 offset = animationData.offsetInternal;
+
+        float depthOffset = animationData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+
+        Transform3D transform = new(Basis.Identity, worldPosition);
+        transform = transform.ScaledLocal(new Vector3(animationData.scale, animationData.scale, 1));
+
+        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
+        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, animationData.uvFramesArray[0]);
+        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
+
+        var world = flecsManager.WorldFlecs;
+        var entity = world.Entity();
+
+        entity.Set(new RenderTransformComponent(transform));
+        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+                 layer, depthOffset, animationData.scale, offset));
+
+        entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
+        entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
+        entity.Set(new PositionComponent { position = new Vector2(worldPosition.X, worldPosition.Y), tilePosition = positionTile });
+        entity.Add<SpriteSimpleAnimationTag>();
+    }
+
+    private int AsignarCollider(int Mundo_x, int Mundo_y, Entity entity, TileSpriteData tileSpriteData)
+    {
+        if (tileSpriteData.fastCollidersBody.Count == 0) return 0;
+
+        int idCollider = staticHash.GetNewEntityId();
+        _colliderDebugMap.Add(idCollider, new List<int>());
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(Mundo_x, Mundo_y);
+
+        float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
+
+        foreach (var collider in tileSpriteData.fastCollidersBody)
+        {
+            FastCollider fast = collider;
+            float actualX = positionCenter.X + fast.Offset.X;
+            float actualY = positionCenter.Y + fast.Offset.Y;
+            float width = fast.Shape == ShapeType.Circle ? fast.Width * 2 : fast.Width;
+            float height = fast.Shape == ShapeType.Circle ? fast.Height * 2 : fast.Height;
+
+            float currentMinX = actualX - (width * 0.5f) - 0.01f;
+            float currentMinY = actualY - (height * 0.5f) - 0.01f;
+            float currentMaxX = actualX + (width * 0.5f) + 0.01f;
+            float currentMaxY = actualY + (height * 0.5f) + 0.01f;
+
+            if (currentMinX < minX) minX = currentMinX;
+            if (currentMinY < minY) minY = currentMinY;
+            if (currentMaxX > maxX) maxX = currentMaxX;
+            if (currentMaxY > maxY) maxY = currentMaxY;
+
+            if (DEBUG_COLLIDERS)
+            {
+                int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
+                _colliderDebugMap[idCollider].Add(idDebugBody);
+            }
+        }
+
+        staticHash.RegisterStatic(idCollider, entity, minX, minY, maxX, maxY);
+
+        entity.Set(new SpatialIDComponent
         {
             Layer = CollisionConfig.TypeResource,
             Mask = CollisionConfig.None,
-            Value = staticHash.GetNewEntityId()
-        };
+            Value = idCollider
+        });
 
-        FastCollider[] bodyColliders = new FastCollider[1]
-        {
-            new FastCollider
-            {
-                Shape = shapeType,
-                Width = width,
-                Height = height,
-                Offset = new Vector2(offsetX, offsetY)
-            }
-        };
-        var BodyComponent = new BodyColliderComponent
-        (
-           bodyColliders
-        );
-
-        entity.Set(SpatialIDComponent);
-        entity.Set(BodyComponent);
-        entity.Add<StaticTag>();
-
-        if (collisionBody is Circle)
-        { 
-            width = width * 2;
-            height = height * 2;
-        }
-        // 2. REGISTRO DIRECTO AL STATIC HASH
-        // Como es estático, lo anotamos una sola vez ahora mismo.
-        float actualX = entity.Get<PositionComponent>().position.X + offsetX;
-        float actualY = entity.Get<PositionComponent>().position.Y + offsetY;
-
-        var tilePositionMin =new Vector2(actualX - (width * 0.5f) - 0.01f, actualY - (width * 0.5f) - 0.01f); // quito un poco para asegurar que cubre el tile correcto aunque esté justo en el borde
-        var tilePositionMax = new Vector2(actualX + (width * 0.5f) - 0.01f, actualY + (height * 0.5f) - 0.01f);    
-        staticHash.RegisterStatic(SpatialIDComponent.Value, entity, tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
- 
-                
-
-    }
-    public Entity Create(ushort id, Vector2I positionTileWorld, bool renderForce = false)
-    {
-
-        Vector2 position = TilesHelper.TilePositionToWorldPosition(positionTileWorld);
-
-        var dataTemplate = MasterDataManager.GetBySaveIds<ResourceSourceData>(id);
-
-        int randomIndex = new Random().Next(0, dataTemplate.listIdTileSpriteData.Count);
-        long idTileSprite = dataTemplate.listIdTileSpriteData[randomIndex];
-        var tileSprite = MasterDataManager.GetData<TileSpriteData>(idTileSprite);
-
-        if (occupancyMap.IsOccupiedTiles(0, positionTileWorld.X, positionTileWorld.Y, tileSprite.tilesOcupancy))
-        {
-            return default;
-        }
-        _resourcesCount++;
-
-        int height = 1;//
-        if (height == 1)
-        {
-            height = 2;
-        }
-        height = 4;
-        var entity = flecsManager.WorldFlecs.Entity();
-
-        GeometricShape2D colliderBody = null;
-        
-        if (tileSprite.tileSpriteType == TileSpriteType.Static)
-        {
-            if (tileSprite.spriteData.listCollisionBody != null)
-            {
-                colliderBody = tileSprite.spriteData.listCollisionBody[0];
-                if (DEBUG_COLLIDERS)
-                {
-                    List<int> idsDebugsCollider = CollisionShapeDraw.Instance.DrawCollisionShapes(tileSprite.spriteData.listCollisionBody.ToList(), position);
-                    entity.Set(new ColliderDebugComponent(idsDebugsCollider));
-                }
-                
-
-                Godot.Vector2 pos = position - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
-                var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
-                int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entity, tileSprite.spriteData.listCollisionBody.ToList(), position, 1, colliderBody, false);
-                entity.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero, 0));
-            }
-
-        }
-        else
-        {
-            if (tileSprite.animationData.collisionBodyArray != null)
-            {
-                colliderBody = tileSprite.animationData.collisionBodyArray[0];
-                if (DEBUG_COLLIDERS)
-                {
-                    List<int> idsDebugsCollider = CollisionShapeDraw.Instance.DrawCollisionShapes(tileSprite.animationData.collisionBodyArray.ToList(), position);
-                    entity.Set(new ColliderDebugComponent(idsDebugsCollider));
-                }                        
-                Godot.Vector2 pos = position - (colliderBody.GetSizeQuad() / 2) + colliderBody.OriginCurrent;
-                var rectangle = new Rect2(pos, colliderBody.GetSizeQuad());
-                int idCollider = CollisionManager.Instance.ResourceSourceCollidersFlecs.AddColliderObject(entity, tileSprite.animationData.collisionBodyArray.ToList(), position, 1, colliderBody, false);
-                entity.Set(new ColliderComponent(idCollider, rectangle, colliderBody.OriginCurrent, new Rect2(), Vector2.Zero, 0));
-            }
-
-        }
-
-        
-
-        entity.Set(new PositionComponent { position = position, tilePosition = positionTileWorld, height = height });
-        entity.Set(new TeamComponent(0));
-        entity.Set(new IdGenericComponent(id, EntityType.RECURSO));
-        entity.Set(new HealthComponent(10));
-        entity.Set(new TileSpriteComponent(tileSprite.id));
-
-        spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(positionTileWorld));
-        AddCollider(entity, colliderBody);
-
-        if (renderForce)
-        {
-            renderSystem.ForceRenderEntity(entity);
-        }
-
-        occupancyMap.SetTiles(0, positionTileWorld.X, positionTileWorld.Y, tileSprite.tilesOcupancy, entity.Id.Value);
-
-        return entity;
-    }
-
-    public void remove(Vector2I positionTileWorld)
-    {
-        ulong idEntity = occupancyMap.Get(0, positionTileWorld.X, positionTileWorld.Y);
-        // FlecsManager.Instance.WorldFlecs como busco la entidad a partir del idEntity
-
-        // Si idEntity es 0, no hay entidad
-        if (idEntity != 0)
-        {
-
-           Entity entity = flecsManager.WorldFlecs.Entity(idEntity);
-
-            
-            if (entity.Has<ColliderComponent>())
-            {
-                ColliderComponent collider = entity.Get<ColliderComponent>();
-                CollisionManager.Instance.ResourceSourceCollidersFlecs.RemoveCollider(collider.idCollider);
-                if (DEBUG_COLLIDERS)
-                {
-                    var debugCollider = entity.Get<ColliderDebugComponent>();
-                    foreach (var idDebug in debugCollider.idShapes)
-                    {
-                        WireShape.Instance.FreeShape(idDebug);
-                    }
-
-                }
-            }
-            entity.Children((Entity child) =>
-            {
-                if (!child.Has<SpatialIDComponent>() || !child.Has<FastColliderComponent>())
-                    return;
-
-                var spatial = child.Get<SpatialIDComponent>();
-                var collider = child.Get<FastColliderComponent>();
-                var pos = child.Get<PositionComponent>().position;
-
-                float actualX = pos.X + collider.OffsetX;
-                float actualY = pos.Y + collider.OffsetY;
-
-                float width = collider.Width;
-                float height = collider.Height;
-
-                if (collider.Shape == ShapeType.Circle)
-                {
-                    width = width * 2;
-                    height = height * 2;
-                }
-
-                var tilePositionMin = new Vector2(actualX - (width * 0.5f) - 0.01f, actualY - (width * 0.5f) - 0.01f); // quito un poco para asegurar que cubre el tile correcto aunque esté justo en el borde
-                var tilePositionMax = new Vector2(actualX + (width * 0.5f) - 0.01f, actualY + (height * 0.5f) - 0.01f);
-                staticHash.UnregisterStatic(spatial.Value, tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
-
-            
-            });
-            
-
-            spatialEntityMap.Remove(entity);
-           renderSystem.ForceDisposeEntity(entity);               
-           RenderCommandQueue.Enqueue(new DestroyEntityCommand(entity));
-        }
-        occupancyMap.ClearByEntity(0, positionTileWorld.X, positionTileWorld.Y);
-
+        return idCollider;
     }
 }
