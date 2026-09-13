@@ -138,7 +138,7 @@ public class BlackyCharacterCreator
     }
     private Entity CreateGeneric(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Vector2 position)
     {
-        int height = 5; // altura en el mundo
+        int height = 1; // altura en el mundo
 
         var idTileSprite = characterBaseData.idTileSpriteData; // información del sprite del personaje y colliders ID
         int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite
@@ -160,7 +160,7 @@ public class BlackyCharacterCreator
 
         Godot.Vector2 originOffset = new Vector2(MoveData.offsetInternal.X * characterBaseData.scale, MoveData.offsetInternal.Y * characterBaseData.scale);
 
-        float depthOffset = MoveData.yDepthRenderFormat;
+        float depthOffset = 0;// MoveData.yDepthRenderFormat;
         float z = CommonAtributes.Calculate(depthOffset, height, layer, position); // debemos usar esto apartir de ahora
 
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
@@ -221,7 +221,7 @@ public class BlackyCharacterCreator
     
     private Entity CreateEnemy(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position)
     {
-        int height = 5; // altura en el mundo
+        int height = 1; // altura en el mundo
 
         var idTileSprite = characterBaseData.idTileSpriteData; // información del sprite del personaje y colliders ID
         int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite); // Obtén el ID único del sprite

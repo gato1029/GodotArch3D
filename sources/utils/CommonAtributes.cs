@@ -21,6 +21,6 @@ public  class CommonAtributes
 
     internal static float Calculate(float depthOffsetY, float height, float layer, Vector2 positionCenter)
     {
-        return depthOffsetY + (height * 10f) + (layer * 0.1f) + (positionCenter.Y * 0.001f);
+        return  (height * 10f) + (layer * 0.1f) - ((positionCenter.Y+ depthOffsetY) * 0.001f);
     }
 }

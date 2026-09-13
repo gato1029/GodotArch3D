@@ -27,11 +27,32 @@ public static class TilesEntityTextureCreatorHelper
 
         int idSpriteInternal= AtlasModsManager.GetSpriteUniqueId(idSprite, out TileSpriteData templateSprite);
 
-        //var mat = MasterDataManager.GetData<MaterialData>(idMaterial);
-        var instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(templateSprite.spriteData.idModMaterial);
+        var entity = flecsManager.WorldFlecs.Entity();
+        (Rid rid, int instance, int layerTexture) instanceRender = default ;
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
-        transform = transform.ScaledLocal(new Godot.Vector3(templateSprite.spriteData.scale, templateSprite.spriteData.scale, 1));
-        var world = flecsManager.WorldFlecs.GetCtx<BlackyWorld>();
+        switch (templateSprite.tileSpriteType)
+        {
+            case TileSpriteType.Static:
+                instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(templateSprite.spriteData.idModMaterial);
+                entity.Set(new RenderFrameDataComponent { uvMap = templateSprite.spriteData.uv });
+                entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.spriteData.yDepthRender, templateSprite.spriteData.scale, templateSprite.spriteData.offsetInternal));
+                transform = transform.ScaledLocal(new Godot.Vector3(templateSprite.spriteData.scale, templateSprite.spriteData.scale, 1));
+                break;
+            case TileSpriteType.Animated:
+                instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(templateSprite.animationData.idModMaterial);
+                entity.Set(new RenderFrameDataComponent { uvMap = templateSprite.animationData.uvFramesArray[0] });
+                entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.animationData.yDepthRender, templateSprite.animationData.scale, templateSprite.animationData.offsetInternal));
+                transform = transform.ScaledLocal(new Godot.Vector3(templateSprite.animationData.scale, templateSprite.animationData.scale, 1));
+                break;         
+            default:
+                break;
+        }
+       
+
+
+        
+        
+      
 
         //BlackyPersistentTilePalette pallete = world.State.TilePalette;
         //ushort idInternal = pallete.GetOrCreateTile(idMod, (ushort)index);
@@ -40,14 +61,16 @@ public static class TilesEntityTextureCreatorHelper
 
 
         // aqui necesito la paleta por region y de acuerdo a eso creamos tile simple o animado
-        var entity = flecsManager.WorldFlecs.Entity();
+        
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.spriteData.yDepthRender, templateSprite.spriteData.scale, templateSprite.spriteData.offsetInternal));
+  
 
-        entity.Set(new RenderFrameDataComponent { uvMap = templateSprite.spriteData.uv });
         entity.Set(new PositionComponent { tilePosition = tilePosition, height = 10 });
         entity.Add<DirtyTileSpriteTextureRenderTag>();
         entity.Set(new TileSpriteTextureComponent { idSpriteInternal = idSpriteInternal });
+
+
+
         return entity;
     }
 

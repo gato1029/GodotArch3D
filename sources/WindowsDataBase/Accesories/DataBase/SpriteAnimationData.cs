@@ -96,7 +96,12 @@ public class SpriteAnimationData {
                 {
                     collisionBodyDictionary.Add(item.name, item);
                 }
-                collisionDictionary.Add(item.collisionUseType, item);
+                if (item.collisionUseType!= CollisionUseType.NINGUNO)
+                {
+                    collisionDictionary.Add(item.collisionUseType, item);
+                }
+
+
                 if (item.collisionUseType == CollisionUseType.CUERPO)
                 {
                     collisionBodyList.Add(item);
