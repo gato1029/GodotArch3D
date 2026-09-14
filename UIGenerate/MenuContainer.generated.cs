@@ -25,14 +25,6 @@ public partial class MenuContainer : VBoxContainer
     private PopupMenu Mapas;
     private KuroButton ButtonGuardarMod;
     private PanelContainer ContenedorEditor;
-    private VBoxContainer VBoxContainerRidht;
-    private EditorPanel AnimatedPanelContainer;
-    private Panel PanelContainer;
-    private ViewPortContainerEditor SubViewportContainer;
-    private Node Render;
-    private Camera3dGodot Camera3D;
-    private MeshInstance3D center;
-    private InputHandler InputHandlerGame;
 
     public void InitializeUI()
     {
@@ -54,13 +46,5 @@ public partial class MenuContainer : VBoxContainer
         Mapas = GetNode<PopupMenu>("Menu/hbox/MenuBar/Mapas");
         ButtonGuardarMod = GetNode<KuroButton>("Menu/hbox/ButtonGuardarMod");
         ContenedorEditor = GetNode<PanelContainer>("ContenedorEditor");
-        VBoxContainerRidht = GetNode<VBoxContainer>("HBoxContainer/HSplitContainer/VBoxContainerRidht");
-        AnimatedPanelContainer = GetNode<EditorPanel>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/AnimatedPanelContainer");
-        PanelContainer = GetNode<Panel>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer");
-        SubViewportContainer = GetNode<ViewPortContainerEditor>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer");
-        Render = GetNode<Node>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render");
-        Camera3D = GetNode<Camera3dGodot>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D");
-        center = GetNode<MeshInstance3D>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/Camera3D/center");
-        InputHandlerGame = GetNode<InputHandler>("HBoxContainer/HSplitContainer/VBoxContainerRidht/HBoxContainer/PanelContainer/SubViewportContainer/SubViewport/Render/InputHandlerGame");
     }
 }

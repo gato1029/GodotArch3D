@@ -60,9 +60,9 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<long, SuperficieData> superficieData = new();
     private readonly AtlasMods<long, BiomaData> biomaData = new();
     private readonly AtlasMods<long, CharacterModelBaseData> characterData = new();
+    private readonly AtlasMods<long, BuildingData> buildingData = new(); 
 
-    private readonly AtlasMods<int, BuildingData> buildingData = new(); // deben cambiar a long
-    private readonly AtlasMods<int, BulletData> bulletData = new(); // deben cambiar a long
+    private readonly AtlasMods<int, BulletData> bulletData = new(); // la unica execepcion que sera int
     
 
     // string-key atlas
@@ -387,11 +387,12 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(superficieData,idMod, name);
         CargarDatos(biomaData, idMod, name);
         CargarDatos(characterData, idMod,name);
+        CargarDatos(buildingData, idMod,name);
     }
 
     private void CargarPorModEspecial(ushort idMod)
     {
-        CargarDatosEspecial(buildingData, idMod);
+        
         CargarDatosEspecial(bulletData, idMod);
         
     }

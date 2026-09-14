@@ -75,26 +75,48 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                 {
                     Vector2 originAttackCenter = pos.position + melle.OffSetRange;
                     var targetPos = atp.Target.Get<PositionComponent>();
-                    ushort targetTemplateId = atp.Target.Get<UnitDefinitionComponent>().idTemplate;
-
-                    if (CheckCollisionWithTarget(originAttackCenter, dir.normalized, melle.RangeAttack, targetPos.position, targetTemplateId))
+                    if (atp.Target.Has<UnitDefinitionComponent>())
                     {
-                        GlobalData.EventsDamage.Enqueue(new DamageEvent
+                        ushort targetTemplateId = atp.Target.Get<UnitDefinitionComponent>().idTemplate;
+                        if (CheckCollisionWithTargetUnit(originAttackCenter, dir.normalized, melle.RangeAttack, targetPos.position, targetTemplateId))
                         {
-                            Source = ent,
-                            Target = atp.Target,
-                            Amount = melle.Damage
-                        });
-                        //cha.characterStateType = CharacterStateType.ATTACK;
-                    }
-                    else
+                            GlobalData.EventsDamage.Enqueue(new DamageEvent
+                            {
+                                Source = ent,
+                                Target = atp.Target,
+                                Amount = melle.Damage
+                            });
+                            //cha.characterStateType = CharacterStateType.ATTACK;
+                        }
+                        else
+                        {
+                            // si no hubo collision quiere decir que no hay objetivo y libero
+                            cha.characterStateType = CharacterStateType.IDLE;
+                            atp.Active = false;
+                            atp.Target = default;
+                        }
+                    } else
+                    //if (atp.Target.Has<BuildingDefinitionComponent>())
                     {
-                        // si no hubo collision quiere decir que no hay objetivo y libero
-                        cha.characterStateType = CharacterStateType.IDLE;
-                        atp.Active = false;
-                        atp.Target = default;
+                        ushort targetTemplateId = atp.Target.Get<BuildingDefinitionComponent>().idTemplate;
+                        if (CheckCollisionWithTargetBuild(originAttackCenter, dir.normalized, melle.RangeAttack, targetPos.position, targetTemplateId))
+                        {
+                            GlobalData.EventsDamage.Enqueue(new DamageEvent
+                            {
+                                Source = ent,
+                                Target = atp.Target,
+                                Amount = melle.Damage
+                            });
+                            //cha.characterStateType = CharacterStateType.ATTACK;
+                        }
+                        else
+                        {
+                            // si no hubo collision quiere decir que no hay objetivo y libero
+                            cha.characterStateType = CharacterStateType.IDLE;
+                            atp.Active = false;
+                            atp.Target = default;
+                        }
                     }
-
 
                 }
                 else
@@ -102,7 +124,8 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                     // si esta muerto libero target
                     cha.characterStateType = CharacterStateType.IDLE;
                     atp.Active = false;
-                    atp.Target = default;
+                    atp.Target = default; 
+                    ent.Remove<AttackPendingTag>();
                 }
                                 
             }
@@ -125,56 +148,27 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
         }
     }
 
-
-
-    private void SearchEnemy(Entity entity, ref Components.CharacterComponent cha, PositionComponent pos, ref MeleeAttackComponent melle, TeamComponent team, DirectionComponent direction, FastSpatialHash dynGrid, SpatialIDComponent spatialId, ref AttackPendingComponent atp)
+    private bool CheckCollisionWithTargetBuild(Vector2 origin, Vector2 dirNormalized, float range, Vector2 targetPos, ushort templateId)
     {
-        Span<int> neighbors = stackalloc int[8];
-        Vector2 originAttackCenter = pos.position + melle.OffSetRange;
-
-        int count = dynGrid.QueryNodesBounded(
-            originAttackCenter.X,
-            originAttackCenter.Y,
-            melle.RangeAttack,
-            neighbors
-        );
-        bool existTarget = false;
-        for (int ii = 0; ii < count; ii++)
+        var template = BlackyPalletesPersistence.buildingPalette.GetData(templateId);
+        foreach (var item in template.bodyColliders)
         {
-            int neighborId = neighbors[ii];
-            if (spatialId.Value == neighborId) continue;
-
-            var targetEntity = dynGrid.GetEntity(neighborId);
-            if (!targetEntity.IsAlive() || targetEntity.Has<DeadTag>()) continue;
-
-            // Filtro rápido de equipo antes de buscar componentes pesados
-            var otherTeam = targetEntity.Get<TeamComponent>();
-            if (team.TeamId == otherTeam.TeamId) continue;
-
-            var targetPosition = targetEntity.Get<PositionComponent>();
-            ushort idTemplate = targetEntity.Get<UnitDefinitionComponent>().idTemplate;
-
-            if (CheckCollisionWithTarget(originAttackCenter, direction.normalized, melle.RangeAttack, targetPosition.position, idTemplate))
+            FastCollider fast = item;
+            if (CollisionMathHelper.CheckAttackHalfCircle(
+                origin.X, origin.Y,
+                dirNormalized.X, dirNormalized.Y,
+                range,
+                targetPos.X, targetPos.Y,
+                ref fast
+            ))
             {
-                cha.characterStateType = CharacterStateType.ATTACK;
-                melle.Timer = melle.Cooldown;
-                atp.Target = targetEntity;
-                atp.Active = true;
-                existTarget = true;
-                break;
-                
+                return true;
             }
         }
-        if (!existTarget)
-        {
-            cha.characterStateType = CharacterStateType.IDLE;
-            atp.Active = false;
-            atp.Target = default;
-            entity.Remove<AttackPendingTag>();
-        }
+        return false;
     }
 
-    private bool CheckCollisionWithTarget(Vector2 origin, Vector2 dirNormalized, float range, Vector2 targetPos, ushort templateId)
+    private bool CheckCollisionWithTargetUnit(Vector2 origin, Vector2 dirNormalized, float range, Vector2 targetPos, ushort templateId)
     {
         var template = BlackyPalletesPersistence.characterPalette.GetData(templateId);
         foreach (var item in template.bodyColliders)

@@ -14,6 +14,7 @@ public enum CollisionUseType
     BASE_PIES = 1,
     CUERPO = 2,
     RADIO_ATAQUE_CUERPO = 3,    
+    UMBRAL_LLEGADA_ATAQUE_CUERPO = 4,
 }
 
 public abstract class GeometricShape2D

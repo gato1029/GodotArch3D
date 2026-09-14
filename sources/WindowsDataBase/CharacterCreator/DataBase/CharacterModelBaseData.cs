@@ -40,7 +40,8 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
 
         [BsonIgnore]
         public List<FastCollider> bodyColliders { get; set; }
-
+        [BsonIgnore]
+        public FastCollider colliderUmbralAtaque { get; set; }
         public CharacterModelBaseData()
         {
             id = EpochIdGenerator.NewId();
@@ -93,7 +94,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
                         SetBodyCollider(item.Multiplicity(scale));
                     }
                 }
-                
+                colliderUmbralAtaque = data.fastColliderUmbralAtaque;
             }            
         }
     }

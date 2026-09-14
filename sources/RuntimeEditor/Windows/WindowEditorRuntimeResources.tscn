@@ -7,7 +7,7 @@
 [node name="WindowEditorRuntimeResources" type="Window" unique_id=1517214218 groups=["BloqueaMundo"]]
 transparent_bg = true
 oversampling_override = 1.0
-size = Vector2i(300, 600)
+size = Vector2i(350, 600)
 borderless = true
 transparent = true
 script = ExtResource("1_ydol3")
@@ -45,4 +45,4 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-columns = 4
+columns = 2

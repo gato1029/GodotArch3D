@@ -4,7 +4,7 @@ using GodotEcsArch.sources.BlackyEngine.Core;
 
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
 
-internal class ResourceCreationSystem : FlecsSystemBase
+internal class ResourceBuildingCreationSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => false; // 🟢 Se ejecuta seguro en el hilo principal
@@ -20,8 +20,10 @@ internal class ResourceCreationSystem : FlecsSystemBase
         if (world == null) return;
 
         // Cada servicio procesa su propia cola respetando su propio presupuesto por frame
+        world.Services.Characters.ProcessPendingCommands();
         world.Services.ResourcePainter.ProcessPendingCommands();
         world.Services.ResourcePainter.ProcessPendingRemovals();
-        world.Services.EntityRenderer.ProcessPendingChunks();
+        world.Services.BuildingPainter.ProcessPendingCommands();
+        world.Services.EntityRenderer.ProcessPendingChunks(); // esto aplica para todo las entidades el render
     }
 }

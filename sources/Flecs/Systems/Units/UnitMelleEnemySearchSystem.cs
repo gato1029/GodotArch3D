@@ -1,16 +1,23 @@
-using Arch.Core;
+
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
+using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
+using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace GodotFlecs.sources.Flecs.Systems.Units;
 public class UnitMelleEnemySearchSystem: FlecsSystemBase
@@ -28,6 +35,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
           .With<EnemySearchComponent>()
           .With<MoveResolutorComponent>()
           .With<MeleeAttackComponent>()
+          .With<DirectionComponent>()
           .Without<MoveTargetComponent>()
           .Without<PlayerInputComponent>()
           .Without<DeadTag>()
@@ -43,6 +51,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
         if (sim == null || sim.TickCount == 0) return;
 
         var dynGrid = world.State.DynamicHash;
+        var staticGrid = world.State.StaticSpatialBuildings;
 
         var posArray = it.Field<PositionComponent>(0);
         var spatialArray = it.Field<SpatialIDComponent>(1);
@@ -50,11 +59,13 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
         var charArray = it.Field<CharacterComponent>(3);
         var searchArray = it.Field<EnemySearchComponent>(4);        
         var moveResolutorArray = it.Field<MoveResolutorComponent>(5);
+        var melleArray = it.Field<MeleeAttackComponent>(6);
+        var dirArray = it.Field<DirectionComponent>(7);
 
         Span<int> neighbors = stackalloc int[8];
 
         float deltaTime = sim.FixedDelta; // 🔥 Usar solo el delta del tick actual, no el acumulado histórico
-        int mask = sim.GetGroupMask();
+        int mask = sim.GetGroupMaskMelle();
         int frame = sim.FrameIndex & mask;
 
         for (int i = 0; i < it.Count(); i++)
@@ -64,7 +75,8 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
             ref var team = ref teamArray[i];
             ref var search = ref searchArray[i];
             ref var moveResolutor = ref moveResolutorArray[i];
-
+            ref var melle = ref melleArray[i];
+            ref var dir = ref dirArray[i];
             var e = it.Entity(i);
 
             // 🔥 acumular tiempo correctamente
@@ -78,7 +90,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                 // 🔥 conservar excedente (CLAVE)
                 search.Timer -= times * search.Interval;
                 // 🔥 👇 AQUI VA EL STAGGERING 👇
-                int group = spatial.Value & mask;
+                int group = melle.numberUnitMelle & mask;
                 if (group != frame) continue;
 
                 // 🔥 SOLO UNA QUERY (optimización crítica)
@@ -88,10 +100,15 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                     search.Radius,
                     neighbors
                 );
-
+                bool existTarget = false;
+                Vector2 targetPos = Vector2.Zero;
+                Entity targetEntity = default;
+                bool istargetUnit = false;
+                ushort idTarget = 0;
+                
                 for (int ii = 0; ii < count; ii++)
                 {
-                    var targetEntity = dynGrid.GetEntity(neighbors[ii]);
+                    targetEntity = dynGrid.GetEntity(neighbors[ii]);
 
                     if (spatial.Value == neighbors[ii]) continue;
 
@@ -100,18 +117,124 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
 
                     if (targetEntity.IsAlive() && !targetEntity.Has<DeadTag>())
                     {
-                        moveResolutor.Blocked = false;
-                        moveResolutor.BlockedTimer = 0f;
+                        targetPos = targetEntity.Get<PositionComponent>().position;
+                        float rangeSqr = search.Radius * search.Radius;
+                        float distSqr = pos.position.DistanceSquaredTo(targetPos);
 
-                        Vector2 targetPos = targetEntity.Get<PositionComponent>().position;
-
-                        e.Set(new MoveTargetComponent(targetPos));
-                        e.Remove<StoppedTag>();
-                        e.Set(new AttackPendingComponent(true,targetEntity));                       
+                        if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
+                        idTarget = targetEntity.Get<UnitDefinitionComponent>().idTemplate;
+                        
+                        existTarget = true;
+                        istargetUnit = true;
                         break;
                     }
                 }
+                int radius = (int)MathF.Ceiling((search.Radius * 2f) / staticGrid._cellSize);
+                // aqui buscar edificos
+                foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius))
+                {
+                    if (staticGrid.TryGetValue(id, out Entity otherEntity))
+                    {
+                        if (!otherEntity.IsAlive()) continue;
+                        targetEntity = otherEntity;
+                        TileSpriteData sprite = null;
+         
+                        if (otherEntity.Has<BuildingDefinitionComponent>())
+                        {
+                            int idTemplate = otherEntity.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal; // 🔹 para asegurar que es una entidad con collider
+                            var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                        }
+                        var posOther = otherEntity.Get<PositionComponent>();
+
+                        targetPos = otherEntity.Get<PositionComponent>().position;
+                        float rangeSqr = search.Radius * search.Radius;
+                        float distSqr = pos.position.DistanceSquaredTo(targetPos);
+
+                        if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
+                        idTarget = targetEntity.Get<BuildingDefinitionComponent>().idTemplate;
+                        
+                        existTarget = true;
+                        break;
+                    }
+                }
+                if (existTarget)
+                {
+                    //Vector2 toTarget = targetPos - pos.position + melle.OffSetRange;
+                    //float distSq = toTarget.LengthSquared();
+                    //float umbralLlegada = melle.RangeAttack;
+                    //if (distSq <= umbralLlegada)//0.05f) // Umbral de llegada
+                    //{
+                    //    //ataca directamente
+                    //    e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos));
+                    //    e.Add<AttackPendingTag>();
+                    //}
+                    bool inRange = false;
+                    if (istargetUnit)
+                    {
+                        inRange = CheckCollisionWithTargetUnit(pos.position,dir.normalized, melle.RangeAttack, targetPos, idTarget);
+                    }
+                    else
+                    {
+                        inRange= CheckCollisionWithTargetBuild(pos.position, dir.normalized, melle.RangeAttack, targetPos, idTarget);
+                    }
+                    if (inRange)
+                    {
+                        //ataca directamente
+                            e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos));
+                            e.Add<AttackPendingTag>();
+                    }
+                    else
+                    {
+                        moveResolutor.Blocked = false;
+                        moveResolutor.BlockedTimer = 0f;
+                        e.Set(new MoveTargetComponent(targetPos));
+                        e.Remove<StoppedTag>();
+                        e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos));
+                    }
+                    
+                }
+            
             }
         }
-    }  
+    }
+
+    private bool CheckCollisionWithTargetBuild(Vector2 origin, Vector2 dirNormalized, float range, Vector2 targetPos, ushort templateId)
+    {
+        var template = BlackyPalletesPersistence.buildingPalette.GetData(templateId);
+        foreach (var item in template.bodyColliders)
+        {
+            FastCollider fast = item;
+            if (CollisionMathHelper.CheckAttackHalfCircle(
+                origin.X, origin.Y,
+                dirNormalized.X, dirNormalized.Y,
+                range,
+                targetPos.X, targetPos.Y,
+                ref fast
+            ))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private bool CheckCollisionWithTargetUnit(Vector2 origin, Vector2 dirNormalized, float range, Vector2 targetPos, ushort templateId)
+    {
+        var template = BlackyPalletesPersistence.characterPalette.GetData(templateId);
+        foreach (var item in template.bodyColliders)
+        {
+            FastCollider fast = item;
+            if (CollisionMathHelper.CheckAttackHalfCircle(
+                origin.X, origin.Y,
+                dirNormalized.X, dirNormalized.Y,
+                range,
+                targetPos.X, targetPos.Y,
+                ref fast
+            ))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

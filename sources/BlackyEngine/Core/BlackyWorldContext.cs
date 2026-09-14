@@ -63,9 +63,9 @@ public static class BlackyWorldContext
     // ================================
 
     public static BlackyCharacterCreator Characters => Services.Characters;
-    public static BlackyTerrainSystem Terrain => Services.TerrainPainter;
+    
     public static BlackyResourcesCreator Resources => Services.ResourcePainter;
-    public static BlackyBuildingSystem Buildings => Services.BuildingPainter;
+    public static BlackyBuildingCreator Buildings => Services.BuildingPainter;
     public static BlackyHeightSystem Heights => Services.HeightMapWorld;
     //public static BlackyChunkCacheTextureMap PintarTerreno => Services.TerrainTexturePainter;
     public static BlackyRampVisualWorld PintarRampas => Services.RampasDataLienzo;
@@ -98,7 +98,7 @@ public static class BlackyWorldContext
     // ================================
 
     public static FastSpatialHash DynamicHash => State.DynamicHash;
-    public static StaticSpatialGridOptimizedGeneric<Entity> StaticSpatial => State.StaticSpatial;
+    public static StaticSpatialGridOptimizedGeneric<Entity> StaticSpatial => State.StaticSpatialBuildings;
     public static BlackyChunkedBitGrid GridMove => State.GridMove;
     public static BlackyChunkRenderData RenderData => State.RenderData;
     public static BlackySpatialEntityMap SpatialEntityMap => State.SpatialEntityMap;

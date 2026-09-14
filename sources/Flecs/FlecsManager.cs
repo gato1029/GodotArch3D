@@ -4,7 +4,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Simulation;
 using GodotEcsArch.sources.Flecs.Systems.Animation;
-using GodotEcsArch.sources.Flecs.Systems.Building;
+
 using GodotEcsArch.sources.Flecs.Systems.Collisions;
 using GodotEcsArch.sources.Flecs.Systems.Debug;
 using GodotEcsArch.sources.Flecs.Systems.Generic;
@@ -160,16 +160,18 @@ public class FlecsManager
         //RegisterSystem<HumanCharacterSystem>();
         RegisterSystem<HumanCharacterSimpleSystem>();
         RegisterSystem<UnitMelleEnemySearchSystem>();
-        RegisterSystem<UnitRangedEnemySearchSystem>();
+        RegisterSystem<RangedEnemySearchSystem>();
         
-        RegisterSystem<MoveTargetSystem>(); 
-                                                                             
+        
+        RegisterSystem<MoveTargetAttackMelleSystem>();
+        RegisterSystem<MoveTargetSystem>();
+
         RegisterSystem<RegisterFastHashSystem>();
         
         RegisterSystem<ResolveTerrainCollisionSystem>(); // resuelve colisiones con el terreno, debe ir antes de movimiento para ajustar la posición       
-        
+        RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición      
         RegisterSystem<SteeringSystem>();
-        RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición                                                        
+                                                         
 
         RegisterSystem<MovementResolutionSystem>();
         RegisterSystem<ProjectileMovementSystem>();
@@ -188,12 +190,10 @@ public class FlecsManager
 
         RegisterSystem<ApplyDamageSystem>(); // aplica el daño a las unidades/buildings single thread
         RegisterSystem<UnitDamageApplySystem>(); // aplica efectos de daño a las unidades
-        //RegisterSystem<BuildDamageApplySystem>(); // aplica efectos de daño a los edificios
-
-
-
+        RegisterSystem<BuildingDamageApplySystem>(); // aplica efectos de daño a los edificios
+        
         // transform
-       // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
+        // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
         RegisterSystem<ProjectileTransformSystem>();
         RegisterSystem<SpriteTransformSystem>();
         RegisterSystem<SpriteTransformLayerSystem>();
@@ -220,14 +220,15 @@ public class FlecsManager
         
         // creadores y spawn
         RegisterSystem<ProjectileSpawnSystem>();
-        RegisterSystem<ResourceCreationSystem>();
+        RegisterSystem<ResourceBuildingCreationSystem>();
 
         //post
         RegisterSystem<ArrowVisualSyncSystem>();
-        RegisterSystem<DeathCleanupSystem>();
-        RegisterSystem<CleanupSystem>();
-        RegisterSystem<BuildCleanupSystem>();
+        RegisterSystem<DeathCleanupSystem>(); // limpieza de unidades muertas
+        RegisterSystem<DestroyCleanupSystem>(); // limpieza de edificios destruidos
+                
         
+
 
 
 

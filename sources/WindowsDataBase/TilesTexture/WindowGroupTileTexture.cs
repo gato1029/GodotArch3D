@@ -12,7 +12,7 @@ using GodotFlecs.sources.KuroTiles;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static ControlEditorTerrain;
+
 using static System.Formats.Asn1.AsnWriter;
 
 public partial class WindowGroupTileTexture : Window

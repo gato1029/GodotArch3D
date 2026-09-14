@@ -49,12 +49,12 @@ public  class BlackyWorldGeneration
 
         ResourcePostProcessor = new BlackyResourcesPostProcessor(seed);
 
-        TileMapper = new BlackyWorldTileMapper(
-            chunkSize,
-            seed,
-            BiomeMap,
-            TerrainGenerator,
-            services.TerrainPainter);
+        //TileMapper = new BlackyWorldTileMapper(
+        //    chunkSize,
+        //    seed,
+        //    BiomeMap,
+        //    TerrainGenerator,
+        //    services.TerrainPainter);
 
         ResourceGenerator = new BlackyResourcesGenerator(
             services.HeightMapWorld,

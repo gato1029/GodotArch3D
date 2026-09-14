@@ -56,7 +56,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
             ref var col = ref colArray[i];
             ref var steering = ref steeringArray[i];
             ref var vel = ref velArray[i];
-            Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime()*1.6f);            
+            Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime()*2f);            
             bool collided = CheckAgainstStaticGrid(posFuture, ref col, staticSpatialGrid);                     
             if (collided)
             {

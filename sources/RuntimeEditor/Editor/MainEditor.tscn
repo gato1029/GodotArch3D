@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="7_8qgvi"]
 [ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="7_wsd07"]
 [ext_resource type="Texture2D" uid="uid://bol7ivbg2eei" path="res://resources/Textures/iconos/tree.png" id="8_f1fuj"]
-[ext_resource type="Texture2D" uid="uid://bbuvwyt7liqe4" path="res://resources/Textures/iconos/casa-ecologica.png" id="9_34055"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="10_egwe3"]
 [ext_resource type="Texture2D" uid="uid://4fsf6xnbk6cv" path="res://resources/Textures/iconos/castle-tower.png" id="11_qdd1k"]
 [ext_resource type="Shader" uid="uid://dvbvdwx16lalc" path="res://Blur.gdshader" id="12_7liqt"]
@@ -146,7 +145,6 @@ theme_override_constants/margin_bottom = 10
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Editor/VBoxContainer/MarginContainer" unique_id=606403333]
 layout_mode = 2
-size_flags_horizontal = 0
 size_flags_vertical = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer" unique_id=2081333398 groups=["BloqueaMundo"]]
@@ -185,18 +183,6 @@ IconTexture = ExtResource("8_f1fuj")
 ButtonText = "Recursos"
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="KuroButton4" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1915230957]
-custom_minimum_size = Vector2(44, 86.5)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_mode = 1
-script = ExtResource("6_2n80q")
-IconTexture = ExtResource("9_34055")
-ButtonText = "Edificios Visuales "
-TextVerticalAlignment = 2
-metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
-
 [node name="KuroButton5" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=596606079]
 custom_minimum_size = Vector2(44, 69.25)
 layout_mode = 2
@@ -210,10 +196,7 @@ TextVerticalAlignment = 0
 TextColor = Color(0.89, 0.89, 0.89, 1)
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="CenterContainer" type="CenterContainer" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1386846687]
-layout_mode = 2
-
-[node name="KuroButton3" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/CenterContainer" unique_id=1636081198]
+[node name="KuroButtonEdificios" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1636081198]
 custom_minimum_size = Vector2(44, 69.25)
 layout_mode = 2
 size_flags_horizontal = 4

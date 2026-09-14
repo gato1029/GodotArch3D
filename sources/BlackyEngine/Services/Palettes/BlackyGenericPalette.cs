@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.Biomas;
+using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
@@ -40,6 +41,7 @@ public class BlackyPalletesPersistence
     public static BlackyGenericPalette<BiomaData> biomePalette { get; } = new("Biomas",true);
     public static BlackyGenericPalette<CharacterModelBaseData> characterPalette { get; } = new("Personajes", true);
     public static BlackyGenericPalette<ResourceSourceData> resourcesPalette { get; } = new("Recursos", true);
+    public static BlackyGenericPalette<BuildingData> buildingPalette { get; } = new("Edificios", true);
 }
 
 public class BlackyGenericPalette<T> where T : class

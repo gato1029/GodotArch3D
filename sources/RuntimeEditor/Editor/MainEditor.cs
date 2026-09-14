@@ -22,6 +22,24 @@ public partial class MainEditor : Node
         ChunkManager.Initialize();
         KuroButtonTerreno.Pressed += KuroButtonTerreno_Pressed;
         KuroButtonRecursos.Pressed += KuroButtonRecursos_Pressed;
+        KuroButtonEdificios.Pressed += KuroButtonEdificios_Pressed;
+    }
+    private WindowEditorRuntimeBuildings _windowEditorRuntimeBuildings;
+    private void KuroButtonEdificios_Pressed()
+    {
+        if (IsInstanceValid(_windowEditorRuntimeBuildings))
+        {
+            _windowEditorRuntimeBuildings.Popup();
+            _windowEditorRuntimeBuildings.GrabFocus();
+            return;
+        }
+
+        _windowEditorRuntimeBuildings = RuntimeServices.NodeRegistry.Create<WindowEditorRuntimeBuildings>();
+        AddChild(_windowEditorRuntimeBuildings);
+
+        _windowEditorRuntimeBuildings.TreeExited += () => _windowEditorRuntimeBuildings = null;
+
+        _windowEditorRuntimeBuildings.Popup();
     }
 
     private WindowEditorRuntimeResources _windowEditorRuntimeResources;

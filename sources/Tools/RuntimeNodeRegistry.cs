@@ -13,9 +13,9 @@ public class RuntimeNodeRegistry
 
     public void RegisterAllScenesFromFolder(string folder)
     {
-        GD.Print($"[RuntimeNodeRegistry] Escaneando carpeta: {folder}");
+        //GD.Print($"[RuntimeNodeRegistry] Escaneando carpeta: {folder}");
         ScanRecursive(folder);
-        GD.Print($"[RuntimeNodeRegistry] Escenas registradas: {registryByType.Count}");
+        //GD.Print($"[RuntimeNodeRegistry] Escenas registradas: {registryByType.Count}");
     }
 
     private void ScanRecursive(string path)
@@ -84,7 +84,7 @@ public class RuntimeNodeRegistry
         if (!registryPaths.ContainsKey(className))
             registryPaths.Add(className, scenePath);
 
-        GD.Print($"[RuntimeNodeRegistry] Registrado: {className} -> {scenePath}");
+        //GD.Print($"[RuntimeNodeRegistry] Registrado: {className} -> {scenePath}");
 
         instance.QueueFree();
     }

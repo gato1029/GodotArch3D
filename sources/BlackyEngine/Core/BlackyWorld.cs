@@ -59,9 +59,9 @@ public sealed class BlackyWorld : IDisposable
     public SimulationTick Tick => Simulation.Tick;
 
     public BlackyCharacterCreator Characters => Services.Characters;
-    public BlackyTerrainSystem Terrain => Services.TerrainPainter;
+    
     public BlackyResourcesCreator Resources => Services.ResourcePainter;
-    public BlackyBuildingSystem Buildings => Services.BuildingPainter;
+    public BlackyBuildingCreator Buildings => Services.BuildingPainter;
     public BlackyHeightSystem Heights => Services.HeightMapWorld;
 
     public BlackyTileRenderSystem TileRenderer => Services.TileRenderer;
@@ -155,12 +155,12 @@ public sealed class BlackyWorld : IDisposable
 
     private void DebugBoot()
     {
-        var e = Characters.Create(1787768744605000, new Vector2(0, 0)); // principal
+        var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-       // SpawnEnemiesAroundPlayer(50,10);
+        SpawnEnemiesAroundPlayer(1,10);
         
-        //var ee = Characters.Create(1788369074799000, new Vector2(3, 0)); // enemigos
-        //ee.Set(new MoveTargetComponent(new Vector2(20, 0)));
+        //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
+        //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));
         
     }
     private void SpawnEnemiesAroundPlayer(int targetEnemies, int baseRadius = 100, int minSpacing = 3)
@@ -206,7 +206,7 @@ public sealed class BlackyWorld : IDisposable
                 occupiedTiles.Add(tileCoord);
                 Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tx, ty);
 
-                var enemy = Characters.Create(1788369074799000, worldPos);
+                var enemy = Characters.InternalExecuteCreation(1788369074799000,1, worldPos);
                 //enemy.Set(new MoveTargetComponent(playerWorldPos));
 
                 spawned++;
@@ -215,7 +215,7 @@ public sealed class BlackyWorld : IDisposable
     }
     private void DebugBootStressTest(int targetEnemies = 1000)
     {
-        var player = Characters.Create(1787768744605000, new Vector2(0, 0)); // principal
+        var player = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
         Vector2 playerWorldPos = new Vector2(0, 0);
 
         int playerTileX = 0;
@@ -257,7 +257,7 @@ public sealed class BlackyWorld : IDisposable
                 occupiedTiles.Add(tileCoord);
                 Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tx, ty);
 
-                var enemy = Characters.Create(1788369074799000, worldPos);
+                var enemy = Characters.InternalExecuteCreation(1788369074799000,1, worldPos);
                 enemy.Set(new MoveTargetComponent(playerWorldPos));
 
                 spawned++;

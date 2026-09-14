@@ -40,8 +40,17 @@ internal class RvoDebugSystem : FlecsSystemBase
             WireShape.Instance.UpdatePosition(age.idShapeMove, pos.position+col.Offset);
             if (age.idShapeRadiusAttack!=0)
             {
-                var colMelle = entity.Get<MeleeAttackComponent>();
-                WireShape.Instance.UpdatePosition(age.idShapeRadiusAttack, pos.position+ colMelle.OffSetRange);
+                if (entity.Has<MeleeAttackComponent>())
+                {
+                    var colMelle = entity.Get<MeleeAttackComponent>();
+                    WireShape.Instance.UpdatePosition(age.idShapeRadiusAttack, pos.position + colMelle.OffSetRange);
+                }
+                if (entity.Has<RangedAttackComponent>())
+                {
+                    var colMelle = entity.Get<RangedAttackComponent>();
+                    WireShape.Instance.UpdatePosition(age.idShapeRadiusAttack, pos.position);
+                }
+                
             }
             if (age.idShapeRadiusRangeSearch!=0)
             {

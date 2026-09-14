@@ -133,6 +133,9 @@ public class TileSpriteData:IdDataLong
     
     [BsonIgnore]
      public List<FastCollider> fastCollidersBody { get; } = new List<FastCollider>();
+
+    [BsonIgnore]
+    public FastCollider fastColliderUmbralAtaque { get; set; }
     public TileSpriteData()
     {
         id = EpochIdGenerator.NewId();
@@ -244,35 +247,41 @@ public class TileSpriteData:IdDataLong
         }
         foreach (var item in animationData.collisionBodyArray)
         {
+            FastCollider fastCollider = new FastCollider();
+            GeometricShape2D shape = item.Multiplicity(animationData.scale);
+            switch (shape)
+            {
+                case Circle circle:
+                    fastCollider.Shape = ShapeType.Circle;
+                    fastCollider.Width = circle.Radius;
+                    fastCollider.Height = circle.Radius;
+                    fastCollider.Offset = new Vector2(circle.OriginCurrent.X, circle.OriginCurrent.Y);
+                    break;
+                case Rectangle rectangle:
+                    fastCollider.Shape = ShapeType.Rect;
+                    fastCollider.Width = rectangle.Width;
+                    fastCollider.Height = rectangle.Height;
+                    fastCollider.Offset = new Vector2(rectangle.OriginCurrent.X, rectangle.OriginCurrent.Y);
+                    break;
+                case Slope slope:
+                    fastCollider.Shape = ShapeType.Slope;
+                    fastCollider.Slope = slope.slopeType;
+                    fastCollider.Width = slope.Width;
+                    fastCollider.Height = slope.Height;
+                    fastCollider.Offset = new Vector2(slope.OriginCurrent.X, slope.OriginCurrent.Y);
+                    break;
+                default:
+                    break;
+            }
+
             if (item.collisionUseType == CollisionUseType.CUERPO)
             {
-                FastCollider fastCollider = new FastCollider();
-                GeometricShape2D shape = item.Multiplicity(animationData.scale);
-                switch (shape)
-                {
-                    case Circle circle:
-                        fastCollider.Shape = ShapeType.Circle;
-                        fastCollider.Width = circle.Radius;
-                        fastCollider.Height = circle.Radius;
-                        fastCollider.Offset = new Vector2(circle.OriginCurrent.X, circle.OriginCurrent.Y);
-                        break;
-                    case Rectangle rectangle:
-                        fastCollider.Shape = ShapeType.Rect;
-                        fastCollider.Width = rectangle.Width;
-                        fastCollider.Height = rectangle.Height;
-                        fastCollider.Offset = new Vector2(rectangle.OriginCurrent.X, rectangle.OriginCurrent.Y);
-                        break;
-                    case Slope slope:
-                        fastCollider.Shape = ShapeType.Slope;
-                        fastCollider.Slope = slope.slopeType;
-                        fastCollider.Width = slope.Width;
-                        fastCollider.Height = slope.Height;
-                        fastCollider.Offset = new Vector2(slope.OriginCurrent.X, slope.OriginCurrent.Y);
-                        break;
-                    default:
-                        break;
-                }
+              
                 fastCollidersBody.Add(fastCollider);
+            }
+            if (item.collisionUseType == CollisionUseType.UMBRAL_LLEGADA_ATAQUE_CUERPO)
+            {
+                fastColliderUmbralAtaque = fastCollider;
             }
         }
     }
@@ -285,35 +294,40 @@ public class TileSpriteData:IdDataLong
         }
         foreach (var item in spriteData.listCollisionBody)
         {
+            GeometricShape2D shape = item.Multiplicity(spriteData.scale);
+            FastCollider fastCollider = new FastCollider();
+            switch (shape)
+            {
+                case Circle circle:
+                    fastCollider.Shape = ShapeType.Circle;
+                    fastCollider.Width = circle.Radius;
+                    fastCollider.Height = circle.Radius;
+                    fastCollider.Offset = new Vector2(circle.OriginCurrent.X, circle.OriginCurrent.Y);
+                    break;
+                case Rectangle rectangle:
+                    fastCollider.Shape = ShapeType.Rect;
+                    fastCollider.Width = rectangle.Width;
+                    fastCollider.Height = rectangle.Height;
+                    fastCollider.Offset = new Vector2(rectangle.OriginCurrent.X, rectangle.OriginCurrent.Y);
+                    break;
+                case Slope slope:
+                    fastCollider.Shape = ShapeType.Slope;
+                    fastCollider.Slope = slope.slopeType;
+                    fastCollider.Width = slope.Width;
+                    fastCollider.Height = slope.Height;
+                    fastCollider.Offset = new Vector2(slope.OriginCurrent.X, slope.OriginCurrent.Y);
+                    break;
+                default:
+                    break;
+            }
             if (item.collisionUseType == CollisionUseType.CUERPO)
             {
-                GeometricShape2D shape = item.Multiplicity(spriteData.scale);
-                FastCollider fastCollider = new FastCollider();
-                switch (shape)
-                {
-                    case Circle circle:
-                        fastCollider.Shape = ShapeType.Circle;
-                        fastCollider.Width = circle.Radius;
-                        fastCollider.Height = circle.Radius;
-                        fastCollider.Offset = new Vector2(circle.OriginCurrent.X, circle.OriginCurrent.Y);
-                        break;
-                    case Rectangle rectangle:
-                        fastCollider.Shape = ShapeType.Rect;
-                        fastCollider.Width = rectangle.Width;
-                        fastCollider.Height = rectangle.Height;
-                        fastCollider.Offset = new Vector2(rectangle.OriginCurrent.X, rectangle.OriginCurrent.Y);
-                        break;
-                    case Slope slope:
-                        fastCollider.Shape = ShapeType.Slope;
-                        fastCollider.Slope = slope.slopeType;
-                        fastCollider.Width = slope.Width;
-                        fastCollider.Height = slope.Height;
-                        fastCollider.Offset = new Vector2(slope.OriginCurrent.X, slope.OriginCurrent.Y);
-                        break;
-                    default:
-                        break;
-                }
+               
                 fastCollidersBody.Add(fastCollider);
+            }
+            if (item.collisionUseType == CollisionUseType.UMBRAL_LLEGADA_ATAQUE_CUERPO)
+            {
+                fastColliderUmbralAtaque = fastCollider;
             }
         }
         

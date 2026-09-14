@@ -9,6 +9,7 @@ using GodotFlecs.sources.Flecs.Systems;
 using RVO;
 using SadRogue.Primitives;
 using System;
+using static System.Net.WebRequestMethods;
 using CharacterComponent = GodotFlecs.sources.Flecs.Components.CharacterComponent;
 
 namespace GodotFlecs.sources.Flecs.Systems.Units;
@@ -25,7 +26,7 @@ public class MoveTargetSystem : FlecsSystemBase
           .With<Components.CharacterComponent>()
           .With<SteeringComponent>() // <-- Añadido
           .With<MoveResolutorComponent>()
-          .With<AttackPendingComponent>()
+          //.With<AttackPendingComponent>()
           .Without<DeadTag>();
     }
 
@@ -36,7 +37,7 @@ public class MoveTargetSystem : FlecsSystemBase
         var chaArray = it.Field<Components.CharacterComponent>(2);
         var steeringArray = it.Field<SteeringComponent>(3); // <-- Añadido
         var resolutorArray = it.Field<MoveResolutorComponent>(4);
-        var attackpendingArray = it.Field<AttackPendingComponent>(5);
+        //var attackpendingArray = it.Field<AttackPendingComponent>(5);
 
         for (int i = 0; i < it.Count(); i++)
         {
@@ -45,9 +46,9 @@ public class MoveTargetSystem : FlecsSystemBase
             ref var cha = ref chaArray[i];
             ref var steering = ref steeringArray[i];
             ref var resolutor = ref resolutorArray[i];
-            ref var attackPending = ref attackpendingArray[i];
+          //  ref var attackPending = ref attackpendingArray[i];
 
-            if (resolutor.BlockedTimer>1)
+            if (resolutor.BlockedTimer>1 )
             {
                 steering.DesiredDir = Vector2.Zero;
                 resolutor.BlockedTimer = 0;
@@ -55,25 +56,38 @@ public class MoveTargetSystem : FlecsSystemBase
                 cha.characterStateType = CharacterStateType.IDLE;
                 it.Entity(i).Remove<MoveTargetComponent>();
                 it.Entity(i).Add<StoppedTag>();
+
+             
+                // aqui quiere decir que choco con algo inesperado
+                //if (attackPending.Active)
+                //{
+                //    // libero objetivo 
+                //    attackPending.Active = false;
+                //    attackPending.Target = default;
+                //}
                 continue;
             }
             Vector2 toTarget = target.Value - pos.position;
             float distSq = toTarget.LengthSquared();
 
             float umbralLlegada = 0.05f;
-            if (attackPending.Active)
-            {
-                if (attackPending.Target.Has<CharacterComponent>())
-                {
-                    umbralLlegada = attackPending.Target.Get<MoveColliderComponent>().Radius;
-                }
-                else
-                {
-                    // es un edificio aqui me falta esto
-
-                }
-                
-            }
+            //if (attackPending.Active && attackPending.Target.IsAlive() && !attackPending.Target.Has<DeadTag>())
+            //{
+            //    if (attackPending.isUnit)
+            //    {
+            //        if (attackPending.Target.Has<CharacterComponent>())
+            //        {
+            //            umbralLlegada = attackPending.Target.Get<MoveColliderComponent>().Radius;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        //if (attackPending.Target.Has<BuildingDefinitionComponent>())
+            //        //{
+            //        //    umbralLlegada = 2;
+            //        //}                
+            //    }
+            //}
 
             if (distSq <= umbralLlegada)//0.05f) // Umbral de llegada
             {
@@ -83,10 +97,10 @@ public class MoveTargetSystem : FlecsSystemBase
                 cha.characterStateType = CharacterStateType.IDLE;
                 it.Entity(i).Remove<MoveTargetComponent>();
                 it.Entity(i).Add<StoppedTag>();
-                if (attackPending.Active)
-                {
-                    it.Entity(i).Add<AttackPendingTag>();
-                }                
+                //if (attackPending.Active)
+                //{
+                //    it.Entity(i).Add<AttackPendingTag>();
+                //}                
                 continue;
             }
 

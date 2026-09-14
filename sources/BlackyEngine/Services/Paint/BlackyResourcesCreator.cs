@@ -35,13 +35,13 @@ public class BlackyResourcesCreator
 {
     private readonly BlackyChunkOccupancyMap occupancyMap;
     private readonly BlackySpatialEntityMap spatialEntityMap;
-    private readonly BlackyEntityRenderSystem renderSystem;
+    
     private readonly BlackyTerrainWorldData terrain;
     private readonly FlecsManager flecsManager;
-    private readonly StaticSpatialGridOptimizedGeneric<Entity> staticHash;
+    private readonly StaticSpatialGridOptimizedGeneric<Entity> staticHashResource;
     private int _resourcesCount = 0;
 
-    private const bool DEBUG_COLLIDERS = false;
+    private const bool DEBUG_COLLIDERS = true;
     private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
     private Dictionary<int, List<int>> _colliderDebugMap = new();
     private readonly ConcurrentQueue<CreateResourceCommand> _commandQueue = new();
@@ -51,11 +51,10 @@ public class BlackyResourcesCreator
     public BlackyResourcesCreator(StaticSpatialGridOptimizedGeneric<Entity> staticHash, FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainWorldData terrain)
     {
         this.occupancyMap = occupancyMap;
-        this.spatialEntityMap = spatialEntityMap;
-        this.renderSystem = renderSystem;
+        this.spatialEntityMap = spatialEntityMap;        
         this.terrain = terrain;
         this.flecsManager = flecsManager;
-        this.staticHash = staticHash;
+        this.staticHashResource = staticHash;
     }
 
  
@@ -99,7 +98,14 @@ public class BlackyResourcesCreator
             if (entity.Has<SpatialIDComponent>())
             {
                 SpatialIDComponent spatial = entity.Get<SpatialIDComponent>();                
-                staticHash.FreeCollider(spatial.Value);                
+                staticHashResource.FreeCollider(spatial.Value);
+                
+                foreach (int item in _colliderDebugMap[spatial.Value])
+                {
+                    CollisionShapeDraw.Instance.FreeDraw(item);
+                }
+                
+                _colliderDebugMap.Remove(spatial.Value);
             }
 
             RenderGPUComponent gpu = entity.Get<RenderGPUComponent>();
@@ -231,13 +237,17 @@ public class BlackyResourcesCreator
     {
         if (tileSpriteData.fastCollidersBody.Count == 0) return 0;
 
-        int idCollider = staticHash.GetNewEntityId();
-        _colliderDebugMap.Add(idCollider, new List<int>());
+        int idCollider = staticHashResource.GetNewEntityId();
+        
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(Mundo_x, Mundo_y);
 
         float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
 
-        foreach (var collider in tileSpriteData.fastCollidersBody)
+        if (DEBUG_COLLIDERS)
+        {
+            _colliderDebugMap.Add(idCollider, new List<int>());
+        }
+            foreach (var collider in tileSpriteData.fastCollidersBody)
         {
             FastCollider fast = collider;
             float actualX = positionCenter.X + fast.Offset.X;
@@ -257,12 +267,13 @@ public class BlackyResourcesCreator
 
             if (DEBUG_COLLIDERS)
             {
+                
                 int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
                 _colliderDebugMap[idCollider].Add(idDebugBody);
             }
         }
 
-        staticHash.RegisterStatic(idCollider, entity, minX, minY, maxX, maxY);
+        staticHashResource.RegisterStatic(idCollider, entity, minX, minY, maxX, maxY);
 
         entity.Set(new SpatialIDComponent
         {

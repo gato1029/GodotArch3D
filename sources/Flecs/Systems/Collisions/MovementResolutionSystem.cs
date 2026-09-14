@@ -65,7 +65,7 @@ public class MovementResolutionSystem : FlecsSystemBase
             // 🎨 movimiento suave
             pos.position += vel.desiredVel * dt; // * dt;
             pos.tilePosition = TilesHelper.WorldPositionToTile(pos.position);            
-            //pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
+            pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
             bool isMoving = vel.desiredVel.LengthSquared() > 0.0002f;
 
             if (!isMoving)

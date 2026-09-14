@@ -18,7 +18,8 @@ public enum ModeGrid
 public sealed class BlackyWorldState : IDisposable
 {
     public FastSpatialHash DynamicHash { get; }
-    public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatial { get; }
+    public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatialBuildings { get; }
+    public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatialResources { get; }
     public StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> StaticSpatialTerrain { get; }
     public BlackyChunkedBitGrid GridMove { get; }
 
@@ -40,7 +41,8 @@ public sealed class BlackyWorldState : IDisposable
         this.config = world.Config;
 
         DynamicHash = new FastSpatialHash(config.MapSize.X, config.MapSize.Y, 11000);
-        StaticSpatial = new StaticSpatialGridOptimizedGeneric<Entity>(config.MapSize.X, config.MapSize.Y, 32, 100_000, 50_000);
+        StaticSpatialBuildings = new StaticSpatialGridOptimizedGeneric<Entity>(config.MapSize.X, config.MapSize.Y, 32, 100_000, 50_000);
+        StaticSpatialResources = new StaticSpatialGridOptimizedGeneric<Entity>(config.MapSize.X, config.MapSize.Y, 32, 1000_000, 50_000);
         StaticSpatialTerrain = new StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData>(config.MapSize.X, config.MapSize.Y, 32, 100_000,50_000);
         GridMove = new BlackyChunkedBitGrid(config.MapSize.X, config.MapSize.Y, 16);
 
@@ -84,7 +86,7 @@ public sealed class BlackyWorldState : IDisposable
     public void Dispose()
     {
         DynamicHash.Clear();
-        StaticSpatial.Clear();
+        StaticSpatialBuildings.Clear();
         StaticSpatialTerrain.Clear();
     }
 }

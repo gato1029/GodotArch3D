@@ -325,10 +325,10 @@ public partial class ControlRuleItem : PanelContainer
                                 winBuiling.OnNotifySelected += (BuildingData objectSelected) =>
                                 {
                                     button.Icon = objectSelected.textureVisual;
-                                    tileRuleData.UpdateNeighborMask(direction, check, objectSelected.id);
-                                    var condition = tileRuleData.neighborConditions[id];
-                                    condition.State = NeighborState.Filled;
-                                    condition.SpecificTileId = objectSelected.id;
+                                    //tileRuleData.UpdateNeighborMask(direction, check, objectSelected.id);
+                                    //var condition = tileRuleData.neighborConditions[id];
+                                    //condition.State = NeighborState.Filled;
+                                    //condition.SpecificTileId = objectSelected.id;
 
                                 };
                                 break;

@@ -18,28 +18,40 @@ public class SimulationTick
     public int TickCount; // 🔥 cuantos ticks ocurrieron este frame
     public int FrameIndex; // 🔥 índice del frame actual, para sistemas que quieran hacer algo cada N frames
     public int TotalUnits; // lo usare para luego dividir la carga de búsqueda de enemigos entre frames, para no hacer todo en un frame y que se note el lag
-    public int GruposDivisionUnidades = 1;
+    public int GruposDivisionUnidadesMelle = 1;
+    public int GruposDivisionUnidadesRango = 1;
 
     /// <summary>
     /// Ajusta automáticamente la cantidad de grupos en función de las unidades totales
     /// para balancear el rendimiento de la CPU (staggering).
     /// </summary>
-    public void UpdateGroupCount()
+    public void UpdateGroupCountMelle(int totalUnits)
     {
-        if (TotalUnits > 1000)
-            GruposDivisionUnidades = 4;
-        else if (TotalUnits > 300)
-            GruposDivisionUnidades = 4;
-        else if (TotalUnits > 50)
-            GruposDivisionUnidades = 2;
+        if (totalUnits > 1000)
+            GruposDivisionUnidadesMelle = 4;
+        else if (totalUnits > 300)
+            GruposDivisionUnidadesMelle = 4;
+        else if (totalUnits > 50)
+            GruposDivisionUnidadesMelle = 2;
         else
-            GruposDivisionUnidades = 1; // Sin escalonamiento para grupos pequeños
+            GruposDivisionUnidadesMelle = 1; // Sin escalonamiento para grupos pequeños
     }
-
+    public void UpdateGroupCountRanged(int totalUnits)
+    {
+        if (totalUnits > 1000)
+            GruposDivisionUnidadesRango = 4;
+        else if (totalUnits > 300)
+            GruposDivisionUnidadesRango = 4;
+        else if (totalUnits > 50)
+            GruposDivisionUnidadesRango = 2;
+        else
+            GruposDivisionUnidadesRango = 1; // Sin escalonamiento para grupos pequeños
+    }
     /// <summary>
     /// Devuelve la máscara binaria segura para usar con el operador bitwise (&).
     /// </summary>
-    public int GetGroupMask() => Math.Max(1, GruposDivisionUnidades) - 1;
+    public int GetGroupMaskMelle() => Math.Max(1, GruposDivisionUnidadesMelle) - 1;
+    public int GetGroupMaskRango() => Math.Max(1, GruposDivisionUnidadesRango) - 1;
 }
 
 public class SimulationTickSystem : FlecsSystemBase

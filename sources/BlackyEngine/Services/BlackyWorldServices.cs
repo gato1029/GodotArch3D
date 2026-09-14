@@ -33,13 +33,11 @@ public sealed class BlackyWorldServices
     // Spawn / Author tools
     // ============================
 
-    public BlackyCharacterCreator Characters { get; }
+    public BlackyCharacterCreator Characters { get; } // 
 
-    public BlackyTerrainSystem TerrainPainter { get; } // ya no se usa , pero lo dejo por compatibilidad, ahora se usa TerrainPainter y ResourcePainter luego se eliminara
+    public BlackyResourcesCreator ResourcePainter { get; } // listo
 
-    public BlackyResourcesCreator ResourcePainter { get; }
-
-    public BlackyBuildingSystem BuildingPainter { get; }
+    public BlackyBuildingCreator BuildingPainter { get; } // listo
 
     public BlackyHeightSystem HeightMapWorld { get; }
 
@@ -56,9 +54,9 @@ public sealed class BlackyWorldServices
 
     public BlackyTileRenderSystem TileRenderer { get; } // eliminar luego
 
-    public BlackyEntityRenderSystem EntityRenderer { get; }
+    public BlackyEntityRenderSystem EntityRenderer { get; } // listo
 
-    public BlackyOccupancyRendererSystem OccupancyRenderer { get; }
+    public BlackyOccupancyRendererSystem OccupancyRenderer { get; } // listo
 
     public ArrowPoolService ArrowPool { get; }
     private readonly BlackyWorld world;
@@ -108,25 +106,25 @@ public sealed class BlackyWorldServices
 
         Characters = new BlackyCharacterCreator(sim.Flecs,state.DynamicHash,world);
 
-        TerrainPainter = new BlackyTerrainSystem(
-            state.RenderData,
-            state.OccupancyMap,
-            TileRenderer);
+        //TerrainPainter = new BlackyTerrainSystem(
+        //    state.RenderData,
+        //    state.OccupancyMap,
+        //    TileRenderer);
 
         ResourcePainter = new BlackyResourcesCreator(
-            state.StaticSpatial,
+            state.StaticSpatialResources,
             sim.Flecs,
             state.OccupancyMap,
             state.SpatialEntityMap,
             EntityRenderer,
             TerrainDataLienzo);
 
-        BuildingPainter = new BlackyBuildingSystem(
+        BuildingPainter = new BlackyBuildingCreator(
             sim.Flecs,
             state.OccupancyMap,
             state.SpatialEntityMap,
-            EntityRenderer,
-            TerrainPainter);
+            state.StaticSpatialBuildings,
+            TerrainDataLienzo);
 
         ArrowPool = new ArrowPoolService(sim.Flecs.WorldFlecs);
     }

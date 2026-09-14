@@ -67,8 +67,10 @@ public record struct HealthComponent
 [RegisterComponentFlecs]
 public record struct AttackPendingComponent
 (
-    bool Active,        
-    Entity Target
+    bool Active,
+    Entity Target,
+    bool isUnit,
+    Vector2 targetPosition
 );
 
 [RegisterComponentFlecs]
@@ -101,7 +103,8 @@ public record struct RangedAttackComponent
     float Cooldown,        // Tiempo entre ataques
     float Timer,           // Temporizador interno
     bool Homing,           // misil auto dirigido
-    float SpeedProjectile
+    float SpeedProjectile,
+    int NumberUnitRange
 );
 [RegisterComponentFlecs]
 public record struct WeaponComponent
@@ -118,7 +121,8 @@ public record struct MeleeAttackComponent
     float RangeAttack,           // Rango de ataque melee (ej. 1.5m)
     Vector2 OffSetRange,   // Offset del rango de ataque (ej. 0.5m hacia adelante)
     float Cooldown,        // Tiempo entre ataques
-    float Timer           // Temporizador interno
+    float Timer,           // Temporizador interno
+    int numberUnitMelle
 );
 
 [RegisterComponentFlecs]
@@ -194,6 +198,15 @@ public record struct DirtyTransformTag();
 public record struct UnitDefinitionComponent
 (
     ushort idTemplate // id Template de la unidad, para buscar en la base de datos
+);
+
+[RegisterComponentFlecs]
+public record struct BuildingDefinitionComponent
+(
+    ushort idTemplate, // id Template del edificio
+    int idSpriteTemplateNormal, // id template del sprite    
+    int idSpriteConstruccion,
+    int idSpriteDestruccion 
 );
 
 [RegisterComponentFlecs]
@@ -334,6 +347,11 @@ public record struct VelocityComponent(Vector2 currentVel, float MaxSpeed, Vecto
 [RegisterComponentFlecs]
 public record struct MoveTargetComponent(
     Vector2 Value
+    );
+
+[RegisterComponentFlecs]
+public record struct MelleAttackThereshold (
+    float radius
     );
 
 [RegisterComponentFlecs]

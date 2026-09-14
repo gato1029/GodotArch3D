@@ -5,7 +5,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
-
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -71,7 +71,8 @@ public class MoveSeparationSystem : FlecsSystemBase
         var unitArray = it.Field<UnitDefinitionComponent>(6);
 
         var dynGrid = blackyWorld.State.DynamicHash;
-        var staGrid = blackyWorld.State.StaticSpatial;
+        var staGridBuilding = blackyWorld.State.StaticSpatialBuildings;
+        var staResourceGrid = blackyWorld.State.StaticSpatialResources;
 
         for (int i = 0; i < it.Count(); i++)
         {
@@ -100,7 +101,7 @@ public class MoveSeparationSystem : FlecsSystemBase
             if (steering.DesiredDir.LengthSquared() < 0.0001f)
                 continue;
 
-            Vector2 posFuture = pos.position + (steering.DesiredDir*vel.MaxSpeed* it.DeltaTime());
+            Vector2 posFuture = pos.position + (steering.DesiredDir*vel.MaxSpeed* it.DeltaTime())*2;
 
             float cx = posFuture.X + col.Offset.X;
             float cy = posFuture.Y + col.Offset.Y;
@@ -129,26 +130,26 @@ public class MoveSeparationSystem : FlecsSystemBase
             }
             if (!existCollision)
             {
-                // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (paredes, árboles, etc)
-                var sta = CheckAgainstStaticGrid(ref posFuture, ref col, staGrid);
+                // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (paredes, edificios)
+                var sta = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding);
+                existCollision = sta;
+            }
+            if (!existCollision)
+            {
+                // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (recursos, árboles, etc)
+                var sta = CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
                 existCollision = sta;
             }
             if (existCollision)
             {
-                steering.DesiredDir = Vector2.Zero; // Detener el movimiento
+                steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimiento
 
             }
         }
     }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private  bool  CheckAgainstStaticGrid(
-    ref Vector2 pos,
-    ref MoveColliderComponent col,
-    StaticSpatialGridOptimizedGeneric<Entity> grid)
+    private bool CheckAgainstStaticGridResources(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
     {
-
-
         float cx = pos.X + col.Offset.X;
         float cy = pos.Y + col.Offset.Y;
 
@@ -169,15 +170,72 @@ public class MoveSeparationSystem : FlecsSystemBase
             if (grid.TryGetValue(id, out Entity other))
             {
                 if (!other.IsAlive()) continue;
-
-                ushort idTemplate = other.Get<UnitDefinitionComponent>().idTemplate; // 🔹 para asegurar que es una entidad con collider
-                var template = BlackyPalletesPersistence.characterPalette.GetData(idTemplate);
-
-                //var bodyCollider = other.Value.Get<BodyColliderComponent>();
+                TileSpriteData sprite = null;
+                if (other.Has<ResourceDefinitionComponent>())
+                {// verificar contra recursos
+                    int idTemplate = other.Get<ResourceDefinitionComponent>().idSpriteTemplate; // 🔹 para asegurar que es una entidad con collider
+                    var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                }
 
                 var posOther = other.Get<PositionComponent>();
 
-                foreach (var shape in template.bodyColliders)
+                foreach (var shape in sprite.fastCollidersBody)
+                {
+                    var shapeInternal = shape;
+                    if (!CollisionMathHelper.Check(
+                            pos.X, pos.Y, ref colUnit,
+                            posOther.position.X, posOther.position.Y, ref shapeInternal))
+                    {
+
+                        continue;
+                    }
+                    else
+                    {
+                        existCollision = true;
+                        break;
+                    }
+                }
+            }
+
+
+        }
+
+        return existCollision;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private  bool  CheckAgainstStaticGrid(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
+    {
+        float cx = pos.X + col.Offset.X;
+        float cy = pos.Y + col.Offset.Y;
+
+        // 🔹 collider temporal (como ya hacías)
+        var colUnit = new FastCollider
+        {
+            Shape = ShapeType.Circle,
+            Width = col.Radius,
+            Height = col.Radius,
+            Offset = new Vector2(col.Offset.X, col.Offset.Y)
+        };
+
+        // 🔹 calcular radio dinámico (IMPORTANTE)
+        int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
+        bool existCollision = false;
+        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
+        {
+            if (grid.TryGetValue(id, out Entity other))
+            {
+                if (!other.IsAlive()) continue;
+                TileSpriteData sprite = null;
+
+                if (other.Has<BuildingDefinitionComponent>())
+                {
+                    int idTemplate = other.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal; // 🔹 para asegurar que es una entidad con collider
+                    var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                }                        
+                var posOther = other.Get<PositionComponent>();
+
+                foreach (var shape in sprite.fastCollidersBody)
                 {
                     var shapeInternal = shape;
                     if (!CollisionMathHelper.Check(

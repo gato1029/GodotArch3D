@@ -29,22 +29,22 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
     {
         objectData = data;
         LineEditName.Text = objectData.name;
-        TextEditDescription.Text = objectData.description;
-        OptionButtonTypeBuilding.Selected = (int)objectData.buildingType;
-        SpinBoxMaxHealth.Value = objectData.maxHealth;
-        SpinBoxRangeAttack.Value = objectData.attackRange;
-        SpinBoxChargueAttack.Value = objectData.attackCooldown;
-        SpinBoxTimeBuild.Value = objectData.timeToBuild;
-        ControlTileSpriteItem.SetIdTile(objectData.idTileSpriteNormal);
-        ControlProyectileItem.SetData(objectData.idProyectile);
+        TextEditDescription.Text = objectData.Description;
+        OptionButtonTypeBuilding.Selected = (int)objectData.BuildingType;
+        SpinBoxMaxHealth.Value = objectData.MaxHealth;
+        SpinBoxRangeAttack.Value = objectData.AttackRange;
+        SpinBoxChargueAttack.Value = objectData.AttackCooldown;
+        SpinBoxTimeBuild.Value = objectData.TimeToBuild;
+        ControlTileSpriteItem.SetIdTile(objectData.IdTileSpriteNormal);
+        ControlProyectileItem.SetData(objectData.IdProjectile);
 
-        if (objectData.defensePowers!=null)
+        if (objectData.DefensePowers!=null)
         {
-            ControlDefensa.SetAllData(objectData.defensePowers.ToArray());
+            ControlDefensa.SetAllData(objectData.DefensePowers.ToArray());
         }
-        if (objectData.attackPowers!=null)
+        if (objectData.AttackPowers!=null)
         {
-            ControlAtaque.SetAllData(objectData.attackPowers.ToArray());
+            ControlAtaque.SetAllData(objectData.AttackPowers.ToArray());
         }
         
         OptionButtonTypeBuilding_ItemSelected(OptionButtonTypeBuilding.Selected);
@@ -52,16 +52,16 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
     private void ButtonSave_Pressed()
     {
         objectData.name = LineEditName.Text;
-        objectData.description = TextEditDescription.Text;
-        objectData.buildingType = (BuildingType)OptionButtonTypeBuilding.Selected;
-        objectData.maxHealth = (int)SpinBoxMaxHealth.Value;
-        objectData.attackRange = (float)SpinBoxRangeAttack.Value;
-        objectData.attackCooldown = (float)SpinBoxChargueAttack.Value;
-        objectData.timeToBuild = (float)SpinBoxTimeBuild.Value;
-        objectData.idTileSpriteNormal = ControlTileSpriteItem.GetidTile();       
-        objectData.defensePowers = ControlDefensa.GetAllData();
-        objectData.attackPowers = ControlAtaque.GetAllData();
-        objectData.idProyectile = ControlProyectileItem.GetData();
+        objectData.Description = TextEditDescription.Text;
+        objectData.BuildingType = (BuildingType)OptionButtonTypeBuilding.Selected;
+        objectData.MaxHealth = (int)SpinBoxMaxHealth.Value;
+        objectData.AttackRange = (float)SpinBoxRangeAttack.Value;
+        objectData.AttackCooldown = (float)SpinBoxChargueAttack.Value;
+        objectData.TimeToBuild = (float)SpinBoxTimeBuild.Value;
+        objectData.IdTileSpriteNormal = ControlTileSpriteItem.GetidTile();       
+        objectData.DefensePowers = ControlDefensa.GetAllData();
+        objectData.AttackPowers = ControlAtaque.GetAllData();
+        objectData.IdProjectile = ControlProyectileItem.GetData();
         DataBaseManager.Instance.InsertUpdate(objectData);
         
         MasterDataManager.UpdateRegisterData(objectData.id, objectData);
@@ -89,7 +89,7 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
                 this.Size = sizeReal;
                 ContainerAtaque.Visible = false;
                 break;
-            case BuildingType.TorreDefensa:     
+            case BuildingType.Torres:     
                 this.Size = sizeReal+sizeAtaque;
                 ContainerAtaque.Visible = true;
                 break;
