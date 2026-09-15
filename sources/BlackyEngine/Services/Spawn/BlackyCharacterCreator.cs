@@ -28,7 +28,7 @@ public class BlackyCharacterCreator
     private readonly FlecsManager flecsManager;
     private readonly FastSpatialHash dynamicHash;
     private readonly Core.BlackyWorld world;
-    private bool DEBUG_COLLIDERS = true;
+    private bool DEBUG_COLLIDERS = false;
 
     // Cola thread-safe y presupuesto por frame
     private readonly ConcurrentQueue<CreateCharacterCommand> _createQueue = new();

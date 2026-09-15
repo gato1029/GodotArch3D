@@ -81,6 +81,7 @@ public partial class MainEditor : Node
     {
         if (what == NotificationWMCloseRequest)
         {
+            TilesEntityPreviewHelper.Clear();
             var worlds = BlackyWorldRegistry.Instance.GetAllWorlds();
 
             foreach (var item in worlds)

@@ -26,6 +26,7 @@ public class MoveTargetSystem : FlecsSystemBase
           .With<Components.CharacterComponent>()
           .With<SteeringComponent>() // <-- Añadido
           .With<MoveResolutorComponent>()
+          .With<MoveColliderComponent>()
           //.With<AttackPendingComponent>()
           .Without<DeadTag>();
     }
@@ -37,6 +38,7 @@ public class MoveTargetSystem : FlecsSystemBase
         var chaArray = it.Field<Components.CharacterComponent>(2);
         var steeringArray = it.Field<SteeringComponent>(3); // <-- Añadido
         var resolutorArray = it.Field<MoveResolutorComponent>(4);
+        var moveArray = it.Field<MoveColliderComponent>(5);
         //var attackpendingArray = it.Field<AttackPendingComponent>(5);
 
         for (int i = 0; i < it.Count(); i++)
@@ -46,9 +48,10 @@ public class MoveTargetSystem : FlecsSystemBase
             ref var cha = ref chaArray[i];
             ref var steering = ref steeringArray[i];
             ref var resolutor = ref resolutorArray[i];
+            ref var move = ref moveArray[i];
           //  ref var attackPending = ref attackpendingArray[i];
 
-            if (resolutor.BlockedTimer>1 )
+            if (resolutor.BlockedTimer>0.5f )
             {
                 steering.DesiredDir = Vector2.Zero;
                 resolutor.BlockedTimer = 0;
@@ -67,7 +70,7 @@ public class MoveTargetSystem : FlecsSystemBase
                 //}
                 continue;
             }
-            Vector2 toTarget = target.Value - pos.position;
+            Vector2 toTarget = target.Value - pos.position+move.Offset;
             float distSq = toTarget.LengthSquared();
 
             float umbralLlegada = 0.05f;

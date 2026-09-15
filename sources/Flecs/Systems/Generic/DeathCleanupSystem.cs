@@ -90,7 +90,8 @@ internal class DestroyCleanupSystem : FlecsSystemBase
         qb.With<RenderGPUComponent>()
         .With<SpatialIDComponent>()
         .With<DeathTimerComponent>()
-        .With<BuildingDefinitionComponent>()  
+        .With<PositionComponent>()
+        .With<BuildingDefinitionComponent>()          
         .With<DeadTag>();
     }
 
@@ -100,10 +101,13 @@ internal class DestroyCleanupSystem : FlecsSystemBase
         if (world == null) return;
 
         var staticGrid = world.State.StaticSpatialBuildings;
+        var occupancyMap = world.State.OccupancyMap;
+        var spatialEntityMap = world.State.SpatialEntityMap;
 
         var gpuArray = it.Field<RenderGPUComponent>(0);
         var spatialArray = it.Field<SpatialIDComponent>(1);
         var timerArray = it.Field<DeathTimerComponent>(2);
+        var posArray = it.Field<PositionComponent>(3);
         float dt = it.DeltaTime();
         for (int i = 0; i < it.Count(); i++)
         {
@@ -114,6 +118,7 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                 var entity = it.Entity(i);
                 ref var gpu = ref gpuArray[i];
                 ref var spatial = ref spatialArray[i];
+                ref var  pos = ref posArray[i];
                 AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
                 staticGrid.FreeCollider(spatial.Value); // todo edificio deberia tener su collider
                 
@@ -131,6 +136,8 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                     ContadoresHelper.Liberar(TipoContador.EdificiosUnidadesRango, ranged.NumberUnitRange);
                     world.Tick.UpdateGroupCountRanged(ContadoresHelper.ObtenerUltimo(TipoContador.EdificiosUnidadesRango));
                 }
+                spatialEntityMap.Remove(entity);
+                occupancyMap.ClearByEntity(0, pos.tilePosition.X,pos.tilePosition.Y);
                 entity.Destruct();
             }
         }

@@ -60,7 +60,7 @@ internal class ProjectileMovementSystem : FlecsSystemBase
                     GlobalData.EventsDamage.Enqueue(new DamageEvent
                     {
                         Target = projTarget.Target,
-                        Amount = projTarget.Damage
+                        Amount = projTarget.Damage,                        
                     });
 
                     arrowPool.EnqueueRecycle(arrowEntity); // 🟢 Seguro en multihilo

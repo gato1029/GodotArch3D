@@ -46,9 +46,13 @@ internal class UnitDamageApplySystem : FlecsSystemBase
                 cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.DIE;
                 it.Entity(i).Add<DeadTag>();
                 it.Entity(i).Set(new DeathTimerComponent { RemainingTime = 2f }); // ⏱ 2 segundos, por ejemplo
-                ref var atp = ref  dmg.Source.GetMut<AttackPendingComponent>();
-                atp.Target = default;
-                atp.Active = false;
+                if (dmg.Source!=default && dmg.Source.IsAlive() && dmg.Source.Has<AttackPendingComponent>())
+                {
+                    ref var atp = ref dmg.Source.GetMut<AttackPendingComponent>();
+                    atp.Target = default;
+                    atp.Active = false;
+                }
+                
             }                                               
             // Eliminar el componente temporal
             it.Entity(i).Remove<DamagePendingComponent>();

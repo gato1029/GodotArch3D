@@ -129,34 +129,38 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                         break;
                     }
                 }
-                int radius = (int)MathF.Ceiling((search.Radius * 2f) / staticGrid._cellSize);
-                // aqui buscar edificos
-                foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius))
+                if (!existTarget)
                 {
-                    if (staticGrid.TryGetValue(id, out Entity otherEntity))
+                    int radius = (int)MathF.Ceiling((search.Radius * 2f) / staticGrid._cellSize);
+                    // aqui buscar edificos
+                    foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius))
                     {
-                        if (!otherEntity.IsAlive()) continue;
-                        targetEntity = otherEntity;
-                        TileSpriteData sprite = null;
-         
-                        if (otherEntity.Has<BuildingDefinitionComponent>())
+                        if (staticGrid.TryGetValue(id, out Entity otherEntity))
                         {
-                            int idTemplate = otherEntity.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal; // 🔹 para asegurar que es una entidad con collider
-                            var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                            if (!otherEntity.IsAlive()) continue;
+                            targetEntity = otherEntity;
+                            TileSpriteData sprite = null;
+
+                            if (otherEntity.Has<BuildingDefinitionComponent>())
+                            {
+                                int idTemplate = otherEntity.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal; // 🔹 para asegurar que es una entidad con collider
+                                var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                            }
+                            var posOther = otherEntity.Get<PositionComponent>();
+
+                            targetPos = otherEntity.Get<PositionComponent>().position;
+                            float rangeSqr = search.Radius * search.Radius;
+                            float distSqr = pos.position.DistanceSquaredTo(targetPos);
+
+                            if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
+                            idTarget = targetEntity.Get<BuildingDefinitionComponent>().idTemplate;
+
+                            existTarget = true;
+                            break;
                         }
-                        var posOther = otherEntity.Get<PositionComponent>();
-
-                        targetPos = otherEntity.Get<PositionComponent>().position;
-                        float rangeSqr = search.Radius * search.Radius;
-                        float distSqr = pos.position.DistanceSquaredTo(targetPos);
-
-                        if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
-                        idTarget = targetEntity.Get<BuildingDefinitionComponent>().idTemplate;
-                        
-                        existTarget = true;
-                        break;
                     }
                 }
+       
                 if (existTarget)
                 {
                     //Vector2 toTarget = targetPos - pos.position + melle.OffSetRange;
@@ -171,11 +175,11 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                     bool inRange = false;
                     if (istargetUnit)
                     {
-                        inRange = CheckCollisionWithTargetUnit(pos.position,dir.normalized, melle.RangeAttack, targetPos, idTarget);
+                        inRange = CheckCollisionWithTargetUnit(pos.position+melle.OffSetRange,dir.normalized, melle.RangeAttack, targetPos, idTarget);
                     }
                     else
                     {
-                        inRange= CheckCollisionWithTargetBuild(pos.position, dir.normalized, melle.RangeAttack, targetPos, idTarget);
+                        inRange= CheckCollisionWithTargetBuild(pos.position+melle.OffSetRange, dir.normalized, melle.RangeAttack, targetPos, idTarget);
                     }
                     if (inRange)
                     {

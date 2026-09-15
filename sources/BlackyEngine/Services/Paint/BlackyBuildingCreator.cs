@@ -42,7 +42,7 @@ public class BlackyBuildingCreator
     private readonly ConcurrentQueue<RemoveBuildingCommand> _removeQueue = new();
     private const int MaxOpsPerFrame = 5; // Presupuesto por frame para evitar tirones
 
-    private const bool DEBUG_COLLIDERS = true;
+    private const bool DEBUG_COLLIDERS = false;
     private readonly Dictionary<int, List<int>> _colliderDebugMap = new();
     private readonly int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
 
@@ -158,7 +158,7 @@ public class BlackyBuildingCreator
         // Particularidades por tipo de edificio
         if (templateBuilding.BuildingType == BuildingType.Torres)
         {
-            //CreateTorre(entity, templateBuilding);
+            CreateTorre(entity, templateBuilding);
         }
     }
 

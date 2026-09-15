@@ -23,8 +23,9 @@ internal class MoveTargetAttackMelleSystem:FlecsSystemBase
         qb.With<PositionComponent>()
           .With<MoveResolutorComponent>()
           .With<AttackPendingComponent>()
-          .With<MeleeAttackComponent>()  
-          .With<MoveTargetComponent>()
+          .With<MeleeAttackComponent>()
+          .With<MoveColliderComponent>()
+          .With<MoveTargetComponent>()          
           .Without<AttackPendingTag>()
           .Without<DeadTag>();
     }
@@ -35,6 +36,7 @@ internal class MoveTargetAttackMelleSystem:FlecsSystemBase
         var resolutorArray = it.Field<MoveResolutorComponent>(1);
         var attackpendingArray = it.Field<AttackPendingComponent>(2);
         var theresholdArray = it.Field<MeleeAttackComponent>(3);
+        var moveArray = it.Field<MoveColliderComponent>(4);
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
@@ -42,7 +44,7 @@ internal class MoveTargetAttackMelleSystem:FlecsSystemBase
             ref var resolutor = ref resolutorArray[i];
             ref var attackPending = ref attackpendingArray[i];
             ref var melle = ref theresholdArray[i];
-
+            ref var move = ref moveArray[i];
                 //if (it.Entity(i).Has<StoppedTag>() && attackPending.Active)
                 //{                 
                 //    it.Entity(i).Add<AttackPendingTag>();
@@ -50,10 +52,10 @@ internal class MoveTargetAttackMelleSystem:FlecsSystemBase
                 //}
 
 
-            Vector2 toTarget = attackPending.targetPosition - pos.position+melle.OffSetRange;
+            Vector2 toTarget = attackPending.targetPosition - (pos.position+move.Offset);
             float distSq = toTarget.LengthSquared();
 
-            float umbralLlegada = melle.RangeAttack-0.3f;// thereshold.radius;
+            float umbralLlegada = melle.RangeAttack;// thereshold.radius;
             if (distSq <= umbralLlegada)//0.05f) // Umbral de llegada
             {
               

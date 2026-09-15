@@ -32,7 +32,7 @@ public class SimulationTick
         else if (totalUnits > 300)
             GruposDivisionUnidadesMelle = 4;
         else if (totalUnits > 50)
-            GruposDivisionUnidadesMelle = 2;
+            GruposDivisionUnidadesMelle = 1;
         else
             GruposDivisionUnidadesMelle = 1; // Sin escalonamiento para grupos pequeños
     }
@@ -43,7 +43,7 @@ public class SimulationTick
         else if (totalUnits > 300)
             GruposDivisionUnidadesRango = 4;
         else if (totalUnits > 50)
-            GruposDivisionUnidadesRango = 2;
+            GruposDivisionUnidadesRango = 1;
         else
             GruposDivisionUnidadesRango = 1; // Sin escalonamiento para grupos pequeños
     }
