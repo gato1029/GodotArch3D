@@ -16,7 +16,7 @@ namespace GodotEcsArch.sources.Flecs.Systems.Rendering;
 internal class RenderSpriteSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => false;
+    protected override bool MultiThreaded => false; // nunca en true, por que es mas lento por el mutex interno del rendering server
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<RenderGPUComponent>()
@@ -37,9 +37,9 @@ internal class RenderSpriteSystem : FlecsSystemBase
             ref var r = ref gpu[i];
             ref var f = ref frame[i];
             ref var t = ref transform[i];
-            RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform);
+            RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform); // luego comentar esto
             RenderingServer.MultimeshInstanceSetCustomData(r.rid, r.instance, f.uvMap);
-            RenderingServer.MultimeshInstanceSetColor(r.rid, r.instance, new Color(0, 0, 0, r.layerTextureMaterial));
+            RenderingServer.MultimeshInstanceSetColor(r.rid, r.instance, new Color(0, 0, 0, r.layerTextureMaterial)); // y esto y hacerlo en la creacion directa por que no se vuelve a usar
         }
     }
 }

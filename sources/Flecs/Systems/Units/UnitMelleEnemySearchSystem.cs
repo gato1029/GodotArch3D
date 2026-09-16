@@ -92,7 +92,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                 search.Timer -= times * search.Interval;
                 // 🔥 👇 AQUI VA EL STAGGERING 👇
                 int group = melle.numberUnitMelle & mask;
-                //if (group != frame) continue;
+                if (group != frame) continue; 
 
                 // 🔥 SOLO UNA QUERY (optimización crítica)
                 int count = dynGrid.QueryNodesBoundedClosestLayersFiltered(

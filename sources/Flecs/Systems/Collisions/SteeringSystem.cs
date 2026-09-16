@@ -36,6 +36,7 @@ public class SteeringSystem : FlecsSystemBase
     }
     protected override void OnIter(Iter it)
     {
+        
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
         var sim = world.Simulation.Tick;

@@ -136,13 +136,5 @@ internal class ProjectileMoveSystem : FlecsSystemBase
             }
         }
     }
-    private void ApplyDamage(World world, Entity target, int damage)
-    {
-        if (!target.IsAlive() && !target.Has<DestroyRequestTag>() && !target.Has<DeadTag>())
-            return;
 
-        int dmgAmount = damage;           
-        target.Set(new DamagePendingComponent { Amount = dmgAmount });
-        
-    }
 }

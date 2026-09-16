@@ -70,15 +70,31 @@ public class ArrowPoolService
     {
         while (_pendingSpawns.TryDequeue(out var req))
         {
-            if (!_pool.TryPop(out var arrowEntity))
+            if (req.TargetData.Target.IsAlive() && !req.TargetData.Target.Has<DeadTag>())
             {
-                arrowEntity = _world.Entity();
+                if (!_pool.TryPop(out var arrowEntity))
+                {
+                    arrowEntity = _world.Entity();
+                }
+                if (arrowEntity.Has<RenderGPUComponent>())
+                {
+                    var gpu = arrowEntity.Ensure<RenderGPUComponent>();
+                    if (gpu.instance!=-1) // quedo sucia debemos limpiarla
+                    {
+                        AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                        gpu.rid = default;
+                        gpu.instance = -1;
+                    }
+                }
+
+                arrowEntity.Set(new ProjectilePositionComponent { Position = req.Position });
+                arrowEntity.Set(new ProjectileVelocityComponent { Velocity = req.Velocity });
+                arrowEntity.Set(req.TargetData);
+                arrowEntity.Add<ActiveProjectileTag>();
             }
 
-            arrowEntity.Set(new ProjectilePositionComponent { Position = req.Position });
-            arrowEntity.Set(new ProjectileVelocityComponent { Velocity = req.Velocity });
-            arrowEntity.Set(req.TargetData);
-            arrowEntity.Add<ActiveProjectileTag>();
+
+                        
         }
     }
 
@@ -90,9 +106,14 @@ public class ArrowPoolService
             // Limpieza segura de componentes visuales si la flecha llegó a renderizarse
             if (arrowEntity.Has<RenderGPUComponent>())
             {
-                var gpu = arrowEntity.Get<RenderGPUComponent>();                
-                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid,gpu.instance);
-                arrowEntity.Remove<RenderGPUComponent>();
+                ref var gpu = ref arrowEntity.Ensure<RenderGPUComponent>();
+                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                gpu.rid = default;
+                gpu.instance = -1;
+                
+                
+                
+                //arrowEntity.Remove<RenderGPUComponent>();
                 arrowEntity.Remove<RenderTransformComponent>();
                 arrowEntity.Remove<RenderFrameDataComponent>();
 

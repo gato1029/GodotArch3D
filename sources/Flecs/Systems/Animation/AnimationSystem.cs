@@ -1,5 +1,6 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Globals;
@@ -24,7 +25,10 @@ internal class AnimationSystem : FlecsSystemBase
 
     protected override void OnIter(Iter it)
     {
-        
+        var world = it.World().GetCtx<BlackyWorld>();
+        if (world == null) return;
+        var sim = world.Simulation.Tick;
+  
         var animation = it.Field<AnimationComponent>(0);
         var dir = it.Field<DirectionComponent>(1);
         var frameArray = it.Field<RenderFrameDataComponent>(2);
