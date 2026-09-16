@@ -132,7 +132,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
 
             if (unitB.health<=0)
             {
-                stateComponentB.currentType = StateType.DIE;             
+                stateComponentB.currentType = systems.StateType.DIE;             
             }
         }
 
@@ -144,7 +144,7 @@ namespace GodotEcsArch.sources.managers.Behaviors
             unitB.healthBase -= unitA.damageBase;
             if (unitB.healthBase <= 0)
             {
-                unitB.characterStateType = CharacterStateType.DIE;
+                unitB.characterStateType = Characters.StateType.DIE;
             }
         }
     }

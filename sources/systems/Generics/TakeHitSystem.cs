@@ -45,7 +45,7 @@ namespace GodotEcsArch.sources.systems.Combat
                     ref TakeHitComponent takeHit = ref Unsafe.Add(ref pointerTakeHit, i);
 
                     // Cambiar estado a animación de recibir golpe
-                    character.characterStateType = CharacterStateType.TAKE_HIT;
+                    character.characterStateType = managers.Characters.StateType.TAKE_HIT;
                     character.hitStunTimer = takeHit.stunTime;
                     //GD.Print($"Entidad {entity.Id} entra en estado TAKE_HIT por {takeHit.stunTime}s");
 

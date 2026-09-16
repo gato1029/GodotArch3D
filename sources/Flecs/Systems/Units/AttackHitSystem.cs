@@ -23,7 +23,7 @@ internal class AttackHitSystem : FlecsSystemBase
     {
         qb.With<AttackPendingComponent>()
             .With<AnimationComponent>()
-            .With<CharacterComponent>()
+            .With<StateComponent>()
             .With<MeleeAttackComponent>()
             .With<PositionComponent>()
             .With<ColliderComponent>()
@@ -36,7 +36,7 @@ internal class AttackHitSystem : FlecsSystemBase
     {
         var atkArray = it.Field<AttackPendingComponent>(0);
         var aniArray = it.Field<AnimationComponent>(1);
-        var chaArray = it.Field<CharacterComponent>(2);
+        var chaArray = it.Field<StateComponent>(2);
         var melleArray = it.Field<MeleeAttackComponent>(3);
         var posArray = it.Field<PositionComponent>(4);
         var colArray = it.Field<ColliderComponent>(5);
@@ -50,12 +50,12 @@ internal class AttackHitSystem : FlecsSystemBase
             ref var pos = ref posArray[i];
             ref var col = ref colArray[i];
 
-            if (atk.Active && cha.characterStateType == GodotEcsArch.sources.managers.Characters.CharacterStateType.IDLE)
+            if (atk.Active && cha.stateType == GodotEcsArch.sources.managers.Characters.StateType.IDLE)
             {
-                cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.ATTACK;
+                cha.stateType = GodotEcsArch.sources.managers.Characters.StateType.ATTACK;
                 ani.animationComplete = false;   // empezar de nuevo
             }
-            if (atk.Active && ani.animationComplete && cha.characterStateType == GodotEcsArch.sources.managers.Characters.CharacterStateType.ATTACK)
+            if (atk.Active && ani.animationComplete && cha.stateType == GodotEcsArch.sources.managers.Characters.StateType.ATTACK)
             {
                 
                 //
@@ -117,14 +117,14 @@ internal class AttackHitSystem : FlecsSystemBase
                     
                     atk.Target = default;
                     atk.Active = false;
-                    cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.IDLE;
+                    cha.stateType = GodotEcsArch.sources.managers.Characters.StateType.IDLE;
                     
                 }
                 else
                 {
                     atk.Target = default;
                     atk.Active = false;
-                    cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.IDLE;
+                    cha.stateType = GodotEcsArch.sources.managers.Characters.StateType.IDLE;
                 }
 
                 

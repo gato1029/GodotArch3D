@@ -57,50 +57,19 @@ internal class ProjectileMovementSystem : FlecsSystemBase
             {
                 var targetPos = projTarget.Target.Get<PositionComponent>();
                 // if es unidad verifico contra el cuerpo
-                var collisionThreshold = projTarget.Target.Get<MoveColliderComponent>().Radius;
+                var collisionThreshold = projTarget.impactThereshold;
 
                 if (pos.Position.DistanceSquaredTo(targetPos.position) <= (collisionThreshold * collisionThreshold))
-                {
-                    // si esta dentro del umbral minimo verifico contra su collider del body
-                    if (projTarget.isUnit)
+                {                        
+                    GlobalData.EventsDamage.Enqueue(new DamageEvent
                     {
-                        ushort idTarget = projTarget.Target.Get<UnitDefinitionComponent>().idTemplate;
-                        if (CheckCollisionWithTargetUnit(pos.Position, targetPos.position, idTarget))
-                        {
-                            GlobalData.EventsDamage.Enqueue(new DamageEvent
-                            {
-                                Target = projTarget.Target,
-                                Amount = projTarget.Damage,
-                            });
-                            arrowPool.EnqueueRecycle(arrowEntity); // 🟢 Seguro en multihilo
-                            continue;
-                        }
-                        else
-                        {                          
-                            arrowPool.EnqueueRecycle(arrowEntity); // 🟢 Seguro en multihilo
-                            continue;
-                        }
-
-                    }
-                    else
-                    {
-                        // el edificio nunca se mueve
-                        GlobalData.EventsDamage.Enqueue(new DamageEvent
-                        {
-                            Target = projTarget.Target,
-                            Amount = projTarget.Damage,
-                        });
-                        arrowPool.EnqueueRecycle(arrowEntity); // 🟢 Seguro en multihilo
-                        continue;
-
-                   
-                    }
-
-                   
+                        Target = projTarget.Target,
+                        Amount = projTarget.Damage,
+                    });
+                    arrowPool.EnqueueRecycle(arrowEntity); // 🟢 Seguro en multihilo
+                    continue;
                 }
-
-                
-             
+                             
             }
 
             // 3. Comprobar si la flecha llegó a su distancia máxima de recorrido sin impactar
@@ -115,38 +84,5 @@ internal class ProjectileMovementSystem : FlecsSystemBase
 
         }
     }
-
-    private bool CheckCollisionWithTargetBuild(Vector2 point, Vector2 targetPos, ushort templateId)
-    {
-        var template = BlackyPalletesPersistence.buildingPalette.GetData(templateId);
   
-        foreach (var item in template.bodyColliders)
-        {
-            FastCollider fast = item;
-            if (CollisionMathHelper.PointCheck(point.X, point.Y, targetPos.X, targetPos.Y, ref fast
-            ))
-            {
-                return true;
-            }
-        }
-        return false;
-   
-    }
-
-    private bool CheckCollisionWithTargetUnit(Vector2 point, Vector2 targetPos, ushort templateId)
-    {
-        var template = BlackyPalletesPersistence.characterPalette.GetData(templateId);
-        foreach (var item in template.bodyColliders)
-        {
-            FastCollider fast = item;
-            if (CollisionMathHelper.PointCheck(point.X,point.Y,targetPos.X,targetPos.Y, ref fast
-            ))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
 }

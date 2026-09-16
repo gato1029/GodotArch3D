@@ -150,7 +150,7 @@ public class BlackyCharacterCreator
         float z = CommonAtributes.Calculate(depthOffset, height, layer, position);
 
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
-        transform.Origin = new Godot.Vector3(position.X, position.Y, z);
+        transform.Origin = new Godot.Vector3(position.X + originOffset.X, position.Y + originOffset.Y, z);
         transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
 
         entity.Set(new RenderTransformComponent(transform));
@@ -158,10 +158,11 @@ public class BlackyCharacterCreator
         entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = moveData.uvFramesArray[0] });
 
-        entity.Set(new GodotFlecs.sources.Flecs.Components.CharacterComponent
+        entity.Set(new GodotFlecs.sources.Flecs.Components.StateComponent
         {
-            characterStateType = CharacterStateType.IDLE,
-            characterBehaviorType = CharacterBehaviorType.PERSONAJE_PRINCIPAL
+            stateType = StateType.IDLE,
+            behaviorType = BehaviorType.PERSONAJE_PRINCIPAL,
+            lastStateType = StateType.BLOCKED
         });
 
         entity.Set(new TeamComponent(1));
@@ -211,9 +212,9 @@ public class BlackyCharacterCreator
 
         float depthOffset = moveData.yDepthRenderFormat;
         float z = CommonAtributes.Calculate(depthOffset, height, layer, position);
-
+        
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
-        transform.Origin = new Godot.Vector3(position.X, position.Y, z);
+        transform.Origin = new Godot.Vector3(position.X+ originOffset.X, position.Y+ originOffset.Y, z);
         transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
 
         entity.Set(new RenderTransformComponent(transform));
@@ -221,10 +222,11 @@ public class BlackyCharacterCreator
         entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = moveData.uvFramesArray[0] });
 
-        entity.Set(new GodotFlecs.sources.Flecs.Components.CharacterComponent
+        entity.Set(new StateComponent
         {
-            characterStateType = CharacterStateType.IDLE,
-            characterBehaviorType = CharacterBehaviorType.GENERICO
+            stateType = StateType.IDLE,
+            behaviorType = BehaviorType.GENERICO,
+            lastStateType = StateType.BLOCKED
         });
 
         entity.Set(new TeamComponent(2));
@@ -233,17 +235,17 @@ public class BlackyCharacterCreator
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, animationDir.directionAnimationType, GodotEcsArch.sources.components.AnimationDirection.LEFT));
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3f, new Vector2(0, 0)));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0));
-
+        entity.Add<StoppedTag>();
         entity.Add<UseBoidTag>();
         entity.Set(new HealthComponent(100));
 
         float rvoRadius = MeshCreator.PixelsToUnits(16);
-        float radiusSearchEnemy = MeshCreator.PixelsToUnits(128);
+        float radiusSearchEnemy = MeshCreator.PixelsToUnits(256);
 
         if (characterBaseData.unitAttackType == UnitAttackType.CUERPO)
         {
             entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 1f, 0,ContadoresHelper.Obtener(TipoContador.UnidadesMelle)));
-            entity.Set(new EnemySearchComponent(radiusSearchEnemy, 2, 0));
+            entity.Set(new EnemySearchComponent(radiusSearchEnemy, 1, 0));
             entity.Set(new MelleAttackThereshold(characterBaseData.colliderUmbralAtaque.Width));
         }
         else
@@ -251,7 +253,7 @@ public class BlackyCharacterCreator
             entity.Set(new RangedAttackComponent(characterBaseData.idMod, characterBaseData.idProjectile, 20, 10f, 1f, 0, true, 6, ContadoresHelper.Obtener(TipoContador.EdificiosUnidadesRango)));
         }
 
-        entity.Set(new AttackPendingComponent(false, default,false,Vector2.Zero));
+        entity.Set(new AttackPendingComponent(false, default,false,Vector2.Zero,0));
         entity.Set(new SteeringComponent(rvoRadius, 2, Vector2.Zero));
 
         AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody,2);

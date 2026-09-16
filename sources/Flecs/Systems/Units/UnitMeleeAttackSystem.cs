@@ -26,7 +26,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
     {
         qb.With<PositionComponent>()
         .With<SpatialIDComponent>()
-        .With<Components.CharacterComponent>()
+        .With<Components.StateComponent>()
         .With<MeleeAttackComponent>()
         .With<TeamComponent>()
         .With<AttackPendingComponent>()
@@ -46,7 +46,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
 
         var posArray = it.Field<PositionComponent>(0);
         var spaArray = it.Field<SpatialIDComponent>(1);
-        var charArray = it.Field<Components.CharacterComponent>(2);
+        var charArray = it.Field<Components.StateComponent>(2);
         var melleArray = it.Field<MeleeAttackComponent>(3);
         var teamArray = it.Field<TeamComponent>(4);
         var attackPendArray = it.Field<AttackPendingComponent>(5);
@@ -69,7 +69,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
             {
                 melle.Timer -= it.DeltaTime();
             }
-            if (cha.characterStateType == CharacterStateType.EXECUTE_ATTACK)
+            if (cha.stateType == StateType.EXECUTE_ATTACK)
             {
                 if (atp.Active && atp.Target.IsAlive() && !atp.Target.Has<DeadTag>())
                 {
@@ -91,7 +91,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                         else
                         {
                             // si no hubo collision quiere decir que no hay objetivo y libero
-                            cha.characterStateType = CharacterStateType.IDLE;
+                            cha.stateType = StateType.IDLE;
                             atp.Active = false;
                             atp.Target = default;
                         }
@@ -112,7 +112,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                         else
                         {
                             // si no hubo collision quiere decir que no hay objetivo y libero
-                            cha.characterStateType = CharacterStateType.IDLE;
+                            cha.stateType = StateType.IDLE;
                             atp.Active = false;
                             atp.Target = default;
                         }
@@ -122,7 +122,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                 else
                 {
                     // si esta muerto libero target
-                    cha.characterStateType = CharacterStateType.IDLE;
+                    cha.stateType = StateType.IDLE;
                     atp.Active = false;
                     atp.Target = default; 
                     ent.Remove<AttackPendingTag>();
@@ -134,12 +134,12 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
             {
                 if (atp.Active && atp.Target.IsAlive() && !atp.Target.Has<DeadTag>())
                 {
-                    cha.characterStateType = CharacterStateType.ATTACK;
+                    cha.stateType = StateType.ATTACK;
                     melle.Timer = melle.Cooldown;
                 }
                 else
                 {
-                    cha.characterStateType = CharacterStateType.IDLE;
+                    cha.stateType = StateType.IDLE;
                     atp.Active = false;
                     atp.Target = default;
                     ent.Remove<AttackPendingTag>();

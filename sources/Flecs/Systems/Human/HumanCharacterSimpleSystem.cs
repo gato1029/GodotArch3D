@@ -21,7 +21,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PlayerInputComponent>()
-            .With<GodotFlecs.sources.Flecs.Components.CharacterComponent>()
+            .With<GodotFlecs.sources.Flecs.Components.StateComponent>()
             .With<PositionComponent>()
             .With<DirectionComponent>()
             .With<VelocityComponent>()
@@ -43,7 +43,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
         var dynGrid = world.State.DynamicHash;
 
         var playerArray = it.Field<PlayerInputComponent>(0);
-        var charArray = it.Field<GodotFlecs.sources.Flecs.Components.CharacterComponent>(1);
+        var charArray = it.Field<GodotFlecs.sources.Flecs.Components.StateComponent>(1);
         var posArray = it.Field<PositionComponent>(2);
         var dirArray = it.Field<DirectionComponent>(3);
         var velArray = it.Field<VelocityComponent>(4);
@@ -78,16 +78,16 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
                 // aqui ira el rango
             }
 
-            if (!isAtack && chara.characterStateType != CharacterStateType.DIE)
+            if (!isAtack && chara.stateType != StateType.DIE)
             {
-                chara.characterStateType = CharacterStateType.IDLE;
+                chara.stateType = StateType.IDLE;
                 HandleMovement(ref player, ref chara, ref pos, ref dir, ref vel, ref moveRes, it.DeltaTime(), ref steeringData);
             }            
         }
     }
     private bool HandleAttackMelle(Entity entity,
     ref PlayerInputComponent input,
-    ref GodotFlecs.sources.Flecs.Components.CharacterComponent character,
+    ref GodotFlecs.sources.Flecs.Components.StateComponent character,
     ref MeleeAttackComponent attack,
     ref PositionComponent position,
     ref DirectionComponent direction,            
@@ -104,7 +104,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
             attack.Timer -= deltaTime;
             return false;
         }
-        if (character.characterStateType == CharacterStateType.EXECUTE_ATTACK)
+        if (character.stateType == StateType.EXECUTE_ATTACK)
         {   
             attack.Timer = attack.Cooldown; // inicia cooldown
             ExecuteAttack(entity, position, attack, teamComponent, direction,dynGrid, spatialId);            
@@ -112,10 +112,10 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
             return true;
         }
         // --- Inicio del ataque ---
-        if (input.attackPressed && character.characterStateType != CharacterStateType.EXECUTE_ATTACK)
+        if (input.attackPressed && character.stateType != StateType.EXECUTE_ATTACK)
         {            
             input.isAttack = true;
-            character.characterStateType = CharacterStateType.ATTACK;
+            character.stateType = StateType.ATTACK;
             return true;
         }
       
@@ -222,7 +222,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
     }
     private void HandleMovement(
       ref PlayerInputComponent input,
-      ref GodotFlecs.sources.Flecs.Components.CharacterComponent character,
+      ref GodotFlecs.sources.Flecs.Components.StateComponent character,
       ref PositionComponent position,
       ref DirectionComponent direction, // opcional (puedes quitarlo)
       ref VelocityComponent velocity,
@@ -231,7 +231,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
       ref SteeringComponent steeringData)
     {
         // 1. Si hay input y no estamos bloqueados, mandamos la intención al steering
-        if (input.moveDirection != Vector2.Zero && character.characterStateType != CharacterStateType.BLOCKED)
+        if (input.moveDirection != Vector2.Zero && character.stateType != StateType.BLOCKED)
         {
             Vector2 moveDir = input.moveDirection.Normalized();
 
@@ -239,7 +239,7 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
             // Ya no tocamos velocity.prefVel aquí, lo hará el SteeringSystem.
             steeringData.DesiredDir = moveDir;
 
-            character.characterStateType = CharacterStateType.MOVING;
+            character.stateType = StateType.MOVING;
             moveRes.Blocked = false;
         }
         else
@@ -248,9 +248,9 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
             steeringData.DesiredDir = Vector2.Zero;
 
             // Limpiamos la velocidad si el SteeringSystem no está corriendo o para frenado inmediato
-            if (character.characterStateType == CharacterStateType.MOVING)
+            if (character.stateType == StateType.MOVING)
             {
-                character.characterStateType = CharacterStateType.IDLE;
+                character.stateType = StateType.IDLE;
                 // Opcional: velocity.prefVel = Vector2.Zero; 
                 // Aunque el SteeringSystem lo hará solo al ver DesiredDir en Zero.
             }

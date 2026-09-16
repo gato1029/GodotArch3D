@@ -25,7 +25,8 @@ internal class MoveTargetAttackMelleSystem:FlecsSystemBase
           .With<AttackPendingComponent>()
           .With<MeleeAttackComponent>()
           .With<MoveColliderComponent>()
-          .With<MoveTargetComponent>()          
+          .With<MoveTargetComponent>() 
+          .Without<StoppedTag>()
           .Without<AttackPendingTag>()
           .Without<DeadTag>();
     }

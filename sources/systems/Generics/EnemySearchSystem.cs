@@ -85,7 +85,7 @@ namespace GodotEcsArch.sources.systems.Combat
                     // reseteo cooldown normal
                     search.cooldownSearch = 0.05f;
 
-                    if (character.characterStateType == CharacterStateType.IDLE)
+                    if (character.characterStateType == managers.Characters.StateType.IDLE)
                     {
                         Entity target = FindNearestEnemy(self, position.position, search.radius, team.team);
                         if (target != Entity.Null)

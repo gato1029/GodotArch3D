@@ -40,9 +40,9 @@ public class MoveRadiusCharacter2D : ICharacterMoveBehavior
         }
         else
         {
-            if (characterComponent.characterStateType != CharacterStateType.ATTACK &&characterComponent.characterStateType != CharacterStateType.TAKE_HIT && characterComponent.characterStateType != CharacterStateType.EXECUTE_ATTACK && characterComponent.characterStateType != CharacterStateType.DIE && characterComponent.characterStateType != CharacterStateType.TAKE_STUN)
+            if (characterComponent.characterStateType != Characters.StateType.ATTACK && characterComponent.characterStateType != Characters.StateType.TAKE_HIT && characterComponent.characterStateType != Characters.StateType.EXECUTE_ATTACK && characterComponent.characterStateType != Characters.StateType.DIE && characterComponent.characterStateType != Characters.StateType.TAKE_STUN)
             {
-                Move(entity, ref characterComponent, ref unitMovementComponent, ref positionComponent, ref directionComponent, ref characterBehaviorComponent, delta, batchIndex,numBatches);
+                Move(entity, ref characterComponent, ref unitMovementComponent, ref positionComponent, ref directionComponent, ref characterBehaviorComponent, delta, batchIndex, numBatches);
             }
             
         }

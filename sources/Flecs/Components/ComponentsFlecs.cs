@@ -70,8 +70,8 @@ public record struct AttackPendingComponent
     bool Active,
     Entity Target,
     bool isUnit,
-    Vector2 targetPosition
-    
+    Vector2 targetPosition,
+    float impactThereshold
 );
 
 [RegisterComponentFlecs]
@@ -257,8 +257,8 @@ public record struct AnimationComponent
 (
    long idSpriteOrAnimation,
    EntityType entityType,
-   AnimationType stateAnimation,
-   AnimationType lastStateAnimation,
+   AnimationType animationType,
+   AnimationType lastAnimationType,
    int currentFrameIndex,
    float TimeSinceLastFrame,
    float frameDuration,
@@ -330,10 +330,11 @@ public struct PlayerInputComponent
 }
 
 [RegisterComponentFlecs]
-public record struct CharacterComponent
+public record struct StateComponent
 {
-    public CharacterStateType characterStateType;
-    public CharacterBehaviorType characterBehaviorType;                   
+    public StateType lastStateType;
+    public StateType stateType;
+    public BehaviorType behaviorType;                   
 }
 
 [RegisterComponentFlecs]
@@ -410,7 +411,7 @@ public struct ProjectileTargetComponent
     public Vector2 Origin;
     public Vector2 Destination;
     public float TotalDistance;
-    public bool isUnit;
+    public float impactThereshold;
 }
 
 [RegisterComponentFlecs]

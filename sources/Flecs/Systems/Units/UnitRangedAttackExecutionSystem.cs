@@ -83,7 +83,7 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
                         Origin = pos.position,
                         Destination = targetPos.position,
                         TotalDistance = totalDist,
-                        isUnit = atp.isUnit
+                        impactThereshold = atp.impactThereshold
                     }
                 );
             }

@@ -22,7 +22,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
     public class CharacterModelBaseData : IdDataLong
     {        
         public long idTileSpriteData { get; set; }
-        public CharacterBehaviorType characterBehaviorType { get; set; }
+        public BehaviorType characterBehaviorType { get; set; }
         public CharacterType characterType { get; set; }
         public UnitDirectionType unitDirectionType { get; set; }
         public UnitType unitType { get; set; }

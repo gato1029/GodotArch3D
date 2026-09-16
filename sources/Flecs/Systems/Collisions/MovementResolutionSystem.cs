@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CharacterComponent = GodotFlecs.sources.Flecs.Components.CharacterComponent;
+using StateComponent = GodotFlecs.sources.Flecs.Components.StateComponent;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Collisions;
 
@@ -26,7 +26,7 @@ public class MovementResolutionSystem : FlecsSystemBase
         qb.With<PositionComponent>()
             .With<VelocityComponent>() // 🔥 ahora necesario
             .With<MoveResolutorComponent>()
-            .With<CharacterComponent>()
+            .With<StateComponent>()
             .With<UnitTag>()
             .Without<StoppedTag>();
     }
@@ -40,7 +40,7 @@ public class MovementResolutionSystem : FlecsSystemBase
         var posArray = it.Field<PositionComponent>(0);
         var velArray = it.Field<VelocityComponent>(1);
         var moveArray = it.Field<MoveResolutorComponent>(2);
-        var chaArray = it.Field<CharacterComponent>(3);
+        var chaArray = it.Field<StateComponent>(3);
 
         float dt = (float)it.DeltaTime(); // 🎨 movimiento
         float tick = sim?.FixedDelta ?? 0f;
@@ -58,7 +58,7 @@ public class MovementResolutionSystem : FlecsSystemBase
             ref var move = ref moveArray[i];
             ref var cha = ref chaArray[i];
 
-            if (cha.characterStateType != CharacterStateType.MOVING) //solo mover si el estado es MOVING
+            if (cha.stateType != StateType.MOVING) //solo mover si el estado es MOVING
             {
                 continue;
             }
@@ -71,7 +71,7 @@ public class MovementResolutionSystem : FlecsSystemBase
             if (!isMoving)
             {
                 move.Blocked = true;
-                cha.characterStateType = CharacterStateType.IDLE;
+                cha.stateType = StateType.IDLE;
 
                 // 🔥 timer determinista sin loop
                 move.BlockedTimer += totalTickTime;

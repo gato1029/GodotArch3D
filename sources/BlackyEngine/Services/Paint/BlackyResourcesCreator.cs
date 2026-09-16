@@ -166,7 +166,7 @@ public class BlackyResourcesCreator
         entity.Set(new ResourceDefinitionComponent(idResource, spriteId));
         entity.Set(new HealthComponent(templateResource.health));
 
-        spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition));
+        spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition),false);
 
         AsignarCollider(tilePosition.X, tilePosition.Y, entity, sprite);
         occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, sprite.tilesOcupancy, entity.Id.Value);

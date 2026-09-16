@@ -24,13 +24,13 @@ public class MelleAtack2D : ICharacterAttackBehavior
         ref DirectionComponent directionComponent = ref entity.Get<DirectionComponent>();
         ref PositionComponent positionComponent = ref entity.Get<PositionComponent>();
         
-        if ((characterComponent.characterStateType == CharacterStateType.IDLE || characterComponent.characterStateType == CharacterStateType.MOVING ) && AtackIsPosible(entity, positionComponent, directionComponent, characterComponent, characterCommonBehaviorComponent,delta, batchIndex,numBatches))
+        if ((characterComponent.characterStateType == Characters.StateType.IDLE || characterComponent.characterStateType == Characters.StateType.MOVING ) && AtackIsPosible(entity, positionComponent, directionComponent, characterComponent, characterCommonBehaviorComponent, delta, batchIndex, numBatches))
         {
-            characterComponent.characterStateType = CharacterStateType.ATTACK;            
+            characterComponent.characterStateType = Characters.StateType.ATTACK;            
         }
         else
         {
-            if (characterComponent.characterStateType == CharacterStateType.EXECUTE_ATTACK)
+            if (characterComponent.characterStateType == Characters.StateType.EXECUTE_ATTACK)
             {
                 ExecuteAtack(entity, positionComponent, directionComponent, characterComponent, ref characterCommonBehaviorComponent);
             }

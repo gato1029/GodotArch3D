@@ -41,18 +41,18 @@ internal class AnimationLayerUpdateSystem : FlecsSystemBase
                 var animationData = AnimationCache.GetAnimation(
                     a.idSpriteOrAnimation,
                     a.entityType,                   
-                    a.stateAnimation, 
+                    a.animationType, 
                     d
                 );
 
                 // Si cambió el estado de animación → reiniciar
-                if (a.lastStateAnimation != a.stateAnimation)
+                if (a.lastAnimationType != a.animationType)
                 {
                     a.TimeSinceLastFrame = 0f;
                     a.animationComplete = false;
                     a.currentFrameIndex = 1;
                     a.active = true;
-                    a.lastStateAnimation = a.stateAnimation;
+                    a.lastAnimationType = a.animationType;
                     a.frameDuration = animationData.frameDuration;
 
                     f.uvMap =animationData.uvFramesArray[0];                    

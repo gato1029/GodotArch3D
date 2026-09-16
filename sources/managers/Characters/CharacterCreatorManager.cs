@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.managers.Characters;
 
-public enum CharacterStateType
+public enum StateType
 {
     IDLE,
     MOVING,
@@ -41,8 +41,8 @@ public enum CharacterStateType
 [Component]
 public struct CharacterComponent
 {
-    public CharacterStateType characterStateType;    
-    public CharacterBehaviorType behaviorType;
+    public StateType characterStateType;    
+    public BehaviorType behaviorType;
     public int idCharacterBaseData; // CharacterModelBaseData
     public int healthBase;
     public int damageBase;

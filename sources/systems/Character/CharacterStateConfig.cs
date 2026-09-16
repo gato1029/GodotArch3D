@@ -1,99 +1,78 @@
-// Define reglas por personaje
 using GodotEcsArch.sources.managers.Characters;
 using GodotFlecs.sources.Flecs.Components;
-using System;
-using System.Collections.Generic;
 
 public class CharacterStateRules
 {
-    public Func<GodotFlecs.sources.Flecs.Components.CharacterComponent, GodotFlecs.sources.Flecs.Components.AnimationComponent, CharacterStateType>? OnAnimationComplete;
-    public Dictionary<CharacterStateType, AnimationType> StateToAnimation = new();
+    // Función normal de transición de estados
+    public StateType GetNextState(GodotFlecs.sources.Flecs.Components.StateComponent character, AnimationComponent anim)
+    {
+        return character.stateType switch
+        {
+            StateType.ATTACK => StateType.EXECUTE_ATTACK,
+            StateType.EXECUTE_ATTACK => StateType.ATTACK,
+            StateType.TAKE_HIT => StateType.IDLE,
+            StateType.TAKE_STUN => StateType.IDLE,
+            StateType.DIE => StateType.DIE,
+            StateType.BLOCKED => StateType.IDLE,
+            _ => character.stateType
+        };
+    }
+
+    // Reemplazamos el Dictionary por un arreglo plano indexado por el enum (CharacterStateType)
+    public AnimationType[] AnimationMap;
 }
 
-// Configuración centralizada
 public static class CharacterStateConfig
 {
-    private static Dictionary<CharacterBehaviorType, CharacterStateRules> _rulesByCharacter = new();
+    // Usamos un arreglo plano en lugar de un Dictionary. 
+    // El tamaño debe ser igual o mayor al número total de elementos en el enum CharacterBehaviorType.
+    private static readonly CharacterStateRules[] _rulesArray = new CharacterStateRules[16];
 
     static CharacterStateConfig()
     {
-        // Reglas del PersonajePrincipal (id = 1)
-        rulePersonajePrincipal();
-        ruleEstadoComun();
-        
-    }
-    private static void ruleEstadoComun()
-    {
-        _rulesByCharacter[CharacterBehaviorType.GENERICO] = new CharacterStateRules
+        // 1. Configurar Reglas para GENERICO
+        var genericRules = new CharacterStateRules
         {
-            OnAnimationComplete = (character, anim) =>
-            {
-                return character.characterStateType switch
-                {
-                    CharacterStateType.ATTACK => CharacterStateType.EXECUTE_ATTACK,
-                    CharacterStateType.EXECUTE_ATTACK => CharacterStateType.ATTACK,
-                    CharacterStateType.TAKE_HIT => CharacterStateType.IDLE,
-                    CharacterStateType.TAKE_STUN => CharacterStateType.IDLE,
-                    CharacterStateType.DIE => CharacterStateType.DIE,
-                    CharacterStateType.BLOCKED => CharacterStateType.IDLE,// se queda en DIE, se destruye luego
-                    _ => character.characterStateType
-                };
-            },
-            StateToAnimation = new Dictionary<CharacterStateType, AnimationType>
-                {
-                    { CharacterStateType.IDLE,  AnimationType.PARADO  },
-                    { CharacterStateType.MOVING, AnimationType.CAMINANDO },
-                    { CharacterStateType.ATTACK, AnimationType.ATACANDO_CUERPO },               
-                    { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
-                     { CharacterStateType.EXECUTE_ATTACK, AnimationType.NINGUNA }, 
-                    { CharacterStateType.TAKE_STUN, AnimationType.STUNEADO },
-                    { CharacterStateType.DIE, AnimationType.MUERTO },
-                }
+            AnimationMap = new AnimationType[16] // Tamaño basado en el número de estados
         };
-    }
-    private static void rulePersonajePrincipal()
-    {
-        _rulesByCharacter[CharacterBehaviorType.PERSONAJE_PRINCIPAL] = new CharacterStateRules
+
+        // Asignamos directamente por índice numérico del enum (Cero hashmaps)
+        genericRules.AnimationMap[(int)StateType.IDLE] = AnimationType.PARADO;
+        genericRules.AnimationMap[(int)StateType.MOVING] = AnimationType.CAMINANDO;
+        genericRules.AnimationMap[(int)StateType.ATTACK] = AnimationType.ATACANDO_CUERPO;
+        genericRules.AnimationMap[(int)StateType.TAKE_HIT] = AnimationType.RECIBE_DANIO;
+        genericRules.AnimationMap[(int)StateType.EXECUTE_ATTACK] = AnimationType.NINGUNA;
+        genericRules.AnimationMap[(int)StateType.TAKE_STUN] = AnimationType.STUNEADO;
+        genericRules.AnimationMap[(int)StateType.DIE] = AnimationType.MUERTO;
+
+        // 2. Configurar Reglas para PERSONAJE_PRINCIPAL
+        var principalRules = new CharacterStateRules
         {
-            OnAnimationComplete = (character, anim) =>
-            {
-                return character.characterStateType switch
-                {
-                    CharacterStateType.ATTACK => CharacterStateType.EXECUTE_ATTACK,
-                    CharacterStateType.EXECUTE_ATTACK => CharacterStateType.ATTACK,
-                    CharacterStateType.TAKE_HIT => CharacterStateType.IDLE,
-                    CharacterStateType.DIE => CharacterStateType.DIE, // se queda en DIE, se destruye luego
-                    _ => character.characterStateType
-                };
-            },
-            StateToAnimation = new Dictionary<CharacterStateType, AnimationType>
-                {
-                    { CharacterStateType.IDLE,  AnimationType.PARADO  },
-                    { CharacterStateType.MOVING, AnimationType.CAMINANDO },
-                    { CharacterStateType.ATTACK, AnimationType.ATACANDO_CUERPO },
-                    { CharacterStateType.EXECUTE_ATTACK, AnimationType.NINGUNA }, // opcional: animación especial // revisar luego para quitarlo
-                    { CharacterStateType.TAKE_HIT, AnimationType.RECIBE_DANIO },
-                    { CharacterStateType.DIE, AnimationType.MUERTO },
-                }
+            AnimationMap = new AnimationType[16]
         };
+
+        principalRules.AnimationMap[(int)StateType.IDLE] = AnimationType.PARADO;
+        principalRules.AnimationMap[(int)StateType.MOVING] = AnimationType.CAMINANDO;
+        principalRules.AnimationMap[(int)StateType.ATTACK] = AnimationType.ATACANDO_CUERPO;
+        principalRules.AnimationMap[(int)StateType.EXECUTE_ATTACK] = AnimationType.NINGUNA;
+        principalRules.AnimationMap[(int)StateType.TAKE_HIT] = AnimationType.RECIBE_DANIO;
+        principalRules.AnimationMap[(int)StateType.DIE] = AnimationType.MUERTO;
+
+        // Guardamos en el arreglo principal usando el enum casteado a entero como índice
+        _rulesArray[(int)BehaviorType.GENERICO] = genericRules;
+        _rulesArray[(int)BehaviorType.PERSONAJE_PRINCIPAL] = principalRules;
     }
 
-    public static CharacterStateRules GetRules(CharacterBehaviorType baseId)
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    public static CharacterStateRules GetRules(BehaviorType baseId)
     {
-        if (_rulesByCharacter.TryGetValue(baseId, out var rules))
-            return rules;
-
-        // Si no hay reglas específicas, usar reglas por defecto
-        return new CharacterStateRules
+        int index = (int)baseId;
+        if (index >= 0 && index < _rulesArray.Length && _rulesArray[index] != null)
         {
-            OnAnimationComplete = (c, a) => c.characterStateType,
-            StateToAnimation = new Dictionary<CharacterStateType, AnimationType>
-                {
-                    { CharacterStateType.IDLE, AnimationType.PARADO  }
-                }
-        };
+            return _rulesArray[index];
+        }
+
+        // Fallback por defecto si no existe
+        return _rulesArray[(int)BehaviorType.GENERICO];
     }
-
-
-
 }

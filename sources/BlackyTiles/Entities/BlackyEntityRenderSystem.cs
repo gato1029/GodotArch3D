@@ -78,8 +78,14 @@ public class BlackyEntityRenderSystem
             if (itemExist)
             {
                 Entity ent = bucket.Entities[i];
-                var gpu = ent.Get<RenderGPUComponent>();
-                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                if (!ent.IsAlive() || ent.Has<DeadTag>())
+                {
+                    continue;
+                }
+                ref var gpu = ref ent.Ensure<RenderGPUComponent>();
+                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance); // liberamos instancia
+                gpu.rid = default;
+                gpu.instance = -1;
 
                 if (ent.Has<SpriteSimpleAnimationTag>())
                 {
@@ -97,12 +103,29 @@ public class BlackyEntityRenderSystem
         for (int i = 0; i < bucket.Exist.Length; i++)
         {
             bool itemExist = bucket.Exist[i];
+            bool isBuilding = bucket.IsBuilding[i];
             if (itemExist)
             {
                 Entity ent = bucket.Entities[i];
-                var rd = ent.Get<ResourceDefinitionComponent>();
+                if (!ent.IsAlive() || ent.Has<DeadTag>())
+                {
+                    continue; // no renderizo por esta muerto
+                }
+                int spriteId = 0;
+                if (isBuilding)
+                {
+                    var bd = ent.Get<BuildingDefinitionComponent>();
+                    spriteId = bd.idSpriteTemplateNormal;
+                  
+                }
+                else
+                {
+                    var rd = ent.Get<ResourceDefinitionComponent>();
+                    spriteId = rd.idSpriteTemplate;
+                }
+                                
                 var pos = ent.Get<PositionComponent>();
-                int spriteId =rd.idSpriteTemplate;
+                
 
                 AtlasModsManager.TryGetTileSprite(spriteId, out var sprite);
                 switch (sprite.tileSpriteType)

@@ -25,7 +25,7 @@ internal class DeathCleanupSystem : FlecsSystemBase
         qb.With<RenderGPUComponent>()
         .With<SpatialIDComponent>()
         .With<DeathTimerComponent>()
-        .With<CharacterComponent>()   // solo para unidades     
+        .With<StateComponent>()   // solo para unidades     
         .With<DeadTag>();
     }
 
@@ -119,7 +119,11 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                 ref var gpu = ref gpuArray[i];
                 ref var spatial = ref spatialArray[i];
                 ref var  pos = ref posArray[i];
-                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                if (gpu.instance!=-1)
+                {
+                    AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                }
+                
                 staticGrid.FreeCollider(spatial.Value); // todo edificio deberia tener su collider
                 
                 if (entity.Has<RvoAgentDebugComponent>())

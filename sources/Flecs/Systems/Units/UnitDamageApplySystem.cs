@@ -19,7 +19,7 @@ internal class UnitDamageApplySystem : FlecsSystemBase
     {
         qb.With<HealthComponent>()
           .With<DamagePendingComponent>()
-          .With<CharacterComponent>()
+          .With<StateComponent>()
           
           .Without<DeadTag>()
           .Write(Ecs.Wildcard);
@@ -29,7 +29,7 @@ internal class UnitDamageApplySystem : FlecsSystemBase
     {
         var hpArray = it.Field<HealthComponent>(0);
         var dmgArray = it.Field<DamagePendingComponent>(1);
-        var chaArray = it.Field<CharacterComponent>(2);
+        var chaArray = it.Field<StateComponent>(2);
         
         for (int i = 0; i < it.Count(); i++)
         {
@@ -39,11 +39,11 @@ internal class UnitDamageApplySystem : FlecsSystemBase
            
 
             hp.value -= dmg.Amount;
-            cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.TAKE_HIT;
+            cha.stateType = GodotEcsArch.sources.managers.Characters.StateType.TAKE_HIT;
             if (hp.value <= 0)
             {
                 hp.value = 0;
-                cha.characterStateType = GodotEcsArch.sources.managers.Characters.CharacterStateType.DIE;
+                cha.stateType = GodotEcsArch.sources.managers.Characters.StateType.DIE;
                 it.Entity(i).Add<DeadTag>();
                 it.Entity(i).Set(new DeathTimerComponent { RemainingTime = 2f }); // ⏱ 2 segundos, por ejemplo
                 if (dmg.Source!=default && dmg.Source.IsAlive() && dmg.Source.Has<AttackPendingComponent>())

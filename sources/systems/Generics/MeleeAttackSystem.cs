@@ -78,7 +78,7 @@ public class MeleeAttackSystem : BaseSystem<World, float>
                     //{
                     //    _commandBuffer.Add<PendingDestroyComponent>(candidate.target);
                     //}
-                    character.characterStateType = CharacterStateType.IDLE;
+                    character.characterStateType = managers.Characters.StateType.IDLE;
                     _commandBuffer.Remove<MeleeTargetCandidateComponent>(entity);
                     continue;
                 }
@@ -99,7 +99,7 @@ public class MeleeAttackSystem : BaseSystem<World, float>
 
                 if (pos.position.DistanceTo(positionTarget) > attack.attackRange * 1)
                 {
-                    character.characterStateType = CharacterStateType.IDLE;
+                    character.characterStateType = managers.Characters.StateType.IDLE;
                     _commandBuffer.Remove<MeleeTargetCandidateComponent>(entity);
                     continue;
                 }
@@ -110,13 +110,13 @@ public class MeleeAttackSystem : BaseSystem<World, float>
                 // ⚔️ Si está en rango y listo para atacar
                 if (distance <= ran)
                 {// 🔹 Esperar a que termine la animación antes de ejecutar ataque
-                    character.characterStateType = CharacterStateType.ATTACK;
+                    character.characterStateType = managers.Characters.StateType.ATTACK;
                     if (anim.animationComplete)
                     {
                        
 
                         ApplyDamage(entity, candidate.target, attack.damage);
-                        character.characterStateType = CharacterStateType.IDLE;
+                        character.characterStateType = managers.Characters.StateType.IDLE;
                     }
                     
                 }

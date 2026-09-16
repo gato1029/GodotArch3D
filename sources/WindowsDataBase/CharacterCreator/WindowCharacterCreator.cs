@@ -22,7 +22,7 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         ButtonSave.Pressed += ButtonSave_Pressed;
         ButtonSearch.Pressed += ButtonSearch_Pressed;
 
-        foreach (CharacterBehaviorType type in Enum.GetValues(typeof(CharacterBehaviorType)))
+        foreach (BehaviorType type in Enum.GetValues(typeof(BehaviorType)))
         {
             OptionButtonBehavior.AddItem(type.ToString());
         }
@@ -68,7 +68,7 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
 
     private void OptionButtonBehavior_ItemSelected(long index)
     {
-        if (OptionButtonBehavior.GetSelectedId() == (int)CharacterBehaviorType.GENERICO)
+        if (OptionButtonBehavior.GetSelectedId() == (int)BehaviorType.GENERICO)
         {
             VBoxContainerUnits.Visible = true;
         }
@@ -106,7 +106,7 @@ public partial class WindowCharacterCreator : Window,IFacadeWindow<CharacterMode
         objectData.damageDataArray = PanelAtaque.GetAllData().ToArray();
         objectData.defenseDataArray = PanelDefensa.GetAllData().ToArray();
 
-        objectData.characterBehaviorType = (CharacterBehaviorType)OptionButtonBehavior.GetSelectedId();
+        objectData.characterBehaviorType = (BehaviorType)OptionButtonBehavior.GetSelectedId();
         objectData.characterType = (CharacterType)OptionButtonType.GetSelectedId();
         objectData.unitType = (UnitType)OptionButtonUnitType.GetSelectedId();
         objectData.unitDirectionType = (UnitDirectionType)OptionButtonUnitDirectionType.GetSelectedId();

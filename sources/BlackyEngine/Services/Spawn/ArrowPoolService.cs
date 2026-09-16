@@ -90,8 +90,7 @@ public class ArrowPoolService
             // Limpieza segura de componentes visuales si la flecha llegó a renderizarse
             if (arrowEntity.Has<RenderGPUComponent>())
             {
-                var gpu = arrowEntity.Get<RenderGPUComponent>();
-
+                var gpu = arrowEntity.Get<RenderGPUComponent>();                
                 AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid,gpu.instance);
                 arrowEntity.Remove<RenderGPUComponent>();
                 arrowEntity.Remove<RenderTransformComponent>();

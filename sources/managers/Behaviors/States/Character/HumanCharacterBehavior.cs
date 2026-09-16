@@ -31,27 +31,27 @@ public class HumanCharacterBehavior : ICharacterBehavior
         switch (characterComponent.characterStateType)
         {
             
-            case CharacterStateType.IDLE:
+            case Characters.StateType.IDLE:
                  animation.stateAnimation = 0;
                 break;
-            case CharacterStateType.MOVING:
+            case Characters.StateType.MOVING:
                  animation.stateAnimation = 1;            
                 break;
-            case CharacterStateType.ATTACK:
+            case Characters.StateType.ATTACK:
                 characterComponent.speedAtackBase =-0.08f;
                 animation.stateAnimation = 2;                                
                 if (animation.animationComplete)
                 {
-                    characterComponent.characterStateType = CharacterStateType.EXECUTE_ATTACK;          
+                    characterComponent.characterStateType = Characters.StateType.EXECUTE_ATTACK;          
                     
                 }
          
                 break;
-            case CharacterStateType.EXECUTE_ATTACK:
-                characterComponent.characterStateType = CharacterStateType.IDLE;                
+            case Characters.StateType.EXECUTE_ATTACK:
+                characterComponent.characterStateType = Characters.StateType.IDLE;                
                 break;
             
-            case CharacterStateType.TAKE_HIT:
+            case Characters.StateType.TAKE_HIT:
                 
                 animation.stateAnimation = 4;
                 //if (animation.animationComplete)
@@ -64,12 +64,12 @@ public class HumanCharacterBehavior : ICharacterBehavior
                 // Si ya pasó el tiempo de "stun", volvemos a IDLE
                 if (characterComponent.hitStunTimer <= 0f)
                 {
-                    characterComponent.characterStateType = CharacterStateType.IDLE;
+                    characterComponent.characterStateType = Characters.StateType.IDLE;
                 }
                 break;
-            case CharacterStateType.TAKE_STUN:
+            case Characters.StateType.TAKE_STUN:
                 break;
-            case CharacterStateType.DIE:
+            case Characters.StateType.DIE:
                 animation.stateAnimation = 3;
                 if (animation.animationComplete)
                 {
@@ -89,7 +89,7 @@ public class HumanCharacterBehavior : ICharacterBehavior
         ref VelocityComponent  velocityComponent = ref entity.Get<VelocityComponent>();
         ref CharacterAtackComponent characterAtackComponent = ref entity.Get<CharacterAtackComponent>();
 
-        CharacterStateType stateCharacter = characterComponent.characterStateType;
+        Characters.StateType stateCharacter = characterComponent.characterStateType;
 
 
         Vector2 moveDirection = Vector2.Zero;
@@ -108,12 +108,12 @@ public class HumanCharacterBehavior : ICharacterBehavior
         if (Input.IsActionPressed("attack"))
         {
             characterAtackComponent.isAttack = true;
-            characterComponent.characterStateType = CharacterStateType.ATTACK;
+            characterComponent.characterStateType = Characters.StateType.ATTACK;
             attack = true;
         }
         if (Input.IsActionJustReleased("attack"))
         {
-            characterComponent.characterStateType = CharacterStateType.IDLE;
+            characterComponent.characterStateType = Characters.StateType.IDLE;
         
             characterAtackComponent.isAttack = false;
             attack = false;
@@ -129,13 +129,13 @@ public class HumanCharacterBehavior : ICharacterBehavior
             //    //characterAtackComponent.isAttack = true;
             //}
 
-            if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING) && moveDirection == Vector2.Zero)
+            if ((stateCharacter == Characters.StateType.IDLE || stateCharacter == Characters.StateType.MOVING) && moveDirection == Vector2.Zero)
             {
-                characterComponent.characterStateType = CharacterStateType.IDLE;
+                characterComponent.characterStateType = Characters.StateType.IDLE;
 
             }
 
-            if ((stateCharacter == CharacterStateType.IDLE || stateCharacter == CharacterStateType.MOVING ) && moveDirection != Vector2.Zero)
+            if ((stateCharacter == Characters.StateType.IDLE || stateCharacter == Characters.StateType.MOVING ) && moveDirection != Vector2.Zero)
             {
                 moveDirection = moveDirection.Normalized();
                 Move(entity, moveDirection, ref characterComponent, ref characterBehaviorComponent, ref positionComponent, ref directionComponent, velocityComponent, delta);
@@ -143,11 +143,11 @@ public class HumanCharacterBehavior : ICharacterBehavior
         }
         else
         {
-            if (stateCharacter == CharacterStateType.EXECUTE_ATTACK)
+            if (stateCharacter == Characters.StateType.EXECUTE_ATTACK)
             {
                 GD.Print("ataque");
                 Atack(entity, characterComponent, positionComponent, directionComponent);
-                characterComponent.characterStateType = CharacterStateType.IDLE;
+                characterComponent.characterStateType = Characters.StateType.IDLE;
             }
         }
           

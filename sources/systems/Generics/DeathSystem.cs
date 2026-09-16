@@ -45,9 +45,9 @@ internal class DeathSystem : BaseSystem<World, float>
                 ref CharacterAnimationComponent anim = ref Unsafe.Add(ref pointerAnim, i);
 
                 // 🔹 Cambiar estado a DIE si aún no lo está
-                if (character.characterStateType != CharacterStateType.DIE)
+                if (character.characterStateType != StateType.DIE)
                 {
-                    character.characterStateType = CharacterStateType.DIE;
+                    character.characterStateType = StateType.DIE;
                     //anim.stateAnimation = 3; // asumiendo que 3 es animación de morir
                     //anim.currentFrameIndex = 0;
                     //anim.TimeSinceLastFrame = 0f;

@@ -5,7 +5,7 @@ using GodotEcsArch.sources.managers.Characters;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
-using CharacterComponent = GodotFlecs.sources.Flecs.Components.CharacterComponent;
+using StateComponent = GodotFlecs.sources.Flecs.Components.StateComponent;
 
 
 namespace GodotEcsArch.sources.Flecs.Systems.Generic;
@@ -19,7 +19,7 @@ public class DirectionSystem : FlecsSystemBase
     {
         qb.With<VelocityComponent>()
           .With<DirectionComponent>()
-          .With<CharacterComponent>()
+          .With<StateComponent>()
           .With<SteeringComponent>() // <--- Añadimos esto
           .Without<DeadTag>()
           .Without<StoppedTag>();
@@ -29,7 +29,7 @@ public class DirectionSystem : FlecsSystemBase
     {
         var velArray = it.Field<VelocityComponent>(0);
         var dirArray = it.Field<DirectionComponent>(1);
-        var chaArray = it.Field<CharacterComponent>(2);
+        var chaArray = it.Field<StateComponent>(2);
         var steerArray = it.Field<SteeringComponent>(3); // <---
         for (int i = 0; i < it.Count(); i++)
         {
@@ -39,7 +39,7 @@ public class DirectionSystem : FlecsSystemBase
             ref var steer = ref steerArray[i];
             // Dentro del loop de DirectionSystem
             ref var steering = ref steerArray[i];
-            if (cha.characterStateType != CharacterStateType.MOVING)
+            if (cha.stateType != StateType.MOVING)
             {
                 continue;
             }
@@ -82,15 +82,15 @@ public class DirectionSystem : FlecsSystemBase
                 }
 
                 if (vel.desiredVel.LengthSquared() > 0.01f)
-                    cha.characterStateType = CharacterStateType.MOVING;
+                    cha.stateType = StateType.MOVING;
                 else
-                    cha.characterStateType = CharacterStateType.IDLE;
+                    cha.stateType = StateType.IDLE;
                 //cha.characterStateType = managers.Characters.CharacterStateType.MOVING;
             }
             else
             {
                 // 🔹 sin movimiento
-                cha.characterStateType = managers.Characters.CharacterStateType.IDLE;
+                cha.stateType = managers.Characters.StateType.IDLE;
 
                 // ❗ opcional: NO tocar dir.value para mantener última dirección
             }

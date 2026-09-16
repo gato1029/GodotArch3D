@@ -31,11 +31,12 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
         qb.With<PositionComponent>()
           .With<SpatialIDComponent>()
           .With<TeamComponent>()
-          .With<CharacterComponent>()
+          .With<StateComponent>()
           .With<EnemySearchComponent>()
           .With<MoveResolutorComponent>()
           .With<MeleeAttackComponent>()
           .With<DirectionComponent>()
+          .With<StoppedTag>()
           .Without<MoveTargetComponent>()
           .Without<PlayerInputComponent>()
           .Without<DeadTag>()
@@ -56,7 +57,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
         var posArray = it.Field<PositionComponent>(0);
         var spatialArray = it.Field<SpatialIDComponent>(1);
         var teamArray = it.Field<TeamComponent>(2);
-        var charArray = it.Field<CharacterComponent>(3);
+        var charArray = it.Field<StateComponent>(3);
         var searchArray = it.Field<EnemySearchComponent>(4);        
         var moveResolutorArray = it.Field<MoveResolutorComponent>(5);
         var melleArray = it.Field<MeleeAttackComponent>(6);
@@ -91,7 +92,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                 search.Timer -= times * search.Interval;
                 // 🔥 👇 AQUI VA EL STAGGERING 👇
                 int group = melle.numberUnitMelle & mask;
-                if (group != frame) continue;
+                //if (group != frame) continue;
 
                 // 🔥 SOLO UNA QUERY (optimización crítica)
                 int count = dynGrid.QueryNodesBoundedClosestLayersFiltered(
@@ -185,7 +186,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                     if (inRange)
                     {
                         //ataca directamente
-                            e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos));
+                            e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos,0));
                             e.Add<AttackPendingTag>();
                     }
                     else
@@ -194,7 +195,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                         moveResolutor.BlockedTimer = 0f;
                         e.Set(new MoveTargetComponent(targetPos));
                         e.Remove<StoppedTag>();
-                        e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos));
+                        e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos,0));
                     }
                     
                 }

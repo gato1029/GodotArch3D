@@ -103,6 +103,7 @@ public class BlackyBuildingCreator
 
     private void InternalExecuteCreation(ushort idBuilding, Vector2I tilePosition, int height)
     {
+        ushort team = 1;
         var templateBuilding = BlackyPalletesPersistence.buildingPalette.GetData(idBuilding);
         if (templateBuilding == null) return;
 
@@ -135,13 +136,13 @@ public class BlackyBuildingCreator
         Vector2 position = TilesHelper.TilePositionToWorldPosition(tilePosition);
 
         entity.Set(new PositionComponent { position = position, tilePosition = tilePosition, height = height });
-        entity.Set(new TeamComponent(1));
+        entity.Set(new TeamComponent(team));
         entity.Set(new BuildingDefinitionComponent(idBuilding, spriteIdNormal, spriteIdConstruccion, spriteIdDestruccion));
         entity.Set(new HealthComponent(templateBuilding.MaxHealth));
         //entity.Set(new MelleAttackThereshold(spriteNormal.fastColliderUmbralAtaque.Width));
-        spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition));
+        spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition),true);
 
-        AsignarCollider(tilePosition.X, tilePosition.Y, entity, spriteNormal,out int idDebugBody);
+        AsignarCollider(tilePosition.X, tilePosition.Y, entity, spriteNormal,out int idDebugBody,team);
         occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, spriteNormal.tilesOcupancy, entity.Id.Value);
         entity.Set(new RvoAgentDebugComponent(0, idDebugBody, 0, 0));
         // Renderizado
@@ -217,7 +218,7 @@ public class BlackyBuildingCreator
             }
         }
 
-        entity.Set(new AttackPendingComponent(false, default,false,Vector2.Zero));
+        entity.Set(new AttackPendingComponent(false, default,false,Vector2.Zero,0));
         entity.Set(new RangedAttackComponent
         {
             idMod = templateBuilding.idMod,
@@ -280,7 +281,7 @@ public class BlackyBuildingCreator
         entity.Add<SpriteSimpleAnimationTag>();
     }
 
-    private int AsignarCollider(int mundoX, int mundoY, Entity entity, TileSpriteData tileSpriteData, out  int idDebugBody)
+    private int AsignarCollider(int mundoX, int mundoY, Entity entity, TileSpriteData tileSpriteData, out  int idDebugBody, ushort team)
     {
         idDebugBody = -1;
         if (tileSpriteData.fastCollidersBody.Count == 0) return 0;
@@ -323,7 +324,7 @@ public class BlackyBuildingCreator
             }
         }
 
-        staticHash.RegisterStatic(idCollider, entity, minX, minY, maxX, maxY);
+        staticHash.RegisterStatic(idCollider, entity, minX, minY, maxX, maxY,team);
 
         entity.Set(new SpatialIDComponent
         {

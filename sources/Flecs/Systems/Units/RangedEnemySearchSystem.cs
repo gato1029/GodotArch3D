@@ -99,9 +99,9 @@ internal class RangedEnemySearchSystem : FlecsSystemBase
                     // 🔥 1. Verifica que esté viva ANTES de extraer componentes
                     if (!targetEntity.IsAlive() || targetEntity.Has<DeadTag>()) continue;
 
-                    // 🔥 2. Ahora es seguro consultar sus componentes
-                    var otherTeam = targetEntity.Get<TeamComponent>();
-                    if (team.TeamId == otherTeam.TeamId) continue;
+                    //// 🔥 2. Ahora es seguro consultar sus componentes
+                    //var otherTeam = targetEntity.Get<TeamComponent>();
+                    //if (team.TeamId == otherTeam.TeamId) continue;
 
                     // 🔥 3. Validar si el objetivo está realmente dentro del rango de ataque
                     // (Asumiendo que PositionComponent tiene un campo 'position' de tipo Vector2 o Vector3)
@@ -112,7 +112,8 @@ internal class RangedEnemySearchSystem : FlecsSystemBase
 
                     if (distSqr > rangeSqr) continue; // Fuera de rango, pasamos al siguiente vecino
                     existTarget = true;
-                    e.Set(new AttackPendingComponent(true, targetEntity,true, targetPos));
+                    float impactThereshold = targetEntity.Get<MoveColliderComponent>().Radius;
+                    e.Set(new AttackPendingComponent(true, targetEntity,true, targetPos,impactThereshold));
                     e.Add<AttackPendingTag>();
                     break;
                 }
@@ -141,7 +142,8 @@ internal class RangedEnemySearchSystem : FlecsSystemBase
                             float distSqr = pos.position.DistanceSquaredTo(targetPos);
 
                             if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
-                            e.Set(new AttackPendingComponent(true, targetEntity, false, targetPos));
+                            float impactThereshold = 0.5f;
+                            e.Set(new AttackPendingComponent(true, targetEntity, false, targetPos,impactThereshold));
                             e.Add<AttackPendingTag>();
 
                             existTarget = true;

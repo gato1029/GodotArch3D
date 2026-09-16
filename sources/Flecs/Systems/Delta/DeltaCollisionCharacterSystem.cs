@@ -16,7 +16,7 @@ internal class DeltaCollisionCharacterSystem : FlecsSystemBase
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
-            .With<CharacterComponent>()
+            .With<StateComponent>()
             .With<ColliderComponent>()
             .With<MoveResolutorComponent>()
             .Without<DeadTag>();
@@ -25,7 +25,7 @@ internal class DeltaCollisionCharacterSystem : FlecsSystemBase
     protected override void OnIter(Iter it)
     {
         var posArray = it.Field<PositionComponent>(0);
-        var charArray = it.Field<CharacterComponent>(1);
+        var charArray = it.Field<StateComponent>(1);
         var colArray = it.Field<ColliderComponent>(2);
 
 

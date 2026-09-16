@@ -22,11 +22,10 @@ internal class ApplyDamageSystem : FlecsSystemBase
 
     protected override void OnIter(Iter it)
     {
-        while (GlobalData.EventsDamage.Count > 0)
+        // TryDequeue saca el elemento y devuelve true si había uno, o false si está vacía.
+        while (GlobalData.EventsDamage.TryDequeue(out var ev))
         {
-            DamageEvent ev = GlobalData.EventsDamage.Dequeue();
-            
-            // ✅ Procesá el evento fuera del lock (para no bloquear otros hilos)
+            // ✅ Procesá el evento de forma segura
             if (ev.Target.IsAlive() &&
                 !ev.Target.Has<DestroyRequestTag>() &&
                 !ev.Target.Has<DeadTag>())
@@ -38,6 +37,6 @@ internal class ApplyDamageSystem : FlecsSystemBase
                 });
             }
         }
-       
+
     }
 }

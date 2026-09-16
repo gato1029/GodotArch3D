@@ -14,7 +14,7 @@ public class BlackySpatialEntityMap
 {
     private readonly Dictionary<Vector2I, BlackyChunkEntityBucket> buckets = new();
 
-    public void Add(Entity entity, Vector2I chunk)
+    public void Add(Entity entity, Vector2I chunk, bool isBuilding)
     {
         if (!buckets.TryGetValue(chunk, out var bucket))
         {
@@ -27,7 +27,7 @@ public class BlackySpatialEntityMap
         spatial.Chunk = chunk;
         spatial.IndexInBucket = bucket.Count;
 
-        bucket.Add(entity, ref spatial);
+        bucket.Add(entity, ref spatial,isBuilding);
     }
 
     public void Remove(Entity entity)
@@ -47,7 +47,7 @@ public class BlackySpatialEntityMap
         }
     }
 
-    public void Move(Entity entity, Vector2I newChunk)
+    public void Move(Entity entity, Vector2I newChunk, bool isBuilding)
     {
         ref var spatial = ref entity.Ensure<SpatialComponent>();
 
@@ -74,7 +74,7 @@ public class BlackySpatialEntityMap
         }
 
         spatial.Chunk = newChunk;
-        newBucket.Add(entity, ref spatial);
+        newBucket.Add(entity, ref spatial,isBuilding);
     }
 
     public BlackyChunkEntityBucket GetBucket(Vector2I chunk)

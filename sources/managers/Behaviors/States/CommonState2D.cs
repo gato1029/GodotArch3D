@@ -17,23 +17,23 @@ public class CommonState2D : ICharacterStateBehavior
     {
         switch (characterComponent.characterStateType)
         {
-            case CharacterStateType.IDLE:
+            case StateType.IDLE:
                 animation.stateAnimation = 0;
                 break;
-            case CharacterStateType.MOVING:
+            case StateType.MOVING:
                 animation.stateAnimation = 1;
                 break;
-            case CharacterStateType.EXECUTE_ATTACK:
-                characterComponent.characterStateType = CharacterStateType.IDLE;
+            case StateType.EXECUTE_ATTACK:
+                characterComponent.characterStateType = StateType.IDLE;
                 break;
-            case CharacterStateType.ATTACK:
+            case StateType.ATTACK:
                 animation.stateAnimation = 2;
                 if (animation.animationComplete)
                 {
-                    characterComponent.characterStateType = CharacterStateType.EXECUTE_ATTACK;
+                    characterComponent.characterStateType = StateType.EXECUTE_ATTACK;
                 }
                 break;
-            case CharacterStateType.TAKE_HIT:
+            case StateType.TAKE_HIT:
                 animation.stateAnimation = 4;
                 //if (animation.animationComplete)
                 //{                  
@@ -44,17 +44,17 @@ public class CommonState2D : ICharacterStateBehavior
                 // Si ya pasó el tiempo de "stun", volvemos a IDLE
                 if (characterComponent.hitStunTimer <= 0f)
                 {
-                    characterComponent.characterStateType = CharacterStateType.IDLE;
+                    characterComponent.characterStateType = StateType.IDLE;
                 }
                 break;
-            case CharacterStateType.TAKE_STUN:
+            case StateType.TAKE_STUN:
                 animation.stateAnimation = 5;
                 if (animation.animationComplete)
                 {
-                    characterComponent.characterStateType = CharacterStateType.IDLE;
+                    characterComponent.characterStateType = StateType.IDLE;
                 }
                 break;
-            case CharacterStateType.DIE:
+            case StateType.DIE:
                 animation.stateAnimation = 3;
                 if (animation.animationComplete)
                 {

@@ -15,7 +15,7 @@ public enum CharacterType
     NPC,
     ENEMIGO
 }
-public enum CharacterBehaviorType   
+public enum BehaviorType   
 {
     NINGUNO,
     PERSONAJE_PRINCIPAL,

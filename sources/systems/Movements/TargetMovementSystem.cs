@@ -64,30 +64,30 @@ public class TargetMovementSystem : BaseSystem<World, float>
                 {
                     continue;
                 }
-                if ((character.characterStateType == CharacterStateType.BLOCKED))
+                if ((character.characterStateType == managers.Characters.StateType.BLOCKED))
                 {
-                    character.characterStateType = CharacterStateType.IDLE;
+                    character.characterStateType = managers.Characters.StateType.IDLE;
                     _commandBuffer.Remove<TargetPositionComponent>(entity);
                     return;
                 }
-                if (character.characterStateType == CharacterStateType.IDLE || character.characterStateType == CharacterStateType.MOVING)
+                if (character.characterStateType == managers.Characters.StateType.IDLE || character.characterStateType == managers.Characters.StateType.MOVING)
                 {
 
-                
-                
-                Vector2 dir = targetPos.targetPosition - position.position;
+
+
+                    Vector2 dir = targetPos.targetPosition - position.position;
                 float distance = dir.Length();
 
                 if (distance <= targetPos.arrivalThreshold)
                 {
                     // ✅ Llegó al destino
-                    character.characterStateType = CharacterStateType.IDLE;
-                    _commandBuffer.Remove<TargetPositionComponent>(entity);
+                    character.characterStateType = managers.Characters.StateType.IDLE;
+                        _commandBuffer.Remove<TargetPositionComponent>(entity);
                     continue;
                 }
 
                 dir = dir.Normalized();
-                Vector2 movement = dir * velocity.velocity * _deltaTime;
+                    Vector2 movement = dir * velocity.velocity * _deltaTime;
 
                 // Si va a pasarse, ajustamos exacto al destino
                 if (movement.Length() >= distance)
@@ -95,8 +95,8 @@ public class TargetMovementSystem : BaseSystem<World, float>
                     position.lastPosition = position.position;    // 🔹 guardamos dónde estaba
                     position.position = targetPos.targetPosition;
                     position.positionFuture = targetPos.targetPosition;
-                    character.characterStateType = CharacterStateType.IDLE;
-                    _commandBuffer.Remove<TargetPositionComponent>(entity);
+                    character.characterStateType = managers.Characters.StateType.IDLE;
+                        _commandBuffer.Remove<TargetPositionComponent>(entity);
                 }
                 else
                 {
@@ -109,7 +109,7 @@ public class TargetMovementSystem : BaseSystem<World, float>
                     direction.value = dir;
                     direction.normalized = new Vector2(Math.Sign(dir.X), Math.Sign(dir.Y));
 
-                    character.characterStateType = CharacterStateType.MOVING;
+                    character.characterStateType = managers.Characters.StateType.MOVING;
                     }
                 }
             }

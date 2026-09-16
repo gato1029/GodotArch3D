@@ -200,8 +200,8 @@ public class FlecsManager
         RegisterSystem<TileSpriteTextureTransformSystem>();
 
         // estados
-        RegisterSystem<CharacterStateLayerSystem>();        
-        RegisterSystem<StateCharacterSystem>();
+        //RegisterSystem<CharacterStateLayerSystem>();        
+        //RegisterSystem<StateCharacterSystem>();
 
         // animaciones
         RegisterSystem<AnimationLayerUpdateSystem>();

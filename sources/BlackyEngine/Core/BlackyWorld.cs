@@ -157,7 +157,7 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-        SpawnEnemiesAroundPlayer(1000,20);
+        SpawnEnemiesAroundPlayer(3000,10);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));

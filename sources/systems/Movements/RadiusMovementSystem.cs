@@ -80,7 +80,7 @@ public class RadiusMovementSystem : BaseSystem<World, float>
                     continue;
                 }
 
-                if (character.characterStateType == CharacterStateType.IDLE)
+                if (character.characterStateType == managers.Characters.StateType.IDLE)
                 {
                     switch (radiusMove.mode)
                     {

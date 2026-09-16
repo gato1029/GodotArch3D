@@ -1,6 +1,7 @@
 using Godot;
 using GodotFlecs.sources.Flecs.Components;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +19,5 @@ internal static class GlobalData
     public static Queue<(Vector2I pos, int id)> PendingBuildingQueue = new();
     public static Queue<(Vector3 pos, TileSpriteData)> PendingTileSprite = new();
 
-    public static Queue<DamageEvent> EventsDamage = new();
+    public static ConcurrentQueue<DamageEvent> EventsDamage = new();
 }
