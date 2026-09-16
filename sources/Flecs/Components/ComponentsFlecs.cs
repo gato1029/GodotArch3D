@@ -59,6 +59,11 @@ public record struct DamagePendingComponent
 );
 
 [RegisterComponentFlecs]
+public record struct AmountComponent
+(
+   int value
+);
+[RegisterComponentFlecs]
 public record struct HealthComponent
 (
    int value

@@ -1,6 +1,9 @@
+using Flecs.NET.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
+using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotFlecs.sources.Flecs.Components;
 using MessagePack;
 using Microsoft.VisualBasic;
 using System;
@@ -8,6 +11,47 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
+
+
+// =====================================================
+// ENTIDADES POR REGIÓN (Independiente del Terreno)
+// =====================================================
+
+[MessagePackObject]
+public struct SavedBuildingData
+{
+    [Key(0)] public ushort TemplateId { get; set; }
+    [Key(1)] public int Health { get; set; }
+    [Key(2)] public int LocalX { get; set; }
+    [Key(3)] public int LocalY { get; set; }
+}
+
+[MessagePackObject]
+public struct SavedResourceData
+{
+    [Key(0)] public ushort TemplateId { get; set; }
+    [Key(1)] public int Health { get; set; }
+    [Key(2)] public int Amount { get; set; }
+    [Key(3)] public int LocalX { get; set; }
+    [Key(4)] public int LocalY { get; set; }
+}
+
+[MessagePackObject]
+public class EntityChunkSave
+{
+    [Key(0)] public int ChunkX { get; set; }
+    [Key(1)] public int ChunkY { get; set; }
+    [Key(2)] public List<SavedBuildingData> Buildings { get; set; } = new();
+    [Key(3)] public List<SavedResourceData> Resources { get; set; } = new();
+}
+
+[MessagePackObject]
+public class RegionEntitiesSaveData
+{
+    [Key(0)] public int RegionX { get; set; }
+    [Key(1)] public int RegionY { get; set; }
+    [Key(2)] public List<EntityChunkSave> EntityChunks { get; set; } = new();
+}
 
 // =====================================================
 // TERRAIN
@@ -118,8 +162,7 @@ public class BlackyWorldPersistence
     private readonly BlackySurfaceWorldData _superficiesData;
     private readonly BlackyDecorationWorldData _adornosData;
     private readonly BlackyPathWorldData _caminosData;
-
-    // aun me faltan agregar el de los caminos, decoraciones, superficies
+    private readonly BlackySpatialEntityMap _entidadesMap;
 
     private readonly SaveFormat _format;
 
@@ -130,6 +173,7 @@ public class BlackyWorldPersistence
         BlackySurfaceWorldData superficiesData,
         BlackyDecorationWorldData adornosData,
         BlackyPathWorldData caminosData,
+        BlackySpatialEntityMap entidades,
         SaveFormat format = SaveFormat.Binary)
     {
         this.nameMap = nameMap;
@@ -140,7 +184,7 @@ public class BlackyWorldPersistence
         _adornosData = adornosData;
         _caminosData = caminosData;
         _format = format;
-
+        _entidadesMap = entidades;
         rootPath = path + "\\ " + nameMap;
     }
 
@@ -180,25 +224,121 @@ public class BlackyWorldPersistence
 
     public void SavePalletes(string rootPath)
     {
+        // terreno
         BlackyPalletesPersistence.terrainPalette.Save(rootPath, _format);
         BlackyPalletesPersistence.rampsPalette.Save(rootPath, _format);
         BlackyPalletesPersistence.surfacesPalette.Save(rootPath, _format);
         BlackyPalletesPersistence.decorationsPalette.Save(rootPath, _format);
-        BlackyPalletesPersistence.pathsPalette.Save(rootPath, _format);        
+        BlackyPalletesPersistence.pathsPalette.Save(rootPath, _format);
+
+        //entidades
+        BlackyPalletesPersistence.buildingPalette.Save(rootPath, _format);
+        BlackyPalletesPersistence.resourcesPalette.Save(rootPath, _format);
+        BlackyPalletesPersistence.characterPalette.Save(rootPath, _format);
     }
     public void SaveAllDirtyRegions()
     {
-        
-
         SavePalletes(rootPath);
+        SaveTerrain();
+        SaveEntities();
+    }
 
+    private void SaveEntities()
+    {
+        foreach (var regionCoord in _entidadesMap.GetDirtyRegions())
+        {
+            RegionEntitiesSaveData regionSave = new()
+            {
+                RegionX = regionCoord.X,
+                RegionY = regionCoord.Y
+            };
+
+            foreach (var chunkCoord in _entidadesMap.GetChunksForRegion(regionCoord))
+            {
+                var bucket = _entidadesMap.GetBucket(chunkCoord);
+                if (bucket == null || bucket.Count == 0) continue;
+
+                EntityChunkSave chunkSave = new()
+                {
+                    ChunkX = chunkCoord.X,
+                    ChunkY = chunkCoord.Y
+                };
+
+                for (int i = 0; i < bucket.Count; i++)
+                {
+                    bool isBuilding = bucket.IsBuilding[i];
+                    Entity ent = bucket.Entities[i];
+
+                    if (isBuilding)
+                    {
+                        var bt = ent.Get<BuildingDefinitionComponent>();
+                        var health = ent.Get<HealthComponent>();
+
+                        chunkSave.Buildings.Add(new SavedBuildingData
+                        {
+                            TemplateId = bt.idTemplate,
+                            Health = health.value
+                        });
+                    }
+                    else
+                    {
+                        var res = ent.Get<ResourceDefinitionComponent>();
+                        var health = ent.Get<HealthComponent>();
+                        var amount = ent.Get<AmountComponent>();
+
+                        chunkSave.Resources.Add(new SavedResourceData
+                        {
+                            TemplateId = res.idTemplate,
+                            Health = health.value,
+                            Amount = amount.value
+                        });
+                    }
+                }
+
+                if (chunkSave.Buildings.Count > 0 || chunkSave.Resources.Count > 0)
+                {
+                    regionSave.EntityChunks.Add(chunkSave);
+                }
+            }
+
+            // Guardar en su propio archivo independiente por región (ej: region_0_0_entities.bin)
+            WriteEntitiesRegionToDisk(regionCoord.X, regionCoord.Y, regionSave);
+
+            // Limpiar estado sucio de entidades
+            _entidadesMap.ClearDirtyRegion(regionCoord);
+        }
+    }
+
+    private void WriteEntitiesRegionToDisk(int regionX, int regionY, RegionEntitiesSaveData data)
+    {
+        string regionFolder = Path.Combine(rootPath, "regions");
+        Directory.CreateDirectory(regionFolder);
+
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        string fileName = $"region_{regionX}_{regionY}_entities.{extension}";
+        string fullPath = Path.Combine(regionFolder, fileName);
+
+        byte[] bytes = MessagePackSerializer.Serialize(data);
+
+        if (_format == SaveFormat.Json)
+        {
+            string json = MessagePackSerializer.ConvertToJson(bytes);
+            File.WriteAllText(fullPath, json);
+        }
+        else
+        {
+            File.WriteAllBytes(fullPath, bytes);
+        }
+    }
+    private void SaveTerrain()
+    {
         foreach (var region in _regions.GetDirtyRegions())
         {
             // ============================================
             // BUILD SAVE
             // ============================================
 
-            RegionSaveData save = SaveRegion( region.X, region.Y);
+            RegionSaveData save = SaveRegion(region.X, region.Y);
 
             // ============================================
             // PATH
@@ -273,6 +413,7 @@ public class BlackyWorldPersistence
                 region.Y);
         }
     }
+    
 
     // =====================================================
     // SAVE REGION

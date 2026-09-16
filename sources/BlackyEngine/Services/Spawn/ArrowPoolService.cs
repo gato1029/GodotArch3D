@@ -110,10 +110,7 @@ public class ArrowPoolService
                 AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
                 gpu.rid = default;
                 gpu.instance = -1;
-                
-                
-                
-                //arrowEntity.Remove<RenderGPUComponent>();
+                                                                
                 arrowEntity.Remove<RenderTransformComponent>();
                 arrowEntity.Remove<RenderFrameDataComponent>();
 

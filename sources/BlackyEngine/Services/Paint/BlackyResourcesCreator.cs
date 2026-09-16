@@ -148,7 +148,7 @@ public class BlackyResourcesCreator
         entity = default;
         Vector2 position = TilesHelper.TilePositionToWorldPosition(tilePosition);
 
-        var templateResource = BlackyPalletesPersistence.resourcesPalette.GetData(idResource);
+        ResourceSourceData templateResource = BlackyPalletesPersistence.resourcesPalette.GetData(idResource);
         entity = flecsManager.WorldFlecs.Entity();
 
         long idTileSprite = templateResource.listIdTileSpriteData[0];
@@ -165,6 +165,7 @@ public class BlackyResourcesCreator
         entity.Set(new TeamComponent(0));
         entity.Set(new ResourceDefinitionComponent(idResource, spriteId));
         entity.Set(new HealthComponent(templateResource.health));
+        entity.Set(new AmountComponent(templateResource.amount));
 
         spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition),false);
 
