@@ -45,6 +45,9 @@ public class StaticSpatialGridOptimizedGeneric<T>
     // Node -> Entity ID.
     private readonly int[] _entityIDs;
 
+    // Node -> Team ID (NUEVO: Para identificar la facción/equipo por nodo)
+    private readonly ushort[] _teams;
+
     // Entity ID -> Query ID.
     // Se utiliza para evitar devolver la misma entidad varias veces.
     private readonly int[] _visited;
@@ -112,6 +115,8 @@ public class StaticSpatialGridOptimizedGeneric<T>
 
         _entityIDs = new int[maxNodes];
 
+        _teams = new ushort[maxNodes]; // NUEVO
+
         // Ahora el tamaño corresponde al máximo
         // de ENTIDADES y no al máximo de NODES.
         //
@@ -121,6 +126,7 @@ public class StaticSpatialGridOptimizedGeneric<T>
         Array.Fill(_heads, -1);
         Array.Fill(_next, -1);
         Array.Fill(_entityIDs, -1);
+        Array.Fill(_teams, (ushort)0); // NUEVO
 
         // Reservamos el índice 0.
         _values.Add(default!);
@@ -199,7 +205,8 @@ public class StaticSpatialGridOptimizedGeneric<T>
         float minX,
         float minY,
         float maxX,
-        float maxY)
+        float maxY,
+        ushort team = 0) // NUEVO: Parámetro opcional de equipo
     {
         int id = GetNewEntityId();
 
@@ -209,7 +216,8 @@ public class StaticSpatialGridOptimizedGeneric<T>
             minX,
             minY,
             maxX,
-            maxY);
+            maxY,
+            team);
 
         return id;
     }
@@ -220,7 +228,8 @@ public class StaticSpatialGridOptimizedGeneric<T>
         float minX,
         float minY,
         float maxX,
-        float maxY)
+        float maxY,
+        ushort team = 0) // NUEVO: Parámetro opcional de equipo
     {
         if (id <= 0 || id > _maxEntities)
             throw new ArgumentOutOfRangeException(
@@ -232,8 +241,10 @@ public class StaticSpatialGridOptimizedGeneric<T>
             minX,
             minY,
             maxX,
-            maxY);
+            maxY,
+            team);
     }
+
     public void FreeCollider(int colliderId)
     {
         if (colliderId <= 0 ||
@@ -284,6 +295,7 @@ public class StaticSpatialGridOptimizedGeneric<T>
                         // Liberamos el node.
                         _next[current] = -1;
                         _entityIDs[current] = -1;
+                        _teams[current] = 0; // NUEVO
 
                         _freeNodes.Push(current);
 
@@ -307,13 +319,15 @@ public class StaticSpatialGridOptimizedGeneric<T>
         // El ID puede reutilizarse.
         _freeEntityIds.Push(colliderId);
     }
+
     private void RegisterInternal(
       int id,
       T value,
       float minX,
       float minY,
       float maxX,
-      float maxY)
+      float maxY,
+      ushort team)
     {
         while (_values.Count <= id)
         {
@@ -361,6 +375,7 @@ public class StaticSpatialGridOptimizedGeneric<T>
                 int node = GetNewNode();
 
                 _entityIDs[node] = id;
+                _teams[node] = team; // NUEVO
 
                 _next[node] = _heads[cell];
 
@@ -368,6 +383,7 @@ public class StaticSpatialGridOptimizedGeneric<T>
             }
         }
     }
+
     // ============================================================
     // UNREGISTER
     // ============================================================
@@ -443,6 +459,7 @@ public class StaticSpatialGridOptimizedGeneric<T>
                         // Liberamos el node.
                         _next[current] = -1;
                         _entityIDs[current] = -1;
+                        _teams[current] = 0; // NUEVO
 
                         _freeNodes.Push(current);
 
@@ -457,13 +474,18 @@ public class StaticSpatialGridOptimizedGeneric<T>
     }
 
     // ============================================================
-    // QUERY
+    // QUERY (NUEVO: Ordenado por anillos desde el centro + Filtro de Equipo)
     // ============================================================
 
+    /// <summary>
+    /// Consulta entidades cercanas empezando estrictamente desde el centro hacia afuera (por anillos)
+    /// y opcionalmente ignorando un equipo/facción (ej. para no golpear aliados).
+    /// </summary>
     public IEnumerable<int> QueryNearbyUnique(
         float worldX,
         float worldY,
-        int radius)
+        int radius,
+        ushort teamToIgnore = ushort.MaxValue) // ushort.MaxValue por defecto significa que no se ignora ninguno
     {
         if (radius < 0)
             yield break;
@@ -485,49 +507,73 @@ public class StaticSpatialGridOptimizedGeneric<T>
                 worldX,
                 worldY);
 
-        for (
-            int x = center.X - radius;
-            x <= center.X + radius;
-            x++)
+        // 1. Procesar primero la celda central exacta
+        if (ProcessCell(center.X, center.Y, teamToIgnore, out IEnumerable<int> centralResults))
         {
-            for (
-                int y = center.Y - radius;
-                y <= center.Y + radius;
-                y++)
+            foreach (var id in centralResults) yield return id; // Nota: optimizado abajo para evitar yield overhead redundante si prefieres, pero mantenemos estructura limpia IEnumerable.
+        }
+
+        // 2. Expandir por anillos concéntricos (desde r = 1 hasta radius)
+        for (int r = 1; r <= radius; r++)
+        {
+            // Borde superior e inferior del anillo
+            for (int dx = -r; dx <= r; dx++)
             {
-                int cell =
-                    GetCellIndex(x, y);
+                // Borde superior (Y - r)
+                foreach (int id in GetEntitiesFromCellSafe(center.X + dx, center.Y - r, teamToIgnore))
+                    yield return id;
 
-                if (cell == -1)
-                    continue;
+                // Borde inferior (Y + r)
+                foreach (int id in GetEntitiesFromCellSafe(center.X + dx, center.Y + r, teamToIgnore))
+                    yield return id;
+            }
 
-                int current =
-                    _heads[cell];
+            // Lados izquierdo y derecho del anillo (excluyendo esquinas ya evaluadas)
+            for (int dy = -r + 1; dy <= r - 1; dy++)
+            {
+                // Borde izquierdo (X - r)
+                foreach (int id in GetEntitiesFromCellSafe(center.X - r, center.Y + dy, teamToIgnore))
+                    yield return id;
 
-                while (current != -1)
-                {
-                    int id =
-                        _entityIDs[current];
-
-                    // Seguridad ante nodes inválidos.
-                    if (id > 0 &&
-                        id <= _maxEntities)
-                    {
-                        if (_visited[id] !=
-                            _currentQueryId)
-                        {
-                            _visited[id] =
-                                _currentQueryId;
-
-                            yield return id;
-                        }
-                    }
-
-                    current =
-                        _next[current];
-                }
+                // Borde derecho (X + r)
+                foreach (int id in GetEntitiesFromCellSafe(center.X + r, center.Y + dy, teamToIgnore))
+                    yield return id;
             }
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private IEnumerable<int> GetEntitiesFromCellSafe(int x, int y, ushort teamToIgnore)
+    {
+        int cell = GetCellIndex(x, y);
+        if (cell == -1)
+            yield break;
+
+        int current = _heads[cell];
+        while (current != -1)
+        {
+            int id = _entityIDs[current];
+            ushort entityTeam = _teams[current];
+
+            // Seguridad ante nodes inválidos y filtrado por equipo
+            if (id > 0 && id <= _maxEntities && entityTeam != teamToIgnore)
+            {
+                if (_visited[id] != _currentQueryId)
+                {
+                    _visited[id] = _currentQueryId;
+                    yield return id;
+                }
+            }
+
+            current = _next[current];
+        }
+    }
+
+    private bool ProcessCell(int x, int y, ushort teamToIgnore, out IEnumerable<int> resultsList)
+    {
+        // Wrapper auxiliar para la celda central si se desea procesar inline
+        resultsList = GetEntitiesFromCellSafe(x, y, teamToIgnore);
+        return true;
     }
 
     // ============================================================
@@ -565,13 +611,15 @@ public class StaticSpatialGridOptimizedGeneric<T>
     public IEnumerable<T> QueryNearbyValues(
         float worldX,
         float worldY,
-        int radius)
+        int radius,
+        ushort teamToIgnore = ushort.MaxValue) // NUEVO: Añadido soporte de filtro de equipo aquí también
     {
         foreach (
             int id in QueryNearbyUnique(
                 worldX,
                 worldY,
-                radius))
+                radius,
+                teamToIgnore))
         {
             if (TryGetValue(
                 id,
@@ -599,6 +647,10 @@ public class StaticSpatialGridOptimizedGeneric<T>
         Array.Fill(
             _entityIDs,
             -1);
+
+        Array.Fill(
+            _teams,
+            (ushort)0); // NUEVO
 
         Array.Fill(
             _visited,

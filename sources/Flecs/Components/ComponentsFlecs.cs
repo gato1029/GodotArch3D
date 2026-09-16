@@ -71,6 +71,7 @@ public record struct AttackPendingComponent
     Entity Target,
     bool isUnit,
     Vector2 targetPosition
+    
 );
 
 [RegisterComponentFlecs]
@@ -146,7 +147,7 @@ public record struct EnemySearchComponent
 [RegisterComponentFlecs]
 public record struct TeamComponent
 (
-    int TeamId            // Ej: 0 = player, 1 = enemigos
+    ushort TeamId            // Ej: 0 = player, 1 = enemigos
 );
 
 [RegisterComponentFlecs]
@@ -409,6 +410,7 @@ public struct ProjectileTargetComponent
     public Vector2 Origin;
     public Vector2 Destination;
     public float TotalDistance;
+    public bool isUnit;
 }
 
 [RegisterComponentFlecs]

@@ -94,10 +94,11 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                 if (group != frame) continue;
 
                 // 🔥 SOLO UNA QUERY (optimización crítica)
-                int count = dynGrid.QueryNodesBounded(
+                int count = dynGrid.QueryNodesBoundedClosestLayersFiltered(
                     pos.position.X,
                     pos.position.Y,
                     search.Radius,
+                    team.TeamId,
                     neighbors
                 );
                 bool existTarget = false;
@@ -112,8 +113,8 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
 
                     if (spatial.Value == neighbors[ii]) continue;
 
-                    var otherTeam = targetEntity.Get<TeamComponent>();
-                    if (team.TeamId == otherTeam.TeamId) continue;
+                    //var otherTeam = targetEntity.Get<TeamComponent>();
+                    //if (team.TeamId == otherTeam.TeamId) continue; // el query ya hace este filtro
 
                     if (targetEntity.IsAlive() && !targetEntity.Has<DeadTag>())
                     {
@@ -133,7 +134,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                 {
                     int radius = (int)MathF.Ceiling((search.Radius * 2f) / staticGrid._cellSize);
                     // aqui buscar edificos
-                    foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius))
+                    foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius,team.TeamId))
                     {
                         if (staticGrid.TryGetValue(id, out Entity otherEntity))
                         {

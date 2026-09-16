@@ -82,7 +82,8 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
                         idProjectile = ranged.idProjectile,
                         Origin = pos.position,
                         Destination = targetPos.position,
-                        TotalDistance = totalDist
+                        TotalDistance = totalDist,
+                        isUnit = atp.isUnit
                     }
                 );
             }

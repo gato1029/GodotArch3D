@@ -76,7 +76,7 @@ public class FastSpatialHash
     private readonly Entity[] _entities; // [MaxNodes] -> La entidad guardada en este nodo
     private readonly int[] _spatialIDs;  // [MaxNodes] -> El ID del objeto (para filtrado/borrado)
     private readonly int[] _nodeCellIndexes; // [MaxNodes] -> La celda a la que pertenece este nodo. Útil para Update.
-
+    private readonly ushort[] _teams;    // <--- NUEVO: Almacena el equipo/facción de cada nodo [MaxNodes]
     // Gestión de Nodos
     private int _nextNodeIndex = 0;
     private readonly Stack<int> _freeNodes = new();
@@ -104,11 +104,14 @@ public class FastSpatialHash
         _spatialIDs = new int[maxNodes];
         _nodeCellIndexes = new int[maxNodes];
         _visitedMarks = new int[maxNodes];
+        _teams = new ushort[maxNodes]; // <--- NUEVO
 
         Array.Fill(_heads, -1);
         Array.Fill(_nextNodes, -1);
         Array.Fill(_spatialIDs, -1);
         Array.Fill(_nodeCellIndexes, -1);
+        Array.Fill(_teams, (ushort)0);         // <--- NUEVO
+        Array.Fill(_visitedMarks, 0);
     }
 
     // Función auxiliar para encontrar la siguiente potencia de 2
@@ -126,7 +129,7 @@ public class FastSpatialHash
 
     // --- MÉTODOS DE REGISTRO ---
 
-    public void RegisterDirect(int sid, int tx, int ty, Entity e)
+    public void RegisterDirect(int sid, int tx, int ty, Entity e, ushort team = 0)
     {
         int cell = GetHashDirect(tx, ty, TotalCells);
         int nodeIdx = GetNewNodeIndex();
@@ -134,7 +137,7 @@ public class FastSpatialHash
         _entities[nodeIdx] = e;
         _spatialIDs[nodeIdx] = sid;
         _nodeCellIndexes[nodeIdx] = cell; // Guardamos la celda del nodo
-
+        _teams[nodeIdx] = team; // <--- NUEVO
         // El nuevo nodo se inserta al principio de la lista de la celda
         _nextNodes[nodeIdx] = _heads[cell];
         _heads[cell] = nodeIdx;
@@ -143,7 +146,7 @@ public class FastSpatialHash
         _spatialIDToNodeIndex[sid] = nodeIdx;
     }
 
-    public void Register(int sid, float x, float y, Entity e)
+    public void Register(int sid, float x, float y, Entity e, ushort team = 0)
     {
         int cell = GetHash(x, y, TotalCells);
         int nodeIdx = GetNewNodeIndex();
@@ -151,6 +154,7 @@ public class FastSpatialHash
         _entities[nodeIdx] = e;
         _spatialIDs[nodeIdx] = sid;
         _nodeCellIndexes[nodeIdx] = cell; // Guardamos la celda del nodo
+        _teams[nodeIdx] = team; // <--- NUEVO
 
         _nextNodes[nodeIdx] = _heads[cell];
         _heads[cell] = nodeIdx;
@@ -205,6 +209,7 @@ public class FastSpatialHash
                 _entities[toFree] = default;
                 _spatialIDs[toFree] = -1;
                 _nodeCellIndexes[toFree] = -1; // Limpiamos la celda del nodo
+                _teams[toFree] = 0;
                 _freeNodes.Push(toFree);
 
                 // NOTA IMPORTANTE: Si un Spatial ID (SID) puede tener múltiples entradas en la misma celda,
@@ -331,6 +336,7 @@ public class FastSpatialHash
         _spatialIDToNodeIndex.Clear(); // Limpiamos también el mapeo
         Array.Fill(_spatialIDs, -1); // Limpiar SIDs por si acaso
         Array.Fill(_nodeCellIndexes, -1); // Limpiar celdas por si acaso
+        Array.Fill(_teams, (ushort)0);
     }
 
     public int QueryNodesBounded(
@@ -383,10 +389,156 @@ public class FastSpatialHash
         return count;
     }
 
+    /// <summary>
+    /// Consulta nodos expandiéndose desde el centro hacia afuera por anillos (Capas de celdas).
+    /// No requiere ordenar un arreglo, lo que ahorra ciclos de CPU.
+    /// </summary>
+    public int QueryNodesBoundedClosestLayers(
+        float x, float y, float radius,
+        Span<int> results)
+    {
+        int count = 0;
+        _currentQueryId++;
+
+        if (_currentQueryId == int.MaxValue)
+        {
+            Array.Fill(_visitedMarks, 0);
+            _currentQueryId = 1;
+        }
+
+        int centerX = (int)MathF.Floor(x / tileSizeUnits);
+        int centerY = (int)MathF.Floor(y / tileSizeUnits);
+        int cellRadius = (int)MathF.Ceiling(radius / tileSizeUnits);
+
+        // 1. Procesar primero el centro exacto (Radio 0)
+        if (ProcessCellNodes(GetHashDirect(centerX, centerY, TotalCells), results, ref count))
+            return count;
+
+        // 2. Expandir por anillos (r desde 1 hasta cellRadius)
+        for (int r = 1; r <= cellRadius; r++)
+        {
+            // Borde Superior e Inferior del anillo
+            for (int dx = -r; dx <= r; dx++)
+            {
+                // Celda arriba
+                if (ProcessCellNodes(GetHashDirect(centerX + dx, centerY - r, TotalCells), results, ref count)) return count;
+                // Celda abajo
+                if (ProcessCellNodes(GetHashDirect(centerX + dx, centerY + r, TotalCells), results, ref count)) return count;
+            }
+
+            // Bordes Laterales del anillo (excluyendo esquinas para no duplicar llamadas a hash)
+            for (int dy = -r + 1; dy <= r - 1; dy++)
+            {
+                // Celda izquierda
+                if (ProcessCellNodes(GetHashDirect(centerX - r, centerY + dy, TotalCells), results, ref count)) return count;
+                // Celda derecha
+                if (ProcessCellNodes(GetHashDirect(centerX + r, centerY + dy, TotalCells), results, ref count)) return count;
+            }
+        }
+
+        return count;
+    }
+
+    // Método auxiliar privado para procesar los nodos de una celda y evaluar el corte duro
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ProcessCellNodes(int cell, Span<int> results, ref int count)
+    {
+        int node = _heads[cell];
+        while (node != -1)
+        {
+            if (_visitedMarks[node] != _currentQueryId)
+            {
+                _visitedMarks[node] = _currentQueryId;
+                results[count++] = node;
+
+                // Corte duro si llenamos el buffer
+                if (count == results.Length)
+                    return true; // Retorna true indicando que debemos detenernos por completo
+            }
+            node = _nextNodes[node];
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Consulta nodos por anillos cercanos, discriminando un equipo específico 
+    /// (Ideal para ignorar aliados o buscar enemigos).
+    /// </summary>
+    public int QueryNodesBoundedClosestLayersFiltered(
+        float x, float y, float radius,
+        ushort teamToIgnore, // Equipo que quieres filtrar/ignorar (ej. tus propios aliados)
+        Span<int> results)
+    {
+        int count = 0;
+        _currentQueryId++;
+
+        if (_currentQueryId == int.MaxValue)
+        {
+            Array.Fill(_visitedMarks, 0);
+            _currentQueryId = 1;
+        }
+
+        int centerX = (int)MathF.Floor(x / tileSizeUnits);
+        int centerY = (int)MathF.Floor(y / tileSizeUnits);
+        int cellRadius = (int)MathF.Ceiling(radius / tileSizeUnits);
+
+        // 1. Centro exacto
+        if (ProcessCellNodesFiltered(GetHashDirect(centerX, centerY, TotalCells), teamToIgnore, results, ref count))
+            return count;
+
+        // 2. Expandir por anillos
+        for (int r = 1; r <= cellRadius; r++)
+        {
+            for (int dx = -r; dx <= r; dx++)
+            {
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX + dx, centerY - r, TotalCells), teamToIgnore, results, ref count)) return count;
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX + dx, centerY + r, TotalCells), teamToIgnore, results, ref count)) return count;
+            }
+
+            for (int dy = -r + 1; dy <= r - 1; dy++)
+            {
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX - r, centerY + dy, TotalCells), teamToIgnore, results, ref count)) return count;
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX + r, centerY + dy, TotalCells), teamToIgnore, results, ref count)) return count;
+            }
+        }
+
+        return count;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ProcessCellNodesFiltered(int cell, ushort teamToIgnore, Span<int> results, ref int count)
+    {
+        int node = _heads[cell];
+        while (node != -1)
+        {
+            // Filtramos por equipo antes de marcar o agregar
+            if (_teams[node] != teamToIgnore && _visitedMarks[node] != _currentQueryId)
+            {
+                _visitedMarks[node] = _currentQueryId;
+                results[count++] = node;
+
+                if (count == results.Length)
+                    return true;
+            }
+            node = _nextNodes[node];
+        }
+        return false;
+    }
+    /// <summary>
+    /// Actualiza únicamente el equipo/facción de una entidad ya registrada de forma instantánea O(1).
+    /// </summary>
+    public void UpdateTeam(int sid, ushort newTeam)
+    {
+        if (_spatialIDToNodeIndex.TryGetValue(sid, out int nodeIdx))
+        {
+            _teams[nodeIdx] = newTeam;
+        }
+    }
     // Getters para recorrer desde afuera (Sistemas de colisión)
     public int GetHead(int cell) => _heads[cell];
     public int GetNext(int nodeIdx) => _nextNodes[nodeIdx];
     public Entity GetEntity(int nodeIdx) => _entities[nodeIdx];
     public int GetSpatialID(int nodeIdx) => _spatialIDs[nodeIdx];
+    public ushort GetTeam(int nodeIdx) => _teams[nodeIdx];
 }
 

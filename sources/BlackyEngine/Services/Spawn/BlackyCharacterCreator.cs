@@ -78,7 +78,7 @@ public class BlackyCharacterCreator
         };
     }
 
-    private void AddCollider(Entity entity, Vector2 position, List<FastCollider> collisionBodys, GeometricShape2D collisionFeet, out int idDebugMove, out int idDebugBody)
+    private void AddCollider(Entity entity, Vector2 position, List<FastCollider> collisionBodys, GeometricShape2D collisionFeet, out int idDebugMove, out int idDebugBody, ushort team)
     {
         ShapeType shapeTypePies = ShapeType.Rect;
         float widthPies = 0;
@@ -116,7 +116,7 @@ public class BlackyCharacterCreator
         entity.Set(moveComponent);
         entity.Add<UnitTag>();
 
-        dynamicHash.Register(spatialIDComponent.Value, position.X, position.Y, entity);
+        dynamicHash.Register(spatialIDComponent.Value, position.X, position.Y, entity,team);
 
         if (DEBUG_COLLIDERS)
         {
@@ -179,7 +179,7 @@ public class BlackyCharacterCreator
         entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero));
         entity.Set(new WeaponComponent(1, false));
 
-        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody);
+        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody,1);
 
         int idDebugRangeMelle = CollisionShapeDraw.Instance.DrawCircleShape(colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, Colors.Blue);
 
@@ -254,7 +254,7 @@ public class BlackyCharacterCreator
         entity.Set(new AttackPendingComponent(false, default,false,Vector2.Zero));
         entity.Set(new SteeringComponent(rvoRadius, 2, Vector2.Zero));
 
-        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody);
+        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody,2);
 
         if (DEBUG_COLLIDERS)
         {
