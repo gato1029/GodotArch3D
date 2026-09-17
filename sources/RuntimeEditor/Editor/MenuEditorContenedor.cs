@@ -13,7 +13,15 @@ public partial class MenuEditorContenedor : HBoxContainer
         ButtonGuardarMapa.Pressed += ButtonGuardarMapa_Pressed;
         ButtonGuardarComoMapa.Pressed += ButtonGuardarComoMapa_Pressed;
         ButtonEliminarMapa.Pressed += ButtonEliminarMapa_Pressed;
+        ButtonCargarMapa.Pressed += ButtonCargarMapa_Pressed;
 	}
+
+    private void ButtonCargarMapa_Pressed()
+    {
+        var window = RuntimeServices.NodeRegistry.Create<LoadMapsWindows>();
+        AddChild(window);
+        window.Popup();
+    }
 
     private void ButtonEliminarMapa_Pressed()
     {

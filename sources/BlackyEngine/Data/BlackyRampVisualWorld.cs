@@ -51,9 +51,12 @@ public class BlackyRampVisualWorld : BlackyWorldDataMap<SerializerCellGeneric>
         }
     }
 
-    // =====================================================
-    // SET TILE
-    // =====================================================
+    public void SetDataDirectNoRenderLocal(BlackyChunkCoord coord, int lx, int ly, int h, ushort id)
+    {
+        ref var cell = ref ResolveOrCreateCellLocal(coord, lx, ly, h);
+        cell.id = id;        
+    }
+
     public void SetRamp(int worldX, int worldY, int height, RampsData rampsData, Brush brush)
     {
         ushort id = BlackyPalletesPersistence.rampsPalette.GetIdPersistence(rampsData.nameMod, rampsData.id, out var rampDataPersist);

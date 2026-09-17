@@ -137,6 +137,13 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
         cell.isBorder = isBorder;
     }
 
+    public void SetTerrainDataNoRenderLocal(BlackyChunkCoord coord, int lx, int ly, int h, bool isBorder, ushort id)
+    {
+        ref var cell = ref ResolveOrCreateCellLocal(coord, lx, ly, h);
+        cell.id = id;
+        cell.isBorder = isBorder;
+    }
+
     public void SetTerrainDirectNoRenderLocal(BlackyChunkCoord coord,int lx, int ly, int h, bool isBorder, TerrainBaseData data)
     {
         ref var cell = ref ResolveOrCreateCellLocal(coord,lx,ly, h);

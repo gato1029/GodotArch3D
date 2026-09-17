@@ -49,6 +49,13 @@ public class BlackySurfaceWorldData: BlackyWorldDataMap<SerializerCellGeneric>
     #region Public API: Set & Remove
     public void SetDualTemplate(DualTileTemplate dualTemplate) => _dualTemplate = dualTemplate;
 
+
+    public void SetDataDirectNoRenderLocal(BlackyChunkCoord coord, int lx, int ly, int h, ushort id)
+    {
+        ref var cell = ref ResolveOrCreateCellLocal(coord, lx, ly, h);
+        cell.id = id;
+    }
+
     public void SetSuperficieDirectNoRender(int x, int y, int h, bool isBorder, SuperficieData data)
     {
         ref var cell = ref ResolveOrCreateCell(x, y, h);

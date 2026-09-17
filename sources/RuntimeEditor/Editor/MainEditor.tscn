@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="6_2n80q"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="7_8qgvi"]
 [ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="7_wsd07"]
+[ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="8_0x4a8"]
 [ext_resource type="Texture2D" uid="uid://bol7ivbg2eei" path="res://resources/Textures/iconos/tree.png" id="8_f1fuj"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="10_egwe3"]
 [ext_resource type="Texture2D" uid="uid://4fsf6xnbk6cv" path="res://resources/Textures/iconos/castle-tower.png" id="11_qdd1k"]
@@ -123,6 +124,15 @@ tooltip_text = "Guardar Como"
 focus_mode = 1
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("6_0x4a8")
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonCargarMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=1634986029]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+tooltip_text = "Guardar Como"
+focus_mode = 1
+script = ExtResource("6_2n80q")
+IconTexture = ExtResource("8_0x4a8")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="ButtonEliminarMapa" type="TextureButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=416660920]

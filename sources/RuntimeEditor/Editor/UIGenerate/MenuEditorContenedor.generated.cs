@@ -10,6 +10,7 @@ public partial class MenuEditorContenedor : HBoxContainer
     private KuroButton ButtonNuevoMapa;
     private KuroButton ButtonGuardarMapa;
     private KuroButton ButtonGuardarComoMapa;
+    private KuroButton ButtonCargarMapa;
     private KuroButton ButtonEliminarMapa;
 
     public void InitializeUI()
@@ -17,6 +18,7 @@ public partial class MenuEditorContenedor : HBoxContainer
         ButtonNuevoMapa = GetNode<KuroButton>("ButtonNuevoMapa");
         ButtonGuardarMapa = GetNode<KuroButton>("ButtonGuardarMapa");
         ButtonGuardarComoMapa = GetNode<KuroButton>("ButtonGuardarComoMapa");
+        ButtonCargarMapa = GetNode<KuroButton>("ButtonCargarMapa");
         ButtonEliminarMapa = GetNode<KuroButton>("ButtonEliminarMapa");
     }
 }

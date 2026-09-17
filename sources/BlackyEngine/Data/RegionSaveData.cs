@@ -5,6 +5,7 @@ using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using MessagePack;
@@ -107,8 +108,10 @@ public class TerrainHeightSave
 
     [Key(1)]
     public ushort[] TerrainIds { get; set; }
-}
 
+    [Key(2)]
+    public bool[] TerrainBorders { get; set; } // <--- Nuevo array para los bordes
+}
 [MessagePackObject]
 public class TerrainChunkSave
 {
@@ -221,6 +224,7 @@ public class BlackyWorldPersistence
         BlackyWorldConfig inf,
         SaveFormat format = SaveFormat.Binary)
     {
+        path = CommonAtributes.RutaGuardadoMapas;
         this.nameMap = nameMap;
         _regions = regions;
         _terrainWorld = terrainWorld;
@@ -274,7 +278,7 @@ public class BlackyWorldPersistence
     public List<RegionEntitiesSaveData> LoadAllEntitiesRegions()
     {
         List<RegionEntitiesSaveData> allRegionsData = new();
-        string regionFolder = Path.Combine(rootPath, "regions");
+        string regionFolder = Path.Combine(rootPath, "regionsEntities");
 
         if (!Directory.Exists(regionFolder))
         {
@@ -351,6 +355,52 @@ public class BlackyWorldPersistence
             return MessagePackSerializer.Deserialize<RegionEntitiesSaveData>(data);
         }
     }
+    // =====================================================
+    // LOAD ALL REGIONS (TERRAIN Y CAPAS VISUALES)
+    // =====================================================
+
+    public List<RegionSaveData> LoadAllRegions()
+    {
+        List<RegionSaveData> allRegionsData = new();
+        string regionFolder = Path.Combine(rootPath, "regions");
+
+        if (!Directory.Exists(regionFolder))
+        {
+            return allRegionsData;
+        }
+
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+
+        // Buscamos únicamente los archivos de región principales (excluyendo los que terminan en _entities)
+        // Usamos un patrón como "region_*.*" y luego filtramos para evitar cargar los de entidades por error.
+        string[] files = Directory.GetFiles(regionFolder, $"region_*.{extension}");
+
+        foreach (string filePath in files)
+        {
+            // Omitir los archivos de entidades que siguen el patrón region_X_Y_entities.bin
+            if (filePath.Contains("_entities"))
+            {
+                continue;
+            }
+
+            try
+            {
+                RegionSaveData regionData = LoadRegion(filePath);
+
+                if (regionData != null)
+                {
+                    allRegionsData.Add(regionData);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Opcional: Manejo de errores si algún archivo de región está corrupto
+                // GD.PrintErr($"Error al cargar la región en {filePath}: {ex.Message}");
+            }
+        }
+
+        return allRegionsData;
+    }
     public RegionSaveData LoadRegion(string path)
     {
         string extension =
@@ -379,17 +429,13 @@ public class BlackyWorldPersistence
     // LOAD INFO MAP
     // =====================================================
 
-    public SavedMapData LoadInfoMap()
+    public SavedMapData LoadInfoMap(string nameMap)
     {
+        string rootPathLocal = path + "\\ " + nameMap;
         string saveFolder = Path.Combine(rootPath, "world");
         string extension = _format == SaveFormat.Json ? "json" : "bin";
         string fileName = $"world_info.{extension}"; // Nota: Si prefieres cambiarlo a "map_info.{extension}" en el save y load, sería ideal para no mezclarlo con las unidades.
         string fullPath = Path.Combine(saveFolder, fileName);
-
-        //if (!File.Exists(fullPath))
-        //{
-        //    return null; // O puedes retornar una nueva instancia por defecto si lo prefieres
-        //}
 
         if (_format == SaveFormat.Json)
         {
@@ -433,6 +479,7 @@ public class BlackyWorldPersistence
     }
     public void SaveInfoMap()
     {
+        //SIEMPRE EN JSON
         SavedMapData data = new SavedMapData();
         data.MapType = _blackyWorldConfig.WorldTypeDetail;
         data.Name = _blackyWorldConfig.Name;
@@ -444,21 +491,14 @@ public class BlackyWorldPersistence
         string saveFolder = Path.Combine(rootPath, "world"); // O la ruta raíz donde guardes tus archivos globales
         Directory.CreateDirectory(saveFolder);
 
-        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        string extension = "json";
         string fileName = $"world_info.{extension}";
         string fullPath = Path.Combine(saveFolder, fileName);
 
         byte[] bytes = MessagePackSerializer.Serialize(data);
-
-        if (_format == SaveFormat.Json)
-        {
-            string json = MessagePackSerializer.ConvertToJson(bytes);
-            File.WriteAllText(fullPath, json);
-        }
-        else
-        {
-            File.WriteAllBytes(fullPath, bytes);
-        }
+        
+        string json = MessagePackSerializer.ConvertToJson(bytes);
+        File.WriteAllText(fullPath, json);                
     }
     public void SaveUnits()
     {
@@ -583,7 +623,7 @@ public class BlackyWorldPersistence
 
     private void WriteEntitiesRegionToDisk(int regionX, int regionY, RegionEntitiesSaveData data)
     {
-        string regionFolder = Path.Combine(rootPath, "regions");
+        string regionFolder = Path.Combine(rootPath, "regionsEntities");
         Directory.CreateDirectory(regionFolder);
 
         string extension = _format == SaveFormat.Json ? "json" : "bin";
@@ -828,34 +868,29 @@ public class BlackyWorldPersistence
             foreach (var pair in chunk.Heights)
             {
                 int height = pair.Key;
-
                 var heightData = pair.Value;
 
-                ushort[] terrain =
-                    new ushort[
-                        _terrainWorld.ChunkSize *
-                        _terrainWorld.ChunkSize];
+                int size = _terrainWorld.ChunkSize;
+                ushort[] terrain = new ushort[size * size];
+                bool[] borders = new bool[size * size]; // <--- Array auxiliar para los bordes
 
                 bool hasData = false;
 
-                for (int y = 0;
-                    y < _terrainWorld.ChunkSize;
-                    y++)
+                for (int y = 0; y < size; y++)
                 {
-                    for (int x = 0;
-                        x < _terrainWorld.ChunkSize;
-                        x++)
+                    for (int x = 0; x < size; x++)
                     {
-                        ushort id =
-                            heightData
-                                .GetCell(x, y)
-                                .id;
+                        // Obtenemos la celda una sola vez para optimizar
+                        var cell = heightData.GetCell(x, y);
+                        ushort id = cell.id;
+                        bool isBorder = cell.isBorder; // <--- Capturamos el valor
 
-                        terrain[
-                            y * _terrainWorld.ChunkSize + x]
-                                = id;
+                        int index = y * size + x;
+                        terrain[index] = id;
+                        borders[index] = isBorder; // <--- Lo guardamos en su posición paralela
 
-                        if (id != 0)
+                        // Consideramos que hay datos si el ID es diferente de 0 o si es un borde activo
+                        if (id != 0 || isBorder)
                             hasData = true;
                     }
                 }
@@ -867,7 +902,8 @@ public class BlackyWorldPersistence
                     new TerrainHeightSave
                     {
                         Height = height,
-                        TerrainIds = terrain
+                        TerrainIds = terrain,
+                        TerrainBorders = borders // <--- Asignamos el array al guardado
                     });
             }
 

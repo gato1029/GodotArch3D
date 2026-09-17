@@ -40,6 +40,13 @@ public class BlackyDecorationWorldData: BlackyWorldDataMap<SerializerCellGeneric
     // =====================================================
     // SET TILE
     // =====================================================
+
+    public void SetDataDirectNoRenderLocal(BlackyChunkCoord coord, int lx, int ly, int h, ushort id)
+    {
+        ref var cell = ref ResolveOrCreateCellLocal(coord, lx, ly, h);
+        cell.id = id;
+    }
+
     public void SetDecoration(int worldX, int worldY, int height, DecorationData data, Brush brush)
     {
         ushort id = BlackyPalletesPersistence.decorationsPalette.GetIdPersistence(data.nameMod, data.id, out var decorationPersist);

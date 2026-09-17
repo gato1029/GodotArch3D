@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://cl84mjdpl5l61"]
+
+[ext_resource type="Script" uid="uid://b3fykfpbddswc" path="res://sources/RuntimeEditor/Editor/Maps/LoadMapsWindows.cs" id="1_4gndm"]
+[ext_resource type="PackedScene" uid="uid://nvo80o8qce3p" path="res://sources/Editor/Common/KuroControlWindow.tscn" id="1_f413y"]
+[ext_resource type="Script" uid="uid://bv2acki07u6at" path="res://sources/CustomWidgets/KuroItemList.cs" id="2_f413y"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="4_ajcac"]
+[ext_resource type="Texture2D" uid="uid://ddjqy6oxgh1ug" path="res://resources/Textures/iconos/Open Sign.png" id="5_l1aqw"]
+
+[node name="LoadMapsWindows" type="Window" unique_id=1841802043]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+size = Vector2i(400, 500)
+script = ExtResource("1_4gndm")
+
+[node name="KuroControlWindowItem" parent="." unique_id=1599535816 instance=ExtResource("1_f413y")]
+mouse_filter = 1
+NameWindow = "Mapas Disponibles"
+
+[node name="Contenido" type="MarginContainer" parent="KuroControlWindowItem" unique_id=1579966002]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 80
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="KuroControlWindowItem/Contenido" unique_id=42031904]
+layout_mode = 2
+
+[node name="KuroItemsListMaps" type="ItemList" parent="KuroControlWindowItem/Contenido/VBoxContainer" unique_id=205782507]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_f413y")
+metadata/_custom_type_script = "uid://bv2acki07u6at"
+
+[node name="KuroButtonCargar" type="TextureButton" parent="KuroControlWindowItem/Contenido/VBoxContainer" unique_id=872253914]
+custom_minimum_size = Vector2(151, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 1
+script = ExtResource("4_ajcac")
+IconTexture = ExtResource("5_l1aqw")
+ButtonText = "Cargar Mapa"
+TextPosition = 2
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
