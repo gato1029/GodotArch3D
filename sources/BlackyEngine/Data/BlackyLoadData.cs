@@ -13,10 +13,15 @@ internal class BlackyLoadData
     public static void LoadAll(BlackyWorld blackyWorld)
     {
 
-        
+        // cargamos todas las paletas de juego
+        blackyWorld.Services.persistenceData.LoadPalletes();
+
         // 1. Cargamos todas las regiones una sola vez desde el disco
         List<RegionSaveData> regions = blackyWorld.Services.persistenceData.LoadAllRegions();
         if (regions == null || regions.Count == 0) return;
+
+        
+        //BlackyPalletesPersistence.terrainPalette.Load(blackyWorld,)
 
         // 2. Cargamos el terreno por separado (tiene estructura distinta con isBorder e IDs)
         CargarTerreno(blackyWorld, regions);
@@ -26,8 +31,43 @@ internal class BlackyLoadData
         CargarCapaGenerica(blackyWorld, regions, r => r.SurfaceChunks, LayerType.Surface);
         CargarCapaGenerica(blackyWorld, regions, r => r.DecorationChunks, LayerType.Decoration);
         CargarCapaGenerica(blackyWorld, regions, r => r.PathChunks, LayerType.Path);
+
+        CargarRecursos(blackyWorld);
+        CargarUnidades(blackyWorld);
     }
-    
+
+    private static void CargarUnidades(BlackyWorld blackyWorld)
+    {
+        var regions = blackyWorld.Services.persistenceData.LoadUnits();
+        foreach (var item in regions.Units)
+        {
+            blackyWorld.Services.Characters.CreateRenderDirect(item);
+        }
+    }
+
+    private static void CargarRecursos(BlackyWorld blackyWorld)
+    {
+        var  regions =blackyWorld.Services.persistenceData.LoadAllEntitiesRegions();
+        foreach (RegionEntitiesSaveData item in regions)
+        {
+            var EntityChunks = item.EntityChunks;
+            foreach (var itemSave in EntityChunks)
+            {
+                var builds = itemSave.Buildings;
+                var resources = itemSave.Resources;
+                foreach (var itemBuild in builds)
+                {
+                    blackyWorld.Services.BuildingPainter.CreationDataNoRender(itemBuild);
+                }
+                
+                foreach (var itemRes in resources)
+                {
+                    blackyWorld.Services.ResourcePainter.CreationDataNoRender(itemRes);
+                }
+                
+            }
+        }
+    }
 
     private static void CargarTerreno(BlackyWorld blackyWorld, List<RegionSaveData> regions)
     {

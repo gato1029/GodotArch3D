@@ -2,6 +2,7 @@
 
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Generation;
 using GodotEcsArch.sources.BlackyEngine.Generation.Biomes;
 using GodotEcsArch.sources.BlackyEngine.Generation.Procedural;
@@ -118,7 +119,12 @@ public sealed class BlackyWorld : IDisposable
             // si es nuevo hacemos procedural etc
             Procedural = new BlackyWorldProceduralGeneration(this, Config);
             DebugBoot();
-        } 
+        }
+        else
+        {
+            BlackyLoadData.LoadAll(this);
+            Streaming.chunkManagerLocal.Teleport(new Vector2(0, 0)); // esto hace que se renderice el chunk central y se carguen los chunks alrededor
+        }
       //  DebugBootStressTest(10000);
     }
  
@@ -159,7 +165,7 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-        SpawnEnemiesAroundPlayer(5000,30);
+        SpawnEnemiesAroundPlayer(5000,10);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));

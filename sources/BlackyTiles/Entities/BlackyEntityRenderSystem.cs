@@ -83,14 +83,18 @@ public class BlackyEntityRenderSystem
                     continue;
                 }
                 ref var gpu = ref ent.Ensure<RenderGPUComponent>();
-                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance); // liberamos instancia
-                gpu.rid = default;
-                gpu.instance = -1;
-
-                if (ent.Has<SpriteSimpleAnimationTag>())
+                if (gpu.instance!=-1)
                 {
-                    ent.Remove<SpriteSimpleAnimationTag>();
-                }
+                    AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance); // liberamos instancia
+                    gpu.rid = default;
+                    gpu.instance = -1;
+                    gpu.layerTextureMaterial = -1;
+
+                    if (ent.Has<SpriteSimpleAnimationTag>())
+                    {
+                        ent.Remove<SpriteSimpleAnimationTag>();
+                    }
+                }                
             }
         }
     }

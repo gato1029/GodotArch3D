@@ -12,6 +12,7 @@ using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -100,8 +101,11 @@ public class BlackyBuildingCreator
     }
 
     // --- EJECUCIÓN REAL (Hilo Principal) ---
-
-    private void InternalExecuteCreation(ushort idBuilding, Vector2I tilePosition, int height)
+    public void CreationDataNoRender(SavedBuildingData itemBuild)
+    {
+        InternalExecuteCreation(itemBuild.TemplateId, new Vector2I(itemBuild.WorldTileX, itemBuild.WorldTileY), itemBuild.Height, itemBuild.Health, false);
+    }
+    private void InternalExecuteCreation(ushort idBuilding, Vector2I tilePosition, int height, int health=0, bool render=true)
     {
         ushort team = 1;
         var templateBuilding = BlackyPalletesPersistence.buildingPalette.GetData(idBuilding);
@@ -138,8 +142,17 @@ public class BlackyBuildingCreator
         entity.Set(new PositionComponent { position = position, tilePosition = tilePosition, height = height });
         entity.Set(new TeamComponent(team));
         entity.Set(new BuildingDefinitionComponent(idBuilding, spriteIdNormal, spriteIdConstruccion, spriteIdDestruccion));
-        entity.Set(new HealthComponent(templateBuilding.MaxHealth));
-        //entity.Set(new MelleAttackThereshold(spriteNormal.fastColliderUmbralAtaque.Width));
+
+        if (health!=0)
+        {
+            entity.Set(new HealthComponent(health));
+        }
+        else
+        {
+            entity.Set(new HealthComponent(templateBuilding.MaxHealth));
+        }
+        
+        
         spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition),true);
 
         AsignarCollider(tilePosition.X, tilePosition.Y, entity, spriteNormal,out int idDebugBody,team);
@@ -149,10 +162,10 @@ public class BlackyBuildingCreator
         switch (spriteNormal.tileSpriteType)
         {
             case TileSpriteType.Static:
-                CreateSprite(entity, spriteNormal.spriteData, height, tilePosition);
+                CreateSprite(entity, spriteNormal.spriteData, height, tilePosition,render);
                 break;
             case TileSpriteType.Animated:
-                CreateAnimation(entity, spriteNormal.animationData, spriteIdNormal, height, tilePosition);
+                CreateAnimation(entity, spriteNormal.animationData, spriteIdNormal, height, tilePosition,render);
                 break;
         }
 
@@ -233,9 +246,9 @@ public class BlackyBuildingCreator
         });
     }
 
-    private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile)
+    private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile, bool render)
     {
-        var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+        
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
         Vector2 offset = spriteData.offsetInternal;
 
@@ -247,17 +260,25 @@ public class BlackyBuildingCreator
         Transform3D transform = new(Basis.Identity, worldPosition);
         transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
 
-        RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
-        RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, spriteData.uv);
-        RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(0, 0, 0, renderInstance.layerTexture));
-
-        entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
-                 layer, depthOffset, spriteData.scale, offset));
+        if (render)
+        {
+            var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+            RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
+            RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, spriteData.uv);
+            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(0, 0, 0, renderInstance.layerTexture));
+            entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
+                     layer, depthOffset, spriteData.scale, offset));
+        }
+        else
+        {
+            entity.Set(new RenderGPUComponent(default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
+        }
+        
     }
 
-    private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile)
+    private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile, bool render)
     {
-        var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
+        
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile);
         Vector2 offset = animationData.offsetInternal;
 
@@ -267,18 +288,27 @@ public class BlackyBuildingCreator
 
         Transform3D transform = new(Basis.Identity, worldPosition);
         transform = transform.ScaledLocal(new Vector3(animationData.scale, animationData.scale, 1));
-
-        RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
-        RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, animationData.uvFramesArray[0]);
-        RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(0, 0, 0, renderInstance.layerTexture));
-
+        
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
+        if (render)
+        {
+            var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
+            RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
+            RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, animationData.uvFramesArray[0]);
+            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(0, 0, 0, renderInstance.layerTexture));
+            entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
                  layer, depthOffset, animationData.scale, offset));
 
-        entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
-        entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
-        entity.Add<SpriteSimpleAnimationTag>();
+            entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
+            entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
+            entity.Add<SpriteSimpleAnimationTag>();
+        }
+        else
+        {
+            entity.Set(new RenderGPUComponent(default, -1, 0, -1,layer, depthOffset, animationData.scale, offset));
+        }
+        
+        
     }
 
     private int AsignarCollider(int mundoX, int mundoY, Entity entity, TileSpriteData tileSpriteData, out  int idDebugBody, ushort team)
@@ -335,4 +365,6 @@ public class BlackyBuildingCreator
 
         return idCollider;
     }
+
+
 }

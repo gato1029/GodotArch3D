@@ -35,7 +35,7 @@ public class BlackyResourcesCreator
 {
     private readonly BlackyChunkOccupancyMap occupancyMap;
     private readonly BlackySpatialEntityMap spatialEntityMap;
-    
+
     private readonly BlackyTerrainWorldData terrain;
     private readonly FlecsManager flecsManager;
     private readonly StaticSpatialGridOptimizedGeneric<Entity> staticHashResource;
@@ -45,19 +45,19 @@ public class BlackyResourcesCreator
     private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
     private Dictionary<int, List<int>> _colliderDebugMap = new();
     private readonly ConcurrentQueue<CreateResourceCommand> _commandQueue = new();
-    private const int MaxPerFrame = 100;    
+    private const int MaxPerFrame = 100;
     private readonly ConcurrentQueue<RemoveResourceCommand> _removeCommandQueue = new();
     private const int MaxRemovalsPerFrame = 100; // O el presupuesto que prefieras
     public BlackyResourcesCreator(StaticSpatialGridOptimizedGeneric<Entity> staticHash, FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainWorldData terrain)
     {
         this.occupancyMap = occupancyMap;
-        this.spatialEntityMap = spatialEntityMap;        
+        this.spatialEntityMap = spatialEntityMap;
         this.terrain = terrain;
         this.flecsManager = flecsManager;
         this.staticHashResource = staticHash;
     }
 
- 
+
 
     // 1. Método público: Se llama desde cualquier hilo para solicitar la eliminación
     public void RemoveResource(Vector2I tilePosition)
@@ -65,7 +65,7 @@ public class BlackyResourcesCreator
         _removeCommandQueue.Enqueue(new RemoveResourceCommand
         {
             TilePosition = tilePosition,
-            
+
         });
     }
 
@@ -97,14 +97,14 @@ public class BlackyResourcesCreator
         {
             if (entity.Has<SpatialIDComponent>())
             {
-                SpatialIDComponent spatial = entity.Get<SpatialIDComponent>();                
+                SpatialIDComponent spatial = entity.Get<SpatialIDComponent>();
                 staticHashResource.FreeCollider(spatial.Value);
-                
+
                 foreach (int item in _colliderDebugMap[spatial.Value])
                 {
                     CollisionShapeDraw.Instance.FreeDraw(item);
                 }
-                
+
                 _colliderDebugMap.Remove(spatial.Value);
             }
 
@@ -142,8 +142,12 @@ public class BlackyResourcesCreator
         }
     }
 
+    public void CreationDataNoRender(SavedResourceData data)
+    {
+        InternalExecuteCreation(data.TemplateId, new Vector2I(data.WorldTileX, data.WorldTileY), data.Height, out Entity entity, false, data.Health, data.Amount);
+    }
     // Método interno: Contiene la lógica real y se ejecuta de forma segura en el hilo principal
-    public void InternalExecuteCreation(ushort idResource, Vector2I tilePosition, int height, out Entity entity)
+    public void InternalExecuteCreation(ushort idResource, Vector2I tilePosition, int height, out Entity entity, bool render=true, int health=0,int amount=0)
     {
         entity = default;
         Vector2 position = TilesHelper.TilePositionToWorldPosition(tilePosition);
@@ -164,8 +168,24 @@ public class BlackyResourcesCreator
         entity.Set(new PositionComponent { position = position, tilePosition = tilePosition, height = height });
         entity.Set(new TeamComponent(0));
         entity.Set(new ResourceDefinitionComponent(idResource, spriteId));
-        entity.Set(new HealthComponent(templateResource.health));
-        entity.Set(new AmountComponent(templateResource.amount));
+        if (health!=0)
+        {
+            entity.Set(new HealthComponent(health));
+        }
+        else
+        {
+            entity.Set(new HealthComponent(templateResource.health));
+        }
+        if (amount !=0)
+        {
+            entity.Set(new AmountComponent(amount));
+        }
+        else
+        {
+            entity.Set(new AmountComponent(templateResource.amount));
+        }
+        
+        
 
         spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition),false);
 
@@ -175,17 +195,17 @@ public class BlackyResourcesCreator
         switch (sprite.tileSpriteType)
         {
             case TileSpriteType.Static:
-                CreateSprite(entity, sprite.spriteData, height, tilePosition);
+                CreateSprite(entity, sprite.spriteData, height, tilePosition,render);
                 break;
             case TileSpriteType.Animated:
-                CreateAnimation(entity, sprite.animationData, spriteId, height, tilePosition);
+                CreateAnimation(entity, sprite.animationData, spriteId, height, tilePosition,render);
                 break;
         }
     }
 
-    private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile)
+    private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile, bool render)
     {
-        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+        
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
         Vector2 offset = spriteData.offsetInternal;
 
@@ -196,18 +216,25 @@ public class BlackyResourcesCreator
 
         Transform3D transform = new(Basis.Identity, worldPosition);
         transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
-
-        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
-        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
-        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
-
-        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
-                 layer, depthOffset, spriteData.scale, offset));
+        if (render)
+        {
+            var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+            RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
+            RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
+            RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
+            entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+                     layer, depthOffset, spriteData.scale, offset));
+        }
+        else
+        {
+            entity.Set(new RenderGPUComponent(default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
+        }
+        
     }
 
-    private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile)
+    private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile, bool render)
     {
-        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
+        
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile);
         Vector2 offset = animationData.offsetInternal;
 
@@ -217,21 +244,28 @@ public class BlackyResourcesCreator
 
         Transform3D transform = new(Basis.Identity, worldPosition);
         transform = transform.ScaledLocal(new Vector3(animationData.scale, animationData.scale, 1));
-
-        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
-        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, animationData.uvFramesArray[0]);
-        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
-
-
-
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
-                 layer, depthOffset, animationData.scale, offset));
 
-        entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
-        entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
+  
+
+        if (render)
+        {
+            var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
+            RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
+            RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, animationData.uvFramesArray[0]);
+            RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(0, 0, 0, RenderInstance.layerTexture));
+            entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+                 layer, depthOffset, animationData.scale, offset));
+            entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
+            entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
+
+            entity.Add<SpriteSimpleAnimationTag>();
+        }
+        else
+        {
+            entity.Set(new RenderGPUComponent(default, -1, 0, -1, layer, depthOffset, animationData.scale, offset));
+        }
         
-        entity.Add<SpriteSimpleAnimationTag>();
     }
 
     private int AsignarCollider(int Mundo_x, int Mundo_y, Entity entity, TileSpriteData tileSpriteData)

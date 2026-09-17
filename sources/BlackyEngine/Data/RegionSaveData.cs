@@ -236,7 +236,7 @@ public class BlackyWorldPersistence
         _entidadesMap = entidades;
         _flecsManager = flecs;
         _blackyWorldConfig = inf;
-        rootPath = path + "\\ " + nameMap;
+        rootPath = path + "\\" + nameMap;
     }
 
     // =====================================================
@@ -431,7 +431,7 @@ public class BlackyWorldPersistence
 
     public SavedMapData LoadInfoMap(string nameMap)
     {
-        string rootPathLocal = path + "\\ " + nameMap;
+        string rootPathLocal = path + "\\" + nameMap;
         string saveFolder = Path.Combine(rootPath, "world");
         string extension = _format == SaveFormat.Json ? "json" : "bin";
         string fileName = $"world_info.{extension}"; // Nota: Si prefieres cambiarlo a "map_info.{extension}" en el save y load, sería ideal para no mezclarlo con las unidades.
@@ -453,7 +453,19 @@ public class BlackyWorldPersistence
     // =====================================================
     // SAVE ALL DIRTY
     // =====================================================
+    public void LoadPalletes()
+    {
+        BlackyPalletesPersistence.terrainPalette.Load(rootPath, _format);
+        BlackyPalletesPersistence.rampsPalette.Load(rootPath, _format);
+        BlackyPalletesPersistence.surfacesPalette.Load(rootPath, _format);
+        BlackyPalletesPersistence.decorationsPalette.Load(rootPath, _format);
+        BlackyPalletesPersistence.pathsPalette.Load(rootPath, _format);
 
+        //entidades
+        BlackyPalletesPersistence.buildingPalette.Load(rootPath, _format);
+        BlackyPalletesPersistence.resourcesPalette.Load(rootPath, _format);
+        BlackyPalletesPersistence.characterPalette.Load(rootPath, _format);
+    }
     public void SavePalletes(string rootPath)
     {
         // terreno
@@ -484,6 +496,7 @@ public class BlackyWorldPersistence
         data.MapType = _blackyWorldConfig.WorldTypeDetail;
         data.Name = _blackyWorldConfig.Name;
         data.seed = _blackyWorldConfig.WorldSeed;
+        data.HeightCount = _blackyWorldConfig.HeightCount;
         data.ChunkSize = _blackyWorldConfig.ChunkSize;
         data.TileSizeX = _blackyWorldConfig.MapSize.X;
         data.TileSizeY = _blackyWorldConfig.MapSize.Y;

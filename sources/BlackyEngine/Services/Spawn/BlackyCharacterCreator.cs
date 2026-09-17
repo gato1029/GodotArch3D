@@ -1,5 +1,6 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyTiles.Data;
@@ -60,7 +61,30 @@ public class BlackyCharacterCreator
             created++;
         }
     }
+    public void CreateRenderDirect(SavedUnitData unitData)
+    {
+        world.Tick.TotalUnits++;
+        CharacterModelBaseData charModel= BlackyPalletesPersistence.characterPalette.GetData(unitData.TemplateId);
+        
+        if (charModel == null) return;
 
+        var entity = flecsManager.WorldFlecs.Entity();
+
+        switch (charModel.characterType)
+        {
+            case CharacterType.MAIN:
+                CreateGeneric(unitData.TemplateId, entity, charModel, new Vector2(unitData.PosX,unitData.PosY), unitData.Height,unitData.Health);                
+                break;
+            case CharacterType.NPC:
+                break;
+            case CharacterType.ENEMIGO:
+                CreateEnemy(unitData.TemplateId, entity, charModel, new Vector2(unitData.PosX, unitData.PosY), unitData.Height,unitData.Health);
+                break;
+            default:
+                break;
+        }
+
+    }
     public Entity InternalExecuteCreation(long id, int height, Godot.Vector2 position)
     {
         world.Tick.TotalUnits++;
@@ -130,7 +154,7 @@ public class BlackyCharacterCreator
         }
     }
 
-    private Entity CreateGeneric(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Vector2 position, int height)
+    private Entity CreateGeneric(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Vector2 position, int height,int health=0)
     {        
         var idTileSprite = characterBaseData.idTileSpriteData;
         int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);
@@ -175,7 +199,15 @@ public class BlackyCharacterCreator
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0));
         entity.Set(new PlayerInputComponent());
-        entity.Set(new HealthComponent(100));
+        if (health!=0)
+        {
+            entity.Set(new HealthComponent(health));
+        }
+        else
+        {
+            entity.Set(new HealthComponent(100));
+        }
+        
 
         float rvoRadius = MeshCreator.PixelsToUnits(16);
 
@@ -197,7 +229,7 @@ public class BlackyCharacterCreator
         return entity;
     }
 
-    private Entity CreateEnemy(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position, int height)
+    private Entity CreateEnemy(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position, int height, int health=0)
     {
         characterBaseData.isPersist = true;
         var idTileSprite = characterBaseData.idTileSpriteData;
@@ -244,7 +276,14 @@ public class BlackyCharacterCreator
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0));
         entity.Add<StoppedTag>();
         entity.Add<UseBoidTag>();
-        entity.Set(new HealthComponent(100));
+        if (health != 0)
+        {
+            entity.Set(new HealthComponent(health));
+        }
+        else
+        {
+            entity.Set(new HealthComponent(100));
+        }
 
         float rvoRadius = MeshCreator.PixelsToUnits(16);
         float radiusSearchEnemy = MeshCreator.PixelsToUnits(256);
