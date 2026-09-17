@@ -1,17 +1,57 @@
+
 using Flecs.NET.Core;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using MessagePack;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using static Flecs.NET.Core.Ecs.Units;
 
 namespace GodotEcsArch.sources.BlackyEngine.Data;
 
+// =====================================================
+// InfoMap
+// =====================================================
+
+[MessagePackObject]
+public struct SavedMapData
+{
+    [Key(0)] public string Name { get; set; }
+    [Key(1)] public BlackyWorldTypeDetail MapType { get; set; }
+    [Key(2)] public int ChunkSize { get; set; }
+    [Key(3)] public int HeightCount { get; set; }
+    [Key(4)] public int seed { get; set; }
+    [Key(5)] public int TileSizeX { get; set; }
+    [Key(6)] public int TileSizeY { get; set; }
+}
+
+// =====================================================
+// Unidades
+// =====================================================
+
+[MessagePackObject]
+public struct SavedUnitData
+{
+    [Key(0)] public ushort TemplateId { get; set; }
+    [Key(1)] public int Health { get; set; }
+    [Key(2)] public float PosX { get; set; }
+    [Key(3)] public float PosY { get; set; }
+    [Key(4)] public int Height { get; set; } 
+    [Key(5)] public ushort Team { get; set; } 
+}
+
+[MessagePackObject]
+public class GlobalUnitsSaveData
+{
+    [Key(0)] public List<SavedUnitData> Units { get; set; } = new();
+}
 
 // =====================================================
 // ENTIDADES POR REGIÓN (Independiente del Terreno)
@@ -22,8 +62,9 @@ public struct SavedBuildingData
 {
     [Key(0)] public ushort TemplateId { get; set; }
     [Key(1)] public int Health { get; set; }
-    [Key(2)] public int LocalX { get; set; }
-    [Key(3)] public int LocalY { get; set; }
+    [Key(2)] public int WorldTileX { get; set; }
+    [Key(3)] public int WorldTileY { get; set; }
+    [Key(4)] public int Height { get; set; }
 }
 
 [MessagePackObject]
@@ -32,8 +73,9 @@ public struct SavedResourceData
     [Key(0)] public ushort TemplateId { get; set; }
     [Key(1)] public int Health { get; set; }
     [Key(2)] public int Amount { get; set; }
-    [Key(3)] public int LocalX { get; set; }
-    [Key(4)] public int LocalY { get; set; }
+    [Key(3)] public int WorldTileX { get; set; }
+    [Key(4)] public int WorldTileY { get; set; }
+    [Key(5)] public int Height { get; set; }
 }
 
 [MessagePackObject]
@@ -151,7 +193,7 @@ public enum SaveFormat
 }
 public class BlackyWorldPersistence
 {
-
+    // luego cambiar el path donde deberia estar
     string path = "D:\\GitKraken\\MapsGame";
     string rootPath;
     string nameMap;
@@ -163,7 +205,8 @@ public class BlackyWorldPersistence
     private readonly BlackyDecorationWorldData _adornosData;
     private readonly BlackyPathWorldData _caminosData;
     private readonly BlackySpatialEntityMap _entidadesMap;
-
+    private readonly FlecsManager _flecsManager;
+    private readonly BlackyWorldConfig _blackyWorldConfig;
     private readonly SaveFormat _format;
 
     public BlackyWorldPersistence(string nameMap,
@@ -174,6 +217,8 @@ public class BlackyWorldPersistence
         BlackyDecorationWorldData adornosData,
         BlackyPathWorldData caminosData,
         BlackySpatialEntityMap entidades,
+        FlecsManager flecs,
+        BlackyWorldConfig inf,
         SaveFormat format = SaveFormat.Binary)
     {
         this.nameMap = nameMap;
@@ -185,13 +230,127 @@ public class BlackyWorldPersistence
         _caminosData = caminosData;
         _format = format;
         _entidadesMap = entidades;
+        _flecsManager = flecs;
+        _blackyWorldConfig = inf;
         rootPath = path + "\\ " + nameMap;
     }
 
     // =====================================================
     // LOAD
     // =====================================================
+    // =====================================================
+    // LOAD UNITS
+    // =====================================================
 
+    public GlobalUnitsSaveData LoadUnits()
+    {
+        string saveFolder = Path.Combine(rootPath, "world");
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        string fileName = $"world_units.{extension}";
+        string fullPath = Path.Combine(saveFolder, fileName);
+
+        if (!File.Exists(fullPath))
+        {
+            // Retorna un objeto vacío si aún no existe el archivo de guardado
+            return new GlobalUnitsSaveData();
+        }
+
+        if (_format == SaveFormat.Json)
+        {
+            string json = File.ReadAllText(fullPath);
+            byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
+            return MessagePackSerializer.Deserialize<GlobalUnitsSaveData>(bytes);
+        }
+        else
+        {
+            byte[] data = File.ReadAllBytes(fullPath);
+            return MessagePackSerializer.Deserialize<GlobalUnitsSaveData>(data);
+        }
+    }
+    // =====================================================
+    // LOAD ALL ENTITIES REGIONS
+    // =====================================================
+
+    public List<RegionEntitiesSaveData> LoadAllEntitiesRegions()
+    {
+        List<RegionEntitiesSaveData> allRegionsData = new();
+        string regionFolder = Path.Combine(rootPath, "regions");
+
+        if (!Directory.Exists(regionFolder))
+        {
+            return allRegionsData;
+        }
+
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        // Buscamos todos los archivos de entidades que coincidan con el formato actual
+        string searchPattern = $"*_entities.{extension}";
+        string[] files = Directory.GetFiles(regionFolder, searchPattern);
+
+        foreach (string filePath in files)
+        {
+            try
+            {
+                RegionEntitiesSaveData regionData;
+
+                if (_format == SaveFormat.Json)
+                {
+                    string json = File.ReadAllText(filePath);
+                    byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
+                    regionData = MessagePackSerializer.Deserialize<RegionEntitiesSaveData>(bytes);
+                }
+                else
+                {
+                    byte[] data = File.ReadAllBytes(filePath);
+                    regionData = MessagePackSerializer.Deserialize<RegionEntitiesSaveData>(data);
+                }
+
+                if (regionData != null)
+                {
+                    allRegionsData.Add(regionData);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores opcional si algún archivo está corrupto
+                // GD.PrintErr($"Error al cargar entidades de región en {filePath}: {ex.Message}");
+            }
+        }
+
+        return allRegionsData;
+    }
+    // =====================================================
+    // LOAD ENTITIES REGION
+    // =====================================================
+
+    public RegionEntitiesSaveData LoadEntitiesRegion(int regionX, int regionY)
+    {
+        string regionFolder = Path.Combine(rootPath, "regions");
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        string fileName = $"region_{regionX}_{regionY}_entities.{extension}";
+        string fullPath = Path.Combine(regionFolder, fileName);
+
+        if (!File.Exists(fullPath))
+        {
+            // Retorna un contenedor vacío si la región no tiene archivo de entidades guardado
+            return new RegionEntitiesSaveData
+            {
+                RegionX = regionX,
+                RegionY = regionY
+            };
+        }
+
+        if (_format == SaveFormat.Json)
+        {
+            string json = File.ReadAllText(fullPath);
+            byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
+            return MessagePackSerializer.Deserialize<RegionEntitiesSaveData>(bytes);
+        }
+        else
+        {
+            byte[] data = File.ReadAllBytes(fullPath);
+            return MessagePackSerializer.Deserialize<RegionEntitiesSaveData>(data);
+        }
+    }
     public RegionSaveData LoadRegion(string path)
     {
         string extension =
@@ -216,8 +375,35 @@ public class BlackyWorldPersistence
         return MessagePackSerializer
             .Deserialize<RegionSaveData>(data);
     }
+    // =====================================================
+    // LOAD INFO MAP
+    // =====================================================
 
-    
+    public SavedMapData LoadInfoMap()
+    {
+        string saveFolder = Path.Combine(rootPath, "world");
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        string fileName = $"world_info.{extension}"; // Nota: Si prefieres cambiarlo a "map_info.{extension}" en el save y load, sería ideal para no mezclarlo con las unidades.
+        string fullPath = Path.Combine(saveFolder, fileName);
+
+        //if (!File.Exists(fullPath))
+        //{
+        //    return null; // O puedes retornar una nueva instancia por defecto si lo prefieres
+        //}
+
+        if (_format == SaveFormat.Json)
+        {
+            string json = File.ReadAllText(fullPath);
+            byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
+            return MessagePackSerializer.Deserialize<SavedMapData>(bytes);
+        }
+        else
+        {
+            byte[] data = File.ReadAllBytes(fullPath);
+            return MessagePackSerializer.Deserialize<SavedMapData>(data);
+        }
+    }
+
     // =====================================================
     // SAVE ALL DIRTY
     // =====================================================
@@ -238,11 +424,91 @@ public class BlackyWorldPersistence
     }
     public void SaveAllDirtyRegions()
     {
+        SaveInfoMap();
         SavePalletes(rootPath);
         SaveTerrain();
         SaveEntities();
-    }
+        SaveUnits();
 
+    }
+    public void SaveInfoMap()
+    {
+        SavedMapData data = new SavedMapData();
+        data.MapType = _blackyWorldConfig.WorldTypeDetail;
+        data.Name = _blackyWorldConfig.Name;
+        data.seed = _blackyWorldConfig.WorldSeed;
+        data.ChunkSize = _blackyWorldConfig.ChunkSize;
+        data.TileSizeX = _blackyWorldConfig.MapSize.X;
+        data.TileSizeY = _blackyWorldConfig.MapSize.Y;
+
+        string saveFolder = Path.Combine(rootPath, "world"); // O la ruta raíz donde guardes tus archivos globales
+        Directory.CreateDirectory(saveFolder);
+
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        string fileName = $"world_info.{extension}";
+        string fullPath = Path.Combine(saveFolder, fileName);
+
+        byte[] bytes = MessagePackSerializer.Serialize(data);
+
+        if (_format == SaveFormat.Json)
+        {
+            string json = MessagePackSerializer.ConvertToJson(bytes);
+            File.WriteAllText(fullPath, json);
+        }
+        else
+        {
+            File.WriteAllBytes(fullPath, bytes);
+        }
+    }
+    public void SaveUnits()
+    {
+        GlobalUnitsSaveData globalSave = new();
+
+        // 1. Construimos la query para obtener todas las entidades marcadas como persistentes
+        var query = _flecsManager.WorldFlecs.QueryBuilder<PositionComponent, HealthComponent, UnitDefinitionComponent, TeamComponent>()
+            .With<PersistEntityTag>()
+            .Build();
+
+        // 2. Iteramos de forma ultra-performante por cada entidad encontrada
+        query.Each((Entity ent, ref PositionComponent pos, ref HealthComponent health, ref UnitDefinitionComponent def, ref TeamComponent team) =>
+        {
+
+
+            globalSave.Units.Add(new SavedUnitData
+            {
+                TemplateId = def.idTemplate,
+                Health = health.value,
+                PosX = pos.position.X,
+                PosY = pos.position.Y,
+                Height = pos.height,
+                Team = team.TeamId
+            });
+        });
+
+        // 3. Escribimos el archivo global en el disco
+        WriteGlobalUnitsToDisk(globalSave);
+    }
+    private void WriteGlobalUnitsToDisk(GlobalUnitsSaveData data)
+    {
+        string saveFolder = Path.Combine(rootPath, "world"); // O la ruta raíz donde guardes tus archivos globales
+        Directory.CreateDirectory(saveFolder);
+
+        string extension = _format == SaveFormat.Json ? "json" : "bin";
+        string fileName = $"world_units.{extension}";
+        string fullPath = Path.Combine(saveFolder, fileName);
+
+        byte[] bytes = MessagePackSerializer.Serialize(data);
+
+        if (_format == SaveFormat.Json)
+        {
+            string json = MessagePackSerializer.ConvertToJson(bytes);
+            File.WriteAllText(fullPath, json);
+        }
+        else
+        {
+            File.WriteAllBytes(fullPath, bytes);
+        }
+    }
     private void SaveEntities()
     {
         foreach (var regionCoord in _entidadesMap.GetDirtyRegions())
@@ -273,11 +539,14 @@ public class BlackyWorldPersistence
                     {
                         var bt = ent.Get<BuildingDefinitionComponent>();
                         var health = ent.Get<HealthComponent>();
-
+                        var position = ent.Get<PositionComponent>();
                         chunkSave.Buildings.Add(new SavedBuildingData
                         {
                             TemplateId = bt.idTemplate,
-                            Health = health.value
+                            Health = health.value,
+                            WorldTileX = position.tilePosition.X,
+                            WorldTileY = position.tilePosition.Y,
+                            Height = position.height
                         });
                     }
                     else
@@ -285,12 +554,15 @@ public class BlackyWorldPersistence
                         var res = ent.Get<ResourceDefinitionComponent>();
                         var health = ent.Get<HealthComponent>();
                         var amount = ent.Get<AmountComponent>();
-
+                        var position = ent.Get<PositionComponent>();
                         chunkSave.Resources.Add(new SavedResourceData
                         {
                             TemplateId = res.idTemplate,
                             Health = health.value,
-                            Amount = amount.value
+                            Amount = amount.value,
+                            WorldTileX = position.tilePosition.X,
+                            WorldTileY = position.tilePosition.Y,
+                            Height = position.height
                         });
                     }
                 }

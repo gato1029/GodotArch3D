@@ -87,7 +87,7 @@ public sealed class BlackyWorld : IDisposable
         int chunkSize,
         int heightCount,
         int worldSeed,
-        Vector2I mapSize)
+        Vector2I mapSize,bool isLoad = false)
     {
         
 
@@ -113,10 +113,12 @@ public sealed class BlackyWorld : IDisposable
 
         BlackyWorldRegistry.Instance.AddWorld(name, this, true);
 
-        Procedural = new BlackyWorldProceduralGeneration(this, Config);
-
-        
-        DebugBoot();
+        if (!isLoad)
+        {
+            // si es nuevo hacemos procedural etc
+            Procedural = new BlackyWorldProceduralGeneration(this, Config);
+            DebugBoot();
+        } 
       //  DebugBootStressTest(10000);
     }
  
@@ -157,7 +159,7 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-        SpawnEnemiesAroundPlayer(1000,10);
+        SpawnEnemiesAroundPlayer(5000,30);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));

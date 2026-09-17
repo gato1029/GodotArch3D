@@ -63,7 +63,8 @@ public class BlackyGenericPalette<T> where T : class
         }
     }
     private void LoadAllData()
-    {            
+    {
+        isDirty = true;
         Dictionary<ushort, Dictionary<long, T>> allInfo = AtlasModsManager.GetDictionaryAll<T, long>();
         foreach (var item in allInfo)
         {

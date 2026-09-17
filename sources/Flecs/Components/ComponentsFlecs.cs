@@ -155,6 +155,9 @@ public record struct TeamComponent
     ushort TeamId            // Ej: 0 = player, 1 = enemigos
 );
 
+
+[RegisterComponentFlecs]
+public record struct PersistEntityTag();
 [RegisterComponentFlecs]
 public record struct RvoDeltaTag();
 
@@ -356,10 +359,7 @@ public record struct MoveTargetComponent(
     Vector2 Value
     );
 
-[RegisterComponentFlecs]
-public record struct MelleAttackThereshold (
-    float radius
-    );
+
 
 [RegisterComponentFlecs]
 public record struct MoveResolutorComponent(

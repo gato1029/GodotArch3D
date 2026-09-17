@@ -82,7 +82,7 @@ public sealed class BlackyWorldServices
         AdornosDataLienzo = new BlackyDecorationWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
         CaminosDataLienzo = new BlackyPathWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal, world);
 
-        persistenceData = new BlackyWorldPersistence(world.Name,regionsRender,TerrainDataLienzo,RampasDataLienzo,SuperficiesDataLienzo,AdornosDataLienzo,CaminosDataLienzo,state.SpatialEntityMap, SaveFormat.Binary);
+        persistenceData = new BlackyWorldPersistence(world.Name,regionsRender,TerrainDataLienzo,RampasDataLienzo,SuperficiesDataLienzo,AdornosDataLienzo,CaminosDataLienzo,state.SpatialEntityMap, sim.Flecs,inf, SaveFormat.Json);
 
         TileRenderer = new BlackyTileRenderSystem(
             sim.Flecs,

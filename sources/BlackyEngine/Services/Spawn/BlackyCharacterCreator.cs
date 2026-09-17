@@ -164,7 +164,10 @@ public class BlackyCharacterCreator
             behaviorType = BehaviorType.PERSONAJE_PRINCIPAL,
             lastStateType = StateType.BLOCKED
         });
-
+        if (characterBaseData.isPersist)
+        {
+            entity.Add<PersistEntityTag>(); // O un componente con datos si lo prefieres
+        }
         entity.Set(new TeamComponent(1));
         entity.Set(new UnitDefinitionComponent(characterId));
         entity.Set(new PositionComponent(position, Vector2I.Zero, height));
@@ -195,7 +198,8 @@ public class BlackyCharacterCreator
     }
 
     private Entity CreateEnemy(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position, int height)
-    {        
+    {
+        characterBaseData.isPersist = true;
         var idTileSprite = characterBaseData.idTileSpriteData;
         int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);
         AtlasModsManager.TryGetTileSprite(spriteId, out var sprite);
@@ -228,7 +232,10 @@ public class BlackyCharacterCreator
             behaviorType = BehaviorType.GENERICO,
             lastStateType = StateType.BLOCKED
         });
-
+        if (characterBaseData.isPersist)
+        {
+            entity.Add<PersistEntityTag>(); // O un componente con datos si lo prefieres
+        }
         entity.Set(new TeamComponent(2));
         entity.Set(new UnitDefinitionComponent(characterId));
         entity.Set(new PositionComponent(position, Vector2I.Zero, 1));
@@ -246,7 +253,7 @@ public class BlackyCharacterCreator
         {
             entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 1f, 0,ContadoresHelper.Obtener(TipoContador.UnidadesMelle)));
             entity.Set(new EnemySearchComponent(radiusSearchEnemy, 0, 0));
-            entity.Set(new MelleAttackThereshold(characterBaseData.colliderUmbralAtaque.Width));
+      
         }
         else
         {

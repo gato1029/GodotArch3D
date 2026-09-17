@@ -17,7 +17,7 @@ public partial class MenuEditorContenedor : HBoxContainer
 
     private void ButtonEliminarMapa_Pressed()
     {
-        
+      //  BlackyWorld blackyWorld = new BlackyWorld(LineEditName.Text, (BlackyWorldTypeDetail)OptionButtonType.Selected, 32, 5, 41245134, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value));
     }
 
     private void ButtonGuardarComoMapa_Pressed()

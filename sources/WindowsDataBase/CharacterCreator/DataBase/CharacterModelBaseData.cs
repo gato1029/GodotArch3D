@@ -37,6 +37,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
         public ElementsData[] damageDataArray { get; set; }
         public ElementsData[] defenseDataArray { get; set; }
         public StatsData[] statsDataArray { get; set; }
+        public bool isPersist { get; set; }
 
         [BsonIgnore]
         public List<FastCollider> bodyColliders { get; set; }
