@@ -11,9 +11,12 @@
 [ext_resource type="Texture2D" uid="uid://r8jpqdfxbqxv" path="res://resources/Textures/internal/tiles_4647616.png" id="7_wsd07"]
 [ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="8_0x4a8"]
 [ext_resource type="Texture2D" uid="uid://bol7ivbg2eei" path="res://resources/Textures/iconos/tree.png" id="8_f1fuj"]
+[ext_resource type="Script" uid="uid://b2tq08112l2fo" path="res://sources/CustomWidgets/KuroCheckButton.cs" id="10_8qgvi"]
 [ext_resource type="Texture2D" uid="uid://bcxla761rabai" path="res://resources/cdemo.png" id="10_egwe3"]
+[ext_resource type="Texture2D" uid="uid://n841qxvcogdx" path="res://resources/Textures/iconos/Hide.png" id="10_wsd07"]
 [ext_resource type="Texture2D" uid="uid://4fsf6xnbk6cv" path="res://resources/Textures/iconos/castle-tower.png" id="11_qdd1k"]
 [ext_resource type="Shader" uid="uid://dvbvdwx16lalc" path="res://Blur.gdshader" id="12_7liqt"]
+[ext_resource type="Texture2D" uid="uid://bpx2axr18xy4e" path="res://resources/Textures/iconos/Rectangle.png" id="12_f1fuj"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="13_q6grh"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="14_0xllq"]
 [ext_resource type="Script" uid="uid://db1501ma03w8d" path="res://sources/RuntimeEditor/Editor/EditorPanelPosiciones.cs" id="15_0x4a8"]
@@ -143,6 +146,15 @@ focus_mode = 1
 script = ExtResource("6_2n80q")
 IconTexture = ExtResource("7_8qgvi")
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="KuroCheckButtonGrid" type="CheckButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=880552329]
+layout_mode = 2
+text = "Grid"
+icon = ExtResource("10_wsd07")
+script = ExtResource("10_8qgvi")
+TextureOn = ExtResource("12_f1fuj")
+TextureOff = ExtResource("10_wsd07")
+metadata/_custom_type_script = "uid://b2tq08112l2fo"
 
 [node name="MarginContainer" type="MarginContainer" parent="Editor/VBoxContainer" unique_id=1853149494]
 layout_mode = 2

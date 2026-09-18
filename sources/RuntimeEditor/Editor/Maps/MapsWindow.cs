@@ -23,7 +23,11 @@ public partial class MapsWindow : Window
     }
 
     private void ButtonSave_Pressed()
-    {           
+    {
+        if (BlackyWorldContext.World != null)
+        {
+            BlackyWorldContext.World.Dispose(); // limpiar y libera el mundo actual
+        }
         BlackyWorld blackyWorld = new BlackyWorld(LineEditName.Text, (BlackyWorldTypeDetail)OptionButtonType.Selected, 32, 5, 41245134, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value));
         QueueFree();
     }

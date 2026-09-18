@@ -52,7 +52,7 @@ public sealed class BlackyWorldState : IDisposable
 
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize);
 
-        idGridDraw= WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),-50,Colors.DarkCyan);
+        idGridDraw= WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),40,Colors.DarkCyan);
    
     }
     public void SetModeGrid(ModeGrid modeGrid)
@@ -61,10 +61,10 @@ public sealed class BlackyWorldState : IDisposable
         switch (modeGrid)
         {
             case ModeGrid.DUAL:
-                idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X, config.MapSize.Y, 16, new Vector2(0.25f, 0.25f), -50, Colors.DarkCyan);
+                idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X, config.MapSize.Y, 16, new Vector2(0.25f, 0.25f), 40, Colors.DarkCyan);
                 break;
             case ModeGrid.NORMAL:
-                idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X, config.MapSize.Y, 16, new Vector2(0, 0), -50, Colors.DarkCyan);
+                idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X, config.MapSize.Y, 16, new Vector2(0, 0), 40, Colors.DarkCyan);
                 break;
             default:
                 break;
@@ -72,6 +72,10 @@ public sealed class BlackyWorldState : IDisposable
     }
     public void SetGridDrawVisible(bool visible)
     {
+        if (idGridDraw!=-1)
+        {
+            WireShape.Instance.FreeShape(idGridDraw);
+        }
         if (visible)
         {
             SetModeGrid(modeGrid);
@@ -79,6 +83,7 @@ public sealed class BlackyWorldState : IDisposable
         else
         {
             WireShape.Instance.FreeShape(idGridDraw);
+            idGridDraw = -1;
         }                
     }
 
@@ -88,5 +93,9 @@ public sealed class BlackyWorldState : IDisposable
         DynamicHash.Clear();
         StaticSpatialBuildings.Clear();
         StaticSpatialTerrain.Clear();
+        StaticSpatialResources.Clear(); 
+        WireShape.Instance.FreeShape(idGridDraw);
+        OccupancyMap.Dispose();
+        SpatialEntityMap.Clear();
     }
 }

@@ -1,5 +1,6 @@
 
 
+using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Data;
@@ -49,7 +50,7 @@ public sealed class BlackyWorld : IDisposable
     public BlackyWorldState State { get; }
     public BlackyWorldSimulation Simulation { get; }
     public BlackyWorldServices Services { get; }
-    public BlackyWorldGeneration Generation { get; }
+    public BlackyWorldGeneration Generation { get; } // esto ya no se usa
     public BlackyWorldStreaming Streaming { get; }
     public BlackyWorldProceduralGeneration Procedural { get; }
     // =========================================
@@ -117,7 +118,7 @@ public sealed class BlackyWorld : IDisposable
         if (!isLoad)
         {
             // si es nuevo hacemos procedural etc
-            Procedural = new BlackyWorldProceduralGeneration(this, Config);
+            //Procedural = new BlackyWorldProceduralGeneration(this, Config);
             DebugBoot();
         }
         else
@@ -152,9 +153,31 @@ public sealed class BlackyWorld : IDisposable
     public void Dispose()
     {
         IsActive = false;
-        Flecs.Destroy();
+        ClearRenders();
+        Services.Dispose();
         //Simulation.Dispose();
         State.Dispose();
+        WireShape.Clear();
+        Flecs.Destroy();        
+    }
+    private void ClearRenders()
+    {
+        // para limpiar entidades que quedaron al aire        
+        var query = Flecs.WorldFlecs.QueryBuilder<RenderGPUComponent>()
+            .With<PersistEntityTag>()
+            .Build();
+
+        // 2. Iteramos de forma ultra-performante por cada entidad encontrada
+        query.Each((Entity ent, ref RenderGPUComponent gpu) =>
+        {
+            if (gpu.instance != -1) // quedo sucia debemos limpiarla
+            {
+                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                gpu.rid = default;
+                gpu.instance = -1;
+            }
+        });
+
     }
 
     // =========================================
@@ -165,7 +188,7 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-        SpawnEnemiesAroundPlayer(5000,10);
+        //SpawnEnemiesAroundPlayer(5000,10);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));

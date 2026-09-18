@@ -150,4 +150,16 @@ public class BlackyWorldRegions
 
         return result;
     }
+    // =====================================================
+    // CLEAR
+    // =====================================================
+
+    public void Clear()
+    {
+        // 1. Limpiamos las regiones almacenadas
+        _regions.Clear();
+
+        // 2. Limpiamos el registro de regiones sucias
+        _dirtyRegions.Clear();
+    }
 }

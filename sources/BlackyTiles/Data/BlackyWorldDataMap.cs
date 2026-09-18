@@ -461,4 +461,18 @@ public abstract class BlackyWorldDataMap<T>
             localX,
             localY);
     }
+    // =====================================================
+    // CLEAR
+    // =====================================================
+
+    public virtual void Clear()
+    {
+        // 1. Limpiamos los chunks y el registro de sucios
+        _chunks.Clear();
+        _dirtyChunks.Clear();
+
+        // 2. Limpiamos la caché del último chunk visitado para evitar referencias viejas
+        _lastChunk = null;
+        _lastCoord = default;
+    }
 }

@@ -14,7 +14,21 @@ public partial class MenuEditorContenedor : HBoxContainer
         ButtonGuardarComoMapa.Pressed += ButtonGuardarComoMapa_Pressed;
         ButtonEliminarMapa.Pressed += ButtonEliminarMapa_Pressed;
         ButtonCargarMapa.Pressed += ButtonCargarMapa_Pressed;
+        KuroCheckButtonGrid.Pressed += KuroCheckButtonGrid_Pressed;
 	}
+
+    private void KuroCheckButtonGrid_Pressed()
+    {
+        if (KuroCheckButtonGrid.ButtonPressed)
+        {
+            BlackyWorldContext.State.SetGridDrawVisible(true);
+        }
+        else
+        {
+            BlackyWorldContext.State.SetGridDrawVisible(false);
+        }
+        
+    }
 
     private void ButtonCargarMapa_Pressed()
     {

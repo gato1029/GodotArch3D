@@ -217,4 +217,22 @@ public class BlackyOccupancyRendererSystem
             return Godot.Colors.Gray;
         }
     }
+    // ===============================
+    // 🔥 MÉTODO CLEAR
+    // ===============================
+
+    public void Clear()
+    {
+        // 1. Liberar todas las formas geométricas/visuales activas de depuración en WireShape
+        foreach (var shapes in chunksLoad.Values)
+        {
+            foreach (var id in shapes.Values)
+            {
+                WireShape.Instance.FreeShape(id);
+            }
+        }
+
+        // 2. Limpiar el registro de chunks cargados en memoria
+        chunksLoad.Clear();
+    }
 }

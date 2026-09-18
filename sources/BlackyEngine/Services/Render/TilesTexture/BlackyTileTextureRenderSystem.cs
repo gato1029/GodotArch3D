@@ -271,6 +271,37 @@ public class BlackyTileTextureRenderSystem
             chunkY * chunkManager.chunkDimencion.Y + localY
         );
     }
+    // ===============================
+    // 🔥 MÉTODO CLEAR (TileTextureRenderSystem)
+    // ===============================
 
+    public void Clear()
+    {
+        // 1. Recorrer todos los chunks registrados actualmente en el sistema
+        foreach (var kvp in chunkRenderInstances)
+        {
+            var chunkCoord = kvp.Key;
+            var chunkRender = kvp.Value;
+
+            if (chunkRender == null) continue;
+
+            // 2. Marcar el chunk completo como destruido
+            chunkRender.MarkDestroyed();
+
+            // 3. Iterar sobre cada instancia de tile renderizada y encolar su destrucción
+            foreach (var instance in chunkRender.GetAll())
+            {
+                if (instance == null || instance.IsDestroyed) continue;
+
+                AtlasTexturesModsManager.Instance.FreeInstance(
+                    instance.Rid,
+                    instance.InstanceId
+                );                
+            }
+        }
+
+        // 4. Limpiar el diccionario principal de chunks renderizados
+        chunkRenderInstances.Clear();
+    }
 
 }

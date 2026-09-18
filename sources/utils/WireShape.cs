@@ -916,4 +916,37 @@ public class WireShape : SingletonBase<WireShape>
             color,
             typeDraw);
     }
+
+    // ===========================
+    // Liberar todas las formas activas
+    // ===========================
+    public static void Clear()
+    {
+        foreach (var kvp in _shapes)
+        {
+            var shape = kvp.Value;
+            if (shape == null) continue;
+
+            // 1. Liberar la instancia de renderizado en el servidor
+            if (shape.InstanceRid.IsValid)
+            {
+                RenderingServer.FreeRid(shape.InstanceRid);
+            }
+
+            // 2. Liberar el RID del mesh
+            if (shape.MeshRid.IsValid)
+            {
+                RenderingServer.FreeRid(shape.MeshRid);
+            }
+
+            // 3. Limpiar referencia administrada
+            shape.Mesh = null;
+
+            // 4. Si tu UniqueIdGenerator requiere reciclar o liberar los IDs, hazlo aquí:
+            // UniqueIdGenerator.ReleaseId<WireShape>(kvp.Key);
+        }
+        UniqueIdGenerator.Clear();
+        // 5. Vaciar completamente el diccionario de formas
+        _shapes.Clear();
+    }
 }

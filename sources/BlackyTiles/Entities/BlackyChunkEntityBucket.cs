@@ -72,4 +72,18 @@ public class BlackyChunkEntityBucket
         IsBuilding[lastIndex] = false; // Limpiar valor por defecto
         Count--;
     }
+
+    internal void Clear()
+    {
+        if (Count > 0)
+        {
+            // Limpiamos los elementos actuales en los arreglos para liberar referencias de Flecs
+            Array.Clear(Entities, 0, Count);
+            Array.Clear(Exist, 0, Count);
+            Array.Clear(IsBuilding, 0, Count);
+        }
+
+        // Reiniciamos el contador
+        Count = 0;
+    }
 }

@@ -28,7 +28,7 @@ public class BlackyOccupancySubChunk
     public void Clear(int layer, int x, int y)
         => _entityIds[layer, x, y] = 0;
 }
-public class BlackyChunkOccupancyMap
+public class BlackyChunkOccupancyMap:IDisposable
 {
     private readonly int _chunkSize;
     private readonly int _layers;
@@ -184,6 +184,28 @@ public class BlackyChunkOccupancyMap
     {
         int local = coord % _chunkSize;
         return local < 0 ? local + _chunkSize : local;
+    }
+
+    public void Dispose()
+    {
+        // 1. Limpiar los sub-chunks y el diccionario de chunks
+        _chunks.Clear();
+
+        // 2. Limpiar el índice inverso de entidades
+        foreach (var pair in _entityToTiles)
+        {
+            pair.Value.Clear();
+        }
+        _entityToTiles.Clear();
+
+        // 3. Desuscribir todos los listeners del evento para evitar referencias colgadas
+        if (OnTileUpdated != null)
+        {
+            foreach (var d in OnTileUpdated.GetInvocationList())
+            {
+                OnTileUpdated -= (Action<int, int, int, ulong>)d;
+            }
+        }
     }
 
     #endregion

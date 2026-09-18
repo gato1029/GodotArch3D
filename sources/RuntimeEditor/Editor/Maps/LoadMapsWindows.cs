@@ -16,7 +16,12 @@ public partial class LoadMapsWindows : Window
 	}
     SavedMapData infoMap;
     private void KuroButtonCargar_Pressed()
-    {        
+    {
+        if (BlackyWorldContext.World!=null)
+        {
+            BlackyWorldContext.World.Dispose(); // limpiar y libera el mundo actual
+        }
+        
         BlackyWorld blackyWorld = new BlackyWorld(infoMap.Name, infoMap.MapType, infoMap.ChunkSize, infoMap.HeightCount, infoMap.seed, new Vector2I(infoMap.TileSizeX, infoMap.TileSizeY),true);
         QueueFree();
     }

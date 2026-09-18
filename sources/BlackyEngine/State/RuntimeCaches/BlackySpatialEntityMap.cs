@@ -175,4 +175,19 @@ public class BlackySpatialEntityMap
         }
         return Array.Empty<Vector2I>();
     }
+
+    internal void Clear()
+    {
+        // 1. Opcional pero recomendado: Si los buckets internos necesitan limpiar sus propios datos o listas internas,
+        // puedes recorrerlos antes de vaciar el diccionario. (Depende de cómo esté implementado BlackyChunkEntityBucket).
+        foreach (var bucket in buckets.Values)
+        {
+            bucket.Clear(); // <-- Descomenta esto si BlackyChunkEntityBucket tiene un método Clear()
+        }
+
+        // 2. Limpiar los diccionarios y hashes principales
+        buckets.Clear();
+        regionToChunks.Clear();
+        dirtyRegions.Clear();
+    }
 }

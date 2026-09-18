@@ -10,6 +10,7 @@ using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotFlecs.sources.Flecs.Services.Spawn;
+using System;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services;
 
@@ -50,7 +51,7 @@ public sealed class BlackyWorldServices
     // ============================
     // Render helpers
     // ============================
-    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; } 
+    public BlackyTileTextureRenderSystem TerrainTextureRenderSystem { get; }  
 
     public BlackyTileRenderSystem TileRenderer { get; } // eliminar luego
 
@@ -127,5 +128,21 @@ public sealed class BlackyWorldServices
             TerrainDataLienzo);
 
         ArrowPool = new ArrowPoolService(sim.Flecs.WorldFlecs);
+    }
+
+    internal void Dispose()
+    {
+        TerrainTextureRenderSystem.Clear();
+        EntityRenderer.Clear();
+        HeightMapWorld.Dispose();
+        regionsRender.Clear();
+        TerrainDataLienzo.Clear();
+        RampasDataLienzo.Clear();
+        SuperficiesDataLienzo.Clear();
+        CaminosDataLienzo.Clear();
+        AdornosDataLienzo.Clear();
+        TerrainTexturePainter.Clear();
+        
+        OccupancyRenderer.Clear();
     }
 }

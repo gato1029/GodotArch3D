@@ -1085,4 +1085,35 @@ public class BlackyChunkCacheTextureMap
         // l.IsSolid(lx, ly) debe ser una lectura atómica de un campo simple.
         return l.IsSolid(lx, ly);
     }
+
+    // ===============================
+    // 🔥 MÉTODO CLEAR 
+    // ===============================
+
+    public void Clear()
+    {
+                    
+        // 2. Liberar colisionadores de la grilla espacial y depuración visual
+        foreach (var kvp in _colliderDebugMap)
+        {
+            int idCollider = kvp.Key;
+            if (DEBUG_COLLIDER)
+            {
+                foreach (var idDebugBody in kvp.Value)
+                {
+                    CollisionShapeDraw.Instance?.FreeDraw(idDebugBody);
+                }
+            }
+            _staticSpatialTerrain.FreeCollider(idCollider);
+        }
+        _colliderDebugMap.Clear();
+
+        // 3. Limpiar la colección concurrente de chunks
+        _chunks.Clear();
+
+        // 4. Invalidar las cachés locales por hilo
+        _lastChunk = null;
+        _lastCoord = default;
+        
+    }
 }

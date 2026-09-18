@@ -51,4 +51,26 @@ public static class UniqueIdGenerator
     {
         return $"{typeof(T).Name}_{GetNextId<T>()}";
     }
+    /// <summary>
+    /// Limpia y reinicia los pools de IDs de todos los tipos.
+    /// </summary>
+    public static void Clear()
+    {
+        _idPools.Clear();
+    }
+
+    /// <summary>
+    /// Limpia y reinicia el pool de IDs exclusivamente para el tipo T.
+    /// </summary>
+    public static void Clear<T>()
+    {
+        if (_idPools.TryGetValue(typeof(T), out var pool))
+        {
+            lock (pool)
+            {
+                pool.NextId = 1;
+                pool.ReusableIds.Clear();
+            }
+        }
+    }
 }

@@ -193,4 +193,66 @@ public class BlackyEntityRenderSystem
         entity.Set(new PositionComponent { position = new Vector2(worldPosition.X, worldPosition.Y), tilePosition = positionTile });
         entity.Add<SpriteSimpleAnimationTag>();
     }
+
+
+    // ===============================
+    // 🔥 MÉTODO CLEAR OPTIMIZADO (Flecs.NET)
+    // ===============================
+
+    public void Clear()
+    {
+        // 1. Vaciar las colas pendientes para evitar procesar eventos viejos
+        while (_loadQueue.TryDequeue(out _)) { }
+        while (_unloadQueue.TryDequeue(out _)) { }
+
+        // 2. Obtener únicamente los chunks que están activos actualmente
+        var activeChunks = chunkManager.GetActiveChunks();
+        if (activeChunks == null) return;
+
+        // 3. Recorrer exclusivamente los buckets de los chunks activos
+        foreach (var chunkCoord in activeChunks)
+        {
+            var bucket = spatialMap.GetBucket(chunkCoord);
+            if (bucket?.Exist == null) continue;
+
+            for (int i = 0; i < bucket.Exist.Length; i++)
+            {
+                if (!bucket.Exist[i]) continue;
+
+                Entity ent = bucket.Entities[i];
+                if (!ent.IsAlive()) continue;
+
+                // Si tiene el componente de renderizado GPU activo, liberamos la instancia
+                if (ent.Has<RenderGPUComponent>())
+                {
+                    ref var gpu = ref ent.GetMut<RenderGPUComponent>();
+                    if (gpu.instance != -1)
+                    {
+                        AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                        gpu.rid = default;
+                        gpu.instance = -1;
+                        gpu.layerTextureMaterial = -1;
+                    }
+
+                    // Remover componentes o etiquetas de animación asociados
+                    if (ent.Has<SpriteSimpleAnimationTag>())
+                    {
+                        ent.Remove<SpriteSimpleAnimationTag>();
+                    }
+                    if (ent.Has<RenderTransformComponent>())
+                    {
+                        ent.Remove<RenderTransformComponent>();
+                    }
+                    if (ent.Has<AnimationSimpleComponent>())
+                    {
+                        ent.Remove<AnimationSimpleComponent>();
+                    }
+                    if (ent.Has<RenderFrameDataComponent>())
+                    {
+                        ent.Remove<RenderFrameDataComponent>();
+                    }
+                }
+            }
+        }
+    }
 }

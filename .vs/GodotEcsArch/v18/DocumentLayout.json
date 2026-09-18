@@ -7,16 +7,20 @@
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\core\\blackyworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\data\\blackyloaddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\data\\blackyloaddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\runtimeeditor\\editor\\menueditorcontenedor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\runtimeeditor\\editor\\menueditorcontenedor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\state\\blackyworldstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\state\\blackyworldstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\utils\\wireshape.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\utils\\wireshape.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\services\\spawn\\blackycharactercreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\services\\spawn\\blackycharactercreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\services\\blackyworldservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\services\\blackyworldservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\services\\paint\\blackyresourcescreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -25,66 +29,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\services\\paint\\blackybuildingcreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\services\\paint\\blackybuildingcreator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackytiles\\entities\\blackyentityrendersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackytiles\\entities\\blackyentityrendersystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\data\\regionsavedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\data\\regionsavedata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\services\\palettes\\blackygenericpalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\services\\palettes\\blackygenericpalette.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\runtimeeditor\\editor\\maps\\loadmapswindows.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\runtimeeditor\\editor\\maps\\loadmapswindows.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\services\\render\\tilestexture\\blackychunkcachetexturemap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\services\\render\\tilestexture\\blackychunkcachetexturemap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\data\\blackydecorationworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\data\\blackydecorationworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\utils\\commonatributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\utils\\commonatributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\runtimeeditor\\editor\\maps\\mapswindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\runtimeeditor\\editor\\maps\\mapswindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\data\\blackypathworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\data\\blackypathworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\data\\blackysurfaceworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\data\\blackysurfaceworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\data\\blackyrampvisualworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\data\\blackyrampvisualworld.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\blackyengine\\data\\blackyterrainworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\blackyengine\\data\\blackyterrainworlddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\flecs\\components\\componentsflecs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\flecs\\components\\componentsflecs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\runtimeeditor\\editor\\maineditor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\runtimeeditor\\editor\\maineditor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\flecs\\flecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|solutionrelative:sources\\flecs\\flecsmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E3A309B-8A5B-4338-B6B7-91A570CC43C9}|GodotEcsArch.csproj|d:\\gitkraken\\godotflecs3d\\sources\\flecs\\systems\\units\\movetargetattackmellesystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -116,7 +60,7 @@
               "RelativeDocumentMoniker": "sources\\BlackyEngine\\Core\\BlackyWorld.cs",
               "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Core\\BlackyWorld.cs",
               "RelativeToolTip": "sources\\BlackyEngine\\Core\\BlackyWorld.cs",
-              "ViewState": "AgIAAJMAAAAAAAAAAADwv6cAAAAnAAAAAAAAAA==",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAAACQAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-03T17:46:55.85Z",
               "IsPinned": true,
@@ -124,7 +68,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 8,
               "Title": "WindowEditorRuntimeTerrain.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Windows\\WindowEditorRuntimeTerrain.cs",
               "RelativeDocumentMoniker": "sources\\RuntimeEditor\\Windows\\WindowEditorRuntimeTerrain.cs",
@@ -138,7 +82,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 9,
               "Title": "BlackyWorldSeed.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Generation\\Procedural\\BlackyWorldSeed.cs",
               "RelativeDocumentMoniker": "sources\\BlackyEngine\\Generation\\Procedural\\BlackyWorldSeed.cs",
@@ -152,13 +96,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "BlackyCharacterCreator.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Spawn\\BlackyCharacterCreator.cs",
               "RelativeDocumentMoniker": "sources\\BlackyEngine\\Services\\Spawn\\BlackyCharacterCreator.cs",
               "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Spawn\\BlackyCharacterCreator.cs",
               "RelativeToolTip": "sources\\BlackyEngine\\Services\\Spawn\\BlackyCharacterCreator.cs",
-              "ViewState": "AgIAAAgBAAAAAAAAAAAgwBkBAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAHcAAAAAAAAAAAAwwJIAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-25T19:17:24.56Z",
               "IsPinned": true,
@@ -166,35 +110,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "BlackyChunkCacheTextureMap.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyChunkCacheTextureMap.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyChunkCacheTextureMap.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyChunkCacheTextureMap.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Services\\Render\\TilesTexture\\BlackyChunkCacheTextureMap.cs",
-              "ViewState": "AgIAADUDAAAAAAAAAAAMwEQDAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-25T19:43:18.937Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "BlackyTerrainWorldData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyTerrainWorldData.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Data\\BlackyTerrainWorldData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyTerrainWorldData.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackyTerrainWorldData.cs",
-              "ViewState": "AgIAAHoAAAAAAAAAAAAmwIsAAAArAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-06T22:56:45.594Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "BlackyResourcesCreator.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Paint\\BlackyResourcesCreator.cs",
               "RelativeDocumentMoniker": "sources\\BlackyEngine\\Services\\Paint\\BlackyResourcesCreator.cs",
@@ -208,7 +124,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "BlackyBuildingCreator.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Paint\\BlackyBuildingCreator.cs",
               "RelativeDocumentMoniker": "sources\\BlackyEngine\\Services\\Paint\\BlackyBuildingCreator.cs",
@@ -222,7 +138,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 7,
               "Title": "MoveTargetAttackMelleSystem.cs",
               "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\Systems\\Units\\MoveTargetAttackMelleSystem.cs",
               "RelativeDocumentMoniker": "sources\\Flecs\\Systems\\Units\\MoveTargetAttackMelleSystem.cs",
@@ -236,197 +152,42 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "BlackyEntityRenderSystem.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\Entities\\BlackyEntityRenderSystem.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyTiles\\Entities\\BlackyEntityRenderSystem.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyTiles\\Entities\\BlackyEntityRenderSystem.cs",
-              "RelativeToolTip": "sources\\BlackyTiles\\Entities\\BlackyEntityRenderSystem.cs",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAkwE0AAAAaAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "WireShape.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\utils\\WireShape.cs",
+              "RelativeDocumentMoniker": "sources\\utils\\WireShape.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\utils\\WireShape.cs",
+              "RelativeToolTip": "sources\\utils\\WireShape.cs",
+              "ViewState": "AgIAAJcDAAAAAAAAAAAuwLMDAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T20:49:40.019Z",
+              "WhenOpened": "2026-09-18T17:37:11.965Z",
+              "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "BlackyGenericPalette.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Palettes\\BlackyGenericPalette.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Services\\Palettes\\BlackyGenericPalette.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\Palettes\\BlackyGenericPalette.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Services\\Palettes\\BlackyGenericPalette.cs",
-              "ViewState": "AgIAAPsAAAAAAAAAAAAawAABAAAMAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "BlackyWorldState.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\State\\BlackyWorldState.cs",
+              "RelativeDocumentMoniker": "sources\\BlackyEngine\\State\\BlackyWorldState.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\State\\BlackyWorldState.cs",
+              "RelativeToolTip": "sources\\BlackyEngine\\State\\BlackyWorldState.cs",
+              "ViewState": "AgIAADYAAAAAAAAAAAAqwEsAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T19:22:50.093Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "MapsWindow.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\Maps\\MapsWindow.cs",
-              "RelativeDocumentMoniker": "sources\\RuntimeEditor\\Editor\\Maps\\MapsWindow.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\Maps\\MapsWindow.cs",
-              "RelativeToolTip": "sources\\RuntimeEditor\\Editor\\Maps\\MapsWindow.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwBoAAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T06:17:48.644Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "CommonAtributes.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\utils\\CommonAtributes.cs",
-              "RelativeDocumentMoniker": "sources\\utils\\CommonAtributes.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\utils\\CommonAtributes.cs",
-              "RelativeToolTip": "sources\\utils\\CommonAtributes.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAQwCsAAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T06:02:08.783Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "LoadMapsWindows.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\Maps\\LoadMapsWindows.cs",
-              "RelativeDocumentMoniker": "sources\\RuntimeEditor\\Editor\\Maps\\LoadMapsWindows.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\Maps\\LoadMapsWindows.cs",
-              "RelativeToolTip": "sources\\RuntimeEditor\\Editor\\Maps\\LoadMapsWindows.cs",
-              "ViewState": "AgIAAAQAAAAAAAAAAAAAAA0AAABNAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T06:00:16.461Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "BlackyPathWorldData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyPathWorldData.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Data\\BlackyPathWorldData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyPathWorldData.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackyPathWorldData.cs",
-              "ViewState": "AgIAACQAAAAAAAAAAAAmwDUAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T05:48:33.816Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "BlackyDecorationWorldData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyDecorationWorldData.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Data\\BlackyDecorationWorldData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyDecorationWorldData.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackyDecorationWorldData.cs",
-              "ViewState": "AgIAACMAAAAAAAAAAAAwwEQAAABQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T05:47:43.454Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "BlackySurfaceWorldData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackySurfaceWorldData.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Data\\BlackySurfaceWorldData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackySurfaceWorldData.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackySurfaceWorldData.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAArwDYAAABGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T05:47:02.611Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "BlackyRampVisualWorld.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyRampVisualWorld.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Data\\BlackyRampVisualWorld.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyRampVisualWorld.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackyRampVisualWorld.cs",
-              "ViewState": "AgIAACMAAAAAAAAAAAA8wDUAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T05:27:27.968Z",
+              "WhenOpened": "2026-09-18T19:02:51.732Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "BlackyLoadData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyLoadData.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Data\\BlackyLoadData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\BlackyLoadData.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Data\\BlackyLoadData.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAgwDoAAAARAAAAAAAAAA==",
+              "Title": "MenuEditorContenedor.cs",
+              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\MenuEditorContenedor.cs",
+              "RelativeDocumentMoniker": "sources\\RuntimeEditor\\Editor\\MenuEditorContenedor.cs",
+              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\MenuEditorContenedor.cs",
+              "RelativeToolTip": "sources\\RuntimeEditor\\Editor\\MenuEditorContenedor.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAA9wDgAAABCAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-17T04:45:56.366Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "BlackyWorldServices.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\BlackyWorldServices.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Services\\BlackyWorldServices.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Services\\BlackyWorldServices.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Services\\BlackyWorldServices.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAawBYAAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-16T21:49:20.64Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "ComponentsFlecs.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\Components\\ComponentsFlecs.cs",
-              "RelativeDocumentMoniker": "sources\\Flecs\\Components\\ComponentsFlecs.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\Components\\ComponentsFlecs.cs",
-              "RelativeToolTip": "sources\\Flecs\\Components\\ComponentsFlecs.cs",
-              "ViewState": "AgIAACkAAAAAAAAAAAAiwDsAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-16T20:51:57.933Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "RegionSaveData.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\RegionSaveData.cs",
-              "RelativeDocumentMoniker": "sources\\BlackyEngine\\Data\\RegionSaveData.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\BlackyEngine\\Data\\RegionSaveData.cs",
-              "RelativeToolTip": "sources\\BlackyEngine\\Data\\RegionSaveData.cs",
-              "ViewState": "AgIAALsBAAAAAAAAAAAMwMoBAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-16T20:29:40.472Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "MainEditor.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\MainEditor.cs",
-              "RelativeDocumentMoniker": "sources\\RuntimeEditor\\Editor\\MainEditor.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\RuntimeEditor\\Editor\\MainEditor.cs",
-              "RelativeToolTip": "sources\\RuntimeEditor\\Editor\\MainEditor.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-16T20:29:04.186Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "FlecsManager.cs",
-              "DocumentMoniker": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\FlecsManager.cs",
-              "RelativeDocumentMoniker": "sources\\Flecs\\FlecsManager.cs",
-              "ToolTip": "D:\\GitKraken\\GodotFlecs3D\\sources\\Flecs\\FlecsManager.cs",
-              "RelativeToolTip": "sources\\Flecs\\FlecsManager.cs",
-              "ViewState": "AgIAAJMAAAAAAAAAAAAiwLAAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-16T19:30:08.862Z",
+              "WhenOpened": "2026-09-18T19:01:23.036Z",
               "EditorCaption": ""
             }
           ]
