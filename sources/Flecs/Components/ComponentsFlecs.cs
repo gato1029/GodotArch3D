@@ -155,6 +155,8 @@ public record struct TeamComponent
     ushort TeamId            // Ej: 0 = player, 1 = enemigos
 );
 
+[RegisterComponentFlecs]
+public record struct SelectedTag();
 
 [RegisterComponentFlecs]
 public record struct PersistEntityTag();

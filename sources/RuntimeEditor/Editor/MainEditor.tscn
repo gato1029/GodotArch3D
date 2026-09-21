@@ -149,7 +149,6 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
 [node name="KuroCheckButtonGrid" type="CheckButton" parent="Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor" unique_id=880552329]
 layout_mode = 2
-text = "Grid"
 icon = ExtResource("10_wsd07")
 script = ExtResource("10_8qgvi")
 TextureOn = ExtResource("12_f1fuj")

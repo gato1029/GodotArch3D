@@ -461,6 +461,58 @@ public class FastSpatialHash
     }
 
     /// <summary>
+    /// Consulta nodos dentro de un rectángulo (AABB) definido por coordenadas del mundo,
+    /// discriminando opcionalmente un equipo específico.
+    /// </summary>
+    public int QueryNodesInBoxFiltered(
+        float minX, float minY, float maxX, float maxY,
+        ushort teamToIgnore,
+        Span<int> results)
+    {
+        int count = 0;
+        _currentQueryId++;
+
+        if (_currentQueryId == int.MaxValue)
+        {
+            Array.Fill(_visitedMarks, 0);
+            _currentQueryId = 1;
+        }
+
+        // 1. Calcular los límites de celdas (tiles) que cubre el rectángulo
+        int minTx = (int)MathF.Floor(minX / tileSizeUnits);
+        int minTy = (int)MathF.Floor(minY / tileSizeUnits);
+        int maxTx = (int)MathF.Floor(maxX / tileSizeUnits);
+        int maxTy = (int)MathF.Floor(maxY / tileSizeUnits);
+
+        // 2. Recorrer la cuadrícula de celdas afectada por el rectángulo
+        for (int ty = minTy; ty <= maxTy; ty++)
+        {
+            for (int tx = minTx; tx <= maxTx; tx++)
+            {
+                int cell = GetHashDirect(tx, ty, TotalCells);
+                int node = _heads[cell];
+
+                while (node != -1)
+                {
+                    // Filtramos por equipo y evitamos duplicados con el sistema de marcas
+                    if (_teams[node] != teamToIgnore && _visitedMarks[node] != _currentQueryId)
+                    {
+                        _visitedMarks[node] = _currentQueryId;
+                        results[count++] = node;
+
+                        // Corte duro si llenamos el buffer del Span
+                        if (count == results.Length)
+                            return count;
+                    }
+                    node = _nextNodes[node];
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
     /// Consulta nodos por anillos cercanos, discriminando un equipo específico 
     /// (Ideal para ignorar aliados o buscar enemigos).
     /// </summary>

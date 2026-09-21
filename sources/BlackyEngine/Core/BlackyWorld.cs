@@ -19,6 +19,7 @@ using GodotEcsArch.sources.BlackyEngine.State;
 using GodotEcsArch.sources.BlackyEngine.Streaming;
 using GodotEcsArch.sources.BlackyTiles.Entities;
 using GodotEcsArch.sources.BlackyTiles.Systems;
+using GodotEcsArch.sources.godot;
 using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
@@ -95,6 +96,7 @@ public sealed class BlackyWorld : IDisposable
 
         Name = name;
         WorldTypeDetail = worldTypeDetail;        
+
         Config = new BlackyWorldConfig(
             name,
             worldTypeDetail,
@@ -103,17 +105,15 @@ public sealed class BlackyWorld : IDisposable
             worldSeed,
             mapSize);
 
+
         State = new BlackyWorldState(this);
-
         Simulation = new BlackyWorldSimulation(this);
-
         Streaming = new BlackyWorldStreaming(this);
-
         Services = new BlackyWorldServices(this);
-
-        //Generation = new BlackyWorldGeneration(this, Services); esto ya no funcionara luego quitar 
-
         BlackyWorldRegistry.Instance.AddWorld(name, this, true);
+        RTSSelectionManager.Instance.SetWorld(this);
+
+        //Generation = new BlackyWorldGeneration(this, Services); esto ya no funcionara luego quitar         
 
         if (!isLoad)
         {
@@ -188,7 +188,7 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-        //SpawnEnemiesAroundPlayer(5000,10);
+        SpawnEnemiesAroundPlayer(10,20);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));

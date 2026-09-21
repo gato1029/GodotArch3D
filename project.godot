@@ -25,6 +25,7 @@ DebugDraw="*uid://bmj73n4adq0b7"
 DebugMenu="*uid://cggqb75a8w8r"
 MainThreadDispatcher="*res://sources/utils/MainThreadDispatcher.cs"
 RuntimeServices="*uid://fqjq1f4qfxrs"
+RtsSelectionManager="*uid://j342rl5eyl4a"
 
 [display]
 

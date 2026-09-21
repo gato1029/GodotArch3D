@@ -2,15 +2,9 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.managers.Characters;
-using GodotEcsArch.sources.managers.Collision;
-using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
-using GodotFlecs.sources.Flecs.Systems;
-using RVO;
-using SadRogue.Primitives;
-using System;
-using static System.Net.WebRequestMethods;
-using CharacterComponent = GodotFlecs.sources.Flecs.Components.StateComponent;
+
+
 
 namespace GodotFlecs.sources.Flecs.Systems.Units;
 
@@ -23,7 +17,7 @@ public class MoveTargetSystem : FlecsSystemBase
     {
         qb.With<PositionComponent>()          
           .With<MoveTargetComponent>()
-          .With<Components.StateComponent>()
+          .With<StateComponent>()
           .With<SteeringComponent>() // <-- Añadido
           .With<MoveResolutorComponent>()
           .With<MoveColliderComponent>()
@@ -35,7 +29,7 @@ public class MoveTargetSystem : FlecsSystemBase
     {
         var posArray = it.Field<PositionComponent>(0);
         var targetArray = it.Field<MoveTargetComponent>(1);
-        var chaArray = it.Field<Components.StateComponent>(2);
+        var stateArray = it.Field<StateComponent>(2);
         var steeringArray = it.Field<SteeringComponent>(3); // <-- Añadido
         var resolutorArray = it.Field<MoveResolutorComponent>(4);
         var moveArray = it.Field<MoveColliderComponent>(5);
@@ -45,7 +39,7 @@ public class MoveTargetSystem : FlecsSystemBase
         {
             ref var pos = ref posArray[i];
             ref var target = ref targetArray[i];
-            ref var cha = ref chaArray[i];
+            ref var state = ref stateArray[i];
             ref var steering = ref steeringArray[i];
             ref var resolutor = ref resolutorArray[i];
             ref var move = ref moveArray[i];
@@ -56,7 +50,7 @@ public class MoveTargetSystem : FlecsSystemBase
                 steering.DesiredDir = Vector2.Zero;
                 resolutor.BlockedTimer = 0;
                 resolutor.Blocked = true;
-                cha.stateType = StateType.IDLE;
+                state.stateType = StateType.IDLE;
                 it.Entity(i).Remove<MoveTargetComponent>();
                 it.Entity(i).Add<StoppedTag>();
 
@@ -74,7 +68,7 @@ public class MoveTargetSystem : FlecsSystemBase
                 resolutor.BlockedTimer = 0;
                 steering.DesiredDir = Vector2.Zero;
                 resolutor.Blocked = true;
-                cha.stateType = StateType.IDLE;
+                state.stateType = StateType.IDLE;
                 it.Entity(i).Remove<MoveTargetComponent>();
                 it.Entity(i).Add<StoppedTag>();           
                 continue;
@@ -82,7 +76,7 @@ public class MoveTargetSystem : FlecsSystemBase
 
             // Solo enviamos la DIRECCIÓN deseada al Steering
             steering.DesiredDir = (toTarget).Normalized();
-            cha.stateType = StateType.MOVING;
+            state.stateType = StateType.MOVING;
         }
     }
 }
