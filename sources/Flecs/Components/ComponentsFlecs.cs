@@ -290,6 +290,13 @@ public record struct LayerRenderComponent
     int layerRender       
 );
 [RegisterComponentFlecs]
+public record struct RenderSelectionGPUComponent
+(
+    Rid rid,
+    int instance,    
+    int layerTextureMaterial    
+);
+[RegisterComponentFlecs]
 public record struct RenderGPUComponent
 (      
     // ojo idMaterial ya no se usa

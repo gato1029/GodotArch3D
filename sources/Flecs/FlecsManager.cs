@@ -196,7 +196,7 @@ public class FlecsManager
         // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
         RegisterSystem<ProjectileTransformSystem>();
         RegisterSystem<SpriteTransformSystem>();
-        RegisterSystem<SpriteTransformLayerSystem>();
+        //RegisterSystem<SpriteTransformLayerSystem>();
         RegisterSystem<TileSpriteTextureTransformSystem>();
 
         // estados

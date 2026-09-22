@@ -11,6 +11,7 @@ using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -178,9 +179,14 @@ public class BlackyCharacterCreator
         transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
 
         entity.Set(new RenderTransformComponent(transform));
+
+
         entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));
         entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = moveData.uvFramesArray[0] });
+
+        RenderingServer.MultimeshInstanceSetTransform(instance.rid, instance.instance, transform);
+        RenderingServer.MultimeshInstanceSetColor(instance.rid, instance.instance, new Color(1, 1, 1, instance.layerTexture)); 
 
         entity.Set(new GodotFlecs.sources.Flecs.Components.StateComponent
         {
@@ -225,8 +231,13 @@ public class BlackyCharacterCreator
         }
 
         entity.Add<UseBoidTag>();
-
+        AddSelectionRender(entity);
         return entity;
+    }
+
+    private void AddSelectionRender(Entity ent)
+    {
+        ent.Set(new RenderSelectionGPUComponent());
     }
 
     private Entity CreateEnemy(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position, int height, int health=0)
@@ -252,6 +263,9 @@ public class BlackyCharacterCreator
         Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
         transform.Origin = new Godot.Vector3(position.X+ originOffset.X, position.Y+ originOffset.Y, z);
         transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
+
+        RenderingServer.MultimeshInstanceSetTransform(instance.rid, instance.instance, transform); 
+        RenderingServer.MultimeshInstanceSetColor(instance.rid, instance.instance, new Color(1, 1, 1, instance.layerTexture));
 
         entity.Set(new RenderTransformComponent(transform));
         entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));

@@ -265,7 +265,7 @@ public class BlackyBuildingCreator
             var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
             RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
             RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, spriteData.uv);
-            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(0, 0, 0, renderInstance.layerTexture));
+            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(1, 1, 1, renderInstance.layerTexture));
             entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
                      layer, depthOffset, spriteData.scale, offset));
         }
@@ -295,7 +295,7 @@ public class BlackyBuildingCreator
             var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
             RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
             RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, animationData.uvFramesArray[0]);
-            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(0, 0, 0, renderInstance.layerTexture));
+            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(1, 1, 1, renderInstance.layerTexture));
             entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
                  layer, depthOffset, animationData.scale, offset));
 

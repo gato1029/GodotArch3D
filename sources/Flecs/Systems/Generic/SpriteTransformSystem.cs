@@ -48,13 +48,16 @@ internal class SpriteTransformSystem : FlecsSystemBase
             float z = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
             var tt = t.transform;
             tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, z);
-            t.transform = tt; 
+            t.transform = tt;
+
+            RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform);
         }
     }
 }
 
 internal class SpriteTransformLayerSystem : FlecsSystemBase
 {
+    // este sistema falta corregir con el gpu
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
 
@@ -102,6 +105,7 @@ internal class SpriteTransformLayerSystem : FlecsSystemBase
                     z
                 );
                 t.transform = tt;
+                //RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform);
             }
         }
     }

@@ -27,6 +27,8 @@ internal class ProjectileMovementSystem : FlecsSystemBase
         qb.With<ProjectilePositionComponent>()
           .With<ProjectileVelocityComponent>()
           .With<ProjectileTargetComponent>()
+          .With<RenderGPUComponent>()
+          .With<RenderTransformComponent>()
           .With<ActiveProjectileTag>();
     }
 
@@ -39,6 +41,8 @@ internal class ProjectileMovementSystem : FlecsSystemBase
         var posArray = it.Field<ProjectilePositionComponent>(0);
         var velArray = it.Field<ProjectileVelocityComponent>(1);
         var targetArray = it.Field<ProjectileTargetComponent>(2);
+        var gpuArray = it.Field<RenderGPUComponent>(3);
+        var transformArray = it.Field<RenderTransformComponent>(4);
         float deltaTime = it.DeltaTime();
 
         for (int i = 0; i < it.Count(); i++)
@@ -46,11 +50,20 @@ internal class ProjectileMovementSystem : FlecsSystemBase
             ref var pos = ref posArray[i];
             ref var vel = ref velArray[i];
             ref var projTarget = ref targetArray[i];
+            ref var gpu = ref gpuArray[i];
+            ref var transform = ref transformArray[i];
             var arrowEntity = it.Entity(i);
 
 
             // 1. Mover flecha
             pos.Position += vel.Velocity * deltaTime;
+
+            float z = CommonAtributes.Calculate(gpu.depthOffset, 10, gpu.layerRender, pos.Position); // debemos usar esto apartir de ahora
+            var tt = transform.transform;
+            tt.Origin = new Vector3(pos.Position.X + gpu.originOffset.X, pos.Position.Y + gpu.originOffset.Y, z);
+            transform.transform = tt;
+
+            RenderingServer.MultimeshInstanceSetTransform(gpu.rid, gpu.instance, transform.transform);
 
             // 2. Comprobar colisión en tiempo real (si el objetivo sigue vivo)
             if (projTarget.Target.IsAlive() && !projTarget.Target.Has<DeadTag>())

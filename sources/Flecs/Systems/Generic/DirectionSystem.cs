@@ -69,13 +69,13 @@ public class DirectionSystem : FlecsSystemBase
                     case DirectionAnimationType.NINGUNO:
                         break;
                     case DirectionAnimationType.DOS:                        
-                        dir.animationDirection = CommonOperations.GetDirectionAnimationLeftRight(dir.normalized);
+                        dir.animationDirection = CommonOperations.GetDirectionAnimationLeftRight(dir.value); // antes estaba el norm
                         break;
                     case DirectionAnimationType.CUATRO:                        
-                        dir.animationDirection = CommonOperations.GetDirectionAnimation(dir.normalized);
+                        dir.animationDirection = CommonOperations.GetDirectionAnimation(dir.value);
                         break;
                     case DirectionAnimationType.OCHO:
-                        dir.animationDirection = CommonOperations.GetDirectionAnimationEight(dir.normalized);
+                        dir.animationDirection = CommonOperations.GetDirectionAnimationEight(dir.value);
                         break;
                     default:
                         break;

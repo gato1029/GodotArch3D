@@ -24,6 +24,9 @@ varying float layerTexture;     // Texture layer index (as float)
 varying float mirrorX;
 varying float mirrorY;
 
+varying vec3 instance_color;
+varying float instance_alpha;
+
 // Ratio to scale the quad (based on base tile size)
 vec2 get_aspect_ratio(vec2 texture_size) {
 	float base_size = 16.0; // Adjust to your tile size
@@ -31,8 +34,15 @@ vec2 get_aspect_ratio(vec2 texture_size) {
 }
 
 void vertex() {
-	// Read per-instance data
-	layerTexture = COLOR.a;
+	// Color RGB de tinte y lectura de la capa/alfa
+    instance_color = COLOR.rgb; 
+    float raw_value = COLOR.a;
+    layerTexture = floor(raw_value); // Parte entera = La Capa (ej: 2.0)    
+    float fract_part = fract(raw_value); // Obtenemos los decimales
+    
+    // Si no tiene decimales (ej: 2.0), el alfa es 1.0 (opaco total).
+    // Si tiene decimales (ej: 2.5), usamos ese valor como transparencia.
+    instance_alpha = (fract_part == 0.0) ? 1.0 : fract_part;
 
 	x = INSTANCE_CUSTOM.r;
 	y = INSTANCE_CUSTOM.g;
@@ -114,8 +124,8 @@ void fragment() {
 
 	// Output final color
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
-	ALBEDO = texColor.rgb;
-	ALPHA = texColor.a;
+	ALBEDO = texColor.rgb * instance_color; // 🔹 Aplicamos el color RGB de la instancia
+    ALPHA = texColor.a * instance_alpha;    // 🔹 Aplicamos la transparencia de la instancia
 	// =====================================================
     //  DEBUG 2: Borde amarillo para visibles
     // =====================================================

@@ -98,7 +98,7 @@ public class MoveSeparationSystem : FlecsSystemBase
             ref var steering = ref steeringArray[i];
             ref var vel = ref velArray[i];
 
-            if (steering.DesiredDir.LengthSquared() < 0.0001f)
+            if (steering.DesiredDir.LengthSquared() < 0.01f) //  0.0001f
                 continue;
 
             Vector2 posFuture = pos.position + (steering.DesiredDir*vel.MaxSpeed* it.DeltaTime())*2;
@@ -142,6 +142,7 @@ public class MoveSeparationSystem : FlecsSystemBase
             }
             if (existCollision)
             {
+                vel.desiredVel = Vector2.Zero;
                 steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimiento
 
             }

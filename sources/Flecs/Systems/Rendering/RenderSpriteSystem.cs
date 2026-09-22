@@ -37,9 +37,9 @@ internal class RenderSpriteSystem : FlecsSystemBase
             ref var r = ref gpu[i];
             ref var f = ref frame[i];
             ref var t = ref transform[i];
-            RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform); // luego comentar esto
-            RenderingServer.MultimeshInstanceSetCustomData(r.rid, r.instance, f.uvMap);
-            RenderingServer.MultimeshInstanceSetColor(r.rid, r.instance, new Color(0, 0, 0, r.layerTextureMaterial)); // y esto y hacerlo en la creacion directa por que no se vuelve a usar
+            //RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform); // luego comentar esto
+            RenderingServer.MultimeshInstanceSetCustomData(r.rid, r.instance, f.uvMap); // solo esto cambia por la animacion
+            //RenderingServer.MultimeshInstanceSetColor(r.rid, r.instance, new Color(1, 1, 1, r.layerTextureMaterial)); // y esto y hacerlo en la creacion directa por que no se vuelve a usar
         }
     }
 }

@@ -108,6 +108,68 @@ internal class CommonOperations
             ? AnimationDirection.LEFTUP
             : AnimationDirection.LEFTDOWN;
     }
+
+    //public static AnimationDirection GetDirectionAnimationEight(Vector2 normalized)
+    //{
+    //    if (normalized == Vector2.Zero)
+    //        return AnimationDirection.RIGHT;
+
+    //    // Obtenemos el ángulo en grados (0 a 360)
+    //    float angle = MathF.Atan2(normalized.Y, normalized.X) * (180f / MathF.PI);
+    //    if (angle < 0)
+    //        angle += 360f;
+
+    //    // Distribución con preferencia cardinal (60° para cardinales, 30° para diagonales):
+
+    //    // Derecha (centrado en 0°) -> 60° de amplitud (de 330° a 30°)
+    //    if (angle >= 330f || angle < 30f) return AnimationDirection.RIGHT;
+
+    //    // Diagonal Arriba-Derecha -> 30° de amplitud (de 30° a 60°)
+    //    if (angle >= 30f && angle < 60f) return AnimationDirection.RIGHTUP; // Ojo con el eje Y
+
+    //    // Arriba (centrado en 90°) -> 60° de amplitud (de 60° a 120°)
+    //    if (angle >= 60f && angle < 120f) return AnimationDirection.UP;
+
+    //    // Diagonal Arriba-Izquierda -> 30° de amplitud (de 120° a 150°)
+    //    if (angle >= 120f && angle < 150f) return AnimationDirection.LEFTUP;
+
+    //    // Izquierda (centrado en 180°) -> 60° de amplitud (de 150° a 210°)
+    //    if (angle >= 150f && angle < 210f) return AnimationDirection.LEFT;
+
+    //    // Diagonal Abajo-Izquierda -> 30° de amplitud (de 210° a 240°)
+    //    if (angle >= 210f && angle < 240f) return AnimationDirection.LEFTDOWN;
+
+    //    // Abajo (centrado en 270°) -> 60° de amplitud (de 240° a 300°)
+    //    if (angle >= 240f && angle < 300f) return AnimationDirection.DOWN;
+
+    //    // Diagonal Abajo-Derecha -> 30° de amplitud (de 300° a 330°)
+    //    return AnimationDirection.RIGHTDOWN;
+    //}
+
+    //public static AnimationDirection GetDirectionAnimationEight(Vector2 normalized)
+    //{
+    //    if (normalized == Vector2.Zero)
+    //        return AnimationDirection.RIGHT;
+
+    //    // Obtenemos el ángulo en radianes y lo pasamos a grados (de -180 a 180)
+    //    float angle = MathF.Atan2(normalized.Y, normalized.X) * (180f / MathF.PI);
+
+    //    // Normalizamos los grados de 0 a 360
+    //    if (angle < 0)
+    //        angle += 360f;
+
+    //    // Dividimos el círculo de 360° en 8 sectores de 45°.
+    //    // Desplazamos 22.5° para que los ejes cardinales queden protegidos en el centro de su rango.
+    //    if (angle >= 337.5f || angle < 22.5f) return AnimationDirection.RIGHT;
+    //    if (angle >= 22.5f && angle < 67.5f) return AnimationDirection.RIGHTUP;    // Ojo con el eje Y invertido
+    //    if (angle >= 67.5f && angle < 112.5f) return AnimationDirection.UP;
+    //    if (angle >= 112.5f && angle < 157.5f) return AnimationDirection.LEFTUP;
+    //    if (angle >= 157.5f && angle < 202.5f) return AnimationDirection.LEFT;
+    //    if (angle >= 202.5f && angle < 247.5f) return AnimationDirection.LEFTDOWN;
+    //    if (angle >= 247.5f && angle < 292.5f) return AnimationDirection.DOWN;
+
+    //    return AnimationDirection.RIGHTDOWN;
+    //}
     public static Vector2 NewPointInCircle(Vector2 origin, float radius)
     {
         Vector2 newPoint;

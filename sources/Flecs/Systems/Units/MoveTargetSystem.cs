@@ -57,7 +57,7 @@ public class MoveTargetSystem : FlecsSystemBase
 
                 continue;
             }
-            Vector2 toTarget = target.Value - pos.position+move.Offset;
+            Vector2 toTarget = target.Value - pos.position +move.Offset;
             float distSq = toTarget.LengthSquared();
 
             float umbralLlegada = 0.05f;

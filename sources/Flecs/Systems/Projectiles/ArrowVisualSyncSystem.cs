@@ -89,5 +89,9 @@ internal class ArrowVisualSyncSystem : FlecsSystemBase
         entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, spriteData.scale, originOffset));
         //entity.Set(new AnimationComponent(id, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = spriteData.uv });
+
+        RenderingServer.MultimeshInstanceSetTransform(instance.rid, instance.instance, transform); // luego comentar esto
+        RenderingServer.MultimeshInstanceSetCustomData(instance.rid, instance.instance, spriteData.uv); // solo esto cambia por la animacion
+        RenderingServer.MultimeshInstanceSetColor(instance.rid, instance.instance, new Color(1, 1, 1, instance.layerTexture));
     }
 }
