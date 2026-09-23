@@ -294,7 +294,9 @@ public record struct RenderSelectionGPUComponent
 (
     Rid rid,
     int instance,    
-    int layerTextureMaterial    
+    int layerTextureMaterial,
+    int layerRender,
+    Vector2 offset
 );
 [RegisterComponentFlecs]
 public record struct RenderGPUComponent

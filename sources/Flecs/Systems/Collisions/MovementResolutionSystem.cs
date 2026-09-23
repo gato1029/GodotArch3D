@@ -57,7 +57,13 @@ public class MovementResolutionSystem : FlecsSystemBase
             ref var vel = ref velArray[i];
             ref var move = ref moveArray[i];
             ref var cha = ref chaArray[i];
-
+            if (move.Blocked)
+            {
+                cha.stateType = StateType.IDLE;              
+                vel.desiredVel = Vector2.Zero;
+                //move.Blocked = false;
+                continue;
+            }
             if (cha.stateType != StateType.MOVING) //solo mover si el estado es MOVING
             {
                 continue;
@@ -70,11 +76,11 @@ public class MovementResolutionSystem : FlecsSystemBase
 
             if (!isMoving)
             {
-                move.Blocked = true;
+                //move.Blocked = true;
                 cha.stateType = StateType.IDLE;
 
                 // 🔥 timer determinista sin loop
-                move.BlockedTimer += totalTickTime;
+                //move.BlockedTimer += totalTickTime;
             }
             else
             {

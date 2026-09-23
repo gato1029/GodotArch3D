@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="resources\" />
+    <Folder Include="sources\Flecs\Systems\Delta\" />
     <Folder Include="sources\managers\Generic\" />
     <Folder Include="sources\managers\Sprite3D\" />
     <Folder Include="sources\systems\Collisions\" />

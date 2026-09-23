@@ -42,8 +42,8 @@ public class SteeringSystem : FlecsSystemBase
         var sim = world.Simulation.Tick;
 
         // 🔥 AQUI VA (ANTES DE TODO)
-        if ((sim.FrameIndex & 1) != 0)
-            return;
+        //if ((sim.FrameIndex & 1) != 0)
+        //    return;
 
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
@@ -65,7 +65,7 @@ public class SteeringSystem : FlecsSystemBase
 
             Vector2 desiredDir = steering.DesiredDir;
 
-            if (desiredDir == Vector2.Zero)
+            if (desiredDir == Vector2.Zero || res.Blocked)
             {
                 vel.desiredVel = Vector2.Zero;
                 continue;

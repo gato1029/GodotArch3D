@@ -191,11 +191,13 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                     }
                     else
                     {
-                        moveResolutor.Blocked = false;
-                        moveResolutor.BlockedTimer = 0f;
-                        e.Set(new MoveTargetComponent(targetPos));
-                        e.Remove<StoppedTag>();
-                        e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos,0));
+                        if (!moveResolutor.Blocked )
+                        {                            
+                            e.Set(new MoveTargetComponent(targetPos));
+                            e.Remove<StoppedTag>();
+                            e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos, 0));
+                        }
+                        
                     }
                     
                 }

@@ -30,6 +30,26 @@ public  class CommonAtributes
         return  (height * 10f) + (layer * 0.1f) - ((positionCenter.Y+ depthOffsetY) * 0.001f);
     }
 
+    /// <summary>
+    /// Calcula la posición Z para elementos de selección (como BlackySelectionBox)
+    /// situándose justo debajo de la capa/altura actual del objeto, pero por encima del fondo.
+    /// </summary>
+    internal static float CalculateSelection(float depthOffsetY, float height, float layer, Vector2 positionCenter)
+    {
+        // Calculamos la posición base del objeto actual
+        //float currentZ = Calculate(depthOffsetY, height, layer, positionCenter);
+
+        //// Restamos un pequeño margen de seguridad (offset) para que se dibuje 
+        //// ligeramente "más atrás" (debajo) del edificio actual, pero antes del suelo anterior.
+        //// O bien, podemos bajarle una fracción decimal a la layer:
+        float selectionLayer = layer - 0.2f;
+
+        return Calculate(depthOffsetY, height, selectionLayer, positionCenter);
+
+        // Alternativa directa si prefieres restar directo al resultado final:
+        //return currentZ - 0.0002f;
+    }
+
     public static SavedMapData LoadInfoMap(string nameMap, SaveFormat _format)
     {
         string rootPathLocal = RutaGuardadoMapas + "\\" + nameMap;

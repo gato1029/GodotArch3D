@@ -102,7 +102,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         RenderingServer.MultimeshInstanceSetColor(
             RenderInstance.rid,
             RenderInstance.instance,
-            new Godot.Color(0, 0, 0, RenderInstance.layerTexture)
+            new Godot.Color(1, 1, 1, RenderInstance.layerTexture)
         );
 
         var world = flecsManager.WorldFlecs;
@@ -192,7 +192,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         RenderingServer.MultimeshInstanceSetColor(
             RenderInstance.rid,
             RenderInstance.instance,
-            new Godot.Color(0, 0, 0, RenderInstance.layerTexture)
+            new Godot.Color(1, 1, 1, RenderInstance.layerTexture)
         );
 
 

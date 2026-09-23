@@ -85,11 +85,11 @@ public class MoveSeparationSystem : FlecsSystemBase
                 _stamp = 1;
             }
 
-            if (!shouldUpdate)
-            {
-                // 🔥 mantener velocidad anterior (no recalcular)
-                continue;
-            }
+            //if (!shouldUpdate)
+            //{
+            //    // 🔥 mantener velocidad anterior (no recalcular)
+            //    continue;
+            //}
 
             ref var pos = ref posArray[i];
             ref var col = ref colArray[i];
@@ -138,6 +138,7 @@ public class MoveSeparationSystem : FlecsSystemBase
                 {
                     it.Entity(i).Add<StoppedTag>();
                     vel.desiredVel = Vector2.Zero;
+                    res.Blocked = true;
                 }
             }
             if (!existCollision)
@@ -150,13 +151,15 @@ public class MoveSeparationSystem : FlecsSystemBase
                 {
                     it.Entity(i).Add<StoppedTag>();
                     vel.desiredVel = Vector2.Zero;
+                    res.Blocked = true;
                 }
             }
             if (existCollision)
             {
-               
+                //res.Blocked = true;
+                vel.desiredVel = Vector2.Zero;
                 steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimientoxx
-
+                
             }
         }
     }

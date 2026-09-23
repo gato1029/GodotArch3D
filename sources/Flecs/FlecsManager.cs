@@ -17,7 +17,7 @@ using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using GodotFlecs.sources.Flecs.Systems.Building;
-using GodotFlecs.sources.Flecs.Systems.Delta;
+
 using GodotFlecs.sources.Flecs.Systems.Generic;
 using GodotFlecs.sources.Flecs.Systems.Human;
 using GodotFlecs.sources.Flecs.Systems.Units;
@@ -196,6 +196,7 @@ public class FlecsManager
         // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
         RegisterSystem<ProjectileTransformSystem>();
         RegisterSystem<SpriteTransformSystem>();
+        RegisterSystem<SpriteSelectorTransformSystem>();
         //RegisterSystem<SpriteTransformLayerSystem>();
         RegisterSystem<TileSpriteTextureTransformSystem>();
 

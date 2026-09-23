@@ -74,6 +74,16 @@ internal class DeathCleanupSystem : FlecsSystemBase
                     ContadoresHelper.Liberar(TipoContador.EdificiosUnidadesRango, ranged.NumberUnitRange);
                     world.Tick.UpdateGroupCountRanged(ContadoresHelper.ObtenerUltimo(TipoContador.EdificiosUnidadesRango));
                 }
+                if (entity.Has<RenderSelectionGPUComponent>())
+                {
+                    var selector = entity.Get<RenderSelectionGPUComponent>();
+                    if (selector.rid != default && selector.instance != -1)
+                    {
+                        AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
+                    }
+                }
+                
+
                 entity.Destruct();
             }
         }
@@ -142,6 +152,15 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                 }
                 spatialEntityMap.Remove(entity);
                 occupancyMap.ClearByEntity(0, pos.tilePosition.X,pos.tilePosition.Y);
+                if (entity.Has<RenderSelectionGPUComponent>())
+                {
+                    var selector = entity.Get<RenderSelectionGPUComponent>();
+                    if (selector.rid != default && selector.instance != -1)
+                    {
+                        AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
+                    }
+                }
+
                 entity.Destruct();
             }
         }

@@ -45,18 +45,10 @@ public class MoveTargetSystem : FlecsSystemBase
             ref var move = ref moveArray[i];
       
 
-            if (resolutor.BlockedTimer>0.5f )
-            {
-                steering.DesiredDir = Vector2.Zero;
-                resolutor.BlockedTimer = 0;
-                resolutor.Blocked = true;
-                state.stateType = StateType.IDLE;
-                it.Entity(i).Remove<MoveTargetComponent>();
-                it.Entity(i).Add<StoppedTag>();
-
-
-                continue;
-            }
+            //if (resolutor.Blocked)
+            //{        
+            //    continue;
+            //}
             Vector2 toTarget = target.Value - pos.position +move.Offset;
             float distSq = toTarget.LengthSquared();
 
@@ -67,7 +59,7 @@ public class MoveTargetSystem : FlecsSystemBase
             {
                 resolutor.BlockedTimer = 0;
                 steering.DesiredDir = Vector2.Zero;
-                resolutor.Blocked = true;
+                resolutor.Blocked = false; // liberas bloqueo
                 state.stateType = StateType.IDLE;
                 it.Entity(i).Remove<MoveTargetComponent>();
                 it.Entity(i).Add<StoppedTag>();           

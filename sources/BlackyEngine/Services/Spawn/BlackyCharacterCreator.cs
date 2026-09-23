@@ -237,7 +237,7 @@ public class BlackyCharacterCreator
 
     private void AddSelectionRender(Entity ent)
     {
-        ent.Set(new RenderSelectionGPUComponent());
+        ent.Set(new RenderSelectionGPUComponent(default,-1,-1,-1,Vector2.Zero));
     }
 
     private Entity CreateEnemy(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Godot.Vector2 position, int height, int health=0)

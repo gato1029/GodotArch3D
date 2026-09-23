@@ -60,7 +60,8 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
             bool collided = CheckAgainstStaticGrid(posFuture, ref col, staticSpatialGrid);                     
             if (collided)
             {
-                steering.DesiredDir = Godot.Vector2.Zero;                
+                steering.DesiredDir = Godot.Vector2.Zero;      
+                vel.desiredVel = Vector2.Zero;
             }
         }
     }

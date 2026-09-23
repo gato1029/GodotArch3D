@@ -2,7 +2,9 @@
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Generic;
 using GodotEcsArch.sources.managers;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
@@ -179,6 +181,8 @@ public partial class RTSSelectionManager : Node2D
                 if (entity.Has<StoppedTag>())
                 {
                     entity.Remove<StoppedTag>();
+                    ref var res = ref entity.GetMut<MoveResolutorComponent>();
+                    res.Blocked = false;
                 }
 
                 unitsCommanded++;
@@ -232,9 +236,16 @@ public partial class RTSSelectionManager : Node2D
             });
             foreach (var ent in entitiesToDeselect)
             {
-                if (ent.IsAlive())
+                if (ent.IsAlive() && !ent.Has<DeadTag>())
                 {
                     ent.Remove<SelectedTag>();
+                    ref var  selector =  ref ent.GetMut<RenderSelectionGPUComponent>();
+                    if (selector.rid != default && selector.instance!=-1)
+                    {
+                        AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
+                        selector.rid = default;
+                        selector.instance = -1;
+                    }                    
                 }
             }
         }
@@ -288,6 +299,7 @@ public partial class RTSSelectionManager : Node2D
         {
             if (!closestEntity.Has<SelectedTag>())
             {
+                BlackyManagerSelector.CreateSelector(closestEntity);
                 closestEntity.Add<SelectedTag>();
                 GD.Print($"Unidad seleccionada por Spatial Hash (clic): {closestEntity.Id}");
             }
@@ -338,6 +350,7 @@ public partial class RTSSelectionManager : Node2D
                         if (CollisionMathHelper.CheckCircle(positionComp.position.X, positionComp.position.Y, moveCollider.Radius, moveCollider.Offset, centerPosition.X, centerPosition.Y, ref collider))
                         {
                             entity.Add<SelectedTag>();
+                            BlackyManagerSelector.CreateSelector(entity);
                             selectedCount++;
                         }                                                
                     }                    

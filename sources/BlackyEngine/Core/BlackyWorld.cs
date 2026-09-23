@@ -118,7 +118,7 @@ public sealed class BlackyWorld : IDisposable
         if (!isLoad)
         {
             // si es nuevo hacemos procedural etc
-            //Procedural = new BlackyWorldProceduralGeneration(this, Config);
+            Procedural = new BlackyWorldProceduralGeneration(this, Config);
             DebugBoot();
         }
         else
@@ -188,8 +188,8 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-        SpawnEnemiesAroundPlayer(50,10);
-        WireShape.Instance.DrawSelectionBrackets(new Vector2(128, 128), new Vector2(0,0), 20, Colors.Green);
+        SpawnEnemiesAroundPlayer(50,20);
+        
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));
         

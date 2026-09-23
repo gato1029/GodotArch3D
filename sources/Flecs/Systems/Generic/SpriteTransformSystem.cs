@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
 
+
 internal class SpriteTransformSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
@@ -44,13 +45,47 @@ internal class SpriteTransformSystem : FlecsSystemBase
             ref var t = ref trans[i];
 
             float depthOffset = (r.depthOffset);
-            
+
             float z = CommonAtributes.Calculate(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
             var tt = t.transform;
             tt.Origin = new Vector3(p.position.X + r.originOffset.X, p.position.Y + r.originOffset.Y, z);
             t.transform = tt;
 
             RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, t.transform);
+        }
+    }
+}
+internal class SpriteSelectorTransformSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override bool MultiThreaded => false; // en false por que cuando obtenemos el multimesh debe ser sigle
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+        qb.With<PositionComponent>()
+          .With<RenderSelectionGPUComponent>()
+          .With<SelectedTag>()
+          .Without<DeadTag>()
+          .Without<DestroyRequestTag>();          
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var pos = it.Field<PositionComponent>(0);
+        var ren = it.Field<RenderSelectionGPUComponent>(1);        
+        for (int i = 0; i < it.Count(); i++)
+        {
+            var e = it.Entity(i);
+            ref var p = ref pos[i];
+            ref var r = ref ren[i];
+
+
+            var transform = RenderingServer.MultimeshInstanceGetTransform(r.rid, r.instance);
+            float depthOffset = 0;
+
+            float z = CommonAtributes.CalculateSelection(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
+
+            transform.Origin = new Vector3(p.position.X+r.offset.X, p.position.Y+r.offset.Y, z);
+            RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, transform);
         }
     }
 }
