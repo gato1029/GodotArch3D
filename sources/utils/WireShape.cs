@@ -28,6 +28,158 @@ public class WireShape : SingletonBase<WireShape>
     private static Dictionary<int, ShapeData> _shapes = new Dictionary<int, ShapeData>();
     private Dictionary<Color, StandardMaterial3D> _materials = new Dictionary<Color, StandardMaterial3D>();
 
+    // 🔹 Caché para materiales con Shader (efecto punteado/brillo animado)
+    private Dictionary<Color, ShaderMaterial> _shaderMaterials = new Dictionary<Color, ShaderMaterial>();
+    private static Shader _selectionShader;
+
+    // ===========================
+    // NUEVO: Corchetes de Selección para Edificios
+    // ===========================
+    public int DrawSelectionBrackets(Vector2 size, Vector2 position, float layer, Color color, bool useShader = true, float bracketLength = 8f, TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        int idUnico = UniqueIdGenerator.GetNextId<WireShape>();
+
+        var instanceRid = RenderingServer.InstanceCreate();
+        Mesh mesh = CreateWireSelectionBracketsMesh(size.X, size.Y, bracketLength, typeDraw);
+
+        // Asignar material normal o con shader según prefieras
+        if (useShader)
+        {
+            var shaderMat = GetOrCreateShaderMaterial(color);
+            mesh.SurfaceSetMaterial(0, shaderMat);
+        }
+        else
+        {
+            var mat = GetOrCreateMaterial(color);
+            mesh.SurfaceSetMaterial(0, mat);
+        }
+
+        var meshRid = mesh.GetRid();
+
+        // Asignar al mundo
+        RenderingServer.InstanceSetBase(instanceRid, meshRid);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
+
+        // Posicionar en XY con layer como Z
+        Transform3D xform = Transform3D.Identity;
+        xform.Origin = new Vector3(position.X, position.Y, layer);
+        RenderingServer.InstanceSetTransform(instanceRid, xform);
+
+        // Guardamos en el diccionario
+        _shapes[idUnico] = new ShapeData
+        {
+            MeshRid = meshRid,
+            InstanceRid = instanceRid,
+            Transform = xform,
+            Color = color,
+            layer = layer,
+            Mesh = mesh
+        };
+
+        return idUnico;
+    }
+    private ShaderMaterial GetOrCreateShaderMaterial(Color color)
+    {
+        if (_shaderMaterials.TryGetValue(color, out var mat))
+            return mat;
+
+        if (_selectionShader == null)
+        {
+            _selectionShader = GD.Load<Shader>("res://shaders/selection_glow.gdshader");
+        }
+
+        mat = new ShaderMaterial();
+        mat.Shader = _selectionShader;
+        mat.SetShaderParameter("line_color", color);
+        mat.SetShaderParameter("speed", 1.5f);
+        mat.SetShaderParameter("frequency", 18.0f);
+        mat.SetShaderParameter("sketchy_intensity", 0.03f);
+        mat.SetShaderParameter("line_thickness", 0.7f); // 🔹 Modifica este valor (ej. 0.3 para líneas finas, 0.9 para líneas bien gruesas)
+
+        _shaderMaterials[color] = mat;
+        return mat;
+    }
+    private static ArrayMesh CreateWireSelectionBracketsMesh(float width, float height, float bracketLength, TypeDraw typeDraw)
+    {
+        ArrayMesh arrayMesh = new ArrayMesh();
+        var vertices = new System.Collections.Generic.List<Vector3>();
+        var uvs = new System.Collections.Generic.List<Vector2>();
+        var indices = new System.Collections.Generic.List<int>();
+        int index = 0;
+
+        float halfW;
+        float halfH;
+        float bLen;
+        float thickness = 2f; // Grosor geométrico base (en unidades o píxeles)
+
+        if (typeDraw == TypeDraw.PIXEL)
+        {
+            halfW = 0.5f * MeshCreator.PixelsToUnits(width);
+            halfH = 0.5f * MeshCreator.PixelsToUnits(height);
+            bLen = MeshCreator.PixelsToUnits(bracketLength);
+            thickness = MeshCreator.PixelsToUnits(2.5f); // Grosor en píxeles ajustado a unidades
+        }
+        else
+        {
+            halfW = 0.5f * width;
+            halfH = 0.5f * height;
+            bLen = bracketLength;
+            thickness = 1f;
+        }
+
+        void AddSegment(Vector3 start, Vector3 end, bool horizontal)
+        {
+            Vector3 dir = (end - start).Normalized();
+            Vector3 perp = horizontal ? new Vector3(0, thickness, 0) : new Vector3(thickness, 0, 0);
+
+            // Creamos un quad (4 vértices) para que el shader tenga UVs reales y espacio para el grosor
+            int i0 = index++;
+            int i1 = index++;
+            int i2 = index++;
+            int i3 = index++;
+
+            vertices.Add(start - perp); uvs.Add(new Vector2(0, 0));
+            vertices.Add(start + perp); uvs.Add(new Vector2(0, 1));
+            vertices.Add(end + perp); uvs.Add(new Vector2(1, 1));
+            vertices.Add(end - perp); uvs.Add(new Vector2(1, 0));
+
+            // Dos triángulos por segmento
+            indices.Add(i0); indices.Add(i1); indices.Add(i2);
+            indices.Add(i0); indices.Add(i2); indices.Add(i3);
+        }
+
+        // Esquinas
+        Vector3 topLeft = new Vector3(-halfW, -halfH, 0);
+        Vector3 topRight = new Vector3(halfW, -halfH, 0);
+        Vector3 bottomRight = new Vector3(halfW, halfH, 0);
+        Vector3 bottomLeft = new Vector3(-halfW, halfH, 0);
+
+        // --- Esquina Superior Izquierda ---
+        AddSegment(topLeft, topLeft + new Vector3(bLen, 0, 0), false);
+        AddSegment(topLeft, topLeft + new Vector3(0, bLen, 0), true);
+
+        // --- Esquina Superior Derecha ---
+        AddSegment(topRight, topRight + new Vector3(-bLen, 0, 0), false);
+        AddSegment(topRight, topRight + new Vector3(0, bLen, 0), true);
+
+        // --- Esquina Inferior Derecha ---
+        AddSegment(bottomRight, bottomRight + new Vector3(-bLen, 0, 0), false);
+        AddSegment(bottomRight, bottomRight + new Vector3(0, -bLen, 0), true);
+
+        // --- Esquina Inferior Izquierda ---
+        AddSegment(bottomLeft, bottomLeft + new Vector3(bLen, 0, 0), false);
+        AddSegment(bottomLeft, bottomLeft + new Vector3(0, -bLen, 0), true);
+
+        Godot.Collections.Array arrays = new Godot.Collections.Array();
+        arrays.Resize((int)ArrayMesh.ArrayType.Max);
+        arrays[(int)ArrayMesh.ArrayType.Vertex] = vertices.ToArray();
+        arrays[(int)ArrayMesh.ArrayType.TexUV] = uvs.ToArray();
+        arrays[(int)ArrayMesh.ArrayType.Index] = indices.ToArray();
+
+        // Nota: Cambiamos a Triangles porque ahora son quads sólidos
+        arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
+        return arrayMesh;
+    }
     public int DrawArrow(Vector2 from, Vector2 to, float layer, Color color, float headSize = 0.2f, TypeDraw typeDraw = TypeDraw.PIXEL)
     {
         int idUnico = UniqueIdGenerator.GetNextId<WireShape>();

@@ -37,7 +37,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
           .With<MeleeAttackComponent>()
           .With<DirectionComponent>()
           .With<StoppedTag>()
-          .Without<MoveTargetComponent>()
+          //.Without<MoveTargetComponent>()
           .Without<PlayerInputComponent>()
           .Without<DeadTag>()
           .Without<DestroyRequestTag>()

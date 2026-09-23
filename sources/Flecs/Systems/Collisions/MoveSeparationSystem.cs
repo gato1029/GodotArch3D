@@ -130,20 +130,32 @@ public class MoveSeparationSystem : FlecsSystemBase
             }
             if (!existCollision)
             {
+            
                 // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (paredes, edificios)
                 var sta = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding);
                 existCollision = sta;
+                if (sta)
+                {
+                    it.Entity(i).Add<StoppedTag>();
+                    vel.desiredVel = Vector2.Zero;
+                }
             }
             if (!existCollision)
             {
+                
                 // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (recursos, árboles, etc)
                 var sta = CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
                 existCollision = sta;
+                if (sta)
+                {
+                    it.Entity(i).Add<StoppedTag>();
+                    vel.desiredVel = Vector2.Zero;
+                }
             }
             if (existCollision)
             {
-                vel.desiredVel = Vector2.Zero;
-                steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimiento
+               
+                steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimientoxx
 
             }
         }

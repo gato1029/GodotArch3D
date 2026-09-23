@@ -120,7 +120,7 @@ public class SteeringSystem : FlecsSystemBase
 
                         ref var otherPos = ref other.GetMut<PositionComponent>();
                         ref var otherCol = ref other.GetMut<MoveColliderComponent>();
-
+                    
                         float dx = cx - (otherPos.position.X + otherCol.Offset.X);
                         float dy = cy - (otherPos.position.Y + otherCol.Offset.Y);
 
