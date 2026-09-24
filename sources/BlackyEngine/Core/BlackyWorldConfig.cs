@@ -53,7 +53,7 @@ public sealed class BlackyWorldConfig
     private static Vector2I CorrectMapSize(Vector2I input)
     {
         const int MIN = 64;
-        const int MAX = 4096;
+        const int MAX = 4096*2;
         const int STEP = 32;
 
         int Fix(int value)

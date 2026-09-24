@@ -23,6 +23,26 @@ public partial class RTSSelectionManager : Node2D
     private static BlackyWorld _world;
     public static RTSSelectionManager Instance { get; private set; }
 
+    // --- NUEVO: Flag para encender/apagar el sistema ---
+    private bool _isEnabled = true;
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            _isEnabled = value;
+            if (!_isEnabled)
+            {
+                // Si lo apagamos mientras estábamos arrastrando, cancelamos el estado visual
+                if (_isDragging)
+                {
+                    _isDragging = false;
+                    QueueRedraw();
+                }
+            }
+        }
+    }
+
     // 1. Variables para el control VISUAL (Pantalla / UI)
     private bool _isDragging = false;
     private Vector2 _dragStartScreen = Vector2.Zero;
@@ -50,7 +70,7 @@ public partial class RTSSelectionManager : Node2D
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (_world == null) return;
+        if (_world == null || !_isEnabled) return;
 
         // 1. Clic Derecho: Dar orden de movimiento
         if (IsRightMouseButtonPressed(@event))
@@ -166,26 +186,29 @@ public partial class RTSSelectionManager : Node2D
         {
             if (entity.IsAlive())
             {
-                // Actualizar o añadir destino (cambio estructural o de mutación)
-                if (entity.Has<MoveTargetComponent>())
+                if (CollisionMathHelper.RutaLibre(entity, ref targetPosition, _world))
                 {
-                    ref var target = ref entity.GetMut<MoveTargetComponent>();
-                    target.Value = targetPosition;
-                }
-                else
-                {
-                    entity.Set(new MoveTargetComponent { Value = targetPosition });
+                    // Actualizar o añadir destino (cambio estructural o de mutación)
+                    if (entity.Has<MoveTargetComponent>())
+                    {
+                        ref var target = ref entity.GetMut<MoveTargetComponent>();
+                        target.Value = targetPosition;
+                    }
+                    else
+                    {
+                        entity.Set(new MoveTargetComponent { Value = targetPosition });
+                    }
+
+                    // Quitar el tag de detenido
+                    if (entity.Has<StoppedTag>())
+                    {
+                        entity.Remove<StoppedTag>();
+                        ref var res = ref entity.GetMut<MoveResolutorComponent>();
+                        res.Blocked = false;
+                    }
+                    unitsCommanded++;
                 }
 
-                // Quitar el tag de detenido
-                if (entity.Has<StoppedTag>())
-                {
-                    entity.Remove<StoppedTag>();
-                    ref var res = ref entity.GetMut<MoveResolutorComponent>();
-                    res.Blocked = false;
-                }
-
-                unitsCommanded++;
             }
         }
 

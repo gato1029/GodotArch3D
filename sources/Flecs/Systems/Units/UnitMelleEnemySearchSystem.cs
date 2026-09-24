@@ -25,7 +25,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
     // busca enemigos de las unidades que son melle, osea ataque cuerpo a cuerpo
     // encuentra objetivo y automaticamente ya asigna destino y objetivo
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => true;    
+    protected override bool MultiThreaded => false;    
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
@@ -191,11 +191,17 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                     }
                     else
                     {
-                        if (!moveResolutor.Blocked )
-                        {                            
+                        // validar si el camino esta libre
+                        if (CollisionMathHelper.RutaLibre(e, ref targetPos, world))
+                        {
+                            moveResolutor.Blocked = false;
                             e.Set(new MoveTargetComponent(targetPos));
                             e.Remove<StoppedTag>();
                             e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos, 0));
+                        }
+                        else
+                        {
+                            moveResolutor.Blocked = true;
                         }
                         
                     }

@@ -59,6 +59,7 @@ public class MovementResolutionSystem : FlecsSystemBase
             ref var cha = ref chaArray[i];
             if (move.Blocked)
             {
+              
                 cha.stateType = StateType.IDLE;              
                 vel.desiredVel = Vector2.Zero;
                 //move.Blocked = false;
@@ -68,10 +69,7 @@ public class MovementResolutionSystem : FlecsSystemBase
             {
                 continue;
             }
-            // 🎨 movimiento suave
-            pos.position += vel.desiredVel * dt; // * dt;
-            pos.tilePosition = TilesHelper.WorldPositionToTile(pos.position);            
-            pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
+
             bool isMoving = vel.desiredVel.LengthSquared() > 0.0002f;
 
             if (!isMoving)
@@ -83,7 +81,10 @@ public class MovementResolutionSystem : FlecsSystemBase
                 //move.BlockedTimer += totalTickTime;
             }
             else
-            {
+            {   // 🎨 movimiento suave
+                pos.position += vel.desiredVel * dt; // * dt;
+                pos.tilePosition = TilesHelper.WorldPositionToTile(pos.position);
+                pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
                 move.Blocked = false;
                 move.BlockedTimer = 0f;
             }

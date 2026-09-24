@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
+using GodotEcsArch.sources.godot;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
@@ -30,10 +31,15 @@ public partial class WindowEditorRuntimeResources : Window
         KuroOptionButtonMod.OnDataSelected += KuroOptionButtonMod_OnDataSelected;                        
         LoadMods();        
         KuroControlWindowItem.OnCloseWindow += KuroControlWindowItem_OnCloseWindow;
+        RTSSelectionManager.Instance.IsEnabled = false;
+        
     }
+
+    
 
     private void KuroControlWindowItem_OnCloseWindow(object obj)
     {
+        RTSSelectionManager.Instance.IsEnabled = true;
         TilesEntityPreviewHelper.Clear();
     }
 

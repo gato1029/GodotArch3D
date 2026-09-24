@@ -43,6 +43,8 @@ public class MoveSeparationSystem : FlecsSystemBase
           .With<SteeringComponent>()
           .With<VelocityComponent>()
           .With<UnitDefinitionComponent>()
+          .With<StateComponent>()
+          .With<MoveTargetComponent>()
           .Without<StoppedTag>();
           
     }
@@ -69,6 +71,7 @@ public class MoveSeparationSystem : FlecsSystemBase
         var steeringArray = it.Field<SteeringComponent>(4);
         var velArray = it.Field<VelocityComponent>(5);
         var unitArray = it.Field<UnitDefinitionComponent>(6);
+        var stateArray = it.Field<StateComponent>(7);
 
         var dynGrid = blackyWorld.State.DynamicHash;
         var staGridBuilding = blackyWorld.State.StaticSpatialBuildings;
@@ -97,11 +100,15 @@ public class MoveSeparationSystem : FlecsSystemBase
             ref var res = ref resArray[i];
             ref var steering = ref steeringArray[i];
             ref var vel = ref velArray[i];
-
+            ref var state = ref stateArray[i];
+            if (res.Blocked)
+            {
+                continue;
+            }
             if (steering.DesiredDir.LengthSquared() < 0.01f) //  0.0001f
                 continue;
 
-            Vector2 posFuture = pos.position + (steering.DesiredDir*vel.MaxSpeed* it.DeltaTime())*2;
+            Vector2 posFuture = pos.position + (steering.DesiredDir*vel.MaxSpeed* it.DeltaTime());
 
             float cx = posFuture.X + col.Offset.X;
             float cy = posFuture.Y + col.Offset.Y;
@@ -155,12 +162,17 @@ public class MoveSeparationSystem : FlecsSystemBase
                 }
             }
             if (existCollision)
-            {
+            {                
                 //res.Blocked = true;
                 vel.desiredVel = Vector2.Zero;
                 steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimientoxx
-                
+                state.stateType = managers.Characters.StateType.IDLE;
             }
+            //else
+            //{                
+            //    res.Blocked = false;                
+            //}
+
         }
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -169,7 +181,6 @@ public class MoveSeparationSystem : FlecsSystemBase
         float cx = pos.X + col.Offset.X;
         float cy = pos.Y + col.Offset.Y;
 
-        // 🔹 collider temporal (como ya hacías)
         var colUnit = new FastCollider
         {
             Shape = ShapeType.Circle,
@@ -178,42 +189,47 @@ public class MoveSeparationSystem : FlecsSystemBase
             Offset = new Vector2(col.Offset.X, col.Offset.Y)
         };
 
-        // 🔹 calcular radio dinámico (IMPORTANTE)
         int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
         bool existCollision = false;
-        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
+        var list = grid.QueryNearbyUnique(pos.X, pos.Y, radius);
+
+        foreach (var id in list)
         {
             if (grid.TryGetValue(id, out Entity other))
             {
                 if (!other.IsAlive()) continue;
+
                 TileSpriteData sprite = null;
                 if (other.Has<ResourceDefinitionComponent>())
-                {// verificar contra recursos
-                    int idTemplate = other.Get<ResourceDefinitionComponent>().idSpriteTemplate; // 🔹 para asegurar que es una entidad con collider
-                    var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                {
+                    int idTemplate = other.Get<ResourceDefinitionComponent>().idSpriteTemplate;
+                    AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
                 }
+
+                // 🛡️ CORRECCIÓN CLAVE: Si no hay sprite o colisionadores definidos, saltar esta entidad de forma segura
+                if (sprite == null || sprite.fastCollidersBody == null) continue;
 
                 var posOther = other.Get<PositionComponent>();
 
                 foreach (var shape in sprite.fastCollidersBody)
                 {
                     var shapeInternal = shape;
-                    if (!CollisionMathHelper.Check(
-                            pos.X, pos.Y, ref colUnit,
-                            posOther.position.X, posOther.position.Y, ref shapeInternal))
-                    {
-
-                        continue;
-                    }
-                    else
+                    if (CollisionMathHelper.Check(pos.X, pos.Y, ref colUnit, posOther.position.X, posOther.position.Y, ref shapeInternal))
                     {
                         existCollision = true;
                         break;
                     }
                 }
             }
-
-
+            if (existCollision)
+            {
+                break;
+            }
+            
+        }
+        if (!existCollision)
+        {
+           bool debug = false;            
         }
 
         return existCollision;
@@ -268,8 +284,11 @@ public class MoveSeparationSystem : FlecsSystemBase
                     }
                 }
             }
-            
-    
+            if (existCollision)
+            {
+                break;
+            }
+
         }
 
         return existCollision;

@@ -2,6 +2,11 @@
 
 
 
+using Flecs.NET.Core;
+using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
+using GodotEcsArch.sources.managers.Mods;
 using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Runtime.CompilerServices;
@@ -305,5 +310,125 @@ public static class CollisionMathHelper
 
         // Si la distancia es menor que el radio, hay colisión
         return (dx * dx + dy * dy) < (radius * radius);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool RutaLibre(Entity ent, ref Vector2 targetPos,  BlackyWorld blackyWorld)
+    {
+        var spatialBuildings = blackyWorld.State.StaticSpatialBuildings;
+        var spatialResources = blackyWorld.State.StaticSpatialResources;
+        var spatialTerrain = blackyWorld.State.StaticSpatialTerrain;
+
+        Vector2 startPos = ent.Get<PositionComponent>().position;
+        MoveColliderComponent col = ent.Get<MoveColliderComponent>();
+
+        // Vector de dirección desde el origen al destino
+        Vector2 dir = (targetPos - startPos);
+        float distance = dir.Length();
+        if (distance < 0.001f) return true; // Ya está ahí
+
+        dir = dir.Normalized();
+
+        // Sondeo en los primeros 2 metros o el total si está más cerca
+        float probeDistance = MathF.Min(distance, .25f);
+        Vector2 probePos = startPos + (dir * probeDistance);
+
+        // Creamos el collider temporal de la unidad para el sondeo (Círculo)
+        var colUnit = new FastCollider
+        {
+            Shape = ShapeType.Circle,
+            Width = col.Radius,
+            Height = col.Radius,
+            Offset = new Vector2(col.Offset.X, col.Offset.Y)
+        };
+        // 1. Revisar contra terreno colliders
+        if (CheckStaticGridTerrain(probePos, ref col,spatialTerrain))
+        {
+            return false;
+        }
+
+        // 1. Revisar contra edificios estáticos
+        if (CheckGridForProbe(ref probePos, ref colUnit, spatialBuildings, isBuilding: true))
+            return false;
+
+        // 2. Revisar contra recursos estáticos (árboles, piedras, etc.)
+        if (CheckGridForProbe(ref probePos, ref colUnit, spatialResources, isBuilding: false))
+            return false;
+
+        // Ruta libre en el primer tramo
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool CheckStaticGridTerrain(Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> grid)
+    {
+        int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
+        bool existCollision = false;
+        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
+        {
+            if (grid.TryGetValue(id, out var infoSpriteCollider))
+            {
+                AtlasModsManager.TryGetTileSprite(infoSpriteCollider.TileId, out var tileSprite);
+
+                foreach (var fast in tileSprite.fastCollidersBody)
+                {
+                    FastCollider fastCollider = fast;
+                    if (!CollisionMathHelper.CheckCircle(pos.X, pos.Y, col.Radius, col.Offset, infoSpriteCollider.Position.X, infoSpriteCollider.Position.Y, ref fastCollider))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        existCollision = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return existCollision;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool CheckGridForProbe(ref Vector2 probePos, ref FastCollider colUnit, StaticSpatialGridOptimizedGeneric<Entity> grid, bool isBuilding)
+    {
+        if (grid == null) return false;
+
+        int radius = (int)MathF.Ceiling((colUnit.Width * 2f) / grid._cellSize);
+        foreach (var id in grid.QueryNearbyUnique(probePos.X, probePos.Y, radius))
+        {
+            if (grid.TryGetValue(id, out Entity other))
+            {
+                if (!other.IsAlive()) continue;
+
+                TileSpriteData sprite = null;
+                if (isBuilding && other.Has<BuildingDefinitionComponent>())
+                {
+                    int idTemplate = other.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal;
+                    AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                }
+                else if (!isBuilding && other.Has<ResourceDefinitionComponent>())
+                {
+                    int idTemplate = other.Get<ResourceDefinitionComponent>().idSpriteTemplate;
+                    AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                }
+
+                if (sprite == null || sprite.fastCollidersBody == null) continue;
+
+                var posOther = other.Get<PositionComponent>();
+
+                foreach (var shape in sprite.fastCollidersBody)
+                {
+                    var shapeInternal = shape;
+                    if (CollisionMathHelper.Check(probePos.X, probePos.Y, ref colUnit, posOther.position.X, posOther.position.Y, ref shapeInternal))
+                    {
+                        // 🛑 ¡Hay un obstáculo directo!
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

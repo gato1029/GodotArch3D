@@ -63,8 +63,9 @@ public class SteeringSystem : FlecsSystemBase
             ref var steering = ref steeringArray[i];
             ref var res = ref resArray[i];
 
+            Entity ent = it.Entity(i);
             Vector2 desiredDir = steering.DesiredDir;
-
+            
             if (desiredDir == Vector2.Zero || res.Blocked)
             {
                 vel.desiredVel = Vector2.Zero;
@@ -120,7 +121,7 @@ public class SteeringSystem : FlecsSystemBase
 
                         ref var otherPos = ref other.GetMut<PositionComponent>();
                         ref var otherCol = ref other.GetMut<MoveColliderComponent>();
-                    
+
                         float dx = cx - (otherPos.position.X + otherCol.Offset.X);
                         float dy = cy - (otherPos.position.Y + otherCol.Offset.Y);
 
@@ -180,6 +181,7 @@ public class SteeringSystem : FlecsSystemBase
             if (lenSq < 0.0001f)
             {
                 vel.desiredVel = Vector2.Zero;
+                ent.Add<StoppedTag>();
                 continue;
             }
 
@@ -198,6 +200,7 @@ public class SteeringSystem : FlecsSystemBase
 
             if (stuck)
             {
+                ent.Add<StoppedTag>();
                 vel.desiredVel = Vector2.Zero;
                 //res.Blocked = true;
                 //res.BlockedTimer += it.DeltaTime();
