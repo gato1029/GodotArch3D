@@ -1,4 +1,5 @@
 
+
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
@@ -171,64 +172,222 @@ public partial class RTSSelectionManager : Node2D
     }
     private void CommandSelectedUnitsToMove(Vector2 targetPosition)
     {
-        // 1. FASE DE LECTURA: Recopilamos las entidades seleccionadas en una lista temporal
         List<Entity> selectedEntities = new();
 
         query.Each((Entity entity) =>
-            {
-                if (entity.IsAlive())
-                {
-                    selectedEntities.Add(entity);
-                }
-            });
-        if (selectedEntities.Count<=0)
-        {
-            return;
-        }
-        int unitsCommanded = 0;
-
-        Vector2I origin = TilesHelper.WorldPositionToTile(selectedEntities[0].Get<PositionComponent>().position);
-
-        Vector2I destiny = TilesHelper.WorldPositionToTile(targetPosition);
-        var points = _pathfinder.FindSimplifiedPath(origin, destiny);
-        // 2. FASE DE ACCIÓN: Modificamos las entidades de forma 100% segura fuera del Each
-        foreach (var entity in selectedEntities)
         {
             if (entity.IsAlive())
-            {
+                selectedEntities.Add(entity);
+        });
 
-                if (CollisionMathHelper.RutaLibre(entity, ref targetPosition, _world))
-                {
-                    // Actualizar o añadir destino (cambio estructural o de mutación)
-                    if (entity.Has<MoveTargetComponent>())
-                    {
-                        ref var target = ref entity.GetMut<MoveTargetComponent>();
-                        target.Value = targetPosition;
-                    }
-                    else
-                    {
-                        entity.Set(new MoveTargetComponent { Value = targetPosition });
-                    }
+        if (selectedEntities.Count == 0)
+            return;
 
-                    // Quitar el tag de detenido
-                    if (entity.Has<StoppedTag>())
-                    {
-                        entity.Remove<StoppedTag>();
-                        ref var res = ref entity.GetMut<MoveResolutorComponent>();
-                        res.Blocked = false;
-                    }
-                    unitsCommanded++;
-                }
+        // ---------------------------------------------------------
+        // 1. Centro del grupo
+        // ---------------------------------------------------------
 
-            }
-        }
+        Vector2 groupCenter = Vector2.Zero;
 
-        if (unitsCommanded > 0)
+        foreach (var entity in selectedEntities)
         {
-            GD.Print($"Moviendo {unitsCommanded} unidades a {targetPosition}");
+            groupCenter +=
+                entity.Get<PositionComponent>().position;
         }
-    }
 
+        groupCenter /= selectedEntities.Count;
+
+
+        // ---------------------------------------------------------
+        // 2. Dirección del movimiento
+        // ---------------------------------------------------------
+
+        Vector2 movementDirection =
+            targetPosition - groupCenter;
+
+        if (movementDirection.LengthSquared() < 0.001f)
+            return;
+
+        movementDirection = movementDirection.Normalized();
+
+
+        // ---------------------------------------------------------
+        // 3. Crear formación
+        // ---------------------------------------------------------
+
+        float spacing = .9f; // antes 1.5f
+
+        var slots =
+            FormationHelper.GenerateGridSlots(
+                selectedEntities.Count,
+                spacing);
+
+
+        // ---------------------------------------------------------
+        // 4. Asignar cada unidad a un slot
+        // ---------------------------------------------------------
+
+        var assignments =
+            FormationHelper.AssignNearestSlots(
+                selectedEntities,
+                slots,
+                groupCenter,
+                movementDirection);
+
+
+        if (assignments.Count == 0)
+            return;
+
+
+        // ---------------------------------------------------------
+        // 5. Punto de salida de la formación
+        //
+        // No hacemos A* desde el centro exacto del grupo.
+        // Lo adelantamos para evitar que las unidades
+        // converjan hacia el centro.
+        // ---------------------------------------------------------
+
+        float formationLeadDistance = spacing * 3.0f;
+
+        Vector2 pathStart =
+            groupCenter +
+            movementDirection * formationLeadDistance;
+
+
+        // ---------------------------------------------------------
+        // 6. Calcular A*
+        // ---------------------------------------------------------
+
+        Vector2I origin =
+            TilesHelper.WorldPositionToTile(pathStart);
+
+        Vector2I destiny =
+            TilesHelper.WorldPositionToTile(targetPosition);
+
+        var points =
+            _pathfinder.FindPathWorld(origin, destiny);
+
+        if (points == null || points.Count == 0)
+            return;
+
+
+        // ---------------------------------------------------------
+        // 7. Registrar camino compartido
+        // ---------------------------------------------------------
+
+        int pathId =
+            _world.State.PathRegistryManager
+                .RegisterPath(points.ToArray());
+
+
+        int unitsCommanded = 0;
+
+
+        // ---------------------------------------------------------
+        // 8. Asignar path + formación a cada unidad
+        // ---------------------------------------------------------
+
+        foreach (var assignment in assignments)
+        {
+            Entity entity = assignment.Key;
+            Vector2 formationOffset = assignment.Value;
+
+            if (!entity.IsAlive())
+                continue;
+
+
+            // ---------------------------------------------
+            // Liberar path anterior
+            // ---------------------------------------------
+
+            if (entity.Has<PathReferenceComponent>())
+            {
+                var oldPath =
+                    entity.Get<PathReferenceComponent>();
+
+                _world.State.PathRegistryManager
+                    .ReleasePath(oldPath.PathId);
+            }
+
+
+            // ---------------------------------------------
+            // Referencia al nuevo path
+            // ---------------------------------------------
+
+            _world.State.PathRegistryManager
+                .AddReference(pathId);
+
+
+            entity.Set(
+                new PathReferenceComponent(
+                    pathId,
+                    0,
+                    formationOffset));
+
+
+            // ---------------------------------------------
+            // Primer waypoint + offset de formación
+            // ---------------------------------------------
+
+            Vector2 waypoint =
+                _world.State.PathRegistryManager
+                    .GetWaypoint(pathId, 0);
+
+            Vector2 firstTarget =
+                waypoint + formationOffset;
+
+
+            if (entity.Has<MoveTargetComponent>())
+            {
+                ref var target =
+                    ref entity.GetMut<MoveTargetComponent>();
+
+                target.Value = firstTarget;
+            }
+            else
+            {
+                entity.Set(
+                    new MoveTargetComponent
+                    {
+                        Value = firstTarget
+                    });
+            }
+
+
+            // ---------------------------------------------
+            // Desbloquear unidad
+            // ---------------------------------------------
+
+            if (entity.Has<StoppedTag>())
+                entity.Remove<StoppedTag>();
+
+            ref var resolutor =
+                ref entity.GetMut<MoveResolutorComponent>();
+
+            resolutor.Blocked = false;
+            resolutor.BlockedTimer = 0f;
+
+
+            unitsCommanded++;
+        }
+
+
+        // ---------------------------------------------------------
+        // 9. Si nadie pudo usar el path, liberarlo
+        // ---------------------------------------------------------
+
+        if (unitsCommanded == 0)
+        {
+            _world.State.PathRegistryManager
+                .ReleasePath(pathId);
+
+            return;
+        }
+
+
+        GD.Print(
+            $"Moviendo {unitsCommanded} unidades a {targetPosition}");
+    }
     // El dibujo visual se mantiene en coordenadas de pantalla
     public override void _Draw()
     {

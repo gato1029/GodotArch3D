@@ -164,9 +164,9 @@ public class MoveSeparationSystem : FlecsSystemBase
             if (existCollision)
             {                
                 //res.Blocked = true;
-                vel.desiredVel = Vector2.Zero;
-                steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimientoxx
-                state.stateType = managers.Characters.StateType.IDLE;
+                //vel.desiredVel = Vector2.Zero;
+                //steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimientoxx
+                //state.stateType = managers.Characters.StateType.IDLE;
             }
             //else
             //{                

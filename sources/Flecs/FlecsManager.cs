@@ -161,8 +161,8 @@ public class FlecsManager
         RegisterSystem<HumanCharacterSimpleSystem>();
         RegisterSystem<UnitMelleEnemySearchSystem>();
         RegisterSystem<RangedEnemySearchSystem>();
-        
-        
+
+        RegisterSystem<PathManagerSystem>();
         RegisterSystem<MoveTargetAttackMelleSystem>();
         RegisterSystem<MoveTargetSystem>();
 

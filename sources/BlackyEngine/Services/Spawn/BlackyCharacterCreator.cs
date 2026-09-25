@@ -299,7 +299,7 @@ public class BlackyCharacterCreator
             entity.Set(new HealthComponent(100));
         }
 
-        float rvoRadius = MeshCreator.PixelsToUnits(16);
+        float rvoRadius = MeshCreator.PixelsToUnits(25);
         float radiusSearchEnemy = MeshCreator.PixelsToUnits(256);
 
         if (characterBaseData.unitAttackType == UnitAttackType.CUERPO)

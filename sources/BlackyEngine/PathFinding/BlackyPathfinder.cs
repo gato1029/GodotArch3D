@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
+using GodotEcsArch.sources.utils;
 using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.BlackyEngine.PathFinding
@@ -25,6 +26,17 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             _microPathfinder = new BlackyMicroPathfinder(_chunkOccupancyMap);
         }
 
+        public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile)
+        {
+            List< Vector2> points = new ();
+            var result = FindSimplifiedPath(startTile, goalTile);
+            foreach (var item in result)
+            {
+                var point = TilesHelper.TilePositionToWorldPosition(item);
+                points.Add(point);
+            }
+            return points;
+        }
         public List<Vector2I> FindSimplifiedPath(Vector2I startTile, Vector2I goalTile)
         {
             List<Vector2I> fullPath = FindPath(startTile, goalTile);

@@ -521,11 +521,12 @@ public record struct StuckComponent
 
 
 [RegisterComponentFlecs]
-public struct PathReferenceComponent
-{
-    public int PathId;       // El ID de la ruta en el BlackyPathRegistryManager
-    public int CurrentIndex; // El índice del siguiente punto a visitar
-}
+public record struct PathReferenceComponent
+(
+    int PathId,       // El ID de la ruta en el BlackyPathRegistryManager
+    int CurrentIndex, // El índice del siguiente punto a visitar
+    Vector2 FormationOffset
+);
 
 [RegisterComponentFlecs]
 public record struct SteeringComponent

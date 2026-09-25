@@ -36,182 +36,402 @@ public class SteeringSystem : FlecsSystemBase
     }
     protected override void OnIter(Iter it)
     {
-        
-        var world = it.World().GetCtx<BlackyWorld>();
-        if (world == null) return;
-        var sim = world.Simulation.Tick;
+        var world =
+            it.World().GetCtx<BlackyWorld>();
 
-        // 🔥 AQUI VA (ANTES DE TODO)
-        //if ((sim.FrameIndex & 1) != 0)
-        //    return;
+        if (world == null)
+            return;
 
-        var posArray = it.Field<PositionComponent>(0);
-        var colArray = it.Field<MoveColliderComponent>(1);
-        var sidArray = it.Field<SpatialIDComponent>(2);
-        var velArray = it.Field<VelocityComponent>(3);
-        var steeringArray = it.Field<SteeringComponent>(4);
-        var resArray = it.Field<MoveResolutorComponent>(5);
+        var posArray =
+            it.Field<PositionComponent>(0);
 
-        var dynGrid = world.State.DynamicHash;
+        var colArray =
+            it.Field<MoveColliderComponent>(1);
+
+        var sidArray =
+            it.Field<SpatialIDComponent>(2);
+
+        var velArray =
+            it.Field<VelocityComponent>(3);
+
+        var steeringArray =
+            it.Field<SteeringComponent>(4);
+
+        var resArray =
+            it.Field<MoveResolutorComponent>(5);
+
+        var dynGrid =
+            world.State.DynamicHash;
+
 
         for (int i = 0; i < it.Count(); i++)
         {
-            ref var pos = ref posArray[i];
-            ref var col = ref colArray[i];
-            ref var sid = ref sidArray[i];
-            ref var vel = ref velArray[i];
-            ref var steering = ref steeringArray[i];
-            ref var res = ref resArray[i];
+            ref var pos =
+                ref posArray[i];
 
-            Entity ent = it.Entity(i);
-            Vector2 desiredDir = steering.DesiredDir;
-            
-            if (desiredDir == Vector2.Zero || res.Blocked)
+            ref var col =
+                ref colArray[i];
+
+            ref var sid =
+                ref sidArray[i];
+
+            ref var vel =
+                ref velArray[i];
+
+            ref var steering =
+                ref steeringArray[i];
+
+            ref var res =
+                ref resArray[i];
+
+            // Si quedó bloqueada, se queda quieta
+            if (res.Blocked)
             {
                 vel.desiredVel = Vector2.Zero;
                 continue;
             }
+            // =====================================================
+            // DIRECCIÓN DESEADA
+            // =====================================================
+
+            Vector2 desiredDir =
+                steering.DesiredDir;
+
+            if (desiredDir == Vector2.Zero)
+            {
+                vel.desiredVel = Vector2.Zero;
+
+                //res.BlockedTimer = 0f;
+
+                continue;
+            }
+
 
             if (desiredDir.LengthSquared() > 1.001f)
-                desiredDir = desiredDir.Normalized();
+            {
+                desiredDir =
+                    desiredDir.Normalized();
+            }
 
-            float radius = steering.SeparationRadius;
-            float radiusSq = radius * radius;
 
-            Vector2 avoidance = Vector2.Zero;
-            int neighborCount = 0;
+            // =====================================================
+            // DATOS DE SEPARACIÓN
+            // =====================================================
 
-            Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime());
+            float radius =
+                steering.SeparationRadius;
 
-            float cx = posFuture.X + col.Offset.X;
-            float cy = posFuture.Y + col.Offset.Y;
+            float radiusSq =
+                radius * radius;
 
-            var min = FastSpatialHash.WorldToTile(cx - radius, cy - radius);
-            var max = FastSpatialHash.WorldToTile(cx + radius, cy + radius);
 
-            // ======================================
-            // 🔥 AVOIDANCE + CROWD DETECTION
-            // ======================================
-            bool done = false;
+            Vector2 avoidance =
+                Vector2.Zero;
+
+            int neighborCount =
+                0;
+
+
+            // =====================================================
+            // POSICIÓN FUTURA
+            // =====================================================
+
+            Vector2 posFuture =
+                pos.position +
+                desiredDir *
+                vel.MaxSpeed *
+                it.DeltaTime();
+
+
+            float cx =
+                posFuture.X +
+                col.Offset.X;
+
+            float cy =
+                posFuture.Y +
+                col.Offset.Y;
+
+
+            var min =
+                FastSpatialHash.WorldToTile(
+                    cx - radius,
+                    cy - radius
+                );
+
+            var max =
+                FastSpatialHash.WorldToTile(
+                    cx + radius,
+                    cy + radius
+                );
+
+
+            // =====================================================
+            // AVOIDANCE + CROWD DETECTION
+            // =====================================================
+
             for (int tx = min.X; tx <= max.X; tx++)
             {
                 for (int ty = min.Y; ty <= max.Y; ty++)
                 {
-                    int cell = FastSpatialHash.GetHashDirect(tx, ty, dynGrid.TotalCells);
-                    int idx = dynGrid.GetHead(cell);
+                    int cell =
+                        FastSpatialHash.GetHashDirect(
+                            tx,
+                            ty,
+                            dynGrid.TotalCells
+                        );
+
+                    int idx =
+                        dynGrid.GetHead(cell);
+
 
                     while (idx != -1)
                     {
-                        int otherSID = dynGrid.GetSpatialID(idx);
+                        int otherSID =
+                            dynGrid.GetSpatialID(idx);
+
+
+                        // -------------------------------------------------
+                        // Nosotros mismos
+                        // -------------------------------------------------
 
                         if (otherSID == sid.Value)
                         {
-                            idx = dynGrid.GetNext(idx);
+                            idx =
+                                dynGrid.GetNext(idx);
+
                             continue;
                         }
 
-                        Entity other = dynGrid.GetEntity(idx);
-                        ref var otherSid = ref other.GetMut<SpatialIDComponent>();
+
+                        Entity other =
+                            dynGrid.GetEntity(idx);
+
+
+                        ref var otherSid =
+                            ref other.GetMut<SpatialIDComponent>();
+
+
+                        // -------------------------------------------------
+                        // Capas incompatibles
+                        // -------------------------------------------------
 
                         if ((sid.Mask & otherSid.Layer) == 0)
                         {
-                            idx = dynGrid.GetNext(idx);
+                            idx =
+                                dynGrid.GetNext(idx);
+
                             continue;
                         }
 
-                        ref var otherPos = ref other.GetMut<PositionComponent>();
-                        ref var otherCol = ref other.GetMut<MoveColliderComponent>();
 
-                        float dx = cx - (otherPos.position.X + otherCol.Offset.X);
-                        float dy = cy - (otherPos.position.Y + otherCol.Offset.Y);
+                        ref var otherPos =
+                            ref other.GetMut<PositionComponent>();
 
-                        float distSq = dx * dx + dy * dy;
+                        ref var otherCol =
+                            ref other.GetMut<MoveColliderComponent>();
+
+
+                        // -------------------------------------------------
+                        // Distancia
+                        // -------------------------------------------------
+
+                        float dx =
+                            cx -
+                            (otherPos.position.X +
+                             otherCol.Offset.X);
+
+                        float dy =
+                            cy -
+                            (otherPos.position.Y +
+                             otherCol.Offset.Y);
+
+
+                        float distSq =
+                            dx * dx +
+                            dy * dy;
+
 
                         if (distSq < 0.0001f)
                         {
-                            idx = dynGrid.GetNext(idx);
+                            idx =
+                                dynGrid.GetNext(idx);
+
                             continue;
                         }
 
+
+                        // -------------------------------------------------
+                        // Vecino
+                        // -------------------------------------------------
+
                         if (distSq < radiusSq)
                         {
-                            float dist = MathF.Sqrt(distSq);
-                            float inv = 1f / dist;
+                            float dist =
+                                MathF.Sqrt(distSq);
 
-                            float nx = dx * inv;
-                            float ny = dy * inv;
+                            float inv =
+                                1f / dist;
 
-                            float weight = 1f - (dist / radius);
 
-                            avoidance.X += nx * weight;
-                            avoidance.Y += ny * weight;
+                            float nx =
+                                dx * inv;
+
+                            float ny =
+                                dy * inv;
+
+
+                            float weight =
+                                1f -
+                                (dist / radius);
+
+
+                            avoidance.X +=
+                                nx * weight;
+
+                            avoidance.Y +=
+                                ny * weight;
+
 
                             neighborCount++;
+
+
                             if (neighborCount >= MAX_NEIGHBORS)
                             {
-                                done = true;
                                 break;
                             }
                         }
 
-                        idx = dynGrid.GetNext(idx);
+
+                        idx =
+                            dynGrid.GetNext(idx);
                     }
+
+
+                    if (neighborCount >= MAX_NEIGHBORS)
+                        break;
                 }
+
+
+                if (neighborCount >= MAX_NEIGHBORS)
+                    break;
             }
 
-            // ======================================
-            // 🔥 CROWD PRESSURE
-            // ======================================
 
-            float crowd = MathF.Min(1f, neighborCount / 6f);
-            float speedFactor = 1f - (crowd * 0.65f);
+            // =====================================================
+            // CROWD
+            // =====================================================
 
-            float avoidanceWeight = steering.SeparationWeight;
+            float crowd =
+                MathF.Min(
+                    1f,
+                    neighborCount / 6f
+                );
 
-            // ======================================
-            // 🔥 FINAL DIRECTION
-            // ======================================
+
+            // No dejamos que el crowd elimine completamente
+            // la dirección hacia el objetivo.
+            float crowdInfluence =
+                crowd * 0.35f;
+
+
+            // =====================================================
+            // DIRECCIÓN FINAL
+            // =====================================================
+
+            float avoidanceWeight =
+                steering.SeparationWeight;
+
 
             Vector2 finalDir =
-                desiredDir * (1f - crowd) +
-                avoidance * avoidanceWeight;
+                desiredDir *
+                (1f - crowdInfluence)
+                +
+                avoidance *
+                avoidanceWeight;
 
-            float lenSq = finalDir.LengthSquared();
+
+            float lenSq =
+                finalDir.LengthSquared();
+
 
             if (lenSq < 0.0001f)
             {
-                vel.desiredVel = Vector2.Zero;
-                ent.Add<StoppedTag>();
+                vel.desiredVel =
+                    Vector2.Zero;
+
+                res.BlockedTimer +=
+                    it.DeltaTime();
+
                 continue;
             }
 
-            finalDir /= MathF.Sqrt(lenSq);
 
-            // ======================================
-            // 🔥 STUCK DETECTION (clave RTS)
-            // ======================================
+            finalDir /=
+                MathF.Sqrt(lenSq);
 
-            float forwardProgress = finalDir.Dot(desiredDir);
 
-            bool crowded = neighborCount >= 4;
-            bool badDirection = forwardProgress < 0.01f;
+            // =====================================================
+            // PROGRESO HACIA EL OBJETIVO
+            // =====================================================
 
-            bool stuck = crowded || badDirection; // 
+            float forwardProgress =
+                finalDir.Dot(desiredDir);
 
-            if (stuck)
+
+            // =====================================================
+            // DETECCIÓN DE BLOQUEO
+            // =====================================================
+
+            bool crowded =
+                neighborCount >= 4;
+
+            bool badDirection =
+                forwardProgress < 0.05f;
+
+
+            if (crowded && badDirection)
             {
-                ent.Add<StoppedTag>();
+                res.BlockedTimer += it.DeltaTime();
+
+                if (res.BlockedTimer >= 0.5f)
+                {
+                    res.Blocked = true;
+                    vel.desiredVel = Vector2.Zero;
+                    continue;
+                }
+            }
+            //else
+            //{
+            //    res.BlockedTimer = 0f;
+            //}
+
+
+            // =====================================================
+            // BLOQUEO REAL
+            // =====================================================
+
+            if (res.BlockedTimer >= 0.35f)
+            {
+                res.Blocked = true;
                 vel.desiredVel = Vector2.Zero;
-                //res.Blocked = true;
-                //res.BlockedTimer += it.DeltaTime();
+
                 continue;
             }
 
-            // ======================================
-            // 🔥 APPLY VELOCITY
-            // ======================================
 
-            vel.desiredVel = finalDir * vel.MaxSpeed * speedFactor;
+            // =====================================================
+            // VELOCIDAD
+            // =====================================================
+
+            float speedFactor =
+                1f -
+                (crowd * 0.65f);
+
+
+            vel.desiredVel =
+                finalDir *
+                vel.MaxSpeed *
+                speedFactor;
         }
     }
 }

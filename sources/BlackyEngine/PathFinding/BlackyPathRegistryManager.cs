@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.PathFinding;
 
-internal class BlackyPathRegistryManager
+public class BlackyPathRegistryManager
 {
     private struct PathData
     {
@@ -34,7 +34,7 @@ internal class BlackyPathRegistryManager
             _pathPool[pathId] = new PathData
             {
                 Points = points,
-                ReferenceCount = 1,
+                ReferenceCount = 0,
                 IsActive = true
             };
         }
@@ -45,7 +45,7 @@ internal class BlackyPathRegistryManager
             _pathPool.Add(new PathData
             {
                 Points = points,
-                ReferenceCount = 1,
+                ReferenceCount = 0,
                 IsActive = true
             });
         }

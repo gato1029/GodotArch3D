@@ -1,3 +1,4 @@
+
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
@@ -33,6 +34,7 @@ public class MovementResolutionSystem : FlecsSystemBase
     protected override void OnIter(Iter it)
     {
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
+        var _pathRegistry = blackyWorld.State.PathRegistryManager;
         if (blackyWorld == null) return;
 
         var sim = blackyWorld.Simulation.Tick;
@@ -63,6 +65,18 @@ public class MovementResolutionSystem : FlecsSystemBase
                 cha.stateType = StateType.IDLE;              
                 vel.desiredVel = Vector2.Zero;
                 //move.Blocked = false;
+                if (e.Has<PathReferenceComponent>())
+                {
+                    var path = e.Get<PathReferenceComponent>();
+
+                    int pathIdToRelease = path.PathId;
+                    _pathRegistry.ReleasePath(pathIdToRelease);
+
+                    // Limpiamos componentes de ruta
+                    e.Remove<PathReferenceComponent>();
+                }
+
+                e.Add<StoppedTag>();
                 continue;
             }
             if (cha.stateType != StateType.MOVING) //solo mover si el estado es MOVING
@@ -86,7 +100,7 @@ public class MovementResolutionSystem : FlecsSystemBase
                 pos.tilePosition = TilesHelper.WorldPositionToTile(pos.position);
                 pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
                 move.Blocked = false;
-                move.BlockedTimer = 0f;
+                //move.BlockedTimer = 0f;
             }
         }
     }

@@ -51,7 +51,7 @@ public class MoveTargetSystem : FlecsSystemBase
             float umbralLlegada = 0.05f;
        
 
-            if (distSq <= umbralLlegada) // Umbral de llegada
+            if (distSq <= umbralLlegada* umbralLlegada) // Umbral de llegada
             {
                 resolutor.BlockedTimer = 0;
                 steering.DesiredDir = Vector2.Zero;

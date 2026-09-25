@@ -2,6 +2,7 @@ using Godot;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public class WireShape : SingletonBase<WireShape>
@@ -32,6 +33,166 @@ public class WireShape : SingletonBase<WireShape>
     private Dictionary<Color, ShaderMaterial> _shaderMaterials = new Dictionary<Color, ShaderMaterial>();
     private static Shader _selectionShader;
 
+    // ===========================
+    // Dibujar múltiples puntos
+    // ===========================
+    public int DrawPoints(List<Vector2I> points, Vector2 position, float layer, Color color, float pointSize = 2f, TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        return DrawPoints(points.ToArray(), position, layer, color, pointSize, typeDraw);
+    }
+    public int DrawPoints(List<Vector2> points, Vector2 position, float layer, Color color, float pointSize = 2f, TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        return DrawPoints(points.ToArray(), position, layer, color, pointSize, typeDraw);
+    }
+    public int DrawPoints(
+    Vector2I[] points,
+    Vector2 position,
+    float layer,
+    Color color,
+    float pointSize = 2f,
+    TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        if (points == null || points.Length == 0)
+            return -1;
+
+        // Convertir Vector2I -> Vector2
+        Vector2[] convertedPoints = new Vector2[points.Length];
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            convertedPoints[i] = new Vector2(
+                points[i].X,
+                points[i].Y);
+        }
+
+        return DrawPoints(
+            convertedPoints,
+            position,
+            layer,
+            color,
+            pointSize,
+            typeDraw);
+    }
+    public int DrawPoints(Vector2[] points, Vector2 position, float layer, Color color, float pointSize = 2f, TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        int idUnico = UniqueIdGenerator.GetNextId<WireShape>();
+
+        var instanceRid = RenderingServer.InstanceCreate();
+        Mesh mesh = CreateWirePointsMesh(points, pointSize, typeDraw);
+
+        var mat = GetOrCreateMaterial(color);
+        mesh.SurfaceSetMaterial(0, mat);
+
+        var meshRid = mesh.GetRid();
+
+        // Asignar al mundo
+        RenderingServer.InstanceSetBase(instanceRid, meshRid);
+        RenderingServer.InstanceSetScenario(instanceRid, NodeMainHelper.ridWorld3D);
+
+        // Posicionar en XY con layer como Z
+        Transform3D xform = Transform3D.Identity;
+        xform.Origin = new Vector3(position.X, position.Y, layer);
+        RenderingServer.InstanceSetTransform(instanceRid, xform);
+
+        // Guardar referencia en el diccionario
+        _shapes[idUnico] = new ShapeData
+        {
+            MeshRid = meshRid,
+            InstanceRid = instanceRid,
+            Transform = xform,
+            Color = color,
+            Mesh = mesh, // 🔥 Evita que el GC lo libere
+            layer = layer
+        };
+
+        return idUnico;
+    }
+    // ===========================
+    // Crear malla de puntos (en forma de cruz)
+    // ===========================
+    public static ArrayMesh CreateWirePointsMesh(
+    Vector2[] points,
+    float pointSize = 2f,
+    TypeDraw typeDraw = TypeDraw.PIXEL)
+    {
+        var arrayMesh = new ArrayMesh();
+
+        if (points == null || points.Length == 0)
+            return arrayMesh;
+
+        var vertices = new List<Vector3>();
+        var indices = new List<int>();
+
+        float size = typeDraw == TypeDraw.PIXEL
+            ? MeshCreator.PixelsToUnits(pointSize)
+            : pointSize;
+
+        int index = 0;
+
+        foreach (Vector2 pt in points)
+        {
+            Vector3 center;
+
+            if (typeDraw == TypeDraw.PIXEL)
+            {
+                center = new Vector3(
+                    MeshCreator.PixelsToUnits(pt.X),
+                    MeshCreator.PixelsToUnits(pt.Y),
+                    0f);
+            }
+            else
+            {
+                center = new Vector3(
+                    pt.X,
+                    pt.Y,
+                    0f);
+            }
+
+            // --------------------------------------------
+            // Línea horizontal
+            // --------------------------------------------
+
+            vertices.Add(
+                center + new Vector3(-size, 0f, 0f));
+
+            vertices.Add(
+                center + new Vector3(size, 0f, 0f));
+
+            indices.Add(index++);
+            indices.Add(index++);
+
+
+            // --------------------------------------------
+            // Línea vertical
+            // --------------------------------------------
+
+            vertices.Add(
+                center + new Vector3(0f, -size, 0f));
+
+            vertices.Add(
+                center + new Vector3(0f, size, 0f));
+
+            indices.Add(index++);
+            indices.Add(index++);
+        }
+
+        // Crear arrays para Godot
+        var arrays = new Godot.Collections.Array();
+        arrays.Resize((int)ArrayMesh.ArrayType.Max);
+
+        arrays[(int)ArrayMesh.ArrayType.Vertex] =
+            vertices.ToArray();
+
+        arrays[(int)ArrayMesh.ArrayType.Index] =
+            indices.ToArray();
+
+        // Cada dos índices forman una línea.
+        arrayMesh.AddSurfaceFromArrays(
+            Mesh.PrimitiveType.Lines,
+            arrays);
+
+        return arrayMesh;
+    }
     // ===========================
     // NUEVO: Corchetes de Selección para Edificios
     // ===========================
