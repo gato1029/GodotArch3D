@@ -8,6 +8,7 @@ using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Multimesh;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
+using GodotFlecs.sources.Flecs.Systems.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ using System.Threading.Tasks;
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
 internal class DeathCleanupSystem : FlecsSystemBase
 {
+    //eliminacion de unidades
     protected override bool MultiThreaded => false;
     protected override ulong Phase => flecs.EcsPostUpdate;
 
@@ -82,8 +84,18 @@ internal class DeathCleanupSystem : FlecsSystemBase
                         AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
                     }
                 }
-                
 
+                // -------------------------------------------------
+                // Si esta unidad tenía un slot de ataque reservado
+                // contra otro objetivo (aún vivo), lo liberamos.
+                // Sin esto, el slot quedaría ocupado para siempre
+                // en el AttackSlotsComponent del objetivo, aunque
+                // esta atacante ya no exista.
+                // -------------------------------------------------
+                if (entity.Has<AttackSlotComponent>())
+                {
+                    AttackSlotHelper.ReleaseAttackSlot(entity);
+                }
                 entity.Destruct();
             }
         }
@@ -92,6 +104,7 @@ internal class DeathCleanupSystem : FlecsSystemBase
 
 internal class DestroyCleanupSystem : FlecsSystemBase
 {
+    //destruccion de edificios
     protected override bool MultiThreaded => false;
     protected override ulong Phase => flecs.EcsPostUpdate;
 
@@ -160,7 +173,16 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                         AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
                     }
                 }
-
+                // -------------------------------------------------
+                // Si este edificio tenía un slot de ataque reservado
+                // contra otro objetivo (aún vivo), lo liberamos.
+                // Aplica si el edificio puede actuar como atacante
+                // (torre defensiva, etc.).
+                // -------------------------------------------------
+                if (entity.Has<AttackSlotComponent>())
+                {
+                    AttackSlotHelper.ReleaseAttackSlot(entity);
+                }
                 entity.Destruct();
             }
         }

@@ -1,9 +1,8 @@
 using Godot;
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.BlackyEngine.PathFinding;
 
@@ -16,20 +15,17 @@ public class BlackyPathRegistryManager
         public bool IsActive;
     }
 
-    // Almacenamiento plano y contiguo en memoria
-    private List<PathData> _pathPool = new();
+    // Colecciones genéricas fuertemente tipadas
+    private readonly List<PathData> _pathPool = new ();
+    private readonly Stack<int> _freeIndices = new Stack<int> ();
+    private readonly ConcurrentQueue<int> _pendingReleases = new ();
 
-    // Pila para reciclar los espacios de rutas que ya fueron eliminadas
-    private Stack<int> _freeIndices = new();
-
-    // 1. Registrar o reutilizar un espacio
     public int RegisterPath(Vector2[] points)
     {
         int pathId;
 
         if (_freeIndices.Count > 0)
         {
-            // Reutilizamos un índice que ya no se usa (evita crecer el array innecesariamente)
             pathId = _freeIndices.Pop();
             _pathPool[pathId] = new PathData
             {
@@ -40,7 +36,6 @@ public class BlackyPathRegistryManager
         }
         else
         {
-            // Si no hay huecos libres, agregamos al final
             pathId = _pathPool.Count;
             _pathPool.Add(new PathData
             {
@@ -60,12 +55,29 @@ public class BlackyPathRegistryManager
         _pathPool[pathId] = data;
     }
 
-    // Acceso directo por índice (Ultra rápido, sin hashing)
     public Vector2 GetWaypoint(int pathId, int index) => _pathPool[pathId].Points[index];
 
     public int GetPathLength(int pathId) => _pathPool[pathId].Points.Length;
 
-    // 2. Liberar ruta y reciclar su índice
+    // --- COMANDOS THREAD-SAFE ---
+
+    // Llamado desde hilos secundarios en paralelo
+    public void EnqueueReleasePath(int pathId)
+    {
+        _pendingReleases.Enqueue(pathId);
+    }
+
+    // Consumido exclusivamente en el thread principal
+    public void ProcessPendingReleases()
+    {
+        while (_pendingReleases.TryDequeue(out int pathId))
+        {
+            ReleasePath(pathId);
+        }
+    }
+
+    // ----------------------------
+
     public void ReleasePath(int pathId)
     {
         var data = _pathPool[pathId];
@@ -73,12 +85,9 @@ public class BlackyPathRegistryManager
 
         if (data.ReferenceCount <= 0)
         {
-            // Desactivamos y limpiamos la referencia al array de puntos para ayudar al GC
             data.IsActive = false;
             data.Points = null;
             _pathPool[pathId] = data;
-
-            // Guardamos el índice para que la próxima ruta lo reutilice
             _freeIndices.Push(pathId);
         }
         else

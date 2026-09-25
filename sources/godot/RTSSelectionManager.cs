@@ -1,5 +1,3 @@
-
-
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
@@ -18,12 +16,10 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.godot;
 
-
-
 public partial class RTSSelectionManager : Node2D
 {
     private static BlackyWorld _world;
-    private static BlackyPathfinder _pathfinder; 
+    private static BlackyPathfinder _pathfinder;
     public static RTSSelectionManager Instance { get; private set; }
 
     // --- NUEVO: Flag para encender/apagar el sistema ---
@@ -59,6 +55,7 @@ public partial class RTSSelectionManager : Node2D
     private const float DragThreshold = 6.0f;
 
     Query query;
+
     public void SetWorld(BlackyWorld world)
     {
         _world = world;
@@ -170,6 +167,7 @@ public partial class RTSSelectionManager : Node2D
             QueueRedraw(); // Fuerza a redibujar el rectángulo en pantalla
         }
     }
+
     private void CommandSelectedUnitsToMove(Vector2 targetPosition)
     {
         List<Entity> selectedEntities = new();
@@ -186,107 +184,73 @@ public partial class RTSSelectionManager : Node2D
         // ---------------------------------------------------------
         // 1. Centro del grupo
         // ---------------------------------------------------------
-
         Vector2 groupCenter = Vector2.Zero;
 
         foreach (var entity in selectedEntities)
         {
-            groupCenter +=
-                entity.Get<PositionComponent>().position;
+            groupCenter += entity.Get<PositionComponent>().position;
         }
 
         groupCenter /= selectedEntities.Count;
 
-
         // ---------------------------------------------------------
         // 2. Dirección del movimiento
         // ---------------------------------------------------------
-
-        Vector2 movementDirection =
-            targetPosition - groupCenter;
+        Vector2 movementDirection = targetPosition - groupCenter;
 
         if (movementDirection.LengthSquared() < 0.001f)
             return;
 
         movementDirection = movementDirection.Normalized();
 
-
         // ---------------------------------------------------------
         // 3. Crear formación
         // ---------------------------------------------------------
-
         float spacing = .9f; // antes 1.5f
 
-        var slots =
-            FormationHelper.GenerateGridSlots(
-                selectedEntities.Count,
-                spacing);
-
+        var slots = FormationHelper.GenerateGridSlots(selectedEntities.Count, spacing);
 
         // ---------------------------------------------------------
         // 4. Asignar cada unidad a un slot
         // ---------------------------------------------------------
-
-        var assignments =
-            FormationHelper.AssignNearestSlots(
-                selectedEntities,
-                slots,
-                groupCenter,
-                movementDirection);
-
+        var assignments = FormationHelper.AssignNearestSlots(
+            selectedEntities,
+            slots,
+            groupCenter,
+            movementDirection);
 
         if (assignments.Count == 0)
             return;
 
-
         // ---------------------------------------------------------
         // 5. Punto de salida de la formación
-        //
-        // No hacemos A* desde el centro exacto del grupo.
-        // Lo adelantamos para evitar que las unidades
-        // converjan hacia el centro.
         // ---------------------------------------------------------
-
         float formationLeadDistance = spacing * 3.0f;
 
-        Vector2 pathStart =
-            groupCenter +
-            movementDirection * formationLeadDistance;
-
+        Vector2 pathStart = groupCenter + movementDirection * formationLeadDistance;
 
         // ---------------------------------------------------------
-        // 6. Calcular A*
+        // 6. Calcular A* (UNA sola vez para todo el grupo)
         // ---------------------------------------------------------
+        Vector2I origin = TilesHelper.WorldPositionToTile(pathStart);
+        Vector2I destiny = TilesHelper.WorldPositionToTile(targetPosition);
 
-        Vector2I origin =
-            TilesHelper.WorldPositionToTile(pathStart);
-
-        Vector2I destiny =
-            TilesHelper.WorldPositionToTile(targetPosition);
-
-        var points =
-            _pathfinder.FindPathWorld(origin, destiny);
+        var points = _pathfinder.FindPathWorld(origin, destiny);
 
         if (points == null || points.Count == 0)
             return;
 
-
         // ---------------------------------------------------------
         // 7. Registrar camino compartido
         // ---------------------------------------------------------
-
-        int pathId =
-            _world.State.PathRegistryManager
-                .RegisterPath(points.ToArray());
-
+        int pathId = _world.State.PathRegistryManager.RegisterPath(points.ToArray());
+        int pathLength = points.Count;
 
         int unitsCommanded = 0;
-
 
         // ---------------------------------------------------------
         // 8. Asignar path + formación a cada unidad
         // ---------------------------------------------------------
-
         foreach (var assignment in assignments)
         {
             Entity entity = assignment.Key;
@@ -295,98 +259,94 @@ public partial class RTSSelectionManager : Node2D
             if (!entity.IsAlive())
                 continue;
 
-
             // ---------------------------------------------
             // Liberar path anterior
             // ---------------------------------------------
-
             if (entity.Has<PathReferenceComponent>())
             {
-                var oldPath =
-                    entity.Get<PathReferenceComponent>();
-
-                _world.State.PathRegistryManager
-                    .ReleasePath(oldPath.PathId);
+                var oldPath = entity.Get<PathReferenceComponent>();
+                _world.State.PathRegistryManager.ReleasePath(oldPath.PathId);
             }
-
 
             // ---------------------------------------------
             // Referencia al nuevo path
             // ---------------------------------------------
+            _world.State.PathRegistryManager.AddReference(pathId);
 
-            _world.State.PathRegistryManager
-                .AddReference(pathId);
+            // ---------------------------------------------
+            // Elegir el waypoint inicial de ESTA unidad
+            //
+            // Recorremos el path desde el índice 0 y nos
+            // quedamos con el primer waypoint que no quede
+            // "detrás" de la unidad respecto a la dirección
+            // de movimiento del grupo. Evita el retroceso
+            // cuando la unidad ya iba adelantada.
+            // ---------------------------------------------
+            Vector2 entityPos = entity.Get<PositionComponent>().position;
 
+            int startIndex = 0;
+            Vector2 waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, 0);
+            Vector2 firstTarget = waypoint + formationOffset;
+
+            while (startIndex < pathLength - 1)
+            {
+                Vector2 toWaypoint = firstTarget - entityPos;
+
+                // Si el waypoint está delante (o es ambiguo por estar muy cerca), lo aceptamos
+                if (toWaypoint.Dot(movementDirection) >= 0f || toWaypoint.LengthSquared() < 0.01f)
+                    break;
+
+                startIndex++;
+                waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, startIndex);
+                firstTarget = waypoint + formationOffset;
+            }
 
             entity.Set(
                 new PathReferenceComponent(
                     pathId,
-                    0,
+                    startIndex + 1, // el waypoint startIndex ya lo consumimos como MoveTarget
                     formationOffset));
 
-
             // ---------------------------------------------
-            // Primer waypoint + offset de formación
+            // Asignar MoveTarget
             // ---------------------------------------------
-
-            Vector2 waypoint =
-                _world.State.PathRegistryManager
-                    .GetWaypoint(pathId, 0);
-
-            Vector2 firstTarget =
-                waypoint + formationOffset;
-
-
             if (entity.Has<MoveTargetComponent>())
             {
-                ref var target =
-                    ref entity.GetMut<MoveTargetComponent>();
-
+                ref var target = ref entity.GetMut<MoveTargetComponent>();
                 target.Value = firstTarget;
             }
             else
             {
-                entity.Set(
-                    new MoveTargetComponent
-                    {
-                        Value = firstTarget
-                    });
+                entity.Set(new MoveTargetComponent
+                {
+                    Value = firstTarget
+                });
             }
-
 
             // ---------------------------------------------
             // Desbloquear unidad
             // ---------------------------------------------
-
             if (entity.Has<StoppedTag>())
                 entity.Remove<StoppedTag>();
 
-            ref var resolutor =
-                ref entity.GetMut<MoveResolutorComponent>();
+            ref var resolutor = ref entity.GetMut<MoveResolutorComponent>();
 
             resolutor.Blocked = false;
             resolutor.BlockedTimer = 0f;
 
-
             unitsCommanded++;
         }
-
 
         // ---------------------------------------------------------
         // 9. Si nadie pudo usar el path, liberarlo
         // ---------------------------------------------------------
-
         if (unitsCommanded == 0)
         {
-            _world.State.PathRegistryManager
-                .ReleasePath(pathId);
-
+            _world.State.PathRegistryManager.ReleasePath(pathId);
             return;
         }
 
-
-        GD.Print(
-            $"Moviendo {unitsCommanded} unidades a {targetPosition}");
+        GD.Print($"Moviendo {unitsCommanded} unidades a {targetPosition}");
     }
     // El dibujo visual se mantiene en coordenadas de pantalla
     public override void _Draw()
@@ -395,8 +355,8 @@ public partial class RTSSelectionManager : Node2D
 
         Rect2 rect = CreateRect(_dragStartScreen, _dragCurrentScreen);
 
-        Color fillColor = new Color(0, 1, 0, 0.15f); // Verde translúcido
-        Color borderColor = new Color(0, 1, 0, 0.8f); // Borde verde sólido
+        Color fillColor = new Color(0, 1, 0, 0.15f);   // Verde translúcido
+        Color borderColor = new Color(0, 1, 0, 0.8f);  // Borde verde sólido
 
         DrawRect(rect, fillColor, true);
         DrawRect(rect, borderColor, false, 2.0f);
@@ -413,32 +373,34 @@ public partial class RTSSelectionManager : Node2D
 
     private void ClearPreviousSelection()
     {
-        //Si no mantienes Shift presionado, limpiamos las selecciones previas
+        // Si no mantienes Shift presionado, limpiamos las selecciones previas
         if (!Input.IsKeyPressed(Key.Shift))
         {
-
             // 1. Creamos una lista temporal para almacenar las entidades encontradas
             List<Entity> entitiesToDeselect = new();
+
             // 2. Iteramos de forma ultra-performante por cada entidad encontrada
             query.Each((Entity ent) =>
             {
                 if (ent.Has<SelectedTag>())
                 {
                     entitiesToDeselect.Add(ent);
-                }                
+                }
             });
+
             foreach (var ent in entitiesToDeselect)
             {
                 if (ent.IsAlive() && !ent.Has<DeadTag>())
                 {
                     ent.Remove<SelectedTag>();
-                    ref var  selector =  ref ent.GetMut<RenderSelectionGPUComponent>();
-                    if (selector.rid != default && selector.instance!=-1)
+
+                    ref var selector = ref ent.GetMut<RenderSelectionGPUComponent>();
+                    if (selector.rid != default && selector.instance != -1)
                     {
                         AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
                         selector.rid = default;
                         selector.instance = -1;
-                    }                    
+                    }
                 }
             }
         }
@@ -508,7 +470,9 @@ public partial class RTSSelectionManager : Node2D
         float minY = rect.Position.Y;
         float maxX = rect.Position.X + rect.Size.X;
         float maxY = rect.Position.Y + rect.Size.Y;
+
         Vector2 centerPosition = rect.GetCenter();
+
         FastCollider collider = new FastCollider
         {
             Shape = ShapeType.Rect,
@@ -516,6 +480,7 @@ public partial class RTSSelectionManager : Node2D
             Width = rect.Size.X,
             Offset = Vector2.Zero
         };
+
         // Preparamos un Span temporal para recibir los resultados (ej. máximo 250 unidades a la vez)
         Span<int> results = stackalloc int[250];
 
@@ -533,22 +498,29 @@ public partial class RTSSelectionManager : Node2D
 
             // aqui debemos verificar si realmente esta dentro del collider
             if (entity.IsAlive())
-            {                            
+            {
                 if (!entity.Has<SelectedTag>())
                 {
                     if (entity.Has<UnitDefinitionComponent>())
                     {
                         var moveCollider = entity.Get<MoveColliderComponent>();
                         var positionComp = entity.Get<PositionComponent>();
-                        if (CollisionMathHelper.CheckCircle(positionComp.position.X, positionComp.position.Y, moveCollider.Radius, moveCollider.Offset, centerPosition.X, centerPosition.Y, ref collider))
+
+                        if (CollisionMathHelper.CheckCircle(
+                            positionComp.position.X,
+                            positionComp.position.Y,
+                            moveCollider.Radius,
+                            moveCollider.Offset,
+                            centerPosition.X,
+                            centerPosition.Y,
+                            ref collider))
                         {
                             entity.Add<SelectedTag>();
                             BlackyManagerSelector.CreateSelector(entity);
                             selectedCount++;
-                        }                                                
-                    }                    
-                    
-                }                
+                        }
+                    }
+                }
             }
         }
 

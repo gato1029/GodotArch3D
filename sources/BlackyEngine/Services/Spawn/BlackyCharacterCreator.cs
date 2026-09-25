@@ -211,7 +211,7 @@ public class BlackyCharacterCreator
         }
         else
         {
-            entity.Set(new HealthComponent(100));
+            entity.Set(new HealthComponent(1000));
         }
         
 

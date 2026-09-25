@@ -63,14 +63,12 @@ public class MovementResolutionSystem : FlecsSystemBase
             {
               
                 cha.stateType = StateType.IDLE;              
-                vel.desiredVel = Vector2.Zero;
-                //move.Blocked = false;
+                vel.desiredVel = Vector2.Zero;                
                 if (e.Has<PathReferenceComponent>())
                 {
                     var path = e.Get<PathReferenceComponent>();
-
                     int pathIdToRelease = path.PathId;
-                    _pathRegistry.ReleasePath(pathIdToRelease);
+                    _pathRegistry.EnqueueReleasePath(pathIdToRelease);
 
                     // Limpiamos componentes de ruta
                     e.Remove<PathReferenceComponent>();
@@ -87,20 +85,15 @@ public class MovementResolutionSystem : FlecsSystemBase
             bool isMoving = vel.desiredVel.LengthSquared() > 0.0002f;
 
             if (!isMoving)
-            {
-                //move.Blocked = true;
-                cha.stateType = StateType.IDLE;
-
-                // 🔥 timer determinista sin loop
-                //move.BlockedTimer += totalTickTime;
+            {                
+                cha.stateType = StateType.IDLE; 
             }
             else
             {   // 🎨 movimiento suave
-                pos.position += vel.desiredVel * dt; // * dt;
+                pos.position += vel.desiredVel * dt; 
                 pos.tilePosition = TilesHelper.WorldPositionToTile(pos.position);
                 pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
-                move.Blocked = false;
-                //move.BlockedTimer = 0f;
+                move.Blocked = false;                
             }
         }
     }

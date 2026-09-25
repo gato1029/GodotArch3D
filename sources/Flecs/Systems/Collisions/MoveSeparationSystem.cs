@@ -143,7 +143,7 @@ public class MoveSeparationSystem : FlecsSystemBase
                 existCollision = sta;
                 if (sta)
                 {
-                    it.Entity(i).Add<StoppedTag>();
+                 //   it.Entity(i).Add<StoppedTag>();
                     vel.desiredVel = Vector2.Zero;
                     res.Blocked = true;
                 }
@@ -156,7 +156,7 @@ public class MoveSeparationSystem : FlecsSystemBase
                 existCollision = sta;
                 if (sta)
                 {
-                    it.Entity(i).Add<StoppedTag>();
+                  //  it.Entity(i).Add<StoppedTag>();
                     vel.desiredVel = Vector2.Zero;
                     res.Blocked = true;
                 }

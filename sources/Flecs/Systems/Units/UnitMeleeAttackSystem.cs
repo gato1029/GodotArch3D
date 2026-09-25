@@ -64,17 +64,20 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
             ref var dir = ref dirArray[i];
             ref var unit = ref unitArray[i];
             Entity ent = it.Entity(i);
+
             // Reducción del cooldown de ataque
             if (melle.Timer > 0f)
             {
                 melle.Timer -= it.DeltaTime();
             }
+
             if (cha.stateType == StateType.EXECUTE_ATTACK)
             {
                 if (atp.Active && atp.Target.IsAlive() && !atp.Target.Has<DeadTag>())
                 {
                     Vector2 originAttackCenter = pos.position + melle.OffSetRange;
                     var targetPos = atp.Target.Get<PositionComponent>();
+
                     if (atp.Target.Has<UnitDefinitionComponent>())
                     {
                         ushort targetTemplateId = atp.Target.Get<UnitDefinitionComponent>().idTemplate;
@@ -94,8 +97,13 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                             cha.stateType = StateType.IDLE;
                             atp.Active = false;
                             atp.Target = default;
+                            ent.Remove<AttackPendingTag>();
+
+                            // El objetivo salió de rango: liberamos el slot reservado
+                            AttackSlotHelper.RequestReleaseAttackSlot(ent);
                         }
-                    } else
+                    }
+                    else
                     //if (atp.Target.Has<BuildingDefinitionComponent>())
                     {
                         ushort targetTemplateId = atp.Target.Get<BuildingDefinitionComponent>().idTemplate;
@@ -115,19 +123,24 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                             cha.stateType = StateType.IDLE;
                             atp.Active = false;
                             atp.Target = default;
+                            ent.Remove<AttackPendingTag>();
+
+                            // El objetivo salió de rango: liberamos el slot reservado
+                            AttackSlotHelper.RequestReleaseAttackSlot(ent);
                         }
                     }
-
                 }
                 else
                 {
                     // si esta muerto libero target
                     cha.stateType = StateType.IDLE;
                     atp.Active = false;
-                    atp.Target = default; 
+                    atp.Target = default;
                     ent.Remove<AttackPendingTag>();
+
+                    // El target murió o dejó de existir: liberamos el slot reservado
+                    AttackSlotHelper.RequestReleaseAttackSlot(ent);
                 }
-                                
             }
 
             if (melle.Timer <= 0f)
@@ -143,6 +156,9 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                     atp.Active = false;
                     atp.Target = default;
                     ent.Remove<AttackPendingTag>();
+
+                    // Ataque cancelado por cooldown sin target válido: liberamos el slot
+                    AttackSlotHelper.RequestReleaseAttackSlot(ent);
                 }
             }
         }

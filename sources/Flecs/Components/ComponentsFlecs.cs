@@ -518,7 +518,19 @@ public record struct StuckComponent
     float StuckTime,
      bool IsBlocked 
 );
-
+// En el ENEMIGO/TARGET: qué slots están ocupados
+[RegisterComponentFlecs]
+public struct AttackSlotsComponent
+{
+    public uint OccupiedMask; // hasta 32 slots, uno por bit
+}
+// En el ATACANTE: qué slot tiene reservado y contra quién
+[RegisterComponentFlecs]
+public struct AttackSlotComponent
+{
+    public Entity Target;
+    public int SlotIndex;
+}
 
 [RegisterComponentFlecs]
 public record struct PathReferenceComponent

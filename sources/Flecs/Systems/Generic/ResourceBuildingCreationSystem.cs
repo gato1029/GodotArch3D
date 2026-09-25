@@ -24,6 +24,9 @@ internal class ResourceBuildingCreationSystem : FlecsSystemBase
         world.Services.ResourcePainter.ProcessPendingCommands();
         world.Services.ResourcePainter.ProcessPendingRemovals();
         world.Services.BuildingPainter.ProcessPendingCommands();
+
         world.Services.EntityRenderer.ProcessPendingChunks(); // esto aplica para todo las entidades el render
+        world.State.PathRegistryManager.ProcessPendingReleases();
+        AttackSlotHelper.ProcessPendingReleases();
     }
 }

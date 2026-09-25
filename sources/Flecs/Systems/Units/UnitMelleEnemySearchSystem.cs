@@ -25,7 +25,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
     // busca enemigos de las unidades que son melle, osea ataque cuerpo a cuerpo
     // encuentra objetivo y automaticamente ya asigna destino y objetivo
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => false;    
+    protected override bool MultiThreaded => true;    
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
@@ -37,165 +37,204 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
           .With<MeleeAttackComponent>()
           .With<DirectionComponent>()
           .With<StoppedTag>()
-          //.Without<MoveTargetComponent>()
           .Without<PlayerInputComponent>()
           .Without<DeadTag>()
           .Without<DestroyRequestTag>()
           .Without<AttackPendingTag>();
     }
-    protected override void OnIter(Iter it)
+ protected override void OnIter(Iter it)
+{
+    var world = it.World().GetCtx<BlackyWorld>();
+    if (world == null) return;
+
+    var sim = world.Simulation.Tick;
+    if (sim == null || sim.TickCount == 0) return;
+
+    var dynGrid = world.State.DynamicHash;
+    var staticGrid = world.State.StaticSpatialBuildings;
+
+    var posArray = it.Field<PositionComponent>(0);
+    var spatialArray = it.Field<SpatialIDComponent>(1);
+    var teamArray = it.Field<TeamComponent>(2);
+    var charArray = it.Field<StateComponent>(3);
+    var searchArray = it.Field<EnemySearchComponent>(4);
+    var moveResolutorArray = it.Field<MoveResolutorComponent>(5);
+    var melleArray = it.Field<MeleeAttackComponent>(6);
+    var dirArray = it.Field<DirectionComponent>(7);
+
+    Span<int> neighbors = stackalloc int[8];
+
+    float deltaTime = sim.FixedDelta; // 🔥 Usar solo el delta del tick actual, no el acumulado histórico
+    int mask = sim.GetGroupMaskMelle();
+    int frame = sim.FrameIndex & mask;
+
+    const int SlotsPerRing = 8;  // unidades por anillo alrededor del target
+    const int MaxSlots = 32;     // debe calzar con el ancho de OccupiedMask (uint)
+
+    for (int i = 0; i < it.Count(); i++)
     {
-        var world = it.World().GetCtx<BlackyWorld>();
-        if (world == null) return;
+        ref var pos = ref posArray[i];
+        ref var spatial = ref spatialArray[i];
+        ref var team = ref teamArray[i];
+        ref var search = ref searchArray[i];
+        ref var moveResolutor = ref moveResolutorArray[i];
+        ref var melle = ref melleArray[i];
+        ref var dir = ref dirArray[i];
+        var e = it.Entity(i);
 
-        var sim = world.Simulation.Tick;
-        if (sim == null || sim.TickCount == 0) return;
+        // 🔥 acumular tiempo correctamente
+        search.Timer += deltaTime;
 
-        var dynGrid = world.State.DynamicHash;
-        var staticGrid = world.State.StaticSpatialBuildings;
-
-        var posArray = it.Field<PositionComponent>(0);
-        var spatialArray = it.Field<SpatialIDComponent>(1);
-        var teamArray = it.Field<TeamComponent>(2);
-        var charArray = it.Field<StateComponent>(3);
-        var searchArray = it.Field<EnemySearchComponent>(4);        
-        var moveResolutorArray = it.Field<MoveResolutorComponent>(5);
-        var melleArray = it.Field<MeleeAttackComponent>(6);
-        var dirArray = it.Field<DirectionComponent>(7);
-
-        Span<int> neighbors = stackalloc int[8];
-
-        float deltaTime = sim.FixedDelta; // 🔥 Usar solo el delta del tick actual, no el acumulado histórico
-        int mask = sim.GetGroupMaskMelle();
-        int frame = sim.FrameIndex & mask;
-
-        for (int i = 0; i < it.Count(); i++)
+        if (search.Timer >= search.Interval)
         {
-            ref var pos = ref posArray[i];
-            ref var spatial = ref spatialArray[i];
-            ref var team = ref teamArray[i];
-            ref var search = ref searchArray[i];
-            ref var moveResolutor = ref moveResolutorArray[i];
-            ref var melle = ref melleArray[i];
-            ref var dir = ref dirArray[i];
-            var e = it.Entity(i);
+            // 🔥 cuántas veces "debió" ejecutarse
+            int times = (int)(search.Timer / search.Interval);
 
-            // 🔥 acumular tiempo correctamente
-            search.Timer += deltaTime;
+            // 🔥 conservar excedente (CLAVE)
+            search.Timer -= times * search.Interval;
 
-            if (search.Timer >= search.Interval)
+            // 🔥 👇 AQUI VA EL STAGGERING 👇
+            int group = melle.numberUnitMelle & mask;
+            if (group != frame) continue;
+
+            // 🔥 SOLO UNA QUERY (optimización crítica)
+            int count = dynGrid.QueryNodesBoundedClosestLayersFiltered(
+                pos.position.X,
+                pos.position.Y,
+                search.Radius,
+                team.TeamId,
+                neighbors
+            );
+
+            bool existTarget = false;
+            Vector2 targetPos = Vector2.Zero;
+            Entity targetEntity = default;
+            bool istargetUnit = false;
+            ushort idTarget = 0;
+
+            for (int ii = 0; ii < count; ii++)
             {
-                // 🔥 cuántas veces "debió" ejecutarse
-                int times = (int)(search.Timer / search.Interval);
+                targetEntity = dynGrid.GetEntity(neighbors[ii]);
 
-                // 🔥 conservar excedente (CLAVE)
-                search.Timer -= times * search.Interval;
-                // 🔥 👇 AQUI VA EL STAGGERING 👇
-                int group = melle.numberUnitMelle & mask;
-                if (group != frame) continue; 
+                if (spatial.Value == neighbors[ii]) continue;
 
-                // 🔥 SOLO UNA QUERY (optimización crítica)
-                int count = dynGrid.QueryNodesBoundedClosestLayersFiltered(
-                    pos.position.X,
-                    pos.position.Y,
-                    search.Radius,
-                    team.TeamId,
-                    neighbors
-                );
-                bool existTarget = false;
-                Vector2 targetPos = Vector2.Zero;
-                Entity targetEntity = default;
-                bool istargetUnit = false;
-                ushort idTarget = 0;
-                
-                for (int ii = 0; ii < count; ii++)
+                if (targetEntity.IsAlive() && !targetEntity.Has<DeadTag>())
                 {
-                    targetEntity = dynGrid.GetEntity(neighbors[ii]);
+                    targetPos = targetEntity.Get<PositionComponent>().position;
+                    float rangeSqr = search.Radius * search.Radius;
+                    float distSqr = pos.position.DistanceSquaredTo(targetPos);
 
-                    if (spatial.Value == neighbors[ii]) continue;
+                    if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
+                    idTarget = targetEntity.Get<UnitDefinitionComponent>().idTemplate;
 
-                    //var otherTeam = targetEntity.Get<TeamComponent>();
-                    //if (team.TeamId == otherTeam.TeamId) continue; // el query ya hace este filtro
+                    existTarget = true;
+                    istargetUnit = true;
+                    break;
+                }
+            }
 
-                    if (targetEntity.IsAlive() && !targetEntity.Has<DeadTag>())
+            if (!existTarget)
+            {
+                int radius = (int)MathF.Ceiling((search.Radius * 2f) / staticGrid._cellSize);
+                // aqui buscar edificos
+                foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius, team.TeamId))
+                {
+                    if (staticGrid.TryGetValue(id, out Entity otherEntity))
                     {
-                        targetPos = targetEntity.Get<PositionComponent>().position;
+                        if (!otherEntity.IsAlive()) continue;
+                        targetEntity = otherEntity;
+
+                        targetPos = otherEntity.Get<PositionComponent>().position;
                         float rangeSqr = search.Radius * search.Radius;
                         float distSqr = pos.position.DistanceSquaredTo(targetPos);
 
                         if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
-                        idTarget = targetEntity.Get<UnitDefinitionComponent>().idTemplate;
-                        
+                        idTarget = targetEntity.Get<BuildingDefinitionComponent>().idTemplate;
+
                         existTarget = true;
-                        istargetUnit = true;
                         break;
                     }
                 }
-                if (!existTarget)
+            }
+
+            if (existTarget)
+            {
+                bool inRange = false;
+                if (istargetUnit)
                 {
-                    int radius = (int)MathF.Ceiling((search.Radius * 2f) / staticGrid._cellSize);
-                    // aqui buscar edificos
-                    foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius,team.TeamId))
-                    {
-                        if (staticGrid.TryGetValue(id, out Entity otherEntity))
-                        {
-                            if (!otherEntity.IsAlive()) continue;
-                            targetEntity = otherEntity;
-                            TileSpriteData sprite = null;
-
-                            if (otherEntity.Has<BuildingDefinitionComponent>())
-                            {
-                                int idTemplate = otherEntity.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal; // 🔹 para asegurar que es una entidad con collider
-                                var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
-                            }
-                            var posOther = otherEntity.Get<PositionComponent>();
-
-                            targetPos = otherEntity.Get<PositionComponent>().position;
-                            float rangeSqr = search.Radius * search.Radius;
-                            float distSqr = pos.position.DistanceSquaredTo(targetPos);
-
-                            if (distSqr > rangeSqr) continue; // Fuera del rango de melee, buscar siguiente
-                            idTarget = targetEntity.Get<BuildingDefinitionComponent>().idTemplate;
-
-                            existTarget = true;
-                            break;
-                        }
-                    }
+                    inRange = CheckCollisionWithTargetUnit(pos.position + melle.OffSetRange, dir.normalized, melle.RangeAttack, targetPos, idTarget);
                 }
-       
-                if (existTarget)
+                else
                 {
-                    //Vector2 toTarget = targetPos - pos.position + melle.OffSetRange;
-                    //float distSq = toTarget.LengthSquared();
-                    //float umbralLlegada = melle.RangeAttack;
-                    //if (distSq <= umbralLlegada)//0.05f) // Umbral de llegada
-                    //{
-                    //    //ataca directamente
-                    //    e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos));
-                    //    e.Add<AttackPendingTag>();
-                    //}
-                    bool inRange = false;
-                    if (istargetUnit)
-                    {
-                        inRange = CheckCollisionWithTargetUnit(pos.position+melle.OffSetRange,dir.normalized, melle.RangeAttack, targetPos, idTarget);
+                    inRange = CheckCollisionWithTargetBuild(pos.position + melle.OffSetRange, dir.normalized, melle.RangeAttack, targetPos, idTarget);
+                }
+
+                if (inRange)
+                {
+                    // ataca directamente
+                    e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos, 0));
+                    e.Add<AttackPendingTag>();
+
+                        // -------------------------------------------------
+                        // Ya está en rango de ataque: si tenía un slot
+                        // reservado, lo liberamos (no necesita más
+                        // desplazarse alrededor del objetivo).
+                        // -------------------------------------------------
+                        AttackSlotHelper.RequestReleaseAttackSlot(e);
                     }
-                    else
+                else
                     {
-                        inRange= CheckCollisionWithTargetBuild(pos.position+melle.OffSetRange, dir.normalized, melle.RangeAttack, targetPos, idTarget);
-                    }
-                    if (inRange)
-                    {
-                        //ataca directamente
-                            e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos,0));
-                            e.Add<AttackPendingTag>();
-                    }
-                    else
-                    {
+                        if (!targetEntity.IsAlive() || targetEntity.Has<DeadTag>())
+                        {
+                            AttackSlotHelper.ReleaseAttackSlot(e);
+                            continue;
+                        }
+                        // -------------------------------------------------
+                        // Obtener/reutilizar slot de aproximación
+                        // -------------------------------------------------
+                        int slotIndex;
+
+                        if (e.Has<AttackSlotComponent>())
+                        {
+                            var mySlot = e.Get<AttackSlotComponent>(); // copia, no ref
+
+                            if (mySlot.Target == targetEntity && mySlot.Target.IsAlive())
+                            {
+                                slotIndex = mySlot.SlotIndex;
+                            }
+                            else
+                            {
+                                // Tenía slot en OTRO target: liberarlo primero
+                                AttackSlotHelper.ReleaseAttackSlot(e);
+                                slotIndex = AttackSlotHelper.AcquireAttackSlot(e, targetEntity, MaxSlots);
+                            }
+                        }
+                        else
+                        {
+                            slotIndex = AttackSlotHelper.AcquireAttackSlot(e, targetEntity, MaxSlots);
+                        }
+                        if (slotIndex == -1)
+                        {
+                            // No se pudo reservar (target inválido u otro problema) — no avanzamos este ciclo.
+                            continue;
+                        }
+                        // -------------------------------------------------
+                        // Calcular approachPoint a partir del slot
+                        // -------------------------------------------------
+                        int ring = slotIndex / SlotsPerRing;
+                        int slotInRing = slotIndex % SlotsPerRing;
+
+                        float angle = slotInRing * (MathF.Tau / SlotsPerRing);
+                        float ringRadius = melle.RangeAttack * 0.85f + ring * (melle.RangeAttack * 0.5f);
+
+                        Vector2 slotDir = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+                        Vector2 approachPoint = targetPos + slotDir * ringRadius;
+
                         // validar si el camino esta libre
                         if (CollisionMathHelper.RutaLibre(e, ref targetPos, world))
                         {
                             moveResolutor.Blocked = false;
-                            e.Set(new MoveTargetComponent(targetPos));
+                            e.Set(new MoveTargetComponent(approachPoint));
                             e.Remove<StoppedTag>();
                             e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos, 0));
                         }
@@ -203,14 +242,54 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                         {
                             moveResolutor.Blocked = true;
                         }
-                        
                     }
-                    
-                }
-            
             }
         }
     }
+}
+
+// ---------------------------------------------------------
+// Reserva el primer slot libre en el anillo del target
+// y lo registra en la unidad atacante.
+// ---------------------------------------------------------
+private int AcquireAttackSlot(Entity attacker, Entity target, ref AttackSlotsComponent targetSlots, int maxSlots)
+{
+    int slotIndex = -1;
+
+    for (int s = 0; s < maxSlots; s++)
+    {
+        if ((targetSlots.OccupiedMask & (1u << s)) == 0)
+        {
+            slotIndex = s;
+            break;
+        }
+    }
+
+    if (slotIndex == -1) slotIndex = 0; // fallback si están todos ocupados (caso extremo)
+
+    targetSlots.OccupiedMask |= (1u << slotIndex);
+    attacker.Set(new AttackSlotComponent { Target = target, SlotIndex = slotIndex });
+
+    return slotIndex;
+}
+
+// ---------------------------------------------------------
+// Libera el slot que la unidad tenía reservado, si tenía.
+// ---------------------------------------------------------
+private void ReleaseAttackSlot(Entity attacker)
+{
+    if (!attacker.Has<AttackSlotComponent>()) return;
+
+    ref var slot = ref attacker.GetMut<AttackSlotComponent>();
+
+    if (slot.Target.IsAlive() && slot.Target.Has<AttackSlotsComponent>())
+    {
+        ref var targetSlots = ref slot.Target.GetMut<AttackSlotsComponent>();
+        targetSlots.OccupiedMask &= ~(1u << slot.SlotIndex);
+    }
+
+    attacker.Remove<AttackSlotComponent>();
+}
 
     private bool CheckCollisionWithTargetBuild(Vector2 origin, Vector2 dirNormalized, float range, Vector2 targetPos, ushort templateId)
     {
