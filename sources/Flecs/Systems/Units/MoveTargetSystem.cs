@@ -18,7 +18,7 @@ public class MoveTargetSystem : FlecsSystemBase
         qb.With<PositionComponent>()          
           .With<MoveTargetComponent>()
           .With<StateComponent>()
-          .With<SteeringComponent>() // <-- Añadido
+          .With<SteeringComponent>() 
           .With<MoveResolutorComponent>()
           .With<MoveColliderComponent>()
           .Without<StoppedTag>()
@@ -30,7 +30,7 @@ public class MoveTargetSystem : FlecsSystemBase
         var posArray = it.Field<PositionComponent>(0);
         var targetArray = it.Field<MoveTargetComponent>(1);
         var stateArray = it.Field<StateComponent>(2);
-        var steeringArray = it.Field<SteeringComponent>(3); // <-- Añadido
+        var steeringArray = it.Field<SteeringComponent>(3);
         var resolutorArray = it.Field<MoveResolutorComponent>(4);
         var moveArray = it.Field<MoveColliderComponent>(5);
 
@@ -45,17 +45,13 @@ public class MoveTargetSystem : FlecsSystemBase
             ref var move = ref moveArray[i];
       
 
-            //if (resolutor.Blocked)
-            //{        
-            //    continue;
-            //}
             Vector2 toTarget = target.Value - pos.position +move.Offset;
             float distSq = toTarget.LengthSquared();
 
             float umbralLlegada = 0.05f;
        
 
-            if (distSq <= umbralLlegada)//0.05f) // Umbral de llegada
+            if (distSq <= umbralLlegada) // Umbral de llegada
             {
                 resolutor.BlockedTimer = 0;
                 steering.DesiredDir = Vector2.Zero;

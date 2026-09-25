@@ -2,6 +2,7 @@ using Flecs.NET.Core;
 using Godot;
 
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.PathFinding;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
@@ -26,9 +27,9 @@ public sealed class BlackyWorldState : IDisposable
     public BlackyChunkRenderData RenderData { get; }
     public BlackySpatialEntityMap SpatialEntityMap { get; }
     public BlackyPersistentTilePalette TilePalette { get; }
-
+    public BlackyPathfinder PathFinder { get; }
     public BlackyChunkOccupancyMap OccupancyMap { get; }
- 
+    public BlackyMacroGraphCache GraphCache { get; }
 
     private int idGridDraw { get; set; }
     private ModeGrid modeGrid { get; set; } = ModeGrid.NORMAL;
@@ -53,7 +54,9 @@ public sealed class BlackyWorldState : IDisposable
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize);
 
         idGridDraw= WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),40,Colors.DarkCyan);
-   
+        GraphCache = new BlackyMacroGraphCache();
+        GraphCache.BuildCache(config.MinChunk, config.MaxChunk);
+        PathFinder = new BlackyPathfinder(GraphCache,OccupancyMap);
     }
     public void SetModeGrid(ModeGrid modeGrid)
     {

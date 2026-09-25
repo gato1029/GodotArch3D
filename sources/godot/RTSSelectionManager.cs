@@ -3,6 +3,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Generic;
+using GodotEcsArch.sources.BlackyEngine.PathFinding;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
@@ -21,6 +22,7 @@ namespace GodotEcsArch.sources.godot;
 public partial class RTSSelectionManager : Node2D
 {
     private static BlackyWorld _world;
+    private static BlackyPathfinder _pathfinder; 
     public static RTSSelectionManager Instance { get; private set; }
 
     // --- NUEVO: Flag para encender/apagar el sistema ---
@@ -59,6 +61,7 @@ public partial class RTSSelectionManager : Node2D
     public void SetWorld(BlackyWorld world)
     {
         _world = world;
+        _pathfinder = world.State.PathFinder;
         query = _world.Simulation.Flecs.WorldFlecs.QueryBuilder().With<SelectedTag>().Build();
     }
 
@@ -178,14 +181,22 @@ public partial class RTSSelectionManager : Node2D
                     selectedEntities.Add(entity);
                 }
             });
-
+        if (selectedEntities.Count<=0)
+        {
+            return;
+        }
         int unitsCommanded = 0;
 
+        Vector2I origin = TilesHelper.WorldPositionToTile(selectedEntities[0].Get<PositionComponent>().position);
+
+        Vector2I destiny = TilesHelper.WorldPositionToTile(targetPosition);
+        var points = _pathfinder.FindSimplifiedPath(origin, destiny);
         // 2. FASE DE ACCIÓN: Modificamos las entidades de forma 100% segura fuera del Each
         foreach (var entity in selectedEntities)
         {
             if (entity.IsAlive())
             {
+
                 if (CollisionMathHelper.RutaLibre(entity, ref targetPosition, _world))
                 {
                     // Actualizar o añadir destino (cambio estructural o de mutación)
