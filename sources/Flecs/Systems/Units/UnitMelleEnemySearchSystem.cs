@@ -198,7 +198,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                         {
                             var mySlot = e.Get<AttackSlotComponent>(); // copia, no ref
 
-                            if (mySlot.Target == targetEntity && mySlot.Target.IsAlive())
+                            if (mySlot.Target == targetEntity && mySlot.Target.IsAlive() && !mySlot.Target.Has<DeadTag>())
                             {
                                 slotIndex = mySlot.SlotIndex;
                             }

@@ -205,6 +205,7 @@ public class BlackyCharacterCreator
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0));
         entity.Set(new PlayerInputComponent());
+        entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         if (health!=0)
         {
             entity.Set(new HealthComponent(health));
@@ -288,6 +289,7 @@ public class BlackyCharacterCreator
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, animationDir.directionAnimationType, GodotEcsArch.sources.components.AnimationDirection.LEFT));
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3f, new Vector2(0, 0)));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0));
+        entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         entity.Add<StoppedTag>();
         entity.Add<UseBoidTag>();
         if (health != 0)

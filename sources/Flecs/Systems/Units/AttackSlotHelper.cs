@@ -20,8 +20,9 @@ internal static class AttackSlotHelper
     // ---------------------------------------------------------
     public static int AcquireAttackSlot(Entity attacker, Entity target, int maxSlots)
     {
+
         // Nunca reservar un slot contra un target inválido.
-        if (!target.IsAlive() || target.Has<DeadTag>())
+        if (!target.IsAlive() || target.Has<DeadTag>() || !attacker.IsAlive() || attacker.Has<DeadTag>())
         {
             return -1;
         }
