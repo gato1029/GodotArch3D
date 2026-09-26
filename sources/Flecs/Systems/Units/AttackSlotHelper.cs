@@ -20,36 +20,40 @@ internal static class AttackSlotHelper
     // ---------------------------------------------------------
     public static int AcquireAttackSlot(Entity attacker, Entity target, int maxSlots)
     {
-
-        // Nunca reservar un slot contra un target inválido.
-        if (!target.IsAlive() || target.Has<DeadTag>() || !attacker.IsAlive() || attacker.Has<DeadTag>())
+        if (!target.IsAlive() || target.Has<DeadTag>())
         {
             return -1;
         }
 
-        AttackSlotsComponent targetSlots = target.Has<AttackSlotsComponent>()
-            ? target.Get<AttackSlotsComponent>()
-            : new AttackSlotsComponent { OccupiedMask = 0 };
-
-        int slotIndex = -1;
-
-        for (int s = 0; s < maxSlots; s++)
+        // AttackSlotsComponent ahora se agrega en el spawn de toda unidad/edificio
+        // combatiente — aquí siempre debería existir. Igual dejamos el fallback
+        // por seguridad, pero ya no debería ser el camino común.
+        if (target.Has<AttackSlotsComponent>())
         {
-            if ((targetSlots.OccupiedMask & (1u << s)) == 0)
+            ref var  targetSlots = ref target.GetMut<AttackSlotsComponent>();
+            int slotIndex = -1;
+
+            for (int s = 0; s < maxSlots; s++)
             {
-                slotIndex = s;
-                break;
+                if ((targetSlots.OccupiedMask & (1u << s)) == 0)
+                {
+                    slotIndex = s;
+                    break;
+                }
             }
+
+            if (slotIndex == -1) slotIndex = 0;
+
+            targetSlots.OccupiedMask |= (1u << slotIndex);
+       
+
+            attacker.Set(new AttackSlotComponent { Target = target, SlotIndex = slotIndex });
+
+            return slotIndex;
         }
+        return -1;
 
-        if (slotIndex == -1) slotIndex = 0; // fallback si están todos ocupados
-
-        targetSlots.OccupiedMask |= (1u << slotIndex);
-        target.Set(targetSlots);
-
-        attacker.Set(new AttackSlotComponent { Target = target, SlotIndex = slotIndex });
-
-        return slotIndex;
+      
     }
 
     // ---------------------------------------------------------

@@ -186,7 +186,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                     {
                         if (!targetEntity.IsAlive() || targetEntity.Has<DeadTag>())
                         {
-                            AttackSlotHelper.ReleaseAttackSlot(e);
+                            AttackSlotHelper.RequestReleaseAttackSlot(e);
                             continue;
                         }
                         // -------------------------------------------------
@@ -205,7 +205,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                             else
                             {
                                 // Tenía slot en OTRO target: liberarlo primero
-                                AttackSlotHelper.ReleaseAttackSlot(e);
+                                AttackSlotHelper.RequestReleaseAttackSlot(e);
                                 slotIndex = AttackSlotHelper.AcquireAttackSlot(e, targetEntity, MaxSlots);
                             }
                         }

@@ -142,7 +142,7 @@ public class BlackyBuildingCreator
         entity.Set(new PositionComponent { position = position, tilePosition = tilePosition, height = height });
         entity.Set(new TeamComponent(team));
         entity.Set(new BuildingDefinitionComponent(idBuilding, spriteIdNormal, spriteIdConstruccion, spriteIdDestruccion));
-
+        entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         if (health!=0)
         {
             entity.Set(new HealthComponent(health));
