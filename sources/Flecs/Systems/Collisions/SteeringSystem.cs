@@ -263,10 +263,7 @@ public class SteeringSystem : FlecsSystemBase
                     continue;
                 }
             }
-            //else
-            //{
-            //    res.BlockedTimer = 0f;
-            //}
+
 
             // =====================================================
             // BLOQUEO REAL

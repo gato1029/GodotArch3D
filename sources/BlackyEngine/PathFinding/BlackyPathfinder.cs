@@ -8,28 +8,36 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
     public class BlackyPathfinder
     {
         private readonly BlackyMacroGraphCache _macroGraphCache;
-        private readonly BlackyChunkOccupancyMap _chunkOccupancyMap;
+        private readonly BlackyClearanceMap _clearanceMap;
         private readonly BlackyMacroPathfinder _macroPathfinder;
         private readonly BlackyMicroPathfinder _microPathfinder;
         private readonly int _chunkSize;
 
+        // Radio por defecto (en tiles) para la mayoría de tus unidades.
+        // Se usa cuando quien llama no especifica uno propio.
+        private const int DefaultRadiusTiles = 1;
+
         public BlackyPathfinder(
             BlackyMacroGraphCache macroGraphCache,
-            BlackyChunkOccupancyMap chunkOccupancyMap,
+            BlackyClearanceMap clearanceMap,
             int chunkSize = 32)
         {
             _macroGraphCache = macroGraphCache;
-            _chunkOccupancyMap = chunkOccupancyMap;
+            _clearanceMap = clearanceMap;
             _chunkSize = chunkSize;
 
             _macroPathfinder = new BlackyMacroPathfinder(_macroGraphCache);
-            _microPathfinder = new BlackyMicroPathfinder(_chunkOccupancyMap);
+            _microPathfinder = new BlackyMicroPathfinder(_clearanceMap);
         }
 
-        public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile)
+        public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile, int radiusTiles = DefaultRadiusTiles)
         {
-            List< Vector2> points = new ();
-            var result = FindSimplifiedPath(startTile, goalTile);
+            List<Vector2> points = new();
+            var result = FindSimplifiedPath(startTile, goalTile, radiusTiles);
+            if (result == null)
+            {
+                return null; // no hubo camino
+            }
             foreach (var item in result)
             {
                 var point = TilesHelper.TilePositionToWorldPosition(item);
@@ -37,9 +45,10 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             }
             return points;
         }
-        public List<Vector2I> FindSimplifiedPath(Vector2I startTile, Vector2I goalTile)
+
+        public List<Vector2I> FindSimplifiedPath(Vector2I startTile, Vector2I goalTile, int radiusTiles = DefaultRadiusTiles)
         {
-            List<Vector2I> fullPath = FindPath(startTile, goalTile);
+            List<Vector2I> fullPath = FindPath(startTile, goalTile, radiusTiles);
             if (fullPath == null || fullPath.Count <= 2) return fullPath;
 
             List<Vector2I> simplifiedPath = new();
@@ -62,7 +71,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             return simplifiedPath;
         }
 
-        private List<Vector2I> FindPath(Vector2I startTile, Vector2I goalTile)
+        private List<Vector2I> FindPath(Vector2I startTile, Vector2I goalTile, int radiusTiles)
         {
             Vector2I startChunk = WorldToChunkCoord(startTile);
             Vector2I goalChunk = WorldToChunkCoord(goalTile);
@@ -87,10 +96,10 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
                 {
                     // Calculamos dinámicamente el mejor punto de cruce en el borde hacia el siguiente chunk
                     Vector2I nextChunk = chunkPath[i + 1];
-                    subGoalTile = GetOptimalBorderTile(currentTile, currentChunk, nextChunk, goalTile);
+                    subGoalTile = GetOptimalBorderTile(currentTile, currentChunk, nextChunk, goalTile, radiusTiles);
                 }
 
-                List<Vector2I> segmentPath = _microPathfinder.FindTilePath(currentTile, subGoalTile);
+                List<Vector2I> segmentPath = _microPathfinder.FindTilePath(currentTile, subGoalTile, radiusTiles);
                 if (segmentPath == null) continue;
 
                 if (fullTilePath.Count > 0 && segmentPath.Count > 0)
@@ -112,7 +121,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         /// <summary>
         /// Selecciona el tile libre en la frontera entre dos chunks que ofrece la ruta más directa hacia la meta.
         /// </summary>
-        private Vector2I GetOptimalBorderTile(Vector2I currentTile, Vector2I fromChunk, Vector2I toChunk, Vector2I finalGoal)
+        private Vector2I GetOptimalBorderTile(Vector2I currentTile, Vector2I fromChunk, Vector2I toChunk, Vector2I finalGoal, int radiusTiles)
         {
             Vector2I dir = toChunk - fromChunk;
 
@@ -129,7 +138,6 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
 
             Vector2I bestTile = GetChunkCenterTile(toChunk); // Fallback por defecto
             float minTotalDistance = float.MaxValue;
-            bool foundWalkable = false;
 
             for (int x = minX; x <= maxX; x++)
             {
@@ -137,7 +145,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
                 {
                     Vector2I tile = new(x, y);
 
-                    if (!_chunkOccupancyMap.IsOccupied(0,x,y))
+                    if (_clearanceMap.IsWalkableForRadius(x, y, radiusTiles))
                     {
                         float distFromCurrent = currentTile.DistanceSquaredTo(tile);
                         float distToGoal = tile.DistanceSquaredTo(finalGoal);
@@ -147,7 +155,6 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
                         {
                             minTotalDistance = totalCost;
                             bestTile = tile;
-                            foundWalkable = true;
                         }
                     }
                 }
@@ -159,7 +166,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         /// <summary>
         /// Obtiene todos los tiles transitables en la línea de frontera que une dos chunks adyacentes.
         /// </summary>
-        private List<Vector2I> GetWalkableBorderTiles(Vector2I fromChunk, Vector2I toChunk)
+        private List<Vector2I> GetWalkableBorderTiles(Vector2I fromChunk, Vector2I toChunk, int radiusTiles)
         {
             List<Vector2I> walkableBorders = new();
             Vector2I dir = toChunk - fromChunk;
@@ -182,8 +189,8 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
                 {
                     Vector2I tile = new(x, y);
 
-                    // Asegura que el tile del borde sea transitable antes de considerarlo un portal
-                    if (!_chunkOccupancyMap.IsOccupied(0,x,y))
+                    // Asegura que el tile del borde tenga holgura suficiente antes de considerarlo un portal
+                    if (_clearanceMap.IsWalkableForRadius(x, y, radiusTiles))
                     {
                         walkableBorders.Add(tile);
                     }

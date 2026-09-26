@@ -236,7 +236,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                             moveResolutor.Blocked = false;
                             e.Set(new MoveTargetComponent(approachPoint));
                             e.Remove<StoppedTag>();
-                            e.Set(new AttackPendingComponent(true, targetEntity, istargetUnit, targetPos, 0));
+                            e.Set(new AttackPendingComponent(false, targetEntity, istargetUnit, targetPos, 0));
                         }
                         else
                         {

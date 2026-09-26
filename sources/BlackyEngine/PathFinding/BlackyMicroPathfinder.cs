@@ -18,10 +18,12 @@ public class BlackyMicroPathfinder
         new Vector2I(1, 1),   new Vector2I(-1, 1),
         new Vector2I(1, -1),  new Vector2I(-1, -1)
     };
-    private readonly BlackyChunkOccupancyMap blackyChunkOccupancy; 
-    public BlackyMicroPathfinder(BlackyChunkOccupancyMap blackyChunkOccupancyMap)
+
+    private readonly BlackyClearanceMap _clearanceMap;
+
+    public BlackyMicroPathfinder(BlackyClearanceMap clearanceMap)
     {
-        blackyChunkOccupancy = blackyChunkOccupancyMap;
+        _clearanceMap = clearanceMap;
     }
 
     /// <summary>
@@ -29,14 +31,20 @@ public class BlackyMicroPathfinder
     /// </summary>
     /// <param name="startTile">Tile de inicio</param>
     /// <param name="goalTile">Tile de destino</param>
+    /// <param name="radiusTiles">
+    /// Radio del collider (en tiles) para el que se calcula la ruta. Un tile
+    /// es transitable solo si su distancia al obstáculo más cercano es mayor
+    /// a este radio (ver BlackyClearanceMap).
+    /// </param>
     /// <param name="maxIterations">Límite de seguridad para evitar congelamientos si no hay ruta</param>
     public List<Vector2I> FindTilePath(
-             Vector2I startTile,
-             Vector2I goalTile,
-             int maxIterations = 2000) // Aumentado para evitar falsos nulos
+        Vector2I startTile,
+        Vector2I goalTile,
+        int radiusTiles,
+        int maxIterations = 2000)
     {
-        // Corregido: Si el destino está ocupado, no podemos ir ahí
-        if (blackyChunkOccupancy.IsOccupied(0, goalTile.X, goalTile.Y)) return null;
+        // Si el destino no tiene holgura suficiente para este radio, no podemos ir ahí
+        if (!_clearanceMap.IsWalkableForRadius(goalTile.X, goalTile.Y, radiusTiles)) return null;
 
         PriorityQueue<Vector2I, float> openQueue = new();
         Dictionary<Vector2I, Vector2I> cameFrom = new();
@@ -66,13 +74,14 @@ public class BlackyMicroPathfinder
                 Vector2I neighborTile = currentTile + dir;
 
                 if (closedSet.Contains(neighborTile)) continue;
-                if (blackyChunkOccupancy.IsOccupied(0, neighborTile.X, neighborTile.Y)) continue;
+                if (!_clearanceMap.IsWalkableForRadius(neighborTile.X, neighborTile.Y, radiusTiles)) continue;
 
-                // Validación de esquinas en diagonal (corregido el doble ++)
+                // Validación de esquinas en diagonal: no cortar la esquina de
+                // un obstáculo aunque el tile diagonal en sí tenga holgura.
                 if (dir.X != 0 && dir.Y != 0)
                 {
-                    if (blackyChunkOccupancy.IsOccupied(0, currentTile.X + dir.X, currentTile.Y) ||
-                        blackyChunkOccupancy.IsOccupied(0, currentTile.X, currentTile.Y + dir.Y))
+                    if (!_clearanceMap.IsWalkableForRadius(currentTile.X + dir.X, currentTile.Y, radiusTiles) ||
+                        !_clearanceMap.IsWalkableForRadius(currentTile.X, currentTile.Y + dir.Y, radiusTiles))
                     {
                         continue;
                     }

@@ -1,20 +1,14 @@
-
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
-using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Collisions;
 
@@ -22,17 +16,6 @@ public class MoveSeparationSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
-
-    [ThreadStatic] static int[] _visitedDynamic;
-    [ThreadStatic] static int[] _visitedStatic;
-    [ThreadStatic] private static int _stamp;
-
-    private const int MAX_SIDS_Static = 200_000;
-    private const int MAX_SIDS_Dinamic = 20_000;
-
-    // 🔥 ajustes finos
-    private const float MIN_PENETRATION = 0.01f;
-    private const float BLOCK_THRESHOLD = 0.02f;
 
     protected override void BuildQuery(ref QueryBuilder qb)
     {
@@ -46,23 +29,19 @@ public class MoveSeparationSystem : FlecsSystemBase
           .With<StateComponent>()
           .With<MoveTargetComponent>()
           .Without<StoppedTag>();
-          
     }
 
     protected override void OnIter(Iter it)
     {
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
         if (blackyWorld == null) return;
-        var sim = blackyWorld.Simulation.Tick;
-        // 🔥 AQUI VA (ANTES DE TODO)
-        bool shouldUpdate = (sim.FrameIndex & 1) == 0;
 
-        if (_visitedDynamic == null)
-        {
-            _visitedDynamic = new int[MAX_SIDS_Dinamic];
-            _visitedStatic = new int[MAX_SIDS_Static];
-            _stamp = 1;
-        }
+        var sim = blackyWorld.Simulation.Tick;
+
+        // 🔥 Staggering: la mitad de las unidades se evalúa en frames
+        // pares, la otra mitad en impares (repartido por sid.Value).
+        // Reduce el costo de este sistema a la mitad por frame.
+        bool evenFrame = (sim.FrameIndex & 1) == 0;
 
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
@@ -73,27 +52,11 @@ public class MoveSeparationSystem : FlecsSystemBase
         var unitArray = it.Field<UnitDefinitionComponent>(6);
         var stateArray = it.Field<StateComponent>(7);
 
-        var dynGrid = blackyWorld.State.DynamicHash;
         var staGridBuilding = blackyWorld.State.StaticSpatialBuildings;
         var staResourceGrid = blackyWorld.State.StaticSpatialResources;
 
         for (int i = 0; i < it.Count(); i++)
         {
-
-            _stamp++;
-            if (_stamp == int.MaxValue)
-            {
-                Array.Fill(_visitedStatic, 0);
-                Array.Fill(_visitedDynamic, 0);
-                _stamp = 1;
-            }
-
-            //if (!shouldUpdate)
-            //{
-            //    // 🔥 mantener velocidad anterior (no recalcular)
-            //    continue;
-            //}
-
             ref var pos = ref posArray[i];
             ref var col = ref colArray[i];
             ref var sid = ref sidArray[i];
@@ -101,86 +64,53 @@ public class MoveSeparationSystem : FlecsSystemBase
             ref var steering = ref steeringArray[i];
             ref var vel = ref velArray[i];
             ref var state = ref stateArray[i];
+
             if (res.Blocked)
             {
                 continue;
             }
-            if (steering.DesiredDir.LengthSquared() < 0.01f) //  0.0001f
-                continue;
 
-            Vector2 posFuture = pos.position + (steering.DesiredDir*vel.MaxSpeed* it.DeltaTime());
-
-            float cx = posFuture.X + col.Offset.X;
-            float cy = posFuture.Y + col.Offset.Y;
-
-            var min = FastSpatialHash.WorldToTile(cx - col.Radius , cy - col.Radius );
-            var max = FastSpatialHash.WorldToTile(cx + col.Radius , cy + col.Radius );
-                
-
-            bool existCollision = false;
-            for (int tx = min.X; tx <= max.X; tx++)
-            {
-                for (int ty = min.Y; ty <= max.Y; ty++)
-                {
-                    var dyn = CheckAgainstGrid(it.Entity(i), ref posFuture, ref col, ref sid, tx, ty, dynGrid, false);                    
-                    if (dyn)
-                    {
-                        existCollision = true;
-                        break;
-                    }
-                    
-                }
-                if (existCollision)
-                {
-                    break;
-                }
-            }
-            if (!existCollision)
-            {
-            
-                // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (paredes, edificios)
-                var sta = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding);
-                existCollision = sta;
-                if (sta)
-                {
-                 //   it.Entity(i).Add<StoppedTag>();
-                    vel.desiredVel = Vector2.Zero;
-                    res.Blocked = true;
-                }
-            }
-            if (!existCollision)
-            {
-                
-                // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (recursos, árboles, etc)
-                var sta = CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
-                existCollision = sta;
-                if (sta)
-                {
-                  //  it.Entity(i).Add<StoppedTag>();
-                    vel.desiredVel = Vector2.Zero;
-                    res.Blocked = true;
-                }
-            }
-            if (existCollision)
-            {                
-                //res.Blocked = true;
-                //vel.desiredVel = Vector2.Zero;
-                //steering.DesiredDir = Godot.Vector2.Zero; // Detener el movimientoxx
-                //state.stateType = managers.Characters.StateType.IDLE;
-            }
-            //else
-            //{                
-            //    res.Blocked = false;                
+            //// 🔥 Le toca a esta unidad este frame?
+            //bool unitIsEven = (sid.Value & 1) == 0;
+            //if (unitIsEven != evenFrame)
+            //{
+            //    // No le toca: mantener velocidad anterior (no recalcular)
+            //    continue;
             //}
 
+            if (steering.DesiredDir.LengthSquared() < 0.01f)
+                continue;
+
+            Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime());
+
+            bool existCollision = false;
+
+            // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (paredes, edificios)
+            var sta = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding);
+            existCollision = sta;
+            if (sta)
+            {
+                vel.desiredVel = Vector2.Zero;
+                res.Blocked = true;
+            }
+
+            if (!existCollision)
+            {
+                // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (recursos, árboles, etc)
+                var staRes = CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
+                existCollision = staRes;
+                if (staRes)
+                {
+                    vel.desiredVel = Vector2.Zero;
+                    res.Blocked = true;
+                }
+            }
         }
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool CheckAgainstStaticGridResources(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
     {
-        float cx = pos.X + col.Offset.X;
-        float cy = pos.Y + col.Offset.Y;
-
         var colUnit = new FastCollider
         {
             Shape = ShapeType.Circle,
@@ -206,7 +136,7 @@ public class MoveSeparationSystem : FlecsSystemBase
                     AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
                 }
 
-                // 🛡️ CORRECCIÓN CLAVE: Si no hay sprite o colisionadores definidos, saltar esta entidad de forma segura
+                // 🛡️ Si no hay sprite o colisionadores definidos, saltar esta entidad de forma segura
                 if (sprite == null || sprite.fastCollidersBody == null) continue;
 
                 var posOther = other.Get<PositionComponent>();
@@ -221,27 +151,19 @@ public class MoveSeparationSystem : FlecsSystemBase
                     }
                 }
             }
+
             if (existCollision)
             {
                 break;
             }
-            
-        }
-        if (!existCollision)
-        {
-           bool debug = false;            
         }
 
         return existCollision;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private  bool  CheckAgainstStaticGrid(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
+    private bool CheckAgainstStaticGrid(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
     {
-        float cx = pos.X + col.Offset.X;
-        float cy = pos.Y + col.Offset.Y;
-
-        // 🔹 collider temporal (como ya hacías)
         var colUnit = new FastCollider
         {
             Shape = ShapeType.Circle,
@@ -250,116 +172,46 @@ public class MoveSeparationSystem : FlecsSystemBase
             Offset = new Vector2(col.Offset.X, col.Offset.Y)
         };
 
-        // 🔹 calcular radio dinámico (IMPORTANTE)
         int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
         bool existCollision = false;
+
         foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
         {
             if (grid.TryGetValue(id, out Entity other))
             {
                 if (!other.IsAlive()) continue;
-                TileSpriteData sprite = null;
 
+                TileSpriteData sprite = null;
                 if (other.Has<BuildingDefinitionComponent>())
                 {
-                    int idTemplate = other.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal; // 🔹 para asegurar que es una entidad con collider
-                    var template = AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
-                }                        
+                    int idTemplate = other.Get<BuildingDefinitionComponent>().idSpriteTemplateNormal;
+                    AtlasModsManager.TryGetTileSprite(idTemplate, out sprite);
+                }
+
+                // 🛡️ Si no hay sprite o colisionadores definidos, saltar esta entidad de forma segura
+                if (sprite == null || sprite.fastCollidersBody == null) continue;
+
                 var posOther = other.Get<PositionComponent>();
 
                 foreach (var shape in sprite.fastCollidersBody)
                 {
                     var shapeInternal = shape;
-                    if (!CollisionMathHelper.Check(
+                    if (CollisionMathHelper.Check(
                             pos.X, pos.Y, ref colUnit,
                             posOther.position.X, posOther.position.Y, ref shapeInternal))
-                    {
-
-                        continue;
-                    }
-                    else
                     {
                         existCollision = true;
                         break;
                     }
                 }
             }
+
             if (existCollision)
             {
                 break;
             }
-
         }
 
         return existCollision;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private  bool  CheckAgainstGrid(
-        Entity e,
-        ref Vector2 pos,
-        ref MoveColliderComponent col,
-        ref SpatialIDComponent sid,
-        int cx,
-        int cy,
-        FastSpatialHash grid,
-        bool isStatic = false)
-    {
-        int cell = FastSpatialHash.GetHashDirect(cx, cy, grid.TotalCells);
-        int currentIdx = grid.GetHead(cell);
-
-      
-
-        float cxSelf = pos.X + col.Offset.X;
-        float cySelf = pos.Y + col.Offset.Y;
-        bool existCollision = false;
-        while (currentIdx != -1)
-        {
-            int otherSID = grid.GetSpatialID(currentIdx);
-            var visited = isStatic ? _visitedStatic : _visitedDynamic;
-
-            if (visited[otherSID] == _stamp)
-            {
-                currentIdx = grid.GetNext(currentIdx);
-                continue;
-            }
-
-            visited[otherSID] = _stamp;
-
-            if (!isStatic && otherSID == sid.Value)
-            {
-                currentIdx = grid.GetNext(currentIdx);
-                continue;
-            }
-
-            Entity other = grid.GetEntity(currentIdx);
-            ref var otherSid = ref other.GetMut<SpatialIDComponent>();
-
-            if ((sid.Mask & otherSid.Layer) != 0)
-            {
-                ref var otherPos = ref other.GetMut<PositionComponent>();
-                ref var otherCol = ref other.GetMut<MoveColliderComponent>();
-
-                float cxOther = otherPos.position.X + otherCol.Offset.X;
-                float cyOther = otherPos.position.Y + otherCol.Offset.Y;
-
-                float dx = cxSelf - cxOther;
-                float dy = cySelf - cyOther;
-
-                float distSq = dx * dx + dy * dy;
-                float minDist = col.Radius + otherCol.Radius;
-
-                if (distSq < minDist * minDist)
-                {
-                    existCollision = true;
-                    break;
-              
-                }
-            }
-
-            currentIdx = grid.GetNext(currentIdx);
-        }
-
-        return  existCollision;
     }
 }
