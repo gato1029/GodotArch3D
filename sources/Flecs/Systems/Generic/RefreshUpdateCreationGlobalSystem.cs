@@ -4,7 +4,7 @@ using GodotEcsArch.sources.BlackyEngine.Core;
 
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
 
-internal class ResourceBuildingCreationSystem : FlecsSystemBase
+internal class RefreshUpdateCreationGlobalSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => false; // 🟢 Se ejecuta seguro en el hilo principal
@@ -27,6 +27,7 @@ internal class ResourceBuildingCreationSystem : FlecsSystemBase
 
         world.Services.EntityRenderer.ProcessPendingChunks(); // esto aplica para todo las entidades el render
         world.State.PathRegistryManager.ProcessPendingReleases();
+        world.State.ClearanceMap.FlushDirty();
         AttackSlotHelper.ProcessPendingReleases();
     }
 }

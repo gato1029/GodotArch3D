@@ -221,10 +221,9 @@ public class FlecsManager
         
         // creadores y spawn
         RegisterSystem<ProjectileSpawnSystem>();
-        RegisterSystem<ResourceBuildingCreationSystem>();
-
-        //post
         RegisterSystem<ArrowVisualSyncSystem>();
+        RegisterSystem<RefreshUpdateCreationGlobalSystem>();
+        //post        
         RegisterSystem<DeathCleanupSystem>(); // limpieza de unidades muertas
         RegisterSystem<DestroyCleanupSystem>(); // limpieza de edificios destruidos
                 

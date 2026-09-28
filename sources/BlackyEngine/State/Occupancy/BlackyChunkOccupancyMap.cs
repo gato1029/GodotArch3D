@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.PathFinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +39,12 @@ public class BlackyChunkOccupancyMap:IDisposable
     private readonly Dictionary<ulong, List<(int layer, int x, int y)>> _entityToTiles
     = new();
     public event Action<int, int, int, ulong>? OnTileUpdated;
-    public BlackyChunkOccupancyMap(int layers, int chunkSize)
+    private readonly BlackyPathfinder blackyPathFinder;
+    public BlackyChunkOccupancyMap(int layers, int chunkSize, BlackyPathfinder blackyPathfinder)
     {
         _layers = layers;
         _chunkSize = chunkSize;
+        blackyPathFinder = blackyPathfinder;
     }
 
     #region Public API
@@ -76,9 +79,10 @@ public class BlackyChunkOccupancyMap:IDisposable
         {
             int x = worldX + tile.x;
             int y = worldY + tile.y;
-
+            blackyPathFinder.NotifyTileOccupancyChanged(worldX, worldY, true);
             Set(layer, x, y, entityId);
         }
+       
     }
     public void Set(int layer, int worldX, int worldY, ulong entityId)
     {
@@ -126,7 +130,7 @@ public class BlackyChunkOccupancyMap:IDisposable
         foreach (var (l, x, y) in tiles)
         {
             var (chunkCoord, localX, localY) = GetCoords(x, y);
-
+            blackyPathFinder.NotifyTileOccupancyChanged(x, y, false);
             if (_chunks.TryGetValue(chunkCoord, out var chunk))
             {
                 chunk.Clear(l, localX, localY);

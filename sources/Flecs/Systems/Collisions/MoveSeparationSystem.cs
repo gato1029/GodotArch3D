@@ -16,7 +16,8 @@ public class MoveSeparationSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
-
+    // Distancia fija de retroceso al chocar (unidades del mundo).
+    private const float BackoffDistance = 0.12f;
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
@@ -70,11 +71,10 @@ public class MoveSeparationSystem : FlecsSystemBase
                 continue;
             }
 
-            //// 🔥 Le toca a esta unidad este frame?
+            // comentado por el momento
             //bool unitIsEven = (sid.Value & 1) == 0;
             //if (unitIsEven != evenFrame)
             //{
-            //    // No le toca: mantener velocidad anterior (no recalcular)
             //    continue;
             //}
 
@@ -83,28 +83,20 @@ public class MoveSeparationSystem : FlecsSystemBase
 
             Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime());
 
-            bool existCollision = false;
+            // 🔥 Colisión con edificios/paredes y con recursos (árboles, rocas, etc.)
+            bool hit = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding)
+                    || CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
 
-            // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (paredes, edificios)
-            var sta = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding);
-            existCollision = sta;
-            if (sta)
-            {
-                vel.desiredVel = Vector2.Zero;
-                res.Blocked = true;
-            }
+            if (!hit)
+                continue;
 
-            if (!existCollision)
-            {
-                // 🔥 DETECCIÓN DE COLISIÓN CON ENTIDADES ESTÁTICAS (recursos, árboles, etc)
-                var staRes = CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
-                existCollision = staRes;
-                if (staRes)
-                {
-                    vel.desiredVel = Vector2.Zero;
-                    res.Blocked = true;
-                }
-            }
+            vel.desiredVel = Vector2.Zero;
+            res.Blocked = true;            
+            // -------------------------------------------------
+            // Restitución barata: retrocedemos un paso fijo en la
+            // dirección opuesta al avance, sin comprobar nada más.
+            // -------------------------------------------------
+            //pos.position -= steering.DesiredDir.Normalized() * BackoffDistance;
         }
     }
 

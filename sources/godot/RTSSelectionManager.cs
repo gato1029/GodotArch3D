@@ -422,7 +422,7 @@ public partial class RTSSelectionManager : Node2D
             QueueRedraw(); // Fuerza a redibujar el rectángulo en pantalla
         }
     }
-
+    private const float DefaultUnitRadius = 0.6f; // o el valor que ya usas como default
     private void CommandSelectedUnitsToMove(Vector2 targetPosition)
     {
         List<Entity> selectedEntities = new();
@@ -451,12 +451,13 @@ public partial class RTSSelectionManager : Node2D
         // ---------------------------------------------------------
         // 2. Dirección del movimiento
         // ---------------------------------------------------------
-        Vector2 movementDirection = targetPosition - groupCenter;
+        Vector2 toTarget = targetPosition - groupCenter;
+        float totalMoveDistance = toTarget.Length();
 
-        if (movementDirection.LengthSquared() < 0.001f)
+        if (totalMoveDistance < 0.001f)
             return;
 
-        movementDirection = movementDirection.Normalized();
+        Vector2 movementDirection = toTarget / totalMoveDistance;
 
         // ---------------------------------------------------------
         // 3. Crear formación
@@ -479,18 +480,53 @@ public partial class RTSSelectionManager : Node2D
 
         // ---------------------------------------------------------
         // 5. Punto de salida de la formación
+        //
+        // No adelantamos más de lo que realmente se va a mover el
+        // grupo — si el destino está más cerca que el adelanto de
+        // formación, el A* terminaría calculando una ruta desde un
+        // punto más lejos del destino que la propia unidad, generando
+        // un "rodeo" artificial en vez de un movimiento corto directo.
         // ---------------------------------------------------------
-        float formationLeadDistance = spacing * 3.0f;
+        float formationLeadDistance = MathF.Min(spacing * 3.0f, totalMoveDistance * 0.5f);
 
         Vector2 pathStart = groupCenter + movementDirection * formationLeadDistance;
 
         // ---------------------------------------------------------
+        // 5b. Validar que el punto adelantado sea un origen válido
+        // para el A*. Como 'pathStart' es un punto matemático (no la
+        // posición real de ninguna unidad), puede caer sobre un
+        // obstáculo o zona sin holgura — si eso pasa, el A* falla
+        // desde el primer tile. Buscamos el tile transitable más
+        // cercano; si no aparece ninguno cerca, usamos el groupCenter
+        // original sin adelanto como último recurso.
+        // ---------------------------------------------------------
+        Vector2I originTile = TilesHelper.WorldPositionToTile(pathStart);
+
+        if (!_pathfinder.IsWalkableForRadius(originTile, DefaultUnitRadius))
+        {
+            Vector2I? nearestWalkable = _pathfinder.FindNearestWalkableTile(originTile, DefaultUnitRadius, searchRadiusTiles: 1);
+
+            if (nearestWalkable.HasValue)
+            {
+                originTile = nearestWalkable.Value;
+            }
+            else
+            {
+                // Sin nada transitable cerca del punto adelantado: caemos
+                // de vuelta al groupCenter real, sin adelanto.
+                pathStart = groupCenter;
+                originTile = TilesHelper.WorldPositionToTile(pathStart);
+            }
+        }
+
+        // ---------------------------------------------------------
         // 6. Calcular A* (UNA sola vez para todo el grupo)
         // ---------------------------------------------------------
-        Vector2I origin = TilesHelper.WorldPositionToTile(pathStart);
         Vector2I destiny = TilesHelper.WorldPositionToTile(targetPosition);
 
-        var points = _pathfinder.FindPathWorld(origin, destiny);
+        var points = _pathfinder.FindPathWorld(originTile, destiny);
+
+      
 
         if (points == null || points.Count == 0)
             return;
@@ -503,9 +539,6 @@ public partial class RTSSelectionManager : Node2D
 
         int unitsCommanded = 0;
 
-        // ---------------------------------------------------------
-        // 8. Asignar path + formación a cada unidad
-        // ---------------------------------------------------------
         // ---------------------------------------------------------
         // 8. Asignar path + formación a cada unidad
         // ---------------------------------------------------------

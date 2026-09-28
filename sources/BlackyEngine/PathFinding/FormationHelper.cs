@@ -1,5 +1,6 @@
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,62 @@ public enum FormationType
     Circle
     // Futuras formaciones van aquí: ej. Wedge, Line, Column, etc.
 }
+internal static class FormationOffsetHelper
+{
+    // Distancia (unidades del mundo) desde el destino final a partir de la cual
+    // la formación empieza a abrirse. Con spacing 0.9 un valor de ~5-6 funciona bien.
+    public const float BlendDistance = 6.4f; //5.4 medio
 
+    public static Vector2 ComputeOffset(
+        BlackyPathfinder pathfinder,
+        Vector2 waypoint,
+        Vector2 finalWaypoint,
+        Vector2 pathDir,
+        Vector2 offset,
+        float radiusTiles)
+    {
+        if (offset == Vector2.Zero)
+            return Vector2.Zero;
+
+        // 0 = lejos del destino (sin offset), 1 = en el destino (offset completo)
+        float distToEnd = waypoint.DistanceTo(finalWaypoint);
+        float t = 1f - Mathf.Clamp(distToEnd / BlendDistance, 0f, 1f);
+
+        if (t <= 0.001f)
+            return Vector2.Zero;
+
+        return FitOffset(pathfinder, waypoint, pathDir, offset * t, radiusTiles);
+    }
+
+    // Si el punto waypoint + offset no es transitable, comprime el offset:
+    // primero el componente lateral (queda en columna) y, si no alcanza, lo anula.
+    private static Vector2 FitOffset(
+        BlackyPathfinder pathfinder,
+        Vector2 waypoint,
+        Vector2 pathDir,
+        Vector2 offset,
+        float radiusTiles)
+    {
+        Vector2 longitudinal = Vector2.Zero;
+        if (pathDir.LengthSquared() > 0.001f)
+            longitudinal = pathDir * offset.Dot(pathDir);
+
+        Vector2 lateral = offset - longitudinal;
+
+        float[] lateralScales = { 1f, 0.5f, 0f };
+
+        foreach (float k in lateralScales)
+        {
+            Vector2 candidate = longitudinal + lateral * k;
+            Vector2I tile = TilesHelper.WorldPositionToTile(waypoint + candidate);
+
+            if (pathfinder.IsWalkableForRadius(tile, radiusTiles))
+                return candidate;
+        }
+
+        return Vector2.Zero; // el waypoint central siempre es válido (lo validó el A*)
+    }
+}
 public static class FormationHelper
 {
     // ---------------------------------------------------------
@@ -85,18 +141,27 @@ public static class FormationHelper
     // anillos concéntricos alrededor del centro del grupo.
     // Puramente estética — no tiene relación con AttackSlotHelper.
     // ---------------------------------------------------------
-    public static List<Vector2> GenerateCircleSlots(
-        int unitCount,
-        float spacing)
+
+   public static List<Vector2> GenerateCircleSlots(
+    int unitCount,
+    float spacing)
     {
         var slots = new List<Vector2>();
 
         if (unitCount <= 0)
             return slots;
 
-        float baseRadius = spacing;
+        // Primer slot: el centro mismo (radio 0). Así con pocas unidades
+        // (ej. 1) queda una parada en el centro exacto, en vez de arrancar
+        // directamente en el primer anillo a distancia 'spacing'.
+        slots.Add(Vector2.Zero);
 
-        int remaining = unitCount;
+        int remaining = unitCount - 1;
+
+        if (remaining <= 0)
+            return slots;
+
+        float baseRadius = spacing;
         int ring = 0;
 
         while (remaining > 0)

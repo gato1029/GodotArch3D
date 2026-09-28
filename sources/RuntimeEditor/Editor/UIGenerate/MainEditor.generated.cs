@@ -9,6 +9,7 @@ public partial class MainEditor : Node
 
     private Node Base;
     private Node3D mainRender;
+    private CanvasLayer mainRender2D;
     private Node Game;
     private MeshInstance3D center;
     private Node Editor;
@@ -16,7 +17,9 @@ public partial class MainEditor : Node
     private KuroButton ButtonNuevoMapa;
     private KuroButton ButtonGuardarMapa;
     private KuroButton ButtonGuardarComoMapa;
+    private KuroButton ButtonCargarMapa;
     private KuroButton ButtonEliminarMapa;
+    private KuroCheckButton KuroCheckButtonGrid;
     private KuroButton KuroButtonTerreno;
     private KuroButton KuroButtonRecursos;
     private KuroButton KuroButton5;
@@ -31,6 +34,7 @@ public partial class MainEditor : Node
     {
         Base = GetNode<Node>("Base");
         mainRender = GetNode<Node3D>("Base/mainRender");
+        mainRender2D = GetNode<CanvasLayer>("Base/mainRender2D");
         Game = GetNode<Node>("Game");
         center = GetNode<MeshInstance3D>("Game/center");
         Editor = GetNode<Node>("Editor");
@@ -38,7 +42,9 @@ public partial class MainEditor : Node
         ButtonNuevoMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonNuevoMapa");
         ButtonGuardarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonGuardarMapa");
         ButtonGuardarComoMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonGuardarComoMapa");
+        ButtonCargarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonCargarMapa");
         ButtonEliminarMapa = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/ButtonEliminarMapa");
+        KuroCheckButtonGrid = GetNode<KuroCheckButton>("Editor/VBoxContainer/MarginContainer2/PanelContainer/MarginContainer/MenuEditorContenedor/KuroCheckButtonGrid");
         KuroButtonTerreno = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButtonTerreno");
         KuroButtonRecursos = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButtonRecursos");
         KuroButton5 = GetNode<KuroButton>("Editor/VBoxContainer/MarginContainer/HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/KuroButton5");

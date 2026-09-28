@@ -1,21 +1,23 @@
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.utils;
+using System;
 using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.BlackyEngine.PathFinding
 {
     public class BlackyPathfinder
     {
+        private const float DefaultUnitRadius = 0.6f; // o el valor que ya usas como default
         private readonly BlackyMacroGraphCache _macroGraphCache;
         private readonly BlackyClearanceMap _clearanceMap;
         private readonly BlackyMacroPathfinder _macroPathfinder;
         private readonly BlackyMicroPathfinder _microPathfinder;
         private readonly int _chunkSize;
 
-        // Radio por defecto (en tiles) para la mayoría de tus unidades.
+        // Radio por defecto (en tiles, admite decimales) para la mayoría de tus unidades.
         // Se usa cuando quien llama no especifica uno propio.
-        private const int DefaultRadiusTiles = 1;
+        public const float DefaultRadiusTiles = 1f;
 
         public BlackyPathfinder(
             BlackyMacroGraphCache macroGraphCache,
@@ -30,7 +32,21 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             _microPathfinder = new BlackyMicroPathfinder(_clearanceMap);
         }
 
-        public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile, int radiusTiles = DefaultRadiusTiles)
+        // ---------------------------------------------------------
+        // Punto único de notificación: llama esto cada vez que un
+        // tile pasa a estar ocupado/libre (colocar o destruir un
+        // edificio, árbol, recurso, etc.). Propaga el cambio tanto
+        // al mapa de holgura (nivel tile) como al grafo macro
+        // (nivel chunk, para marcar chunks saturados como no
+        // transitables).
+        // ---------------------------------------------------------
+        public void NotifyTileOccupancyChanged(int worldX, int worldY, bool isBlocked)
+        {
+            _clearanceMap.OnTileChanged(worldX, worldY, isBlocked);
+            _macroGraphCache.NotifyTileOccupancyChanged(worldX, worldY, isBlocked);
+        }
+
+        public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile, float radiusTiles = DefaultRadiusTiles)
         {
             List<Vector2> points = new();
             var result = FindSimplifiedPath(startTile, goalTile, radiusTiles);
@@ -46,7 +62,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             return points;
         }
 
-        public List<Vector2I> FindSimplifiedPath(Vector2I startTile, Vector2I goalTile, int radiusTiles = DefaultRadiusTiles)
+        public List<Vector2I> FindSimplifiedPath(Vector2I startTile, Vector2I goalTile, float radiusTiles = DefaultRadiusTiles)
         {
             List<Vector2I> fullPath = FindPath(startTile, goalTile, radiusTiles);
             if (fullPath == null || fullPath.Count <= 2) return fullPath;
@@ -71,8 +87,12 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             return simplifiedPath;
         }
 
-        private List<Vector2I> FindPath(Vector2I startTile, Vector2I goalTile, int radiusTiles)
+        private List<Vector2I> FindPath(Vector2I startTile, Vector2I goalTile, float radiusTiles)
         {
+            
+            _microPathfinder.ClearDraw(); // solo para debug
+            _microPathfinder.DrawOriginTarget(startTile, goalTile);
+
             Vector2I startChunk = WorldToChunkCoord(startTile);
             Vector2I goalChunk = WorldToChunkCoord(goalTile);
 
@@ -121,7 +141,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         /// <summary>
         /// Selecciona el tile libre en la frontera entre dos chunks que ofrece la ruta más directa hacia la meta.
         /// </summary>
-        private Vector2I GetOptimalBorderTile(Vector2I currentTile, Vector2I fromChunk, Vector2I toChunk, Vector2I finalGoal, int radiusTiles)
+        private Vector2I GetOptimalBorderTile(Vector2I currentTile, Vector2I fromChunk, Vector2I toChunk, Vector2I finalGoal, float radiusTiles)
         {
             Vector2I dir = toChunk - fromChunk;
 
@@ -163,10 +183,48 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             return bestTile;
         }
 
+        // En BlackyPathfinder
+
+        public bool IsWalkableForRadius(Vector2I tile, float radiusTiles)
+            => _clearanceMap.IsWalkableForRadius(tile.X, tile.Y, radiusTiles);
+
+        /// <summary>
+        /// Busca el tile transitable más cercano a 'center', expandiendo
+        /// en anillos cuadrados crecientes. Útil cuando un punto calculado
+        /// matemáticamente (no una posición real de entidad) puede caer
+        /// sobre un obstáculo y necesitas "recuperarlo" al tile válido
+        /// más próximo.
+        /// </summary>
+        public Vector2I? FindNearestWalkableTile(Vector2I center, float radiusTiles, int searchRadiusTiles = 5)
+        {
+            if (_clearanceMap.IsWalkableForRadius(center.X, center.Y, radiusTiles))
+                return center;
+
+            for (int ring = 1; ring <= searchRadiusTiles; ring++)
+            {
+                for (int x = -ring; x <= ring; x++)
+                {
+                    for (int y = -ring; y <= ring; y++)
+                    {
+                        // Solo el borde del anillo actual (evita re-chequear el interior ya probado)
+                        if (MathF.Max(MathF.Abs(x), MathF.Abs(y)) != ring)
+                            continue;
+
+                        var candidate = new Vector2I(center.X + x, center.Y + y);
+
+                        if (_clearanceMap.IsWalkableForRadius(candidate.X, candidate.Y, radiusTiles))
+                            return candidate;
+                    }
+                }
+            }
+
+            return null; // nada transitable cerca, en el rango buscado
+        }
+
         /// <summary>
         /// Obtiene todos los tiles transitables en la línea de frontera que une dos chunks adyacentes.
         /// </summary>
-        private List<Vector2I> GetWalkableBorderTiles(Vector2I fromChunk, Vector2I toChunk, int radiusTiles)
+        private List<Vector2I> GetWalkableBorderTiles(Vector2I fromChunk, Vector2I toChunk, float radiusTiles)
         {
             List<Vector2I> walkableBorders = new();
             Vector2I dir = toChunk - fromChunk;

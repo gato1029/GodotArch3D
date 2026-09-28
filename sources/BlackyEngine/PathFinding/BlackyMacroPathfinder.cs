@@ -1,12 +1,12 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 
 namespace GodotEcsArch.sources.BlackyEngine.PathFinding;
 
 public class BlackyMacroPathfinder
 {
-    private  BlackyMacroGraphCache macroGraphCache = null;
+    private BlackyMacroGraphCache macroGraphCache = null;
+
     public BlackyMacroPathfinder(BlackyMacroGraphCache blackyMacroGraphCache)
     {
         macroGraphCache = blackyMacroGraphCache;
@@ -50,8 +50,8 @@ public class BlackyMacroPathfinder
 
                 // 1. Costo base calculado al vuelo (Recto = 1.0, Diagonal = 1.414)
                 float baseCost = (currentChunk.X != neighborChunk.X && currentChunk.Y != neighborChunk.Y) ? 1.414f : 1.0f;
-            
-                float tentativeG = gScore[currentChunk] + baseCost ;
+
+                float tentativeG = gScore[currentChunk] + baseCost;
 
                 if (!gScore.ContainsKey(neighborChunk) || tentativeG < gScore[neighborChunk])
                 {

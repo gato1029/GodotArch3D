@@ -15,7 +15,7 @@ public partial class PerfiladorAutoTileTexture : Node
 	{
         InitializeUI(); // Insertado por el generador de UI
       
-        NodeMainHelper.SetNode3DMain(mainRender);
+        NodeMainHelper.SetNode3DMain(mainRender,null);
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();
         BlackyWorld blackyWorld = new BlackyWorld("Perfilador", BlackyWorldTypeDetail.MUNDO, 32, 5, 1, new Vector2I(64,64));

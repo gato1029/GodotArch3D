@@ -51,6 +51,9 @@ script = ExtResource("1_kfhju")
 
 [node name="mainRender" type="Node3D" parent="Base" unique_id=1157692729]
 
+[node name="mainRender2D" type="CanvasLayer" parent="Base" unique_id=479865168]
+follow_viewport_enabled = true
+
 [node name="Game" type="Node" parent="." unique_id=809468821]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Game" unique_id=1550609064]

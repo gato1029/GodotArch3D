@@ -139,6 +139,7 @@ public sealed class BlackyWorld : IDisposable
             return;
 
         Simulation.Update(delta);
+        Simulation.DebugText.Update();
     }
 
     public void SetActive(bool active)
@@ -188,7 +189,7 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
 
-        SpawnEnemiesAroundPlayer(5000,20);
+        SpawnEnemiesAroundPlayer(10000,20);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));

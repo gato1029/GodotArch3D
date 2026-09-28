@@ -35,8 +35,8 @@ public partial class Main3D : Node3D
         FileHelper.Initialize("D:\\GitKraken/AssetExternals/NuevosMods/Base");        
         ModHelper.Init(false);
         AtlasTexturesModsManager.Instance.FirstLoad(false);
-
-        NodeMainHelper.SetNode3DMain(this);
+        
+        NodeMainHelper.SetNode3DMain(this,null);
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();
         DataBaseManager.Instance.LoadCurrentDataBase();

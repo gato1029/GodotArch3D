@@ -1,5 +1,10 @@
+using Arch.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
+using GodotEcsArch.sources.utils;
+using GodotFlecs.sources.KuroTiles;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +25,7 @@ public class BlackyMicroPathfinder
     };
 
     private readonly BlackyClearanceMap _clearanceMap;
+    List<int> idsDebug = new List<int>();
 
     public BlackyMicroPathfinder(BlackyClearanceMap clearanceMap)
     {
@@ -32,17 +38,18 @@ public class BlackyMicroPathfinder
     /// <param name="startTile">Tile de inicio</param>
     /// <param name="goalTile">Tile de destino</param>
     /// <param name="radiusTiles">
-    /// Radio del collider (en tiles) para el que se calcula la ruta. Un tile
-    /// es transitable solo si su distancia al obstáculo más cercano es mayor
-    /// a este radio (ver BlackyClearanceMap).
+    /// Radio del collider (en tiles, puede tener decimales) para el que se
+    /// calcula la ruta. Un tile es transitable solo si su distancia al
+    /// obstáculo más cercano es mayor a este radio (ver BlackyClearanceMap).
     /// </param>
     /// <param name="maxIterations">Límite de seguridad para evitar congelamientos si no hay ruta</param>
     public List<Vector2I> FindTilePath(
         Vector2I startTile,
         Vector2I goalTile,
-        int radiusTiles,
-        int maxIterations = 2000)
+        float radiusTiles,
+        int maxIterations = 10000)
     {
+      
         // Si el destino no tiene holgura suficiente para este radio, no podemos ir ahí
         if (!_clearanceMap.IsWalkableForRadius(goalTile.X, goalTile.Y, radiusTiles)) return null;
 
@@ -58,10 +65,13 @@ public class BlackyMicroPathfinder
 
         while (openQueue.Count > 0)
         {
-            if (++iterations > maxIterations) return null;
-
+            if (++iterations > maxIterations)
+            {
+                return null;
+            }
+            
             var currentTile = openQueue.Dequeue();
-
+            DrawPath(currentTile);
             if (currentTile == goalTile)
             {
                 return ReconstructPath(cameFrom, currentTile);
@@ -72,9 +82,12 @@ public class BlackyMicroPathfinder
             foreach (var dir in TileDirections)
             {
                 Vector2I neighborTile = currentTile + dir;
-
-                if (closedSet.Contains(neighborTile)) continue;
-                if (!_clearanceMap.IsWalkableForRadius(neighborTile.X, neighborTile.Y, radiusTiles)) continue;
+                
+                if (closedSet.Contains(neighborTile)) {
+                    continue; 
+                }
+                if (!_clearanceMap.IsWalkableForRadius(neighborTile.X, neighborTile.Y, radiusTiles)) { 
+                    continue; }
 
                 // Validación de esquinas en diagonal: no cortar la esquina de
                 // un obstáculo aunque el tile diagonal en sí tenga holgura.
@@ -86,7 +99,7 @@ public class BlackyMicroPathfinder
                         continue;
                     }
                 }
-
+                
                 float baseCost = (dir.X != 0 && dir.Y != 0) ? 1.414f : 1.0f;
                 float tentativeG = gScore[currentTile] + baseCost;
 
@@ -97,6 +110,7 @@ public class BlackyMicroPathfinder
 
                     float h = neighborTile.DistanceTo(goalTile);
                     openQueue.Enqueue(neighborTile, tentativeG + h);
+                   
                 }
             }
         }
@@ -104,6 +118,30 @@ public class BlackyMicroPathfinder
         return null;
     }
 
+    public void ClearDraw()
+    {
+        foreach (var item in idsDebug)
+        {
+            BlackyWorldContext.Simulation.DebugText.ReleaseText(item);
+        }
+        idsDebug.Clear();
+    }
+    public void DrawOriginTarget(Vector2I origin, Vector2I destiny)
+    {
+        Vector2 pos = TilesHelper.TilePositionToWorldPosition(origin);
+        int id = BlackyWorldContext.Simulation.DebugText.DrawText(new Vector3(pos.X, pos.Y, 10), origin.ToString(), Colors.Green);
+        idsDebug.Add(id);
+
+        Vector2 posFin = TilesHelper.TilePositionToWorldPosition(destiny);
+        int idFin = BlackyWorldContext.Simulation.DebugText.DrawText(new Vector3(posFin.X, posFin.Y, 10), destiny.ToString(), Colors.Green);
+        idsDebug.Add(idFin);
+    }
+    private void DrawPath(Vector2I tilePos)
+    {
+        Vector2 pos = TilesHelper.TilePositionToWorldPosition(tilePos);        
+        int id = BlackyWorldContext.Simulation.DebugText.DrawText(new Vector3(pos.X, pos.Y, 10), "*",Colors.Red);
+        idsDebug.Add(id);        
+    }
     private static List<Vector2I> ReconstructPath(Dictionary<Vector2I, Vector2I> cameFrom, Vector2I current)
     {
         List<Vector2I> path = new() { current };

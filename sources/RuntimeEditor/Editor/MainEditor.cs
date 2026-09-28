@@ -17,7 +17,8 @@ public partial class MainEditor : Node
         FileHelper.Initialize("D:\\GitKraken\\ModsGame");
         ModHelper.Init(true);
         AtlasTexturesModsManager.Instance.FirstLoad();
-        NodeMainHelper.SetNode3DMain(mainRender);
+        
+        NodeMainHelper.SetNode3DMain(mainRender,mainRender2D);
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();
         KuroButtonTerreno.Pressed += KuroButtonTerreno_Pressed;

@@ -51,14 +51,16 @@ public sealed class BlackyWorldState : IDisposable
         RenderData = new BlackyChunkRenderData(config.ChunkSize, config.HeightCount);
         SpatialEntityMap = new BlackySpatialEntityMap();
         TilePalette = new BlackyPersistentTilePalette();
+                
+        idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),25,Colors.DarkCyan);
 
-        OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize);
-        //ClearanceMap = new BlackyClearanceMap()
-        idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),40,Colors.DarkCyan);
-        GraphCache = new BlackyMacroGraphCache();
+        ClearanceMap = new BlackyClearanceMap(config.ChunkSize, 4);
+        GraphCache = new BlackyMacroGraphCache(config.ChunkSize);
         GraphCache.BuildCache(config.MinChunk, config.MaxChunk);
         PathFinder = new BlackyPathfinder(GraphCache,ClearanceMap,config.ChunkSize);
         PathRegistryManager = new BlackyPathRegistryManager();
+
+        OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize, PathFinder);
     }
     public void SetModeGrid(ModeGrid modeGrid)
     {
