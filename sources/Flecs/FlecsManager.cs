@@ -162,9 +162,10 @@ public class FlecsManager
         RegisterSystem<UnitMelleEnemySearchSystem>();
         RegisterSystem<RangedEnemySearchSystem>();
 
-        RegisterSystem<PathManagerSystem>();
+        RegisterSystem<PathManagerSystem>();        
         RegisterSystem<MoveTargetAttackMelleSystem>();
         RegisterSystem<MoveTargetSystem>();
+        RegisterSystem<FlowFieldFollowSystem>();
 
         RegisterSystem<RegisterFastHashSystem>();
         

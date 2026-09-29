@@ -11,6 +11,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         private const float DefaultUnitRadius = 0.6f; // o el valor que ya usas como default
         private readonly BlackyMacroGraphCache _macroGraphCache;
         private readonly BlackyClearanceMap _clearanceMap;
+        private readonly BlackyFlowFieldManager _flowFieldManager;
         private readonly BlackyMacroPathfinder _macroPathfinder;
         private readonly BlackyMicroPathfinder _microPathfinder;
         private readonly int _chunkSize;
@@ -22,12 +23,13 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         public BlackyPathfinder(
             BlackyMacroGraphCache macroGraphCache,
             BlackyClearanceMap clearanceMap,
+            BlackyFlowFieldManager flowFieldManager,
             int chunkSize = 32)
         {
             _macroGraphCache = macroGraphCache;
             _clearanceMap = clearanceMap;
             _chunkSize = chunkSize;
-
+            _flowFieldManager = flowFieldManager;
             _macroPathfinder = new BlackyMacroPathfinder(_macroGraphCache);
             _microPathfinder = new BlackyMicroPathfinder(_clearanceMap);
         }
@@ -44,6 +46,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         {
             _clearanceMap.OnTileChanged(worldX, worldY, isBlocked);
             _macroGraphCache.NotifyTileOccupancyChanged(worldX, worldY, isBlocked);
+            _flowFieldManager.MarkTileChanged(worldX, worldY); // solo marca, no recalcul
         }
 
         public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile, float radiusTiles = DefaultRadiusTiles)

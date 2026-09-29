@@ -28,6 +28,7 @@ internal class RefreshUpdateCreationGlobalSystem : FlecsSystemBase
         world.Services.EntityRenderer.ProcessPendingChunks(); // esto aplica para todo las entidades el render
         world.State.PathRegistryManager.ProcessPendingReleases();
         world.State.ClearanceMap.FlushDirty();
+        world.State.FlowFieldManager.FlushDirty();
         AttackSlotHelper.ProcessPendingReleases();
     }
 }

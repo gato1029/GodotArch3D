@@ -554,6 +554,12 @@ public record struct SteeringStateComponent
     Vector2 LastDir
 );
 [RegisterComponentFlecs]
+public record struct FlowFieldFollowerComponent
+(
+    int FlowFieldId
+);
+
+[RegisterComponentFlecs]
 public record struct MoveColliderComponent
 (
     float Radius, // Para colisiones circulares, que usara el steerring

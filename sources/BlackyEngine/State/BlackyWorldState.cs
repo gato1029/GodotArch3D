@@ -32,6 +32,7 @@ public sealed class BlackyWorldState : IDisposable
     public BlackyMacroGraphCache GraphCache { get; }
     public BlackyPathRegistryManager PathRegistryManager { get; }
     public BlackyClearanceMap ClearanceMap { get; }
+    public BlackyFlowFieldManager FlowFieldManager { get; }
     private int idGridDraw { get; set; }
     private ModeGrid modeGrid { get; set; } = ModeGrid.NORMAL;
     private readonly BlackyWorld world;
@@ -60,6 +61,7 @@ public sealed class BlackyWorldState : IDisposable
         PathFinder = new BlackyPathfinder(GraphCache,ClearanceMap,config.ChunkSize);
         PathRegistryManager = new BlackyPathRegistryManager();
 
+        FlowFieldManager = new BlackyFlowFieldManager(ClearanceMap);
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize, PathFinder);
     }
     public void SetModeGrid(ModeGrid modeGrid)
