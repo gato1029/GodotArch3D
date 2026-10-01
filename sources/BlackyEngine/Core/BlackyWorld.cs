@@ -9,6 +9,7 @@ using GodotEcsArch.sources.BlackyEngine.Generation.Biomes;
 using GodotEcsArch.sources.BlackyEngine.Generation.Procedural;
 using GodotEcsArch.sources.BlackyEngine.Generation.Resources;
 using GodotEcsArch.sources.BlackyEngine.Generation.Terrain;
+using GodotEcsArch.sources.BlackyEngine.Generation.Territory;
 using GodotEcsArch.sources.BlackyEngine.Services;
 using GodotEcsArch.sources.BlackyEngine.Services.Paint;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
@@ -53,7 +54,8 @@ public sealed class BlackyWorld : IDisposable
     public BlackyWorldServices Services { get; }
     public BlackyWorldGeneration Generation { get; } // esto ya no se usa
     public BlackyWorldStreaming Streaming { get; }
-    public BlackyWorldProceduralGeneration Procedural { get; }
+    public BlackyWorldProceduralGeneration Procedural { get; } // esto se elimina luego, es solo para pruebas
+    public BlackyWorldProceduralTerritory ProceduralTerritory { get; }
     // =========================================
     // Public Facade Shortcuts
     // =========================================
@@ -65,7 +67,7 @@ public sealed class BlackyWorld : IDisposable
     
     public BlackyResourcesCreator Resources => Services.ResourcePainter;
     public BlackyBuildingCreator Buildings => Services.BuildingPainter;
-    public BlackyHeightSystem Heights => Services.HeightMapWorld;
+    public BlackyWorldHeight Heights => Services.HeightMapWorld;
 
     public BlackyTileRenderSystem TileRenderer => Services.TileRenderer;
     public BlackyEntityRenderSystem EntityRenderer => Services.EntityRenderer;
@@ -118,7 +120,8 @@ public sealed class BlackyWorld : IDisposable
         if (!isLoad)
         {
             // si es nuevo hacemos procedural etc
-            Procedural = new BlackyWorldProceduralGeneration(this, Config);
+            ProceduralTerritory = new BlackyWorldProceduralTerritory(this, Config);
+            //Procedural = new BlackyWorldProceduralGeneration(this, Config);
             DebugBoot();
         }
         else

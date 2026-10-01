@@ -40,7 +40,7 @@ public sealed class BlackyWorldServices
 
     public BlackyBuildingCreator BuildingPainter { get; } // listo
 
-    public BlackyHeightSystem HeightMapWorld { get; }
+    public BlackyWorldHeight HeightMapWorld { get; }
 
     // ============================
     // Cache para renderizado
@@ -73,7 +73,7 @@ public sealed class BlackyWorldServices
         // ============================
         // Render infra first
         // ============================
-        HeightMapWorld = new BlackyHeightSystem();
+        HeightMapWorld = new BlackyWorldHeight();
 
         TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal, HeightMapWorld,state.StaticSpatialTerrain);
 

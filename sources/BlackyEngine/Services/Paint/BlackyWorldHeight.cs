@@ -8,14 +8,14 @@ namespace GodotEcsArch.sources.BlackyEngine.Services.Paint;
 
 
 
-public sealed class BlackyHeightSystem : IDisposable
+public sealed class BlackyWorldHeight : IDisposable
 {
     
     private readonly Dictionary<Vector2I, BlackyHeightChunkData> chunks = new();
 
     private bool disposed;
 
-    public BlackyHeightSystem()
+    public BlackyWorldHeight()
     {    
     }
 
@@ -133,7 +133,7 @@ public sealed class BlackyHeightSystem : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    ~BlackyHeightSystem()
+    ~BlackyWorldHeight()
     {
         Dispose();
     }

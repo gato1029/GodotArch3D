@@ -43,6 +43,19 @@ public class PerformanceTimer
             lastDurations[label] = ns;
         }
     }
+    public string GetDurationString(string label)
+    {
+        if (!Enabled) return string.Empty;
+        if (lastDurations.TryGetValue(label, out double ms))
+        {
+            double seconds = ms / 1000.0;
+            return $"[Profiler] {label}: {ms:F4} ms ({seconds:F6} s)";
+        }
+        else
+        {
+            return $"[Profiler] {label}: (sin datos todavía)";
+        }
+    }
     public void Print(string label)
     {
         if (!Enabled) return;

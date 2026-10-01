@@ -77,7 +77,7 @@ public class BlackyChunkCacheTextureMap
     private readonly ConcurrentDictionary<BlackyChunkCoord, BlackyChunkTexture> _chunks = new();
     private readonly BlackyWorldRegions _regions;
     private readonly ChunkManagerBase chunkManager;
-    private readonly BlackyHeightSystem _heightMapWorld;
+    private readonly BlackyWorldHeight _heightMapWorld;
     private readonly StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> _staticSpatialTerrain;
     public int ChunkSize { get; }
     public int HeightCount { get; }
@@ -96,7 +96,7 @@ public class BlackyChunkCacheTextureMap
     
     public object SyncRoot { get; } = new();
 
-    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager, Paint.BlackyHeightSystem heightMapWorld, StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> staticSpatialTerrain)
+    public BlackyChunkCacheTextureMap(int chunkSize, int heightCount, int maxLayers, BlackyWorldRegions regions, ChunkManagerBase chunkManager, Paint.BlackyWorldHeight heightMapWorld, StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> staticSpatialTerrain)
     {
         ChunkSize = chunkSize;
         HeightCount = heightCount;

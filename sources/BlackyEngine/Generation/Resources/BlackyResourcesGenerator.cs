@@ -14,7 +14,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Generation.Resources;
 
 public sealed class BlackyResourcesGenerator : IDisposable
 {
-    private readonly BlackyHeightSystem heightSystem;
+    private readonly BlackyWorldHeight heightSystem;
     private readonly BlackyResourcesCreator resourcesSourceSystem;
     private readonly BlackyResourcesPostProcessor postProcessor;  
     private readonly BlackyWorldTerrainGenerator terrainGenerator;
@@ -31,7 +31,7 @@ public sealed class BlackyResourcesGenerator : IDisposable
     private bool disposed;
     public int MinDistanceFromHeightBorder { get; set; } = 3;
     public BlackyResourcesGenerator(
-        BlackyHeightSystem heightSystem,        
+        BlackyWorldHeight heightSystem,        
         BlackyWorldTerrainGenerator terrainGenerator,
         BlackyResourcesCreator resourcesSourceSystem,
         BlackyResourcesPostProcessor postProcessor,

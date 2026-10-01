@@ -58,10 +58,12 @@ public sealed class BlackyWorldState : IDisposable
         ClearanceMap = new BlackyClearanceMap(config.ChunkSize, 4);
         GraphCache = new BlackyMacroGraphCache(config.ChunkSize);
         GraphCache.BuildCache(config.MinChunk, config.MaxChunk);
-        PathFinder = new BlackyPathfinder(GraphCache,ClearanceMap,config.ChunkSize);
+        FlowFieldManager = new BlackyFlowFieldManager(ClearanceMap);
+
+        PathFinder = new BlackyPathfinder(GraphCache,ClearanceMap,FlowFieldManager, config.ChunkSize);
         PathRegistryManager = new BlackyPathRegistryManager();
 
-        FlowFieldManager = new BlackyFlowFieldManager(ClearanceMap);
+        
         OccupancyMap = new BlackyChunkOccupancyMap(config.HeightCount, config.ChunkSize, PathFinder);
     }
     public void SetModeGrid(ModeGrid modeGrid)
