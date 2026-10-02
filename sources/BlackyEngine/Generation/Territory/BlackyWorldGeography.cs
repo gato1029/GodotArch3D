@@ -8,7 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
-using static MessagePack.GeneratedMessagePackResolver.GodotEcsArch.sources.BlackyEngine;
+
 // (los using de BlackyWorldConfig / BlackyWorldSeed / BlackyWorldHeight ya existen en tu proyecto)
 
 public class BlackyWorldGeography

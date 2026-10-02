@@ -135,6 +135,10 @@ public partial class RTSSelectionManager : Node2D
         {
             CommandSelectedUnitsToAttack(clickedEnemy);
         }
+        else if (Input.IsKeyPressed(Key.Shift)) // tecla de prueba temporal
+        {
+            CommandSelectedUnitsToMoveFlowField(targetWorldPos);
+        }
         else
         {
             CommandSelectedUnitsToMove(targetWorldPos);
@@ -667,6 +671,109 @@ public partial class RTSSelectionManager : Node2D
         GD.Print($"Moviendo {unitsCommanded} unidades a {targetPosition}");
     }
 
+    private void CommandSelectedUnitsToMoveFlowField(Vector2 targetPosition)
+    {
+        List<Entity> selectedEntities = new();
+
+        query.Each((Entity entity) =>
+        {
+            if (entity.IsAlive())
+                selectedEntities.Add(entity);
+        });
+
+        if (selectedEntities.Count == 0)
+            return;
+
+        // ---------------------------------------------------------
+        // 1. Centro del grupo (solo para calcular la región del campo,
+        // no se usa offset de formación aquí)
+        // ---------------------------------------------------------
+        Vector2 groupCenter = Vector2.Zero;
+
+        foreach (var entity in selectedEntities)
+        {
+            groupCenter += entity.Get<PositionComponent>().position;
+        }
+
+        groupCenter /= selectedEntities.Count;
+
+        // ---------------------------------------------------------
+        // 2. Tiles de origen/destino
+        // ---------------------------------------------------------
+        Vector2I originTile = TilesHelper.WorldPositionToTile(groupCenter);
+        Vector2I destinyTile = TilesHelper.WorldPositionToTile(targetPosition);
+
+        // ---------------------------------------------------------
+        // 3. Región del campo: caja que envuelve origen y destino,
+        // más un margen para permitir rodeos de obstáculos.
+        // ---------------------------------------------------------
+        const int RegionMargin = 10; // tiles extra alrededor de la caja justa
+
+        Vector2I regionMin = new(
+            Mathf.Min(originTile.X, destinyTile.X) - RegionMargin,
+            Mathf.Min(originTile.Y, destinyTile.Y) - RegionMargin);
+
+        Vector2I regionMax = new(
+            Mathf.Max(originTile.X, destinyTile.X) + RegionMargin,
+            Mathf.Max(originTile.Y, destinyTile.Y) + RegionMargin);
+
+        // ---------------------------------------------------------
+        // 4. Reutilizar un campo existente si ya hay uno cercano,
+        // o crear uno nuevo.
+        // ---------------------------------------------------------
+        var flowFieldManager = _world.State.FlowFieldManager;
+
+        int fieldId = flowFieldManager.FindNearestFieldId(originTile, destinyTile);
+
+        if (fieldId == -1)
+        {
+            fieldId = flowFieldManager.CreateField(originTile, destinyTile, regionMin, regionMax, DefaultUnitRadius);
+        }
+
+        if (fieldId == -1)
+        {
+            // Destino no transitable: no se pudo construir el campo.
+            GD.Print("No se pudo calcular un flow field hacia ese destino.");
+            return;
+        }
+
+        // ---------------------------------------------------------
+        // 5. Asignar el seguidor a cada unidad, liberando cualquier
+        // path de A* que tuviera antes (son flujos de movimiento
+        // excluyentes, ver Without cruzados en las queries).
+        // ---------------------------------------------------------
+        int unitsCommanded = 0;
+
+        foreach (var entity in selectedEntities)
+        {
+            if (!entity.IsAlive())
+                continue;
+
+            // Libera path de A* anterior si tenía (cambia de modo de movimiento)
+            if (entity.Has<PathReferenceComponent>())
+            {
+                var oldPath = entity.Get<PathReferenceComponent>();
+                _world.State.PathRegistryManager.ReleasePath(oldPath.PathId);
+                entity.Remove<PathReferenceComponent>();
+            }
+
+            entity.Set(new FlowFieldFollowerComponent(fieldId));
+
+            if (entity.Has<MoveResolutorComponent>())
+            {
+                ref var resolutor = ref entity.GetMut<MoveResolutorComponent>();
+                resolutor.Blocked = false;
+                resolutor.BlockedTimer = 0f;
+            }
+
+            if (entity.Has<StoppedTag>())
+                entity.Remove<StoppedTag>();
+
+            unitsCommanded++;
+        }
+
+        GD.Print($"[FlowField] Moviendo {unitsCommanded} unidades a {targetPosition} (field id={fieldId})");
+    }
     private Entity FindEnemyEntityAtPoint(Vector2 point)
     {
         float tolerance = .5f;

@@ -15,14 +15,15 @@ public class MoveTargetSystem : FlecsSystemBase
 
     protected override void BuildQuery(ref QueryBuilder qb)
     {
-        qb.With<PositionComponent>()          
+        qb.With<PositionComponent>()
           .With<MoveTargetComponent>()
           .With<StateComponent>()
-          .With<SteeringComponent>() 
+          .With<SteeringComponent>()
           .With<MoveResolutorComponent>()
           .With<MoveColliderComponent>()
           .Without<StoppedTag>()
-          .Without<DeadTag>();
+          .Without<DeadTag>()
+          .Without<FlowFieldFollowerComponent>();
     }
 
     protected override void OnIter(Iter it)

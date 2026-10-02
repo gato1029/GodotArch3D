@@ -2,6 +2,7 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.managers.Characters;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 
@@ -17,6 +18,7 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
         qb.With<PositionComponent>()
           .With<FlowFieldFollowerComponent>()
           .With<SteeringComponent>()
+          .With<StateComponent>() 
           .Without<StoppedTag>()
           .Without<DeadTag>();
     }
@@ -31,12 +33,14 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
         var posArray = it.Field<PositionComponent>(0);
         var followerArray = it.Field<FlowFieldFollowerComponent>(1);
         var steeringArray = it.Field<SteeringComponent>(2);
+        var stateArray = it.Field<StateComponent>(3);
 
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
             ref var follower = ref followerArray[i];
             ref var steering = ref steeringArray[i];
+            ref var state = ref stateArray[i];
 
             var field = flowFieldManager.GetField(follower.FlowFieldId);
 
@@ -45,7 +49,7 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
                 steering.DesiredDir = Vector2.Zero;
                 continue;
             }
-
+            state.stateType = StateType.MOVING;
             steering.DesiredDir = field.SampleInterpolated(pos.position);
         }
     }

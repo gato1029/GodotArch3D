@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 
+using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using System;
 
 public enum PerfilGeografico
@@ -153,33 +154,24 @@ public struct ConfiguracionGeograficaData
             throw new InvalidOperationException($"{perfil}: AlturaMaxima {AlturaMaxima} no tiene peso asignado.");
     }
 }
-
-public struct TemplateTerrenoAlturaData
+public class BiomePlacementRuleData
 {
-    public float PorcentajeTerreno { get; set; }
-    public long IdTerreno { get; set; }
-}
-public class TemplateWorldProfileData : IdDataLong
-{    
-    public int AlturaMaxima { get; set; } = 3; // Altura máxima del mundo, por defecto 3
-    public Dictionary<int,TemplateTerrenoAlturaData> TerrenosAltura { get; set; } = new Dictionary<int,TemplateTerrenoAlturaData>(); // Clave: altura, Valor: datos del terreno para esa altura
+    public BiomaData bioma { get; set; }
 
-    [BsonIgnore]
-    public TemplateTerrenoAlturaData[] TerrenosAlturaGame; // Array para uso en el juego, construido a partir del diccionario TerrenosAltura
+    public float alturaMinima { get; set; } // Por ejemplo, altura normalizada entre 0 y 1
+    public float alturaMaxima { get; set; }
+
+    public float peso { get; set; } = 1f;
+}
+
+public class TemplateWorldProfileData : IdDataLong
+{
+    public ConfiguracionGeograficaData configuracionGeografica { get; set; }
+
+    public List<BiomePlacementRuleData> reglasBiomas { get; set; } = new();
 
     public TemplateWorldProfileData()
     {
         id = EpochIdGenerator.NewId();
     }
-
-    [BsonCtor]
-    public TemplateWorldProfileData(Dictionary<int, TemplateTerrenoAlturaData> terrenosAltura)
-    {
-        TerrenosAlturaGame = new TemplateTerrenoAlturaData[terrenosAltura.Count];
-        foreach (var kvp in terrenosAltura)
-        {            
-            TerrenosAlturaGame[kvp.Key] = kvp.Value;
-        }
-    }
-
 }
