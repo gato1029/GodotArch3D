@@ -81,18 +81,16 @@ public class DirectionSystem : FlecsSystemBase
                         break;
                 }
 
-                if (vel.desiredVel.LengthSquared() > 0.01f)
-                    cha.stateType = StateType.MOVING;
-                else
-                    cha.stateType = StateType.IDLE;
-                //cha.characterStateType = managers.Characters.CharacterStateType.MOVING;
+                //if (vel.desiredVel.LengthSquared() > 0.01f)
+                //    cha.stateType = StateType.MOVING;
+                //else
+                //    cha.stateType = StateType.IDLE;
+               
             }
             else
             {
                 // 🔹 sin movimiento
-                cha.stateType = managers.Characters.StateType.IDLE;
-
-                // ❗ opcional: NO tocar dir.value para mantener última dirección
+                //cha.stateType = managers.Characters.StateType.IDLE;
             }
         }
     }

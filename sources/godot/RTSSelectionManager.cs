@@ -670,7 +670,13 @@ public partial class RTSSelectionManager : Node2D
 
         GD.Print($"Moviendo {unitsCommanded} unidades a {targetPosition}");
     }
-
+    private int ComputeGoalSpreadRadius(int unitCount)
+    {
+        // Área necesaria ≈ unitCount * (spacing como unidad de tile).
+        // radius = sqrt(área / π), con mínimo 1 y techo razonable.
+        int radius = Mathf.CeilToInt(MathF.Sqrt(unitCount) * 0.6f);
+        return Mathf.Clamp(radius, 1, 6);
+    }
     private void CommandSelectedUnitsToMoveFlowField(Vector2 targetPosition)
     {
         List<Entity> selectedEntities = new();
@@ -723,11 +729,15 @@ public partial class RTSSelectionManager : Node2D
         // ---------------------------------------------------------
         var flowFieldManager = _world.State.FlowFieldManager;
 
-        int fieldId = flowFieldManager.FindNearestFieldId(originTile, destinyTile);
+        int requiredSpreadRadius = 1; //ComputeGoalSpreadRadius(selectedEntities.Count);
+
+        int fieldId = flowFieldManager.FindNearestFieldId(originTile, destinyTile, requiredSpreadRadius);
 
         if (fieldId == -1)
         {
-            fieldId = flowFieldManager.CreateField(originTile, destinyTile, regionMin, regionMax, DefaultUnitRadius);
+            fieldId = flowFieldManager.CreateField(
+                originTile, destinyTile, regionMin, regionMax,
+                DefaultUnitRadius, requiredSpreadRadius);
         }
 
         if (fieldId == -1)

@@ -377,7 +377,9 @@ public record struct MoveResolutorComponent(
     bool Blocked,     // Flag que indica si el agente está bloqueado
     float BlockedTimer, // tiempo acumulado sin moverse
     Vector2 ResolveDir,
-    float PenetrationMagnitude, float SeparationForceMagnitude
+    float PenetrationMagnitude, 
+    float SeparationForceMagnitude,
+    float StuckTimer
     // <-- Nuevo campo
 );
 

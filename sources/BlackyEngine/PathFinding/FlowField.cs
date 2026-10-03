@@ -52,20 +52,41 @@ public class FlowField
     }
 
     public static FlowField Build(
-        BlackyClearanceMap clearanceMap,
-        Vector2I goalTile,
-        Vector2I regionMin,
-        Vector2I regionMax,
-        float radiusTiles)
+      BlackyClearanceMap clearanceMap,
+      Vector2I goalTile,
+      Vector2I regionMin,
+      Vector2I regionMax,
+      float radiusTiles,
+      int goalSpreadRadius = 0) // 0 = un solo tile semilla (comportamiento original)
     {
         if (!clearanceMap.IsWalkableForRadius(goalTile.X, goalTile.Y, radiusTiles))
             return null;
 
         var field = new FlowField(regionMin, regionMax, goalTile);
-
         var frontier = new PriorityQueue<Vector2I, float>();
-        frontier.Enqueue(goalTile, 0f);
-        field.SetDistance(goalTile, 0f);
+
+        bool anySeed = false;
+
+        // Sembramos el Dijkstra desde un disco alrededor del destino,
+        // no solo un tile — así el campo converge hacia una zona en vez
+        // de un punto exacto, repartiendo naturalmente a las unidades.
+        for (int dx = -goalSpreadRadius; dx <= goalSpreadRadius; dx++)
+        {
+            for (int dy = -goalSpreadRadius; dy <= goalSpreadRadius; dy++)
+            {
+                var seedTile = goalTile + new Vector2I(dx, dy);
+
+                if (!field.InRegion(seedTile)) continue;
+                if (!clearanceMap.IsWalkableForRadius(seedTile.X, seedTile.Y, radiusTiles)) continue;
+
+                field.SetDistance(seedTile, 0f);
+                frontier.Enqueue(seedTile, 0f);
+                anySeed = true;
+            }
+        }
+
+        if (!anySeed)
+            return null; // ni el propio goalTile ni nada de su disco es transitable
 
         while (frontier.Count > 0)
         {

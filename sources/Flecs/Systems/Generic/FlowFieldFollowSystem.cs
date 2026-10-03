@@ -8,6 +8,44 @@ using GodotFlecs.sources.Flecs.Systems;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Generic;
 
+internal class FlowFieldUnstickSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override bool MultiThreaded => false;
+
+    private const float UnstickDelay = 1.0f; // segundos bloqueada antes de reintentar
+
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+        qb.With<FlowFieldFollowerComponent>()
+          .With<MoveResolutorComponent>()
+          .With<StoppedTag>()
+          .Without<DeadTag>();
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var resArray = it.Field<MoveResolutorComponent>(1);
+        float dt = it.DeltaTime();
+
+        for (int i = 0; i < it.Count(); i++)
+        {
+            ref var res = ref resArray[i];
+            var e = it.Entity(i);
+
+            res.StuckTimer += dt; // necesitas agregar este campo a MoveResolutorComponent
+
+            if (res.StuckTimer >= UnstickDelay)
+            {
+                res.Blocked = false;
+                res.BlockedTimer = 0f;
+                res.StuckTimer = 0f;
+                e.Remove<StoppedTag>();
+            }
+        }
+    }
+}
+
 internal class FlowFieldFollowSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;

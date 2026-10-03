@@ -167,7 +167,7 @@ public class FlecsManager
         RegisterSystem<MoveTargetSystem>();
         RegisterSystem<FlowFieldFollowSystem>();
 
-        RegisterSystem<RegisterFastHashSystem>();
+         // aqui antes el hash de colliders
         
         RegisterSystem<ResolveTerrainCollisionSystem>(); // resuelve colisiones con el terreno, debe ir antes de movimiento para ajustar la posición       
         RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición      
@@ -175,6 +175,7 @@ public class FlecsManager
                                                          
 
         RegisterSystem<MovementResolutionSystem>();
+        RegisterSystem<FlowFieldUnstickSystem>();
         RegisterSystem<ProjectileMovementSystem>();
 
         //RegisterSystem<MovementFreeUnitTargetSytem>(); // libera el target de movimiento si la unidad está bloqueada o no puede llegar al target
@@ -219,7 +220,8 @@ public class FlecsManager
         
         RegisterSystem<RvoDebugSystem>();
 
-        
+        RegisterSystem<RegisterFastHashSystem>();
+
         // creadores y spawn
         RegisterSystem<ProjectileSpawnSystem>();
         RegisterSystem<ArrowVisualSyncSystem>();

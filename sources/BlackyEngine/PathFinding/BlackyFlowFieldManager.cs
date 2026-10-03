@@ -18,6 +18,7 @@ public class FlowFieldEntry
     public Vector2I RegionMin;
     public Vector2I RegionMax;
     public float RadiusTiles;
+    public int GoalSpreadRadius;
     public FlowField Field;
 }
 
@@ -38,6 +39,11 @@ public class BlackyFlowFieldManager
     private readonly Dictionary<int, FlowFieldEntry> _entries = new();
     private readonly HashSet<int> _dirtyIds = new();
 
+    // Para campos persistentes de IA: un único id por tile de objetivo,
+    // reutilizado siempre que exista (sin tolerancia de distancia, el
+    // objetivo es fijo).
+    private readonly Dictionary<Vector2I, int> _persistentFieldsByGoal = new();
+
     private int _nextId = 1;
 
     public BlackyFlowFieldManager(BlackyClearanceMap clearanceMap)
@@ -45,20 +51,21 @@ public class BlackyFlowFieldManager
         _clearanceMap = clearanceMap;
     }
 
-    #region Creación
+    #region Creación — uso general (jugador, campos efímeros)
 
     /// <summary>
     /// Construye un campo nuevo y lo registra con un id propio.
-    /// Devuelve -1 si el destino no es transitable.
+    /// Devuelve -1 si el destino (ni su disco de siembra) es transitable.
     /// </summary>
     public int CreateField(
         Vector2I originTile,
         Vector2I goalTile,
         Vector2I regionMin,
         Vector2I regionMax,
-        float radiusTiles)
+        float radiusTiles,
+        int goalSpreadRadius = 0)
     {
-        var field = FlowField.Build(_clearanceMap, goalTile, regionMin, regionMax, radiusTiles);
+        var field = FlowField.Build(_clearanceMap, goalTile, regionMin, regionMax, radiusTiles, goalSpreadRadius);
         if (field == null)
             return -1;
 
@@ -72,6 +79,7 @@ public class BlackyFlowFieldManager
             RegionMin = regionMin,
             RegionMax = regionMax,
             RadiusTiles = radiusTiles,
+            GoalSpreadRadius = goalSpreadRadius,
             Field = field
         };
 
@@ -80,16 +88,21 @@ public class BlackyFlowFieldManager
 
     #endregion
 
-    #region Búsqueda de campo existente
+    #region Búsqueda de campo existente (jugador)
 
     /// <summary>
-    /// Busca, entre los campos ya cacheados, el más cercano cuyo
-    /// destino coincida (dentro de 'maxGoalDistanceTiles') con
-    /// 'destinyTile' y cuya región cubra tanto el origen como el
-    /// destino pedidos. Devuelve -1 si no hay ninguno reutilizable
-    /// — en ese caso, el llamador debe usar CreateField.
+    /// Busca, entre los campos cacheados, el más cercano cuyo destino
+    /// coincida con 'destinyTile', cuya región cubra origen y destino,
+    /// y cuyo GoalSpreadRadius alcance para 'requiredSpreadRadius'
+    /// (si el campo existente tiene un disco más chico del necesario,
+    /// no se reutiliza, para no apretar al grupo nuevo en un espacio
+    /// pensado para menos unidades).
     /// </summary>
-    public int FindNearestFieldId(Vector2I originTile, Vector2I destinyTile, float maxGoalDistanceTiles = 2f)
+    public int FindNearestFieldId(
+        Vector2I originTile,
+        Vector2I destinyTile,
+        int requiredSpreadRadius,
+        float maxGoalDistanceTiles = 2f)
     {
         int bestId = -1;
         float bestGoalDistSq = maxGoalDistanceTiles * maxGoalDistanceTiles;
@@ -97,6 +110,7 @@ public class BlackyFlowFieldManager
         foreach (var entry in _entries.Values)
         {
             if (entry.Field == null) continue; // sucio, pendiente de reconstruir
+            if (entry.GoalSpreadRadius < requiredSpreadRadius) continue;
 
             if (!Contains(entry, originTile)) continue;
             if (!Contains(entry, destinyTile)) continue;
@@ -116,6 +130,35 @@ public class BlackyFlowFieldManager
 
     #endregion
 
+    #region Campos persistentes (IA / oleadas)
+
+    /// <summary>
+    /// Para objetivos fijos y duraderos (la base del jugador, un
+    /// edificio clave): un único campo por tile de destino exacto,
+    /// reutilizado indefinidamente por cualquier cantidad de unidades,
+    /// sin importar cuántas oleadas lo usen. Se recalcula solo vía
+    /// MarkTileChanged/FlushDirty si el terreno cambia.
+    /// </summary>
+    public int GetOrCreatePersistentField(
+        Vector2I goalTile,
+        Vector2I regionMin,
+        Vector2I regionMax,
+        float radiusTiles,
+        int goalSpreadRadius = 3)
+    {
+        if (_persistentFieldsByGoal.TryGetValue(goalTile, out int existingId) && _entries.ContainsKey(existingId))
+            return existingId;
+
+        int id = CreateField(default, goalTile, regionMin, regionMax, radiusTiles, goalSpreadRadius);
+
+        if (id != -1)
+            _persistentFieldsByGoal[goalTile] = id;
+
+        return id;
+    }
+
+    #endregion
+
     #region Consulta
 
     public FlowField GetField(int id)
@@ -128,12 +171,6 @@ public class BlackyFlowFieldManager
 
     #region Invalidación (marcar) y reconstrucción (flush)
 
-    /// <summary>
-    /// Llamar desde el mismo punto que notifica cambios de
-    /// ocupación (BlackyPathfinder.NotifyTileOccupancyChanged).
-    /// Solo MARCA qué ids quedaron afectados — no recalcula nada
-    /// todavía. Barato: recorre entradas, sin tocar Dijkstra.
-    /// </summary>
     public void MarkTileChanged(int worldX, int worldY)
     {
         var tile = new Vector2I(worldX, worldY);
@@ -147,15 +184,6 @@ public class BlackyFlowFieldManager
         }
     }
 
-    /// <summary>
-    /// Recalcula todos los campos marcados como sucios. Llamar
-    /// UNA vez por frame (o antes de consultar campos), igual que
-    /// BlackyClearanceMap.FlushDirty(). Mientras un id está sucio
-    /// y no se hizo flush, GetField(id) devuelve el valor viejo
-    /// (Field no se pone en null hasta el propio recálculo, para
-    /// que las unidades no se queden sin dirección un frame entero
-    /// solo por estar en cola).
-    /// </summary>
     public void FlushDirty()
     {
         if (_dirtyIds.Count == 0) return;
@@ -170,11 +198,8 @@ public class BlackyFlowFieldManager
                 entry.GoalTile,
                 entry.RegionMin,
                 entry.RegionMax,
-                entry.RadiusTiles);
-
-            // Si el destino dejó de ser transitable, Field queda null:
-            // GetField(id) devolverá null y FlowFieldFollowSystem
-            // pondrá DesiredDir en cero para esos seguidores.
+                entry.RadiusTiles,
+                entry.GoalSpreadRadius);
         }
 
         _dirtyIds.Clear();
@@ -184,6 +209,13 @@ public class BlackyFlowFieldManager
 
     public void RemoveField(int id)
     {
+        if (_entries.TryGetValue(id, out var entry))
+        {
+            // Si era un campo persistente, limpiamos también ese índice
+            if (_persistentFieldsByGoal.TryGetValue(entry.GoalTile, out int persistentId) && persistentId == id)
+                _persistentFieldsByGoal.Remove(entry.GoalTile);
+        }
+
         _entries.Remove(id);
         _dirtyIds.Remove(id);
     }
@@ -192,6 +224,7 @@ public class BlackyFlowFieldManager
     {
         _entries.Clear();
         _dirtyIds.Clear();
+        _persistentFieldsByGoal.Clear();
     }
 
     private static bool Contains(FlowFieldEntry entry, Vector2I tile)

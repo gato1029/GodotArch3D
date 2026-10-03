@@ -39,9 +39,7 @@ public class SteeringSystem : FlecsSystemBase
     protected override void OnIter(Iter it)
     {
         var world = it.World().GetCtx<BlackyWorld>();
-
-        if (world == null)
-            return;
+        if (world == null) return;
 
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
@@ -61,7 +59,6 @@ public class SteeringSystem : FlecsSystemBase
             ref var steering = ref steeringArray[i];
             ref var res = ref resArray[i];
 
-            // Si quedó bloqueada, se queda quieta
             if (res.Blocked)
             {
                 vel.desiredVel = Vector2.Zero;
@@ -72,18 +69,17 @@ public class SteeringSystem : FlecsSystemBase
             // DIRECCIÓN DESEADA
             // =====================================================
             Vector2 desiredDir = steering.DesiredDir;
+            bool hasDesiredDir = desiredDir != Vector2.Zero;
 
-            if (desiredDir == Vector2.Zero)
-            {
-                vel.desiredVel = Vector2.Zero;
-                //res.BlockedTimer = 0f;
-                continue;
-            }
-
-            if (desiredDir.LengthSquared() > 1.001f)
+            if (hasDesiredDir && desiredDir.LengthSquared() > 1.001f)
             {
                 desiredDir = desiredDir.Normalized();
             }
+
+            // NOTA: ya NO salimos aquí cuando desiredDir es cero.
+            // Una unidad sin dirección (por ejemplo, llegó al disco
+            // de destino de un flow field) igual necesita avoidance
+            // para separarse de otras que converjan al mismo punto.
 
             // =====================================================
             // DATOS DE SEPARACIÓN
@@ -95,9 +91,11 @@ public class SteeringSystem : FlecsSystemBase
             int neighborCount = 0;
 
             // =====================================================
-            // POSICIÓN FUTURA
+            // POSICIÓN FUTURA (si no hay desiredDir, usamos la posición actual)
             // =====================================================
-            Vector2 posFuture = pos.position + desiredDir * vel.MaxSpeed * it.DeltaTime();
+            Vector2 posFuture = hasDesiredDir
+                ? pos.position + desiredDir * vel.MaxSpeed * it.DeltaTime()
+                : pos.position;
 
             float cx = posFuture.X + col.Offset.X;
             float cy = posFuture.Y + col.Offset.Y;
@@ -119,9 +117,6 @@ public class SteeringSystem : FlecsSystemBase
                     {
                         int otherSID = dynGrid.GetSpatialID(idx);
 
-                        // -------------------------------------------------
-                        // Nosotros mismos
-                        // -------------------------------------------------
                         if (otherSID == sid.Value)
                         {
                             idx = dynGrid.GetNext(idx);
@@ -129,12 +124,8 @@ public class SteeringSystem : FlecsSystemBase
                         }
 
                         Entity other = dynGrid.GetEntity(idx);
-
                         ref var otherSid = ref other.GetMut<SpatialIDComponent>();
 
-                        // -------------------------------------------------
-                        // Capas incompatibles
-                        // -------------------------------------------------
                         if ((sid.Mask & otherSid.Layer) == 0)
                         {
                             idx = dynGrid.GetNext(idx);
@@ -144,9 +135,6 @@ public class SteeringSystem : FlecsSystemBase
                         ref var otherPos = ref other.GetMut<PositionComponent>();
                         ref var otherCol = ref other.GetMut<MoveColliderComponent>();
 
-                        // -------------------------------------------------
-                        // Distancia
-                        // -------------------------------------------------
                         float dx = cx - (otherPos.position.X + otherCol.Offset.X);
                         float dy = cy - (otherPos.position.Y + otherCol.Offset.Y);
 
@@ -158,9 +146,6 @@ public class SteeringSystem : FlecsSystemBase
                             continue;
                         }
 
-                        // -------------------------------------------------
-                        // Vecino
-                        // -------------------------------------------------
                         if (distSq < radiusSq)
                         {
                             float dist = MathF.Sqrt(distSq);
@@ -177,9 +162,7 @@ public class SteeringSystem : FlecsSystemBase
                             neighborCount++;
 
                             if (neighborCount >= MAX_NEIGHBORS)
-                            {
                                 break;
-                            }
                         }
 
                         idx = dynGrid.GetNext(idx);
@@ -197,82 +180,92 @@ public class SteeringSystem : FlecsSystemBase
             // CROWD
             // =====================================================
             float crowd = MathF.Min(1f, neighborCount / 6f);
-
-            // No dejamos que el crowd elimine completamente
-            // la dirección hacia el objetivo.
             float crowdInfluence = crowd * 0.35f;
 
             // =====================================================
             // DIRECCIÓN FINAL
             // =====================================================
             float avoidanceWeight = steering.SeparationWeight;
-
-            // Quitamos la componente de avoidance que se opone al avance.
-            // Esto evita que dos unidades yendo en direcciones similares
-            // se cancelen mutuamente y se queden "empujándose" sin moverse.
             Vector2 avoidanceLateral = avoidance;
 
-            float avoidAlongDesired = avoidance.Dot(desiredDir);
-            if (avoidAlongDesired < 0f)
+            if (hasDesiredDir)
             {
-                avoidanceLateral -= desiredDir * avoidAlongDesired; // solo resta la parte "hacia atrás"
-            }
+                float avoidAlongDesired = avoidance.Dot(desiredDir);
+                if (avoidAlongDesired < 0f)
+                {
+                    avoidanceLateral -= desiredDir * avoidAlongDesired;
+                }
 
-            // Sesgo de desempate: rotamos levemente el avoidance hacia un lado fijo
-            // determinado por el ID, para evitar el "empate" cuando dos unidades
-            // quedan exactamente de frente sin componente lateral que las separe.
-            if (avoidance.LengthSquared() > 0.0001f)
+                if (avoidance.LengthSquared() > 0.0001f)
+                {
+                    float side = (sid.Value % 2 == 0) ? 1f : -1f;
+                    Vector2 perp = new Vector2(-desiredDir.Y, desiredDir.X) * side;
+                    avoidanceLateral += perp * 0.15f;
+                }
+            }
+            else if (avoidance.LengthSquared() > 0.0001f)
             {
+                // Sin dirección propia: usamos un eje fijo del mundo
+                // (no relativo a desiredDir, porque no existe) para
+                // seguir rompiendo empates simétricos entre vecinos.
                 float side = (sid.Value % 2 == 0) ? 1f : -1f;
-                Vector2 perp = new Vector2(-desiredDir.Y, desiredDir.X) * side;
-                avoidanceLateral += perp * 0.15f; // peso pequeño, solo para desempatar
+                Vector2 worldPerp = new Vector2(0, 1) * side;
+                avoidanceLateral += worldPerp * 0.15f;
             }
 
-            Vector2 finalDir = desiredDir * (1f - crowdInfluence) + avoidanceLateral * avoidanceWeight;
+            Vector2 finalDir = hasDesiredDir
+                ? desiredDir * (1f - crowdInfluence) + avoidanceLateral * avoidanceWeight
+                : avoidanceLateral * avoidanceWeight; // pura separación, sin avance
 
             float lenSq = finalDir.LengthSquared();
 
             if (lenSq < 0.0001f)
             {
                 vel.desiredVel = Vector2.Zero;
-                res.BlockedTimer += it.DeltaTime();
+
+                // Solo acumulamos BlockedTimer si la unidad REALMENTE
+                // quería avanzar a algún lado y no pudo — una unidad
+                // sin desiredDir (ya llegó, sin vecinos que la empujen)
+                // está correctamente detenida, no "bloqueada".
+                if (hasDesiredDir)
+                {
+                    res.BlockedTimer += it.DeltaTime();
+                }
+
                 continue;
             }
 
             finalDir /= MathF.Sqrt(lenSq);
 
             // =====================================================
-            // PROGRESO HACIA EL OBJETIVO
+            // DETECCIÓN DE BLOQUEO — solo aplica si había intención
+            // real de avanzar hacia algo (hasDesiredDir).
             // =====================================================
-            float forwardProgress = finalDir.Dot(desiredDir);
-
-            // =====================================================
-            // DETECCIÓN DE BLOQUEO
-            // =====================================================
-            bool crowded = neighborCount >= 4;
-            bool badDirection = forwardProgress < 0.05f;
-
-            if (crowded && badDirection)
+            if (hasDesiredDir)
             {
-                res.BlockedTimer += it.DeltaTime();
+                float forwardProgress = finalDir.Dot(desiredDir);
 
-                if (res.BlockedTimer >= 0.5f)
+                bool crowded = neighborCount >= 4;
+                bool badDirection = forwardProgress < 0.05f;
+
+                if (crowded && badDirection)
+                {
+                    res.BlockedTimer += it.DeltaTime();
+
+                    if (res.BlockedTimer >= 0.5f)
+                    {
+                        res.Blocked = true;
+                        vel.desiredVel = Vector2.Zero;
+                        continue;
+                    }
+                }
+
+                if (res.BlockedTimer >= 0.35f)
                 {
                     res.Blocked = true;
                     vel.desiredVel = Vector2.Zero;
                     continue;
                 }
-            }
-
-
-            // =====================================================
-            // BLOQUEO REAL
-            // =====================================================
-            if (res.BlockedTimer >= 0.35f)
-            {
-                res.Blocked = true;
-                vel.desiredVel = Vector2.Zero;
-                continue;
             }
 
             // =====================================================
