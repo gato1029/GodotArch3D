@@ -8,6 +8,7 @@ using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 using System;
+using System.Collections.Concurrent;
 
 namespace GodotEcsArch.sources.BlackyEngine.State;
 
@@ -15,6 +16,23 @@ public enum ModeGrid
 {
     DUAL,
     NORMAL
+}
+public readonly struct OverlapPair
+{
+    public readonly int SelfSID;
+    public readonly int OtherSID;
+    public readonly float DirX;
+    public readonly float DirY;
+    public readonly float Overlap;
+
+    public OverlapPair(int selfSID, int otherSID, float dirX, float dirY, float overlap)
+    {
+        SelfSID = selfSID;
+        OtherSID = otherSID;
+        DirX = dirX;
+        DirY = dirY;
+        Overlap = overlap;
+    }
 }
 public sealed class BlackyWorldState : IDisposable
 {
@@ -37,7 +55,7 @@ public sealed class BlackyWorldState : IDisposable
     private ModeGrid modeGrid { get; set; } = ModeGrid.NORMAL;
     private readonly BlackyWorld world;
     private readonly BlackyWorldConfig config;
-
+    public ConcurrentQueue<OverlapPair> PendingOverlapCorrections = new();
     public BlackyWorldState(BlackyWorld world)
     {
         this.world = world;

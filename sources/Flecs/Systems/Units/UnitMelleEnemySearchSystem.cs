@@ -114,9 +114,10 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
 
             for (int ii = 0; ii < count; ii++)
             {
+                int otherSpatialId = dynGrid.GetSpatialID(neighbors[ii]);
                 targetEntity = dynGrid.GetEntity(neighbors[ii]);
 
-                if (spatial.Value == neighbors[ii]) continue;
+                if (spatial.Value == otherSpatialId) continue;
 
                 if (targetEntity.IsAlive() && !targetEntity.Has<DeadTag>())
                 {

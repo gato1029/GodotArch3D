@@ -629,7 +629,62 @@ public class StaticSpatialGridOptimizedGeneric<T>
             }
         }
     }
+    public int QueryNearbyUniqueNonAlloc(
+    float worldX, float worldY, int radius,
+    Span<int> results,
+    ushort teamToIgnore = ushort.MaxValue)
+    {
+        if (radius < 0) return 0;
 
+        if (++_currentQueryId == int.MaxValue)
+        {
+            Array.Fill(_visited, 0);
+            _currentQueryId = 1;
+        }
+
+        Vector2I c = WorldToCell(worldX, worldY);
+        int count = 0;
+
+        if (CollectCell(c.X, c.Y, teamToIgnore, results, ref count)) return count;
+
+        for (int r = 1; r <= radius; r++)
+        {
+            for (int dx = -r; dx <= r; dx++)
+            {
+                if (CollectCell(c.X + dx, c.Y - r, teamToIgnore, results, ref count)) return count;
+                if (CollectCell(c.X + dx, c.Y + r, teamToIgnore, results, ref count)) return count;
+            }
+            for (int dy = -r + 1; dy <= r - 1; dy++)
+            {
+                if (CollectCell(c.X - r, c.Y + dy, teamToIgnore, results, ref count)) return count;
+                if (CollectCell(c.X + r, c.Y + dy, teamToIgnore, results, ref count)) return count;
+            }
+        }
+        return count;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool CollectCell(int x, int y, ushort teamToIgnore, Span<int> results, ref int count)
+    {
+        int cell = GetCellIndex(x, y);
+        if (cell == -1) return false;
+
+        int node = _heads[cell];
+        while (node != -1)
+        {
+            int id = _entityIDs[node];
+            if (id > 0 && id <= _maxEntities &&
+                _teams[node] != teamToIgnore &&
+                _visited[id] != _currentQueryId)
+            {
+                _visited[id] = _currentQueryId;
+                results[count++] = id;
+                if (count == results.Length) return true;
+            }
+            node = _next[node];
+        }
+        return false;
+    }
     // ============================================================
     // CLEAR
     // ============================================================

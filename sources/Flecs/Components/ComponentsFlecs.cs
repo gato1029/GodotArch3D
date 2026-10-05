@@ -363,7 +363,7 @@ public record struct BuildingComponent
 }
 
 [RegisterComponentFlecs]
-public record struct VelocityComponent(Vector2 currentVel, float MaxSpeed, Vector2 desiredVel);
+public record struct VelocityComponent(Vector2 currentVel, float MaxSpeed, Vector2 desiredVel,float Acceleration );
 
 [RegisterComponentFlecs]
 public record struct MoveTargetComponent(

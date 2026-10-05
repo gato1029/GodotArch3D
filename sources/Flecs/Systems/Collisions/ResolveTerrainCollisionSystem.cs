@@ -29,6 +29,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
           .With<SpatialIDComponent>()
           .With<SteeringComponent>()
           .With<VelocityComponent>()
+          .With<MoveResolutorComponent>()
           .With<UnitTag>()
           .Without<StoppedTag>();
           
@@ -47,6 +48,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
         var sidArray = it.Field<SpatialIDComponent>(2);
         var steeringArray = it.Field<SteeringComponent>(3);
         var velArray = it.Field<VelocityComponent>(4);
+        var moveArray = it.Field<MoveResolutorComponent>(5);
 
         for (int i = 0; i < it.Count(); i++)
         {
@@ -56,12 +58,15 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
             ref var col = ref colArray[i];
             ref var steering = ref steeringArray[i];
             ref var vel = ref velArray[i];
-            Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime()*2f);            
+            ref var move = ref moveArray[i];
+            Vector2 temp = steering.DesiredDir.Normalized();
+            Vector2 posFuture = pos.position + temp * it.DeltaTime();            
             bool collided = CheckAgainstStaticGrid(posFuture, ref col, staticSpatialGrid);                     
             if (collided)
             {
                 steering.DesiredDir = Godot.Vector2.Zero;      
                 vel.desiredVel = Vector2.Zero;
+                move.Blocked = true;
             }
         }
     }

@@ -560,7 +560,10 @@ public partial class RTSSelectionManager : Node2D
             if (entity.Has<PathReferenceComponent>())
             {
                 var oldPath = entity.Get<PathReferenceComponent>();
-                _world.State.PathRegistryManager.ReleasePath(oldPath.PathId);
+                if (oldPath.PathId != pathId)
+                {
+                    _world.State.PathRegistryManager.ReleasePath(oldPath.PathId);
+                }                
             }
 
             // ---------------------------------------------

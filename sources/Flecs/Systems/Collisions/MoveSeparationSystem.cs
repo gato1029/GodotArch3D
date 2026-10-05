@@ -55,7 +55,8 @@ public class MoveSeparationSystem : FlecsSystemBase
 
         var staGridBuilding = blackyWorld.State.StaticSpatialBuildings;
         var staResourceGrid = blackyWorld.State.StaticSpatialResources;
-
+        var dynGrid = blackyWorld.State.DynamicHash;
+        Span<int> neighbors = stackalloc int[8];
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
@@ -67,39 +68,75 @@ public class MoveSeparationSystem : FlecsSystemBase
             ref var state = ref stateArray[i];
 
             if (res.Blocked)
-            {
                 continue;
-            }
-
-            // comentado por el momento
-            //bool unitIsEven = (sid.Value & 1) == 0;
-            //if (unitIsEven != evenFrame)
-            //{
-            //    continue;
-            //}
 
             if (steering.DesiredDir.LengthSquared() < 0.01f)
                 continue;
 
             Vector2 posFuture = pos.position + (steering.DesiredDir * vel.MaxSpeed * it.DeltaTime());
 
-            // 🔥 Colisión con edificios/paredes y con recursos (árboles, rocas, etc.)
-            bool hit = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding)
-                    || CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
+            // -------------------------------------------------
+            // Contra ESTÁTICOS (edificios, recursos): bloqueo duro.
+            // No cambian de posición, así que si hay colisión ahora,
+            // va a seguir habiéndola — tiene sentido frenar del todo
+            // hasta una orden nueva o el mecanismo de Unstick.
+            // -------------------------------------------------
+            bool hitStatic = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding)
+                           || CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
 
-            if (!hit)
+            if (hitStatic)
+            {
+                vel.desiredVel = Vector2.Zero;
+                res.Blocked = true;
                 continue;
+            }
 
-            vel.desiredVel = Vector2.Zero;
-            res.Blocked = true;            
             // -------------------------------------------------
-            // Restitución barata: retrocedemos un paso fijo en la
-            // dirección opuesta al avance, sin comprobar nada más.
+            // Contra UNIDADES dinámicas: NO bloqueamos duro. Solo
+            // evitamos avanzar ESTE frame si el paso siguiente choca
+            // contra alguien que también se está moviendo. El próximo
+            // frame, SteeringSystem recalcula avoidance con la nueva
+            // posición de todos — si el otro ya se movió, el camino
+            // puede estar libre sin que nadie tenga que "desbloquear"
+            // nada explícitamente.
             // -------------------------------------------------
-            //pos.position -= steering.DesiredDir.Normalized() * BackoffDistance;
+            bool hitUnit = CheckUnits(posFuture, col.Radius, col, neighbors, sid, dynGrid);
+
+            if (hitUnit)
+            {
+                vel.desiredVel = Vector2.Zero; 
+                //res.Blocked = true;
+                // SIN res.Blocked = true aquí — solo detenemos este
+                // frame puntual, sin entrar en el estado "congelada".
+            }
+
         }
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool CheckUnits(Vector2 pos, float radius, MoveColliderComponent moveCollider, Span<int> neighbors, SpatialIDComponent spatial, FastSpatialHash grid)
+    {
+        var count = grid.QueryNodesBoundedClosestLayersFiltered(pos.X, pos.Y, radius, 0, neighbors);
 
+        for (int ii = 0; ii < count; ii++)
+        {
+            int otherSid = grid.GetSpatialID(neighbors[ii]);
+            Entity currentEntity = grid.GetEntity(neighbors[ii]);
+
+            if (spatial.Value == otherSid) continue;
+
+            if (currentEntity.IsAlive() && !currentEntity.Has<DeadTag>())
+            {
+                var currentPos = currentEntity.Get<PositionComponent>().position;
+                var currentCol = currentEntity.Get<MoveColliderComponent>();
+
+                if (CollisionMathHelper.CheckCircle(pos.X, pos.Y, moveCollider.Radius, moveCollider.Offset, currentPos.X, currentPos.Y, currentCol.Radius, currentCol.Offset))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool CheckAgainstStaticGridResources(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
     {

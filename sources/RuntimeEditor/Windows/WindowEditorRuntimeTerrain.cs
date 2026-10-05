@@ -329,7 +329,7 @@ public partial class WindowEditorRuntimeTerrain : Window
                // offsetVisual = new Vector2(0.25f,0.25f);
                 break;
             case ModePaint.AUTO_DUAL:
-                offsetVisual = new Vector2(-0.25f, -0.25f);
+                //offsetVisual = new Vector2(-0.25f, -0.25f);
                 //TilesEntityPreviewHelper.Move(currentMouseTile, new Vector2(0.25f, 0.25f));                                
                 break;
             default:

@@ -24,7 +24,8 @@ size_flags_vertical = 3
 [node name="KuroItems" parent="HBoxContainer2" unique_id=1154977173 instance=ExtResource("2_x8xtv")]
 layout_mode = 2
 size_flags_horizontal = 0
-size_flags_vertical = 0
+size_flags_vertical = 1
+_startExpanded = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2" unique_id=1773333836]
 layout_mode = 2
@@ -45,6 +46,7 @@ layout_mode = 2
 [node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=677075772]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+focus_mode = 1
 script = ExtResource("3_u3etv")
 IconTexture = ExtResource("4_iwqxo")
 IconExpand = true
@@ -53,6 +55,7 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 [node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=1404882766]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+focus_mode = 1
 script = ExtResource("3_u3etv")
 IconTexture = ExtResource("5_7a7x7")
 IconExpand = true
@@ -61,6 +64,7 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 [node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/VBoxContainer/HBoxContainer2" unique_id=1882424413]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+focus_mode = 1
 script = ExtResource("3_u3etv")
 IconTexture = ExtResource("6_5qsp0")
 IconExpand = true
@@ -96,6 +100,7 @@ custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
+focus_mode = 1
 script = ExtResource("3_u3etv")
 IconTexture = ExtResource("4_x8xtv")
 IconExpand = true

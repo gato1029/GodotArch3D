@@ -175,6 +175,7 @@ public class FlecsManager
                                                          
 
         RegisterSystem<MovementResolutionSystem>();
+        //RegisterSystem<ApplyOverlapCorrectionsSystem>(); // <- nuevo
         RegisterSystem<FlowFieldUnstickSystem>();
         RegisterSystem<ProjectileMovementSystem>();
 

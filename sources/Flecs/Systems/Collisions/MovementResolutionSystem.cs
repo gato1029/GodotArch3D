@@ -90,7 +90,9 @@ public class MovementResolutionSystem : FlecsSystemBase
             }
             else
             {   // 🎨 movimiento suave
-                pos.position += vel.desiredVel * dt; 
+                float accel = vel.Acceleration > 0f ? vel.Acceleration : 8f; // valor de respaldo si no está seteado
+                vel.currentVel = vel.currentVel.MoveToward(vel.desiredVel, accel * dt);
+                pos.position += vel.currentVel * dt;
                 pos.tilePosition = TilesHelper.WorldPositionToTile(pos.position);
                 pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
                 move.Blocked = false;                

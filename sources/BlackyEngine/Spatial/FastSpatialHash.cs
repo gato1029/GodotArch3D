@@ -519,7 +519,7 @@ public class FastSpatialHash
     public int QueryNodesBoundedClosestLayersFiltered(
         float x, float y, float radius,
         ushort teamToIgnore, // Equipo que quieres filtrar/ignorar (ej. tus propios aliados)
-        Span<int> results)
+        Span<int> resultsNodeidX)
     {
         int count = 0;
         _currentQueryId++;
@@ -535,7 +535,7 @@ public class FastSpatialHash
         int cellRadius = (int)MathF.Ceiling(radius / tileSizeUnits);
 
         // 1. Centro exacto
-        if (ProcessCellNodesFiltered(GetHashDirect(centerX, centerY, TotalCells), teamToIgnore, results, ref count))
+        if (ProcessCellNodesFiltered(GetHashDirect(centerX, centerY, TotalCells), teamToIgnore, resultsNodeidX, ref count))
             return count;
 
         // 2. Expandir por anillos
@@ -543,14 +543,14 @@ public class FastSpatialHash
         {
             for (int dx = -r; dx <= r; dx++)
             {
-                if (ProcessCellNodesFiltered(GetHashDirect(centerX + dx, centerY - r, TotalCells), teamToIgnore, results, ref count)) return count;
-                if (ProcessCellNodesFiltered(GetHashDirect(centerX + dx, centerY + r, TotalCells), teamToIgnore, results, ref count)) return count;
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX + dx, centerY - r, TotalCells), teamToIgnore, resultsNodeidX, ref count)) return count;
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX + dx, centerY + r, TotalCells), teamToIgnore, resultsNodeidX, ref count)) return count;
             }
 
             for (int dy = -r + 1; dy <= r - 1; dy++)
             {
-                if (ProcessCellNodesFiltered(GetHashDirect(centerX - r, centerY + dy, TotalCells), teamToIgnore, results, ref count)) return count;
-                if (ProcessCellNodesFiltered(GetHashDirect(centerX + r, centerY + dy, TotalCells), teamToIgnore, results, ref count)) return count;
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX - r, centerY + dy, TotalCells), teamToIgnore, resultsNodeidX, ref count)) return count;
+                if (ProcessCellNodesFiltered(GetHashDirect(centerX + r, centerY + dy, TotalCells), teamToIgnore, resultsNodeidX, ref count)) return count;
             }
         }
 

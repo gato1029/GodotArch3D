@@ -30,7 +30,7 @@ public class BlackyCharacterCreator
     private readonly FlecsManager flecsManager;
     private readonly FastSpatialHash dynamicHash;
     private readonly Core.BlackyWorld world;
-    private bool DEBUG_COLLIDERS = false;
+    private bool DEBUG_COLLIDERS = true ;
 
     // Cola thread-safe y presupuesto por frame
     private readonly ConcurrentQueue<CreateCharacterCommand> _createQueue = new();
@@ -202,7 +202,7 @@ public class BlackyCharacterCreator
         entity.Set(new UnitDefinitionComponent(characterId));
         entity.Set(new PositionComponent(position, Vector2I.Zero, height));
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.OCHO, GodotEcsArch.sources.components.AnimationDirection.LEFT));
-        entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0)));
+        entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0),18));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0));
         entity.Set(new PlayerInputComponent());
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
@@ -287,7 +287,7 @@ public class BlackyCharacterCreator
         entity.Set(new UnitDefinitionComponent(characterId));
         entity.Set(new PositionComponent(position, Vector2I.Zero, 1));
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, animationDir.directionAnimationType, GodotEcsArch.sources.components.AnimationDirection.LEFT));
-        entity.Set(new VelocityComponent(new Vector2(0, 0), 3f, new Vector2(0, 0)));
+        entity.Set(new VelocityComponent(new Vector2(0, 0), 3f, new Vector2(0, 0), 15));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0));
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         entity.Add<StoppedTag>();
@@ -316,7 +316,7 @@ public class BlackyCharacterCreator
         }
 
         entity.Set(new AttackPendingComponent(false, default,false,Vector2.Zero,0));
-        entity.Set(new SteeringComponent(rvoRadius, 2, Vector2.Zero));
+        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero));
 
         AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody,2);
 

@@ -78,7 +78,17 @@ public static class CollisionMathHelper
                 return false;
         }
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckCircle(float x1, float y1, float radius, Godot.Vector2 offset1, float x2, float y2, float radius2, Vector2 offset2)
+    {
+        float cx1 = x1 + offset1.X;
+        float cy1 = y1 + offset1.Y;
 
+        float cx2 = x2 + offset2.X;
+        float cy2 = y2 + offset2.Y;
+
+        return CircleToCircle(cx1, cy1, radius, cx2, cy2, radius2);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckAttackHalfCircle(

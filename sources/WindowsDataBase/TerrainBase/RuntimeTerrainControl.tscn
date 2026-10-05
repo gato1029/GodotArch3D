@@ -25,6 +25,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 1
+_startExpanded = true
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer2" unique_id=517929566]
 layout_mode = 2
@@ -44,6 +45,7 @@ theme_override_constants/separation = 10
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
+focus_mode = 1
 script = ExtResource("2_5etia")
 IconTexture = ExtResource("4_i5ri6")
 IconExpand = true
@@ -69,6 +71,7 @@ text = "Terreno Dual:"
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_horizontal = 0
+focus_mode = 1
 script = ExtResource("2_5etia")
 IconTexture = ExtResource("3_5etia")
 IconMinSize = Vector2(64, 64)
@@ -89,6 +92,7 @@ size_flags_horizontal = 4
 [node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=116552285]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+focus_mode = 1
 script = ExtResource("2_5etia")
 IconTexture = ExtResource("4_smlrj")
 IconExpand = true
@@ -97,6 +101,7 @@ metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 [node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=1447995048]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
+focus_mode = 1
 script = ExtResource("2_5etia")
 IconTexture = ExtResource("5_o3314")
 IconExpand = true

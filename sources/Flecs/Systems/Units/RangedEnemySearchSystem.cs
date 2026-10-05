@@ -92,7 +92,8 @@ internal class RangedEnemySearchSystem : FlecsSystemBase
                 for (int ii = 0; ii < count; ii++)
                 {
                     var neighborId = neighbors[ii];
-                    if (spatial.Value == neighborId) continue;
+                    int otherSpatialId = dynGrid.GetSpatialID(neighbors[ii]);
+                    if (spatial.Value == otherSpatialId) continue;
 
                     targetEntity = dynGrid.GetEntity(neighborId);
 
