@@ -170,13 +170,18 @@ public class FlecsManager
          // aqui antes el hash de colliders
         
         RegisterSystem<ResolveTerrainCollisionSystem>(); // resuelve colisiones con el terreno, debe ir antes de movimiento para ajustar la posición       
-        RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición      
-        RegisterSystem<SteeringSystem>();
+       
+   
                                                          
 
-        RegisterSystem<MovementResolutionSystem>();
+
         //RegisterSystem<ApplyOverlapCorrectionsSystem>(); // <- nuevo
-        RegisterSystem<FlowFieldUnstickSystem>();
+        //RegisterSystem<FlowFieldUnstickSystem>();
+        RegisterSystem<SteeringSystem>();
+        RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición
+        RegisterSystem<MovementResolutionSystem>();
+
+        RegisterSystem<DebugOverlapCheckSystem>(); // solo para debug
         RegisterSystem<ProjectileMovementSystem>();
 
         //RegisterSystem<MovementFreeUnitTargetSytem>(); // libera el target de movimiento si la unidad está bloqueada o no puede llegar al target
