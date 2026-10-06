@@ -58,13 +58,14 @@ public class MoveTargetSystem : FlecsSystemBase
                 steering.DesiredDir = Vector2.Zero;
                 resolutor.Blocked = false; // liberas bloqueo
                 state.stateType = StateType.IDLE;
+                resolutor.LastConeIndex = 0;
                 it.Entity(i).Remove<MoveTargetComponent>();
                 it.Entity(i).Add<StoppedTag>();           
                 continue;
             }
 
-            // Solo enviamos la DIRECCIÓN deseada al Steering
-            steering.DesiredDir = (toTarget).Normalized();
+            // Asigna únicamente la intención global a TargetDir
+            steering.TargetDir = toTarget.Normalized();
             state.stateType = StateType.MOVING;
         }
     }

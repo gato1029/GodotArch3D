@@ -16,9 +16,9 @@ public class BlackyStaticGridLayer
 
     private readonly byte[] _grid;
 
-    public BlackyStaticGridLayer(float worldWidth, float worldHeight, float minCellSize)
+    public BlackyStaticGridLayer(float worldWidth, float worldHeight, float minCellSizePixel)
     {
-        InvCellSize = 1.0f / minCellSize;
+        InvCellSize = 1.0f / minCellSizePixel;
         GridWidth = Mathf.CeilToInt(worldWidth * InvCellSize);
         GridHeight = Mathf.CeilToInt(worldHeight * InvCellSize);
 

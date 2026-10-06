@@ -142,6 +142,7 @@ public class BlackyCharacterCreator
         entity.Add<UnitTag>();
 
         dynamicHash.Register(spatialIDComponent.Value, position.X, position.Y, entity,team);
+        world.State.GridSparseManager.RegisterUnit(position);
 
         if (DEBUG_COLLIDERS)
         {
@@ -203,7 +204,7 @@ public class BlackyCharacterCreator
         entity.Set(new PositionComponent(position, Vector2I.Zero, height));
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.OCHO, GodotEcsArch.sources.components.AnimationDirection.LEFT));
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0),18));
-        entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0,0,0));
+        entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0,0,0,0,0));
         entity.Set(new PlayerInputComponent());
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         if (health!=0)
@@ -219,7 +220,7 @@ public class BlackyCharacterCreator
         float rvoRadius = MeshCreator.PixelsToUnits(16);
 
         entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 0f, 0,0));
-        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero));
+        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero, Vector2.Zero));
         entity.Set(new WeaponComponent(1, false));
 
         AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody,1);
@@ -287,8 +288,8 @@ public class BlackyCharacterCreator
         entity.Set(new UnitDefinitionComponent(characterId));
         entity.Set(new PositionComponent(position, Vector2I.Zero, 1));
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, animationDir.directionAnimationType, GodotEcsArch.sources.components.AnimationDirection.LEFT));
-        entity.Set(new VelocityComponent(new Vector2(0, 0), 3f, new Vector2(0, 0), 15));
-        entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0,0,0));
+        entity.Set(new VelocityComponent(new Vector2(0, 0), 3f, new Vector2(0, 0), 20));
+        entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0,0,0,0,0));
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         entity.Add<StoppedTag>();
         entity.Add<UseBoidTag>();
@@ -316,7 +317,7 @@ public class BlackyCharacterCreator
         }
 
         entity.Set(new AttackPendingComponent(false, default,false,Vector2.Zero,0));
-        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero));
+        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero,Vector2.Zero));
 
         AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody,2);
 

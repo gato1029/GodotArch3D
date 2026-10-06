@@ -2,6 +2,7 @@ using Flecs.NET.Core;
 using Godot;
 
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.GridSparse;
 using GodotEcsArch.sources.BlackyEngine.PathFinding;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
@@ -40,6 +41,7 @@ public sealed class BlackyWorldState : IDisposable
     public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatialBuildings { get; }
     public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatialResources { get; }
     public StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> StaticSpatialTerrain { get; }
+    public BlackyWorldGridManager GridSparseManager { get; }
     public BlackyChunkedBitGrid GridMove { get; }
 
     public BlackyChunkRenderData RenderData { get; }
@@ -67,6 +69,7 @@ public sealed class BlackyWorldState : IDisposable
         StaticSpatialTerrain = new StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData>(config.MapSize.X, config.MapSize.Y, 32, 100_000,50_000);
         GridMove = new BlackyChunkedBitGrid(config.MapSize.X, config.MapSize.Y, 16);
 
+        GridSparseManager = new BlackyWorldGridManager();
         RenderData = new BlackyChunkRenderData(config.ChunkSize, config.HeightCount);
         SpatialEntityMap = new BlackySpatialEntityMap();
         TilePalette = new BlackyPersistentTilePalette();

@@ -5,6 +5,57 @@ using GodotFlecs.sources.Flecs.Components;
 
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
 
+
+public class GridSparseClearSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate; // Justo después de Clear
+    protected override bool MultiThreaded => false; // Escritura en Hash no es Thread-Safe
+    protected override bool HasQuery => false;
+
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+    
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var blackyWorld = it.World().GetCtx<BlackyWorld>();
+
+        if (blackyWorld == null) return;
+      
+        blackyWorld.State.GridSparseManager.BeginDynamicFrame();
+    }
+}
+public class GridSparseRegisterSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate; 
+    protected override bool MultiThreaded => true; 
+
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+        qb.With<PositionComponent>()
+          .With<SpatialIDComponent>()
+          .With<UnitTag>();          
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var blackyWorld = it.World().GetCtx<BlackyWorld>();
+
+        if (blackyWorld == null) return;
+
+        var posArray = it.Field<PositionComponent>(0);
+        var sidArray = it.Field<SpatialIDComponent>(1);
+
+        for (int i = 0; i < it.Count(); i++)
+        {
+            ref var p = ref posArray[i];            
+
+            blackyWorld.State.GridSparseManager.RegisterUnit(p.position);
+        }
+    }
+}
+
 public class RegisterFastHashSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate; // Justo después de Clear
@@ -21,6 +72,7 @@ public class RegisterFastHashSystem : FlecsSystemBase
     protected override void OnIter(Iter it)
     {
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
+        
         if (blackyWorld == null) return;
 
         var posArray = it.Field<PositionComponent>(0);        
@@ -34,7 +86,7 @@ public class RegisterFastHashSystem : FlecsSystemBase
             //Calculamos posición real del colisionador
             float actualX = p.position.X; //+ col.OffsetX;
             float actualY = p.position.Y;// + col.OffsetY;
-            
+           
             //Registramos en el hash dinámico
             blackyWorld.State.DynamicHash.UpdatePosition(sid.Value, actualX, actualY);
         }

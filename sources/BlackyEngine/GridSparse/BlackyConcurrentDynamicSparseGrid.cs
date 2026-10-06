@@ -6,6 +6,8 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Godot;
+using GodotEcsArch.sources.utils;
+using SadRogue.Primitives;
 
 public class BlackyConcurrentDynamicSparseGrid
 {
@@ -18,12 +20,14 @@ public class BlackyConcurrentDynamicSparseGrid
     private readonly int[] _grid;
     private readonly int[] _occupiedIndices;
     private int _occupiedCount = 0;
-
-    public BlackyConcurrentDynamicSparseGrid(float worldWidth, float worldHeight, float minCellSize, int maxOccupiedCells = 150000)
-    {
-        InvCellSize = 1.0f / minCellSize;
-        GridWidth = Mathf.CeilToInt(worldWidth * InvCellSize);
-        GridHeight = Mathf.CeilToInt(worldHeight * InvCellSize);
+    private const float pixelsPerUnit = 0.03125f; // 1 px → 1 unit /32 px
+    private int sizeTileBase = 16;
+    public BlackyConcurrentDynamicSparseGrid(float worldWidth, float worldHeight, int CellSizePixel, int maxOccupiedCells = 150000)
+    {        
+        InvCellSize = pixelsPerUnit*CellSizePixel;
+        int ws = sizeTileBase / CellSizePixel;
+        GridWidth = Mathf.CeilToInt(worldWidth * ws);
+        GridHeight = Mathf.CeilToInt(worldHeight * ws);
 
         HalfGridWidth = GridWidth / 2;
         HalfGridHeight = GridHeight / 2;
@@ -54,10 +58,10 @@ public class BlackyConcurrentDynamicSparseGrid
         float minWorldY = worldPos.Y - radius;
         float maxWorldY = worldPos.Y + radius;
 
-        int minCx = Math.Max(0, Mathf.FloorToInt(minWorldX * InvCellSize) + HalfGridWidth);
-        int maxCx = Math.Min(GridWidth - 1, Mathf.FloorToInt(maxWorldX * InvCellSize) + HalfGridWidth);
-        int minCy = Math.Max(0, Mathf.FloorToInt(minWorldY * InvCellSize) + HalfGridHeight);
-        int maxCy = Math.Min(GridHeight - 1, Mathf.FloorToInt(maxWorldY * InvCellSize) + HalfGridHeight);
+        int minCx = Math.Max(0, Mathf.FloorToInt(minWorldX / InvCellSize) + HalfGridWidth);
+        int maxCx = Math.Min(GridWidth - 1, Mathf.FloorToInt(maxWorldX / InvCellSize) + HalfGridWidth);
+        int minCy = Math.Max(0, Mathf.FloorToInt(minWorldY / InvCellSize) + HalfGridHeight);
+        int maxCy = Math.Min(GridHeight - 1, Mathf.FloorToInt(maxWorldY / InvCellSize) + HalfGridHeight);
 
         for (int cy = minCy; cy <= maxCy; cy++)
         {
@@ -79,9 +83,9 @@ public class BlackyConcurrentDynamicSparseGrid
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetIndex(in Vector2 worldPos)
-    {
-        int cx = Mathf.FloorToInt(worldPos.X * InvCellSize) + HalfGridWidth;
-        int cy = Mathf.FloorToInt(worldPos.Y * InvCellSize) + HalfGridHeight;
+    {                
+        int cx = Mathf.FloorToInt(worldPos.X / InvCellSize) + HalfGridWidth;
+        int cy = Mathf.FloorToInt(worldPos.Y / InvCellSize) + HalfGridHeight;
 
         if (cx < 0 || cx >= GridWidth || cy < 0 || cy >= GridHeight)
             return -1;

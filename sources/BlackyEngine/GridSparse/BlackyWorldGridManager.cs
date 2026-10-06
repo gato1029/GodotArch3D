@@ -1,7 +1,8 @@
+using Godot;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Godot;
 namespace GodotEcsArch.sources.BlackyEngine.GridSparse;
 
 
@@ -23,14 +24,18 @@ namespace GodotEcsArch.sources.BlackyEngine.GridSparse;
  */
 public class BlackyWorldGridManager
 {
+
     // Instancia interna del combinador
     public readonly BlackyCombinedGridManager Grid;
-
+    public ConcurrentDictionary<Vector2I, int> ClaimedCellsThisFrame = new();
     // =========================================================================
     // CONSTANTES Y CONFIGURACIÓN DEL ATLAS
     // =========================================================================
     public static readonly Vector2 MaxMainWorldSize = new Vector2(4096f, 4096f);
     public static readonly Vector2 MaxMiniWorldSize = new Vector2(1024f, 1024f);
+  
+    public const float AtlasWidth = 6144f ;
+    public const float AtlasHeight= 4096f ;
 
     public static readonly Vector2 MainWorldMin = new Vector2(-2048f, -2048f);
     public static readonly Vector2 Slot0Min = new Vector2(2048f, -2048f);
@@ -42,14 +47,16 @@ public class BlackyWorldGridManager
     // CONSTRUCTOR
     // =========================================================================
     public BlackyWorldGridManager(
-        float staticCellSize = 1.0f,
-        float dynamicCellSize = 0.5f,
+        float staticCellSize = 16.0f,
+        int dynamicCellSize = 16,
         int maxOccupiedDynamicCells = 150000)
     {
         // El Atlas completo mide 6144 x 4096 unidades
         Grid = new BlackyCombinedGridManager(
-            worldWidth: 6144f,
-            worldHeight: 4096f,
+            worldWidthStatic: AtlasWidth,
+            worldHeightStatic: AtlasHeight,
+            worldWidthDynamic: AtlasWidth,
+            worldHeightDynamic: AtlasHeight,
             staticCellSize: staticCellSize,
             dynamicCellSize: dynamicCellSize,
             maxOccupiedCells: maxOccupiedDynamicCells
@@ -66,6 +73,7 @@ public class BlackyWorldGridManager
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void BeginDynamicFrame()
     {
+        ClaimedCellsThisFrame.Clear();
         Grid.DynamicLayer.ClearOccupiedOnly();
     }
 
@@ -73,9 +81,9 @@ public class BlackyWorldGridManager
     /// Registra la posición de una unidad individual en el Atlas.
     /// 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void RegisterUnit(in Vector2 globalAtlasPos, float radius = 0.25f)
+    public void RegisterUnit(in Vector2 globalAtlasPos, float radius = 0.5f)
     {
-        if (radius <= 0.25f)
+        if (radius <= 0.5f)
         {
             Grid.DynamicLayer.OccupyCell(globalAtlasPos);
         }

@@ -85,6 +85,7 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
 
             if (field == null)
             {
+                steering.TargetDir = Vector2.Zero;
                 steering.DesiredDir = Vector2.Zero;
                 continue;
             }
@@ -99,7 +100,7 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
                 // sin que nadie recalcule nada para ella.
                 steering.DesiredDir = Vector2.Zero;
                 state.stateType = StateType.IDLE;
-
+                steering.TargetDir = Vector2.Zero;
                 if (!e.Has<StoppedTag>())
                     e.Add<StoppedTag>();
 
@@ -107,7 +108,7 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
             }
 
             state.stateType = StateType.MOVING;
-            steering.DesiredDir = steering.DesiredDir.Lerp(sampledDir, 0.25f).Normalized();
+            steering.TargetDir = steering.TargetDir.Lerp(sampledDir, 0.25f).Normalized();
         }
     }
 }

@@ -381,7 +381,9 @@ public record struct MoveResolutorComponent(
     float SeparationForceMagnitude,
     float StuckTimer,
     float RetryTimer,        // NUEVO: cooldown entre intentos de avance
-    int ConsecutiveBlocks   // NUEVO: cuántas veces seguidas no pudo avanzar
+    int ConsecutiveBlocks,
+    int LastConeIndex,
+    float AvoidanceTimer// NUEVO: cuántas veces seguidas no pudo avanzar
 );
 
 [RegisterComponentFlecs]
@@ -548,7 +550,8 @@ public record struct SteeringComponent
 (
     float SeparationRadius,
     float SeparationWeight,
-    Vector2 DesiredDir
+    Vector2 DesiredDir,
+    Vector2 TargetDir
 );
 
 [RegisterComponentFlecs]

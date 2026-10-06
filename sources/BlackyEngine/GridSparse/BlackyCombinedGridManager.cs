@@ -10,17 +10,19 @@ public class BlackyCombinedGridManager
     public readonly BlackyConcurrentDynamicSparseGrid DynamicLayer;
 
     public BlackyCombinedGridManager(
-        float worldWidth,
-        float worldHeight,
-        float staticCellSize = 1.0f,
-        float dynamicCellSize = 0.5f,
+        float worldWidthStatic,
+        float worldHeightStatic,
+        float worldWidthDynamic,
+        float worldHeightDynamic,
+        float staticCellSize = 16f,
+        int dynamicCellSize = 16,
         int maxOccupiedCells = 150000)
     {
         // La capa estática usa celdas más grandes (ej: 1.0f para tiles del mapa)
-        StaticLayer = new BlackyStaticGridLayer(worldWidth, worldHeight, staticCellSize);
+        StaticLayer = new BlackyStaticGridLayer(worldWidthStatic, worldHeightStatic, staticCellSize);
 
         // La capa dinámica usa celdas más pequeñas (ej: 0.5f para movimiento preciso de tropas)
-        DynamicLayer = new BlackyConcurrentDynamicSparseGrid(worldWidth, worldHeight, dynamicCellSize, maxOccupiedCells);
+        DynamicLayer = new BlackyConcurrentDynamicSparseGrid(worldWidthDynamic, worldHeightDynamic, dynamicCellSize, maxOccupiedCells);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
