@@ -770,7 +770,7 @@ public partial class RTSSelectionManager : Node2D
                 entity.Remove<PathReferenceComponent>();
             }
 
-            entity.Set(new FlowFieldFollowerComponent(fieldId));
+            entity.Set(new FlowFieldFollowerComponent(fieldId,false));
 
             if (entity.Has<MoveResolutorComponent>())
             {

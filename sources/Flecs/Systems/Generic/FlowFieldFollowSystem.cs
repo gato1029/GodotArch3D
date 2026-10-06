@@ -79,6 +79,7 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
             ref var follower = ref followerArray[i];
             ref var steering = ref steeringArray[i];
             ref var state = ref stateArray[i];
+            var e = it.Entity(i);
 
             var field = flowFieldManager.GetField(follower.FlowFieldId);
 
@@ -87,8 +88,26 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
                 steering.DesiredDir = Vector2.Zero;
                 continue;
             }
+
+            Vector2 sampledDir = field.SampleInterpolated(pos.position);
+
+            if (sampledDir == Vector2.Zero)
+            {
+                // Entró al disco de destino: se asienta aquí,
+                // definitivamente. StoppedTag la excluye de este
+                // mismo sistema y de SteeringSystem — queda quieta
+                // sin que nadie recalcule nada para ella.
+                steering.DesiredDir = Vector2.Zero;
+                state.stateType = StateType.IDLE;
+
+                if (!e.Has<StoppedTag>())
+                    e.Add<StoppedTag>();
+
+                continue;
+            }
+
             state.stateType = StateType.MOVING;
-            steering.DesiredDir = field.SampleInterpolated(pos.position);
+            steering.DesiredDir = steering.DesiredDir.Lerp(sampledDir, 0.25f).Normalized();
         }
     }
 }

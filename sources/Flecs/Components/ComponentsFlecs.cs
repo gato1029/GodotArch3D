@@ -379,8 +379,9 @@ public record struct MoveResolutorComponent(
     Vector2 ResolveDir,
     float PenetrationMagnitude, 
     float SeparationForceMagnitude,
-    float StuckTimer
-    // <-- Nuevo campo
+    float StuckTimer,
+    float RetryTimer,        // NUEVO: cooldown entre intentos de avance
+    int ConsecutiveBlocks   // NUEVO: cuántas veces seguidas no pudo avanzar
 );
 
 [RegisterComponentFlecs]
@@ -558,7 +559,8 @@ public record struct SteeringStateComponent
 [RegisterComponentFlecs]
 public record struct FlowFieldFollowerComponent
 (
-    int FlowFieldId
+    int FlowFieldId,
+     bool HasSettled // NUEVO: ya se asentó en el disco de llegada, dejó de perseguir el centro
 );
 
 [RegisterComponentFlecs]

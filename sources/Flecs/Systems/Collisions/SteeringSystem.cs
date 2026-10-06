@@ -3,25 +3,17 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
-using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using static Flecs.NET.Core.Ecs;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Collisions;
 
 public class SteeringSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => true;
+    protected override bool MultiThreaded => false;
 
     const int MAX_NEIGHBORS = 6;
 
@@ -76,11 +68,6 @@ public class SteeringSystem : FlecsSystemBase
                 desiredDir = desiredDir.Normalized();
             }
 
-            // NOTA: ya NO salimos aquí cuando desiredDir es cero.
-            // Una unidad sin dirección (por ejemplo, llegó al disco
-            // de destino de un flow field) igual necesita avoidance
-            // para separarse de otras que converjan al mismo punto.
-
             // =====================================================
             // DATOS DE SEPARACIÓN
             // =====================================================
@@ -91,7 +78,7 @@ public class SteeringSystem : FlecsSystemBase
             int neighborCount = 0;
 
             // =====================================================
-            // POSICIÓN FUTURA (si no hay desiredDir, usamos la posición actual)
+            // POSICIÓN FUTURA
             // =====================================================
             Vector2 posFuture = hasDesiredDir
                 ? pos.position + desiredDir * vel.MaxSpeed * it.DeltaTime()
@@ -161,8 +148,8 @@ public class SteeringSystem : FlecsSystemBase
 
                             neighborCount++;
 
-                            if (neighborCount >= MAX_NEIGHBORS)
-                                break;
+                            //if (neighborCount >= MAX_NEIGHBORS)
+                            //    break;
                         }
 
                         idx = dynGrid.GetNext(idx);
@@ -205,9 +192,6 @@ public class SteeringSystem : FlecsSystemBase
             }
             else if (avoidance.LengthSquared() > 0.0001f)
             {
-                // Sin dirección propia: usamos un eje fijo del mundo
-                // (no relativo a desiredDir, porque no existe) para
-                // seguir rompiendo empates simétricos entre vecinos.
                 float side = (sid.Value % 2 == 0) ? 1f : -1f;
                 Vector2 worldPerp = new Vector2(0, 1) * side;
                 avoidanceLateral += worldPerp * 0.15f;
@@ -215,7 +199,7 @@ public class SteeringSystem : FlecsSystemBase
 
             Vector2 finalDir = hasDesiredDir
                 ? desiredDir * (1f - crowdInfluence) + avoidanceLateral * avoidanceWeight
-                : avoidanceLateral * avoidanceWeight; // pura separación, sin avance
+                : avoidanceLateral * avoidanceWeight;
 
             float lenSq = finalDir.LengthSquared();
 
@@ -223,10 +207,6 @@ public class SteeringSystem : FlecsSystemBase
             {
                 vel.desiredVel = Vector2.Zero;
 
-                // Solo acumulamos BlockedTimer si la unidad REALMENTE
-                // quería avanzar a algún lado y no pudo — una unidad
-                // sin desiredDir (ya llegó, sin vecinos que la empujen)
-                // está correctamente detenida, no "bloqueada".
                 if (hasDesiredDir)
                 {
                     res.BlockedTimer += it.DeltaTime();
@@ -238,8 +218,7 @@ public class SteeringSystem : FlecsSystemBase
             finalDir /= MathF.Sqrt(lenSq);
 
             // =====================================================
-            // DETECCIÓN DE BLOQUEO — solo aplica si había intención
-            // real de avanzar hacia algo (hasDesiredDir).
+            // DETECCIÓN DE BLOQUEO / ASENTAMIENTO EN HORDA
             // =====================================================
             if (hasDesiredDir)
             {
@@ -252,19 +231,36 @@ public class SteeringSystem : FlecsSystemBase
                 {
                     res.BlockedTimer += it.DeltaTime();
 
-                    if (res.BlockedTimer >= 0.5f)
+                    // -------------------------------------------------
+                    // Lleva un rato sostenido sin progresar, rodeada de
+                    // gente: la ASENTAMOS definitivamente como parte de
+                    // la horda, en vez de bloquearla temporalmente (eso
+                    // generaba el titileo). Cubre tanto colisión directa
+                    // como el caso de "orbita sin avanzar nunca" que solo
+                    // el avoidance puede detectar.
+                    // -------------------------------------------------
+                    if (res.BlockedTimer >= 0.6f)
                     {
-                        res.Blocked = true;
                         vel.desiredVel = Vector2.Zero;
+                        vel.currentVel = Vector2.Zero; // <- frenar también la velocidad real
+
+                        // Corrección de último momento: si al asentarnos quedamos
+                        // solapados con un vecino, nos separamos ANTES de congelar
+                        // la posición para siempre.
+                        ResolveOverlapOnSettle(ref pos, ref col, sid, dynGrid);
+
+                        if (!it.Entity(i).Has<StoppedTag>())
+                            it.Entity(i).Add<StoppedTag>();
+
                         continue;
                     }
                 }
-
-                if (res.BlockedTimer >= 0.35f)
+                else
                 {
-                    res.Blocked = true;
-                    vel.desiredVel = Vector2.Zero;
-                    continue;
+                    // Progresando bien: decaimiento gradual, no reseteo
+                    // instantáneo — evita que fluctuaciones puntuales
+                    // borren todo el progreso acumulado hacia el asentamiento.
+                    res.BlockedTimer = MathF.Max(0f, res.BlockedTimer - it.DeltaTime() * 0.5f);
                 }
             }
 
@@ -276,4 +272,45 @@ public class SteeringSystem : FlecsSystemBase
             vel.desiredVel = finalDir * vel.MaxSpeed * speedFactor;
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ResolveOverlapOnSettle(
+    ref PositionComponent pos,
+    ref MoveColliderComponent col,
+    SpatialIDComponent sid,
+    FastSpatialHash dynGrid)
+    {
+        Span<int> neighbors = stackalloc int[8];
+        var count = dynGrid.QueryNodesBoundedClosestLayersFiltered(pos.position.X, pos.position.Y, col.Radius * 2f, 0, neighbors);
+
+        for (int ii = 0; ii < count; ii++)
+        {
+            int otherSid = dynGrid.GetSpatialID(neighbors[ii]);
+            if (sid.Value == otherSid) continue;
+
+            Entity other = dynGrid.GetEntity(neighbors[ii]);
+            if (!other.IsAlive() || other.Has<DeadTag>()) continue;
+
+            ref var otherPos = ref other.GetMut<PositionComponent>();
+            ref var otherCol = ref other.GetMut<MoveColliderComponent>();
+
+            float dx = pos.position.X - otherPos.position.X;
+            float dy = pos.position.Y - otherPos.position.Y;
+            float distSq = dx * dx + dy * dy;
+            float minDist = col.Radius + otherCol.Radius;
+
+            if (distSq < minDist * minDist && distSq > 0.0001f)
+            {
+                float dist = MathF.Sqrt(distSq);
+                float overlap = minDist - dist;
+                float inv = 1f / dist;
+
+                // Empujamos SOLO a esta unidad (la que se está asentando
+                // recién ahora) — la otra puede ya estar asentada/congelada,
+                // así que no la movemos a ella para no reabrir otro solape.
+                pos.position += new Vector2(dx * inv, dy * inv) * overlap;
+            }
+        }
+    }
+
 }
