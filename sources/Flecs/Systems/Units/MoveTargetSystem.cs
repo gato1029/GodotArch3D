@@ -44,27 +44,45 @@ public class MoveTargetSystem : FlecsSystemBase
             ref var steering = ref steeringArray[i];
             ref var resolutor = ref resolutorArray[i];
             ref var move = ref moveArray[i];
-      
 
-            Vector2 toTarget = target.Value - pos.position +move.Offset;
-            float distSq = toTarget.LengthSquared();
+            Vector2 toTarget = target.Value - pos.position;
+            float dist = toTarget.Length();
 
-            float umbralLlegada = 0.05f;
-       
+            // -------------------------------------------------
+            // Umbral de llegada relativo al tamaño físico de la
+            // unidad, no un punto matemático exacto — si el
+            // waypoint cae sobre (o cerca de) otro collider, es
+            // imposible ocupar el punto exacto, y antes nunca
+            // se consideraba "llegada".
+            // -------------------------------------------------
+            float arrivalThreshold = move.Radius;// + 0.15f;
 
-            if (distSq <= umbralLlegada* umbralLlegada) // Umbral de llegada
+            // -------------------------------------------------
+            // Llegada forzada: si llevamos varios intentos
+            // fallidos de GridSteeringSystem (ConsecutiveBlocks)
+            // MIENTRAS ya estamos razonablemente cerca del target,
+            // nos damos por "llegados" igual — evita el loop
+            // circular perpetuo cuando el punto exacto está
+            // ocupado por alguien que no se va a mover.
+            // -------------------------------------------------
+            bool closeEnoughToForceArrival = dist <= arrivalThreshold * 2.5f;// && resolutor.ConsecutiveBlocks >= 3;
+
+            if (dist <= arrivalThreshold || closeEnoughToForceArrival)
             {
                 resolutor.BlockedTimer = 0;
-                steering.DesiredDir = Vector2.Zero;
-                resolutor.Blocked = false; // liberas bloqueo
-                state.stateType = StateType.IDLE;
+                resolutor.AvoidanceTimer = 0;
                 resolutor.LastConeIndex = 0;
+                resolutor.ConsecutiveBlocks = 0;
+                steering.DesiredDir = Vector2.Zero;
+                steering.TargetDir = Vector2.Zero;
+                resolutor.Blocked = false;
+                state.stateType = StateType.IDLE;
+
                 it.Entity(i).Remove<MoveTargetComponent>();
-                it.Entity(i).Add<StoppedTag>();           
+                it.Entity(i).Add<StoppedTag>();
                 continue;
             }
 
-            // Asigna únicamente la intención global a TargetDir
             steering.TargetDir = toTarget.Normalized();
             state.stateType = StateType.MOVING;
         }

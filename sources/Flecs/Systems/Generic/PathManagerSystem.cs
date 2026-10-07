@@ -42,15 +42,16 @@ internal class PathManagerSystem : FlecsSystemBase
 
             if (pathRef.CurrentIndex < pathLength)
             {
-                // -------------------------------------------------
-                // Obtener waypoint
-                // -------------------------------------------------
                 Vector2 waypoint = pathRegistry.GetWaypoint(pathRef.PathId, pathRef.CurrentIndex);
-
-                // -------------------------------------------------
-                // Aplicar formación
-                // -------------------------------------------------
                 Vector2 nextTarget = waypoint + pathRef.FormationOffset;
+
+                if ( blackyWorld.State.GridSparseManager.IsBlocked(nextTarget) && pathRef.CurrentIndex < pathLength - 1)
+                {
+                    // Este waypoint ya está ocupado: saltamos directo al siguiente,
+                    // en vez de mandar a la unidad a perseguir un punto inalcanzable.
+                    pathRef.CurrentIndex++;
+                    continue; // o reestructura el loop para reevaluar sin esperar al próximo frame
+                }
 
                 // -------------------------------------------------
                 // Crear objetivo de movimiento

@@ -2,28 +2,27 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Collisions;
 
 public class GridSteeringSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
-    protected override bool MultiThreaded => false;
+    protected override bool MultiThreaded => false; // necesario: coordinación secuencial dentro del frame
 
     private const float RetryInterval = 0.3f;
     private const int MaxAttempts = 5;
-    // Margen adicional de anticipación (Lookahead) más allá del radio físico
-    private const float LookAheadMargin = 0.2f;
-    // Offsets del cono, en orden de preferencia: primero recto,
-    // luego alternando hacia los costados. ±30° = cono total de 60°.
-    // Nunca incluye ángulos hacia atrás, así que "retroceder" nunca
-    // es una opción posible — queda bloqueado por diseño del cono.
+    private const float LookAheadMargin = 0.05f;
+    private const float cellSize = 0.5f; // tamaño de celda para el hash espacial
+
     private static readonly float[] ConeOffsetsDeg = { 0f, 30f, -30f, 60f, -60f };
-    // Tiempo (en segundos) que mantendrá la dirección de esquiva antes de intentar reorientarse al objetivo
     private const float AvoidanceHoldTime = 2f;
+
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
@@ -40,10 +39,8 @@ public class GridSteeringSystem : FlecsSystemBase
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
 
-        var gridManager = world.State.GridSparseManager;
-        var claimedCells = world.State.GridSparseManager.ClaimedCellsThisFrame;
-
-        const float cellSize = 0.5f; // debe coincidir con dynamicCellSize del grid
+        var gridManager = world.State.GridSparseManager; // solo para terreno estático
+        var dynGrid = world.State.DynamicHash;            // fuente real de colisión entre unidades
 
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
@@ -54,6 +51,8 @@ public class GridSteeringSystem : FlecsSystemBase
 
         float dt = it.DeltaTime();
 
+        Span<int> neighbors = stackalloc int[8];
+
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
@@ -63,14 +62,11 @@ public class GridSteeringSystem : FlecsSystemBase
             ref var steering = ref steeringArray[i];
             ref var res = ref resArray[i];
             var e = it.Entity(i);
- // -------------------------------------------------
-            // Cooldown entre intentos: no revalidamos cada frame.
-            // -------------------------------------------------
+
             if (res.RetryTimer > 0f)
             {
                 res.RetryTimer -= dt;
                 vel.desiredVel = Vector2.Zero;
-                res.Blocked = false;
                 res.AvoidanceTimer = 0f;
                 continue;
             }
@@ -94,35 +90,28 @@ public class GridSteeringSystem : FlecsSystemBase
 
             targetDir = targetDir.Normalized();
 
-            // Consumo del temporizador de fijación de esquiva
             if (res.AvoidanceTimer > 0f)
             {
                 res.AvoidanceTimer -= dt;
             }
 
             Vector2 currentCenter = pos.position + col.Offset;
-            Vector2 currentAtlasPos = gridManager.MainWorldLocalToAtlasPos(currentCenter);
-            Vector2I currentCell = ToCell(currentAtlasPos, cellSize);
 
-            float probeDist = 0.5f + LookAheadMargin;
+            float probeDist = col.Radius + LookAheadMargin;
             float baseAngle = targetDir.Angle();
             bool found = false;
             Vector2 bestDir = Vector2.Zero;
             int chosenIndex = 0;
 
             int lastIdx = res.LastConeIndex;
-
-            // ¿Estamos dentro del periodo de compromiso de esquiva?
             bool inAvoidanceHold = res.AvoidanceTimer > 0f && lastIdx > 0 && lastIdx < ConeOffsetsDeg.Length;
-
+            Vector2I currentCell = ToCell(currentCenter, cellSize);
             for (int step = 0; step < ConeOffsetsDeg.Length; step++)
             {
                 int s;
 
                 if (inAvoidanceHold)
                 {
-                    // MIENTRAS DURE EL TIMER: Mantiene el ángulo de esquiva (lastIdx)
-                    // para darle tiempo a la unidad de avanzar y superar físicamente el obstáculo.
                     if (step == 0) s = lastIdx;
                     else if (step == 1) s = 0;
                     else
@@ -133,7 +122,6 @@ public class GridSteeringSystem : FlecsSystemBase
                 }
                 else
                 {
-                    // CUANDO EL TIMER EXPIRA: Vuelve a intentar apuntar directo al objetivo (0°)
                     if (step == 0) s = 0;
                     else if (step == 1 && lastIdx > 0 && lastIdx < ConeOffsetsDeg.Length) s = lastIdx;
                     else
@@ -145,27 +133,33 @@ public class GridSteeringSystem : FlecsSystemBase
 
                 float angle = baseAngle + Mathf.DegToRad(ConeOffsetsDeg[s]);
                 Vector2 candidateDir = Vector2.Right.Rotated(angle);
-                Vector2 candidateProbePos = currentCenter + candidateDir * probeDist;
+                Vector2 candidatePos = currentCenter + candidateDir * probeDist;
 
-                if (gridManager.IsBlocked(candidateProbePos))
+
+                Vector2I candidateCell = ToCell(candidatePos, cellSize);
+
+                // Si seguimos dentro de la misma celda que ya ocupamos,
+                // no hace falta validar nada — ya estamos físicamente ahí.
+                if (candidateCell != currentCell)
+                {
+                    if (gridManager.IsBlocked(candidatePos))
+                        continue;
+                }
+
+                if (CheckUnitsAtCandidate(candidatePos, col.Radius, sid.Value, neighbors, dynGrid))
                     continue;
 
-                Vector2I candidateCell = ToCell(candidateProbePos, cellSize);
 
-                if (candidateCell == currentCell || claimedCells.TryAdd(candidateCell, sid.Value))
-                {
-                    bestDir = candidateDir;
-                    found = true;
-                    chosenIndex = s;
-                    break;
-                }
+                bestDir = candidateDir;
+                found = true;
+                chosenIndex = s;
+                break;
             }
 
             if (found)
             {
                 if (chosenIndex > 0)
                 {
-                    // Solo iniciamos un nuevo ciclo de temporizador si no estábamos ya esquivando o si cambió de ángulo
                     if (!inAvoidanceHold || chosenIndex != lastIdx)
                     {
                         res.AvoidanceTimer = AvoidanceHoldTime;
@@ -173,7 +167,6 @@ public class GridSteeringSystem : FlecsSystemBase
                 }
                 else
                 {
-                    // Volvió con éxito a 0°: reseteamos la evasión
                     res.AvoidanceTimer = 0f;
                 }
 
@@ -181,6 +174,18 @@ public class GridSteeringSystem : FlecsSystemBase
                 steering.DesiredDir = bestDir;
                 vel.desiredVel = bestDir * vel.MaxSpeed;
                 res.ConsecutiveBlocks = 0;
+
+                // -------------------------------------------------
+                // Actualizamos la posición "intencional" en el hash
+                // AHORA, antes de procesar la siguiente unidad de
+                // este mismo frame — así la próxima consulta de
+                // CheckUnitsAtCandidate ya ve esta nueva posición,
+                // evitando que dos unidades elijan el mismo destino
+                // en el mismo frame (coordinación secuencial, válida
+                // porque el sistema es single-threaded).
+                // -------------------------------------------------
+                Vector2 predictedNextPos = pos.position + bestDir * vel.MaxSpeed * dt;
+                dynGrid.UpdatePosition(sid.Value, predictedNextPos.X,predictedNextPos.Y); // ajusta al método real de tu hash
             }
             else
             {
@@ -200,6 +205,32 @@ public class GridSteeringSystem : FlecsSystemBase
                 }
             }
         }
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    private bool CheckUnitsAtCandidate(
+        Vector2 candidatePos, float radius, int selfSid,
+        Span<int> neighbors, FastSpatialHash dynGrid)
+    {
+        int count = dynGrid.QueryNodesBoundedClosestLayersFiltered(candidatePos.X, candidatePos.Y, radius, 0, neighbors);
+
+        for (int ii = 0; ii < count; ii++)
+        {
+            int otherSid = dynGrid.GetSpatialID(neighbors[ii]);
+            if (otherSid == selfSid) continue;
+
+            Entity other = dynGrid.GetEntity(neighbors[ii]);
+            if (!other.IsAlive() || other.Has<DeadTag>()) continue;
+
+            var otherPos = other.Get<PositionComponent>().position;
+            var otherCol = other.Get<MoveColliderComponent>();
+
+            float dist = candidatePos.DistanceTo(otherPos + otherCol.Offset);
+            if (dist < radius + otherCol.Radius)
+                return true;
+        }
+
+        return false;
     }
 
     private static Vector2I ToCell(Vector2 atlasPos, float cellSize)

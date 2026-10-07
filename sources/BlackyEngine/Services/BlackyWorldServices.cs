@@ -118,7 +118,7 @@ public sealed class BlackyWorldServices
             state.OccupancyMap,
             state.SpatialEntityMap,
             EntityRenderer,
-            TerrainDataLienzo);
+            TerrainDataLienzo,world);
 
         BuildingPainter = new BlackyBuildingCreator(
             sim.Flecs,

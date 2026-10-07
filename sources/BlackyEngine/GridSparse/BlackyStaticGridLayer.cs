@@ -18,9 +18,9 @@ public class BlackyStaticGridLayer
 
     public BlackyStaticGridLayer(float worldWidth, float worldHeight, float minCellSizePixel)
     {
-        InvCellSize = 1.0f / minCellSizePixel;
-        GridWidth = Mathf.CeilToInt(worldWidth * InvCellSize);
-        GridHeight = Mathf.CeilToInt(worldHeight * InvCellSize);
+        InvCellSize = 0.5f;
+        GridWidth = Mathf.CeilToInt(worldWidth );
+        GridHeight = Mathf.CeilToInt(worldHeight);
 
         HalfGridWidth = GridWidth / 2;
         HalfGridHeight = GridHeight / 2;
@@ -113,7 +113,34 @@ public class BlackyStaticGridLayer
             }
         }
     }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void PlaceStaticObject(Vector2I cellPosition, byte obstacleType = 1)
+    {
+        int index = GetCellIndex(cellPosition);
 
+        if (index != -1)
+            _grid[index] = obstacleType;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void RemoveStaticObject(Vector2I cellPosition)
+    {
+        int index = GetCellIndex(cellPosition);
+
+        if (index != -1)
+            _grid[index] = 0;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int GetCellIndex(in Vector2I cellPosition)
+    {
+        int cx = cellPosition.X + HalfGridWidth;
+        int cy = cellPosition.Y + HalfGridHeight;
+
+        if (cx < 0 || cx >= GridWidth || cy < 0 || cy >= GridHeight)
+            return -1;
+
+        return cy * GridWidth + cx;
+    }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetIndex(in Vector2 worldPos)
     {

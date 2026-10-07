@@ -638,7 +638,7 @@ public partial class RTSSelectionManager : Node2D
                 resolutor.LastConeIndex = 0;
                 resolutor.AvoidanceTimer = 0f;
                 resolutor.ConsecutiveBlocks = 0;
-                
+                resolutor.RetryTimer = 0f;
 
                 unitsCommanded++;
             }

@@ -34,7 +34,7 @@ public class GridSparseRegisterSystem : FlecsSystemBase
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
-          .With<SpatialIDComponent>()
+          .With<MoveColliderComponent>()
           .With<UnitTag>();          
     }
 
@@ -45,13 +45,14 @@ public class GridSparseRegisterSystem : FlecsSystemBase
         if (blackyWorld == null) return;
 
         var posArray = it.Field<PositionComponent>(0);
-        var sidArray = it.Field<SpatialIDComponent>(1);
+        var colArray = it.Field<MoveColliderComponent>(1);
 
         for (int i = 0; i < it.Count(); i++)
         {
-            ref var p = ref posArray[i];            
+            ref var p = ref posArray[i];
+            ref var col = ref colArray[i];
 
-            blackyWorld.State.GridSparseManager.RegisterUnit(p.position);
+            blackyWorld.State.GridSparseManager.RegisterUnit(p.position +col.Offset);
         }
     }
 }

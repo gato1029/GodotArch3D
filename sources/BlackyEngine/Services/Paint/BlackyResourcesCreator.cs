@@ -1,6 +1,7 @@
 
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
@@ -48,13 +49,15 @@ public class BlackyResourcesCreator
     private const int MaxPerFrame = 100;
     private readonly ConcurrentQueue<RemoveResourceCommand> _removeCommandQueue = new();
     private const int MaxRemovalsPerFrame = 100; // O el presupuesto que prefieras
-    public BlackyResourcesCreator(StaticSpatialGridOptimizedGeneric<Entity> staticHash, FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainWorldData terrain)
+    private readonly BlackyWorld world;
+    public BlackyResourcesCreator(StaticSpatialGridOptimizedGeneric<Entity> staticHash, FlecsManager flecsManager, BlackyChunkOccupancyMap occupancyMap, BlackySpatialEntityMap spatialEntityMap, BlackyEntityRenderSystem renderSystem, BlackyTerrainWorldData terrain, BlackyWorld world)
     {
         this.occupancyMap = occupancyMap;
         this.spatialEntityMap = spatialEntityMap;
         this.terrain = terrain;
         this.flecsManager = flecsManager;
         this.staticHashResource = staticHash;
+        this.world = world;
     }
 
 
@@ -191,6 +194,7 @@ public class BlackyResourcesCreator
 
         AsignarCollider(tilePosition.X, tilePosition.Y, entity, sprite);
         occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, sprite.tilesOcupancy, entity.Id.Value);
+        world.State.GridSparseManager.PlaceStaticObjectInWorld(tilePosition, sprite.tilesOcupancy);
 
         switch (sprite.tileSpriteType)
         {

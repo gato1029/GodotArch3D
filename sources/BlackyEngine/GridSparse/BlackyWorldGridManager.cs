@@ -1,4 +1,5 @@
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.PathFinding;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ public class BlackyWorldGridManager
     // CONSTRUCTOR
     // =========================================================================
     public BlackyWorldGridManager(
-        float staticCellSize = 16.0f,
+        float staticCellSize = 1,
         int dynamicCellSize = 16,
         int maxOccupiedDynamicCells = 150000)
     {
@@ -102,17 +103,31 @@ public class BlackyWorldGridManager
         Grid.StaticLayer.ClearRegion(MainWorldMin, MaxMainWorldSize);
         Grid.StaticLayer.LoadRegionData(MainWorldMin, obstacleMatrix);
     }
-
-    public void PlaceStaticObjectInMainWorld(Vector2 localCenterPos, Vector2 worldSize, byte obstacleType = 1)
+    public void PlaceStaticObjectInWorld(Vector2I cellPosition, List<KuroTile> tiles, byte obstacleType = 1)
     {
-        Vector2 atlasPos = MainWorldLocalToAtlasPos(localCenterPos);
-        Grid.StaticLayer.PlaceStaticObject(atlasPos, worldSize, obstacleType);
+        foreach (var tile in tiles)
+        {
+            int x = cellPosition.X + tile.x;
+            int y = cellPosition.Y + tile.y;
+            Grid.StaticLayer.PlaceStaticObject(new Vector2I(x, y), obstacleType);
+        }
+        
     }
+    //public void PlaceStaticObjectInMainWorld(Vector2 localCenterPos, Vector2 worldSize, byte obstacleType = 1)
+    //{
+    //    Vector2 atlasPos = MainWorldLocalToAtlasPos(localCenterPos);
+    //    Grid.StaticLayer.PlaceStaticObject(atlasPos, worldSize, obstacleType);
+    //}
 
-    public void RemoveStaticObjectFromMainWorld(Vector2 localCenterPos, Vector2 worldSize)
+    public void RemoveStaticObjectInWorld(Vector2I cellPosition, List<KuroTile> tiles)
     {
-        Vector2 atlasPos = MainWorldLocalToAtlasPos(localCenterPos);
-        Grid.StaticLayer.PlaceStaticObject(atlasPos, worldSize, obstacleType: 0);
+   
+        foreach (var tile in tiles)
+        {
+            int x = cellPosition.X + tile.x;
+            int y = cellPosition.Y + tile.y;
+            Grid.StaticLayer.RemoveStaticObject(new Vector2I(x, y));
+        }
     }
 
     // =========================================================================
