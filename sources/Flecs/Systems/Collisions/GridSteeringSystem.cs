@@ -3,6 +3,7 @@ using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
+using GodotEcsArch.sources.managers.Characters;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
@@ -15,13 +16,13 @@ public class GridSteeringSystem : FlecsSystemBase
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => false; // necesario: coordinación secuencial dentro del frame
 
-    private const float RetryInterval = 0.3f;
+    private const float RetryInterval = 0.5f;
     private const int MaxAttempts = 5;
     private const float LookAheadMargin = 0.05f;
     private const float cellSize = 0.5f; // tamaño de celda para el hash espacial
 
     private static readonly float[] ConeOffsetsDeg = { 0f, 30f, -30f, 60f, -60f };
-    private const float AvoidanceHoldTime = 2f;
+    private const float AvoidanceHoldTime = 0.2f;
 
     protected override void BuildQuery(ref QueryBuilder qb)
     {
@@ -31,6 +32,7 @@ public class GridSteeringSystem : FlecsSystemBase
           .With<VelocityComponent>()
           .With<SteeringComponent>()
           .With<MoveResolutorComponent>()
+          .With<StateComponent>()
           .Without<StoppedTag>();
     }
 
@@ -48,6 +50,7 @@ public class GridSteeringSystem : FlecsSystemBase
         var velArray = it.Field<VelocityComponent>(3);
         var steeringArray = it.Field<SteeringComponent>(4);
         var resArray = it.Field<MoveResolutorComponent>(5);
+        var stateArray = it.Field<StateComponent>(6);
 
         float dt = it.DeltaTime();
 
@@ -61,20 +64,21 @@ public class GridSteeringSystem : FlecsSystemBase
             ref var vel = ref velArray[i];
             ref var steering = ref steeringArray[i];
             ref var res = ref resArray[i];
+            ref var state = ref stateArray[i];
             var e = it.Entity(i);
 
             if (res.RetryTimer > 0f)
             {
-                res.RetryTimer -= dt;
-                vel.desiredVel = Vector2.Zero;
+                res.RetryTimer -= dt;                
                 res.AvoidanceTimer = 0f;
+                GoIdle(ref vel, ref state, ref steering);
                 continue;
             }
 
             if (res.Blocked)
-            {
-                vel.desiredVel = Vector2.Zero;
+            {                
                 res.AvoidanceTimer = 0f;
+                GoIdle(ref vel, ref state, ref steering);
                 continue;
             }
 
@@ -82,9 +86,8 @@ public class GridSteeringSystem : FlecsSystemBase
 
             if (targetDir == Vector2.Zero)
             {
-                steering.DesiredDir = Vector2.Zero;
-                vel.desiredVel = Vector2.Zero;
                 res.AvoidanceTimer = 0f;
+                GoIdle(ref vel, ref state, ref steering);
                 continue;
             }
 
@@ -143,7 +146,11 @@ public class GridSteeringSystem : FlecsSystemBase
                 if (candidateCell != currentCell)
                 {
                     if (gridManager.IsBlocked(candidatePos))
+                    {
+                        //break;
                         continue;
+                    }
+
                 }
 
                 if (CheckUnitsAtCandidate(candidatePos, col.Radius, sid.Value, neighbors, dynGrid))
@@ -195,7 +202,7 @@ public class GridSteeringSystem : FlecsSystemBase
                 vel.desiredVel = Vector2.Zero;
                 res.RetryTimer = RetryInterval;
                 res.ConsecutiveBlocks++;
-                res.Blocked = true;
+                GoIdle(ref vel, ref state, ref steering);
 
                 if (res.ConsecutiveBlocks >= MaxAttempts)
                 {
@@ -206,7 +213,14 @@ public class GridSteeringSystem : FlecsSystemBase
             }
         }
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void GoIdle(ref VelocityComponent vel, ref StateComponent state, ref SteeringComponent steering)
+    {
+        vel.desiredVel = Vector2.Zero;
+        vel.currentVel = Vector2.Zero; // MovementResolutionSystem no corre en IDLE: evita velocidad fantasma
+        steering.DesiredDir = Vector2.Zero;
+        state.stateType = StateType.IDLE;
+    }
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private bool CheckUnitsAtCandidate(
         Vector2 candidatePos, float radius, int selfSid,

@@ -70,24 +70,108 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             List<Vector2I> fullPath = FindPath(startTile, goalTile, radiusTiles);
             if (fullPath == null || fullPath.Count <= 2) return fullPath;
 
-            List<Vector2I> simplifiedPath = new();
-            simplifiedPath.Add(fullPath[0]);
+            // Suaviza sobre el path completo (tile a tile). Como cruza las uniones
+            // entre chunks, también elimina los quiebres que dejaban los puntos de
+            // cruce de GetOptimalBorderTile.
+            var smoothed = SmoothPath(fullPath, radiusTiles);
 
-            Vector2I lastDirection = fullPath[1] - fullPath[0];
+            return RemoveCollinear(smoothed);
+        }
 
-            for (int i = 1; i < fullPath.Count - 1; i++)
+        // Opcional: limpia puntos alineados que deja el límite de lookahead
+        // en tramos largos y rectos.
+        private static List<Vector2I> RemoveCollinear(List<Vector2I> path)
+        {
+            if (path.Count <= 2) return path;
+
+            var result = new List<Vector2I> { path[0] };
+
+            for (int i = 1; i < path.Count - 1; i++)
             {
-                Vector2I currentDirection = fullPath[i + 1] - fullPath[i];
+                Vector2I prev = result[^1];
+                Vector2I cur = path[i];
+                Vector2I next = path[i + 1];
 
-                if (currentDirection != lastDirection)
-                {
-                    simplifiedPath.Add(fullPath[i]);
-                    lastDirection = currentDirection;
-                }
+                Vector2I d1 = cur - prev;
+                Vector2I d2 = next - cur;
+                long cross = (long)d1.X * d2.Y - (long)d1.Y * d2.X;
+
+                if (cross != 0)
+                    result.Add(cur);
             }
 
-            simplifiedPath.Add(fullPath[^1]);
-            return simplifiedPath;
+            result.Add(path[^1]);
+            return result;
+        }
+        // Límite de salto: evita que una línea de 200 tiles se compruebe
+        // entera para cada ancla. 48 cubre casi cualquier tramo útil. // si se vuleve caro bajarlo a 32 o 24, pero no menos, porque entonces se pierde suavizado en diagonales largas.
+        private const int MaxSmoothLookahead = 48;
+
+        private List<Vector2I> SmoothPath(List<Vector2I> path, float radiusTiles)
+        {
+            if (path == null || path.Count <= 2)
+                return path;
+
+            var result = new List<Vector2I> { path[0] };
+            int anchor = 0;
+
+            while (anchor < path.Count - 1)
+            {
+                int next = anchor + 1; // siempre se puede avanzar al siguiente tile
+                int farthest = Math.Min(path.Count - 1, anchor + MaxSmoothLookahead);
+
+                // Del más lejano al más cercano: el primero con línea libre gana.
+                for (int j = farthest; j > anchor + 1; j--)
+                {
+                    if (HasLineOfSight(path[anchor], path[j], radiusTiles))
+                    {
+                        next = j;
+                        break;
+                    }
+                }
+
+                result.Add(path[next]);
+                anchor = next;
+            }
+
+            return result;
+        }
+        private bool IsTileWalkable(int x, int y, float radiusTiles)
+    => _clearanceMap.IsWalkableForRadius(x, y, radiusTiles);
+
+        // Bresenham sobre tiles. En pasos diagonales también valida los dos
+        // tiles ortogonales, para no cortar la esquina de un obstáculo.
+        private bool HasLineOfSight(Vector2I a, Vector2I b, float radiusTiles)
+        {
+            int x = a.X, y = a.Y;
+            int dx = Math.Abs(b.X - a.X);
+            int dy = Math.Abs(b.Y - a.Y);
+            int sx = a.X < b.X ? 1 : -1;
+            int sy = a.Y < b.Y ? 1 : -1;
+            int err = dx - dy;
+
+            while (true)
+            {
+                if (!IsTileWalkable(x, y, radiusTiles))
+                    return false;
+
+                if (x == b.X && y == b.Y)
+                    return true;
+
+                int e2 = 2 * err;
+                bool stepX = e2 > -dy;
+                bool stepY = e2 < dx;
+
+                if (stepX && stepY)
+                {
+                    if (!IsTileWalkable(x + sx, y, radiusTiles) ||
+                        !IsTileWalkable(x, y + sy, radiusTiles))
+                        return false;
+                }
+
+                if (stepX) { err -= dy; x += sx; }
+                if (stepY) { err += dx; y += sy; }
+            }
         }
 
         private List<Vector2I> FindPath(Vector2I startTile, Vector2I goalTile, float radiusTiles)

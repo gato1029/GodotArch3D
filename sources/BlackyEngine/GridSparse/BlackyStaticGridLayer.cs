@@ -33,10 +33,10 @@ public class BlackyStaticGridLayer
     /// 
     public void ClearRegion(Vector2 worldMin, Vector2 worldSize)
     {
-        int minCx = Math.Max(0, Mathf.FloorToInt(worldMin.X * InvCellSize) + HalfGridWidth);
-        int maxCx = Math.Min(GridWidth - 1, Mathf.FloorToInt((worldMin.X + worldSize.X) * InvCellSize) + HalfGridWidth);
-        int minCy = Math.Max(0, Mathf.FloorToInt(worldMin.Y * InvCellSize) + HalfGridHeight);
-        int maxCy = Math.Min(GridHeight - 1, Mathf.FloorToInt((worldMin.Y + worldSize.Y) * InvCellSize) + HalfGridHeight);
+        int minCx = Math.Max(0, Mathf.FloorToInt(worldMin.X / InvCellSize) + HalfGridWidth);
+        int maxCx = Math.Min(GridWidth - 1, Mathf.FloorToInt((worldMin.X + worldSize.X) / InvCellSize) + HalfGridWidth);
+        int minCy = Math.Max(0, Mathf.FloorToInt(worldMin.Y / InvCellSize) + HalfGridHeight);
+        int maxCy = Math.Min(GridHeight - 1, Mathf.FloorToInt((worldMin.Y + worldSize.Y) / InvCellSize) + HalfGridHeight);
 
         for (int cy = minCy; cy < maxCy; cy++)
         {
@@ -99,10 +99,10 @@ public class BlackyStaticGridLayer
         float minWorldY = worldCenterPos.Y - halfSize.Y;
         float maxWorldY = worldCenterPos.Y + halfSize.Y;
 
-        int minCx = Math.Max(0, Mathf.FloorToInt(minWorldX * InvCellSize) + HalfGridWidth);
-        int maxCx = Math.Min(GridWidth - 1, Mathf.FloorToInt(maxWorldX * InvCellSize) + HalfGridWidth);
-        int minCy = Math.Max(0, Mathf.FloorToInt(minWorldY * InvCellSize) + HalfGridHeight);
-        int maxCy = Math.Min(GridHeight - 1, Mathf.FloorToInt(maxWorldY * InvCellSize) + HalfGridHeight);
+        int minCx = Math.Max(0, Mathf.FloorToInt(minWorldX / InvCellSize) + HalfGridWidth);
+        int maxCx = Math.Min(GridWidth - 1, Mathf.FloorToInt(maxWorldX / InvCellSize) + HalfGridWidth);
+        int minCy = Math.Max(0, Mathf.FloorToInt(minWorldY / InvCellSize) + HalfGridHeight);
+        int maxCy = Math.Min(GridHeight - 1, Mathf.FloorToInt(maxWorldY / InvCellSize) + HalfGridHeight);
 
         for (int cy = minCy; cy <= maxCy; cy++)
         {
@@ -144,8 +144,8 @@ public class BlackyStaticGridLayer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetIndex(in Vector2 worldPos)
     {
-        int cx = Mathf.FloorToInt(worldPos.X * InvCellSize) + HalfGridWidth;
-        int cy = Mathf.FloorToInt(worldPos.Y * InvCellSize) + HalfGridHeight;
+        int cx = Mathf.FloorToInt(worldPos.X / InvCellSize) + HalfGridWidth;
+        int cy = Mathf.FloorToInt(worldPos.Y / InvCellSize) + HalfGridHeight;
 
         if (cx < 0 || cx >= GridWidth || cy < 0 || cy >= GridHeight)
             return -1;

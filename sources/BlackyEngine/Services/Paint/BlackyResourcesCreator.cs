@@ -117,6 +117,10 @@ public class BlackyResourcesCreator
             spatialEntityMap.Remove(entity);
             occupancyMap.ClearByEntity(0, tilePosition.X, tilePosition.Y);
 
+            var resource = entity.Get<ResourceDefinitionComponent>();
+            AtlasModsManager.TryGetTileSprite(resource.idSpriteTemplate, out var spriteNormal);
+            world.State.GridSparseManager.RemoveStaticObjectInWorld(tilePosition, spriteNormal.tilesOcupancy);
+
             // Destruye la entidad en Flecs de forma segura
             entity.Destruct();
         }

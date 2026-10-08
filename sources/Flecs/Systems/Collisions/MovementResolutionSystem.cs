@@ -89,13 +89,28 @@ public class MovementResolutionSystem : FlecsSystemBase
                 cha.stateType = StateType.IDLE; 
             }
             else
-            {   // 🎨 movimiento suave
-                float accel = vel.Acceleration > 0f ? vel.Acceleration : 8f; // valor de respaldo si no está seteado
-                vel.currentVel = vel.currentVel.MoveToward(vel.desiredVel, accel * dt);
+            {
+                float accel =  vel.Acceleration > 0f ? vel.Acceleration : 8f;
+
+                Vector2 desired = vel.desiredVel;
+                float desiredSpeed = desired.Length();
+                float currentSpeed = vel.currentVel.Length();
+
+                // Magnitud suavizada
+                float newSpeed = Mathf.MoveToward(currentSpeed, desiredSpeed, accel * dt);
+
+                // Dirección: la que se pide ahora. Si no hay deseo (frenando),
+                // se conserva la dirección actual para desacelerar en línea recta.
+                Vector2 dir;
+                if (desiredSpeed > 0.0001f)
+                    dir = desired / desiredSpeed;
+                else if (currentSpeed > 0.0001f)
+                    dir = vel.currentVel / currentSpeed;
+                else
+                    dir = Vector2.Zero;
+
+                vel.currentVel = dir * newSpeed;
                 pos.position += vel.currentVel * dt;
-                pos.tilePosition = TilesHelper.WorldPositionToTile(pos.position);
-                pos.height = blackyWorld.Services.HeightMapWorld.GetTopHeight(pos.tilePosition);
-                move.Blocked = false;                
             }
         }
     }

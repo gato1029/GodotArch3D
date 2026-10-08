@@ -57,7 +57,15 @@ public class BlackyPathRegistryManager
 
     public Vector2 GetWaypoint(int pathId, int index) => _pathPool[pathId].Points[index];
 
-    public int GetPathLength(int pathId) => _pathPool[pathId].Points.Length;
+    public int GetPathLength(int pathId)
+    {
+        if (_pathPool[pathId].Points==null)
+        {
+            return 0; // caso raro
+        }
+        return _pathPool[pathId].Points.Length;
+    }
+    
 
     // --- COMANDOS THREAD-SAFE ---
 

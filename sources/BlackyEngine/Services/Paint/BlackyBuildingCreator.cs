@@ -1,5 +1,7 @@
+
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Data;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
@@ -46,19 +48,20 @@ public class BlackyBuildingCreator
     private const bool DEBUG_COLLIDERS = false;
     private readonly Dictionary<int, List<int>> _colliderDebugMap = new();
     private readonly int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
-
+    private readonly BlackyWorld world;
     public BlackyBuildingCreator(
         FlecsManager flecsManager,
         BlackyChunkOccupancyMap occupancyMap,
         BlackySpatialEntityMap spatialEntityMap,
         StaticSpatialGridOptimizedGeneric<Entity> staticHash,
-        BlackyTerrainWorldData terrain)
+        BlackyTerrainWorldData terrain, BlackyWorld world)
     {
         this.flecsManager = flecsManager;
         this.occupancyMap = occupancyMap;
         this.spatialEntityMap = spatialEntityMap;
         this.staticHash = staticHash;
         this.terrain = terrain;
+        this.world = world;
     }
 
     // --- MÉTODOS PÚBLICOS DE ENCOLADO (Seguros para hilos secundarios) ---
@@ -157,6 +160,7 @@ public class BlackyBuildingCreator
 
         AsignarCollider(tilePosition.X, tilePosition.Y, entity, spriteNormal,out int idDebugBody,team);
         occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, spriteNormal.tilesOcupancy, entity.Id.Value);
+        world.State.GridSparseManager.PlaceStaticObjectInWorld(tilePosition, spriteNormal.tilesOcupancy);
         entity.Set(new RvoAgentDebugComponent(0, idDebugBody, 0, 0));
         // Renderizado
         switch (spriteNormal.tileSpriteType)
@@ -209,8 +213,16 @@ public class BlackyBuildingCreator
             var rangedAttack = entity.Get<RangedAttackComponent>();
             ContadoresHelper.Liberar(TipoContador.EdificiosUnidadesRango, rangedAttack.NumberUnitRange);
         }
+        if (entity.Has<BuildingDefinitionComponent>())
+        {
+            var build = entity.Get<BuildingDefinitionComponent>();
+            AtlasModsManager.TryGetTileSprite(build.idSpriteTemplateNormal, out var spriteNormal);
+            world.State.GridSparseManager.RemoveStaticObjectInWorld(tilePosition, spriteNormal.tilesOcupancy);
+
+        }
         spatialEntityMap.Remove(entity);
         occupancyMap.ClearByEntity(0, tilePosition.X, tilePosition.Y);
+      
         entity.Destruct();
     }
 

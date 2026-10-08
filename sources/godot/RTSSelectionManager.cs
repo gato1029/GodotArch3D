@@ -466,7 +466,7 @@ public partial class RTSSelectionManager : Node2D
         // ---------------------------------------------------------
         // 3. Crear formación
         // ---------------------------------------------------------
-        float spacing = .9f; // antes 1.5f
+        float spacing = .8f; // antes 1.5f
 
         var slots = FormationHelper.GenerateSlots(_currentFormation, selectedEntities.Count, spacing);
 
@@ -493,7 +493,7 @@ public partial class RTSSelectionManager : Node2D
         // ---------------------------------------------------------
         float formationLeadDistance = MathF.Min(spacing * 3.0f, totalMoveDistance * 0.5f);
 
-        Vector2 pathStart = groupCenter + movementDirection * formationLeadDistance;
+        Vector2 pathStart = groupCenter;// + movementDirection * formationLeadDistance;
 
         // ---------------------------------------------------------
         // 5b. Validar que el punto adelantado sea un origen válido
@@ -577,22 +577,29 @@ public partial class RTSSelectionManager : Node2D
             // ---------------------------------------------
             Vector2 entityPos = entity.Get<PositionComponent>().position;
 
-            int startIndex = 0;
-            Vector2 waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, 0);
+            //int startIndex = 0;
+            //Vector2 waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, 0);
+            //Vector2 firstTarget = waypoint + formationOffset;
+
+            //while (startIndex < pathLength - 1)
+            //{
+            //    Vector2 toWaypoint = firstTarget - entityPos;
+
+            //    // Si el waypoint está delante (o es ambiguo por estar muy cerca), lo aceptamos
+            //    if (toWaypoint.Dot(movementDirection) >= 0f || toWaypoint.LengthSquared() < 0.01f)
+            //        break;
+
+            //    startIndex++;
+            //    waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, startIndex);
+            //    firstTarget = waypoint + formationOffset;
+            //}
+
+            // Proyectamos la posición de la unidad "sin su offset" sobre el path
+            // original: equivale a proyectar sobre el path desplazado por su offset.
+            int startIndex = FindStartWaypointIndex(pathId, pathLength, entityPos - formationOffset);
+
+            Vector2 waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, startIndex);
             Vector2 firstTarget = waypoint + formationOffset;
-
-            while (startIndex < pathLength - 1)
-            {
-                Vector2 toWaypoint = firstTarget - entityPos;
-
-                // Si el waypoint está delante (o es ambiguo por estar muy cerca), lo aceptamos
-                if (toWaypoint.Dot(movementDirection) >= 0f || toWaypoint.LengthSquared() < 0.01f)
-                    break;
-
-                startIndex++;
-                waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, startIndex);
-                firstTarget = waypoint + formationOffset;
-            }
 
             // ---------------------------------------------
             // Validar ruta ANTES de comprometer una referencia
@@ -676,6 +683,51 @@ public partial class RTSSelectionManager : Node2D
         }
 
         GD.Print($"Moviendo {unitsCommanded} unidades a {targetPosition}");
+    }
+    private const float SkipFirstWaypointRadius = 1.0f;
+
+    private int FindStartWaypointIndex(int pathId, int pathLength, Vector2 localPos)
+    {
+        if (pathLength <= 1)
+            return 0;
+
+        var registry = _world.State.PathRegistryManager;
+
+        float bestDistSq = float.MaxValue;
+        int bestTarget = 0;
+
+        for (int i = 0; i < pathLength - 1; i++)
+        {
+            Vector2 a = registry.GetWaypoint(pathId, i);
+            Vector2 b = registry.GetWaypoint(pathId, i + 1);
+            Vector2 ab = b - a;
+            float lenSq = ab.LengthSquared();
+
+            float t = lenSq > 0.0001f
+                ? Mathf.Clamp((localPos - a).Dot(ab) / lenSq, 0f, 1f)
+                : 0f;
+
+            Vector2 closest = a + ab * t;
+            float distSq = localPos.DistanceSquaredTo(closest);
+
+            if (distSq < bestDistSq - 0.0001f)
+            {
+                bestDistSq = distSq;
+                bestTarget = (t <= 0f) ? i : i + 1;
+            }
+        }
+
+        // Si la unidad está antes del inicio del path pero ya cerca de wp0,
+        // ir a wp0 solo para girar de inmediato es un desvío inútil.
+        if (bestTarget == 0)
+        {
+            Vector2 wp0 = registry.GetWaypoint(pathId, 0);
+
+            if (localPos.DistanceSquaredTo(wp0) < SkipFirstWaypointRadius * SkipFirstWaypointRadius)
+                return 1;
+        }
+
+        return bestTarget;
     }
     private int ComputeGoalSpreadRadius(int unitCount)
     {

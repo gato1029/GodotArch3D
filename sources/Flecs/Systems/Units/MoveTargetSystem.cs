@@ -55,7 +55,7 @@ public class MoveTargetSystem : FlecsSystemBase
             // imposible ocupar el punto exacto, y antes nunca
             // se consideraba "llegada".
             // -------------------------------------------------
-            float arrivalThreshold = move.Radius;// + 0.15f;
+            float arrivalThreshold = 0.01f;// move.Radius;// + 0.15f;
 
             // -------------------------------------------------
             // Llegada forzada: si llevamos varios intentos
@@ -65,10 +65,11 @@ public class MoveTargetSystem : FlecsSystemBase
             // circular perpetuo cuando el punto exacto está
             // ocupado por alguien que no se va a mover.
             // -------------------------------------------------
-            bool closeEnoughToForceArrival = dist <= arrivalThreshold * 2.5f;// && resolutor.ConsecutiveBlocks >= 3;
+            bool closeEnoughToForceArrival = dist <= move.Radius * 2.5f && resolutor.ConsecutiveBlocks >= 2;
 
             if (dist <= arrivalThreshold || closeEnoughToForceArrival)
             {
+                bool hasMorePath = it.Entity(i).Has<PathReferenceComponent>();
                 resolutor.BlockedTimer = 0;
                 resolutor.AvoidanceTimer = 0;
                 resolutor.LastConeIndex = 0;
@@ -79,7 +80,13 @@ public class MoveTargetSystem : FlecsSystemBase
                 state.stateType = StateType.IDLE;
 
                 it.Entity(i).Remove<MoveTargetComponent>();
-                it.Entity(i).Add<StoppedTag>();
+                if (!hasMorePath)
+                {
+                    steering.DesiredDir = Vector2.Zero;
+                    steering.TargetDir = Vector2.Zero;
+                    state.stateType = StateType.IDLE;
+                    it.Entity(i).Add<StoppedTag>();
+                }
                 continue;
             }
 
