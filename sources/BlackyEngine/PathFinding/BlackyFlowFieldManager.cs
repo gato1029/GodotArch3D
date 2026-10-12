@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace GodotEcsArch.sources.BlackyEngine.PathFinding;
 
@@ -20,6 +21,7 @@ public class FlowFieldEntry
     public float RadiusTiles;
     public int GoalSpreadRadius;
     public FlowField Field;
+    public int SettledCount;
 }
 
 // ---------------------------------------------------------
@@ -207,6 +209,27 @@ public class BlackyFlowFieldManager
 
     #endregion
 
+
+    public int AddSettled(int fieldId)
+    {
+        var entry = GetEntry(fieldId);
+        return entry == null ? 0 : Interlocked.Increment(ref entry.SettledCount);
+    }
+
+    public void RemoveSettled(int fieldId)
+    {
+        var entry = GetEntry(fieldId);
+        if (entry == null) return;
+
+        if (Interlocked.Decrement(ref entry.SettledCount) < 0)
+            Interlocked.Increment(ref entry.SettledCount);   // protección ante doble descuento
+    }
+
+    public int GetSettledCount(int fieldId)
+    {
+        var entry = GetEntry(fieldId);
+        return entry == null ? 0 : Volatile.Read(ref entry.SettledCount);
+    }
     public void RemoveField(int id)
     {
         if (_entries.TryGetValue(id, out var entry))

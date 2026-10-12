@@ -175,6 +175,18 @@ FontSize = 12
 IconExpand = true
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
+[node name="ButtonPerfiladorBioma" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=819910477]
+custom_minimum_size = Vector2(48, 68.75)
+layout_mode = 2
+focus_mode = 1
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("9_37yya")
+ButtonText = "Perfilador"
+Padding = 8
+FontSize = 12
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
 [node name="MenuBar" type="MenuBar" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=2052876277]
 layout_mode = 2
 size_flags_horizontal = 3

@@ -125,7 +125,7 @@ public sealed class BlackyWorldServices
             state.OccupancyMap,
             state.SpatialEntityMap,
             state.StaticSpatialBuildings,
-            TerrainDataLienzo);
+            TerrainDataLienzo,world);
 
         ArrowPool = new ArrowPoolService(sim.Flecs.WorldFlecs);
     }

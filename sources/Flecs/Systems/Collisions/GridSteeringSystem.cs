@@ -33,6 +33,7 @@ public class GridSteeringSystem : FlecsSystemBase
           .With<SteeringComponent>()
           .With<MoveResolutorComponent>()
           .With<StateComponent>()
+          .Without<MovementMassiveTag>()
           .Without<StoppedTag>();
     }
 
@@ -143,15 +144,15 @@ public class GridSteeringSystem : FlecsSystemBase
 
                 // Si seguimos dentro de la misma celda que ya ocupamos,
                 // no hace falta validar nada — ya estamos físicamente ahí.
-                if (candidateCell != currentCell)
-                {
-                    if (gridManager.IsBlocked(candidatePos))
-                    {
-                        //break;
-                        continue;
-                    }
+                //if (candidateCell != currentCell)
+                //{
+                //    if (gridManager.IsBlocked(candidatePos))
+                //    {
+                //        //break;
+                //        continue;
+                //    }
 
-                }
+                //}
 
                 if (CheckUnitsAtCandidate(candidatePos, col.Radius, sid.Value, neighbors, dynGrid))
                     continue;

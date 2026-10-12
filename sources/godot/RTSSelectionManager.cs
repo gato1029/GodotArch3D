@@ -4,6 +4,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Generic;
 using GodotEcsArch.sources.BlackyEngine.PathFinding;
+using GodotEcsArch.sources.Flecs.Systems.Generic;
 using GodotEcsArch.sources.Flecs.Systems.Units;
 using GodotEcsArch.sources.managers;
 using GodotEcsArch.sources.managers.Mods;
@@ -553,7 +554,19 @@ public partial class RTSSelectionManager : Node2D
 
             if (!entity.IsAlive())
                 continue;
+            if (entity.Has<MovementMassiveTag>())
+                entity.Remove<MovementMassiveTag>();
 
+            if (entity.Has<FlowFieldFollowerComponent>())
+            {
+                var old = entity.Get<FlowFieldFollowerComponent>();
+                if (old.Counted)
+                {
+                    _world.State.FlowFieldManager.RemoveSettled(old.FlowFieldId);
+                }                
+                entity.Remove<FlowFieldFollowerComponent>();
+            }
+                
             // ---------------------------------------------
             // Liberar path anterior
             // ---------------------------------------------
@@ -750,15 +763,12 @@ public partial class RTSSelectionManager : Node2D
             return;
 
         // ---------------------------------------------------------
-        // 1. Centro del grupo (solo para calcular la región del campo,
-        // no se usa offset de formación aquí)
+        // 1. Centro del grupo (solo para calcular la región del campo)
         // ---------------------------------------------------------
         Vector2 groupCenter = Vector2.Zero;
 
         foreach (var entity in selectedEntities)
-        {
             groupCenter += entity.Get<PositionComponent>().position;
-        }
 
         groupCenter /= selectedEntities.Count;
 
@@ -769,10 +779,10 @@ public partial class RTSSelectionManager : Node2D
         Vector2I destinyTile = TilesHelper.WorldPositionToTile(targetPosition);
 
         // ---------------------------------------------------------
-        // 3. Región del campo: caja que envuelve origen y destino,
+        // 3. Región del campo: caja que envuelve origen y destino
         // más un margen para permitir rodeos de obstáculos.
         // ---------------------------------------------------------
-        const int RegionMargin = 10; // tiles extra alrededor de la caja justa
+        const int RegionMargin = 20;
 
         Vector2I regionMin = new(
             Mathf.Min(originTile.X, destinyTile.X) - RegionMargin,
@@ -783,12 +793,15 @@ public partial class RTSSelectionManager : Node2D
             Mathf.Max(originTile.Y, destinyTile.Y) + RegionMargin);
 
         // ---------------------------------------------------------
-        // 4. Reutilizar un campo existente si ya hay uno cercano,
-        // o crear uno nuevo.
+        // 4. Reutilizar un campo existente o crear uno nuevo.
         // ---------------------------------------------------------
         var flowFieldManager = _world.State.FlowFieldManager;
 
-        int requiredSpreadRadius = 1; //ComputeGoalSpreadRadius(selectedEntities.Count);
+        // La zona de meta debe poder alojar a toda la horda: con capacidad
+        // por celda, ~sqrt(N / capacidad) tiles de radio bastan.
+        int requiredSpreadRadius = Mathf.Clamp(
+            Mathf.CeilToInt(MathF.Sqrt(selectedEntities.Count / (float)CrowdSettings.Capacity)),
+            1, 6);
 
         int fieldId = flowFieldManager.FindNearestFieldId(originTile, destinyTile, requiredSpreadRadius);
 
@@ -801,15 +814,12 @@ public partial class RTSSelectionManager : Node2D
 
         if (fieldId == -1)
         {
-            // Destino no transitable: no se pudo construir el campo.
             GD.Print("No se pudo calcular un flow field hacia ese destino.");
             return;
         }
 
         // ---------------------------------------------------------
-        // 5. Asignar el seguidor a cada unidad, liberando cualquier
-        // path de A* que tuviera antes (son flujos de movimiento
-        // excluyentes, ver Without cruzados en las queries).
+        // 5. Asignar el seguidor a cada unidad.
         // ---------------------------------------------------------
         int unitsCommanded = 0;
 
@@ -818,7 +828,7 @@ public partial class RTSSelectionManager : Node2D
             if (!entity.IsAlive())
                 continue;
 
-            // Libera path de A* anterior si tenía (cambia de modo de movimiento)
+            // Sale del modo A*: libera el path y el objetivo puntual.
             if (entity.Has<PathReferenceComponent>())
             {
                 var oldPath = entity.Get<PathReferenceComponent>();
@@ -826,13 +836,35 @@ public partial class RTSSelectionManager : Node2D
                 entity.Remove<PathReferenceComponent>();
             }
 
-            entity.Set(new FlowFieldFollowerComponent(fieldId,false));
+            // Sin esto, MoveTargetSystem / GridSteeringSystem seguirían procesándola.
+            if (entity.Has<MoveTargetComponent>())
+                entity.Remove<MoveTargetComponent>();
 
+            // Pasa a modo masivo: es lo que la hace entrar en las queries de la horda
+            // y salir de las de movimiento individual.
+            if (!entity.Has<MovementMassiveTag>())
+                entity.Add<MovementMassiveTag>();
+
+            // Si ya estaba contada en un campo anterior, se descuenta.
+            if (entity.Has<FlowFieldFollowerComponent>())
+            {
+                var old = entity.Get<FlowFieldFollowerComponent>();
+                if (old.Counted)
+                    flowFieldManager.RemoveSettled(old.FlowFieldId);
+            }
+
+            entity.Set(new FlowFieldFollowerComponent(fieldId, Vector2.Zero, 0, targetPosition,false));
+
+            // Reset completo del estado de movimiento anterior.
             if (entity.Has<MoveResolutorComponent>())
             {
-                ref var resolutor = ref entity.GetMut<MoveResolutorComponent>();
-                resolutor.Blocked = false;
-                resolutor.BlockedTimer = 0f;
+                ref var res = ref entity.GetMut<MoveResolutorComponent>();
+                res.Blocked = false;
+                res.BlockedTimer = 0f;
+                res.RetryTimer = 0f;
+                res.ConsecutiveBlocks = 0;
+                res.AvoidanceTimer = 0f;
+                res.LastConeIndex = 0;
             }
 
             if (entity.Has<StoppedTag>())
@@ -841,7 +873,7 @@ public partial class RTSSelectionManager : Node2D
             unitsCommanded++;
         }
 
-        GD.Print($"[FlowField] Moviendo {unitsCommanded} unidades a {targetPosition} (field id={fieldId})");
+        GD.Print($"[FlowField] Moviendo {unitsCommanded} unidades a {targetPosition} (field id={fieldId}, spread={requiredSpreadRadius})");
     }
     private Entity FindEnemyEntityAtPoint(Vector2 point)
     {

@@ -2,7 +2,8 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
-using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.BlackyEngine.PathFinding;
+using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 
@@ -46,17 +47,19 @@ internal class FlowFieldUnstickSystem : FlecsSystemBase
     }
 }
 
+
+
+
 internal class FlowFieldFollowSystem : FlecsSystemBase
 {
-    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override ulong Phase => flecs.EcsPreUpdate;
     protected override bool MultiThreaded => true;
 
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
           .With<FlowFieldFollowerComponent>()
-          .With<SteeringComponent>()
-          .With<StateComponent>() 
+          .With<MovementMassiveTag>()
           .Without<StoppedTag>()
           .Without<DeadTag>();
     }
@@ -67,48 +70,84 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
         if (blackyWorld == null) return;
 
         var flowFieldManager = blackyWorld.State.FlowFieldManager;
+        if (flowFieldManager == null) return;
 
         var posArray = it.Field<PositionComponent>(0);
         var followerArray = it.Field<FlowFieldFollowerComponent>(1);
-        var steeringArray = it.Field<SteeringComponent>(2);
-        var stateArray = it.Field<StateComponent>(3);
+
+        // Casi toda la horda comparte el mismo campo: cacheamos el último
+        // lookup para no consultar el diccionario por cada unidad.
+        int lastId = int.MinValue;
+        FlowField lastField = null;
 
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
             ref var follower = ref followerArray[i];
-            ref var steering = ref steeringArray[i];
-            ref var state = ref stateArray[i];
-            var e = it.Entity(i);
 
-            var field = flowFieldManager.GetField(follower.FlowFieldId);
+            if (follower.FlowFieldId != lastId)
+            {
+                lastId = follower.FlowFieldId;
+                lastField = flowFieldManager.GetField(lastId);
+            }
 
+            FlowField field = lastField;
+
+            // Sin campo (invalidado y todavía sin reconstruir): esperar, no asentar.
             if (field == null)
             {
-                steering.TargetDir = Vector2.Zero;
-                steering.DesiredDir = Vector2.Zero;
+                follower.Status = 2;
+                follower.TargetDir = Vector2.Zero;
                 continue;
             }
 
-            Vector2 sampledDir = field.SampleInterpolated(pos.position);
+            Vector2 dir = field.SampleInterpolated(pos.position);
 
-            if (sampledDir == Vector2.Zero)
+            if (dir != Vector2.Zero)
             {
-                // Entró al disco de destino: se asienta aquí,
-                // definitivamente. StoppedTag la excluye de este
-                // mismo sistema y de SteeringSystem — queda quieta
-                // sin que nadie recalcule nada para ella.
-                steering.DesiredDir = Vector2.Zero;
-                state.stateType = StateType.IDLE;
-                steering.TargetDir = Vector2.Zero;
-                if (!e.Has<StoppedTag>())
-                    e.Add<StoppedTag>();
-
+                follower.Status = 0;
+                follower.TargetDir = dir;
                 continue;
             }
 
-            state.stateType = StateType.MOVING;
-            steering.TargetDir = steering.TargetDir.Lerp(sampledDir, 0.25f).Normalized();
+            // Dirección cero: solo ocurre en el GoalTile exacto o en una celda sin salida.
+            Vector2I tile = TilesHelper.WorldPositionToTile(pos.position);
+            follower.Status = field.IsGoalTile(tile) ? (byte)1 : (byte)2;
+            follower.TargetDir = Vector2.Zero;
+        }
+    }
+}
+internal static class CrowdSettings
+{
+    // Unidades máximas por celda. Con celdas de 1.0 y colliders de radio ~0.13 caben
+    // muchas más físicamente; 4 es conservador. Súbelo si la horda queda muy suelta.
+    public const int Capacity = 1;
+}
+internal class CrowdRegisterSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override bool MultiThreaded => true; // TryEnterCell es atómico
+
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+        qb.With<PositionComponent>()
+          .With<FlowFieldFollowerComponent>()
+          .With<MovementMassiveTag>()
+          .Without<DeadTag>();   // SIN excluir StoppedTag: las asentadas también ocupan celda
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var world = it.World().GetCtx<BlackyWorld>();
+        if (world == null) return;
+
+        var grid = world.State.GridSparseManager.Grid.DynamicLayer;
+        var posArray = it.Field<PositionComponent>(0);
+
+        for (int i = 0; i < it.Count(); i++)
+        {
+            int idx = grid.GetIndex(posArray[i].position);
+            grid.TryEnterCell(idx, CrowdSettings.Capacity);
         }
     }
 }

@@ -560,10 +560,17 @@ public record struct SteeringStateComponent
     Vector2 LastDir
 );
 [RegisterComponentFlecs]
+public record struct MovementMassiveTag
+();
+
+[RegisterComponentFlecs]
 public record struct FlowFieldFollowerComponent
 (
     int FlowFieldId,
-     bool HasSettled // NUEVO: ya se asentó en el disco de llegada, dejó de perseguir el centro
+    Vector2 TargetDir,
+    byte Status, 
+    Vector2 GoalPos,   // meta en coordenadas del mundo
+    bool Counted      // true si ya cuenta en SettledCount del campo
 );
 
 [RegisterComponentFlecs]

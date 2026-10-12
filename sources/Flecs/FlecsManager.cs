@@ -179,6 +179,7 @@ public class FlecsManager
         //RegisterSystem<FlowFieldUnstickSystem>();
         //RegisterSystem<SteeringSystem>();
         RegisterSystem<GridSteeringSystem>();
+        RegisterSystem<CrowdSteeringSystem>();
         //RegisterSystem<MoveSeparationSystem>(); // resuelve colisiones entre entidades, debe ir antes de movimiento para ajustar la posición
         RegisterSystem<MovementResolutionSystem>();
 
@@ -230,6 +231,7 @@ public class FlecsManager
         RegisterSystem<RegisterFastHashSystem>();
         RegisterSystem<GridSparseClearSystem>();
         RegisterSystem<GridSparseRegisterSystem>();
+        RegisterSystem<CrowdRegisterSystem>();
 
         // creadores y spawn
         RegisterSystem<ProjectileSpawnSystem>();

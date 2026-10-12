@@ -23,7 +23,7 @@ public class MoveTargetSystem : FlecsSystemBase
           .With<MoveColliderComponent>()
           .Without<StoppedTag>()
           .Without<DeadTag>()
-          .Without<FlowFieldFollowerComponent>();
+          .Without<MovementMassiveTag>();
     }
 
     protected override void OnIter(Iter it)

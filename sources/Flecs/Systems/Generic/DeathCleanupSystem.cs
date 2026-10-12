@@ -1,3 +1,4 @@
+using Arch.Core;
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
@@ -84,7 +85,15 @@ internal class DeathCleanupSystem : FlecsSystemBase
                         AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
                     }
                 }
-
+                if (entity.Has<FlowFieldFollowerComponent>())
+                {
+                    var old = entity.Get<FlowFieldFollowerComponent>();
+                    if (old.Counted)
+                    {
+                        world.State.FlowFieldManager.RemoveSettled(old.FlowFieldId);
+                    }
+                  //  entity.Remove<FlowFieldFollowerComponent>();
+                }
                 // -------------------------------------------------
                 // Si esta unidad tenía un slot de ataque reservado
                 // contra otro objetivo (aún vivo), lo liberamos.
@@ -165,6 +174,11 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                 }
                 spatialEntityMap.Remove(entity);
                 occupancyMap.ClearByEntity(0, pos.tilePosition.X,pos.tilePosition.Y);
+
+                var build = entity.Get<BuildingDefinitionComponent>();
+                AtlasModsManager.TryGetTileSprite(build.idSpriteTemplateNormal, out var spriteNormal);
+                world.State.GridSparseManager.RemoveStaticObjectInWorld(pos.tilePosition, spriteNormal.tilesOcupancy);
+
                 if (entity.Has<RenderSelectionGPUComponent>())
                 {
                     var selector = entity.Get<RenderSelectionGPUComponent>();

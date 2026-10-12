@@ -176,6 +176,12 @@ public class BlackyWorldGridManager
         return Grid.IsBlocked(globalAtlasPos);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryEnterCell(in Vector2 globalPos)
+    {
+        return Grid.DynamicLayer.TryEnterCell(globalPos, capacity: 1);
+    }
+
     /// 
     /// Consulta si solo la capa estática (muros/terreno) está bloqueada.
     /// 

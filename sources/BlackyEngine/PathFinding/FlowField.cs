@@ -115,7 +115,6 @@ public class FlowField
         field.ComputeDirections(clearanceMap, radiusTiles);
         return field;
     }
-
     private void ComputeDirections(BlackyClearanceMap clearanceMap, float radiusTiles)
     {
         for (int x = RegionMin.X; x <= RegionMax.X; x++)
@@ -125,6 +124,16 @@ public class FlowField
                 var tile = new Vector2I(x, y);
                 float myDist = GetDistance(tile);
                 if (myDist >= Unreachable) continue;
+
+                // Zona de meta: empujar hacia el tile objetivo para que la horda
+                // se compacte hacia adentro en vez de detenerse en el borde.
+                if (myDist == 0f)
+                {
+                    Vector2 toGoal = new Vector2(GoalTile.X - x, GoalTile.Y - y);
+                    if (toGoal.LengthSquared() > 0.01f)
+                        SetDirection(tile, NearestDirIndex(toGoal));
+                    continue;   // el propio GoalTile queda sin dirección
+                }
 
                 float bestDist = myDist;
                 byte bestDir = NoDirection;
@@ -146,14 +155,63 @@ public class FlowField
             }
         }
     }
+    //private void ComputeDirections(BlackyClearanceMap clearanceMap, float radiusTiles)
+    //{
+    //    for (int x = RegionMin.X; x <= RegionMax.X; x++)
+    //    {
+    //        for (int y = RegionMin.Y; y <= RegionMax.Y; y++)
+    //        {
+    //            var tile = new Vector2I(x, y);
+    //            float myDist = GetDistance(tile);
+    //            if (myDist >= Unreachable) continue;
 
+    //            float bestDist = myDist;
+    //            byte bestDir = NoDirection;
+
+    //            for (byte i = 0; i < Dirs.Length; i++)
+    //            {
+    //                Vector2I neighbor = tile + Dirs[i];
+    //                if (!InRegion(neighbor)) continue;
+
+    //                float neighborDist = GetDistance(neighbor);
+    //                if (neighborDist < bestDist)
+    //                {
+    //                    bestDist = neighborDist;
+    //                    bestDir = i;
+    //                }
+    //            }
+
+    //            SetDirection(tile, bestDir);
+    //        }
+    //    }
+    //}
+    /// <summary>True si el tile pertenece a la zona de meta (las semillas del Dijkstra, distancia 0).</summary>
+    //public bool IsGoalZone(Vector2I tile) => GetDistance(tile) == 0f;
+    public bool IsGoalTile(Vector2I tile) => tile == GoalTile;
     public Vector2 SampleTile(Vector2I tile)
     {
         if (!InRegion(tile)) return Vector2.Zero;
         byte dirIdx = GetDirectionAt(tile);
         return dirIdx == NoDirection ? Vector2.Zero : DirVectors[dirIdx];
     }
+    private static byte NearestDirIndex(Vector2 v)
+    {
+        v = v.Normalized();
+        byte best = 0;
+        float bestDot = float.MinValue;
 
+        for (byte i = 0; i < DirVectors.Length; i++)
+        {
+            float d = DirVectors[i].Dot(v);
+            if (d > bestDot)
+            {
+                bestDot = d;
+                best = i;
+            }
+        }
+
+        return best;
+    }
     public Vector2 SampleInterpolated(Vector2 worldPos)
     {
         Vector2I baseTile = TilesHelper.WorldPositionToTile(worldPos);

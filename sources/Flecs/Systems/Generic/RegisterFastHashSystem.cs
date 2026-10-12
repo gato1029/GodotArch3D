@@ -35,7 +35,8 @@ public class GridSparseRegisterSystem : FlecsSystemBase
     {
         qb.With<PositionComponent>()
           .With<MoveColliderComponent>()
-          .With<UnitTag>();          
+          .With<UnitTag>()
+          .Without<MovementMassiveTag>();
     }
 
     protected override void OnIter(Iter it)
@@ -52,7 +53,7 @@ public class GridSparseRegisterSystem : FlecsSystemBase
             ref var p = ref posArray[i];
             ref var col = ref colArray[i];
 
-            blackyWorld.State.GridSparseManager.RegisterUnit(p.position +col.Offset);
+            blackyWorld.State.GridSparseManager.RegisterUnit(p.position);
         }
     }
 }

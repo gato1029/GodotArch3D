@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://gpjmpsq7ykjd"]
+
+[ext_resource type="Script" uid="uid://bymgcjiuaqryx" path="res://sources/WindowsDataBase/PerfiladorMundo/ControlBiomaRegla.cs" id="1_51lti"]
+[ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="2_ch7qb"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="2_e4ll8"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="3_e4ll8"]
+
+[node name="ControlBiomaRegla" type="PanelContainer" unique_id=1678652984]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -156.5
+offset_top = -106.0
+offset_right = 156.5
+offset_bottom = 106.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+script = ExtResource("1_51lti")
+
+[node name="ButtonGuardar" type="TextureButton" parent="." unique_id=2146714850]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+focus_mode = 1
+script = ExtResource("2_e4ll8")
+IconTexture = ExtResource("3_e4ll8")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1496546221]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1928251943]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1698847411]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Perfil Bioma"
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer" unique_id=1427867620]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=674770609]
+layout_mode = 2
+text = "Bioma:"
+
+[node name="ButtonBioma" type="Button" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=498132759]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Seleccionar"
+icon = ExtResource("2_ch7qb")
+alignment = 0
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=1683825867]
+layout_mode = 2
+text = "Altura Minima:"
+
+[node name="SpinBoxAlturaMinima" type="SpinBox" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=1009492692]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=1383804168]
+layout_mode = 2
+text = "Altura Maxima:"
+
+[node name="SpinBoxAlturaMaxima" type="SpinBox" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=1477917329]
+layout_mode = 2
+max_value = 3.0
+
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=1064711129]
+layout_mode = 2
+text = "Peso:"
+
+[node name="SpinBoxPeso" type="SpinBox" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=1817900282]
+layout_mode = 2
