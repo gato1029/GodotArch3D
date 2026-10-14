@@ -36,7 +36,8 @@ public enum BlackyWorldTypeDetail
 {
     MUNDO,
     HABITACION,
-    MAZMORRA
+    MAZMORRA,
+    MINIMUNDO
 }
 public sealed class BlackyWorld : IDisposable
 {

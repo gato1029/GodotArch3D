@@ -94,7 +94,7 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 scroll_vertical_custom_step = 200.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/ScrollContainer" unique_id=57920586]
+[node name="ContedorReglas" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/ScrollContainer" unique_id=57920586]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
@@ -103,7 +103,7 @@ size_flags_vertical = 6
 layout_mode = 2
 text = "Geografia:"
 
-[node name="Geografia" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1396271853]
+[node name="GeografiaCombo" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1396271853]
 layout_mode = 2
 script = ExtResource("6_tafr6")
 metadata/_custom_type_script = "uid://d4g3outtemvav"
@@ -112,7 +112,7 @@ metadata/_custom_type_script = "uid://d4g3outtemvav"
 layout_mode = 2
 text = "Tipo Mundo:"
 
-[node name="TipoMundo" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=474154145]
+[node name="TipoMundoCombo" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=474154145]
 layout_mode = 2
 script = ExtResource("6_tafr6")
 metadata/_custom_type_script = "uid://d4g3outtemvav"

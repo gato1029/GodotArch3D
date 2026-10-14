@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using System;
 
@@ -166,7 +167,10 @@ public class BiomePlacementRuleData
 
 public class TemplateWorldProfileData : IdDataLong
 {
-    public ConfiguracionGeograficaData configuracionGeografica { get; set; }
+    // recuerda esto solo es un template un perfilador, el mundo podria cambiar realmente por la semilla XD
+    public BlackyWorldTypeDetail tipoMundo { get; set; }
+
+    public PerfilGeografico perfilGeografico { get; set; }
 
     public List<BiomePlacementRuleData> reglasBiomas { get; set; } = new();
 

@@ -20,7 +20,7 @@ grow_vertical = 2
 size_flags_horizontal = 4
 script = ExtResource("1_51lti")
 
-[node name="ButtonGuardar" type="TextureButton" parent="." unique_id=2146714850]
+[node name="ButtonEliminar" type="TextureButton" parent="." unique_id=2146714850]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
