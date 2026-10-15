@@ -2,6 +2,8 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyTiles.Systems;
 using GodotEcsArch.sources.Helpers;
+using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 using System;
 using System.Collections.Generic;
@@ -16,7 +18,8 @@ public partial class ControlPerfiladorMundo : PanelContainer
         InitializeUI(); // Insertado por el generador de UI
         ButtonAgregarBioma.Pressed += ButtonAgregarBioma_Pressed;
         ButtonGuardar.Pressed += ButtonGuardar_Pressed;
-
+        ButtonNuevo.Pressed += ButtonNuevo_Pressed;
+        ButtonEliminar.Pressed += ButtonEliminar_Pressed;
         foreach (var item in Enum.GetValues(typeof(PerfilGeografico)))
         {
             // Obtenemos el valor numérico/enum y su representación en texto
@@ -33,14 +36,66 @@ public partial class ControlPerfiladorMundo : PanelContainer
 
             TipoMundoCombo.AddItemWithData(texto, valor);
         }
+        ContenedorDatos.Visible = false;
+        KuroItems.OnObjectPressed += KuroItems_OnObjectPressed;
+        LoadAllItems();
+    }
+
+    private void LoadAllItems()
+    {
+        var items = DataBaseManager.Instance.FindAll<TemplateWorldProfileData>();
+        foreach (var item in items)
+        {
+            KuroItems.AddObject(item, item.name, item.textureVisual);
+        }
+    }
+
+    private void KuroItems_OnObjectPressed(object obj)
+    {
+        data = (TemplateWorldProfileData)obj;
+        CargarDatos(data);
+    }
+    public void CargarDatos(TemplateWorldProfileData data)
+    {
+        this.data = data;
+        ContenedorDatos.Visible = true;
+        LineEditName.Text = data.name;
+        GeografiaCombo.SelectByData(data.perfilGeografico);
+        TipoMundoCombo.SelectByData(data.tipoMundo);
+        ContedorReglas.ClearChildrens();
+        foreach (var item in data.reglasBiomas)
+        {
+            var control = RuntimeServices.NodeRegistry.Create<ControlBiomaRegla>();
+            control.data = item;            
+            ContedorReglas.AddChild(control);
+            control.SetData(item);
+        }
+    }
+
+    private void ButtonEliminar_Pressed()
+    {
+        DataBaseManager.Instance.RemoveDirectById<TemplateWorldProfileData>(data.id);
+        ContenedorDatos.Visible = false;
+    }
+
+    private void ButtonNuevo_Pressed()
+    {
+        ContenedorDatos.Visible = true;
+        data = new TemplateWorldProfileData();
+        LineEditName.Text = "";
+        ContedorReglas.ClearChildrens();
     }
 
     private void ButtonGuardar_Pressed()
     {
+        data.name= LineEditName.Text;   
         data.reglasBiomas = ObtenerReglasBioma();
         data.perfilGeografico = (PerfilGeografico)GeografiaCombo.GetSelectedData();
         data.tipoMundo = (BlackyWorldTypeDetail)TipoMundoCombo.GetSelectedData();
-        
+
+        DataBaseManager.Instance.InsertUpdate(data);
+        ContenedorDatos.Visible = false;
+
     }
 
     private void ButtonAgregarBioma_Pressed()

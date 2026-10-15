@@ -37,16 +37,18 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer" unique_id=782412460]
+[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer" unique_id=1451196764]
 layout_mode = 2
-theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=2142820400]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2" unique_id=120325079]
 layout_mode = 2
-size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/HBoxContainer" unique_id=2142820400]
+layout_mode = 2
+size_flags_horizontal = 6
 text = "Perfilador Mundo"
 
-[node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=495233680]
+[node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/HBoxContainer" unique_id=495233680]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
@@ -56,28 +58,32 @@ IconTexture = ExtResource("4_tafr6")
 IconExpand = true
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="GridContainer" type="GridContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=513815161]
+[node name="ContenedorDatos" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2" unique_id=782412460]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos" unique_id=513815161]
 layout_mode = 2
 columns = 2
 
-[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=186680213]
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=186680213]
 layout_mode = 2
 text = "Nombre:"
 
-[node name="LineEditName" type="LineEdit" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=683255694]
+[node name="LineEditName" type="LineEdit" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=683255694]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=2059825722]
+[node name="Label2" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=2059825722]
 layout_mode = 2
 text = "Bioma:"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=411646279]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=411646279]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ButtonAgregarBioma" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer" unique_id=31758994]
+[node name="ButtonAgregarBioma" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/VBoxContainer" unique_id=31758994]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 8
@@ -87,41 +93,41 @@ IconTexture = ExtResource("4_u2t2a")
 IconExpand = true
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer" unique_id=621284960]
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/VBoxContainer" unique_id=621284960]
 custom_minimum_size = Vector2(350, 220)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 scroll_vertical_custom_step = 200.0
 
-[node name="ContedorReglas" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/ScrollContainer" unique_id=57920586]
+[node name="ContedorReglas" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/VBoxContainer/ScrollContainer" unique_id=57920586]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 
-[node name="Label3" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1682109911]
+[node name="Label3" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1682109911]
 layout_mode = 2
 text = "Geografia:"
 
-[node name="GeografiaCombo" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1396271853]
+[node name="GeografiaCombo" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1396271853]
 layout_mode = 2
 script = ExtResource("6_tafr6")
 metadata/_custom_type_script = "uid://d4g3outtemvav"
 
-[node name="Label4" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=655423463]
+[node name="Label4" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=655423463]
 layout_mode = 2
 text = "Tipo Mundo:"
 
-[node name="TipoMundoCombo" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=474154145]
+[node name="TipoMundoCombo" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=474154145]
 layout_mode = 2
 script = ExtResource("6_tafr6")
 metadata/_custom_type_script = "uid://d4g3outtemvav"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer" unique_id=1887625118]
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos" unique_id=1887625118]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=552424185]
+[node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/HBoxContainer2" unique_id=552424185]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 focus_mode = 1
@@ -130,7 +136,7 @@ IconTexture = ExtResource("5_mndi1")
 IconExpand = true
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
-[node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2" unique_id=793276106]
+[node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/HBoxContainer2" unique_id=793276106]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 focus_mode = 1

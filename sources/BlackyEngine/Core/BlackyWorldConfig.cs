@@ -23,7 +23,7 @@ public sealed class BlackyWorldConfig
 
     public int ChunksX { get; }
     public int ChunksY { get; }
-
+    public long IdPerfiladorMundo { get; set; }
     public BlackyWorldConfig(
         string name,
         BlackyWorldTypeDetail worldTypeDetail,

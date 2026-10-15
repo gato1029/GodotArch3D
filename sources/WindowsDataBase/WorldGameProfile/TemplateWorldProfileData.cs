@@ -174,6 +174,8 @@ public class TemplateWorldProfileData : IdDataLong
 
     public List<BiomePlacementRuleData> reglasBiomas { get; set; } = new();
 
+    public int IdMundo { get; set; } // lo usaremos para identificar que mundos paso, por el momento nuestro mundo es de 24 mundos
+
     public TemplateWorldProfileData()
     {
         id = EpochIdGenerator.NewId();

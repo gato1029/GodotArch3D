@@ -18,6 +18,7 @@ using GodotEcsArch.sources.WindowsDataBase.TileCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
 using GodotEcsArch.sources.WindowsDataBase.Weapons;
+using GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 using LiteDB;
 using RVO;
 using System;
@@ -123,7 +124,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<CaminosData>("CaminosData");
             RegisterCollection<SuperficieData>("SuperficieData");
             RegisterCollection<BiomaData>("BiomaData");
-
+            RegisterCollection<TemplateWorldProfileData>("TemplateWorldProfileData");
 
 
             ILiteCollection<TextureMasterData> TextureMasterDataCollection =

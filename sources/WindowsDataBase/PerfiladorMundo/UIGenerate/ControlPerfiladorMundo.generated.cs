@@ -9,6 +9,7 @@ public partial class ControlPerfiladorMundo : PanelContainer
 
     private KuroSearchItems KuroItems;
     private KuroButton ButtonNuevo;
+    private VBoxContainer ContenedorDatos;
     private LineEdit LineEditName;
     private KuroButton ButtonAgregarBioma;
     private VBoxContainer ContedorReglas;
@@ -20,13 +21,14 @@ public partial class ControlPerfiladorMundo : PanelContainer
     public void InitializeUI()
     {
         KuroItems = GetNode<KuroSearchItems>("HBoxContainer2/KuroItems");
-        ButtonNuevo = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/ButtonNuevo");
-        LineEditName = GetNode<LineEdit>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/LineEditName");
-        ButtonAgregarBioma = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/ButtonAgregarBioma");
-        ContedorReglas = GetNode<VBoxContainer>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/ScrollContainer/ContedorReglas");
-        GeografiaCombo = GetNode<KuroOptionButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/GeografiaCombo");
-        TipoMundoCombo = GetNode<KuroOptionButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/TipoMundoCombo");
-        ButtonGuardar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonGuardar");
-        ButtonEliminar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonEliminar");
+        ButtonNuevo = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/HBoxContainer/ButtonNuevo");
+        ContenedorDatos = GetNode<VBoxContainer>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos");
+        LineEditName = GetNode<LineEdit>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/LineEditName");
+        ButtonAgregarBioma = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/VBoxContainer/ButtonAgregarBioma");
+        ContedorReglas = GetNode<VBoxContainer>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/VBoxContainer/ScrollContainer/ContedorReglas");
+        GeografiaCombo = GetNode<KuroOptionButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/GeografiaCombo");
+        TipoMundoCombo = GetNode<KuroOptionButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer/TipoMundoCombo");
+        ButtonGuardar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/HBoxContainer2/ButtonGuardar");
+        ButtonEliminar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/HBoxContainer2/ButtonEliminar");
     }
 }

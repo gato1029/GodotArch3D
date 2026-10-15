@@ -14,6 +14,7 @@ using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TileSprite;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
+using GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 using SadRogue.Primitives;
 using System;
 using System.Collections;
@@ -47,8 +48,10 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<int, MaterialData> materiales = new(); // estos nunca se guardan en disco solo en memoria, resuelto de otra forma
     private readonly AtlasMods<long, TileSpriteData> tileSpriteData = new(); // estos nunca se guardan en disco solo en memoria
     private readonly AtlasMods<long, AutoTileSpriteData> autoSpriteData = new(); // estos nunca se guardan en disco solo en memoria
-    private readonly AtlasMods<long, DualTileTemplate> dualTileTemplate = new();
+    private readonly AtlasMods<long, DualTileTemplate> dualTileTemplate = new(); // estos nunca se guardan en disco solo en memoria
 
+    // Datos que se guardan en disco y se resuelven por identficador directo long
+    private readonly AtlasMods<long, TemplateWorldProfileData> worldProfileData = new(); // se guardan en disco y se resuelven por identficador directo long 
     // si requieren persistencia
     private readonly AtlasMods<long, ResourceSourceData> fuenteRecursos = new();    
     private readonly AtlasMods<long, TerrainData> terrainData = new();     // ya no se usan quitarlos luego
@@ -60,7 +63,8 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
     private readonly AtlasMods<long, SuperficieData> superficieData = new();
     private readonly AtlasMods<long, BiomaData> biomaData = new();
     private readonly AtlasMods<long, CharacterModelBaseData> characterData = new();
-    private readonly AtlasMods<long, BuildingData> buildingData = new(); 
+    private readonly AtlasMods<long, BuildingData> buildingData = new();
+   
 
     private readonly AtlasMods<int, BulletData> bulletData = new(); // la unica execepcion que sera int
     
@@ -388,6 +392,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         CargarDatos(biomaData, idMod, name);
         CargarDatos(characterData, idMod,name);
         CargarDatos(buildingData, idMod,name);
+        CargarDatos(worldProfileData, idMod, name);
     }
 
     private void CargarPorModEspecial(ushort idMod)
@@ -601,6 +606,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         caminosData.Clear();
         superficieData.Clear();
         biomaData.Clear();
+        worldProfileData.Clear();
         // ================================
         // CLEAR INDEXES
         // ================================
@@ -633,6 +639,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         RegisterAtlas(caminosData);
         RegisterAtlas(superficieData);
         RegisterAtlas(biomaData);
+        RegisterAtlas(worldProfileData);
 
         foreach (var mod in TableMods.Instance.ObtenerTodos())
         {
