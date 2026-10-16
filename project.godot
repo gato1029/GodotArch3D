@@ -30,7 +30,7 @@ RtsSelectionManager="*uid://j342rl5eyl4a"
 [display]
 
 window/size/viewport_width=1280
-window/size/viewport_height=900
+window/size/viewport_height=800
 
 [dotnet]
 

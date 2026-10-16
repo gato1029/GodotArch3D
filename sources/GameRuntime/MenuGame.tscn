@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://cej5uwrx3it4w"]
+
+[ext_resource type="Theme" uid="uid://epe8tdceq51g" path="res://resources/Textures/GameUI/GameTheme.tres" id="1_5xwu2"]
+
+[node name="MenuGame" type="CanvasLayer" unique_id=1993670620]
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=391659508]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=1785743193]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_5xwu2")
+
+[node name="continuar" type="Button" parent="Panel/VBoxContainer" unique_id=595649673]
+layout_mode = 2
+text = "CONTINUAR"
+
+[node name="nuevaPartida" type="Button" parent="Panel/VBoxContainer" unique_id=2007007456]
+layout_mode = 2
+text = "NUEVA PARTIDA"
+
+[node name="salir" type="Button" parent="Panel/VBoxContainer" unique_id=1931544162]
+layout_mode = 2
+text = "SALIR"

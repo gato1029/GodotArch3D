@@ -1,0 +1,68 @@
+[gd_resource type="Theme" format=3 uid="uid://epe8tdceq51g"]
+
+[ext_resource type="Texture2D" uid="uid://cf685fqowbymh" path="res://resources/Textures/GameUI/UIGame.png" id="1_seu1r"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gvp5l"]
+atlas = ExtResource("1_seu1r")
+region = Rect2(24, 208, 82, 28)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cy6hk"]
+texture = SubResource("AtlasTexture_gvp5l")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ogr1a"]
+atlas = ExtResource("1_seu1r")
+region = Rect2(24, 144, 82, 28)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_seu1r"]
+texture = SubResource("AtlasTexture_ogr1a")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_seu1r"]
+load_path = "res://.godot/imported/UIGame.png-8de0abc041a7f155a477e8175ccae6fb.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j4pee"]
+atlas = SubResource("CompressedTexture2D_seu1r")
+region = Rect2(19, 18, 82, 28)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tn26f"]
+texture = SubResource("AtlasTexture_j4pee")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_11y37"]
+atlas = ExtResource("1_seu1r")
+region = Rect2(24, 176, 82, 28)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_j4pee"]
+texture = SubResource("AtlasTexture_11y37")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gjnue"]
+atlas = ExtResource("1_seu1r")
+region = Rect2(197, 4, 263, 312)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_14s31"]
+texture = SubResource("AtlasTexture_gjnue")
+texture_margin_left = 25.0
+texture_margin_top = 25.0
+texture_margin_right = 25.0
+texture_margin_bottom = 25.0
+
+[resource]
+Button/styles/disabled = SubResource("StyleBoxTexture_cy6hk")
+Button/styles/hover = SubResource("StyleBoxTexture_seu1r")
+Button/styles/normal = SubResource("StyleBoxTexture_tn26f")
+Button/styles/pressed = SubResource("StyleBoxTexture_j4pee")
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_14s31")
