@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://7hwep2dwwswb"]
 
+[ext_resource type="Script" uid="uid://cr2qp23t748w3" path="res://sources/GameRuntime/RuntimeGame.cs" id="1_cweo2"]
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="1_qmkwe"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="2_6cyr2"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_cweo2"]
@@ -12,6 +13,7 @@ ambient_light_color = Color(0.5529655, 0.71749705, 0.9567016, 1)
 [sub_resource type="SphereMesh" id="SphereMesh_0gpky"]
 
 [node name="RuntimeGame" type="Node" unique_id=161006943]
+script = ExtResource("1_cweo2")
 
 [node name="Base" type="Node" parent="." unique_id=945144785]
 

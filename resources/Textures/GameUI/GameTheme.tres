@@ -1,5 +1,6 @@
 [gd_resource type="Theme" format=3 uid="uid://epe8tdceq51g"]
 
+[ext_resource type="FontFile" uid="uid://nq7380wmylvu" path="res://resources/Textures/GameUI/Vastara font 1.ttf" id="1_ogr1a"]
 [ext_resource type="Texture2D" uid="uid://cf685fqowbymh" path="res://resources/Textures/GameUI/UIGame.png" id="1_seu1r"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gvp5l"]
@@ -61,6 +62,7 @@ texture_margin_right = 25.0
 texture_margin_bottom = 25.0
 
 [resource]
+Button/fonts/font = ExtResource("1_ogr1a")
 Button/styles/disabled = SubResource("StyleBoxTexture_cy6hk")
 Button/styles/hover = SubResource("StyleBoxTexture_seu1r")
 Button/styles/normal = SubResource("StyleBoxTexture_tn26f")

@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://cej5uwrx3it4w"]
 
 [ext_resource type="Theme" uid="uid://epe8tdceq51g" path="res://resources/Textures/GameUI/GameTheme.tres" id="1_5xwu2"]
+[ext_resource type="Script" uid="uid://cpdhd221ujnr8" path="res://sources/GameRuntime/MenuGame.cs" id="1_ln6sf"]
 
 [node name="MenuGame" type="CanvasLayer" unique_id=1993670620]
+script = ExtResource("1_ln6sf")
 
 [node name="Panel" type="PanelContainer" parent="." unique_id=391659508]
 anchors_preset = 15
