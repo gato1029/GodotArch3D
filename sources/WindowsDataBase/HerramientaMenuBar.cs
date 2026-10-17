@@ -61,48 +61,10 @@ public partial class HerramientaMenuBar : MenuBar
 
     private void MenuMapas_IdPressed(long id)
     {
-        Window win;
-        switch (id)
-        {
-            case 0:
-                win = GD.Load<PackedScene>("res://sources/WindowsDataBase/Maps/MapsWindow.tscn").Instantiate<Window>();
-                AddChild(win);
-                win.Popup();
-                break;
-                case 1:
-                ShowFileExplorer();
-                    break;
-            default:
 
-                break;
-        }
     }
 
-    public void ShowFileExplorer()
-    { 
-        FileDialog fileDialog;
-        // Crear y configurar el FileDialog
-        fileDialog = new FileDialog
-        {
-            Name = "FileDialog",
-            Access = FileDialog.AccessEnum.Filesystem,
-            FileMode = FileDialog.FileModeEnum.OpenFile,
-            Filters = new string[] { "*.json ; JSON Files" }
-        };
-        // 👉 Establece la ruta por defecto
-        fileDialog.CurrentDir = FileHelper.GetPathGameDB( CommonAtributes.pathMaps); // O usa "res://data" si es dentro del proyecto
-        // Conectar la señal de selección de archivo
-        fileDialog.FileSelected += (string path) =>
-        {
-            MapManagerEditor.Instance.CurrentMapLevelData = MapLevelData.LoadMap(path);            
-        };
-
-        // Agregar el FileDialog como hijo para que funcione
-        AddChild(fileDialog);
-
-        // Mostrar el diálogo
-        fileDialog.PopupCentered();
-    }
+   
 
     
 

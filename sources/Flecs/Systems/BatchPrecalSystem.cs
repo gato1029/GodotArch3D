@@ -30,24 +30,24 @@ internal class BatchPrecalSystem : FlecsSystemBase
     }
     protected override void OnIter(Iter it)
     {
-        int totalColliders = CollisionManager.Instance.characterEntitiesFlecs.Count;
-        numBatches = Math.Max(1, (int)Math.Ceiling(totalColliders / (float)targetUpdatesPerFrame));
-        GlobalData.numBatchColliders = numBatches;
+        //int totalColliders = CollisionManager.Instance.characterEntitiesFlecs.Count;
+        //numBatches = Math.Max(1, (int)Math.Ceiling(totalColliders / (float)targetUpdatesPerFrame));
+        //GlobalData.numBatchColliders = numBatches;
 
-        GlobalData.numBatchMoveColliders = Math.Max(1, (int)Math.Ceiling(totalColliders / (float)targetUpdatesPerFrameMove));
-        batchTimer += it.DeltaTime();
-        batchTimerMove += it.DeltaTime();
-        if (batchTimer >= batchInterval)
-        {
-            batchTimer -= batchInterval;
-            batchIndex = (batchIndex + 1) % numBatches;
-            GlobalData.batchIndexColliders = batchIndex;
-        }
+        //GlobalData.numBatchMoveColliders = Math.Max(1, (int)Math.Ceiling(totalColliders / (float)targetUpdatesPerFrameMove));
+        //batchTimer += it.DeltaTime();
+        //batchTimerMove += it.DeltaTime();
+        //if (batchTimer >= batchInterval)
+        //{
+        //    batchTimer -= batchInterval;
+        //    batchIndex = (batchIndex + 1) % numBatches;
+        //    GlobalData.batchIndexColliders = batchIndex;
+        //}
 
-        if (batchTimerMove >= batchIntervalMove)
-        {
-            batchTimerMove =0;
-            GlobalData.batchIndexMoveColliders = (GlobalData.batchIndexMoveColliders + 1) % GlobalData.numBatchMoveColliders;            
-        }
+        //if (batchTimerMove >= batchIntervalMove)
+        //{
+        //    batchTimerMove =0;
+        //    GlobalData.batchIndexMoveColliders = (GlobalData.batchIndexMoveColliders + 1) % GlobalData.numBatchMoveColliders;            
+        //}
     }
 }

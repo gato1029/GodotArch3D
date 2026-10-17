@@ -35,7 +35,7 @@ internal class BuildingSpawnSystem : FlecsSystemBase
         while (GlobalData.PendingBuildingQueue.Count > 0)
         {
             var (pos, id) = GlobalData.PendingBuildingQueue.Dequeue();
-            MapManagerEditor.Instance.CurrentMapLevelData.mapBuildings.AddUpdateTile(pos,id);            
+            //MapManagerEditor.Instance.CurrentMapLevelData.mapBuildings.AddUpdateTile(pos,id);            
         }
 
         world.DeferEnd();

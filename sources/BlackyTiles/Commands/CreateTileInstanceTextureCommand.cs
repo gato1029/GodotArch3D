@@ -1,20 +1,10 @@
-using Arch.Core;
-using Flecs.NET.Core;
 using Godot;
-using GodotEcsArch.sources.BlackyEngine.Services.Render.Tiles;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Flecs.NET.Core.Ecs.Metrics;
-using static Flecs.NET.Core.Ecs.Units;
 
 namespace GodotEcsArch.sources.BlackyTiles.Commands;
 

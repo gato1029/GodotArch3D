@@ -1,5 +1,4 @@
-using Arch.Core;
-using Arch.Core.Extensions;
+
 using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Collision;
@@ -8,8 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using static Flecs.NET.Core.Ecs.Units.Angles;
-using static Godot.HttpRequest;
+
 public class ColliderData<T>
 {
     public int Id { get; }

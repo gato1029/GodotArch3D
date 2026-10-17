@@ -24,7 +24,7 @@ using System.Collections.Generic;
 public partial class Main3D : Node3D
 {
     private MultimeshMaterial multimeshMaterial;
-    private MapTerrain terrainMap;
+    
     private RandomNumberGenerator _rng = new RandomNumberGenerator();
 
     private int squareId;

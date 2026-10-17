@@ -218,28 +218,7 @@ internal class CommonOperations
         return vector2;
     }
 
-    public static Vector2 SearchNewPosition(AreaMovement am, Position position, RandomNumberGenerator rng)
-    {
-        Vector2 pointDirection = Vector2.Zero;
-        switch (am.type)
-        {
-            case MovementType.CIRCLE:
-                pointDirection = NewPointInCircle(rng, position.value, am.widthRadius);
-                break;
-            case MovementType.SQUARE:
-                pointDirection = MovementSquare(rng, position.value, am.widthRadius, am.height);
-                break;
-            case MovementType.SQUARE_STATIC:
-                pointDirection = MovementSquare(rng, am.origin, am.widthRadius, am.height);
-                break;
-            case MovementType.CIRCLE_STATIC:
-                pointDirection = NewPointInCircle(rng, am.origin, am.widthRadius);
-                break;
-            default:
-                break;
-        }
-        return pointDirection;
-    }
+
 
 
 }

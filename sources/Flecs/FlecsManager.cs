@@ -1,4 +1,4 @@
-using Arch.System;
+
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
@@ -152,8 +152,8 @@ public class FlecsManager
     {
         //pre
         RegisterSystem<SimulationTickSystem>();
-        RegisterSystem<BatchPrecalSystem>();
-        RegisterSystem<BuildingSpawnSystem>();
+        //RegisterSystem<BatchPrecalSystem>();  // revisar si no se usa, de ser asi quitarlo
+        //RegisterSystem<BuildingSpawnSystem>(); // revisar creo q no se usa quitarlo
 
         //update
         RegisterSystem<HumanInputSystem>();
