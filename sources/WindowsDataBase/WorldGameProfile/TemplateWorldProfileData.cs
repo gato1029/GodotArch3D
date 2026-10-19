@@ -159,7 +159,7 @@ public class BiomePlacementRuleData
 {
     public BiomaData bioma { get; set; }
 
-    public float alturaMinima { get; set; } // Por ejemplo, altura normalizada entre 0 y 1
+    public float alturaMinima { get; set; } 
     public float alturaMaxima { get; set; }
 
     public float peso { get; set; } = 1f;

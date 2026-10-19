@@ -67,10 +67,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         float depthOffset = animationData.yDepthRenderFormat;
         int heightRender = this.height;
 
-        if (nivelarBase)
-        {
-            heightRender = heightRender - 1;
-        }
+        //if (nivelarBase)
+        //{
+        //    heightRender = heightRender - 1;
+        //}
         float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
@@ -156,10 +156,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         int heightRender = this.height;
         float depthOffset = spriteData.yDepthRenderFormat;
 
-        if (nivelarBase)
-        {
-            heightRender = heightRender - 1;
-        }
+        //if (nivelarBase)
+        //{
+        //    heightRender = heightRender - 1;
+        //}
         float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
 
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);

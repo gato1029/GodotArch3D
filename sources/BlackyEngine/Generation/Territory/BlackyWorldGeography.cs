@@ -8,7 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
-
+using static MessagePack.GeneratedMessagePackResolver.GodotEcsArch.sources.BlackyEngine;
 // (los using de BlackyWorldConfig / BlackyWorldSeed / BlackyWorldHeight ya existen en tu proyecto)
 
 public class BlackyWorldGeography
@@ -75,8 +75,14 @@ public class BlackyWorldGeography
     //  Coordenadas del mundo: el centro es (0,0) y crece hacia ambos lados.
     //  Mapa de 512: X e Y van de -256 a 255 (256 tiles a cada lado del 0, el +256 no existe).
     //  Si tu mundo SÍ incluye el +256 (513 tiles), cambia aquí el cálculo de MinX/MinY.
-    //  Y crece hacia abajo, igual que las filas del .txt y de la imagen (fila 0 = Y mínima).
+    //  La orientación de Y en el debug (.txt y .png) la controla DebugYAxisUp; los datos no cambian.
     // ------------------------------------------------------------
+    /// <summary>
+    /// Solo afecta al DEBUG (.txt y .png), no a los datos generados: true = Y+ hacia arriba (la fila de arriba es
+    /// MaxY, como en un mundo con Y+ arriba); false = Y+ hacia abajo (la fila de arriba es MinY).
+    /// </summary>
+    public bool DebugYAxisUp { get; set; } = true;
+
     public int MinX => -(worldConfig.MapSize.X / 2);
     public int MinY => -(worldConfig.MapSize.Y / 2);
     public int MaxX => MinX + worldConfig.MapSize.X - 1;
@@ -364,7 +370,7 @@ public class BlackyWorldGeography
     /// Escribe el mapa de alturas en un .txt (un dígito por celda) con cabecera y estadísticas.
     /// <paramref name="step"/>: se escribe 1 celda de cada 'step' (0 = automático, máx. ~1024 columnas).
     /// Usa 1 para volcar el mapa completo (a 8192x8192 el archivo pesa ~67 MB).
-    /// Primera fila = Y mínima (arriba); primera columna = X mínima (izquierda).
+    /// Primera columna = X mínima (izquierda). Primera fila = Y máxima si DebugYAxisUp (por defecto), si no Y mínima.
     /// Ojo: es una ruta del sistema de archivos, no "res://" ni "user://".
     /// </summary>
     public void ExportDebugTxt(string path, int step = 0)
@@ -385,8 +391,9 @@ public class BlackyWorldGeography
 
         // Primero el mapa a un buffer de texto (para poder poner las estadísticas en la cabecera)
         var map = new StringBuilder((cols + 1) * rows);
-        for (int y = 0; y < h; y += step)
+        for (int k = 0; k < rows; k++)
         {
+            int y = DebugYAxisUp ? (h - 1) - k * step : k * step;   // la primera fila escrita es la de arriba
             for (int x = 0; x < w; x += step)
             {
                 int v = (int)heightMapWorld.GetTopHeight(minX + x, minY + y);
@@ -405,7 +412,7 @@ public class BlackyWorldGeography
         sw.WriteLine($"# Perfil:       {cfg.Perfil}");
         sw.WriteLine($"# Semilla:      {seed}");
         sw.WriteLine($"# Mundo:        {w} x {h} celdas");
-        sw.WriteLine($"# Coordenadas:  X de {MinX} a {MaxX}, Y de {MinY} a {MaxY} (centro 0,0; Y crece hacia abajo)");
+        sw.WriteLine($"# Coordenadas:  X de {MinX} a {MaxX}, Y de {MinY} a {MaxY} (centro 0,0; {(DebugYAxisUp ? "Y+ hacia arriba" : "Y+ hacia abajo")} en el debug)");
         sw.WriteLine($"# Volcado:      1 de cada {step} celdas -> {cols} x {rows}");
         float autoFactor = AutoScaleFactor, effScale = EffectiveTerrainScale;
         sw.WriteLine($"# TerrainScale: {TerrainScale.ToString(inv)} (manual) x {autoFactor.ToString("0.###", inv)} (auto{(autoFactor == 1f ? ", no aplica o desactivada" : $", mapa {Math.Max(w, h)} / referencia {ReferenceMapSize}")}) = {effScale.ToString("0.###", inv)}");
@@ -414,10 +421,10 @@ public class BlackyWorldGeography
         switch (cfg.Forma)
         {
             case TipoForma.Costera:
-                sw.WriteLine($"# Agua hacia:   {DescribeWaterSide(TerrainField.CoastWaterAngle(seed))}");
+                sw.WriteLine($"# Agua hacia:   {DescribeWaterSide(TerrainField.CoastWaterAngle(seed), DebugYAxisUp)}");
                 break;
             case TipoForma.Valle:
-                sw.WriteLine($"# Eje valle:    {DescribeValley(TerrainField.ValleyAngle(seed))}");
+                sw.WriteLine($"# Eje valle:    {DescribeValley(TerrainField.ValleyAngle(seed), DebugYAxisUp)}");
                 break;
             case TipoForma.Cuenca:
             case TipoForma.Meseta:
@@ -441,26 +448,31 @@ public class BlackyWorldGeography
             if (kv.Key < 0 || kv.Key > 3)
                 sw.WriteLine($"# (fuera de 0..3) altura {kv.Key}: {kv.Value} celdas");
         sw.WriteLine("#");
-        sw.WriteLine("# --- MAPA (una fila por línea, Y mínima arriba) ---");
+        sw.WriteLine($"# --- MAPA (una fila por línea, {(DebugYAxisUp ? "Y máxima" : "Y mínima")} arriba) ---");
         sw.Write(map.ToString());
     }
 
-    private static string DescribeWaterSide(float angleRad)
+    private static string DescribeWaterSide(float angleRad, bool yUp)
     {
-        string[] names = { "este (derecha)", "sureste (abajo-derecha)", "sur (abajo)", "suroeste (abajo-izquierda)",
-                           "oeste (izquierda)", "noroeste (arriba-izquierda)", "norte (arriba)", "noreste (arriba-derecha)" };
+        // El ángulo se mide hacia +Y: con Y+ abajo, +Y es el sur de la imagen; con Y+ arriba es el norte.
+        string[] names = yUp
+            ? new[] { "este (derecha)", "noreste (arriba-derecha)", "norte (arriba)", "noroeste (arriba-izquierda)",
+                      "oeste (izquierda)", "suroeste (abajo-izquierda)", "sur (abajo)", "sureste (abajo-derecha)" }
+            : new[] { "este (derecha)", "sureste (abajo-derecha)", "sur (abajo)", "suroeste (abajo-izquierda)",
+                      "oeste (izquierda)", "noroeste (arriba-izquierda)", "norte (arriba)", "noreste (arriba-derecha)" };
         double deg = angleRad * 180.0 / Math.PI;
         int idx = ((int)Math.Round(deg / 45.0)) % 8;
         return $"{names[idx]}  (ángulo {deg:0}°)";
     }
 
-    private static string DescribeValley(float angleRad)
+    private static string DescribeValley(float angleRad, bool yUp)
     {
-        double deg = angleRad * 180.0 / Math.PI;     // 0..180, medido desde el eje X hacia abajo
+        double deg = angleRad * 180.0 / Math.PI;     // 0..180, medido desde el eje X hacia +Y
+        string down = "diagonal (de arriba-izquierda a abajo-derecha)", up = "diagonal (de abajo-izquierda a arriba-derecha)";
         string kind = deg < 15 || deg > 165 ? "horizontal"
                     : Math.Abs(deg - 90) < 15 ? "vertical"
-                    : deg < 90 ? "diagonal (de arriba-izquierda a abajo-derecha)"
-                               : "diagonal (de abajo-izquierda a arriba-derecha)";
+                    : deg < 90 ? (yUp ? up : down)
+                               : (yUp ? down : up);
         return $"{kind}  (ángulo {deg:0}°)";
     }
 
@@ -471,7 +483,8 @@ public class BlackyWorldGeography
     /// <summary>
     /// Guarda la geografía como imagen PNG de colores (hasta 8192x8192 píxeles). Lee heightMapWorld.
     /// Colores: 0 azul, 1 verde, 2 ocre, 3 marrón; otra altura = magenta.
-    /// Arriba-izquierda = (MinX, MinY). El centro del mundo (0,0) está en el centro de la imagen.
+    /// Arriba-izquierda = (MinX, MaxY) si DebugYAxisUp (por defecto), o (MinX, MinY) si no.
+    /// El centro del mundo (0,0) está en el centro de la imagen.
     /// <paramref name="pixelsPerTile"/>: 0 = automático (los mapas pequeños se amplían hasta ~2048 px).
     ///   Si el mapa es mayor que 8192 se reduce tomando 1 tile de cada N.
     /// Es una ruta del sistema de archivos, no "res://" ni "user://".
@@ -497,9 +510,9 @@ public class BlackyWorldGeography
 
         byte[] palette =
         {
-             46,  94, 140,   // 0 azul             
-            194, 176,  90,   // 1 ocre
-            94, 158,  78,   // 2 verde
+             46,  94, 140,   // 0 azul
+             94, 158,  78,   // 1 verde
+            194, 176,  90,   // 2 ocre
             140, 106,  75,   // 3 marrón
             255,   0, 255    // otra altura
         };
@@ -515,7 +528,7 @@ public class BlackyWorldGeography
             int ty = py / scale;
             if (ty != cachedTileRow)   // las filas repetidas por la ampliación no vuelven a leer el mapa
             {
-                int worldY = minY + ty * step;
+                int worldY = DebugYAxisUp ? (minY + h - 1) - ty * step : minY + ty * step;
                 for (int tx = 0; tx < tilesX; tx++)
                 {
                     int v = (int)heightMapWorld.GetTopHeight(minX + tx * step, worldY);

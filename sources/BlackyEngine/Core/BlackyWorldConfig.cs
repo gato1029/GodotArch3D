@@ -30,14 +30,14 @@ public sealed class BlackyWorldConfig
         int chunkSize,
         int heightCount,
         int worldSeed,
-        Vector2I requestedMapSize)
+        Vector2I requestedMapSize, long IdPerfilMundo)
     {
         Name = name;
         WorldTypeDetail = worldTypeDetail;
         ChunkSize = chunkSize;
         HeightCount = heightCount;
         WorldSeed = worldSeed;
-
+        IdPerfiladorMundo = IdPerfilMundo;
         MapSize = CorrectMapSize(requestedMapSize);
 
         ChunksX = Mathf.CeilToInt((float)MapSize.X / ChunkSize);

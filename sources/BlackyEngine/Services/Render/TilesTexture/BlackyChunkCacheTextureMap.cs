@@ -346,26 +346,6 @@ public class BlackyChunkCacheTextureMap
         int idCollider = AsignarCollider(worldX, worldY, tileId, tileSpriteData);
         tileLayer.SetTile(localX, localY, tileId,idCollider);
         tileLayer.SetRender(localX, localY, true);
-        
-        //if (height-1 >=0 && isBorder==false) // solo si no es borde y la altura inferior es mayor a 0 no se marca para renderizar
-        //{
-        //    var layerDown = chunk.GetOrCreateLayer(height - 1, layer);
-        //    var tileDown = layerDown.GetTile(localX, localY);
-        //    if (tileDown!=0 && layerDown.IsRender(localX,localY))
-        //    {
-        //        layerDown.SetRender(localX, localY, false);
-        //        OnTileChanged?.Invoke(new TileChange
-        //        {
-        //            WorldX = worldX,
-        //            WorldY = worldY,
-        //            Height = height - 1,
-        //            Layer = layer,
-        //            remove = true
-        //        });
-        //    }            
-        //}
-        
-
 
         OnTileChanged?.Invoke(new TileChange
         {
@@ -865,7 +845,7 @@ public class BlackyChunkCacheTextureMap
         }
         if (mask==0)
         {                       
-            _heightMapWorld.SetTopHeight(vx, vy, height-1);
+            //_heightMapWorld.SetTopHeight(vx, vy, height-1);
             return; // no hacer nada            
         }
         tileLayer.SetDualMask(lx, ly, mask);
@@ -882,7 +862,7 @@ public class BlackyChunkCacheTextureMap
             idCollider = AsignarCollider(vx, vy, tileId, tileSpriteData);
         }
                 
-        _heightMapWorld.SetTopHeight(vx, vy, height);
+       // _heightMapWorld.SetTopHeight(vx, vy, height);
         
         tileLayer.SetTile(lx, ly, tileId, idCollider);
         tileLayer.SetRender(lx, ly, true);

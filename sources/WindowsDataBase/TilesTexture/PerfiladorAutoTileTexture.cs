@@ -18,7 +18,7 @@ public partial class PerfiladorAutoTileTexture : Node
         NodeMainHelper.SetNode3DMain(mainRender,null);
         PerformanceTimer.Instance.Enabled = true;
         ChunkManager.Initialize();
-        BlackyWorld blackyWorld = new BlackyWorld("Perfilador", BlackyWorldTypeDetail.MUNDO, 32, 5, 1, new Vector2I(64,64));
+        BlackyWorld blackyWorld = new BlackyWorld("Perfilador", BlackyWorldTypeDetail.MUNDO, 32, 5, 1, new Vector2I(64,64),1);
     }
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -7,6 +7,7 @@ using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
+using GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 using MessagePack;
 using SadRogue.Primitives;
 using System;
@@ -48,6 +49,7 @@ public class BlackyPalletesPersistence
     public static BlackyGenericPalette<CharacterModelBaseData> characterPalette { get; } = new("Personajes", true);
     public static BlackyGenericPalette<ResourceSourceData> resourcesPalette { get; } = new("Recursos", true);
     public static BlackyGenericPalette<BuildingData> buildingPalette { get; } = new("Edificios", true);
+    public static BlackyGenericPalette<TemplateWorldProfileData> templateWorldProfilePallete { get; } = new("PerfilesMundo", true);
 }
 
 public class BlackyGenericPalette<T> where T : class
@@ -99,7 +101,25 @@ public class BlackyGenericPalette<T> where T : class
             }
         }
     }
+    /// <summary>
+    /// Devuelve una lista con todos los datos deserializados/cargados en memoria de la paleta, ignorando el índice 0.
+    /// </summary>
+    public List<T> GetAllData()
+    {
+        var result = new List<T>();
 
+        for (int i = 1; i < _persistent.Count; i++)
+        {
+            T data = GetData((ushort)i);
+
+            if (data != null)
+            {
+                result.Add(data);
+            }
+        }
+
+        return result;
+    }
     /// <summary>
     /// Devuelve un diccionario con todos los IDs de la paleta y sus respectivos datos deserializados/cargados en memoria.
     /// </summary>

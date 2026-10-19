@@ -25,6 +25,7 @@ using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
+using GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
 using System;
@@ -82,6 +83,7 @@ public sealed class BlackyWorld : IDisposable
 
     public ChunkManagerBase ChunkManager => Streaming.chunkManagerLocal;
 
+    
 
     // =========================================
     // Constructor
@@ -93,7 +95,7 @@ public sealed class BlackyWorld : IDisposable
         int chunkSize,
         int heightCount,
         int worldSeed,
-        Vector2I mapSize,bool isLoad = false)
+        Vector2I mapSize,long IdPerfilMundo,bool isLoad = false)
     {
         
 
@@ -106,7 +108,7 @@ public sealed class BlackyWorld : IDisposable
             chunkSize,
             heightCount,
             worldSeed,
-            mapSize);
+            mapSize,IdPerfilMundo);
 
 
         State = new BlackyWorldState(this);
@@ -191,9 +193,9 @@ public sealed class BlackyWorld : IDisposable
 
     private void DebugBoot()
     {
-     //   var e = Characters.InternalExecuteCreation(1787768744605000,1, new Vector2(0, 0)); // principal
+        var e = Characters.InternalExecuteCreation(1787768744605000,10, new Vector2(0, 0)); // principal
 
-       SpawnEnemiesAroundPlayer(100,30);
+       //SpawnEnemiesAroundPlayer(100,30);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));

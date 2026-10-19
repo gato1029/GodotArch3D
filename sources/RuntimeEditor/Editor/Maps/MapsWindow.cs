@@ -28,7 +28,7 @@ public partial class MapsWindow : Window
         {
             BlackyWorldContext.World.Dispose(); // limpiar y libera el mundo actual
         }
-        BlackyWorld blackyWorld = new BlackyWorld(LineEditName.Text, (BlackyWorldTypeDetail)OptionButtonType.Selected, 32, 5, 41245134, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value));
+        BlackyWorld blackyWorld = new BlackyWorld(LineEditName.Text, (BlackyWorldTypeDetail)OptionButtonType.Selected, 32, 5, 41245134, new Vector2I((int)SpinBoxWidth.Value, (int)SpinBox2Height.Value),1);
         QueueFree();
     }
 

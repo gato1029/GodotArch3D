@@ -74,7 +74,9 @@ public sealed class BlackyWorldState : IDisposable
         SpatialEntityMap = new BlackySpatialEntityMap();
         TilePalette = new BlackyPersistentTilePalette();
                 
-        idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.X,config.MapSize.Y,16,new Vector2(0, 0),25,Colors.DarkCyan);
+        idGridDraw = WireShape.Instance.DrawGrid(config.MapSize.Y,config.MapSize.X,16,new Vector2(0, 0),25,Colors.DarkCyan);
+
+        WireShape.Instance.DrawGrid(config.MapSize.Y, config.MapSize.X, 16*32, new Vector2(0, 0), 30, Colors.Violet);
 
         ClearanceMap = new BlackyClearanceMap(config.ChunkSize, 4);
         GraphCache = new BlackyMacroGraphCache(config.ChunkSize);

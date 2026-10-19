@@ -2,6 +2,8 @@ using Godot;
 using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Paint;
@@ -137,8 +139,99 @@ public sealed class BlackyWorldHeight : IDisposable
     {
         Dispose();
     }
-
+    public KeyValuePair<Vector2I, BlackyHeightChunkData>[] GetChunksSnapshot()
+    {
+        return chunks.ToArray();
+    }
     #endregion
+
+    public void ExportHeightsToTxt(string filePath)
+    {
+        var snapshot = GetChunksSnapshot();
+
+        if (snapshot.Length == 0)
+        {
+            File.WriteAllText(filePath, "No hay chunks en el mundo.");
+            return;
+        }
+
+        int chunkSize = ChunkHelper.ChunkSize;
+
+        // Calcular los límites globales del mundo.
+        int minChunkX = int.MaxValue;
+        int minChunkY = int.MaxValue;
+        int maxChunkX = int.MinValue;
+        int maxChunkY = int.MinValue;
+
+        foreach (var entry in snapshot)
+        {
+            Vector2I coord = entry.Key;
+
+            minChunkX = Math.Min(minChunkX, coord.X);
+            minChunkY = Math.Min(minChunkY, coord.Y);
+            maxChunkX = Math.Max(maxChunkX, coord.X);
+            maxChunkY = Math.Max(maxChunkY, coord.Y);
+        }
+
+        int minX = minChunkX * chunkSize;
+        int minY = minChunkY * chunkSize;
+        int maxX = (maxChunkX + 1) * chunkSize - 1;
+        int maxY = (maxChunkY + 1) * chunkSize - 1;
+
+        int width = maxX - minX + 1;
+        int height = maxY - minY + 1;
+
+        // Reconstruir el mapa completo.
+        short[,] world = new short[height, width];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                world[y, x] = -1;
+            }
+        }
+
+        foreach (var entry in snapshot)
+        {
+            Vector2I chunkCoord = entry.Key;
+            BlackyHeightChunkData chunkData = entry.Value;
+
+            int chunkWorldX = chunkCoord.X * chunkSize;
+            int chunkWorldY = chunkCoord.Y * chunkSize;
+
+            for (int localY = 0; localY < chunkData.Size; localY++)
+            {
+                int worldY = chunkWorldY + localY;
+                int mapY = worldY - minY;
+
+                for (int localX = 0; localX < chunkData.Size; localX++)
+                {
+                    int worldX = chunkWorldX + localX;
+                    int mapX = worldX - minX;
+
+                    world[mapY, mapX] = chunkData.Get(localX, localY);
+                }
+            }
+        }
+
+        // Escribir el mapa completo en un único archivo.
+        using var writer = new StreamWriter(filePath);
+
+        writer.WriteLine($"Dimensiones: {width} x {height}");
+        writer.WriteLine($"Origen: ({minX}, {minY})");
+        writer.WriteLine();
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                writer.Write($"{world[y, x],4}");
+            }
+
+            writer.WriteLine();
+        }
+    }
 }
 
 public sealed class BlackyHeightChunkData
@@ -175,5 +268,10 @@ public sealed class BlackyHeightChunkData
     {
         Array.Fill(heights, value);
     }
+
+ 
+
+
+
 }
 

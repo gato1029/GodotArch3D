@@ -25,15 +25,41 @@ public partial class MenuGame : CanvasLayer
         GetTree().Quit();
     }
 
-    private void NuevaPartida_Pressed()
+    private  void NuevaPartida_Pressed()
     {
         string runGame = RuntimeServices.NodeRegistry.GetPath<RuntimeGame>();
-        GetTree().ChangeSceneToFile(runGame);
+
+        var packedScene = GD.Load<PackedScene>(runGame);
+        var instance = packedScene.Instantiate<RuntimeGame>();
+
+        var previousScene = GetTree().CurrentScene;
+
+        GetTree().Root.AddChild(instance);
+        GetTree().CurrentScene = instance;
+
+        previousScene?.QueueFree();
+        
+        instance.NuevaPartida();
     }
 
-    private void Continuar_Pressed()
+    private async void Continuar_Pressed()
     {
-        
+        string runGame = RuntimeServices.NodeRegistry.GetPath<RuntimeGame>();
+
+        var packedScene = GD.Load<PackedScene>(runGame);
+        var instance = packedScene.Instantiate<RuntimeGame>();
+
+        Error error = GetTree().ChangeSceneToNode(instance);
+
+        if (error != Error.Ok)
+        {
+            GD.PrintErr("No se pudo cargar RuntimeGame.");
+            return;
+        }
+
+        await ToSignal(instance, Node.SignalName.Ready);
+
+        instance.CargarPartida();
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
