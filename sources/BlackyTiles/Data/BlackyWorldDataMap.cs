@@ -156,6 +156,44 @@ public abstract class BlackyWorldDataMap<T>
             ly);
     }
 
+    /// <summary>
+    /// Recorre todos los bloques de celdas del mapa agrupados por chunk y altura.
+    /// Cada bloque es una vista de solo lectura y no se copia.
+    /// El mapa no debe modificarse durante la enumeración.
+    /// </summary>
+    public IEnumerable<(BlackyChunkCoord Coord, int Height, ReadOnlyMemory<T> Cells)> GetAllCells()
+    {
+        foreach (var chunkEntry in _chunks)
+        {
+            foreach (var heightEntry in chunkEntry.Value.GetHeights())
+            {
+                yield return (chunkEntry.Key, heightEntry.Key, heightEntry.Value.GetCells());
+            }
+        }
+    }
+
+    /// <summary>
+    /// Obtiene las celdas de una altura de un chunk como vista de solo lectura, sin copiar el arreglo.
+    /// No crea chunks ni marca datos como modificados.
+    /// </summary>
+    public bool TryGetCells(
+        int chunkX,
+        int chunkY,
+        int height,
+        out ReadOnlyMemory<T> cells)
+    {
+        cells = ReadOnlyMemory<T>.Empty;
+
+        if (!_chunks.TryGetValue(new BlackyChunkCoord(chunkX, chunkY), out var chunk))
+            return false;
+
+        if (!chunk.TryGetHeight(height, out var heightData))
+            return false;
+
+        cells = heightData.GetCells();
+        return true;
+    }
+
     public bool TryGetCell(
         int worldX,
         int worldY,

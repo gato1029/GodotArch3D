@@ -112,12 +112,12 @@ public class BlackyChunkCacheTextureMap
     private void ChunkManager_OnChunkDataUnload(Vector2I obj)
     {
         
-        BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
-        if (_chunks.TryGetValue(coord, out var chunkCurrent))
-        {
-            //GD.Print($"[BlackyChunkCacheTextureMap] Unloading chunk at {coord.X}, {coord.Y}");
-            _chunks.TryRemove(coord, out _);
-        }
+        //BlackyChunkCoord coord = new BlackyChunkCoord(obj.X, obj.Y);
+        //if (_chunks.TryGetValue(coord, out var chunkCurrent))
+        //{
+        //    //GD.Print($"[BlackyChunkCacheTextureMap] Unloading chunk at {coord.X}, {coord.Y}");
+        //    _chunks.TryRemove(coord, out _);
+        //}
     }
 
 
@@ -689,6 +689,86 @@ public class BlackyChunkCacheTextureMap
             //var (targetChunk, lx, ly) = ResolveOrCreate(nx, ny);                                                
         }
     }
+
+    /// <summary>
+    /// Construye el mapa dual completo en dos fases: primero registra la solidez de todos los chunks;
+    /// después calcula y escribe cada tile visual una sola vez, con los vecinos del mapa disponibles.
+    /// </summary>
+    public void ApplyWorldBatchDualTiles(
+        IEnumerable<(BlackyChunkCoord Coord, int Height, ReadOnlyMemory<SerializerCellGeneric> Cells)> blocks,
+        int layer)
+    {
+        if (blocks == null) throw new ArgumentNullException(nameof(blocks));
+
+        var borderVisuals = new Dictionary<int, Dictionary<long, ushort>>();
+
+        // Fase 1: solidez e interiores. El camino sólido usa máscara 15 y no consulta vecinos.
+        foreach (var block in blocks)
+        {
+            var chunk = GetOrCreateChunk(block.Coord.X, block.Coord.Y);
+            var tileLayer = chunk.GetOrCreateLayer(block.Height, layer);
+            var cells = block.Cells.Span;
+
+            for (int i = 0; i < cells.Length; i++)
+            {
+                ref readonly var cell = ref cells[i];
+                int lx = i % ChunkSize;
+                int ly = i / ChunkSize;
+                tileLayer.SetSolid(lx, ly, cell.id != 0);
+
+                if (cell.id == 0 || cell.isBorder) continue;
+
+                int worldX = block.Coord.X * ChunkSize + lx;
+                int worldY = block.Coord.Y * ChunkSize + ly;
+                var template = GetTemplate((BlackyRenderLayer)layer, cell.id);
+                UpdateDualVisualInternal(worldX, worldY, lx, ly, block.Height, layer, template, tileLayer);
+            }
+
+            chunk.MarkDirty();
+        }
+
+        // Fase 2: reunir la vecindad de las celdas de borde, deduplicada globalmente por altura.
+        foreach (var block in blocks)
+        {
+            if (!borderVisuals.TryGetValue(block.Height, out var borders))
+                borderVisuals[block.Height] = borders = new Dictionary<long, ushort>();
+
+            var cells = block.Cells.Span;
+            for (int i = 0; i < cells.Length; i++)
+            {
+                ref readonly var cell = ref cells[i];
+                if (cell.id == 0 || !cell.isBorder) continue;
+
+                int lx = i % ChunkSize;
+                int ly = i / ChunkSize;
+                int worldX = block.Coord.X * ChunkSize + lx;
+                int worldY = block.Coord.Y * ChunkSize + ly;
+
+                for (int oy = -1; oy <= 1; oy++)
+                {
+                    for (int ox = -1; ox <= 1; ox++)
+                        borders.TryAdd(MakeKey(worldX + ox, worldY + oy), cell.id);
+                }
+            }
+        }
+
+        // Fase 3: dibujar bordes una vez. Los interiores ya renderizados conservan prioridad.
+        foreach (var heightEntry in borderVisuals)
+        {
+            int height = heightEntry.Key;
+            foreach (var entry in heightEntry.Value)
+            {
+                DecodeKey(entry.Key, out int worldX, out int worldY);
+                var (targetChunk, lx, ly) = ResolveOrCreate(worldX, worldY);
+                var targetLayer = targetChunk.GetOrCreateLayer(height, layer);
+                if (targetLayer.IsRender(lx, ly)) continue;
+
+                var template = GetTemplate((BlackyRenderLayer)layer, entry.Value);
+                UpdateDualVisualInternal(worldX, worldY, lx, ly, height, layer, template, targetLayer, false);
+                targetChunk.MarkDirty();
+            }
+        }
+    }
     public void ApplyChunkBatchDualTiles(int chunkX, int chunkY, int height, int layer, SerializerCellGeneric[] cells)
     {
         var chunk = GetOrCreateChunk(chunkX, chunkY);
@@ -827,6 +907,7 @@ public class BlackyChunkCacheTextureMap
         }
         return null;
     }
+
   
     private void UpdateDualVisualInternal(int vx, int vy, int lx, int ly, int height, int layer, DualTileTemplate template, IBlackyChunkTilemapTexture tileLayer, bool esSolido = true)
     {        

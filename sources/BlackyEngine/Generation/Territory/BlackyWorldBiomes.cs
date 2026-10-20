@@ -11,61 +11,60 @@ using System.Text;
 using System.Threading.Tasks;
 using static MessagePack.GeneratedMessagePackResolver.GodotEcsArch.sources.BlackyEngine;
 // (los using de BlackyWorldConfig / BlackyWorldSeed / BlackyWorldHeight / BiomaData / TemplateWorldProfileData ya existen en tu proyecto)
-
+[Flags]
+public enum BiomeCellBorderType : byte
+{
+    None = 0,
+    Height = 1 << 0,
+    Map = 1 << 1,
+    Biome = 1 << 2
+}
 /// <summary>Resultado de la capa de biomas para una celda (coordenadas de mundo).</summary>
 public struct BiomeCell
 {
     /// <summary>Bioma de la celda. null si la celda está fuera del mundo.</summary>
     public BiomaData Bioma;
-
     /// <summary>Terreno que corresponde a la celda: SIEMPRE el idTerreno de su propio bioma (0 si está fuera del mundo).</summary>
     public long IdTerreno;
-
     /// <summary>
     /// Superficie de TRANSICIÓN. 0 si la celda no está en transición. Si lo está, es el idSuperficie del bioma que
     /// predomina (más celdas) en la zona de transición alrededor de la celda (ventana de radio TransitionWidth,
     /// contando también el bioma propio). En empate gana el bioma propio y luego el más cercano.
     /// </summary>
     public long IdSuperficie;
-
     /// <summary>Bioma cuya superficie se usó (el predominante). null si no es transición. Puede ser el propio.</summary>
     public BiomaData SurfaceBioma;
-
     /// <summary>
     /// TRANSICIÓN: bioma distinto más cercano (dentro de TransitionWidth tiles). null = la celda no está en una zona de
     /// transición.
     /// </summary>
     public BiomaData TransitionBioma;
-
     /// <summary>Nivel de altura de la geografía en esta celda (0..3). 0 = agua.</summary>
     public byte HeightLevel;
-
     /// <summary>0 = sin transición; 1..TransitionWidth = tiles hasta el bioma vecino (1 = pegada al borde).</summary>
     public byte TransitionDistance;
-
     /// <summary>
     /// TRANSICIÓN DE ALTURA: 0 = ninguna; 1..HeightTransitionWidth = tiles hasta la celda más cercana que tiene OTRO nivel
     /// de altura (1 = pegada al cambio). Se marca a ambos lados del cambio. Es independiente de la transición de biomas.
     /// </summary>
     public byte HeightTransitionDistance;
-
     /// <summary>Nivel de altura (0..3) de esa celda vecina más cercana. Solo es válido si IsHeightTransition.</summary>
     public byte HeightNeighborLevel;
-
     /// <summary>
     /// IdTerreno del lado de menor altura en la transición. Si esta celda es el lado bajo, es su propio IdTerreno;
     /// si la celda vecina es el lado bajo, es el terreno de esa vecina. 0 si no hay transición de altura.
     /// </summary>
     public long HeightLowerTerrainId;
-
+    /// <summary>Tipos de borde o transición que afectan a esta celda. Puede contener varios valores a la vez.</summary>
+    public BiomeCellBorderType BorderType;
+    public bool IsMapBorder => (BorderType & BiomeCellBorderType.Map) != 0;
+    public bool IsBiomeBorder => (BorderType & BiomeCellBorderType.Biome) != 0;
+    public bool IsHeightBorder => (BorderType & BiomeCellBorderType.Height) != 0;
     public bool IsTransition => TransitionBioma != null;
-
     public bool IsHeightTransition => HeightTransitionDistance != 0;
-
     /// <summary>true si la celda vecina que marca el cambio es más alta que esta (esta celda queda "abajo" del cambio).</summary>
     public bool HeightNeighborIsHigher => HeightTransitionDistance != 0 && HeightNeighborLevel > HeightLevel;
 }
-
 /// <summary>Bloque rectangular de celdas de bioma, indexable por coordenadas de MUNDO.</summary>
 public sealed class BiomeRegion
 {
@@ -74,19 +73,15 @@ public sealed class BiomeRegion
     public int Width { get; }
     public int Height { get; }
     public BiomeCell[] Cells { get; }    // fila por fila: índice = (y - MinY) * Width + (x - MinX)
-
     public BiomeRegion(int minX, int minY, int width, int height)
     {
         MinX = minX; MinY = minY; Width = width; Height = height;
         Cells = new BiomeCell[(long)width * height];
     }
-
     public bool Contains(int worldX, int worldY)
         => worldX >= MinX && worldX < MinX + Width && worldY >= MinY && worldY < MinY + Height;
-
     public BiomeCell this[int worldX, int worldY] => Cells[(long)(worldY - MinY) * Width + (worldX - MinX)];
 }
-
 /// <summary>
 /// Capa de biomas: elige el bioma de cada celda a partir de las reglas del template (reglasBiomas) y de la
 /// altura que dejó BlackyWorldGeography en heightMapWorld (la geografía debe estar generada antes de pedir biomas). No guarda un mapa del mundo: el bioma de una celda
@@ -106,21 +101,18 @@ public class BlackyWorldBiomes
     private readonly BlackyWorldSeed worldSeed;
     private readonly BlackyWorldHeight heightMapWorld;
     private readonly TemplateWorldProfileData template;
-
     private const int LevelCount = 4;                  // niveles 0..3
     private const ushort NoBiome = ushort.MaxValue;    // celda fuera del mundo
     private const byte NoLevel = 255;
     private const int MaxDistinctInWindow = 32;       // biomas distintos que se cuentan en una ventana de transición
     private const long CdfSamples = 1_000_000;         // muestras para calcular los cortes por peso
     private const int MinLevelSamples = 200;           // por debajo, un nivel usa la distribución global
-
     // ---- Estructura resuelta desde las reglas ----
     private readonly List<BiomaData> biomes = new();                     // índice de bioma -> BiomaData
     private readonly int[][] levelBiomeIdx = new int[LevelCount][];      // por nivel: bioma de cada tramo
     private readonly float[][] levelWeights = new float[LevelCount][];   // por nivel: peso normalizado de cada tramo
     private readonly bool[] isWaterBiome;                                // el bioma aparece en el nivel 0
     private readonly List<string> warnings = new();
-
     // ---- Estado calculado (lazy) ----
     private readonly object sync = new();
     private volatile bool prepared;
@@ -128,9 +120,8 @@ public class BlackyWorldBiomes
     private float[][] levelCuts;
     private float biomeFrequency = 0.004f;
     private int transitionWidth = 4;
-    private int heightTransitionWidth = 3;
+    private int heightTransitionWidth = 2;
     private readonly Dictionary<int, (int dx, int dy, int d2)[]> ringOffsetsCache = new();
-
     /// <summary>
     /// Ciclos del ruido de territorios por tile. 0.004 => territorios de ~250 tiles. Es un tamaño ABSOLUTO
     /// (no depende del tamaño del mundo). Más bajo = territorios más grandes.
@@ -140,7 +131,6 @@ public class BlackyWorldBiomes
         get => biomeFrequency;
         set { biomeFrequency = value; prepared = false; }
     }
-
     /// <summary>
     /// Ancho (en tiles) de la zona de transición entre dos biomas distintos, a cada lado del borde.
     /// 0 = no marcar transiciones. Máximo 16.
@@ -150,7 +140,6 @@ public class BlackyWorldBiomes
         get => transitionWidth;
         set => transitionWidth = Math.Clamp(value, 0, 16);
     }
-
     /// <summary>
     /// Ancho (en tiles) de la zona de transición de ALTURA: una celda está en transición de altura si hay otra celda con un
     /// nivel de altura distinto a esa distancia o menos. Se marca a ambos lados del cambio de altura.
@@ -161,58 +150,45 @@ public class BlackyWorldBiomes
         get => heightTransitionWidth;
         set => heightTransitionWidth = Math.Clamp(value, 0, 16);
     }
-
     /// <summary>
     /// Fuerza a recalcular los cortes de biomas en la próxima consulta. Llámalo si vuelves a generar la geografía
     /// (los cortes se calculan una vez, la primera vez que se pide un bioma, leyendo las alturas ya generadas).
     /// </summary>
     public void RefreshFromGeography() => prepared = false;
-
     /// <summary>Avisos de validación del template (reglas inválidas, niveles sin reglas, etc.).</summary>
     public IReadOnlyList<string> Warnings => warnings;
-
     /// <summary>
     /// Solo afecta al DEBUG (ExportDebugPng), no a los datos: true = Y+ hacia arriba (la fila de arriba es MaxY);
     /// false = Y+ hacia abajo (la fila de arriba es MinY). Debe coincidir con BlackyWorldGeography.DebugYAxisUp.
     /// </summary>
     public bool DebugYAxisUp { get; set; } = true;
-
     // Misma convención de coordenadas que BlackyWorldGeography: centro (0,0), -N/2 .. N/2-1
     public int MinX => -(worldConfig.MapSize.X / 2);
     public int MinY => -(worldConfig.MapSize.Y / 2);
     public int MaxX => MinX + worldConfig.MapSize.X - 1;
     public int MaxY => MinY + worldConfig.MapSize.Y - 1;
-
     public BlackyWorldBiomes(BlackyWorldConfig worldConfig, BlackyWorldSeed worldSeed, BlackyWorldHeight heightMapWorld, TemplateWorldProfileData template)
     {
         this.worldConfig = worldConfig;
         this.worldSeed = worldSeed;
         this.heightMapWorld = heightMapWorld;
         this.template = template ?? throw new ArgumentNullException(nameof(template));
-
         BuildLevelRules();
-
         isWaterBiome = new bool[biomes.Count];
         foreach (int b in levelBiomeIdx[0]) isWaterBiome[b] = true;
     }
-
     /// <summary>Un solo lugar para decidir cuándo dos BiomaData son "el mismo bioma": mismo id (o misma instancia).</summary>
     private static bool SameBiome(BiomaData a, BiomaData b) => ReferenceEquals(a, b) || a.id == b.id;
-
     /// <summary>Texto corto de un bioma para la leyenda de debug (BiomaData no tiene nombre).</summary>
     private static string BiomeLabel(BiomaData b) => $"bioma #{b.id} (terreno {b.idTerreno}, superficie {b.idSuperficie})";
-
     // ============================================================
     //  REGLAS -> ESTRUCTURA POR NIVEL
     // ============================================================
-
     private void BuildLevelRules()
     {
         var rules = template.reglasBiomas ?? new List<BiomePlacementRuleData>();
-
         // Niveles que el perfil geográfico puede producir (para avisar solo de lo que importa)
         int reachable = new ConfiguracionGeograficaData(template.perfilGeografico).AlturaMaxima;
-
         // Validación de cada regla (una sola vez)
         var valid = new bool[rules.Count];
         for (int i = 0; i < rules.Count; i++)
@@ -223,7 +199,6 @@ public class BlackyWorldBiomes
             if (r.alturaMinima > r.alturaMaxima) { warnings.Add($"Regla #{i}: alturaMinima {r.alturaMinima} > alturaMaxima {r.alturaMaxima}, se ignora."); continue; }
             valid[i] = true;
         }
-
         for (int level = 0; level < LevelCount; level++)
         {
             var entries = new List<(int biome, float weight)>();
@@ -232,19 +207,16 @@ public class BlackyWorldBiomes
                 if (!valid[i]) continue;
                 var r = rules[i];
                 if (level < r.alturaMinima || level > r.alturaMaxima) continue;
-
                 int b = GetBiomeIndex(r.bioma);
                 int existing = entries.FindIndex(e => e.biome == b);
                 if (existing >= 0) entries[existing] = (b, entries[existing].weight + r.peso);   // mismo bioma en 2 reglas
                 else entries.Add((b, r.peso));
             }
-
             if (entries.Count == 0)
             {
                 if (level == 0)
                     throw new InvalidOperationException(
                         "El template no tiene ninguna regla válida para la altura 0 (agua). Siempre debe existir una.");
-
                 // Sin reglas en este nivel: se usan las del nivel inferior
                 levelBiomeIdx[level] = levelBiomeIdx[level - 1];
                 levelWeights[level] = levelWeights[level - 1];
@@ -252,7 +224,6 @@ public class BlackyWorldBiomes
                     warnings.Add($"Nivel {level}: ninguna regla lo cubre; se usan las reglas del nivel {level - 1}.");
                 continue;
             }
-
             float sum = 0f;
             foreach (var e in entries) sum += e.weight;
             levelBiomeIdx[level] = new int[entries.Count];
@@ -264,7 +235,6 @@ public class BlackyWorldBiomes
             }
         }
     }
-
     private int GetBiomeIndex(BiomaData bioma)
     {
         for (int i = 0; i < biomes.Count; i++)
@@ -272,11 +242,9 @@ public class BlackyWorldBiomes
         biomes.Add(bioma);
         return biomes.Count - 1;
     }
-
     // ============================================================
     //  PREPARACIÓN: ruido de territorios + cortes por peso (una vez)
     // ============================================================
-
     private void EnsurePrepared()
     {
         if (prepared) return;
@@ -284,9 +252,7 @@ public class BlackyWorldBiomes
         {
             if (prepared) return;
             if (biomeFrequency <= 0f) throw new InvalidOperationException("BiomeFrequency debe ser mayor que 0");
-
             noise = new PerlinNoise(worldSeed.GetRng("biomes").Next());
-
             // Se muestrea el mundo en una cuadrícula y se guarda (valor de ruido, nivel de altura) de cada muestra.
             // Los cortes de cada nivel salen SOLO de las muestras de ese nivel: así cada bioma ocupa la proporción
             // de su peso dentro de su nivel, aunque la forma de la geografía y el ruido estén correlacionados.
@@ -297,19 +263,16 @@ public class BlackyWorldBiomes
             int s = Math.Max(1, (int)Math.Ceiling(Math.Sqrt((double)total / CdfSamples)));
             int sw = (w + s - 1) / s, sh = (h + s - 1) / s;
             float f = biomeFrequency;
-
             byte[] sampleLevel = new byte[(long)sw * sh];
             for (int j = 0; j < sh; j++)                       // en serie: no asumo que heightMapWorld sea thread-safe
                 for (int i = 0; i < sw; i++)
                     sampleLevel[j * sw + i] = ReadLevel(minX + i * s, minY + j * s);
-
             float[] sample = new float[(long)sw * sh];
             Parallel.For(0, sh, j =>
             {
                 for (int i = 0; i < sw; i++)
                     sample[j * sw + i] = noise.Fbm((minX + i * s) * f, (minY + j * s) * f, 3);
             });
-
             var perLevel = new float[LevelCount][];
             for (int level = 0; level < LevelCount; level++)
             {
@@ -322,7 +285,6 @@ public class BlackyWorldBiomes
                 perLevel[level] = arr;
             }
             Array.Sort(sample);   // distribución global: respaldo para niveles con muy pocas celdas
-
             var cuts = new float[LevelCount][];
             for (int level = 0; level < LevelCount; level++)
             {
@@ -340,7 +302,6 @@ public class BlackyWorldBiomes
             prepared = true;
         }
     }
-
     /// <summary>Índice de bioma para una celda con ese nivel de altura (ya validada como dentro del mundo).</summary>
     private ushort EvaluateBiome(int worldX, int worldY, int level)
     {
@@ -350,19 +311,15 @@ public class BlackyWorldBiomes
         while (r < cuts.Length && v >= cuts[r]) r++;
         return (ushort)levelBiomeIdx[level][r];
     }
-
     private bool InsideWorld(int x, int y) => x >= MinX && x <= MaxX && y >= MinY && y <= MaxY;
-
     private byte ReadLevel(int x, int y)
     {
         int v = (int)heightMapWorld.GetTopHeight(x, y);
         return (byte)Math.Clamp(v, 0, LevelCount - 1);
     }
-
     // ============================================================
     //  API
     // ============================================================
-
     /// <summary>Bioma de una celda (coordenadas de mundo). null si está fuera del mundo. Sin transiciones: es la consulta barata.</summary>
     public BiomaData GetBiome(int worldX, int worldY)
     {
@@ -370,10 +327,8 @@ public class BlackyWorldBiomes
         EnsurePrepared();
         return biomes[EvaluateBiome(worldX, worldY, ReadLevel(worldX, worldY))];
     }
-
     /// <summary>Celda completa (bioma + transición). Para muchas celdas usa GenerateRegion, que es mucho más rápido.</summary>
     public BiomeCell GetCell(int worldX, int worldY) => GenerateRegion(worldX, worldY, 1, 1)[worldX, worldY];
-
     /// <summary>
     /// Calcula biomas y transiciones de un rectángulo (por ejemplo un chunk). Se calcula también un borde extra de
     /// tiles alrededor (el mayor entre TransitionWidth y HeightTransitionWidth), así el resultado de una celda es el mismo sin importar cómo partas el mundo
@@ -383,12 +338,10 @@ public class BlackyWorldBiomes
     {
         if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width), "El tamaño de la región debe ser positivo.");
         EnsurePrepared();
-
         int tw = transitionWidth, hw = heightTransitionWidth;   // se leen una vez por si cambian durante la ejecución
         int m = Math.Max(tw, hw);                                // borde extra: cubre las dos ventanas
         int ew = width + 2 * m, eh = height + 2 * m;
         int ex0 = minX - m, ey0 = minY - m;
-
         // 1) Niveles de altura de la región ampliada (en serie: no asumo que heightMapWorld sea thread-safe)
         byte[] levels = new byte[(long)ew * eh];
         for (int ey = 0; ey < eh; ey++)
@@ -400,7 +353,6 @@ public class BlackyWorldBiomes
                 levels[(long)ey * ew + ex] = InsideWorld(wx, wy) ? ReadLevel(wx, wy) : NoLevel;
             }
         }
-
         // 2) Bioma de cada celda de la región ampliada (en paralelo)
         ushort[] ids = new ushort[(long)ew * eh];
         Action<int> doRow = ey =>
@@ -415,26 +367,21 @@ public class BlackyWorldBiomes
         };
         if ((long)ew * eh >= 20_000) Parallel.For(0, eh, doRow);
         else for (int ey = 0; ey < eh; ey++) doRow(ey);
-
         // 3) Celdas finales + transición (bioma distinto más cercano dentro de TransitionWidth)
         var region = new BiomeRegion(minX, minY, width, height);
         var offsets = GetRingOffsets(tw);
         var heightOffsets = GetRingOffsets(hw);
-
         Action<int> doCells = y =>
         {
             Span<ushort> keys = stackalloc ushort[MaxDistinctInWindow];
             Span<int> counts = stackalloc int[MaxDistinctInWindow];
-
             for (int x = 0; x < width; x++)
             {
                 long center = (long)(y + m) * ew + (x + m);
                 ushort id = ids[center];
                 if (id == NoBiome) continue;
-
                 var bioma = biomes[id];
                 var cell = new BiomeCell { Bioma = bioma, IdTerreno = bioma.idTerreno, HeightLevel = levels[center] };
-
                 // Transición: bioma distinto más cercano (offsets ordenados por distancia: el primero es el más cercano)
                 bool inTransition = false;
                 for (int k = 0; k < offsets.Length; k++)
@@ -448,7 +395,6 @@ public class BlackyWorldBiomes
                         break;
                     }
                 }
-
                 // Superficie: bioma predominante en la ventana (centro primero, luego del más cercano al más lejano;
                 // el '>' estricto hace que en empate gane el propio y luego el más cercano)
                 if (inTransition)
@@ -473,7 +419,6 @@ public class BlackyWorldBiomes
                     cell.SurfaceBioma = surfaceBiome;
                     cell.IdSuperficie = surfaceBiome.idSuperficie;
                 }
-
                 // Transición de altura: celda más cercana con otro nivel (offsets ordenados por distancia)
                 for (int k = 0; k < heightOffsets.Length; k++)
                 {
@@ -491,21 +436,26 @@ public class BlackyWorldBiomes
                         break;
                     }
                 }
-
+                int worldX = minX + x;
+                int worldY = minY + y;
+                if (worldX == MinX || worldX == MaxX || worldY == MinY || worldY == MaxY)
+                    cell.BorderType |= BiomeCellBorderType.Map;
+                if (cell.IsTransition)
+                    cell.BorderType |= BiomeCellBorderType.Biome;
+                if (cell.IsHeightTransition)
+                    if (cell.HeightTransitionDistance == 1)
+                        cell.BorderType |= BiomeCellBorderType.Height;
                 region.Cells[(long)y * width + x] = cell;
             }
         };
         if ((long)width * height >= 4_096) Parallel.For(0, height, doCells);
         else for (int y = 0; y < height; y++) doCells(y);
-
         return region;
     }
-
     // ============================================================
     //  RECORRIDO DEL MUNDO POR CHUNKS
     //  (un mapa de 8192x8192 son 67M de celdas: no cabe en un solo arreglo, por eso se recorre por chunks)
     // ============================================================
-
     /// <summary>
     /// Chunk (chunkX, chunkY) de lado chunkSize. La cuadrícula de chunks parte del (0,0) del mundo, así que hay
     /// índices negativos: el chunk (0,0) cubre X e Y de 0 a chunkSize-1, y el (-1,-1) de -chunkSize a -1.
@@ -516,7 +466,6 @@ public class BlackyWorldBiomes
         if (chunkSize <= 0) throw new ArgumentOutOfRangeException(nameof(chunkSize));
         return GenerateRegion(chunkX * chunkSize, chunkY * chunkSize, chunkSize, chunkSize);
     }
-
     /// <summary>Rango (inclusivo) de índices de chunk que tocan el mundo.</summary>
     public void GetChunkRange(int chunkSize, out int minChunkX, out int maxChunkX, out int minChunkY, out int maxChunkY)
     {
@@ -524,7 +473,6 @@ public class BlackyWorldBiomes
         minChunkX = FloorDiv(MinX, chunkSize); maxChunkX = FloorDiv(MaxX, chunkSize);
         minChunkY = FloorDiv(MinY, chunkSize); maxChunkY = FloorDiv(MaxY, chunkSize);
     }
-
     /// <summary>
     /// Recorre TODO el mundo chunk por chunk (filas de arriba a abajo, de izquierda a derecha). Cada chunk se calcula
     /// cuando se pide y se puede soltar al terminar, así la memoria se mantiene baja.
@@ -538,9 +486,7 @@ public class BlackyWorldBiomes
             for (int cx = minCx; cx <= maxCx; cx++)
                 yield return (cx, cy, GenerateChunk(cx, cy, chunkSize));
     }
-
     private static int FloorDiv(int a, int b) => a >= 0 ? a / b : -((-a + b - 1) / b);
-
     /// <summary>Desplazamientos (dx,dy) con distancia &lt;= m, ordenados de más cerca a más lejos (orden estable).</summary>
     private (int dx, int dy, int d2)[] GetRingOffsets(int m)
     {
@@ -560,11 +506,9 @@ public class BlackyWorldBiomes
             return arr;
         }
     }
-
     // ============================================================
     //  DEBUG: imagen PNG de biomas + leyenda .txt
     // ============================================================
-
     /// <summary>
     /// Guarda un PNG con los biomas (cada bioma un color; los azules son biomas del nivel 0/agua) y, si
     /// <paramref name="markTransitions"/> es true, las celdas de transición de bioma en una versión más clara del color;
@@ -582,11 +526,9 @@ public class BlackyWorldBiomes
         int minX = MinX, minY = MinY;
         int maxSide = Math.Max(w, h);
         const int MaxImageSide = 8192;
-
         int scale = pixelsPerTile > 0 ? pixelsPerTile : Math.Max(1, 2048 / maxSide);
         scale = Math.Clamp(scale, 1, Math.Max(1, MaxImageSide / maxSide));
         int iw = w * scale, ih = h * scale;
-
         // Paleta: 0..63 colores de biomas, 64..127 versión clara (transición de bioma), 128..191 versión oscura (transición de altura)
         byte[] palette = new byte[256 * 3];
         int waterCount = 0, landCount = 0;
@@ -609,26 +551,21 @@ public class BlackyWorldBiomes
             palette[(128 + i) * 3 + 1] = (byte)(c.g * 40 / 100);
             palette[(128 + i) * 3 + 2] = (byte)(c.b * 40 / 100);
         }
-
         string dir = Path.GetDirectoryName(Path.GetFullPath(path));
         if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-
         // Estadísticas: celdas por nivel y bioma, y cuántas están en transición
         long[,] perLevel = new long[LevelCount, biomes.Count];
         long[] transitions = new long[biomes.Count];
         long[] otherSurface = new long[biomes.Count];   // transiciones cuya superficie es de OTRO bioma
         long[,] heightPairs = new long[LevelCount, LevelCount];   // celdas en transición de altura: nivel propio -> nivel vecino
-
         const int StripRows = 64;
         BiomeRegion strip = null;
         int stripStart = -1, stripRows = 0;
         byte[] cache = new byte[iw];
         int cachedTy = -1;
-
         // Las celdas devuelven siempre las instancias de 'biomes', así que se indexan por referencia
         var indexOf = new Dictionary<BiomaData, int>(ReferenceEqualityComparer.Instance);
         for (int i = 0; i < biomes.Count; i++) indexOf[biomes[i]] = i;
-
         BlackyDebugPng.WriteIndexed(path, iw, ih, palette, (py, row) =>
         {
             int ty = py / scale;
@@ -658,7 +595,6 @@ public class BlackyWorldBiomes
             }
             Buffer.BlockCopy(cache, 0, row, 1, iw);
         });
-
         // Leyenda
         var inv = System.Globalization.CultureInfo.InvariantCulture;
         using var sw = new StreamWriter(Path.ChangeExtension(path, ".leyenda.txt"), false, new UTF8Encoding(false));
@@ -696,7 +632,6 @@ public class BlackyWorldBiomes
             for (int c2 = 0; c2 < LevelCount; c2++)
                 if (heightPairs[a, c2] > 0) sw.WriteLine($"   nivel {a} -> vecino {c2}: {heightPairs[a, c2]} celdas");
     }
-
     private static (byte r, byte g, byte b) HsvToRgb(double h, double s, double v)
     {
         double c = v * s, hp = h * 6.0, x = c * (1 - Math.Abs(hp % 2 - 1)), m = v - c;
@@ -712,14 +647,12 @@ public class BlackyWorldBiomes
         }
         return ((byte)((r + m) * 255), (byte)((g + m) * 255), (byte)((b + m) * 255));
     }
-
     // ============================================================
     //  RUIDO PERLIN 2D con semilla + fBm (thread-safe una vez construido)
     // ============================================================
     private sealed class PerlinNoise
     {
         private readonly int[] _p = new int[512];
-
         public PerlinNoise(int seed)
         {
             var rng = new Random(seed);
@@ -732,7 +665,6 @@ public class BlackyWorldBiomes
             }
             for (int i = 0; i < 512; i++) _p[i] = perm[i & 255];
         }
-
         public float Fbm(float x, float y, int octaves = 4, float lacunarity = 2f, float gain = 0.5f)
         {
             float sum = 0f, amp = 1f, freq = 1f, norm = 0f;
@@ -745,7 +677,6 @@ public class BlackyWorldBiomes
             }
             return Math.Clamp((sum / norm / 0.7071f + 1f) * 0.5f, 0f, 1f);
         }
-
         private float Perlin(float x, float y)
         {
             int xi = (int)MathF.Floor(x) & 255;
@@ -753,20 +684,16 @@ public class BlackyWorldBiomes
             float xf = x - MathF.Floor(x);
             float yf = y - MathF.Floor(y);
             float u = Fade(xf), v = Fade(yf);
-
             int aa = _p[_p[xi] + yi];
             int ab = _p[_p[xi] + yi + 1];
             int ba = _p[_p[xi + 1] + yi];
             int bb = _p[_p[xi + 1] + yi + 1];
-
             float x1 = Lerp(Grad(aa, xf, yf), Grad(ba, xf - 1, yf), u);
             float x2 = Lerp(Grad(ab, xf, yf - 1), Grad(bb, xf - 1, yf - 1), u);
             return Lerp(x1, x2, v);
         }
-
         private static float Fade(float t) => t * t * t * (t * (t * 6 - 15) + 10);
         private static float Lerp(float a, float b, float t) => a + (b - a) * t;
-
         private static float Grad(int hash, float x, float y)
         {
             switch (hash & 7)
@@ -783,7 +710,6 @@ public class BlackyWorldBiomes
         }
     }
 }
-
 /// <summary>Escritor mínimo de PNG indexado (8 bits con paleta) para los exports de debug. Sin dependencias.</summary>
 internal static class BlackyDebugPng
 {
@@ -801,10 +727,8 @@ internal static class BlackyDebugPng
                 z.Write(row, 0, row.Length);
             }
         }
-
         using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
         fs.Write(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }, 0, 8);
-
         byte[] ihdr = new byte[13];
         WriteBigEndian(ihdr, 0, width);
         WriteBigEndian(ihdr, 4, height);
@@ -815,7 +739,6 @@ internal static class BlackyDebugPng
         WriteChunk(fs, "IDAT", compressed.GetBuffer(), (int)compressed.Length);
         WriteChunk(fs, "IEND", new byte[0], 0);
     }
-
     private static void WriteBigEndian(byte[] buf, int offset, int value)
     {
         buf[offset] = (byte)(value >> 24);
@@ -823,7 +746,6 @@ internal static class BlackyDebugPng
         buf[offset + 2] = (byte)(value >> 8);
         buf[offset + 3] = (byte)value;
     }
-
     private static void WriteChunk(Stream s, string type, byte[] data, int length)
     {
         byte[] head = new byte[8];
@@ -831,7 +753,6 @@ internal static class BlackyDebugPng
         for (int i = 0; i < 4; i++) head[4 + i] = (byte)type[i];
         s.Write(head, 0, 8);
         s.Write(data, 0, length);
-
         uint crc = 0xFFFFFFFFu;
         crc = Crc32Update(crc, head, 4, 4);
         crc = Crc32Update(crc, data, 0, length);
@@ -840,9 +761,7 @@ internal static class BlackyDebugPng
         WriteBigEndian(tail, 0, unchecked((int)crc));
         s.Write(tail, 0, 4);
     }
-
     private static readonly uint[] CrcTable = BuildCrcTable();
-
     private static uint[] BuildCrcTable()
     {
         var t = new uint[256];
@@ -855,7 +774,6 @@ internal static class BlackyDebugPng
         }
         return t;
     }
-
     private static uint Crc32Update(uint crc, byte[] buf, int offset, int len)
     {
         for (int i = 0; i < len; i++)

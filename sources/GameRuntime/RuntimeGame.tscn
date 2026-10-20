@@ -42,7 +42,7 @@ size = 10.0
 script = ExtResource("2_6cyr2")
 MouseEdgeMargin = 5.0
 MinZoomSize = 5.0
-MaxZoomSize = 30.0
+MaxZoomSize = 100.0
 
 [node name="InputHandlerGame" type="Node" parent="Render" unique_id=111948717]
 script = ExtResource("3_cweo2")

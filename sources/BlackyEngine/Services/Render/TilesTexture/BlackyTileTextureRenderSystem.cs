@@ -142,7 +142,10 @@ public class BlackyTileTextureRenderSystem
     {
         
         if (!chunkMap.TryGetChunk(coord.X, coord.Y, out var chunk))
+        {
             return;
+        }
+            
         
         //GD.Print($"OnChunkLoad Render {coord}");
         if (!chunkRenderInstances.ContainsKey(coord))
@@ -177,7 +180,7 @@ public class BlackyTileTextureRenderSystem
                     {
                         int tileId = layer.GetTile(x, y);
                         bool isRender = layer.IsRender(x, y);                        
-                        if (tileId == 0 || isRender == false)
+                        if (tileId == 0 )
                         { 
                             continue;
                         }

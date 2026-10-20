@@ -10,6 +10,7 @@ using GodotEcsArch.sources.managers.Chunks;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.TilesTexture;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -37,15 +38,20 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
     #region Event Handlers
     private void OnChunkDataPreload(Vector2I pos)
     {
-        var coord = new BlackyChunkCoord(pos.X, pos.Y);
-        if (!_chunks.TryGetValue(coord, out var chunk)) return;
-        GD.Print($"[BlackyTerrainWorldData] Preloading chunk data for {coord.X}, {coord.Y}");
-        foreach (var (height, heightData) in chunk.GetHeights())
-        {
-            _textureMap.ApplyChunkBatchDualTiles(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
-        }
+        //var coord = new BlackyChunkCoord(pos.X, pos.Y);
+        //if (!_chunks.TryGetValue(coord, out var chunk)) return;
+        //GD.Print($"[BlackyTerrainWorldData] Preloading chunk data for {coord.X}, {coord.Y}");
+        //foreach (var (height, heightData) in chunk.GetHeights())
+        //{
+        //    _textureMap.ApplyChunkBatchDualTiles(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
+        //}
     }
     #endregion
+
+    internal void PlotAllMap()
+    {
+        _textureMap.ApplyWorldBatchDualTiles(GetAllCells(), (int)RenderLayer);
+    }
 
     public void DrawAllMapTxt()
     {
@@ -133,7 +139,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
 
     public void SetTerrainBorderDirectNoRenderLocal(BlackyChunkCoord coord, int lx, int ly, int h, bool isBorder)
     {
-        ref var cell = ref ResolveOrCreateCellLocal(coord, lx, ly, h);        
+        ref var cell = ref ResolveOrCreateCellLocal(coord, lx, ly, h);
         cell.isBorder = isBorder;
     }
 
@@ -144,9 +150,30 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
         cell.isBorder = isBorder;
     }
 
-    public void SetTerrainDirectNoRenderLocal(BlackyChunkCoord coord,int lx, int ly, int h, bool isBorder, TerrainBaseData data)
+    /// <summary>Obtiene o crea un chunk para una escritura por lote, sin marcarlo sucio por celda.</summary>
+    public BlackyChunkData<SerializerCellGeneric> GetOrCreateChunkDataForGeneration(BlackyChunkCoord coord)
     {
-        ref var cell = ref ResolveOrCreateCellLocal(coord,lx,ly, h);
+        if (_chunks.TryGetValue(coord, out var chunk))
+            return chunk;
+
+        chunk = new BlackyChunkData<SerializerCellGeneric>(ChunkSize);
+        _chunks.Add(coord, chunk);
+        return chunk;
+    }
+
+    /// <summary>Marca una sola vez el chunk y su región después de completar la escritura por lote.</summary>
+    public void CompleteGenerationChunk(BlackyChunkCoord coord, BlackyChunkData<SerializerCellGeneric> chunk)
+    {
+        MarkChunkDirty(coord, chunk);
+    }
+
+    public ushort GetTerrainPalettePersistenceId(TerrainBaseData data)
+    {
+        return BlackyPalletesPersistence.terrainPalette.GetIdPersistence(data.nameMod, data.id, out _);
+    }
+    public void SetTerrainDirectNoRenderLocal(BlackyChunkCoord coord, int lx, int ly, int h, bool isBorder, TerrainBaseData data)
+    {
+        ref var cell = ref ResolveOrCreateCellLocal(coord, lx, ly, h);
         cell.id = BlackyPalletesPersistence.terrainPalette.GetIdPersistence(data.nameMod, data.id, out _);
         cell.isBorder = isBorder;
     }
@@ -222,7 +249,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
                         ref var cell = ref ResolveOrCreateCell(x, y, h);
 
                         // Ahora sí, la modificación afectará a la data del chunk
-                        cell.isBorder = CalculateIsBorder(x, y, h);                        
+                        cell.isBorder = CalculateIsBorder(x, y, h);
                     }
                 }
             }
@@ -230,7 +257,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
     }
     public bool HasTerrain(int worldX, int worldY, int height)
     {
-        if (!TryGetCell(worldX, worldY,height,out var cell))
+        if (!TryGetCell(worldX, worldY, height, out var cell))
         {
             return false;
         }
@@ -256,6 +283,8 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
         if (isNew) _lastState = new BrushState { x = x, y = y, altura = h, capa = layer, id = id };
         return isNew;
     }
+
+ 
     #endregion
 }
 
