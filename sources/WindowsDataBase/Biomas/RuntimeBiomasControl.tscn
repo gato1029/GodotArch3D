@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dpo3g88l2ea6c" path="res://resources/Textures/internal/search.png" id="5_asx2t"]
 [ext_resource type="PackedScene" uid="uid://60m1n5h6qfwg" path="res://sources/KuroTiles/ControlListResourcesSources.tscn" id="6_3crfo"]
 [ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="6_08ln4"]
+[ext_resource type="PackedScene" uid="uid://dabci65lr101x" path="res://sources/WindowsDataBase/Decoration/ControlListDecoraciones.tscn" id="6_gpnmt"]
 [ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="7_3e5p6"]
 
 [node name="RuntimeBiomasControl" type="PanelContainer" unique_id=680472044]
@@ -103,6 +104,15 @@ size_flags_horizontal = 0
 text = "Caminos"
 icon = ExtResource("5_asx2t")
 alignment = 0
+
+[node name="Label6" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1962954809]
+layout_mode = 2
+text = "Decoraciones:"
+
+[node name="ControlListDecoraciones" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=457056216 instance=ExtResource("6_gpnmt")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="Label5" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer" unique_id=1179606051]
 layout_mode = 2

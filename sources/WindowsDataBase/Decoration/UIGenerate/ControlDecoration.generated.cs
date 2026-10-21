@@ -1,0 +1,16 @@
+// AUTO-GENERATED FILE. DO NOT EDIT.
+using Godot;
+using System;
+
+public partial class ControlDecoration : Control
+{
+    public delegate void EventNotifyChangued(ControlDecoration objectControl);
+    public event EventNotifyChangued OnNotifyChangued;
+
+    private TextureRect TextureRectImage;
+
+    public void InitializeUI()
+    {
+        TextureRectImage = GetNode<TextureRect>("TextureRectImage");
+    }
+}

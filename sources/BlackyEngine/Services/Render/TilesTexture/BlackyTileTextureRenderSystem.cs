@@ -91,14 +91,14 @@ public class BlackyTileTextureRenderSystem
 {
 
 
-    private readonly BlackyChunkCacheTextureMap chunkMap;
+    private readonly BlackyChunkTextureCache chunkMap;
     private readonly ChunkManagerBase chunkManager;
     private readonly FlecsManager flecsManager;
 
 
     private readonly ConcurrentDictionary<Vector2I, BlackyChunkRenderTiles> chunkRenderInstances = new ConcurrentDictionary<Vector2I, BlackyChunkRenderTiles>();
 
-    public BlackyTileTextureRenderSystem(BlackyChunkCacheTextureMap chunkMap,ChunkManagerBase chunkManager,FlecsManager flecsManager)
+    public BlackyTileTextureRenderSystem(BlackyChunkTextureCache chunkMap,ChunkManagerBase chunkManager,FlecsManager flecsManager)
     {
         this.chunkMap = chunkMap;
         this.chunkManager = chunkManager;

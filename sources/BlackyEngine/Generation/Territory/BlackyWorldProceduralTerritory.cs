@@ -56,9 +56,16 @@ public class BlackyWorldProceduralTerritory
         PerformanceTimer.Instance.Start(timePlot);
         _world.Services.TerrainDataLienzo.PlotAllMap();
         _world.Services.SuperficiesDataLienzo.PlotAllMap();
+        _world.Services.AdornosDataLienzo.PlotAllMap();
         PerformanceTimer.Instance.Stop(timePlot);
         PerformanceTimer.Instance.Print(timePlot);
         world.Streaming.chunkManagerLocal.Teleport(new Vector2(0, 0)); // esto hace que se renderice el chunk central y se carguen los chunks alrededor
+    }
+
+    private void GenerateDecorations()
+    {
+        // genera decoracion, como cesped, manchas, u otras cosas que no tienen interaccion con el mundo
+
     }
     private void GenerateGeography()
     {
@@ -72,37 +79,7 @@ public class BlackyWorldProceduralTerritory
         //_geography.ExportDebugTxt(filePath); // debug: genera un txt con el mapa de terreno generado
        // _geography.ExportDebugPng(imgPath); // debug: genera una imagen con el mapa de terreno generado
     }
-    public void Test()
-    {
-        //_biomes.MeasureGenerateChunks(32);
-        //const int chunkSize = 32;
-        //var chunks = _biomes.EnumerateChunks(chunkSize).GetEnumerator();
-        //long biomeTicks = 0;
-        //long otherTicks = 0;
-
-        //while (true)
-        //{
-        //    long start = Stopwatch.GetTimestamp();
-        //    bool hasChunk = chunks.MoveNext();
-        //    biomeTicks += Stopwatch.GetTimestamp() - start;
-
-        //    if (!hasChunk)
-        //        break;
-
-        //    var (chunkX, chunkY, region) = chunks.Current;
-
-        //    start = Stopwatch.GetTimestamp();
-
-        //    // Aquí va el cuerpo actual del foreach para procesar `region`.
-
-        //    otherTicks += Stopwatch.GetTimestamp() - start;
-        //}
-
-        //GD.Print($"Generar BiomeRegion: {biomeTicks * 1000.0 / Stopwatch.Frequency:F0} ms");
-        //GD.Print($"Preparar/escribir chunks: {otherTicks * 1000.0 / Stopwatch.Frequency:F0} ms");
-    }
-    // using System.Threading.Tasks;  (ya lo tienes)
-
+  
     public void GenerateTerritory()
     {
         const int chunkSize = 32;          // debe coincidir con el chunk del juego
@@ -110,8 +87,10 @@ public class BlackyWorldProceduralTerritory
         int heightBufferCount = Math.Max(_heightMax, 3) + 1;
         var terrainPaletteIds = new Dictionary<long, ushort>();
         var surfacePaletteIds = new Dictionary<long, ushort>();
+        var decorationPaletteIds = new Dictionary<long, ushort>();
         var terrainData = _world.Services.TerrainDataLienzo;
         var surfaceData = _world.Services.SuperficiesDataLienzo;
+        var decorationData = _world.Services.AdornosDataLienzo;
 
         var workBatch = new List<(
             BlackyChunkCoord coord,
@@ -119,7 +98,9 @@ public class BlackyWorldProceduralTerritory
             BlackyChunkData<SerializerCellGeneric> chunkData,
             BlackyChunkHeightData<SerializerCellGeneric>[] heightBuffers,
             BlackyChunkData<SerializerCellGeneric> surfaceChunkData,                  // null si el chunk no tiene transiciones
-            BlackyChunkHeightData<SerializerCellGeneric>[] surfaceBuffers)>(chunksPerBatch);
+            BlackyChunkHeightData<SerializerCellGeneric>[] surfaceBuffers,
+            BlackyChunkData<SerializerCellGeneric> decorationChunkData,               // null si el chunk no tiene decoraciones
+            BlackyChunkHeightData<SerializerCellGeneric>[] decorationBuffers)>(chunksPerBatch);
 
         _biomes.HeightReadsAreThreadSafe = true;
 
@@ -139,6 +120,14 @@ public class BlackyWorldProceduralTerritory
             surfacePaletteIds.Add(surfaceId, surfaceData.GetSuperficiePalettePersistenceId(data));
         }
 
+        void CacheDecorationPaletteId(long decorationId)
+        {
+            if (decorationPaletteIds.ContainsKey(decorationId)) return;
+
+            DecorationData data = AtlasModsManager.GetDirect<DecorationData>(decorationId);
+            decorationPaletteIds.Add(decorationId, decorationData.GetDecorationPalettePersistenceId(data));
+        }
+
         void ProcessBatch()
         {
             if (workBatch.Count == 0) return;
@@ -150,6 +139,8 @@ public class BlackyWorldProceduralTerritory
                 BiomeRegion region = item.region;
                 var heightBuffers = item.heightBuffers;
                 var surfaceBuffers = item.surfaceBuffers;
+                var decorationBuffers = item.decorationBuffers;
+                var decorationRng = _worldSeed.GetRng("DecSuperficie", (item.coord.X * 73856093) ^ (item.coord.Y * 19349663));
 
                 for (int y = 0; y < region.Height; y++)
                 {
@@ -179,6 +170,23 @@ public class BlackyWorldProceduralTerritory
                             lowerCell.id = terrainPaletteIds[cell.HeightLowerTerrainId];
                             lowerCell.isBorder = false;
                         }
+                        if (!isBorder && decorationBuffers != null)
+                        {
+                            // Decoración de terreno/superficie: una por celda no-borde.
+                            var listaDecoracion = cell.Bioma.idDecoracion;
+                            if (listaDecoracion != null && listaDecoracion.Count > 0)
+                            {
+                                int rd = decorationRng.Next(listaDecoracion.Count);
+                                long id = listaDecoracion[rd];
+
+                                if (decorationBuffers[height] != null &&
+                                    decorationPaletteIds.TryGetValue(id, out ushort decorationPaletteId))
+                                {
+                                    ref var decoCell = ref decorationBuffers[height].GetCell(x, y);
+                                    decoCell.id = decorationPaletteId;
+                                }
+                            }
+                        }
                        
                     }
                 }
@@ -190,6 +198,8 @@ public class BlackyWorldProceduralTerritory
                 terrainData.CompleteGenerationChunk(item.coord, item.chunkData);
                 if (item.surfaceChunkData != null)
                     surfaceData.CompleteGenerationChunk(item.coord, item.surfaceChunkData);
+                if (item.decorationChunkData != null)
+                    decorationData.CompleteGenerationChunk(item.coord, item.decorationChunkData);
             }
 
             workBatch.Clear();
@@ -224,6 +234,8 @@ public class BlackyWorldProceduralTerritory
                 var chunkData = terrainData.GetOrCreateChunkDataForGeneration(coord);
                 int usedHeightMask = 0;
                 int usedSurfaceMask = 0;
+                int usedDecorationMask = 0;
+                var decorationIdsToCache = new HashSet<long>();
 
                 for (int i = 0; i < region.Cells.Length; i++)
                 {
@@ -245,7 +257,18 @@ public class BlackyWorldProceduralTerritory
                         CachePaletteId(cell.HeightLowerTerrainId);
                         usedHeightMask |= 1 << (height - 1);
                     }
+
+                    bool isBorder = cell.IsHeightBorder || cell.IsMapBorder || cell.IsHeightTransition;
+                    if (!isBorder && cell.Bioma.idDecoracion != null && cell.Bioma.idDecoracion.Count > 0)
+                    {
+                        usedDecorationMask |= 1 << height;
+                        foreach (long decorationId in cell.Bioma.idDecoracion)
+                            decorationIdsToCache.Add(decorationId);
+                    }
                 }
+
+                foreach (long decorationId in decorationIdsToCache)
+                    CacheDecorationPaletteId(decorationId);
 
                 var heightBuffers = new BlackyChunkHeightData<SerializerCellGeneric>[heightBufferCount];
                 for (int height = 0; height < heightBufferCount; height++)
@@ -268,111 +291,25 @@ public class BlackyWorldProceduralTerritory
                     }
                 }
 
-                workBatch.Add((coord, region, chunkData, heightBuffers, surfaceChunkData, surfaceBuffers));
+                BlackyChunkData<SerializerCellGeneric> decorationChunkData = null;
+                BlackyChunkHeightData<SerializerCellGeneric>[] decorationBuffers = null;
+                if (usedDecorationMask != 0)
+                {
+                    decorationChunkData = decorationData.GetOrCreateChunkDataForGeneration(coord);
+                    decorationBuffers = new BlackyChunkHeightData<SerializerCellGeneric>[heightBufferCount];
+                    for (int height = 0; height < heightBufferCount; height++)
+                    {
+                        if ((usedDecorationMask & (1 << height)) != 0)
+                            decorationBuffers[height] = decorationChunkData.GetOrCreateHeight(height);
+                    }
+                }
+
+                workBatch.Add((coord, region, chunkData, heightBuffers, surfaceChunkData, surfaceBuffers, decorationChunkData, decorationBuffers));
             }
 
             // 3) Rellenado en paralelo + cierre en serie
             ProcessBatch();
         }
     }
-    public void GenerateTerritorySingle()
-    {
-        const int chunkSize = 32;
-        const int chunksPerBatch = 64;
-        int heightBufferCount = Math.Max(_heightMax, 3) + 1;
-        var terrainPaletteIds = new Dictionary<long, ushort>();
-        var terrainData = _world.Services.TerrainDataLienzo;
-        var workBatch = new List<(BlackyChunkCoord coord, BiomeRegion region, BlackyChunkData<SerializerCellGeneric> chunkData, BlackyChunkHeightData<SerializerCellGeneric>[] heightBuffers)>(chunksPerBatch);
-
-        void CachePaletteId(long terrainId)
-        {
-            if (terrainPaletteIds.ContainsKey(terrainId)) return;
-
-            TerrainBaseData data = AtlasModsManager.GetDirect<TerrainBaseData>(terrainId);
-            terrainPaletteIds.Add(terrainId, terrainData.GetTerrainPalettePersistenceId(data));
-        }
-
-        void ProcessBatch()
-        {
-            if (workBatch.Count == 0) return;
-
-            // La generación de BiomeRegion y la preparación de chunks ya terminó en el hilo actual.
-            // Cada worker escribe posiciones distintas en arrays ya creados y solo lee el cache de paleta.
-            Parallel.For(0, workBatch.Count, i =>
-            {
-                var item = workBatch[i];
-                BiomeRegion region = item.region;
-                var heightBuffers = item.heightBuffers;
-
-                for (int y = 0; y < region.Height; y++)
-                {
-                    int rowStart = y * region.Width;
-
-                    for (int x = 0; x < region.Width; x++)
-                    {
-                        ref readonly BiomeCell cell = ref region.Cells[rowStart + x];
-                        if (cell.Bioma == null) continue;
-                        bool isBorder = cell.IsHeightBorder || cell.IsMapBorder || cell.IsHeightTransition;
-                        int height = cell.HeightLevel;
-
-                        ref var storedCell = ref heightBuffers[height].GetCell(x, y);
-                        storedCell.id = terrainPaletteIds[cell.IdTerreno];
-                        storedCell.isBorder = isBorder;
-
-                        if (cell.IsHeightTransition && height > 0)
-                        {
-                            int lowerHeight = height - 1;
-                            ref var lowerCell = ref heightBuffers[lowerHeight].GetCell(x, y);
-                            lowerCell.id = terrainPaletteIds[cell.HeightLowerTerrainId];
-                            lowerCell.isBorder = false;
-                        }
-                    }
-                }
-            });
-
-            // Operaciones sobre los diccionarios/regiones compartidos: una vez por chunk y en serie.
-            foreach (var item in workBatch)
-                terrainData.CompleteGenerationChunk(item.coord, item.chunkData);
-
-            workBatch.Clear();
-        }
-
-        foreach (var (chunkX, chunkY, region) in _biomes.EnumerateChunks(chunkSize))
-        {
-            var coord = new BlackyChunkCoord(chunkX, chunkY);
-            var chunkData = terrainData.GetOrCreateChunkDataForGeneration(coord);
-            int usedHeightMask = 0;
-
-            // Prepara paletas y capas en serie antes de iniciar los workers.
-            for (int i = 0; i < region.Cells.Length; i++)
-            {
-                ref readonly BiomeCell cell = ref region.Cells[i];
-                if (cell.Bioma == null) continue;
-
-                CachePaletteId(cell.IdTerreno);
-                int height = cell.HeightLevel;
-                usedHeightMask |= 1 << height;
-
-                if (cell.IsHeightTransition && height > 0)
-                {
-                    CachePaletteId(cell.HeightLowerTerrainId);
-                    usedHeightMask |= 1 << (height - 1);
-                }
-            }
-
-            var heightBuffers = new BlackyChunkHeightData<SerializerCellGeneric>[heightBufferCount];
-            for (int height = 0; height < heightBufferCount; height++)
-            {
-                if ((usedHeightMask & (1 << height)) != 0)
-                    heightBuffers[height] = chunkData.GetOrCreateHeight(height);
-            }
-
-            workBatch.Add((coord, region, chunkData, heightBuffers));
-            if (workBatch.Count >= chunksPerBatch)
-                ProcessBatch();
-        }
-
-        ProcessBatch();
-    }
-
+  
 }

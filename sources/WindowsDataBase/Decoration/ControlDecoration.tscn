@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bjg17j8ltnext"]
+
+[ext_resource type="Script" uid="uid://bauees7wsc2kn" path="res://sources/WindowsDataBase/Decoration/ControlDecoration.cs" id="1_1yq0e"]
+[ext_resource type="Texture2D" uid="uid://caxfqcdd0ifwm" path="res://resources/Textures/Emerald Treasure/images/map_frame.png" id="1_xrqhu"]
+
+[node name="ControlDecoration" type="Control" unique_id=1993849830]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_1yq0e")
+
+[node name="TextureRectImage" type="TextureRect" parent="." unique_id=984888815]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("1_xrqhu")
+expand_mode = 3
+stretch_mode = 4

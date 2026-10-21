@@ -67,7 +67,7 @@ public static class BlackyWorldContext
     public static BlackyResourcesCreator Resources => Services.ResourcePainter;
     public static BlackyBuildingCreator Buildings => Services.BuildingPainter;
     public static BlackyWorldHeight Heights => Services.HeightMapWorld;
-    //public static BlackyChunkCacheTextureMap PintarTerreno => Services.TerrainTexturePainter;
+    //public static BlackyChunkTextureCache TextureCache => Services.TextureCache;
     public static BlackyRampVisualWorld PintarRampas => Services.RampasDataLienzo;
     public static BlackyTerrainWorldData PintarTerreno => Services.TerrainDataLienzo;
     public static BlackySurfaceWorldData PintarSuperficies => Services.SuperficiesDataLienzo;

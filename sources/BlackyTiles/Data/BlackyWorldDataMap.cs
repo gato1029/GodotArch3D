@@ -34,8 +34,6 @@ public abstract class BlackyWorldDataMap<T>
     // VISUAL CACHE
     // =====================================================
 
-    protected readonly BlackyChunkCacheTextureMap
-        _textureMap;
 
     protected readonly BlackyWorldRegions
         _regions;
@@ -66,14 +64,13 @@ public abstract class BlackyWorldDataMap<T>
     protected BlackyWorldDataMap(
         int chunkSize,
         BlackyRenderLayer renderLayer,
-        BlackyChunkCacheTextureMap textureMap, bool isDual, BlackyWorldRegions regions, BlackyWorld blackyWorld)
+        bool isDual, BlackyWorldRegions regions, BlackyWorld blackyWorld)
     {
         ChunkSize = chunkSize;
 
         RenderLayer = renderLayer;
         _regions = regions;
         this.isDual = isDual;
-        _textureMap = textureMap;
         world = blackyWorld;
     }
     public void ClearDirtyRegion(

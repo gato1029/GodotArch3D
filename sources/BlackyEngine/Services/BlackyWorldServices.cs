@@ -46,7 +46,9 @@ public sealed class BlackyWorldServices
     // Cache para renderizado
     // ============================
 
-    public BlackyChunkCacheTextureMap TerrainTexturePainter { get; } // para pintar Terreno
+    public BlackyChunkTextureCache TextureCache { get; }
+    public BlackySimpleTileTextureMap SimpleTileTextures { get; }
+    public BlackyDualTileTextureMap DualTileTextures { get; }
 
     // ============================
     // Render helpers
@@ -75,13 +77,15 @@ public sealed class BlackyWorldServices
         // ============================
         HeightMapWorld = new BlackyWorldHeight();
 
-        TerrainTexturePainter = new BlackyChunkCacheTextureMap(inf.ChunkSize, inf.HeightCount,5, regionsRender, world.Streaming.chunkManagerLocal, HeightMapWorld,state.StaticSpatialTerrain);
+        TextureCache = new BlackyChunkTextureCache(inf.ChunkSize, inf.HeightCount, 5, regionsRender, world.Streaming.chunkManagerLocal);
+        SimpleTileTextures = new BlackySimpleTileTextureMap(TextureCache);
+        DualTileTextures = new BlackyDualTileTextureMap(TextureCache, HeightMapWorld, state.StaticSpatialTerrain);
 
-        TerrainDataLienzo = new BlackyTerrainWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
-        RampasDataLienzo = new BlackyRampVisualWorld(inf.ChunkSize, TerrainTexturePainter, regionsRender,world.Streaming.chunkManagerLocal,world);
-        SuperficiesDataLienzo = new BlackySurfaceWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
-        AdornosDataLienzo = new BlackyDecorationWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal,world);
-        CaminosDataLienzo = new BlackyPathWorldData(inf.ChunkSize, TerrainTexturePainter, regionsRender, world.Streaming.chunkManagerLocal, world);
+        TerrainDataLienzo = new BlackyTerrainWorldData(inf.ChunkSize, DualTileTextures, regionsRender, world.Streaming.chunkManagerLocal,world);
+        RampasDataLienzo = new BlackyRampVisualWorld(inf.ChunkSize, SimpleTileTextures, regionsRender,world.Streaming.chunkManagerLocal,world);
+        SuperficiesDataLienzo = new BlackySurfaceWorldData(inf.ChunkSize, DualTileTextures, regionsRender, world.Streaming.chunkManagerLocal,world);
+        AdornosDataLienzo = new BlackyDecorationWorldData(inf.ChunkSize, SimpleTileTextures, regionsRender, world.Streaming.chunkManagerLocal,world);
+        CaminosDataLienzo = new BlackyPathWorldData(inf.ChunkSize, DualTileTextures, regionsRender, world.Streaming.chunkManagerLocal, world);
 
         persistenceData = new BlackyWorldPersistence(world.Name,regionsRender,TerrainDataLienzo,RampasDataLienzo,SuperficiesDataLienzo,AdornosDataLienzo,CaminosDataLienzo,state.SpatialEntityMap, sim.Flecs,inf, SaveFormat.Json);
 
@@ -103,7 +107,7 @@ public sealed class BlackyWorldServices
         // Runtime authoring services
         // ============================
 
-        TerrainTextureRenderSystem = new BlackyTileTextureRenderSystem(TerrainTexturePainter, stream.chunkManagerLocal,sim.Flecs);
+        TerrainTextureRenderSystem = new BlackyTileTextureRenderSystem(TextureCache, stream.chunkManagerLocal,sim.Flecs);
 
         Characters = new BlackyCharacterCreator(sim.Flecs,state.DynamicHash,world);
 
@@ -141,7 +145,8 @@ public sealed class BlackyWorldServices
         SuperficiesDataLienzo.Clear();
         CaminosDataLienzo.Clear();
         AdornosDataLienzo.Clear();
-        TerrainTexturePainter.Clear();
+        DualTileTextures.Clear();
+        TextureCache.Clear();
         
         OccupancyRenderer.Clear();
     }

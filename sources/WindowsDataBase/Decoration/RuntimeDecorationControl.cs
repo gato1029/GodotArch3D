@@ -15,11 +15,13 @@ public partial class RuntimeDecorationControl : PanelContainer
         ButtonGuardar.Pressed += ButtonGuardar_Pressed;
         ButtonEliminar.Pressed += ButtonEliminar_Pressed;
         ButtonNuevo.Pressed += ButtonNuevo_Pressed;
-        TileSpriteSelector.OnItemSelectedChanged += TileSpriteSelector_OnItemSelected;               
+        TileSpriteSelector.OnItemSelectedChanged += TileSpriteSelector_OnItemSelected;
+        ContenedorDatos.Visible = false;
 	}
 
     private void TileSpriteSelector_OnItemSelected(TileSpriteData obj, object obje)
     {
+        
         data.idTileSprite = obj.id;
     }
 
@@ -31,8 +33,8 @@ public partial class RuntimeDecorationControl : PanelContainer
 
     private void ButtonNuevo_Pressed()
     {
+        ContenedorDatos.Visible = true;
         ClearAll();
-
     }
 
 
@@ -48,6 +50,7 @@ public partial class RuntimeDecorationControl : PanelContainer
         data.name = LineEditName.Text;        
         DataBaseManager.Instance.InsertUpdate(data);
         KuroItems.RefreshObject(data);
+        ContenedorDatos.Visible = false;
     }
     private void KuroItems_OnObjectPressed(object obj)
     {

@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://dabci65lr101x"]
+
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="1_2iovy"]
+[ext_resource type="Script" uid="uid://rui2gyrc50gb" path="res://sources/WindowsDataBase/Decoration/ControlListDecoraciones.cs" id="1_qtur5"]
+[ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="2_qtur5"]
+
+[node name="ControlListDecoraciones" type="PanelContainer" unique_id=457056216]
+custom_minimum_size = Vector2(0, 60)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_qtur5")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2097317132]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer" unique_id=1371335539]
+layout_mode = 2
+
+[node name="ContenedorDatos" type="HBoxContainer" parent="MarginContainer/ScrollContainer" unique_id=2051497988]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="KuroButtonAgregar" type="TextureButton" parent="." unique_id=2014275463]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+focus_mode = 1
+script = ExtResource("1_2iovy")
+IconTexture = ExtResource("2_qtur5")
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

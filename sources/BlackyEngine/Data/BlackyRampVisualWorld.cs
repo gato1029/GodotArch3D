@@ -32,10 +32,12 @@ public struct VisualTileCell
 public class BlackyRampVisualWorld : BlackyWorldDataMap<SerializerCellGeneric>
 {
     private readonly ChunkManagerBase _chunkManager;
+    private readonly BlackySimpleTileTextureMap _simpleTiles;
   
-    public BlackyRampVisualWorld(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
-        : base(chunkSize, BlackyRenderLayer.Rampas, textureMap, true, regions,blackyWorld)
+    public BlackyRampVisualWorld(int chunkSize, BlackySimpleTileTextureMap simpleTiles, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
+        : base(chunkSize, BlackyRenderLayer.Rampas, true, regions,blackyWorld)
     {
+        _simpleTiles = simpleTiles ?? throw new ArgumentNullException(nameof(simpleTiles));
         _chunkManager = chunkManager;
         _chunkManager.OnChunkDataPreload += OnChunkDataPreload;
     }
@@ -47,7 +49,7 @@ public class BlackyRampVisualWorld : BlackyWorldDataMap<SerializerCellGeneric>
 
         foreach (var (height, heightData) in chunk.GetHeights())
         {
-            _textureMap.AplyChunkBatchSingleSprite(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
+            _simpleTiles.AplyChunkBatchSingleSprite(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
         }
     }
 
@@ -82,7 +84,7 @@ public class BlackyRampVisualWorld : BlackyWorldDataMap<SerializerCellGeneric>
         //cell.TileId = rampsPalette.GetIdPersistence(,rampsData);
        
         
-        _textureMap.SetTileSprite(worldX, worldY, height, (int)RenderLayer, rampDataPersist.idTileSprite,true);
+        _simpleTiles.SetTileSprite(worldX, worldY, height, (int)RenderLayer, rampDataPersist.idTileSprite);
 
     }
 
@@ -94,7 +96,7 @@ public class BlackyRampVisualWorld : BlackyWorldDataMap<SerializerCellGeneric>
                 worldY,
                 height);
 
-        cell.id = _textureMap.SetTile( worldX,  worldY,  height, (int)RenderLayer, modName, textureIndex,true);
+        cell.id = _simpleTiles.SetTile( worldX,  worldY,  height, (int)RenderLayer, modName, textureIndex,true);
 
     }
 
@@ -115,7 +117,7 @@ public class BlackyRampVisualWorld : BlackyWorldDataMap<SerializerCellGeneric>
 
         cell.id = 0;
 
-        _textureMap.RemoveTileSprite(
+        _simpleTiles.RemoveTileSprite(
             worldX,
             worldY,
             height,

@@ -22,35 +22,24 @@ namespace GodotEcsArch.sources.BlackyEngine.Data;
 public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
 {
     private readonly ChunkManagerBase _chunkManager;
+    private readonly BlackyDualTileTextureMap _dualTiles;
     private DualTileTemplate _dualTemplate;
 
     // Cache para optimizar la lógica de "DiferentPosition"
     private struct BrushState { public int x, y, altura, capa; public long id; }
     private BrushState _lastState = new() { altura = -1, capa = -1, id = -1 };
 
-    public BlackyTerrainWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
-        : base(chunkSize, BlackyRenderLayer.TerrenoBase, textureMap, true, regions, blackyWorld)
+    public BlackyTerrainWorldData(int chunkSize, BlackyDualTileTextureMap dualTiles, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
+        : base(chunkSize, BlackyRenderLayer.TerrenoBase, true, regions, blackyWorld)
     {
+        _dualTiles = dualTiles ?? throw new ArgumentNullException(nameof(dualTiles));
         _chunkManager = chunkManager;
-        _chunkManager.OnChunkDataPreload += OnChunkDataPreload;
     }
 
-    #region Event Handlers
-    private void OnChunkDataPreload(Vector2I pos)
-    {
-        //var coord = new BlackyChunkCoord(pos.X, pos.Y);
-        //if (!_chunks.TryGetValue(coord, out var chunk)) return;
-        //GD.Print($"[BlackyTerrainWorldData] Preloading chunk data for {coord.X}, {coord.Y}");
-        //foreach (var (height, heightData) in chunk.GetHeights())
-        //{
-        //    _textureMap.ApplyChunkBatchDualTiles(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
-        //}
-    }
-    #endregion
 
     internal void PlotAllMap()
     {
-        _textureMap.ApplyWorldBatchDualTiles(GetAllCells(), (int)RenderLayer);
+        _dualTiles.ApplyWorldBatchDualTiles(GetAllCells(), (int)RenderLayer);
     }
 
     public void DrawAllMapTxt()
@@ -205,7 +194,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
         // 2. Actualizar estado de bordes y Render
         UpdateBorderStatesForBrush(x, y, h, brush);
         _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
-        _textureMap.ApplyBrushCreateDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
+        _dualTiles.ApplyBrushCreateDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
     }
 
     public void RemoveTerrain(int x, int y, int h, Brush brush)
@@ -225,7 +214,7 @@ public class BlackyTerrainWorldData : BlackyWorldDataMap<SerializerCellGeneric>
         UpdateBorderStatesForBrush(x, y, h, brush);
         var data = BlackyPalletesPersistence.terrainPalette.GetData(lastId);
         _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
-        _textureMap.ApplyBrushRemoveDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
+        _dualTiles.ApplyBrushRemoveDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
     }
     #endregion
 

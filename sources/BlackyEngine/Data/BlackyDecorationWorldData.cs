@@ -18,23 +18,45 @@ namespace GodotEcsArch.sources.BlackyEngine.Data;
 public class BlackyDecorationWorldData: BlackyWorldDataMap<SerializerCellGeneric>
 {
     private readonly ChunkManagerBase _chunkManager;
+    private readonly BlackySimpleTileTextureMap _simpleTiles;
 
-    public BlackyDecorationWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
-        : base(chunkSize, BlackyRenderLayer.Adornos, textureMap, true, regions, blackyWorld)
+    public BlackyDecorationWorldData(int chunkSize, BlackySimpleTileTextureMap simpleTiles, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
+        : base(chunkSize, BlackyRenderLayer.Adornos, true, regions, blackyWorld)
     {
-        _chunkManager = chunkManager;
-        _chunkManager.OnChunkDataPreload += OnChunkDataPreload;
+        _simpleTiles = simpleTiles ?? throw new ArgumentNullException(nameof(simpleTiles));
+        _chunkManager = chunkManager;       
+    }
+    
+
+    /// <summary>
+    /// Pinta todos los adornos guardados en el mapa usando la caché de texturas.
+    /// Equivalente a <c>PlotAllMap</c> de terreno/superficie, pero para tiles simples.
+    /// </summary>
+    public void PlotAllMap()
+    {
+        _simpleTiles.ApplyWorldBatchSimpleTiles(GetAllCells(), (int)RenderLayer);
     }
 
-    private void OnChunkDataPreload(Vector2I pos)
+    public ushort GetDecorationPalettePersistenceId(DecorationData data)
     {
-        var coord = new BlackyChunkCoord(pos.X, pos.Y);
-        if (!_chunks.TryGetValue(coord, out var chunk)) return;
+        return BlackyPalletesPersistence.decorationsPalette.GetIdPersistence(data.nameMod, data.id, out _);
+    }
 
-        foreach (var (height, heightData) in chunk.GetHeights())
-        {
-            _textureMap.AplyChunkBatchSingleSprite(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
-        }
+    /// <summary>Obtiene o crea un chunk para una escritura por lote, sin marcarlo sucio por celda.</summary>
+    public BlackyChunkData<SerializerCellGeneric> GetOrCreateChunkDataForGeneration(BlackyChunkCoord coord)
+    {
+        if (_chunks.TryGetValue(coord, out var chunk))
+            return chunk;
+
+        chunk = new BlackyChunkData<SerializerCellGeneric>(ChunkSize);
+        _chunks.Add(coord, chunk);
+        return chunk;
+    }
+
+    /// <summary>Marca una sola vez el chunk y su región después de completar la escritura por lote.</summary>
+    public void CompleteGenerationChunk(BlackyChunkCoord coord, BlackyChunkData<SerializerCellGeneric> chunk)
+    {
+        MarkChunkDirty(coord, chunk);
     }
 
     // =====================================================
@@ -58,22 +80,8 @@ public class BlackyDecorationWorldData: BlackyWorldDataMap<SerializerCellGeneric
             ref var cell = ref ResolveOrCreateCell(x, y, height);
 
             cell.id = id;
-        }
-
-        AtlasModsManager.GetSpriteUniqueId(data.idTileSprite, out TileSpriteData tileSpriteData);
-
-        foreach (var item in tileSpriteData.tilesOcupancy)
-        {
-            int x = worldX + item.x;
-            int y = worldY + item.y;
-            world.Services.TerrainDataLienzo.RemoveTerrain(x, y, height, brush);
-        }
-
-        //cell.TileId = rampsPalette.GetIdPersistence(,rampsData);
-
-
-        _textureMap.SetTileSprite(worldX, worldY, height, (int)RenderLayer, decorationPersist.idTileSprite, true);
-
+            _simpleTiles.SetTileSprite(x, y, height, (int)RenderLayer, decorationPersist.idTileSprite);
+        }        
     }
 
     public void SetTile(int worldX, int worldY, int height, string modName, ushort textureIndex)
@@ -84,7 +92,7 @@ public class BlackyDecorationWorldData: BlackyWorldDataMap<SerializerCellGeneric
                 worldY,
                 height);
 
-        cell.id = _textureMap.SetTile(worldX, worldY, height, (int)RenderLayer, modName, textureIndex, true);
+        cell.id = _simpleTiles.SetTile(worldX, worldY, height, (int)RenderLayer, modName, textureIndex, true);
 
     }
 
@@ -105,7 +113,7 @@ public class BlackyDecorationWorldData: BlackyWorldDataMap<SerializerCellGeneric
 
         cell.id = 0;
 
-        _textureMap.RemoveTileSprite(
+        _simpleTiles.RemoveTileSprite(
             worldX,
             worldY,
             height,

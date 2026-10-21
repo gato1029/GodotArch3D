@@ -19,15 +19,17 @@ namespace GodotEcsArch.sources.BlackyEngine.Data;
 public class BlackyPathWorldData: BlackyWorldDataMap<SerializerCellGeneric>
 {
     private readonly ChunkManagerBase _chunkManager;
+    private readonly BlackyDualTileTextureMap _dualTiles;
     private DualTileTemplate _dualTemplate;
 
     // Cache para optimizar la lógica de "DiferentPosition"
     private struct BrushState { public int x, y, altura, capa; public long id; }
     private BrushState _lastState = new() { altura = -1, capa = -1, id = -1 };
 
-    public BlackyPathWorldData(int chunkSize, BlackyChunkCacheTextureMap textureMap, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
-        : base(chunkSize, BlackyRenderLayer.Caminos, textureMap, true, regions, blackyWorld )
+    public BlackyPathWorldData(int chunkSize, BlackyDualTileTextureMap dualTiles, BlackyWorldRegions regions, ChunkManagerBase chunkManager, BlackyWorld blackyWorld)
+        : base(chunkSize, BlackyRenderLayer.Caminos, true, regions, blackyWorld )
     {
+        _dualTiles = dualTiles ?? throw new ArgumentNullException(nameof(dualTiles));
         _chunkManager = chunkManager;
         _chunkManager.OnChunkDataPreload += OnChunkDataPreload;
     }
@@ -40,7 +42,7 @@ public class BlackyPathWorldData: BlackyWorldDataMap<SerializerCellGeneric>
 
         foreach (var (height, heightData) in chunk.GetHeights())
         {
-            _textureMap.ApplyChunkBatchDualTiles(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
+            _dualTiles.ApplyChunkBatchDualTiles(coord.X, coord.Y, height, (int)RenderLayer, heightData.GetCells().ToArray());
         }
     }
     #endregion
@@ -81,7 +83,7 @@ public class BlackyPathWorldData: BlackyWorldDataMap<SerializerCellGeneric>
         // 2. Actualizar estado de bordes y Render
         UpdateBorderStatesForBrush(x, y, h, brush);
         _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
-        _textureMap.ApplyBrushCreateDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
+        _dualTiles.ApplyBrushCreateDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
     }
 
     public void RemoveCamino(int x, int y, int h, Brush brush)
@@ -101,7 +103,7 @@ public class BlackyPathWorldData: BlackyWorldDataMap<SerializerCellGeneric>
         UpdateBorderStatesForBrush(x, y, h, brush);
         var data = BlackyPalletesPersistence.pathsPalette.GetData(lastId);
         _dualTemplate = AtlasModsManager.Get<DualTileTemplate>(data.nameMod, data.idDualTemplate);
-        _textureMap.ApplyBrushRemoveDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
+        _dualTiles.ApplyBrushRemoveDual(x, y, h, (int)RenderLayer, brush, _dualTemplate);
     }
     #endregion
 
