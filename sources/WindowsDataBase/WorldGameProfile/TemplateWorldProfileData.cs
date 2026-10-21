@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using System;
 
@@ -157,12 +158,25 @@ public struct ConfiguracionGeograficaData
 }
 public class BiomePlacementRuleData
 {
-    public BiomaData bioma { get; set; }
+    public long idBioma { get; set; }
 
     public float alturaMinima { get; set; } 
     public float alturaMaxima { get; set; }
 
     public float peso { get; set; } = 1f;
+
+    [BsonIgnore]
+    public BiomaData bioma { get; set; }
+
+    public BiomePlacementRuleData()
+    {
+        
+    }
+    [BsonCtor]
+    public BiomePlacementRuleData(long idBioma)
+    {
+        bioma = AtlasModsManager.GetDirect<BiomaData>(idBioma);
+    }
 }
 
 public class TemplateWorldProfileData : IdDataLong

@@ -30,9 +30,13 @@ public class BlackySurfaceWorldData: BlackyWorldDataMap<SerializerCellGeneric>
         : base(chunkSize, BlackyRenderLayer.Superficie, textureMap, true, regions,blackyWorld)
     {
         _chunkManager = chunkManager;
-        _chunkManager.OnChunkDataPreload += OnChunkDataPreload;
+        //_chunkManager.OnChunkDataPreload += OnChunkDataPreload;
     }
 
+    public void PlotAllMap()
+    {
+        _textureMap.ApplyWorldBatchDualTiles(GetAllCells(), (int)RenderLayer);
+    }
     #region Event Handlers
     private void OnChunkDataPreload(Vector2I pos)
     {
@@ -161,6 +165,28 @@ public class BlackySurfaceWorldData: BlackyWorldDataMap<SerializerCellGeneric>
         bool isNew = (x != _lastState.x || y != _lastState.y || h != _lastState.altura || id != _lastState.id);
         if (isNew) _lastState = new BrushState { x = x, y = y, altura = h, capa = layer, id = id };
         return isNew;
+    }
+
+    /// <summary>Obtiene o crea un chunk para una escritura por lote, sin marcarlo sucio por celda.</summary>
+    public BlackyChunkData<SerializerCellGeneric> GetOrCreateChunkDataForGeneration(BlackyChunkCoord coord)
+    {
+        if (_chunks.TryGetValue(coord, out var chunk))
+            return chunk;
+
+        chunk = new BlackyChunkData<SerializerCellGeneric>(ChunkSize);
+        _chunks.Add(coord, chunk);
+        return chunk;
+    }
+
+    /// <summary>Marca una sola vez el chunk y su región después de completar la escritura por lote.</summary>
+    public void CompleteGenerationChunk(BlackyChunkCoord coord, BlackyChunkData<SerializerCellGeneric> chunk)
+    {
+        MarkChunkDirty(coord, chunk);
+    }
+
+    public ushort GetSuperficiePalettePersistenceId(SuperficieData data)
+    {
+        return BlackyPalletesPersistence.surfacesPalette.GetIdPersistence(data.nameMod, data.id, out _);
     }
     #endregion
 }

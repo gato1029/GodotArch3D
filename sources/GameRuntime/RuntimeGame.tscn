@@ -40,6 +40,7 @@ projection = 1
 current = true
 size = 10.0
 script = ExtResource("2_6cyr2")
+CameraSpeed = 20.0
 MouseEdgeMargin = 5.0
 MinZoomSize = 5.0
 MaxZoomSize = 100.0

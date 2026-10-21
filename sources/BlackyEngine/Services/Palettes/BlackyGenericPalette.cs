@@ -40,11 +40,11 @@ public class PaletteSaveContainer
 
 public class BlackyPalletesPersistence
 {
-    public static BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new("Terreno");
-    public static BlackyGenericPalette<RampsData> rampsPalette { get; } = new("Rampas");
-    public static BlackyGenericPalette<DecorationData> decorationsPalette { get; } = new("Adornos");
-    public static BlackyGenericPalette<CaminosData> pathsPalette { get; } = new("Caminos");
-    public static BlackyGenericPalette<SuperficieData> surfacesPalette { get; } = new("Superficies");
+    public static BlackyGenericPalette<TerrainBaseData> terrainPalette { get; } = new("Terreno",true);
+    public static BlackyGenericPalette<RampsData> rampsPalette { get; } = new("Rampas",true);
+    public static BlackyGenericPalette<DecorationData> decorationsPalette { get; } = new("Adornos",true);
+    public static BlackyGenericPalette<CaminosData> pathsPalette { get; } = new("Caminos",true);
+    public static BlackyGenericPalette<SuperficieData> surfacesPalette { get; } = new("Superficies",true);
     public static BlackyGenericPalette<BiomaData> biomePalette { get; } = new("Biomas", true);
     public static BlackyGenericPalette<CharacterModelBaseData> characterPalette { get; } = new("Personajes", true);
     public static BlackyGenericPalette<ResourceSourceData> resourcesPalette { get; } = new("Recursos", true);

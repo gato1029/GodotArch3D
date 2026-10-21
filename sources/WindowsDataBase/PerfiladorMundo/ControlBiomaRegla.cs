@@ -61,7 +61,7 @@ public partial class ControlBiomaRegla : PanelContainer
     private void W_OnItemSelectedBioma(object obj)
     {
         BiomaData biomaData = (BiomaData)obj;
-        data.bioma = biomaData;
+        data.idBioma = biomaData.id;
         ButtonBioma.Text = biomaData.name;
     }
 
