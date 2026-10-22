@@ -57,6 +57,11 @@ internal class DebugOverlapCheckSystem : FlecsSystemBase
 
 public class MoveSeparationSystem : FlecsSystemBase
 {
+    [ThreadStatic]
+    private static StaticSpatialChunkGrid<Entity>.QueryContext _buildingContext;
+    [ThreadStatic]
+    private static StaticSpatialChunkGrid<Entity>.QueryContext _resourceContext;
+
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
     // Distancia fija de retroceso al chocar (unidades del mundo).
@@ -91,6 +96,8 @@ public class MoveSeparationSystem : FlecsSystemBase
 
         var staGridBuilding = blackyWorld.State.StaticSpatialBuildings;
         var staResourceGrid = blackyWorld.State.StaticSpatialResources;
+        var buildingContext = _buildingContext ??= new StaticSpatialChunkGrid<Entity>.QueryContext();
+        var resourceContext = _resourceContext ??= new StaticSpatialChunkGrid<Entity>.QueryContext();
         var dynGrid = blackyWorld.State.DynamicHash;
         Span<int> neighbors = stackalloc int[8];
 
@@ -132,8 +139,8 @@ public class MoveSeparationSystem : FlecsSystemBase
             // va a aplicar realmente.
             Vector2 posFuture = pos.position + (vel.desiredVel * dt);
 
-            bool hitStatic = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding)
-                           || CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid);
+            bool hitStatic = CheckAgainstStaticGrid(ref posFuture, ref col, staGridBuilding, buildingContext)
+                           || CheckAgainstStaticGridResources(ref posFuture, ref col, staResourceGrid, resourceContext);
 
             if (hitStatic)
             {
@@ -259,7 +266,7 @@ public class MoveSeparationSystem : FlecsSystemBase
         return false;
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool CheckAgainstStaticGridResources(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
+    private bool CheckAgainstStaticGridResources(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialChunkGrid<Entity> grid, StaticSpatialChunkGrid<Entity>.QueryContext context)
     {
         var colUnit = new FastCollider
         {
@@ -271,7 +278,7 @@ public class MoveSeparationSystem : FlecsSystemBase
 
         int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
         bool existCollision = false;
-        var list = grid.QueryNearbyUnique(pos.X, pos.Y, radius);
+        var list = grid.QueryNearbyUnique(pos.X, pos.Y, radius, context);
 
         foreach (var id in list)
         {
@@ -312,7 +319,7 @@ public class MoveSeparationSystem : FlecsSystemBase
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool CheckAgainstStaticGrid(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<Entity> grid)
+    private bool CheckAgainstStaticGrid(ref Vector2 pos, ref MoveColliderComponent col, StaticSpatialChunkGrid<Entity> grid, StaticSpatialChunkGrid<Entity>.QueryContext context)
     {
         var colUnit = new FastCollider
         {
@@ -325,7 +332,7 @@ public class MoveSeparationSystem : FlecsSystemBase
         int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
         bool existCollision = false;
 
-        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
+        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius, context))
         {
             if (grid.TryGetValue(id, out Entity other))
             {

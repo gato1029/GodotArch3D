@@ -84,3 +84,11 @@ text = "Peso:"
 
 [node name="SpinBoxPeso" type="SpinBox" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=1817900282]
 layout_mode = 2
+
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=818139134]
+layout_mode = 2
+text = "Es Bioma Base:"
+
+[node name="CheckBoxBiomaBase" type="CheckBox" parent="MarginContainer/VBoxContainer/GridContainer" unique_id=2105978982]
+layout_mode = 2
+text = "Base"

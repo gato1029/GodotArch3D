@@ -38,9 +38,11 @@ public readonly struct OverlapPair
 public sealed class BlackyWorldState : IDisposable
 {
     public FastSpatialHash DynamicHash { get; }
-    public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatialBuildings { get; }
-    public StaticSpatialGridOptimizedGeneric<Entity> StaticSpatialResources { get; }
-    public StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> StaticSpatialTerrain { get; }
+    public StaticSpatialChunkGrid<Entity> StaticSpatialBuildings { get; }
+    public StaticSpatialChunkGrid<Entity> StaticSpatialResources { get; }
+    //public StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> StaticSpatialTerrain { get; }
+
+    public StaticSpatialChunkGrid<ColliderSpriteInstanceData> StaticSpatialTerrain { get; }
     public BlackyWorldGridManager GridSparseManager { get; }
     public BlackyChunkedBitGrid GridMove { get; }
 
@@ -64,9 +66,9 @@ public sealed class BlackyWorldState : IDisposable
         this.config = world.Config;
 
         DynamicHash = new FastSpatialHash(config.MapSize.X, config.MapSize.Y, 11000);
-        StaticSpatialBuildings = new StaticSpatialGridOptimizedGeneric<Entity>(config.MapSize.X, config.MapSize.Y, 32, 100_000, 50_000);
-        StaticSpatialResources = new StaticSpatialGridOptimizedGeneric<Entity>(config.MapSize.X, config.MapSize.Y, 32, 1000_000, 50_000);
-        StaticSpatialTerrain = new StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData>(config.MapSize.X, config.MapSize.Y, 32, 100_000,50_000);
+        StaticSpatialBuildings = new StaticSpatialChunkGrid<Entity>(config.MapSize.X, config.MapSize.Y, 1, 512, 16);
+        StaticSpatialResources = new StaticSpatialChunkGrid<Entity>(config.MapSize.X, config.MapSize.Y, 1, 512, 16);
+        StaticSpatialTerrain = new StaticSpatialChunkGrid<ColliderSpriteInstanceData>(config.MapSize.X, config.MapSize.Y, 1, 512,16);
         GridMove = new BlackyChunkedBitGrid(config.MapSize.X, config.MapSize.Y, 16);
 
         GridSparseManager = new BlackyWorldGridManager();

@@ -36,7 +36,7 @@ public class BlackyBuildingCreator
 {
     private readonly BlackyChunkOccupancyMap occupancyMap;
     private readonly BlackySpatialEntityMap spatialEntityMap;
-    private readonly StaticSpatialGridOptimizedGeneric<Entity> staticHash;
+    private readonly StaticSpatialChunkGrid<Entity> staticHash;
     private readonly BlackyTerrainWorldData terrain;
     private readonly FlecsManager flecsManager;
 
@@ -53,7 +53,7 @@ public class BlackyBuildingCreator
         FlecsManager flecsManager,
         BlackyChunkOccupancyMap occupancyMap,
         BlackySpatialEntityMap spatialEntityMap,
-        StaticSpatialGridOptimizedGeneric<Entity> staticHash,
+        StaticSpatialChunkGrid<Entity> staticHash,
         BlackyTerrainWorldData terrain, BlackyWorld world)
     {
         this.flecsManager = flecsManager;
@@ -191,7 +191,7 @@ public class BlackyBuildingCreator
         if (entity.Has<SpatialIDComponent>())
         {
             SpatialIDComponent spatial = entity.Get<SpatialIDComponent>();
-            staticHash.FreeCollider(spatial.Value);
+            staticHash.FreeColliderSafe(spatial.Value);
 
             if (_colliderDebugMap.TryGetValue(spatial.Value, out var debugShapes))
             {
@@ -328,15 +328,10 @@ public class BlackyBuildingCreator
         idDebugBody = -1;
         if (tileSpriteData.fastCollidersBody.Count == 0) return 0;
 
-        int idCollider = staticHash.GetNewEntityId();
+        var debugBodies = new List<int>();
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(mundoX, mundoY);
 
         float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
-
-        if (DEBUG_COLLIDERS)
-        {
-            _colliderDebugMap[idCollider] = new List<int>();
-        }
 
         foreach (var fast in tileSpriteData.fastCollidersBody)
         {
@@ -357,8 +352,8 @@ public class BlackyBuildingCreator
 
             if (DEBUG_COLLIDERS)
             {
-                 idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
-                _colliderDebugMap[idCollider].Add(idDebugBody);
+                idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
+                debugBodies.Add(idDebugBody);
             }
             else
             {
@@ -366,7 +361,10 @@ public class BlackyBuildingCreator
             }
         }
 
-        staticHash.RegisterStatic(idCollider, entity, minX, minY, maxX, maxY,team);
+        int idCollider = staticHash.RegisterStaticSafe(entity, minX, minY, maxX, maxY, team);
+
+        if (DEBUG_COLLIDERS)
+            _colliderDebugMap[idCollider] = debugBodies;
 
         entity.Set(new SpatialIDComponent
         {

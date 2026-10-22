@@ -474,76 +474,123 @@ public class StaticSpatialGridOptimizedGeneric<T>
     }
 
     // ============================================================
-    // QUERY (NUEVO: Ordenado por anillos desde el centro + Filtro de Equipo)
+    // QUERY CONTEXT (scratch por hilo)
+    // ============================================================
+
+    /// <summary>Estado scratch de una consulta. Cada hilo debe tener el suyo.</summary>
+    public sealed class QueryContext
+    {
+        internal int QueryId;
+        internal int[] Visited = Array.Empty<int>();
+    }
+
+    public QueryContext CreateQueryContext() => new QueryContext();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private int NextQueryId()
+    {
+        if (++_currentQueryId == int.MaxValue)
+        {
+            Array.Fill(_visited, 0);
+            _currentQueryId = 1;
+        }
+        return _currentQueryId;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private int NextQueryId(QueryContext context)
+    {
+        int needed = _maxEntities + 1;
+        if (context.Visited.Length < needed)
+            Array.Resize(ref context.Visited, needed);
+
+        if (++context.QueryId == int.MaxValue)
+        {
+            Array.Clear(context.Visited, 0, context.Visited.Length);
+            context.QueryId = 1;
+        }
+        return context.QueryId;
+    }
+
+    // ============================================================
+    // QUERY (ordenado por anillos desde el centro + filtro de equipo)
     // ============================================================
 
     /// <summary>
-    /// Consulta entidades cercanas empezando estrictamente desde el centro hacia afuera (por anillos)
-    /// y opcionalmente ignorando un equipo/facción (ej. para no golpear aliados).
+    /// No es thread-safe: usa el scratch interno del grid.
+    /// Para consultas en paralelo usa la sobrecarga con QueryContext.
     /// </summary>
     public IEnumerable<int> QueryNearbyUnique(
         float worldX,
         float worldY,
         int radius,
-        ushort teamToIgnore = ushort.MaxValue) // ushort.MaxValue por defecto significa que no se ignora ninguno
+        ushort teamToIgnore = ushort.MaxValue)
+    {
+        return QueryNearbyUniqueIterator(
+            worldX, worldY, radius,
+            NextQueryId(), _visited, teamToIgnore);
+    }
+
+    /// <summary>Version con contexto por hilo para consultas en paralelo.</summary>
+    public IEnumerable<int> QueryNearbyUnique(
+        float worldX,
+        float worldY,
+        int radius,
+        QueryContext context,
+        ushort teamToIgnore = ushort.MaxValue)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        return QueryNearbyUniqueIterator(
+            worldX, worldY, radius,
+            NextQueryId(context), context.Visited, teamToIgnore);
+    }
+
+    private IEnumerable<int> QueryNearbyUniqueIterator(
+        float worldX,
+        float worldY,
+        int radius,
+        int qid,
+        int[] visited,
+        ushort teamToIgnore)
     {
         if (radius < 0)
             yield break;
 
-        // Evitar overflow del Query ID.
-        if (_currentQueryId == int.MaxValue)
-        {
-            Array.Fill(
-                _visited,
-                0);
+        Vector2I center = WorldToCell(worldX, worldY);
 
-            _currentQueryId = 1;
-        }
+        foreach (int id in GetEntitiesFromCellSafe(center.X, center.Y, teamToIgnore, visited, qid))
+            yield return id;
 
-        _currentQueryId++;
-
-        Vector2I center =
-            WorldToCell(
-                worldX,
-                worldY);
-
-        // 1. Procesar primero la celda central exacta
-        if (ProcessCell(center.X, center.Y, teamToIgnore, out IEnumerable<int> centralResults))
-        {
-            foreach (var id in centralResults) yield return id; // Nota: optimizado abajo para evitar yield overhead redundante si prefieres, pero mantenemos estructura limpia IEnumerable.
-        }
-
-        // 2. Expandir por anillos concéntricos (desde r = 1 hasta radius)
         for (int r = 1; r <= radius; r++)
         {
-            // Borde superior e inferior del anillo
             for (int dx = -r; dx <= r; dx++)
             {
-                // Borde superior (Y - r)
-                foreach (int id in GetEntitiesFromCellSafe(center.X + dx, center.Y - r, teamToIgnore))
+                foreach (int id in GetEntitiesFromCellSafe(center.X + dx, center.Y - r, teamToIgnore, visited, qid))
                     yield return id;
 
-                // Borde inferior (Y + r)
-                foreach (int id in GetEntitiesFromCellSafe(center.X + dx, center.Y + r, teamToIgnore))
+                foreach (int id in GetEntitiesFromCellSafe(center.X + dx, center.Y + r, teamToIgnore, visited, qid))
                     yield return id;
             }
 
-            // Lados izquierdo y derecho del anillo (excluyendo esquinas ya evaluadas)
             for (int dy = -r + 1; dy <= r - 1; dy++)
             {
-                // Borde izquierdo (X - r)
-                foreach (int id in GetEntitiesFromCellSafe(center.X - r, center.Y + dy, teamToIgnore))
+                foreach (int id in GetEntitiesFromCellSafe(center.X - r, center.Y + dy, teamToIgnore, visited, qid))
                     yield return id;
 
-                // Borde derecho (X + r)
-                foreach (int id in GetEntitiesFromCellSafe(center.X + r, center.Y + dy, teamToIgnore))
+                foreach (int id in GetEntitiesFromCellSafe(center.X + r, center.Y + dy, teamToIgnore, visited, qid))
                     yield return id;
             }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private IEnumerable<int> GetEntitiesFromCellSafe(int x, int y, ushort teamToIgnore)
+    private IEnumerable<int> GetEntitiesFromCellSafe(
+        int x,
+        int y,
+        ushort teamToIgnore,
+        int[] visited,
+        int qid)
     {
         int cell = GetCellIndex(x, y);
         if (cell == -1)
@@ -555,12 +602,11 @@ public class StaticSpatialGridOptimizedGeneric<T>
             int id = _entityIDs[current];
             ushort entityTeam = _teams[current];
 
-            // Seguridad ante nodes inválidos y filtrado por equipo
             if (id > 0 && id <= _maxEntities && entityTeam != teamToIgnore)
             {
-                if (_visited[id] != _currentQueryId)
+                if (visited[id] != qid)
                 {
-                    _visited[id] = _currentQueryId;
+                    visited[id] = qid;
                     yield return id;
                 }
             }
@@ -569,11 +615,113 @@ public class StaticSpatialGridOptimizedGeneric<T>
         }
     }
 
-    private bool ProcessCell(int x, int y, ushort teamToIgnore, out IEnumerable<int> resultsList)
+    public IEnumerable<T> QueryNearbyValues(
+        float worldX,
+        float worldY,
+        int radius,
+        ushort teamToIgnore = ushort.MaxValue)
     {
-        // Wrapper auxiliar para la celda central si se desea procesar inline
-        resultsList = GetEntitiesFromCellSafe(x, y, teamToIgnore);
-        return true;
+        foreach (int id in QueryNearbyUnique(worldX, worldY, radius, teamToIgnore))
+        {
+            if (TryGetValue(id, out T value))
+                yield return value;
+        }
+    }
+
+    public IEnumerable<T> QueryNearbyValues(
+        float worldX,
+        float worldY,
+        int radius,
+        QueryContext context,
+        ushort teamToIgnore = ushort.MaxValue)
+    {
+        foreach (int id in QueryNearbyUnique(worldX, worldY, radius, context, teamToIgnore))
+        {
+            if (TryGetValue(id, out T value))
+                yield return value;
+        }
+    }
+
+    public int QueryNearbyUniqueNonAlloc(
+        float worldX, float worldY, int radius,
+        Span<int> results,
+        ushort teamToIgnore = ushort.MaxValue)
+    {
+        if (radius < 0 || results.Length == 0) return 0;
+
+        return QueryNearbyUniqueNonAllocCore(
+            worldX, worldY, radius, results,
+            NextQueryId(), _visited, teamToIgnore);
+    }
+
+    public int QueryNearbyUniqueNonAlloc(
+        float worldX, float worldY, int radius,
+        Span<int> results,
+        QueryContext context,
+        ushort teamToIgnore = ushort.MaxValue)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (radius < 0 || results.Length == 0) return 0;
+
+        return QueryNearbyUniqueNonAllocCore(
+            worldX, worldY, radius, results,
+            NextQueryId(context), context.Visited, teamToIgnore);
+    }
+
+    private int QueryNearbyUniqueNonAllocCore(
+        float worldX, float worldY, int radius,
+        Span<int> results,
+        int qid, int[] visited,
+        ushort teamToIgnore)
+    {
+        Vector2I c = WorldToCell(worldX, worldY);
+        int count = 0;
+
+        if (CollectCell(c.X, c.Y, teamToIgnore, visited, qid, results, ref count)) return count;
+
+        for (int r = 1; r <= radius; r++)
+        {
+            for (int dx = -r; dx <= r; dx++)
+            {
+                if (CollectCell(c.X + dx, c.Y - r, teamToIgnore, visited, qid, results, ref count)) return count;
+                if (CollectCell(c.X + dx, c.Y + r, teamToIgnore, visited, qid, results, ref count)) return count;
+            }
+            for (int dy = -r + 1; dy <= r - 1; dy++)
+            {
+                if (CollectCell(c.X - r, c.Y + dy, teamToIgnore, visited, qid, results, ref count)) return count;
+                if (CollectCell(c.X + r, c.Y + dy, teamToIgnore, visited, qid, results, ref count)) return count;
+            }
+        }
+        return count;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool CollectCell(
+        int x, int y,
+        ushort teamToIgnore,
+        int[] visited,
+        int qid,
+        Span<int> results,
+        ref int count)
+    {
+        int cell = GetCellIndex(x, y);
+        if (cell == -1) return false;
+
+        int node = _heads[cell];
+        while (node != -1)
+        {
+            int id = _entityIDs[node];
+            if (id > 0 && id <= _maxEntities &&
+                _teams[node] != teamToIgnore &&
+                visited[id] != qid)
+            {
+                visited[id] = qid;
+                results[count++] = id;
+                if (count == results.Length) return true;
+            }
+            node = _next[node];
+        }
+        return false;
     }
 
     // ============================================================
@@ -604,87 +752,6 @@ public class StaticSpatialGridOptimizedGeneric<T>
         return true;
     }
 
-    // ============================================================
-    // QUERY VALUES
-    // ============================================================
-
-    public IEnumerable<T> QueryNearbyValues(
-        float worldX,
-        float worldY,
-        int radius,
-        ushort teamToIgnore = ushort.MaxValue) // NUEVO: Añadido soporte de filtro de equipo aquí también
-    {
-        foreach (
-            int id in QueryNearbyUnique(
-                worldX,
-                worldY,
-                radius,
-                teamToIgnore))
-        {
-            if (TryGetValue(
-                id,
-                out T value))
-            {
-                yield return value;
-            }
-        }
-    }
-    public int QueryNearbyUniqueNonAlloc(
-    float worldX, float worldY, int radius,
-    Span<int> results,
-    ushort teamToIgnore = ushort.MaxValue)
-    {
-        if (radius < 0) return 0;
-
-        if (++_currentQueryId == int.MaxValue)
-        {
-            Array.Fill(_visited, 0);
-            _currentQueryId = 1;
-        }
-
-        Vector2I c = WorldToCell(worldX, worldY);
-        int count = 0;
-
-        if (CollectCell(c.X, c.Y, teamToIgnore, results, ref count)) return count;
-
-        for (int r = 1; r <= radius; r++)
-        {
-            for (int dx = -r; dx <= r; dx++)
-            {
-                if (CollectCell(c.X + dx, c.Y - r, teamToIgnore, results, ref count)) return count;
-                if (CollectCell(c.X + dx, c.Y + r, teamToIgnore, results, ref count)) return count;
-            }
-            for (int dy = -r + 1; dy <= r - 1; dy++)
-            {
-                if (CollectCell(c.X - r, c.Y + dy, teamToIgnore, results, ref count)) return count;
-                if (CollectCell(c.X + r, c.Y + dy, teamToIgnore, results, ref count)) return count;
-            }
-        }
-        return count;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool CollectCell(int x, int y, ushort teamToIgnore, Span<int> results, ref int count)
-    {
-        int cell = GetCellIndex(x, y);
-        if (cell == -1) return false;
-
-        int node = _heads[cell];
-        while (node != -1)
-        {
-            int id = _entityIDs[node];
-            if (id > 0 && id <= _maxEntities &&
-                _teams[node] != teamToIgnore &&
-                _visited[id] != _currentQueryId)
-            {
-                _visited[id] = _currentQueryId;
-                results[count++] = id;
-                if (count == results.Length) return true;
-            }
-            node = _next[node];
-        }
-        return false;
-    }
     // ============================================================
     // CLEAR
     // ============================================================

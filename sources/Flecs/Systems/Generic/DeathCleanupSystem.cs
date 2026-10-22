@@ -156,7 +156,7 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                     AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
                 }
                 
-                staticGrid.FreeCollider(spatial.Value); // todo edificio deberia tener su collider
+                staticGrid.FreeColliderSafe(spatial.Value); // todo edificio deberia tener su collider
                 
                 if (entity.Has<RvoAgentDebugComponent>())
                 {

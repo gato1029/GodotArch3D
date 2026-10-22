@@ -1,6 +1,7 @@
 using Godot;
 using GodotEcsArch.sources.Helpers;
 using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using System;
 using System.Collections.Generic;
@@ -24,18 +25,18 @@ public partial class ControlListDecoraciones : PanelContainer
         w.LoadData<DecorationData>();
     }
 
-    public void SetData(List<long> idsDecorationData)
+    public void SetData(List<DecorationEntry> idsDecorationData)
     {
         if (idsDecorationData==null)
         {
             return;
         }
-        foreach (long id in idsDecorationData)
+        foreach (var item in idsDecorationData)
         {
-            var obj= AtlasModsManager.GetDirect<DecorationData>(id);
+            
             var node = RuntimeServices.NodeRegistry.Create<ControlDecoration>();
             ContenedorDatos.AddChild(node);
-            node.SetData(obj);
+            node.SetData(item);
         }
 
     }
@@ -44,26 +45,17 @@ public partial class ControlListDecoraciones : PanelContainer
     {
       var node =  RuntimeServices.NodeRegistry.Create<ControlDecoration>();      
       ContenedorDatos.AddChild(node);
-      node.SetData((DecorationData)obj);
+      node.SetDataDecoration((DecorationData)obj);
     }
 
-    public List<DecorationData> GetAllData()
+ 
+    public List<DecorationEntry> GetAllDataEntrys()
     {
-        var list = new List<DecorationData>();
+        var list = new List<DecorationEntry>();
         foreach (var item in ContenedorDatos.GetChildren())
         {
             var data = (ControlDecoration)item;
             list.Add(data.GetData());
-        }
-        return list;
-    }
-    public List<long> GetAllDataIds()
-    {
-        var list = new List<long>();
-        foreach (var item in ContenedorDatos.GetChildren())
-        {
-            var data = (ControlDecoration)item;
-            list.Add(data.GetData().id);
         }
         return list;
     }

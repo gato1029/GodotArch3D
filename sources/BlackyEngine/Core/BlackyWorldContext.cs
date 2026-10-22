@@ -98,7 +98,7 @@ public static class BlackyWorldContext
     // ================================
 
     public static FastSpatialHash DynamicHash => State.DynamicHash;
-    public static StaticSpatialGridOptimizedGeneric<Entity> StaticSpatial => State.StaticSpatialBuildings;
+    public static StaticSpatialChunkGrid<Entity> StaticSpatial => State.StaticSpatialBuildings;
     public static BlackyChunkedBitGrid GridMove => State.GridMove;
     public static BlackyChunkRenderData RenderData => State.RenderData;
     public static BlackySpatialEntityMap SpatialEntityMap => State.SpatialEntityMap;

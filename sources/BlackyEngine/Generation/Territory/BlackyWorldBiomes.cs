@@ -29,14 +29,16 @@ public struct BiomeCell
     /// <summary>Bioma de la celda. null si la celda está fuera del mundo.</summary>
     public BiomaData Bioma;
 
-    /// <summary>Terreno que corresponde a la celda: SIEMPRE el idTerreno de su propio bioma (0 si está fuera del mundo).</summary>
+    /// <summary>
+    /// Terreno de la celda. En altura 0 es SIEMPRE el terreno del bioma base (agua);
+    /// en alturas 1..3 es el idTerreno de su propio bioma.
+    /// </summary>
     public long IdTerreno;
 
     /// <summary>
-    /// Superficie de TRANSICIÓN. 0 si la celda no está en transición. Si lo está, es el material ÚNICO del tramo:
-    /// la superficie del bioma de MENOR id del par. Los DOS lados del borde devuelven exactamente el mismo valor;
-    /// en el lado del bioma dueño coincide con la superficie de su propio bioma (se marca igual, para que la banda
-    /// sea simétrica). No se combinan ids.
+    /// Superficie de la celda. En altura 0 lleva la superficie del bioma cuando no es el agua base.
+    /// En una transición es el material ÚNICO del tramo: la superficie del bioma de MENOR id del par.
+    /// Los DOS lados del borde devuelven exactamente el mismo valor; no se combinan ids.
     /// </summary>
     public long IdSuperficie;
 
@@ -75,6 +77,13 @@ public struct BiomeCell
 
     /// <summary>Tipos de borde o transición que afectan a esta celda. Puede contener varios valores a la vez.</summary>
     public BiomeCellBorderType BorderType;
+
+    /// <summary>
+    /// true si esta celda llevará una decoración (pasto, flor, mancha, etc.).
+    /// Se decide con ruido y solo en interiores: nunca en borde de mapa,
+    /// transición de bioma ni transición de altura.
+    /// </summary>
+    public bool HasDecoration;
 
     public bool IsMapBorder => (BorderType & BiomeCellBorderType.Map) != 0;
     public bool IsBiomeBorder => (BorderType & BiomeCellBorderType.Biome) != 0;
@@ -148,7 +157,8 @@ public class BlackyWorldBiomes
     private readonly List<BiomaData> biomes = new();                     // índice de bioma -> BiomaData
     private readonly int[][] levelBiomeIdx = new int[LevelCount][];      // por nivel: bioma de cada tramo
     private readonly float[][] levelWeights = new float[LevelCount][];   // por nivel: peso normalizado de cada tramo
-    private readonly bool[] isWaterBiome;                                // el bioma aparece en el nivel 0
+    private readonly bool[] isWaterBiome;                                // bioma base de agua (isLowerBase)
+    private int baseBiomeIndex = -1;                                     // índice del bioma isLowerBase, -1 si no hay
     private readonly List<string> warnings = new();
     // [FIX] id de bioma más pequeño de todos: permite cortar antes la búsqueda del par de menor id.
     private long globalMinBiomeId = long.MaxValue;
@@ -158,10 +168,14 @@ public class BlackyWorldBiomes
     private readonly object heightLock = new();   // protege las lecturas de heightMapWorld cuando no es thread-safe
     private volatile bool prepared;
     private PerlinNoise noise;
+    private PerlinNoise decorationNoise;
+    private float decorationFrequency = 0.15f;
+    private int decorationGridStep = 3;
+    private float decorationThreshold = 0.45f;
     private float[][] levelCuts;
     private float biomeFrequency = 0.004f;
     private int noiseGridStep = 4;
-    private int transitionWidth = 5;
+    private int transitionWidth = 4;
     private int heightTransitionWidth = 2;
     private readonly Dictionary<int, (int dx, int dy, int d2)[]> ringOffsetsCache = new();
 
@@ -186,6 +200,36 @@ public class BlackyWorldBiomes
     {
         get => noiseGridStep;
         set { noiseGridStep = Math.Clamp(value, 1, 16); prepared = false; }
+    }
+
+    /// <summary>
+    /// Ciclos del ruido de decoraciones por tile. 0.05 => parches de ~20 tiles.
+    /// Más bajo = manchas más grandes de decoración.
+    /// </summary>
+    public float DecorationFrequency
+    {
+        get => decorationFrequency;
+        set => decorationFrequency = Math.Max(0.0001f, value);
+    }
+
+    /// <summary>
+    /// Paso (en tiles) de la rejilla del ruido de decoraciones. 2 = buena calidad y barato.
+    /// La rejilla está alineada a coordenadas de mundo.
+    /// </summary>
+    public int DecorationGridStep
+    {
+        get => decorationGridStep;
+        set => decorationGridStep = Math.Clamp(value, 1, 16);
+    }
+
+    /// <summary>
+    /// Umbral del ruido de decoración: la celda se marca si el valor supera este umbral.
+    /// Más bajo = más decoración; más alto = menos. Rango -1..1.
+    /// </summary>
+    public float DecorationThreshold
+    {
+        get => decorationThreshold;
+        set => decorationThreshold = Math.Clamp(value, -1f, 1f);
     }
 
     /// <summary>
@@ -246,8 +290,18 @@ public class BlackyWorldBiomes
         this.template = template ?? throw new ArgumentNullException(nameof(template));
 
         BuildLevelRules();
+        ResolveBaseBiome();
+
         isWaterBiome = new bool[biomes.Count];
-        foreach (int b in levelBiomeIdx[0]) isWaterBiome[b] = true;
+        if (baseBiomeIndex >= 0)
+        {
+            isWaterBiome[baseBiomeIndex] = true;
+        }
+        else
+        {
+            // Compatibilidad: sin isLowerBase, todos los biomas del nivel 0 se tratan como agua.
+            foreach (int b in levelBiomeIdx[0]) isWaterBiome[b] = true;
+        }
 
         // [FIX] cache del id de bioma más pequeño (corte temprano al buscar el par de menor id)
         globalMinBiomeId = long.MaxValue;
@@ -324,6 +378,72 @@ public class BlackyWorldBiomes
         }
     }
 
+    /// <summary>
+    /// Identifica el bioma base (isLowerBase), que para la altura 0 representa el agua.
+    /// Si no hay ninguna regla marcada, se mantiene el comportamiento anterior.
+    /// </summary>
+    private void ResolveBaseBiome()
+    {
+        baseBiomeIndex = -1;
+
+        var rules = template.reglasBiomas;
+        if (rules == null) return;
+
+        for (int i = 0; i < rules.Count; i++)
+        {
+            var r = rules[i];
+            if (r == null || r.bioma == null || !r.isLowerBase) continue;
+            if (r.peso <= 0f || r.alturaMinima > r.alturaMaxima) continue;
+
+            // La base debe existir en la altura 0 (agua).
+            if (r.alturaMinima > 0f || r.alturaMaxima < 0f)
+            {
+                warnings.Add($"Regla #{i}: isLowerBase=true pero no cubre la altura 0; se ignora como base de agua.");
+                continue;
+            }
+
+            int b = GetBiomeIndex(r.bioma);
+            if (baseBiomeIndex >= 0 && baseBiomeIndex != b)
+            {
+                warnings.Add($"Regla #{i}: hay más de un bioma isLowerBase; se usa '{biomes[baseBiomeIndex].name}'.");
+                continue;
+            }
+
+            baseBiomeIndex = b;
+        }
+
+        if (baseBiomeIndex < 0)
+            warnings.Add("Ninguna regla tiene isLowerBase=true; no se autocompleta la superficie de los biomas de altura 0.");
+    }
+
+    /// <summary>
+    /// Devuelve el terreno que corresponde a un bioma en una altura.
+    /// En altura 0 siempre es el terreno del bioma base (agua); el bioma real se representa en la superficie.
+    /// </summary>
+    private long TerrainIdAt(int biomeIndex, int height)
+    {
+        if (height == 0 && baseBiomeIndex >= 0)
+            return biomes[baseBiomeIndex].idTerreno;
+
+        return biomes[biomeIndex].idTerreno;
+    }
+
+    /// <summary>true si el bioma tiene al menos una decoración con probabilidad > 0.</summary>
+    private static bool HasDecorationCandidates(BiomaData bioma)
+    {
+        var entries = bioma.idDecoraciones;
+        if (entries == null) return false;
+
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            if (entry != null && entry.idDecoracion > 0 && entry.Probability > 0f)
+                return true;
+        }
+
+        return false;
+    }
+
     private int GetBiomeIndex(BiomaData bioma)
     {
         for (int i = 0; i < biomes.Count; i++)
@@ -379,6 +499,10 @@ public class BlackyWorldBiomes
     private float NodeNoise(int worldX, int worldY)
         => noise.Fbm(worldX * biomeFrequency, worldY * biomeFrequency, 3);
 
+    /// <summary>Ruido de parches de decoración. 2 octavas para manchas pequeñas y naturales.</summary>
+    private float DecorationNodeNoise(int worldX, int worldY)
+        => decorationNoise.Fbm(worldX * decorationFrequency, worldY * decorationFrequency, 2);
+
     /// <summary>Ruido de una sola celda, con la misma interpolación que ComputeNoiseBlock (mismos resultados).</summary>
     private float NoiseAt(int worldX, int worldY, int g)
     {
@@ -399,8 +523,9 @@ public class BlackyWorldBiomes
     }
 
     /// <summary>Ruido de todo un bloque rectangular (coordenadas de mundo). Evalúa Fbm solo en los nodos y interpola.</summary>
-    private float[] ComputeNoiseBlock(int ex0, int ey0, int ew, int eh, int g, bool parallel)
+    private float[] ComputeNoiseBlock(int ex0, int ey0, int ew, int eh, int g, bool parallel, Func<int, int, float> nodeNoise = null)
     {
+        nodeNoise ??= NodeNoise;
         float[] block = new float[(long)ew * eh];
 
         if (g <= 1)
@@ -409,7 +534,7 @@ public class BlackyWorldBiomes
             {
                 int wy = ey0 + ey;
                 long o = (long)ey * ew;
-                for (int ex = 0; ex < ew; ex++) block[o + ex] = NodeNoise(ex0 + ex, wy);
+                for (int ex = 0; ex < ew; ex++) block[o + ex] = nodeNoise(ex0 + ex, wy);
             }, parallel, ParallelRowsThreshold);
             return block;
         }
@@ -423,7 +548,7 @@ public class BlackyWorldBiomes
         {
             int ny = (gy0 + j) * g;
             long o = (long)j * gw;
-            for (int i = 0; i < gw; i++) nodes[o + i] = NodeNoise((gx0 + i) * g, ny);
+            for (int i = 0; i < gw; i++) nodes[o + i] = nodeNoise((gx0 + i) * g, ny);
         }, parallel, ParallelRowsThreshold / 4);
 
         // Índice de nodo y fracción por columna (se calculan una vez)
@@ -475,6 +600,7 @@ public class BlackyWorldBiomes
             if (biomeFrequency <= 0f) throw new InvalidOperationException("BiomeFrequency debe ser mayor que 0");
 
             noise = new PerlinNoise(worldSeed.GetRng("biomes").Next());
+            decorationNoise = new PerlinNoise(worldSeed.GetRng("decorations").Next());
             int g = noiseGridStep;
 
             // Se muestrea el mundo en una cuadrícula y se guarda (valor de ruido, nivel de altura) de cada muestra.
@@ -638,6 +764,7 @@ public class BlackyWorldBiomes
 
         // 2) Ruido de la región ampliada (rejilla + interpolación) y bioma de cada celda
         float[] noiseBlock = ComputeNoiseBlock(ex0, ey0, ew, eh, g, parallel);
+        float[] decorationBlock = ComputeNoiseBlock(ex0, ey0, ew, eh, decorationGridStep, parallel, DecorationNodeNoise);
         ushort[] ids = new ushort[(long)ew * eh];
         RunRows(eh, ew, ey =>
         {
@@ -667,7 +794,12 @@ public class BlackyWorldBiomes
                 if (id == NoBiome) continue;
 
                 var bioma = biomes[id];
-                var cell = new BiomeCell { Bioma = bioma, IdTerreno = bioma.idTerreno, HeightLevel = levels[center] };
+                var cell = new BiomeCell
+                {
+                    Bioma = bioma,
+                    IdTerreno = TerrainIdAt(id, levels[center]),
+                    HeightLevel = levels[center]
+                };
 
                 // Camino rápido: si toda la ventana es uniforme, no hay nada que buscar en los anillos
                 bool maybeBiome = tw > 0 && WindowChanges(idSat, ew, x + m, y + m, tw) != 0;
@@ -748,13 +880,23 @@ public class BlackyWorldBiomes
                             long neighbor = center + (long)heightOffsets[k].dy * ew + heightOffsets[k].dx;
                             ushort neighborBiomeId = ids[neighbor];
 
-                            // La superficie/terreno inferior depende de cuál de los dos lados tiene menor nivel.
+                            // El terreno inferior también respeta la regla de altura 0 (agua).
                             cell.HeightLowerTerrainId = other < cell.HeightLevel
-                                ? biomes[neighborBiomeId].idTerreno
+                                ? TerrainIdAt(neighborBiomeId, other)
                                 : cell.IdTerreno;
                             break;
                         }
                     }
+                }
+
+                // Altura 0: el terreno es SIEMPRE agua y solo los biomas NO base aportan
+                // su superficie. El agua base no lleva capa de superficie.
+                if (cell.HeightLevel == 0 && baseBiomeIndex >= 0)
+                {
+                    if (id == baseBiomeIndex)
+                        cell.IdSuperficie = 0;
+                    else if (bioma.idSuperficie != 0)
+                        cell.IdSuperficie = bioma.idSuperficie;
                 }
 
                 int worldX = minX + x;
@@ -766,6 +908,23 @@ public class BlackyWorldBiomes
                 if (cell.IsHeightTransition)
                     if (cell.HeightTransitionDistance == 1)
                         cell.BorderType |= BiomeCellBorderType.Height;
+
+                // Decoración: puede estar DENTRO de una transición, pero no en sus bordes.
+                // Los bordes de la banda son la distancia 1 (el borde real) y la distancia
+                // máxima (el límite exterior de la transición). Igual para altura.
+                bool biomeTransitionEdge = cell.IsTransition
+                    && (cell.TransitionDistance <= 1 || cell.TransitionDistance >= tw);
+                bool heightTransitionEdge = cell.IsHeightTransition
+                    && (cell.HeightTransitionDistance <= 1 || cell.HeightTransitionDistance >= hw);
+
+                if (!cell.IsMapBorder
+                    && !biomeTransitionEdge
+                    && !heightTransitionEdge
+                    && HasDecorationCandidates(bioma)
+                    && decorationBlock[center] > decorationThreshold)
+                {
+                    cell.HasDecoration = true;
+                }
 
                 region.Cells[(long)y * width + x] = cell;
             }

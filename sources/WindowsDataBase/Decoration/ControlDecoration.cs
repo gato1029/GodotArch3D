@@ -1,9 +1,11 @@
 using Godot;
+using GodotEcsArch.sources.managers.Mods;
+using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using System;
 
 public partial class ControlDecoration : Control
 {
-    DecorationData data;
+    DecorationEntry data;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -13,18 +15,32 @@ public partial class ControlDecoration : Control
         // mouse_filter por defecto sea Ignore.
         TextureRectImage.MouseFilter = MouseFilterEnum.Stop;
         TextureRectImage.GuiInput += TextureRectImage_GuiInput;
-        data = new DecorationData();
+        SpinBoxProbabilidad.ValueChanged += SpinBoxProbabilidad_ValueChanged;
+        data = new ();
 	}
-    public void SetData(DecorationData data)
+
+    private void SpinBoxProbabilidad_ValueChanged(double value)
+    {
+        data.Probability = (float)value;
+    }
+    internal void SetDataDecoration(DecorationData obj)
+    {
+        data.idDecoracion = obj.id;
+        TextureRectImage.Texture = obj.textureVisual;
+    }
+    public void SetData(DecorationEntry data)
     {
         if (data==null)
         {
             return;
         }
+        var deco =AtlasModsManager.GetDirect<DecorationData>(data.idDecoracion);
         this.data = data;
-        TextureRectImage.Texture= data.textureVisual;
+        TextureRectImage.Texture= deco.textureVisual;
+        SpinBoxProbabilidad.Value = data.Probability;
+
     }
-    public DecorationData GetData()
+    public DecorationEntry GetData()
     {
         return data;
     }
@@ -55,4 +71,6 @@ public partial class ControlDecoration : Control
 	public override void _Process(double delta)
 	{
 	}
+
+    
 }

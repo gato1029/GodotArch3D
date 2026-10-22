@@ -12,6 +12,7 @@ public partial class ControlBiomaRegla : PanelContainer
     private SpinBox SpinBoxAlturaMinima;
     private SpinBox SpinBoxAlturaMaxima;
     private SpinBox SpinBoxPeso;
+    private CheckBox CheckBoxBiomaBase;
 
     public void InitializeUI()
     {
@@ -20,5 +21,6 @@ public partial class ControlBiomaRegla : PanelContainer
         SpinBoxAlturaMinima = GetNode<SpinBox>("MarginContainer/VBoxContainer/GridContainer/SpinBoxAlturaMinima");
         SpinBoxAlturaMaxima = GetNode<SpinBox>("MarginContainer/VBoxContainer/GridContainer/SpinBoxAlturaMaxima");
         SpinBoxPeso = GetNode<SpinBox>("MarginContainer/VBoxContainer/GridContainer/SpinBoxPeso");
+        CheckBoxBiomaBase = GetNode<CheckBox>("MarginContainer/VBoxContainer/GridContainer/CheckBoxBiomaBase");
     }
 }

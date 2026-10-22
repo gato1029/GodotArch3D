@@ -4,6 +4,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Generic;
 using GodotEcsArch.sources.BlackyEngine.PathFinding;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.Flecs.Systems.Generic;
 using GodotEcsArch.sources.Flecs.Systems.Units;
 using GodotEcsArch.sources.managers;
@@ -26,6 +27,7 @@ public partial class RTSSelectionManager : Node2D
     public static RTSSelectionManager Instance { get; private set; }
 
     private FormationType _currentFormation = FormationType.Circle;
+    private StaticSpatialChunkGrid<Entity>.QueryContext _buildingQueryContext;
     // TODO: reemplazar por la fuente real del team del jugador
     private ushort _playerTeamId = 2;
 
@@ -918,9 +920,10 @@ public partial class RTSSelectionManager : Node2D
         // 2. Si no había unidad, buscar edificios enemigos (staticGrid)
         // -------------------------------------------------
         var staticGrid = _world.State.StaticSpatialBuildings;
+        var buildingContext = _buildingQueryContext ??= new StaticSpatialChunkGrid<Entity>.QueryContext();
         int radius = (int)MathF.Ceiling((tolerance * 2f) / staticGrid._cellSize);
 
-        foreach (var id in staticGrid.QueryNearbyUnique(point.X, point.Y, radius, _playerTeamId))
+        foreach (var id in staticGrid.QueryNearbyUnique(point.X, point.Y, radius, buildingContext, _playerTeamId))
         {
             if (staticGrid.TryGetValue(id, out Entity buildingEntity))
             {

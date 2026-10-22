@@ -311,7 +311,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         objectData.animationData.frameDuration =  (float)SpinBoxFps.Value;
         objectData.animationData.loop = CheckBoxLoop.ButtonPressed;      
         objectData.animationData.idModMaterial = MasterDataManager.GetData<InfoModData>(1).name + ":" + objectData.animationData.idMaterial;
-        objectData.idMaterial = objectData.spriteData.idMaterial;
+        objectData.idMaterial = objectData.animationData.idMaterial;
         objectData.nivelarBase = CheckBoxHasNivelarBase.ButtonPressed;
 
     }

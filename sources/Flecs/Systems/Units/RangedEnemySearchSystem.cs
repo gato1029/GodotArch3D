@@ -2,6 +2,7 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.Flecs.Components;
 using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers.Mods;
@@ -13,6 +14,9 @@ namespace GodotFlecs.sources.Flecs.Systems.Units;
 // busca objetivos tanto para unidades o edificios
 internal class RangedEnemySearchSystem : FlecsSystemBase
 {
+    [ThreadStatic]
+    private static StaticSpatialChunkGrid<Entity>.QueryContext _buildingContext;
+
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
 
@@ -39,6 +43,7 @@ internal class RangedEnemySearchSystem : FlecsSystemBase
 
         var dynGrid = world.State.DynamicHash;
         var staticGrid = world.State.StaticSpatialBuildings;
+        var buildingContext = _buildingContext ??= new StaticSpatialChunkGrid<Entity>.QueryContext();
 
         var posArray = it.Field<PositionComponent>(0);
         var spatialArray = it.Field<SpatialIDComponent>(1);        
@@ -123,7 +128,7 @@ internal class RangedEnemySearchSystem : FlecsSystemBase
                 {
                     int radius = (int)MathF.Ceiling((ranged.Range * 2f) / staticGrid._cellSize);
                     // aqui buscar edificos
-                    foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius, team.TeamId))
+                    foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius, buildingContext, team.TeamId))
                     {
                         if (staticGrid.TryGetValue(id, out Entity otherEntity))
                         {

@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dfiatfmmhcq6e" path="res://resources/Textures/iconos/Add.png" id="2_qtur5"]
 
 [node name="ControlListDecoraciones" type="PanelContainer" unique_id=457056216]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 130)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

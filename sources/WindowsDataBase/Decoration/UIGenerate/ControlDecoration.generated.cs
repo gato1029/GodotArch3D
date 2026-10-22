@@ -8,9 +8,11 @@ public partial class ControlDecoration : Control
     public event EventNotifyChangued OnNotifyChangued;
 
     private TextureRect TextureRectImage;
+    private SpinBox SpinBoxProbabilidad;
 
     public void InitializeUI()
     {
-        TextureRectImage = GetNode<TextureRect>("TextureRectImage");
+        TextureRectImage = GetNode<TextureRect>("VBoxContainer/TextureRectImage");
+        SpinBoxProbabilidad = GetNode<SpinBox>("VBoxContainer/SpinBoxProbabilidad");
     }
 }

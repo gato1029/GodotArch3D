@@ -17,8 +17,14 @@ public partial class ControlBiomaRegla : PanelContainer
         SpinBoxAlturaMinima.ValueChanged += SpinBoxAlturaMinima_ValueChanged;
         SpinBoxPeso.ValueChanged += SpinBoxPeso_ValueChanged;
         ButtonEliminar.Pressed += ButtonEliminar_Pressed;
+        CheckBoxBiomaBase.Pressed += CheckBoxBiomaBase_Pressed;
         data = new BiomePlacementRuleData();
 	}
+
+    private void CheckBoxBiomaBase_Pressed()
+    {
+        data.isLowerBase = CheckBoxBiomaBase.ButtonPressed;
+    }
 
     private void ButtonEliminar_Pressed()
     {
@@ -32,6 +38,7 @@ public partial class ControlBiomaRegla : PanelContainer
         SpinBoxAlturaMinima.Value = data.alturaMinima;
         SpinBoxPeso.Value = data.peso;
         ButtonBioma.Text = data.bioma.name;
+        CheckBoxBiomaBase.ButtonPressed = data.isLowerBase;
     }
 
     private void SpinBoxPeso_ValueChanged(double value)

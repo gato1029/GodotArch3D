@@ -105,7 +105,7 @@ public partial class RuntimeBiomasControl : PanelContainer
     {
         data.name = LineEditName.Text;
         data.idRecursos = ListaRecursos.GetData();
-        data.idDecoracion = ContenedorDecoraciones.GetAllDataIds();
+        data.idDecoraciones = ContenedorDecoraciones.GetAllDataEntrys();
         DataBaseManager.Instance.InsertUpdate(data);
         KuroItems.RefreshObject(data);
     }
@@ -126,7 +126,7 @@ public partial class RuntimeBiomasControl : PanelContainer
             ButtonTerreno.Text = AtlasModsManager.GetDirect<TerrainBaseData>(data.idTerreno).name;
         }
         ListaRecursos.SetData(data.idRecursos);
-        ContenedorDecoraciones.SetData(data.idDecoracion);
+        ContenedorDecoraciones.SetData(data.idDecoraciones);
         LineEditName.Text = data.name;       
     }
 }

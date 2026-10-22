@@ -19,6 +19,10 @@ namespace GodotEcsArch.sources.Flecs.Systems.Collisions;
 
 public class ResolveTerrainCollisionSystem : FlecsSystemBase
 {
+    // Un QueryContext por hilo: Flecs puede ejecutar OnIter en paralelo.
+    [ThreadStatic]
+    private static StaticSpatialChunkGrid<ColliderSpriteInstanceData>.QueryContext _queryContext;
+
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
 
@@ -42,6 +46,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
         if (blackyWorld == null) return;
 
         var staticSpatialGrid = blackyWorld.State.StaticSpatialTerrain;
+        var queryContext = _queryContext ??= new StaticSpatialChunkGrid<ColliderSpriteInstanceData>.QueryContext();
 
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
@@ -61,7 +66,7 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
             ref var move = ref moveArray[i];
             Vector2 temp = steering.DesiredDir.Normalized();
             Vector2 posFuture = pos.position + temp * it.DeltaTime();            
-            bool collided = CheckAgainstStaticGrid(posFuture, ref col, staticSpatialGrid);                     
+            bool collided = CheckAgainstStaticGrid(posFuture, ref col, staticSpatialGrid, queryContext);                     
             if (collided)
             {
                 steering.DesiredDir = Godot.Vector2.Zero;      
@@ -76,11 +81,12 @@ public class ResolveTerrainCollisionSystem : FlecsSystemBase
     private bool CheckAgainstStaticGrid(
     Vector2 pos,
     ref MoveColliderComponent col,
-    StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> grid)
+    StaticSpatialChunkGrid<ColliderSpriteInstanceData> grid,
+    StaticSpatialChunkGrid<ColliderSpriteInstanceData>.QueryContext queryContext)
     {
         int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
         bool existCollision = false;
-        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
+        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius, queryContext))
         {
             if (grid.TryGetValue(id, out var infoSpriteCollider))
             {

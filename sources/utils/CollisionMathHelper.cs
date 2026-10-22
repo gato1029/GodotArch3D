@@ -9,6 +9,7 @@ using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.managers.Mods;
 using GodotFlecs.sources.Flecs.Components;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace GodotEcsArch.sources.utils;
@@ -323,7 +324,32 @@ public static class CollisionMathHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool RutaLibre(Entity ent, ref Vector2 targetPos,  BlackyWorld blackyWorld)
+    public static bool RutaLibre(Entity ent, ref Vector2 targetPos, BlackyWorld blackyWorld)
+    {
+        return RutaLibreCore(ent, ref targetPos, blackyWorld, null);
+    }
+
+    /// <summary>
+    /// Version thread-safe de RutaLibre: recibe un contexto por hilo para consultar
+    /// terreno, edificios y recursos sin compartir el scratch de los grids.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool RutaLibre(
+        Entity ent,
+        ref Vector2 targetPos,
+        BlackyWorld blackyWorld,
+        RutaLibreQueryContext context)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        return RutaLibreCore(ent, ref targetPos, blackyWorld, context);
+    }
+
+    private static bool RutaLibreCore(
+        Entity ent,
+        ref Vector2 targetPos,
+        BlackyWorld blackyWorld,
+        RutaLibreQueryContext context)
     {
         var spatialBuildings = blackyWorld.State.StaticSpatialBuildings;
         var spatialResources = blackyWorld.State.StaticSpatialResources;
@@ -332,18 +358,18 @@ public static class CollisionMathHelper
         Vector2 startPos = ent.Get<PositionComponent>().position;
         MoveColliderComponent col = ent.Get<MoveColliderComponent>();
 
-        // Vector de dirección desde el origen al destino
+        // Vector de direccion desde el origen al destino
         Vector2 dir = (targetPos - startPos);
         float distance = dir.Length();
-        if (distance < 0.001f) return true; // Ya está ahí
+        if (distance < 0.001f) return true; // Ya esta ahi
 
         dir = dir.Normalized();
 
-        // Sondeo en los primeros 2 metros o el total si está más cerca
+        // Sondeo en los primeros 2 metros o el total si esta mas cerca
         float probeDistance = MathF.Min(distance, .25f);
         Vector2 probePos = startPos + (dir * probeDistance);
 
-        // Creamos el collider temporal de la unidad para el sondeo (Círculo)
+        // Creamos el collider temporal de la unidad para el sondeo (Circulo)
         var colUnit = new FastCollider
         {
             Shape = ShapeType.Circle,
@@ -351,18 +377,17 @@ public static class CollisionMathHelper
             Height = col.Radius,
             Offset = new Vector2(col.Offset.X, col.Offset.Y)
         };
+
         // 1. Revisar contra terreno colliders
-        if (CheckStaticGridTerrain(probePos, ref col,spatialTerrain))
-        {
-            return false;
-        }
-
-        // 1. Revisar contra edificios estáticos
-        if (CheckGridForProbe(ref probePos, ref colUnit, spatialBuildings, isBuilding: true))
+        if (CheckStaticGridTerrain(probePos, ref col, spatialTerrain, context?.Terrain))
             return false;
 
-        // 2. Revisar contra recursos estáticos (árboles, piedras, etc.)
-        if (CheckGridForProbe(ref probePos, ref colUnit, spatialResources, isBuilding: false))
+        // 2. Revisar contra edificios estaticos
+        if (CheckGridForProbe(ref probePos, ref colUnit, spatialBuildings, isBuilding: true, context?.Buildings))
+            return false;
+
+        // 3. Revisar contra recursos estaticos (arboles, piedras, etc.)
+        if (CheckGridForProbe(ref probePos, ref colUnit, spatialResources, isBuilding: false, context?.Resources))
             return false;
 
         // Ruta libre en el primer tramo
@@ -370,11 +395,20 @@ public static class CollisionMathHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool CheckStaticGridTerrain(Vector2 pos, ref MoveColliderComponent col, StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> grid)
+    private static bool CheckStaticGridTerrain(
+        Vector2 pos,
+        ref MoveColliderComponent col,
+        StaticSpatialChunkGrid<ColliderSpriteInstanceData> grid,
+        StaticSpatialChunkGrid<ColliderSpriteInstanceData>.QueryContext context = null)
     {
         int radius = (int)MathF.Ceiling((col.Radius * 2f) / grid._cellSize);
         bool existCollision = false;
-        foreach (var id in grid.QueryNearbyUnique(pos.X, pos.Y, radius))
+
+        IEnumerable<int> query = context == null
+            ? grid.QueryNearbyUnique(pos.X, pos.Y, radius)
+            : grid.QueryNearbyUnique(pos.X, pos.Y, radius, context);
+
+        foreach (var id in query)
         {
             if (grid.TryGetValue(id, out var infoSpriteCollider))
             {
@@ -399,14 +433,23 @@ public static class CollisionMathHelper
         return existCollision;
     }
 
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool CheckGridForProbe(ref Vector2 probePos, ref FastCollider colUnit, StaticSpatialGridOptimizedGeneric<Entity> grid, bool isBuilding)
+    private static bool CheckGridForProbe(
+        ref Vector2 probePos,
+        ref FastCollider colUnit,
+        StaticSpatialChunkGrid<Entity> grid,
+        bool isBuilding,
+        StaticSpatialChunkGrid<Entity>.QueryContext context = null)
     {
         if (grid == null) return false;
 
         int radius = (int)MathF.Ceiling((colUnit.Width * 2f) / grid._cellSize);
-        foreach (var id in grid.QueryNearbyUnique(probePos.X, probePos.Y, radius))
+
+        IEnumerable<int> query = context == null
+            ? grid.QueryNearbyUnique(probePos.X, probePos.Y, radius)
+            : grid.QueryNearbyUnique(probePos.X, probePos.Y, radius, context);
+
+        foreach (var id in query)
         {
             if (grid.TryGetValue(id, out Entity other))
             {
@@ -433,12 +476,30 @@ public static class CollisionMathHelper
                     var shapeInternal = shape;
                     if (CollisionMathHelper.Check(probePos.X, probePos.Y, ref colUnit, posOther.position.X, posOther.position.Y, ref shapeInternal))
                     {
-                        // 🛑 ¡Hay un obstáculo directo!
+                        // Hay un obstaculo directo.
                         return true;
                     }
                 }
             }
         }
         return false;
+    }
+}
+
+/// <summary>
+/// Contextos de consulta por hilo para RutaLibre.
+/// Uno por hilo, nunca compartido entre hilos.
+/// </summary>
+public sealed class RutaLibreQueryContext
+{
+    public StaticSpatialChunkGrid<ColliderSpriteInstanceData>.QueryContext Terrain { get; }
+    public StaticSpatialChunkGrid<Entity>.QueryContext Buildings { get; }
+    public StaticSpatialChunkGrid<Entity>.QueryContext Resources { get; }
+
+    public RutaLibreQueryContext()
+    {
+        Terrain = new StaticSpatialChunkGrid<ColliderSpriteInstanceData>.QueryContext();
+        Buildings = new StaticSpatialChunkGrid<Entity>.QueryContext();
+        Resources = new StaticSpatialChunkGrid<Entity>.QueryContext();
     }
 }

@@ -59,12 +59,12 @@ public sealed class BlackyDualTileTextureMap
 
     private readonly BlackyChunkTextureCache _cache;
     private readonly BlackyWorldHeight _heightMapWorld;
-    private readonly StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> _staticSpatialTerrain;
+    private readonly StaticSpatialChunkGrid<ColliderSpriteInstanceData> _staticSpatialTerrain;
 
     public BlackyDualTileTextureMap(
         BlackyChunkTextureCache cache,
         BlackyWorldHeight heightMapWorld,
-        StaticSpatialGridOptimizedGeneric<ColliderSpriteInstanceData> staticSpatialTerrain)
+        StaticSpatialChunkGrid<ColliderSpriteInstanceData> staticSpatialTerrain)
     {
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _heightMapWorld = heightMapWorld ?? throw new ArgumentNullException(nameof(heightMapWorld));
@@ -532,8 +532,7 @@ public sealed class BlackyDualTileTextureMap
             return 0;
         }
 
-        int idCollider = _staticSpatialTerrain.GetNewEntityId();
-        _colliderDebugMap.Add(idCollider, new List<int>());
+        var debugBodies = new List<int>();
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(Mundo_x, Mundo_y);
 
         float minX = float.MaxValue;
@@ -573,14 +572,18 @@ public sealed class BlackyDualTileTextureMap
             if (DEBUG_COLLIDER)
             {
                 int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
-                _colliderDebugMap[idCollider].Add(idDebugBody);
+                debugBodies.Add(idDebugBody);
             }
         }
 
         var tilePositionMin = new Vector2(minX, minY);
         var tilePositionMax = new Vector2(maxX, maxY);
 
-        _staticSpatialTerrain.RegisterStatic(idCollider, new ColliderSpriteInstanceData(idTileSpriteData, positionCenter), tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
+        int idCollider = _staticSpatialTerrain.RegisterStatic(
+            new ColliderSpriteInstanceData(idTileSpriteData, positionCenter),
+            tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
+
+        _colliderDebugMap.Add(idCollider, debugBodies);
 
         return idCollider;
     }

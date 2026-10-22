@@ -621,7 +621,7 @@ public class BlackyWorldGeography
     // ============================================================
     //  RUIDO PERLIN 2D con semilla + fBm (thread-safe una vez construido)
     // ============================================================
-    private sealed class PerlinNoise
+    internal sealed class PerlinNoise
     {
         private readonly int[] _p = new int[512];
 

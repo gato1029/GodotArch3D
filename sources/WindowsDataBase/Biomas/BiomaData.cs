@@ -8,13 +8,18 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.WindowsDataBase.Biomas;
 
+public class DecorationEntry
+{
+    public long idDecoracion { get; set; }
+    public float Probability { get; set; }
+}
 public class BiomaData:IdDataLong
 {
     public long idTerreno {  get; set; }
     public long idSuperficie { get; set; }
     public List<ResourceEntry> idRecursos { get; set; }
     public long idCamino { get; set; }
-    public List<long> idDecoracion { get; set; }
+    public List<DecorationEntry> idDecoraciones { get; set; }
     public BiomaData()
     {
         id = EpochIdGenerator.NewId();

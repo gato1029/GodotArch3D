@@ -159,7 +159,7 @@ public struct ConfiguracionGeograficaData
 public class BiomePlacementRuleData
 {
     public long idBioma { get; set; }
-
+    public bool isLowerBase { get; set; }
     public float alturaMinima { get; set; } 
     public float alturaMaxima { get; set; }
 

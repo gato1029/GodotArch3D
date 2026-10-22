@@ -9,6 +9,7 @@ using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.managers.Profiler;
 using GodotEcsArch.sources.WindowsDataBase.Terrain.DataBase;
+using GodotEcsArch.sources.WindowsDataBase.Biomas;
 using GodotEcsArch.sources.WindowsDataBase.TerrainBase;
 using GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 using System;
@@ -27,6 +28,7 @@ public class BlackyWorldProceduralTerritory
     private BlackyWorldSeed _worldSeed;    
     private BlackyWorldConfig _config;
     private BlackyWorldGeography _geography;
+    private BlackyWorldGeographyVertical _geographyVertical;
     private TemplateWorldProfileData _worldProfile;
     private int _heightMax;
     private BlackyWorldBiomes _biomes;
@@ -39,9 +41,14 @@ public class BlackyWorldProceduralTerritory
         _config = worldConfig;
         _worldSeed = new BlackyWorldSeed(_config.WorldSeed);
         _geography = new BlackyWorldGeography(worldConfig, _worldSeed, _world.Services.HeightMapWorld, configuracionGeografica);
+        _geographyVertical = new BlackyWorldGeographyVertical(worldConfig, _worldSeed, _world.Services.HeightMapWorld, configuracionGeografica)
+        {
+            HighAtPositiveY = true   // altura 3 arriba (Y+), altura 0 abajo (Y-)
+        };
 
         _biomes = new BlackyWorldBiomes(worldConfig, _worldSeed, _world.Services.HeightMapWorld, _worldProfile);
-
+       
+       
 
         string timeT = "Territorio";
         string timePlot = "plot";
@@ -57,9 +64,59 @@ public class BlackyWorldProceduralTerritory
         _world.Services.TerrainDataLienzo.PlotAllMap();
         _world.Services.SuperficiesDataLienzo.PlotAllMap();
         _world.Services.AdornosDataLienzo.PlotAllMap();
+
+        // Deja los chunks de colisión listos para las consultas paralelas del sistema de colisión.
+        _world.State.StaticSpatialTerrain.Flush();
+
         PerformanceTimer.Instance.Stop(timePlot);
         PerformanceTimer.Instance.Print(timePlot);
         world.Streaming.chunkManagerLocal.Teleport(new Vector2(0, 0)); // esto hace que se renderice el chunk central y se carguen los chunks alrededor
+    }
+
+    /// <summary>
+    /// Elige una decoración usando Probability (0..100) como porcentaje de aparición.
+    /// Si la suma es menor que 100, el resto de las celdas queda sin decoración.
+    /// Si la suma supera 100, se normaliza para que todas tengan oportunidad.
+    /// </summary>
+    private static bool TryPickDecoration(List<DecorationEntry> entries, Random rng, out long decorationId)
+    {
+        decorationId = 0;
+        if (entries == null || entries.Count == 0) return false;
+
+        float total = 0f;
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            if (entry != null && entry.Probability > 0f)
+                total += entry.Probability;
+        }
+
+        if (total <= 0f) return false;
+
+        float roll = rng.NextSingle() * 100f;
+
+        // Lo que no llega a 100 es probabilidad de que no aparezca nada.
+        if (total < 100f && roll >= total) return false;
+
+        // Si se pasa de 100, se escala para que todas las entradas tengan oportunidad.
+        float scale = total > 100f ? 100f / total : 1f;
+        float accumulated = 0f;
+
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            if (entry == null || entry.Probability <= 0f)
+                continue;
+
+            accumulated += entry.Probability * scale;
+            if (roll < accumulated)
+            {
+                decorationId = entry.idDecoracion;
+                return decorationId > 0;
+            }
+        }
+
+        return false;
     }
 
     private void GenerateDecorations()
@@ -69,15 +126,15 @@ public class BlackyWorldProceduralTerritory
     }
     private void GenerateGeography()
     {
-        _geography.Generate();
-
+        //_geography.Generate();
+        _geographyVertical.Generate();
         // debug: exporta el mapa de terreno generado a un archivo txt y una imagen png en el escritorio
         //string filePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), "worldTerrenoGeografico" + _config.MapSize.ToString() + _worldProfile.perfilGeografico.ToString() + ".txt");
-        //string imgPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), "worldTerrenoGeografico" + _config.MapSize.ToString() + _worldProfile.perfilGeografico.ToString() + ".png");
+        string imgPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), "worldTerrenoGeografico" + _config.MapSize.ToString() + _worldProfile.perfilGeografico.ToString() + ".png");
         //string filePath2 = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), "worldTerrenoOri" + _config.MapSize.ToString() + _worldProfile.perfilGeografico.ToString() + ".txt");
         //_world.Services.HeightMapWorld.ExportHeightsToTxt(filePath2);
-        //_geography.ExportDebugTxt(filePath); // debug: genera un txt con el mapa de terreno generado
-       // _geography.ExportDebugPng(imgPath); // debug: genera una imagen con el mapa de terreno generado
+      //  _geography.ExportDebugTxt(filePath); // debug: genera un txt con el mapa de terreno generado
+        _geographyVertical.ExportDebugPng(imgPath); // debug: genera una imagen con el mapa de terreno generado
     }
   
     public void GenerateTerritory()
@@ -156,11 +213,17 @@ public class BlackyWorldProceduralTerritory
                         ref var storedCell = ref heightBuffers[height].GetCell(x, y);
                         storedCell.id = terrainPaletteIds[cell.IdTerreno];
                         storedCell.isBorder = isBorder;
-                        if (cell.IsTransition)
-                        {
+                        // Superficie: transiciones en cualquier altura y, además, los biomas
+                        // no base de la altura 0 (el agua base no lleva superficie propia).
+                        bool hasSurface = cell.IdSuperficie != 0
+                            && (cell.IsTransition || cell.HeightLevel == 0);
+
+                        if (hasSurface)
+                        {                            
+                            bool surfaceborder = cell.IsBiomeBorder || cell.HeightLevel == 0; // esto por que para superficie de bordes de bioma en altura mayor a 0 si funciona bien en altura 0 el borde no funciona bien revisar luego
                             ref var surfCell = ref surfaceBuffers[height].GetCell(x, y);
                             surfCell.id = surfacePaletteIds[cell.IdSuperficie];
-                            surfCell.isBorder = true;     // era el 'true' de SetSuperficieDirectNoRender
+                            surfCell.isBorder = surfaceborder;
                         }
 
                         if (cell.IsHeightTransition && height > 0)
@@ -170,21 +233,15 @@ public class BlackyWorldProceduralTerritory
                             lowerCell.id = terrainPaletteIds[cell.HeightLowerTerrainId];
                             lowerCell.isBorder = false;
                         }
-                        if (!isBorder && decorationBuffers != null)
+                        if (cell.HasDecoration && decorationBuffers != null)
                         {
-                            // Decoración de terreno/superficie: una por celda no-borde.
-                            var listaDecoracion = cell.Bioma.idDecoracion;
-                            if (listaDecoracion != null && listaDecoracion.Count > 0)
+                            // Elige la decoración según su probabilidad de aparición (0..100).
+                            if (TryPickDecoration(cell.Bioma.idDecoraciones, decorationRng, out long decorationId)
+                                && decorationBuffers[height] != null
+                                && decorationPaletteIds.TryGetValue(decorationId, out ushort decorationPaletteId))
                             {
-                                int rd = decorationRng.Next(listaDecoracion.Count);
-                                long id = listaDecoracion[rd];
-
-                                if (decorationBuffers[height] != null &&
-                                    decorationPaletteIds.TryGetValue(id, out ushort decorationPaletteId))
-                                {
-                                    ref var decoCell = ref decorationBuffers[height].GetCell(x, y);
-                                    decoCell.id = decorationPaletteId;
-                                }
+                                ref var decoCell = ref decorationBuffers[height].GetCell(x, y);
+                                decoCell.id = decorationPaletteId;
                             }
                         }
                        
@@ -246,7 +303,8 @@ public class BlackyWorldProceduralTerritory
                     int height = cell.HeightLevel;
                     usedHeightMask |= 1 << height;
 
-                    if (cell.IsTransition)
+                    if (cell.IdSuperficie != 0
+                        && (cell.IsTransition || cell.HeightLevel == 0))
                     {
                         CacheSurfacePaletteId(cell.IdSuperficie);
                         usedSurfaceMask |= 1 << height;
@@ -258,12 +316,22 @@ public class BlackyWorldProceduralTerritory
                         usedHeightMask |= 1 << (height - 1);
                     }
 
-                    bool isBorder = cell.IsHeightBorder || cell.IsMapBorder || cell.IsHeightTransition;
-                    if (!isBorder && cell.Bioma.idDecoracion != null && cell.Bioma.idDecoracion.Count > 0)
+                    if (cell.HasDecoration)
                     {
                         usedDecorationMask |= 1 << height;
-                        foreach (long decorationId in cell.Bioma.idDecoracion)
-                            decorationIdsToCache.Add(decorationId);
+
+                        var entries = cell.Bioma.idDecoraciones;
+                        if (entries != null)
+                        {
+                            for (int entryIndex = 0; entryIndex < entries.Count; entryIndex++)
+                            {
+                                var entry = entries[entryIndex];
+                                if (entry == null || entry.idDecoracion <= 0 || entry.Probability <= 0f)
+                                    continue;
+
+                                decorationIdsToCache.Add(entry.idDecoracion);
+                            }
+                        }
                     }
                 }
 

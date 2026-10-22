@@ -22,6 +22,10 @@ using static System.Net.WebRequestMethods;
 namespace GodotFlecs.sources.Flecs.Systems.Units;
 public class UnitMelleEnemySearchSystem: FlecsSystemBase
 {
+    // Un contexto de consulta por hilo: este sistema corre MultiThreaded.
+    [ThreadStatic]
+    private static RutaLibreQueryContext _rutaLibreContext;
+
     // busca enemigos de las unidades que son melle, osea ataque cuerpo a cuerpo
     // encuentra objetivo y automaticamente ya asigna destino y objetivo
     protected override ulong Phase => flecs.EcsOnUpdate;
@@ -46,6 +50,8 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
 {
     var world = it.World().GetCtx<BlackyWorld>();
     if (world == null) return;
+
+    var rutaLibreContext = _rutaLibreContext ??= new RutaLibreQueryContext();
 
     var sim = world.Simulation.Tick;
     if (sim == null || sim.TickCount == 0) return;
@@ -138,7 +144,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
             {
                 int radius = (int)MathF.Ceiling((search.Radius * 2f) / staticGrid._cellSize);
                 // aqui buscar edificos
-                foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius, team.TeamId))
+                foreach (var id in staticGrid.QueryNearbyUnique(pos.position.X, pos.position.Y, radius, rutaLibreContext.Buildings, team.TeamId))
                 {
                     if (staticGrid.TryGetValue(id, out Entity otherEntity))
                     {
@@ -232,7 +238,7 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
                         Vector2 approachPoint = targetPos + slotDir * ringRadius;
 
                         // validar si el camino esta libre
-                        if (CollisionMathHelper.RutaLibre(e, ref targetPos, world))
+                        if (CollisionMathHelper.RutaLibre(e, ref targetPos, world, rutaLibreContext))
                         {
                             moveResolutor.Blocked = false;
                             e.Set(new MoveTargetComponent(approachPoint));
