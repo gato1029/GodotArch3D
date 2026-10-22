@@ -17,9 +17,17 @@ public partial class ControlDecoration : Control
 	}
     public void SetData(DecorationData data)
     {
+        if (data==null)
+        {
+            return;
+        }
+        this.data = data;
         TextureRectImage.Texture= data.textureVisual;
     }
-
+    public DecorationData GetData()
+    {
+        return data;
+    }
     private void TextureRectImage_GuiInput(InputEvent @event)
     {
         if (@event is InputEventMouseButton mouseButton

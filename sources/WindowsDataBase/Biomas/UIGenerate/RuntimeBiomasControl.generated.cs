@@ -13,6 +13,7 @@ public partial class RuntimeBiomasControl : PanelContainer
     private Button ButtonTerreno;
     private Button ButtonSuperficie;
     private Button ButtonCaminos;
+    private ControlListDecoraciones ContenedorDecoraciones;
     private ControlListResourcesSources ListaRecursos;
     private KuroButton ButtonGuardar;
     private KuroButton ButtonEliminar;
@@ -25,6 +26,7 @@ public partial class RuntimeBiomasControl : PanelContainer
         ButtonTerreno = GetNode<Button>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ButtonTerreno");
         ButtonSuperficie = GetNode<Button>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ButtonSuperficie");
         ButtonCaminos = GetNode<Button>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ButtonCaminos");
+        ContenedorDecoraciones = GetNode<ControlListDecoraciones>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ContenedorDecoraciones");
         ListaRecursos = GetNode<ControlListResourcesSources>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/GridContainer/ListaRecursos");
         ButtonGuardar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonGuardar");
         ButtonEliminar = GetNode<KuroButton>("HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/ButtonEliminar");

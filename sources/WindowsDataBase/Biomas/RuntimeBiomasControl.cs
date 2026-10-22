@@ -84,6 +84,7 @@ public partial class RuntimeBiomasControl : PanelContainer
         ButtonCaminos.Text = "Seleccione Uno";
         ButtonTerreno.Text = "Seleccione Uno";
         ListaRecursos.ClearAll();
+        ContenedorDecoraciones.ClearAll();
     }
 
     private void ButtonNuevo_Pressed()
@@ -103,7 +104,8 @@ public partial class RuntimeBiomasControl : PanelContainer
     private void ButtonGuardar_Pressed()
     {
         data.name = LineEditName.Text;
-        data.idRecursos = ListaRecursos.GetData();        
+        data.idRecursos = ListaRecursos.GetData();
+        data.idDecoracion = ContenedorDecoraciones.GetAllDataIds();
         DataBaseManager.Instance.InsertUpdate(data);
         KuroItems.RefreshObject(data);
     }
@@ -124,7 +126,7 @@ public partial class RuntimeBiomasControl : PanelContainer
             ButtonTerreno.Text = AtlasModsManager.GetDirect<TerrainBaseData>(data.idTerreno).name;
         }
         ListaRecursos.SetData(data.idRecursos);
-        
+        ContenedorDecoraciones.SetData(data.idDecoracion);
         LineEditName.Text = data.name;       
     }
 }
