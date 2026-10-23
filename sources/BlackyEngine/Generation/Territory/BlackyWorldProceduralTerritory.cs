@@ -222,16 +222,20 @@ public class BlackyWorldProceduralTerritory
                         {                            
                             bool surfaceborder = cell.IsBiomeBorder || cell.HeightLevel == 0; // esto por que para superficie de bordes de bioma en altura mayor a 0 si funciona bien en altura 0 el borde no funciona bien revisar luego
                             ref var surfCell = ref surfaceBuffers[height].GetCell(x, y);
-                            surfCell.id = surfacePaletteIds[cell.IdSuperficie];
+                            surfCell.id = surfacePaletteIds[cell.IdSuperficie];                         
                             surfCell.isBorder = surfaceborder;
                         }
 
                         if (cell.IsHeightTransition && height > 0)
                         {
+
                             int lowerHeight = height - 1;
-                            ref var lowerCell = ref heightBuffers[lowerHeight].GetCell(x, y);
-                            lowerCell.id = terrainPaletteIds[cell.HeightLowerTerrainId];
-                            lowerCell.isBorder = false;
+                         
+                                ref var lowerCell = ref heightBuffers[lowerHeight].GetCell(x, y);
+                                lowerCell.id = terrainPaletteIds[cell.HeightLowerTerrainId];
+                                lowerCell.isBorder = false;
+                           
+                          
                         }
                         if (cell.HasDecoration && decorationBuffers != null)
                         {

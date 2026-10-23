@@ -8,7 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
-using static MessagePack.GeneratedMessagePackResolver.GodotEcsArch.sources.BlackyEngine;
+
 // (los using de BlackyWorldConfig / BlackyWorldSeed / BlackyWorldHeight ya existen en tu proyecto)
 
 public class BlackyWorldGeography
@@ -23,6 +23,9 @@ public class BlackyWorldGeography
 
     /// <summary>Lado máximo (en píxeles) de la imagen de debug.</summary>
     private const int MaxImageSide = 8192;
+
+    /// <summary>Niveles de altura: 0 agua, 1 costa, 2..4 tierra.</summary>
+    private const int Niveles = ConfiguracionGeograficaData.NivelesTotales;
 
     /// <summary>
     /// Ajuste MANUAL del tamaño del detalle del relieve (el ruido), debe ser > 0. Se multiplica por la
@@ -101,12 +104,12 @@ public class BlackyWorldGeography
     // ============================================================
 
     /// <summary>
-    /// Genera la geografía de todo el mundo (niveles 0..AlturaMaxima) y la escribe en heightMapWorld
-    /// con SetTopHeight, usando coordenadas de mundo (centro 0,0). Las proporciones de Altura0..3
-    /// se cumplen sobre el mundo completo.
+    /// Genera la geografía de todo el mundo (niveles 0..AlturaMaxima; 0 agua, 1 costa, 2..4 tierra) y la escribe
+    /// en heightMapWorld con SetTopHeight, usando coordenadas de mundo (centro 0,0). Las proporciones de
+    /// Altura0..4 se cumplen sobre el mundo completo.
     ///
     /// Pasos: (1) cada celda recibe un valor = ruido mezclado con la forma del perfil;
-    /// (2) los cortes por percentil convierten ese valor en nivel 0..3.
+    /// (2) los cortes por percentil convierten ese valor en nivel 0..4.
     /// </summary>
     public void Generate()
     {
@@ -132,7 +135,8 @@ public class BlackyWorldGeography
             for (int x = 0; x < w; x++)
             {
                 float v = field.Evaluate(x, y);
-                int level = v < cuts[0] ? 0 : v < cuts[1] ? 1 : v < cuts[2] ? 2 : 3;
+                int level = 0;
+                while (level < cuts.Length && v >= cuts[level]) level++;
                 levels[row + x] = (byte)Math.Min(level, maxLevel);
             }
         });
@@ -148,8 +152,8 @@ public class BlackyWorldGeography
     }
 
     /// <summary>
-    /// Calcula los 3 cortes de valor (nivel 0|1, 1|2, 2|3) a partir de una muestra regular del mapa,
-    /// de forma que las proporciones Altura0..3 se cumplan sobre el mundo completo.
+    /// Calcula los cortes de valor (nivel 0|1, 1|2, 2|3, 3|4) a partir de una muestra regular del mapa,
+    /// de forma que las proporciones Altura0..4 se cumplan sobre el mundo completo.
     /// En mapas de hasta ~4M de celdas la muestra es el mapa entero (equivale a ordenar todo).
     /// </summary>
     private static float[] ComputeCuts(TerrainField field, int w, int h, float[] weights)
@@ -166,23 +170,27 @@ public class BlackyWorldGeography
         });
         Array.Sort(sample);
 
-        float[] cum = { weights[0], weights[0] + weights[1], weights[0] + weights[1] + weights[2] };
-        float[] cuts = new float[3];
-        for (int k = 0; k < 3; k++)
-            cuts[k] = cum[k] >= 0.9999f
+        float[] cuts = new float[weights.Length - 1];
+        float acc = 0f;
+        for (int k = 0; k < cuts.Length; k++)
+        {
+            acc += weights[k];
+            cuts[k] = acc >= 0.9999f
                 ? float.PositiveInfinity
-                : sample[Math.Min(sample.Length - 1, (int)(cum[k] * sample.Length))];
+                : sample[Math.Min(sample.Length - 1, (int)(acc * sample.Length))];
+        }
         return cuts;
     }
 
     /// <summary>Proporciones normalizadas (suman 1) y respetando AlturaMaxima.</summary>
     private static float[] GetWeights(ConfiguracionGeograficaData c)
     {
-        float[] p = { c.Altura0, c.Altura1, c.Altura2, c.Altura3 };
-        for (int i = c.AlturaMaxima + 1; i < 4; i++) p[i] = 0f;
-        float sum = p[0] + p[1] + p[2] + p[3];
+        float[] p = { c.Altura0, c.Altura1, c.Altura2, c.Altura3, c.Altura4 };
+        for (int i = c.AlturaMaxima + 1; i < p.Length; i++) p[i] = 0f;
+        float sum = 0f;
+        foreach (float v in p) sum += v;
         if (sum <= 0f) { p[0] = 1f; return p; }
-        for (int i = 0; i < 4; i++) p[i] /= sum;
+        for (int i = 0; i < p.Length; i++) p[i] /= sum;
         return p;
     }
 
@@ -435,18 +443,18 @@ public class BlackyWorldGeography
                 break;
         }
         sw.WriteLine($"# AlturaMaxima: {cfg.AlturaMaxima}");
-        sw.WriteLine($"# Proporciones: A0={cfg.Altura0.ToString(inv)} A1={cfg.Altura1.ToString(inv)} A2={cfg.Altura2.ToString(inv)} A3={cfg.Altura3.ToString(inv)}");
+        sw.WriteLine($"# Proporciones: A0={cfg.Altura0.ToString(inv)} A1={cfg.Altura1.ToString(inv)} A2={cfg.Altura2.ToString(inv)} A3={cfg.Altura3.ToString(inv)} A4={cfg.Altura4.ToString(inv)}");
         sw.WriteLine("#");
         sw.WriteLine("# --- ESTADÍSTICAS (sobre las celdas volcadas) ---");
-        sw.WriteLine("# Nivel | Esperado | Obtenido | Celdas");
-        for (int i = 0; i < 4; i++)
+        sw.WriteLine("# Nivel | Esperado | Obtenido | Celdas   (0 agua, 1 costa, 2..4 tierra)");
+        for (int i = 0; i < Niveles; i++)
         {
             counts.TryGetValue(i, out long n);
             sw.WriteLine($"#   {i}   | {expected[i] * 100,6:0.0}%  | {(sampled > 0 ? n * 100.0 / sampled : 0),6:0.0}%  | {n}");
         }
         foreach (var kv in counts)
-            if (kv.Key < 0 || kv.Key > 3)
-                sw.WriteLine($"# (fuera de 0..3) altura {kv.Key}: {kv.Value} celdas");
+            if (kv.Key < 0 || kv.Key >= Niveles)
+                sw.WriteLine($"# (fuera de 0..{Niveles - 1}) altura {kv.Key}: {kv.Value} celdas");
         sw.WriteLine("#");
         sw.WriteLine($"# --- MAPA (una fila por línea, {(DebugYAxisUp ? "Y máxima" : "Y mínima")} arriba) ---");
         sw.Write(map.ToString());
@@ -482,7 +490,7 @@ public class BlackyWorldGeography
 
     /// <summary>
     /// Guarda la geografía como imagen PNG de colores (hasta 8192x8192 píxeles). Lee heightMapWorld.
-    /// Colores: 0 azul, 1 verde, 2 ocre, 3 marrón; otra altura = magenta.
+    /// Colores: 0 agua (azul), 1 costa (arena), 2 verde, 3 ocre, 4 marrón; otra altura = magenta.
     /// Arriba-izquierda = (MinX, MaxY) si DebugYAxisUp (por defecto), o (MinX, MinY) si no.
     /// El centro del mundo (0,0) está en el centro de la imagen.
     /// <paramref name="pixelsPerTile"/>: 0 = automático (los mapas pequeños se amplían hasta ~2048 px).
@@ -510,11 +518,12 @@ public class BlackyWorldGeography
 
         byte[] palette =
         {
-             46,  94, 140,   // 0 azul
-             94, 158,  78,   // 1 verde
-            194, 176,  90,   // 2 ocre
-            140, 106,  75,   // 3 marrón
-            255,   0, 255    // otra altura
+             46,  94, 140,   // 0 agua (azul)
+            230, 214, 150,   // 1 costa (arena)
+             94, 158,  78,   // 2 verde
+            176, 150,  80,   // 3 ocre
+            120,  90,  65,   // 4 marrón
+            255,   0, 255    // otra altura (magenta)
         };
 
         string dir = Path.GetDirectoryName(Path.GetFullPath(path));
@@ -532,7 +541,7 @@ public class BlackyWorldGeography
                 for (int tx = 0; tx < tilesX; tx++)
                 {
                     int v = (int)heightMapWorld.GetTopHeight(minX + tx * step, worldY);
-                    byte idx = (byte)(v >= 0 && v <= 3 ? v : 4);
+                    byte idx = (byte)(v >= 0 && v < Niveles ? v : Niveles);
                     int px = tx * scale;
                     for (int k = 0; k < scale; k++) cache[px + k] = idx;
                 }
@@ -620,6 +629,7 @@ public class BlackyWorldGeography
 
     // ============================================================
     //  RUIDO PERLIN 2D con semilla + fBm (thread-safe una vez construido)
+    //  'internal' para que BlackyWorldGeographyVertical lo reutilice.
     // ============================================================
     internal sealed class PerlinNoise
     {

@@ -6,14 +6,17 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-// (mismos using de BlackyWorldConfig / BlackyWorldSeed / BlackyWorldHeight que en BlackyWorldGeography)
+
+// (los using de BlackyWorldConfig / BlackyWorldSeed / BlackyWorldHeight ya existen en tu proyecto)
 
 /// <summary>
 /// Geografía "de arriba hacia abajo" para juegos top down: el terreno es más alto en un extremo vertical
-/// del mapa y más bajo en el opuesto. Usa Altura0..3, AlturaMaxima, Frecuencia, FormaPeso y Sinuosidad
-/// de ConfiguracionGeograficaData (la propiedad Forma se ignora).
+/// del mapa y más bajo en el opuesto. Niveles: 0 agua, 1 costa, 2..4 tierra.
+/// Usa Altura0..4, AlturaMaxima, Frecuencia, FormaPeso y Sinuosidad de ConfiguracionGeograficaData
+/// (la propiedad Forma se ignora).
 ///   FormaPeso  = cuánto manda el gradiente vertical frente al ruido (0 = solo ruido, 1 = franjas casi rectas)
 ///   Sinuosidad = cuánto se deforman/ondulan las franjas (0 = rectas)
+/// Requiere que BlackyWorldGeography.PerlinNoise sea 'internal'.
 /// </summary>
 public class BlackyWorldGeographyVertical
 {
@@ -24,12 +27,29 @@ public class BlackyWorldGeographyVertical
 
     private const long MuestrasObjetivo = 4_000_000;
 
+    /// <summary>Lado máximo (en píxeles) de la imagen de debug.</summary>
+    private const int MaxImageSide = 8192;
+
+    /// <summary>Niveles de altura: 0 agua, 1 costa, 2..4 tierra.</summary>
+    private const int Niveles = ConfiguracionGeograficaData.NivelesTotales;
+
     /// <summary>true = la altura máxima está en Y positiva (MaxY); false = en Y negativa (MinY).</summary>
     public bool HighAtPositiveY { get; set; } = true;
 
+    /// <summary>Ajuste MANUAL del tamaño del detalle del ruido (debe ser > 0).</summary>
     public float TerrainScale { get; set; } = 1f;
+
+    /// <summary>Si es true, el detalle del ruido escala con el tamaño del mapa respecto a ReferenceMapSize.</summary>
     public bool AutoTerrainScale { get; set; } = true;
+
+    /// <summary>Tamaño de mapa (lado mayor) para el que están pensadas las Frecuencia del struct.</summary>
     public int ReferenceMapSize { get; set; } = 512;
+
+    /// <summary>
+    /// Solo afecta al DEBUG (.png), no a los datos generados: true = Y+ hacia arriba (la fila de arriba es
+    /// MaxY); false = Y+ hacia abajo (la fila de arriba es MinY).
+    /// </summary>
+    public bool DebugYAxisUp { get; set; } = true;
 
     public int MinX => -(worldConfig.MapSize.X / 2);
     public int MinY => -(worldConfig.MapSize.Y / 2);
@@ -46,6 +66,10 @@ public class BlackyWorldGeographyVertical
         this.heightMapWorld = heightMapWorld;
         this.cfg = cfg;
     }
+
+    // ============================================================
+    //  GENERACIÓN
+    // ============================================================
 
     public void Generate()
     {
@@ -69,7 +93,8 @@ public class BlackyWorldGeographyVertical
             for (int x = 0; x < w; x++)
             {
                 float v = field.Evaluate(x, y);
-                int level = v < cuts[0] ? 0 : v < cuts[1] ? 1 : v < cuts[2] ? 2 : 3;
+                int level = 0;
+                while (level < cuts.Length && v >= cuts[level]) level++;
                 levels[row + x] = (byte)Math.Min(level, maxLevel);
             }
         });
@@ -97,26 +122,34 @@ public class BlackyWorldGeographyVertical
         });
         Array.Sort(sample);
 
-        float[] cum = { weights[0], weights[0] + weights[1], weights[0] + weights[1] + weights[2] };
-        float[] cuts = new float[3];
-        for (int k = 0; k < 3; k++)
-            cuts[k] = cum[k] >= 0.9999f
+        float[] cuts = new float[weights.Length - 1];
+        float acc = 0f;
+        for (int k = 0; k < cuts.Length; k++)
+        {
+            acc += weights[k];
+            cuts[k] = acc >= 0.9999f
                 ? float.PositiveInfinity
-                : sample[Math.Min(sample.Length - 1, (int)(cum[k] * sample.Length))];
+                : sample[Math.Min(sample.Length - 1, (int)(acc * sample.Length))];
+        }
         return cuts;
     }
 
     private static float[] GetWeights(ConfiguracionGeograficaData c)
     {
-        float[] p = { c.Altura0, c.Altura1, c.Altura2, c.Altura3 };
-        for (int i = c.AlturaMaxima + 1; i < 4; i++) p[i] = 0f;
-        float sum = p[0] + p[1] + p[2] + p[3];
+        float[] p = { c.Altura0, c.Altura1, c.Altura2, c.Altura3, c.Altura4 };
+        for (int i = c.AlturaMaxima + 1; i < p.Length; i++) p[i] = 0f;
+        float sum = 0f;
+        foreach (float v in p) sum += v;
         if (sum <= 0f) { p[0] = 1f; return p; }
-        for (int i = 0; i < 4; i++) p[i] /= sum;
+        for (int i = 0; i < p.Length; i++) p[i] /= sum;
         return p;
     }
 
-    /// <summary>valor = (1 - peso) * ruido + peso * gradiente vertical ondulado. Thread-safe una vez construido.</summary>
+    // ============================================================
+    //  CAMPO DE TERRENO: ruido + gradiente vertical (thread-safe una vez construido)
+    // ============================================================
+
+    /// <summary>valor = (1 - peso) * ruido + peso * gradiente vertical ondulado.</summary>
     private sealed class VerticalField
     {
         private readonly BlackyWorldGeography.PerlinNoise noise;
@@ -157,26 +190,15 @@ public class BlackyWorldGeographyVertical
 
             return (1f - shapeWeight) * n + shapeWeight * s;
         }
-
-
     }
 
     // ============================================================
     //  DEBUG: imagen PNG de la geografía
     // ============================================================
 
-    /// <summary>Lado máximo (en píxeles) de la imagen de debug.</summary>
-    private const int MaxImageSide = 8192;
-
-    /// <summary>
-    /// Solo afecta al DEBUG (.png), no a los datos generados: true = Y+ hacia arriba (la fila de arriba es
-    /// MaxY); false = Y+ hacia abajo (la fila de arriba es MinY).
-    /// </summary>
-    public bool DebugYAxisUp { get; set; } = true;
-
     /// <summary>
     /// Guarda la geografía como imagen PNG de colores (hasta 8192x8192 píxeles). Lee heightMapWorld.
-    /// Colores: 0 azul, 1 verde, 2 ocre, 3 marrón; otra altura = magenta.
+    /// Colores: 0 agua (azul), 1 costa (arena), 2 verde, 3 ocre, 4 marrón; otra altura = magenta.
     /// Arriba-izquierda = (MinX, MaxY) si DebugYAxisUp (por defecto), o (MinX, MinY) si no.
     /// <paramref name="pixelsPerTile"/>: 0 = automático (los mapas pequeños se amplían hasta ~2048 px).
     ///   Si el mapa es mayor que 8192 se reduce tomando 1 tile de cada N.
@@ -203,11 +225,12 @@ public class BlackyWorldGeographyVertical
 
         byte[] palette =
         {
-             46,  94, 140,   // 0 azul
-             94, 158,  78,   // 1 verde
-            194, 176,  90,   // 2 ocre
-            140, 106,  75,   // 3 marrón
-            255,   0, 255    // otra altura
+             46,  94, 140,   // 0 agua (azul)
+            230, 214, 150,   // 1 costa (arena)
+             94, 158,  78,   // 2 verde
+            176, 150,  80,   // 3 ocre
+            120,  90,  65,   // 4 marrón
+            255,   0, 255    // otra altura (magenta)
         };
 
         string dir = Path.GetDirectoryName(Path.GetFullPath(path));
@@ -225,7 +248,7 @@ public class BlackyWorldGeographyVertical
                 for (int tx = 0; tx < tilesX; tx++)
                 {
                     int v = (int)heightMapWorld.GetTopHeight(minX + tx * step, worldY);
-                    byte idx = (byte)(v >= 0 && v <= 3 ? v : 4);
+                    byte idx = (byte)(v >= 0 && v < Niveles ? v : Niveles);
                     int px = tx * scale;
                     for (int k = 0; k < scale; k++) cache[px + k] = idx;
                 }
