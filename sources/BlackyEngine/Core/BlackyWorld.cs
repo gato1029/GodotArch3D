@@ -195,7 +195,7 @@ public sealed class BlackyWorld : IDisposable
     {
         var e = Characters.InternalExecuteCreation(1787768744605000,10, new Vector2(0, 0)); // principal
 
-       //SpawnEnemiesAroundPlayer(100,30);
+       SpawnEnemiesAroundPlayer(5,10);
         
         //var ee = Characters.InternalExecuteCreation(1788369074799000,1, new Vector2(2, 0)); // enemigos
         //ee.Set(new MoveTargetComponent(new Vector2(60, 0)));
@@ -244,7 +244,7 @@ public sealed class BlackyWorld : IDisposable
                 occupiedTiles.Add(tileCoord);
                 Vector2 worldPos = TilesHelper.TilePositionToWorldPosition(tx, ty);
 
-                var enemy = Characters.InternalExecuteCreation(1788369074799000,1, worldPos);
+                var enemy = Characters.InternalExecuteCreation(1788369074799000,10, worldPos);
                 //enemy.Set(new MoveTargetComponent(playerWorldPos));
 
                 spawned++;

@@ -85,7 +85,7 @@ public sealed class BlackyWorldState : IDisposable
         GraphCache.BuildCache(config.MinChunk, config.MaxChunk);
         FlowFieldManager = new BlackyFlowFieldManager(ClearanceMap);
 
-        PathFinder = new BlackyPathfinder(GraphCache,ClearanceMap,FlowFieldManager, config.ChunkSize);
+        PathFinder = new BlackyPathfinder(GraphCache,ClearanceMap,FlowFieldManager,world, config.ChunkSize);
         PathRegistryManager = new BlackyPathRegistryManager();
 
         

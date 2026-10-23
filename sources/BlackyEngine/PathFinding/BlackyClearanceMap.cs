@@ -235,8 +235,27 @@ public class BlackyClearanceMap : IDisposable
     {
         var chunk = GetOrCreateChunk(worldX, worldY, out int localX, out int localY);
         chunk.SetDistance(localX, localY, value);
-        
-        DebugDistance(chunk, worldX, worldY, localX, localY, value);
+
+        DebugDistanceZero(chunk, worldX, worldY, localX, localY, value);
+
+    }
+    private void DebugDistanceZero(BlackyClearanceSubChunk chunk, int worldX, int worldY, int localX, int localY, int value)
+    {
+        if (value!=0)
+        {
+            return;
+        }
+        Vector2 pos = TilesHelper.TilePositionToWorldPosition(worldX, worldY);
+        int id = chunk.GetIdDebug(localX, localY);
+        if (id == -1)
+        {
+            id = BlackyWorldContext.Simulation.DebugText.DrawText(new Vector3(pos.X, pos.Y, 10), value.ToString());
+            chunk.SetIdDebug(localX, localY, id);
+        }
+        else
+        {
+            BlackyWorldContext.Simulation.DebugText.UpdateText(id, value.ToString());
+        }
 
     }
     private void DebugDistance(BlackyClearanceSubChunk chunk, int worldX,int worldY, int localX, int localY,  int value)

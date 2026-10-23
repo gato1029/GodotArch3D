@@ -110,14 +110,22 @@ public class BlackyWorldGridManager
             int x = cellPosition.X + tile.x;
             int y = cellPosition.Y + tile.y;
             Grid.StaticLayer.PlaceStaticObject(new Vector2I(x, y), obstacleType);
-        }
-        
+        }        
     }
     //public void PlaceStaticObjectInMainWorld(Vector2 localCenterPos, Vector2 worldSize, byte obstacleType = 1)
     //{
     //    Vector2 atlasPos = MainWorldLocalToAtlasPos(localCenterPos);
     //    Grid.StaticLayer.PlaceStaticObject(atlasPos, worldSize, obstacleType);
     //}
+    public void PlaceStaticObjectInWorld(Vector2I cellPosition)
+    {
+        byte obstacleType = 1;                        
+        Grid.StaticLayer.PlaceStaticObject(cellPosition, obstacleType);        
+    }
+    public void RemoveStaticObjectInWorld(Vector2I cellPosition)
+    {        
+        Grid.StaticLayer.RemoveStaticObject(cellPosition);        
+    }
 
     public void RemoveStaticObjectInWorld(Vector2I cellPosition, List<KuroTile> tiles)
     {

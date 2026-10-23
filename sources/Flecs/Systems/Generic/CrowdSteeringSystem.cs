@@ -2,6 +2,7 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.managers.Characters;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -24,7 +25,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
     private const float ProbeMargin = 0.2f;
 
     // Recto, +45°, -45° (en radianes)
-    private static readonly float[] ConeOffsets = { 0f, Mathf.DegToRad(60f), -Mathf.DegToRad(60f) };
+    private static readonly float[] ConeOffsets = { 0f, Mathf.DegToRad(30f), -Mathf.DegToRad(30f), Mathf.DegToRad(60f), -Mathf.DegToRad(60f) };
 
     protected override void BuildQuery(ref QueryBuilder qb)
     {
@@ -49,6 +50,8 @@ public class CrowdSteeringSystem : FlecsSystemBase
         if (flowFieldManager == null) return;
         var grid = world.State.GridSparseManager.Grid.DynamicLayer;               // capacidad por celda, crowd
         var terrain = world.State.GridSparseManager;    // terreno/edificios
+        var dynGrid = world.State.DynamicHash;
+        Span<int> neighbors = stackalloc int[8];
 
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
@@ -152,6 +155,8 @@ public class CrowdSteeringSystem : FlecsSystemBase
                        // break;
                         continue;
                 }
+                if (CheckUnitsAtCandidate(candPos, col.Radius, sid.Value, neighbors, dynGrid))
+                    continue;
 
                 bestDir = candDir;
                 found = true;
@@ -180,7 +185,31 @@ public class CrowdSteeringSystem : FlecsSystemBase
             }
         }
     }
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    private bool CheckUnitsAtCandidate(
+       Vector2 candidatePos, float radius, int selfSid,
+       Span<int> neighbors, FastSpatialHash dynGrid)
+    {
+        int count = dynGrid.QueryNodesBoundedClosestLayersFiltered(candidatePos.X, candidatePos.Y, radius, 0, neighbors);
 
+        for (int ii = 0; ii < count; ii++)
+        {
+            int otherSid = dynGrid.GetSpatialID(neighbors[ii]);
+            if (otherSid == selfSid) continue;
+
+            Entity other = dynGrid.GetEntity(neighbors[ii]);
+            if (!other.IsAlive() || other.Has<DeadTag>()) continue;
+
+            var otherPos = other.Get<PositionComponent>().position;
+            var otherCol = other.Get<MoveColliderComponent>();
+
+            float dist = candidatePos.DistanceTo(otherPos + otherCol.Offset);
+            if (dist < radius + otherCol.Radius)
+                return true;
+        }
+
+        return false;
+    }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void GoIdle(ref VelocityComponent vel, ref StateComponent state, ref SteeringComponent steering)
     {

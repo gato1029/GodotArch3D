@@ -30,14 +30,13 @@ public struct BiomeCell
     public BiomaData Bioma;
 
     /// <summary>
-    /// Terreno de la celda. En altura 0 es SIEMPRE el terreno del bioma base (agua);
-    /// en alturas 1..3 es el idTerreno de su propio bioma.
+    /// Terreno de la celda: siempre el idTerreno de su propio bioma, en cualquier altura.
     /// </summary>
     public long IdTerreno;
 
     /// <summary>
-    /// Superficie de la celda. En altura 0 lleva la superficie del bioma cuando no es el agua base.
-    /// En una transición es el material ÚNICO del tramo: la superficie del bioma de MENOR id del par.
+    /// Superficie de la celda. Solo se usa en transiciones: es el material ÚNICO del tramo,
+    /// la superficie del bioma de MENOR id del par. Fuera de transición vale 0.
     /// Los DOS lados del borde devuelven exactamente el mismo valor; no se combinan ids.
     /// </summary>
     public long IdSuperficie;
@@ -54,7 +53,7 @@ public struct BiomeCell
     /// </summary>
     public BiomaData TransitionBioma;
 
-    /// <summary>Nivel de altura de la geografía en esta celda (0..3). 0 = agua.</summary>
+    /// <summary>Nivel de altura de la geografía en esta celda (0..4).</summary>
     public byte HeightLevel;
 
     /// <summary>0 = sin transición; 1..TransitionWidth = tiles hasta el bioma vecino (1 = pegada al borde).</summary>
@@ -66,7 +65,7 @@ public struct BiomeCell
     /// </summary>
     public byte HeightTransitionDistance;
 
-    /// <summary>Nivel de altura (0..3) de esa celda vecina más cercana. Solo es válido si IsHeightTransition.</summary>
+    /// <summary>Nivel de altura (0..4) de esa celda vecina más cercana. Solo es válido si IsHeightTransition.</summary>
     public byte HeightNeighborLevel;
 
     /// <summary>
@@ -123,12 +122,12 @@ public sealed class BiomeRegion
 /// depende solo de (semilla, coordenadas, nivel de altura), así que se calcula por regiones/chunks.
 ///
 /// Reglas:
-///  - Una regla aplica a un nivel L (0..3) si alturaMinima &lt;= L &lt;= alturaMaxima (ambos inclusive).
+///  - Una regla aplica a un nivel L (0..4) si alturaMinima &lt;= L &lt;= alturaMaxima (ambos inclusive).
 ///  - Entre las reglas que aplican a un nivel, se reparte por 'peso' con un ruido lento, de modo que cada
 ///    bioma forma territorios continuos y las proporciones respetan los pesos (en el mundo completo).
 ///  - Cada celda devuelve su IdTerreno (siempre el de su bioma). Si está en transición de biomas, la superficie del
 ///    tramo es una sola: la del bioma de menor id del par (no se combinan ni alternan ids entre biomas). [FIX]
-///  - Siempre debe existir al menos una regla para el nivel 0 (agua); si no, el constructor lanza error.
+///  - Siempre debe existir al menos una regla para el nivel 0; si no, el constructor lanza error.
 ///  - Si un nivel alcanzable no tiene reglas, usa las del nivel inmediatamente inferior (y avisa en Warnings).
 ///
 /// Rendimiento:
@@ -145,7 +144,7 @@ public class BlackyWorldBiomes
     private readonly BlackyWorldHeight heightMapWorld;
     private readonly TemplateWorldProfileData template;
 
-    private const int LevelCount = 4;                  // niveles 0..3
+    private const int LevelCount = 5;                  // niveles 0..4
     private const ushort NoBiome = ushort.MaxValue;    // celda fuera del mundo
     private const byte NoLevel = 255;
     private const long CdfSamples = 1_000_000;         // muestras para calcular los cortes por peso
@@ -157,8 +156,7 @@ public class BlackyWorldBiomes
     private readonly List<BiomaData> biomes = new();                     // índice de bioma -> BiomaData
     private readonly int[][] levelBiomeIdx = new int[LevelCount][];      // por nivel: bioma de cada tramo
     private readonly float[][] levelWeights = new float[LevelCount][];   // por nivel: peso normalizado de cada tramo
-    private readonly bool[] isWaterBiome;                                // bioma base de agua (isLowerBase)
-    private int baseBiomeIndex = -1;                                     // índice del bioma isLowerBase, -1 si no hay
+    private readonly bool[] isWaterBiome;                                // biomas del nivel 0 (solo debug)
     private readonly List<string> warnings = new();
     // [FIX] id de bioma más pequeño de todos: permite cortar antes la búsqueda del par de menor id.
     private long globalMinBiomeId = long.MaxValue;
@@ -290,18 +288,9 @@ public class BlackyWorldBiomes
         this.template = template ?? throw new ArgumentNullException(nameof(template));
 
         BuildLevelRules();
-        ResolveBaseBiome();
 
         isWaterBiome = new bool[biomes.Count];
-        if (baseBiomeIndex >= 0)
-        {
-            isWaterBiome[baseBiomeIndex] = true;
-        }
-        else
-        {
-            // Compatibilidad: sin isLowerBase, todos los biomas del nivel 0 se tratan como agua.
-            foreach (int b in levelBiomeIdx[0]) isWaterBiome[b] = true;
-        }
+        foreach (int b in levelBiomeIdx[0]) isWaterBiome[b] = true;
 
         // [FIX] cache del id de bioma más pequeño (corte temprano al buscar el par de menor id)
         globalMinBiomeId = long.MaxValue;
@@ -355,7 +344,7 @@ public class BlackyWorldBiomes
             {
                 if (level == 0)
                     throw new InvalidOperationException(
-                        "El template no tiene ninguna regla válida para la altura 0 (agua). Siempre debe existir una.");
+                        "El template no tiene ninguna regla válida para la altura 0. Siempre debe existir una.");
 
                 // Sin reglas en este nivel: se usan las del nivel inferior
                 levelBiomeIdx[level] = levelBiomeIdx[level - 1];
@@ -376,56 +365,6 @@ public class BlackyWorldBiomes
                 levelWeights[level][k] = entries[k].weight / sum;
             }
         }
-    }
-
-    /// <summary>
-    /// Identifica el bioma base (isLowerBase), que para la altura 0 representa el agua.
-    /// Si no hay ninguna regla marcada, se mantiene el comportamiento anterior.
-    /// </summary>
-    private void ResolveBaseBiome()
-    {
-        baseBiomeIndex = -1;
-
-        var rules = template.reglasBiomas;
-        if (rules == null) return;
-
-        for (int i = 0; i < rules.Count; i++)
-        {
-            var r = rules[i];
-            if (r == null || r.bioma == null || !r.isLowerBase) continue;
-            if (r.peso <= 0f || r.alturaMinima > r.alturaMaxima) continue;
-
-            // La base debe existir en la altura 0 (agua).
-            if (r.alturaMinima > 0f || r.alturaMaxima < 0f)
-            {
-                warnings.Add($"Regla #{i}: isLowerBase=true pero no cubre la altura 0; se ignora como base de agua.");
-                continue;
-            }
-
-            int b = GetBiomeIndex(r.bioma);
-            if (baseBiomeIndex >= 0 && baseBiomeIndex != b)
-            {
-                warnings.Add($"Regla #{i}: hay más de un bioma isLowerBase; se usa '{biomes[baseBiomeIndex].name}'.");
-                continue;
-            }
-
-            baseBiomeIndex = b;
-        }
-
-        if (baseBiomeIndex < 0)
-            warnings.Add("Ninguna regla tiene isLowerBase=true; no se autocompleta la superficie de los biomas de altura 0.");
-    }
-
-    /// <summary>
-    /// Devuelve el terreno que corresponde a un bioma en una altura.
-    /// En altura 0 siempre es el terreno del bioma base (agua); el bioma real se representa en la superficie.
-    /// </summary>
-    private long TerrainIdAt(int biomeIndex, int height)
-    {
-        if (height == 0 && baseBiomeIndex >= 0)
-            return biomes[baseBiomeIndex].idTerreno;
-
-        return biomes[biomeIndex].idTerreno;
     }
 
     /// <summary>true si el bioma tiene al menos una decoración con probabilidad > 0.</summary>
@@ -797,7 +736,7 @@ public class BlackyWorldBiomes
                 var cell = new BiomeCell
                 {
                     Bioma = bioma,
-                    IdTerreno = TerrainIdAt(id, levels[center]),
+                    IdTerreno = bioma.idTerreno,
                     HeightLevel = levels[center]
                 };
 
@@ -880,24 +819,15 @@ public class BlackyWorldBiomes
                             long neighbor = center + (long)heightOffsets[k].dy * ew + heightOffsets[k].dx;
                             ushort neighborBiomeId = ids[neighbor];
 
-                            // El terreno inferior también respeta la regla de altura 0 (agua).
+                            // El terreno inferior es el del bioma del lado bajo de la transición.
                             cell.HeightLowerTerrainId = other < cell.HeightLevel
-                                ? TerrainIdAt(neighborBiomeId, other)
+                                ? biomes[neighborBiomeId].idTerreno
                                 : cell.IdTerreno;
                             break;
                         }
                     }
                 }
 
-                // Altura 0: el terreno es SIEMPRE agua y solo los biomas NO base aportan
-                // su superficie. El agua base no lleva capa de superficie.
-                if (cell.HeightLevel == 0 && baseBiomeIndex >= 0)
-                {
-                    if (id == baseBiomeIndex)
-                        cell.IdSuperficie = 0;
-                    else if (bioma.idSuperficie != 0)
-                        cell.IdSuperficie = bioma.idSuperficie;
-                }
 
                 int worldX = minX + x;
                 int worldY = minY + y;

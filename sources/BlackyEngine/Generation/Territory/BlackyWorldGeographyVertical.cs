@@ -36,6 +36,30 @@ public class BlackyWorldGeographyVertical
     /// <summary>true = la altura máxima está en Y positiva (MaxY); false = en Y negativa (MinY).</summary>
     public bool HighAtPositiveY { get; set; } = true;
 
+    /// <summary>
+    /// Distancia en tiles desde el borde izquierdo (MinX) dentro de la cual se fuerza altura 0.
+    /// Los cambios de altura (0→1, 1→2, etc.) solo pueden aparecer a partir de esta distancia.
+    /// 0 = sin margen.
+    /// </summary>
+    public int BorderMarginLeft { get; set; } = 16;
+
+    /// <summary>Distancia en tiles desde el borde derecho (MaxX) donde se fuerza altura 0.</summary>
+    public int BorderMarginRight { get; set; } = 16;
+
+    /// <summary>Distancia en tiles desde el borde superior (MaxY) donde se fuerza altura 0.</summary>
+    public int BorderMarginTop { get; set; } = 16;
+
+    /// <summary>Distancia en tiles desde el borde inferior (MinY) donde se fuerza altura 0.</summary>
+    public int BorderMarginBottom { get; set; } = 16;
+
+    /// <summary>
+    /// Margen en tiles entre la altura 1 y la altura 2.
+    /// Las celdas de altura 2 que estén a menos de esta distancia de una celda de altura 1
+    /// pasan a ser altura 1, para que la altura 2 no caiga justo sobre el borde de la altura 1.
+    /// 0 = sin margen.
+    /// </summary>
+    public int Height1To2Margin { get; set; } = 8;
+
     /// <summary>Ajuste MANUAL del tamaño del detalle del ruido (debe ser > 0).</summary>
     public float TerrainScale { get; set; } = 1f;
 
@@ -85,6 +109,10 @@ public class BlackyWorldGeographyVertical
         var field = new VerticalField(cfg, GeographySeed, w, h, MinX, MinY, freq, HighAtPositiveY);
         float[] cuts = ComputeCuts(field, w, h, GetWeights(cfg));
         int maxLevel = cfg.AlturaMaxima;
+        int marginLeft = Math.Clamp(BorderMarginLeft, 0, w);
+        int marginRight = Math.Clamp(BorderMarginRight, 0, w);
+        int marginBottom = Math.Clamp(BorderMarginBottom, 0, h);
+        int marginTop = Math.Clamp(BorderMarginTop, 0, h);
 
         byte[] levels = new byte[(long)w * h];
         Parallel.For(0, h, y =>
@@ -95,9 +123,22 @@ public class BlackyWorldGeographyVertical
                 float v = field.Evaluate(x, y);
                 int level = 0;
                 while (level < cuts.Length && v >= cuts[level]) level++;
-                levels[row + x] = (byte)Math.Min(level, maxLevel);
+                level = Math.Min(level, maxLevel);
+
+                // En los bordes del mapa no puede haber cambios de altura:
+                // se mantiene altura 0 dentro de cada margen independiente.
+                if (x < marginLeft || x >= w - marginRight ||
+                    y < marginBottom || y >= h - marginTop)
+                {
+                    level = 0;
+                }
+
+                levels[row + x] = (byte)level;
             }
         });
+
+        if (maxLevel >= 2)
+            ApplyHeight1To2Margin(levels, w, h, Height1To2Margin);
 
         int minX = MinX, minY = MinY;
         for (int y = 0; y < h; y++)
@@ -106,6 +147,84 @@ public class BlackyWorldGeographyVertical
             for (int x = 0; x < w; x++)
                 heightMapWorld.SetTopHeight(minX + x, minY + y, levels[row + x]);
         }
+    }
+
+    /// <summary>
+    /// Erosiona la altura 2 contra la altura 1: cada pasada convierte en altura 1 las celdas
+    /// de altura 2 que tocan una celda de altura 1. Repitiendo 'margin' pasadas queda una
+    /// banda de altura 1 de ese ancho antes de empezar la altura 2.
+    /// </summary>
+    private static void ApplyHeight1To2Margin(byte[] levels, int w, int h, int margin)
+    {
+        margin = Math.Clamp(margin, 0, Math.Min(w, h) / 2);
+        if (margin <= 0 || w <= 0 || h <= 0) return;
+
+        byte[] current = levels;
+        byte[] next = new byte[levels.Length];
+        bool[] changedRows = new bool[h];
+
+        for (int pass = 0; pass < margin; pass++)
+        {
+            Array.Copy(current, next, current.Length);
+            Array.Clear(changedRows, 0, changedRows.Length);
+
+            Parallel.For(0, h, y =>
+            {
+                bool changed = false;
+                int row = y * w;
+
+                for (int x = 0; x < w; x++)
+                {
+                    int index = row + x;
+                    if (current[index] != 2) continue;
+
+                    if (HasNeighborLevel1(current, w, h, x, y))
+                    {
+                        next[index] = 1;
+                        changed = true;
+                    }
+                }
+
+                changedRows[y] = changed;
+            });
+
+            bool anyChanged = false;
+            for (int i = 0; i < changedRows.Length; i++)
+            {
+                if (changedRows[i])
+                {
+                    anyChanged = true;
+                    break;
+                }
+            }
+
+            (current, next) = (next, current);
+
+            if (!anyChanged) break;
+        }
+
+        if (!ReferenceEquals(current, levels))
+            Array.Copy(current, levels, levels.Length);
+    }
+
+    private static bool HasNeighborLevel1(byte[] levels, int w, int h, int x, int y)
+    {
+        int x0 = Math.Max(0, x - 1);
+        int x1 = Math.Min(w - 1, x + 1);
+        int y0 = Math.Max(0, y - 1);
+        int y1 = Math.Min(h - 1, y + 1);
+
+        for (int ny = y0; ny <= y1; ny++)
+        {
+            int row = ny * w;
+            for (int nx = x0; nx <= x1; nx++)
+            {
+                if (nx == x && ny == y) continue;
+                if (levels[row + nx] == 1) return true;
+            }
+        }
+
+        return false;
     }
 
     private static float[] ComputeCuts(VerticalField field, int w, int h, float[] weights)

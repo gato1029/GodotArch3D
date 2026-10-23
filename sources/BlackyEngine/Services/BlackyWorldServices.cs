@@ -79,7 +79,7 @@ public sealed class BlackyWorldServices
 
         TextureCache = new BlackyChunkTextureCache(inf.ChunkSize, inf.HeightCount, 5, regionsRender, world.Streaming.chunkManagerLocal);
         SimpleTileTextures = new BlackySimpleTileTextureMap(TextureCache);
-        DualTileTextures = new BlackyDualTileTextureMap(TextureCache, HeightMapWorld, state.StaticSpatialTerrain);
+        DualTileTextures = new BlackyDualTileTextureMap(TextureCache, HeightMapWorld, state.StaticSpatialTerrain,world);
 
         TerrainDataLienzo = new BlackyTerrainWorldData(inf.ChunkSize, DualTileTextures, regionsRender, world.Streaming.chunkManagerLocal,world);
         RampasDataLienzo = new BlackyRampVisualWorld(inf.ChunkSize, SimpleTileTextures, regionsRender,world.Streaming.chunkManagerLocal,world);

@@ -37,9 +37,9 @@ public class GameRuntime
             BlackyWorldContext.World.Dispose(); // limpiar y libera el mundo actual
         }
         var perfilMundo = GetProfileWorld();
-        int alturaMaxima = 4;
+        int alturaMaxima = 5;
         MasterSeed = 759235213;
-        Vector2I sizeMap = new Vector2I(512,512);//  GenerateRandomSizeMap();
+        Vector2I sizeMap = new Vector2I(256,256);//  GenerateRandomSizeMap();
         CurrentWorld = new BlackyWorld(Name, perfilMundo.tipoMundo, 32, alturaMaxima, MasterSeed,sizeMap,perfilMundo.id);
                 
     }

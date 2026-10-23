@@ -286,7 +286,7 @@ public class BlackyCharacterCreator
         }
         entity.Set(new TeamComponent(2));
         entity.Set(new UnitDefinitionComponent(characterId));
-        entity.Set(new PositionComponent(position, Vector2I.Zero, 1));
+        entity.Set(new PositionComponent(position, Vector2I.Zero, height));
         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, animationDir.directionAnimationType, GodotEcsArch.sources.components.AnimationDirection.LEFT));
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3f, new Vector2(0, 0), 20));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0,0,0,0,0));

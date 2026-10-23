@@ -53,8 +53,8 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
 
         ControlListTexturesAnimated.OnNotifyChangued += ControlListTexturesAnimated_OnNotifyChangued;
 
-        ControlSpriteEdit.SetSelectedTile(0,0);
-        ControlSpriteEdit.SetBlockedTile(0, 0);
+        //ControlSpriteEdit.SetSelectedTile(0,0);
+        //ControlSpriteEdit.SetBlockedTile(0, 0);
 
         ControlSpriteEdit.OnNotifyPreviewShape += ControlSpriteEdit_OnNotifyPreviewShape;
         ControlSpriteEdit.OnNotifyPositionShape += ControlSpriteEdit_OnNotifyPositionShape;

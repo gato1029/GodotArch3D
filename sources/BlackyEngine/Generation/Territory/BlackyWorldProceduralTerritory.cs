@@ -43,7 +43,12 @@ public class BlackyWorldProceduralTerritory
         _geography = new BlackyWorldGeography(worldConfig, _worldSeed, _world.Services.HeightMapWorld, configuracionGeografica);
         _geographyVertical = new BlackyWorldGeographyVertical(worldConfig, _worldSeed, _world.Services.HeightMapWorld, configuracionGeografica)
         {
-            HighAtPositiveY = true   // altura 3 arriba (Y+), altura 0 abajo (Y-)
+            HighAtPositiveY = true,   // altura 3 arriba (Y+), altura 0 abajo (Y-)
+            BorderMarginLeft = 0,
+            BorderMarginRight = 0,
+            BorderMarginTop = 0,
+            BorderMarginBottom = 4,
+            Height1To2Margin = 4
         };
 
         _biomes = new BlackyWorldBiomes(worldConfig, _worldSeed, _world.Services.HeightMapWorld, _worldProfile);
@@ -213,17 +218,14 @@ public class BlackyWorldProceduralTerritory
                         ref var storedCell = ref heightBuffers[height].GetCell(x, y);
                         storedCell.id = terrainPaletteIds[cell.IdTerreno];
                         storedCell.isBorder = isBorder;
-                        // Superficie: transiciones en cualquier altura y, además, los biomas
-                        // no base de la altura 0 (el agua base no lleva superficie propia).
-                        bool hasSurface = cell.IdSuperficie != 0
-                            && (cell.IsTransition || cell.HeightLevel == 0);
+                        // Superficie: solo en transiciones, igual en todas las alturas.
+                        bool hasSurface = cell.IdSuperficie != 0 && cell.IsTransition;
 
                         if (hasSurface)
-                        {                            
-                            bool surfaceborder = cell.IsBiomeBorder || cell.HeightLevel == 0; // esto por que para superficie de bordes de bioma en altura mayor a 0 si funciona bien en altura 0 el borde no funciona bien revisar luego
+                        {
                             ref var surfCell = ref surfaceBuffers[height].GetCell(x, y);
-                            surfCell.id = surfacePaletteIds[cell.IdSuperficie];                         
-                            surfCell.isBorder = surfaceborder;
+                            surfCell.id = surfacePaletteIds[cell.IdSuperficie];
+                            surfCell.isBorder = cell.IsBiomeBorder;
                         }
 
                         if (cell.IsHeightTransition && height > 0)
@@ -307,8 +309,7 @@ public class BlackyWorldProceduralTerritory
                     int height = cell.HeightLevel;
                     usedHeightMask |= 1 << height;
 
-                    if (cell.IdSuperficie != 0
-                        && (cell.IsTransition || cell.HeightLevel == 0))
+                    if (cell.IdSuperficie != 0 && cell.IsTransition)
                     {
                         CacheSurfacePaletteId(cell.IdSuperficie);
                         usedSurfaceMask |= 1 << height;

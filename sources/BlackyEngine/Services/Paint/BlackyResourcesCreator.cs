@@ -200,8 +200,8 @@ public class BlackyResourcesCreator
         spatialEntityMap.Add(entity, ChunkHelper.WorldToChunkCoord(tilePosition),false);
 
         AsignarCollider(tilePosition.X, tilePosition.Y, entity, sprite);
-        occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, sprite.tilesOcupancy, entity.Id.Value);
-        world.State.GridSparseManager.PlaceStaticObjectInWorld(tilePosition, sprite.tilesOcupancy);
+        occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, sprite.tilesOcupancy, entity.Id.Value); // resuelve tmb el a*
+        world.State.GridSparseManager.PlaceStaticObjectInWorld(tilePosition, sprite.tilesOcupancy); // colision en mundo
 
         switch (sprite.tileSpriteType)
         {

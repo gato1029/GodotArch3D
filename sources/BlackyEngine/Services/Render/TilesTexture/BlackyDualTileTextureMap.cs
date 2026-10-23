@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using static Flecs.NET.Core.Ecs.Units;
+using static Godot.Slider;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
@@ -61,11 +62,13 @@ public sealed class BlackyDualTileTextureMap
     private readonly BlackyWorldHeight _heightMapWorld;
     private readonly StaticSpatialChunkGrid<ColliderSpriteInstanceData> _staticSpatialTerrain;
 
+    private readonly BlackyWorld _world;
     public BlackyDualTileTextureMap(
         BlackyChunkTextureCache cache,
         BlackyWorldHeight heightMapWorld,
-        StaticSpatialChunkGrid<ColliderSpriteInstanceData> staticSpatialTerrain)
+        StaticSpatialChunkGrid<ColliderSpriteInstanceData> staticSpatialTerrain, BlackyWorld world)
     {
+        _world = world;
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _heightMapWorld = heightMapWorld ?? throw new ArgumentNullException(nameof(heightMapWorld));
         _staticSpatialTerrain = staticSpatialTerrain ?? throw new ArgumentNullException(nameof(staticSpatialTerrain));
@@ -87,7 +90,7 @@ public sealed class BlackyDualTileTextureMap
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
         tileLayer.ClearTile(localX, localY);
 
-        RemoverCollider(tileLayer, localX, localY);
+        RemoverCollider(tileLayer,worldX,worldY, localX, localY);
 
         _cache.RaiseTileChanged(new TileChange
         {
@@ -99,8 +102,23 @@ public sealed class BlackyDualTileTextureMap
         });
     }
 
-    private void RemoverCollider(IBlackyChunkTilemapTexture tileLayer, int localX, int localY)
+    private void RemoverCollider(IBlackyChunkTilemapTexture tileLayer, int Mundo_x, int Mundo_y, int localX, int localY)
     {
+        
+        int idTile = tileLayer.GetTile(localX, localY);
+        if (idTile==0)
+        {
+            return;
+        }
+        Vector2I tilePosition = new Vector2I(Mundo_x, Mundo_y);
+        AtlasModsManager.TryGetTileSprite(idTile, out TileSpriteData tileSpriteData);
+        _world.State.GridSparseManager.RemoveStaticObjectInWorld(tilePosition, tileSpriteData.tilesOcupancy);
+        foreach (var item in tileSpriteData.tilesOcupancy)
+        {
+            int x = Mundo_x + item.x;
+            int y = Mundo_y + item.y;
+            _world.State.PathFinder.NotifyTileOccupancyChanged(x, y, false);
+        }
         int idCollider = tileLayer.GetIdCollider(localX, localY);
         if (idCollider != 0)
         {
@@ -130,7 +148,7 @@ public sealed class BlackyDualTileTextureMap
 
         var tileLayer = chunk.GetOrCreateLayer(height, layer);
 
-        RemoverCollider(tileLayer, localX, localY);
+        RemoverCollider(tileLayer,worldX,worldY, localX, localY);
 
         int idCollider = AsignarCollider(worldX, worldY, tileId, tileSpriteData);
         tileLayer.SetTile(localX, localY, tileId, idCollider);
@@ -512,7 +530,7 @@ public sealed class BlackyDualTileTextureMap
 
         int idCollider = 0;
         int tileId = AtlasModsManager.GetSpriteUniqueId(item.IdTileSpriteData, out TileSpriteData tileSpriteData);
-        RemoverCollider(tileLayer, lx, ly);
+        RemoverCollider(tileLayer,vx,vy, lx, ly);
 
         if (!esSolido)
         {
@@ -527,6 +545,16 @@ public sealed class BlackyDualTileTextureMap
 
     private int AsignarCollider(int Mundo_x, int Mundo_y, int idTileSpriteData, TileSpriteData tileSpriteData)
     {
+        // independientemente si tiene o no collider marcamos posicion de ocupacion
+        Vector2I tilePosition = new Vector2I(Mundo_x, Mundo_y);
+        _world.State.GridSparseManager.PlaceStaticObjectInWorld(tilePosition, tileSpriteData.tilesOcupancy);
+        foreach (var item in tileSpriteData.tilesOcupancy)
+        {
+            int x = Mundo_x + item.x;
+            int y = Mundo_y + item.y;
+            _world.State.PathFinder.NotifyTileOccupancyChanged(x, y, true);
+        }
+        
         if (tileSpriteData.fastCollidersBody.Count == 0)
         {
             return 0;
@@ -579,11 +607,15 @@ public sealed class BlackyDualTileTextureMap
         var tilePositionMin = new Vector2(minX, minY);
         var tilePositionMax = new Vector2(maxX, maxY);
 
-        int idCollider = _staticSpatialTerrain.RegisterStatic(
-            new ColliderSpriteInstanceData(idTileSpriteData, positionCenter),
-            tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
+        int idCollider = _staticSpatialTerrain.RegisterStatic(new ColliderSpriteInstanceData(idTileSpriteData, positionCenter),tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
 
-        _colliderDebugMap.Add(idCollider, debugBodies);
+        
+
+        if (DEBUG_COLLIDER)
+        {
+            _colliderDebugMap.Add(idCollider, debugBodies);
+        }
+        
 
         return idCollider;
     }

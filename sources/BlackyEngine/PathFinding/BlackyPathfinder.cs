@@ -1,8 +1,11 @@
+using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.utils;
 using System;
 using System.Collections.Generic;
+using static Godot.Slider;
 
 namespace GodotEcsArch.sources.BlackyEngine.PathFinding
 {
@@ -14,18 +17,21 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         private readonly BlackyFlowFieldManager _flowFieldManager;
         private readonly BlackyMacroPathfinder _macroPathfinder;
         private readonly BlackyMicroPathfinder _microPathfinder;
+        private readonly BlackyWorld _world;
         private readonly int _chunkSize;
 
         // Radio por defecto (en tiles, admite decimales) para la mayoría de tus unidades.
         // Se usa cuando quien llama no especifica uno propio.
-        public const float DefaultRadiusTiles = 1f;
+        public const float DefaultRadiusTiles = .5f;
 
         public BlackyPathfinder(
             BlackyMacroGraphCache macroGraphCache,
             BlackyClearanceMap clearanceMap,
             BlackyFlowFieldManager flowFieldManager,
+            BlackyWorld world,
             int chunkSize = 32)
         {
+            _world = world;
             _macroGraphCache = macroGraphCache;
             _clearanceMap = clearanceMap;
             _chunkSize = chunkSize;
@@ -47,8 +53,7 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             _clearanceMap.OnTileChanged(worldX, worldY, isBlocked);
             _macroGraphCache.NotifyTileOccupancyChanged(worldX, worldY, isBlocked);
             _flowFieldManager.MarkTileChanged(worldX, worldY); // solo marca, no recalcul
-        }
-
+        }        
         public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile, float radiusTiles = DefaultRadiusTiles)
         {
             List<Vector2> points = new();
