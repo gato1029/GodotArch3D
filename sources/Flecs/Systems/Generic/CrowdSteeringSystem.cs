@@ -19,7 +19,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
     private const float ArrivalBaseRadius = 0.5f;
-    private const float ArrivalGrowth = 0.6f;
+    private const float ArrivalGrowth = 0.5f; //antes estaba en 0.6
     private const float RetryInterval = 0.1f;
     private const int MaxAttempts = 4;
     private const float ProbeMargin = 0.2f;
@@ -49,7 +49,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
         var flowFieldManager = world.State.FlowFieldManager;
         if (flowFieldManager == null) return;
         var grid = world.State.GridSparseManager.Grid.DynamicLayer;               // capacidad por celda, crowd
-        var terrain = world.State.GridSparseManager;    // terreno/edificios
+        var terrain = world.State.GridSparseManager.Grid.StaticLayer;    // terreno/edificios
         var dynGrid = world.State.DynamicHash;
         Span<int> neighbors = stackalloc int[8];
 
@@ -155,7 +155,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
                        // break;
                         continue;
                 }
-                if (CheckUnitsAtCandidate(candPos, col.Radius, sid.Value, neighbors, dynGrid))
+                if (CheckUnitsAtCandidate(candPos, col.Radius, sid.Value, neighbors, dynGrid)) // sin esto hay solapamientos 
                     continue;
 
                 bestDir = candDir;

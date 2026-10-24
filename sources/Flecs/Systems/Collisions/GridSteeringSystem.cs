@@ -42,7 +42,7 @@ public class GridSteeringSystem : FlecsSystemBase
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
 
-        var gridManager = world.State.GridSparseManager; // solo para terreno estático
+        var gridManager = world.State.GridSparseManager.Grid.StaticLayer; // solo para terreno estático
         var dynGrid = world.State.DynamicHash;            // fuente real de colisión entre unidades
 
         var posArray = it.Field<PositionComponent>(0);
@@ -144,15 +144,15 @@ public class GridSteeringSystem : FlecsSystemBase
 
                 // Si seguimos dentro de la misma celda que ya ocupamos,
                 // no hace falta validar nada — ya estamos físicamente ahí.
-                //if (candidateCell != currentCell)
-                //{
-                //    if (gridManager.IsBlocked(candidatePos))
-                //    {
-                //        //break;
-                //        continue;
-                //    }
+                if (candidateCell != currentCell)
+                {
+                    if (gridManager.IsBlocked(candidatePos))
+                    {
+                        //break;
+                        continue;
+                    }
 
-                //}
+                }
 
                 if (CheckUnitsAtCandidate(candidatePos, col.Radius, sid.Value, neighbors, dynGrid))
                     continue;

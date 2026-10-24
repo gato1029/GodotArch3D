@@ -193,7 +193,7 @@ public sealed class BlackyWorld : IDisposable
 
     private void DebugBoot()
     {
-        var e = Characters.InternalExecuteCreation(1787768744605000,10, new Vector2(0, 0)); // principal
+        var e = Characters.InternalExecuteCreation(1787768744605000,10, new Vector2(-10, -10)); // principal
 
        SpawnEnemiesAroundPlayer(5,10);
         

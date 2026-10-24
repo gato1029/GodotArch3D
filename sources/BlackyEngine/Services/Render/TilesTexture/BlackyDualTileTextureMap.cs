@@ -119,22 +119,22 @@ public sealed class BlackyDualTileTextureMap
             int y = Mundo_y + item.y;
             _world.State.PathFinder.NotifyTileOccupancyChanged(x, y, false);
         }
-        int idCollider = tileLayer.GetIdCollider(localX, localY);
-        if (idCollider != 0)
-        {
-            if (DEBUG_COLLIDER)
-            {
-                foreach (var idDebugBody in _colliderDebugMap[idCollider])
-                {
-                    CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
-                }
+        //int idCollider = tileLayer.GetIdCollider(localX, localY);
+        //if (idCollider != 0)
+        //{
+        //    if (DEBUG_COLLIDER)
+        //    {
+        //        foreach (var idDebugBody in _colliderDebugMap[idCollider])
+        //        {
+        //            CollisionShapeDraw.Instance.FreeDraw(idDebugBody);
+        //        }
 
-                _colliderDebugMap.Remove(idCollider);
-            }
+        //        _colliderDebugMap.Remove(idCollider);
+        //    }
 
-            tileLayer.SetIdCollider(localX, localY, 0);
-            _staticSpatialTerrain.FreeCollider(idCollider);
-        }
+        //    tileLayer.SetIdCollider(localX, localY, 0);
+        //    _staticSpatialTerrain.FreeCollider(idCollider);
+        //}
     }
 
     public void SetTileDualInternalSprite(int worldX, int worldY, int height, int layer, long idTileSprite, bool isBorder)
@@ -555,69 +555,69 @@ public sealed class BlackyDualTileTextureMap
             _world.State.PathFinder.NotifyTileOccupancyChanged(x, y, true);
         }
         
-        if (tileSpriteData.fastCollidersBody.Count == 0)
-        {
-            return 0;
-        }
+        //if (tileSpriteData.fastCollidersBody.Count == 0)
+        //{
+        //    return 0;
+        //}
 
-        var debugBodies = new List<int>();
-        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(Mundo_x, Mundo_y);
+        //var debugBodies = new List<int>();
+        //Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(Mundo_x, Mundo_y);
 
-        float minX = float.MaxValue;
-        float minY = float.MaxValue;
-        float maxX = float.MinValue;
-        float maxY = float.MinValue;
+        //float minX = float.MaxValue;
+        //float minY = float.MaxValue;
+        //float maxX = float.MinValue;
+        //float maxY = float.MinValue;
 
-        foreach (var collider in tileSpriteData.fastCollidersBody)
-        {
-            FastCollider fast = collider;
+        //foreach (var collider in tileSpriteData.fastCollidersBody)
+        //{
+        //    FastCollider fast = collider;
 
-            // Nota: Si el offset es individual por collider, usa fast.Offset.X y fast.Offset.Y en su lugar
-            float actualX = positionCenter.X + fast.Offset.X;
-            float actualY = positionCenter.Y + fast.Offset.Y;
+        //    // Nota: Si el offset es individual por collider, usa fast.Offset.X y fast.Offset.Y en su lugar
+        //    float actualX = positionCenter.X + fast.Offset.X;
+        //    float actualY = positionCenter.Y + fast.Offset.Y;
 
-            float width = fast.Width;
-            float height = fast.Height;
+        //    float width = fast.Width;
+        //    float height = fast.Height;
 
-            if (fast.Shape == ShapeType.Circle) // esto por que es el radio, y queremos diametro para el collider
-            {
-                width = width * 2;
-                height = height * 2;
-            }
+        //    if (fast.Shape == ShapeType.Circle) // esto por que es el radio, y queremos diametro para el collider
+        //    {
+        //        width = width * 2;
+        //        height = height * 2;
+        //    }
 
-            // Se usa height para el eje Y (en tu código original tenías width por error en el eje Y)
-            float currentMinX = actualX - (width * 0.5f) - 0.01f;
-            float currentMinY = actualY - (height * 0.5f) - 0.01f;
-            float currentMaxX = actualX + (width * 0.5f) + 0.01f;
-            float currentMaxY = actualY + (height * 0.5f) + 0.01f;
+        //    // Se usa height para el eje Y (en tu código original tenías width por error en el eje Y)
+        //    float currentMinX = actualX - (width * 0.5f) - 0.01f;
+        //    float currentMinY = actualY - (height * 0.5f) - 0.01f;
+        //    float currentMaxX = actualX + (width * 0.5f) + 0.01f;
+        //    float currentMaxY = actualY + (height * 0.5f) + 0.01f;
 
-            // Acumular mínimos y máximos globales
-            if (currentMinX < minX) minX = currentMinX;
-            if (currentMinY < minY) minY = currentMinY;
-            if (currentMaxX > maxX) maxX = currentMaxX;
-            if (currentMaxY > maxY) maxY = currentMaxY;
+        //    // Acumular mínimos y máximos globales
+        //    if (currentMinX < minX) minX = currentMinX;
+        //    if (currentMinY < minY) minY = currentMinY;
+        //    if (currentMaxX > maxX) maxX = currentMaxX;
+        //    if (currentMaxY > maxY) maxY = currentMaxY;
 
-            if (DEBUG_COLLIDER)
-            {
-                int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
-                debugBodies.Add(idDebugBody);
-            }
-        }
+        //    if (DEBUG_COLLIDER)
+        //    {
+        //        int idDebugBody = CollisionShapeDraw.Instance.DrawCollisionShapes(fast, positionCenter, Godot.Colors.OrangeRed);
+        //        debugBodies.Add(idDebugBody);
+        //    }
+        //}
 
-        var tilePositionMin = new Vector2(minX, minY);
-        var tilePositionMax = new Vector2(maxX, maxY);
+        //var tilePositionMin = new Vector2(minX, minY);
+        //var tilePositionMax = new Vector2(maxX, maxY);
 
-        int idCollider = _staticSpatialTerrain.RegisterStatic(new ColliderSpriteInstanceData(idTileSpriteData, positionCenter),tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
+        //int idCollider = _staticSpatialTerrain.RegisterStatic(new ColliderSpriteInstanceData(idTileSpriteData, positionCenter),tilePositionMin.X, tilePositionMin.Y, tilePositionMax.X, tilePositionMax.Y);
 
         
 
-        if (DEBUG_COLLIDER)
-        {
-            _colliderDebugMap.Add(idCollider, debugBodies);
-        }
+        //if (DEBUG_COLLIDER)
+        //{
+        //    _colliderDebugMap.Add(idCollider, debugBodies);
+        //}
         
 
-        return idCollider;
+        return 0;
     }
 
     public void SetTileDual(

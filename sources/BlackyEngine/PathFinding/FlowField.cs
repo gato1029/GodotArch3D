@@ -103,7 +103,12 @@ public class FlowField
                 bool isDiagonal = dir.X != 0 && dir.Y != 0;
                 float stepCost = isDiagonal ? 1.41421356f : 1.0f;
                 float newDist = currentDist + stepCost;
-
+                if (isDiagonal)
+                {
+                    if (!clearanceMap.IsWalkableForRadius(current.X + dir.X, current.Y, radiusTiles) ||
+                        !clearanceMap.IsWalkableForRadius(current.X, current.Y + dir.Y, radiusTiles))
+                        continue;
+                }
                 if (newDist < field.GetDistance(neighbor))
                 {
                     field.SetDistance(neighbor, newDist);
@@ -140,6 +145,14 @@ public class FlowField
 
                 for (byte i = 0; i < Dirs.Length; i++)
                 {
+                    if (i >= 4)
+                    {
+                        var d = Dirs[i];
+                        if (GetDistance(tile + new Vector2I(d.X, 0)) >= Unreachable ||
+                            GetDistance(tile + new Vector2I(0, d.Y)) >= Unreachable)
+                            continue;
+                    }
+
                     Vector2I neighbor = tile + Dirs[i];
                     if (!InRegion(neighbor)) continue;
 
@@ -155,38 +168,7 @@ public class FlowField
             }
         }
     }
-    //private void ComputeDirections(BlackyClearanceMap clearanceMap, float radiusTiles)
-    //{
-    //    for (int x = RegionMin.X; x <= RegionMax.X; x++)
-    //    {
-    //        for (int y = RegionMin.Y; y <= RegionMax.Y; y++)
-    //        {
-    //            var tile = new Vector2I(x, y);
-    //            float myDist = GetDistance(tile);
-    //            if (myDist >= Unreachable) continue;
-
-    //            float bestDist = myDist;
-    //            byte bestDir = NoDirection;
-
-    //            for (byte i = 0; i < Dirs.Length; i++)
-    //            {
-    //                Vector2I neighbor = tile + Dirs[i];
-    //                if (!InRegion(neighbor)) continue;
-
-    //                float neighborDist = GetDistance(neighbor);
-    //                if (neighborDist < bestDist)
-    //                {
-    //                    bestDist = neighborDist;
-    //                    bestDir = i;
-    //                }
-    //            }
-
-    //            SetDirection(tile, bestDir);
-    //        }
-    //    }
-    //}
-    /// <summary>True si el tile pertenece a la zona de meta (las semillas del Dijkstra, distancia 0).</summary>
-    //public bool IsGoalZone(Vector2I tile) => GetDistance(tile) == 0f;
+  
     public bool IsGoalTile(Vector2I tile) => tile == GoalTile;
     public Vector2 SampleTile(Vector2I tile)
     {
@@ -229,7 +211,36 @@ public class FlowField
 
         return blended.LengthSquared() > 0.0001f ? blended.Normalized() : Vector2.Zero;
     }
+    public Vector2 SampleEscape(Vector2I tile, int maxRadius = 3)
+    {
+        for (int r = 1; r <= maxRadius; r++)
+        {
+            float bestDist = Unreachable;
+            Vector2I best = tile;
+            bool found = false;
 
+            for (int dx = -r; dx <= r; dx++)
+                for (int dy = -r; dy <= r; dy++)
+                {
+                    if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != r) continue; // solo el anillo
+                    var n = tile + new Vector2I(dx, dy);
+                    float d = GetDistance(n);
+                    if (d < bestDist)
+                    {
+                        bestDist = d;
+                        best = n;
+                        found = true;
+                    }
+                }
+
+            if (found)
+            {
+                var toBest = new Vector2(best.X - tile.X, best.Y - tile.Y);
+                return toBest.Normalized();
+            }
+        }
+        return Vector2.Zero;
+    }
     public bool IsGoalReached(Vector2I tile) => tile == GoalTile;
 
     private bool InRegion(Vector2I tile)

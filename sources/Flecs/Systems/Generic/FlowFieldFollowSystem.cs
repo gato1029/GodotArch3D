@@ -6,6 +6,7 @@ using GodotEcsArch.sources.BlackyEngine.PathFinding;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
+using SadRogue.Primitives;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Generic;
 
@@ -112,8 +113,27 @@ internal class FlowFieldFollowSystem : FlecsSystemBase
 
             // Dirección cero: solo ocurre en el GoalTile exacto o en una celda sin salida.
             Vector2I tile = TilesHelper.WorldPositionToTile(pos.position);
-            follower.Status = field.IsGoalTile(tile) ? (byte)1 : (byte)2;
-            follower.TargetDir = Vector2.Zero;
+            
+            //GD.Print($"Zero en {tile} pos={pos.position} walkable={clearanceMap.IsWalkableForRadius(tile.X, tile.Y, radius)} dist={field.DebugDistance(t)} inRegion={field.DebugInRegion(t)}");
+            if (field.IsGoalTile(tile))
+            {
+                follower.Status = 1;
+                follower.TargetDir = Vector2.Zero;
+                continue;
+            }
+
+            Vector2 escape = field.SampleEscape(tile);
+            if (escape != Vector2.Zero)
+            {
+                follower.Status = 0;
+                follower.TargetDir = escape;
+            }
+            else
+            {
+                follower.Status = 2; // realmente atrapada, sin salida cercana
+                follower.TargetDir = Vector2.Zero;
+            }
+          
         }
     }
 }
