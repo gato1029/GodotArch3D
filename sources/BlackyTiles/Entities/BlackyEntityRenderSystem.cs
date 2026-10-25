@@ -19,7 +19,7 @@ public class BlackyEntityRenderSystem
     private readonly ConcurrentQueue<Vector2I> _loadQueue = new();
     private readonly ConcurrentQueue<Vector2I> _unloadQueue = new();
 
-    private const int MaxChunkOpsPerFrame = 2; // Presupuesto por frame para evitar tirones
+    private const int MaxChunkOpsPerFrame = 1; // Presupuesto por frame para evitar tirones
     private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
 
     public BlackyEntityRenderSystem(

@@ -53,7 +53,19 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
             _clearanceMap.OnTileChanged(worldX, worldY, isBlocked);
             _macroGraphCache.NotifyTileOccupancyChanged(worldX, worldY, isBlocked);
             _flowFieldManager.MarkTileChanged(worldX, worldY); // solo marca, no recalcul
-        }        
+        }
+        public void NotifyTileOccupancyChanged(Vector2I positionWorld, List<KuroTile> tiles, bool isBlocked)
+        {
+            foreach (var item in tiles)
+            {
+                int worldX = positionWorld.X + item.x;
+                int worldY = positionWorld.Y + item.y;
+                _clearanceMap.OnTileChanged(worldX, worldY, isBlocked);
+                _macroGraphCache.NotifyTileOccupancyChanged(worldX, worldY, isBlocked);
+                _flowFieldManager.MarkTileChanged(worldX, worldY); // solo marca, no recalcul
+            }
+            
+        }
         public List<Vector2> FindPathWorld(Vector2I startTile, Vector2I goalTile, float radiusTiles = DefaultRadiusTiles)
         {
             List<Vector2> points = new();
@@ -182,8 +194,8 @@ namespace GodotEcsArch.sources.BlackyEngine.PathFinding
         private List<Vector2I> FindPath(Vector2I startTile, Vector2I goalTile, float radiusTiles)
         {
             
-            _microPathfinder.ClearDraw(); // solo para debug
-            _microPathfinder.DrawOriginTarget(startTile, goalTile);
+            //_microPathfinder.ClearDraw(); // solo para debug
+           // _microPathfinder.DrawOriginTarget(startTile, goalTile);
 
             Vector2I startChunk = WorldToChunkCoord(startTile);
             Vector2I goalChunk = WorldToChunkCoord(goalTile);

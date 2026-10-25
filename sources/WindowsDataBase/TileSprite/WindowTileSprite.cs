@@ -35,6 +35,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         CheckBoxHasCollider.Pressed += CheckBoxHasCollider_Pressed;
         ControlCollider.OnNotifyPreview += ControlCollider_OnNotifyPreview;
         SpinBoxDepht.ValueChanged += SpinBoxDepht_ValueChanged;
+        SpinBoxBarLife.ValueChanged += SpinBoxBarLife_ValueChanged;
         LineEditGrouping.GuiInput += LineEditGrouping_GuiInput;
         objectData.spriteData = new SpriteData();
 
@@ -60,9 +61,27 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         ControlSpriteEdit.OnNotifyPositionShape += ControlSpriteEdit_OnNotifyPositionShape;
         ButtonHideConfigBase.Pressed += ButtonHideConfigBase_Pressed;
         ControlMultiple.OnNotifyChanguedAnimatedDirection += ControlMultiple_OnNotifyChanguedAnimatedDirection;
+        CheckBoxLifeBar.Pressed += CheckBoxLifeBar_Pressed;
     }
 
+    private void CheckBoxLifeBar_Pressed()
+    {
+        if (CheckBoxLifeBar.ButtonPressed)
+        {
+            SpinBoxBarLife.Visible = true;
+            ControlSpriteEdit.ShowLifeBar(true);
+        }
+        else
+        {
+            SpinBoxBarLife.Visible = false;
+            ControlSpriteEdit.ShowLifeBar(false);
+        }
+    }
 
+    private void SpinBoxBarLife_ValueChanged(double value)
+    {
+        ControlSpriteEdit.SetBarLifeY(-(float)value);
+    }
 
     ControlItemAnimationDirection selectionControlItemAnimation = null;
     SpriteAnimationDirection selectionSpriteAnimationDirection = null;
@@ -341,6 +360,8 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
     {
         objectData.tileSpriteType = (TileSpriteType)OptionButtonType.Selected;
         objectData.tilesOcupancy = ControlSpriteEdit.GetSelectedTiles();
+        objectData.tilesPathBlocked = ControlSpriteEdit.GetSelectedTilesPath();
+        
         objectData.ReGerenateId();
         switch (objectData.tileSpriteType)
         {
@@ -407,6 +428,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         ControlSpriteEdit.SetScaleTexture(objectData.spriteData.scale);
         ControlSpriteEdit.SetOffsetPositionTexture(new Vector2(objectData.spriteData.offsetX, objectData.spriteData.offsetY));
         ControlSpriteEdit.SetOffsetCenterY(objectData.spriteData.yDepthRender);
+        
         ControlSpriteEdit.SetFlipX(objectData.spriteData.mirrorX);
         ControlSpriteEdit.SetFlipY(objectData.spriteData.mirrorY);
         ControlSpriteEdit.SetCellSize((int)objectData.spriteData.widht, (int)objectData.spriteData.height);
@@ -464,6 +486,7 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         ControlSpriteEdit.SetScaleTexture(objectData.animationData.scale);
         ControlSpriteEdit.SetOffsetPositionTexture(new Vector2(objectData.animationData.offsetX, objectData.animationData.offsetY));
         ControlSpriteEdit.SetOffsetCenterY(objectData.animationData.yDepthRender);
+        
         ControlSpriteEdit.SetFlipX(objectData.animationData.mirrorX);
         ControlSpriteEdit.SetFlipY(objectData.animationData.mirrorY);
         ControlSpriteEdit.SetCellSize(dataInfo[0].width, dataInfo[0].height);
@@ -526,7 +549,15 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
         
         objectData = data;
         ControlSpriteEdit.SetSelectedTiles(objectData.tilesOcupancy);
-
+        ControlSpriteEdit.SetSelectedTilesPath(objectData.tilesPathBlocked);
+        CheckBoxLifeBar.ButtonPressed = objectData.enableLifeBar;
+        if (objectData.enableLifeBar)
+        {            
+            SpinBoxBarLife.Visible = true;
+            SpinBoxBarLife.Value = objectData.offsetLifeBarY;
+            //ControlSpriteEdit.SetBarLifeY(objectData.offsetLifeBarY);
+            ControlSpriteEdit.ShowLifeBar(true);
+        }
         var temp =DataBaseManager.Instance.FindById<GroupingData>(objectData.idGrouping);
         if (temp != null)
         {
@@ -574,6 +605,18 @@ public partial class WindowTileSprite : Window, IFacadeWindow<TileSpriteData>
     {
         objectData.tileSpriteType = (TileSpriteType)OptionButtonType.Selected;
         objectData.tilesOcupancy = ControlSpriteEdit.GetSelectedTiles();
+        objectData.tilesPathBlocked = ControlSpriteEdit.GetSelectedTilesPath();
+        objectData.enableLifeBar = CheckBoxLifeBar.ButtonPressed;
+        if (CheckBoxLifeBar.ButtonPressed)
+        {
+            objectData.offsetLifeBarY = (float)SpinBoxBarLife.Value;
+        }
+        else
+        {
+            objectData.offsetLifeBarY = 0;
+        }
+     
+        
         switch (objectData.tileSpriteType)
         {
             case TileSpriteType.Static:

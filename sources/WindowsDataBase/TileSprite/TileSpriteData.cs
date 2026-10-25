@@ -118,10 +118,14 @@ public class SpriteAnimationDirection
 
 }
 public class TileSpriteData:IdDataLong
-{    
+{
+
+
     public int tileIndex { get; set; }  // solo cuando es dual  
     public int idMaterial { get; set; } // solo cuando es dual
     public bool nivelarBase { get; set; }
+    public float offsetLifeBarY { get; set; }
+    public bool enableLifeBar { get; set; }
     public TileSpriteType tileSpriteType { get; set; }
     public SpriteData spriteData { get; set; }
     public SpriteAnimationData animationData { set; get; }
@@ -130,12 +134,15 @@ public class TileSpriteData:IdDataLong
 
     public SpriteMultipleAnimationDirection spriteMultipleAnimationDirection { get; set; }
     public List<KuroTile> tilesOcupancy { get; set; } = new List<KuroTile>();
-    
+    public List<KuroTile> tilesPathBlocked { get; set; } = new List<KuroTile>();
+
     [BsonIgnore]
      public List<FastCollider> fastCollidersBody { get; } = new List<FastCollider>();
 
     [BsonIgnore]
     public FastCollider fastColliderUmbralAtaque { get; set; }
+    [BsonIgnore]
+    public float offsetLifeBarYFormat { get; set; }
     public TileSpriteData()
     {
         id = EpochIdGenerator.NewId();
@@ -194,8 +201,11 @@ public class TileSpriteData:IdDataLong
     }
 
     [BsonCtor]
-    public TileSpriteData(SpriteData spriteData, TileSpriteType tileSpriteType, SpriteAnimationData animationData, SpriteMultipleAnimationDirection spriteMultipleAnimationDirection) : base()
+    public TileSpriteData(SpriteData spriteData, TileSpriteType tileSpriteType, SpriteAnimationData animationData, SpriteMultipleAnimationDirection spriteMultipleAnimationDirection, float offsetLifeBarY) : base()
     {
+
+        offsetLifeBarYFormat = MeshCreator.PixelsToUnits(offsetLifeBarY);
+
         switch (tileSpriteType)
         {
             case TileSpriteType.Static:

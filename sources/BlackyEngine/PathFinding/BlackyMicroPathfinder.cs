@@ -71,7 +71,7 @@ public class BlackyMicroPathfinder
             }
             
             var currentTile = openQueue.Dequeue();
-            DrawPath(currentTile);
+            //DrawPath(currentTile);
             if (currentTile == goalTile)
             {
                 return ReconstructPath(cameFrom, currentTile);

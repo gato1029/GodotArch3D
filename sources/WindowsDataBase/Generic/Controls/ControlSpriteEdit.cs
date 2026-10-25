@@ -56,8 +56,9 @@ public partial class ControlSpriteEdit : MarginContainer
 
     
     Vector2 positionOffset = Vector2.Zero;
+    float OffsetBarY=0f;
 
-	float centerOffsetY = 0f;
+    float centerOffsetY = 0f;
     // Called every frame. 'delta' is the elapsed time since the previous frame.
 	int indexFrame = 0;
 	float currentfps = 0f;
@@ -116,6 +117,15 @@ public partial class ControlSpriteEdit : MarginContainer
     public void SetSelectedTiles(List<KuroTile> tiles)
     {
         TileOcupancy.SetSelectedTiles(tiles);
+    }
+
+    public List<KuroTile> GetSelectedTilesPath()
+    {
+        return TileOcupancy.GetSelectedTilesPath();
+    }
+    public void SetSelectedTilesPath(List<KuroTile> tiles)
+    {
+        TileOcupancy.SetSelectedTilesPath(tiles);
     }
 
     public void SetModeGrid(GridDrawMode mode)
@@ -229,6 +239,13 @@ public partial class ControlSpriteEdit : MarginContainer
     {
         ShapesForm.shapeType = ShapesForm.ShapeType.Poligono;
     }
+    public void SetBarLifeY(float y)
+    {
+        OffsetBarY = y;
+        Vector2 cent = -(BarLife.GetSize()) / 2f;
+        BarLife.Position = cent + new Vector2(0, y);
+    }
+
     public void SetOffsetCenterY(float y)
 	{ 
 		centerOffsetY = y;
@@ -244,5 +261,8 @@ public partial class ControlSpriteEdit : MarginContainer
 		TextureImage.FlipH = v;
     }
 
-
+    internal void ShowLifeBar(bool v)
+    {
+        BarLife.Visible = v;
+    }
 }

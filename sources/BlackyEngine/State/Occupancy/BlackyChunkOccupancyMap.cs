@@ -79,7 +79,7 @@ public class BlackyChunkOccupancyMap:IDisposable
         {
             int x = worldX + tile.x;
             int y = worldY + tile.y;
-            blackyPathFinder.NotifyTileOccupancyChanged(worldX, worldY, true);
+          //  blackyPathFinder.NotifyTileOccupancyChanged(worldX, worldY, true);
             Set(layer, x, y, entityId);
         }
        
@@ -130,7 +130,7 @@ public class BlackyChunkOccupancyMap:IDisposable
         foreach (var (l, x, y) in tiles)
         {
             var (chunkCoord, localX, localY) = GetCoords(x, y);
-            blackyPathFinder.NotifyTileOccupancyChanged(x, y, false);
+           // blackyPathFinder.NotifyTileOccupancyChanged(x, y, false);
             if (_chunks.TryGetValue(chunkCoord, out var chunk))
             {
                 chunk.Clear(l, localX, localY);

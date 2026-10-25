@@ -166,7 +166,9 @@ public class BlackyBuildingCreator
 
         AsignarCollider(tilePosition.X, tilePosition.Y, entity, spriteNormal,out int idDebugBody,team);
         occupancyMap.SetTiles(0, tilePosition.X, tilePosition.Y, spriteNormal.tilesOcupancy, entity.Id.Value);
-        world.State.GridSparseManager.PlaceStaticObjectInWorld(tilePosition, spriteNormal.tilesOcupancy);
+        world.State.GridSparseManager.PlaceStaticObjectInWorld(tilePosition, spriteNormal.tilesPathBlocked);
+
+        world.State.PathFinder.NotifyTileOccupancyChanged(tilePosition, spriteNormal.tilesPathBlocked, true);
         entity.Set(new RvoAgentDebugComponent(0, idDebugBody, 0, 0));
         // Renderizado
         switch (spriteNormal.tileSpriteType)
@@ -223,11 +225,12 @@ public class BlackyBuildingCreator
         {
             var build = entity.Get<BuildingDefinitionComponent>();
             AtlasModsManager.TryGetTileSprite(build.idSpriteTemplateNormal, out var spriteNormal);
-            world.State.GridSparseManager.RemoveStaticObjectInWorld(tilePosition, spriteNormal.tilesOcupancy);
-
+            world.State.GridSparseManager.RemoveStaticObjectInWorld(tilePosition, spriteNormal.tilesPathBlocked);
+            world.State.PathFinder.NotifyTileOccupancyChanged(tilePosition, spriteNormal.tilesPathBlocked, false);
         }
         spatialEntityMap.Remove(entity);
         occupancyMap.ClearByEntity(0, tilePosition.X, tilePosition.Y);
+
       
         entity.Destruct();
     }

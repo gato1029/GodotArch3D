@@ -22,6 +22,8 @@ public partial class WindowTileSprite : Window
     private SpinBox SpinBoxOffsetY;
     private SpinBox SpinBoxScale;
     private SpinBox SpinBoxDepht;
+    private CheckBox CheckBoxLifeBar;
+    private SpinBox SpinBoxBarLife;
     private ColorPickerButton ColorButtonBase;
     private GridContainer GridContainerBasicTransform;
     private CheckBox CheckBoxMirrorHorizontal;
@@ -58,6 +60,8 @@ public partial class WindowTileSprite : Window
         SpinBoxOffsetY = GetNode<SpinBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer/SpinBoxOffsetY");
         SpinBoxScale = GetNode<SpinBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer/SpinBoxScale");
         SpinBoxDepht = GetNode<SpinBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer/SpinBoxDepht");
+        CheckBoxLifeBar = GetNode<CheckBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer/CheckBoxLifeBar");
+        SpinBoxBarLife = GetNode<SpinBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer/SpinBoxBarLife");
         ColorButtonBase = GetNode<ColorPickerButton>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/ContainerConfigBase/AnimatedPanelContainerConfigBase/GridContainer/ColorButtonBase");
         GridContainerBasicTransform = GetNode<GridContainer>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform");
         CheckBoxMirrorHorizontal = GetNode<CheckBox>("MarginContainer/PanelContainer/MarginContainer/HSplitContainer/HBoxContainer2/VBoxContainer/VBoxContainer2/GridContainerBasicTransform/CheckBoxMirrorHorizontal");

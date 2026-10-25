@@ -4,8 +4,13 @@
 [ext_resource type="Script" uid="uid://balh3aasff1dp" path="res://sources/WindowsDataBase/Generic/Controls/ControlSpriteEdit.cs" id="1_idlvs"]
 [ext_resource type="Texture2D" uid="uid://ba8f2acp42seg" path="res://resources/Textures/iconos/center.png" id="2_ewqsh"]
 [ext_resource type="Script" uid="uid://gt2xe6o4ywua" path="res://sources/WindowsDataBase/Generic/Controls/GridGeneric.cs" id="3_ewqsh"]
+[ext_resource type="Texture2D" uid="uid://b18q214jv5o5b" path="res://resources/Textures/internal/barra-de-vida.png" id="4_7gh1m"]
 [ext_resource type="Script" uid="uid://x40mwcijbixr" path="res://sources/WindowsDataBase/Generic/Controls/ShapesForm.cs" id="6_0fhse"]
 [ext_resource type="Script" uid="uid://c6mr578pqdbji" path="res://sources/WindowsDataBase/Generic/Controls/TileOcupancy.cs" id="6_7gh1m"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_55l5k"]
+atlas = ExtResource("4_7gh1m")
+region = Rect2(0, 37, 64, 23)
 
 [node name="ControlSpriteEdit" type="MarginContainer" unique_id=220671044]
 anchors_preset = 15
@@ -63,6 +68,10 @@ prefix = "Pix Y:"
 layout_mode = 2
 text = "Grid Lineas"
 
+[node name="CheckButtonPath" type="CheckButton" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=1838292787]
+layout_mode = 2
+text = "Tiles Bloqueado (A*)"
+
 [node name="SubViewportContainer" type="SubViewportContainer" parent="VBoxContainer" unique_id=684234536]
 layout_mode = 2
 size_flags_vertical = 3
@@ -72,7 +81,7 @@ mouse_target = true
 [node name="SubViewport" type="SubViewport" parent="VBoxContainer/SubViewportContainer" unique_id=495266497 node_paths=PackedStringArray("tilesCamera2d")]
 transparent_bg = true
 handle_input_locally = false
-size = Vector2i(1260, 825)
+size = Vector2i(1260, 725)
 size_2d_override_stretch = true
 render_target_update_mode = 4
 script = ExtResource("1_ewqsh")
@@ -127,11 +136,32 @@ grow_vertical = 2
 texture = ExtResource("2_ewqsh")
 stretch_mode = 5
 
-[node name="TileOcupancy" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1478519490 node_paths=PackedStringArray("checkEnable")]
+[node name="BarLife" type="TextureRect" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=867361418]
+visible = false
+custom_maximum_size = Vector2(-1, 16)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_55l5k")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TileOcupancy" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1478519490 node_paths=PackedStringArray("checkEnable", "checkEnablePath")]
 script = ExtResource("6_7gh1m")
 tileColor = Color(0.72156864, 0.1254902, 0.43529412, 0.3882353)
+pathTileColor = Color(0.11764706, 0.5647059, 1, 0.7764706)
 outlineColor = Color(0.5882353, 0.35686275, 0.4745098, 1)
 checkEnable = NodePath("../../../../MarginContainer/HBoxContainer/CheckButtonModeGrid")
+checkEnablePath = NodePath("../../../../MarginContainer/HBoxContainer/CheckButtonPath")
 
 [node name="GridGeneric" type="Node2D" parent="VBoxContainer/SubViewportContainer/SubViewport/Panel" unique_id=1222916001 node_paths=PackedStringArray("spinBoxX", "spinBoxY", "subViewport")]
 script = ExtResource("3_ewqsh")

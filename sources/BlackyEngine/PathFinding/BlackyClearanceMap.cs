@@ -236,7 +236,7 @@ public class BlackyClearanceMap : IDisposable
         var chunk = GetOrCreateChunk(worldX, worldY, out int localX, out int localY);
         chunk.SetDistance(localX, localY, value);
 
-    //    DebugDistanceZero(chunk, worldX, worldY, localX, localY, value);
+        //DebugDistanceZero(chunk, worldX, worldY, localX, localY, value);
 
     }
     private void DebugDistanceZero(BlackyClearanceSubChunk chunk, int worldX, int worldY, int localX, int localY, int value)
