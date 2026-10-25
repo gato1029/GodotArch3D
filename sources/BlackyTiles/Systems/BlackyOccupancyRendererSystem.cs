@@ -20,7 +20,7 @@ public class BlackyOccupancyRendererSystem
     private readonly FlecsManager flecsManager;
 
     private readonly Dictionary<Vector2I, Dictionary<Vector2I, int>> chunksLoad = new();
-    private bool _active = true;
+    private bool _active = false;
     private World flecsWorld;
 
     public BlackyOccupancyRendererSystem(FlecsManager flecsManager, ChunkManagerBase chunkManager, BlackyChunkOccupancyMap occupancy)

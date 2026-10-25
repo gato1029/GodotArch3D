@@ -19,11 +19,28 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
+using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
 
 namespace GodotEcsArch.sources.BlackyEngine.Generation.Territory;
 
 public class BlackyWorldProceduralTerritory
 {
+
+    private readonly struct ResourceSpawn
+    {
+        public readonly ushort PaletteId;
+        public readonly Vector2I Position;
+        public readonly int Height;
+
+        public ResourceSpawn(ushort paletteId, Vector2I position, int height)
+        {
+            PaletteId = paletteId;
+            Position = position;
+            Height = height;
+        }
+    }
+
     private readonly BlackyWorld _world;
     private BlackyWorldSeed _worldSeed;    
     private BlackyWorldConfig _config;
@@ -123,6 +140,51 @@ public class BlackyWorldProceduralTerritory
 
         return false;
     }
+    // <summary>
+    /// Elige una entrada por Probability (0..100 = porcentaje de aparición). Lo que falte para 100 es la probabilidad
+    /// de que no aparezca nada; si la suma supera 100 se normaliza. Devuelve false si no sale ninguna.
+    /// Si tu tipo de entrada es un struct, quita "where T : class" y los "if (entry == null) continue;".
+    /// </summary>
+    private static bool TryPickByProbability<T>(List<T> entries, Random rng,
+        Func<T, float> getProbability, Func<T, long> getId, out long pickedId) where T : class
+    {
+        pickedId = 0;
+        if (entries == null || entries.Count == 0) return false;
+
+        float total = 0f;
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            if (entry == null) continue;
+            float p = getProbability(entry);
+            if (p > 0f) total += p;
+        }
+
+        if (total <= 0f) return false;
+
+        float roll = rng.NextSingle() * 100f;
+        if (total < 100f && roll >= total) return false;   // cae en la parte de "nada"
+
+        float scale = total > 100f ? 100f / total : 1f;
+        float accumulated = 0f;
+
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            if (entry == null) continue;
+            float p = getProbability(entry);
+            if (p <= 0f) continue;
+
+            accumulated += p * scale;
+            if (roll < accumulated)
+            {
+                pickedId = getId(entry);
+                return pickedId > 0;
+            }
+        }
+
+        return false;
+    }
 
     private void GenerateDecorations()
     {
@@ -141,7 +203,7 @@ public class BlackyWorldProceduralTerritory
       //  _geography.ExportDebugTxt(filePath); // debug: genera un txt con el mapa de terreno generado
         _geographyVertical.ExportDebugPng(imgPath); // debug: genera una imagen con el mapa de terreno generado
     }
-  
+
     public void GenerateTerritory()
     {
         const int chunkSize = 32;          // debe coincidir con el chunk del juego
@@ -150,9 +212,12 @@ public class BlackyWorldProceduralTerritory
         var terrainPaletteIds = new Dictionary<long, ushort>();
         var surfacePaletteIds = new Dictionary<long, ushort>();
         var decorationPaletteIds = new Dictionary<long, ushort>();
+        var resourcePaletteIds = new Dictionary<long, ushort>();
+        var resourceBiomesCached = new HashSet<BiomaData>(ReferenceEqualityComparer.Instance);   // biomas cuyos recursos ya están en paleta
         var terrainData = _world.Services.TerrainDataLienzo;
         var surfaceData = _world.Services.SuperficiesDataLienzo;
         var decorationData = _world.Services.AdornosDataLienzo;
+        var painter = _world.Services.ResourcePainter;
 
         var workBatch = new List<(
             BlackyChunkCoord coord,
@@ -190,9 +255,21 @@ public class BlackyWorldProceduralTerritory
             decorationPaletteIds.Add(decorationId, decorationData.GetDecorationPalettePersistenceId(data));
         }
 
+        void CacheResourcePaletteId(long resourceId)
+        {
+            if (resourcePaletteIds.ContainsKey(resourceId)) return;
+
+            var res = AtlasModsManager.GetDirect<ResourceSourceData>(resourceId);
+            ushort idInternal = BlackyPalletesPersistence.resourcesPalette.GetIdPersistence(res.nameMod, resourceId, out _);
+            resourcePaletteIds.Add(resourceId, idInternal);
+        }
+
         void ProcessBatch()
         {
             if (workBatch.Count == 0) return;
+
+            // Recursos elegidos por cada chunk del lote (null = ninguno). Se crean en serie al final.
+            var resourceSpawns = new List<ResourceSpawn>[workBatch.Count];
 
             // Cada worker escribe posiciones distintas en arrays ya creados y solo lee los caches de paleta.
             Parallel.For(0, workBatch.Count, i =>
@@ -202,7 +279,10 @@ public class BlackyWorldProceduralTerritory
                 var heightBuffers = item.heightBuffers;
                 var surfaceBuffers = item.surfaceBuffers;
                 var decorationBuffers = item.decorationBuffers;
-                var decorationRng = _worldSeed.GetRng("DecSuperficie", (item.coord.X * 73856093) ^ (item.coord.Y * 19349663));
+                int chunkHash = (item.coord.X * 73856093) ^ (item.coord.Y * 19349663);
+                var decorationRng = _worldSeed.GetRng("DecSuperficie", chunkHash);
+                Random resourceRng = null;                    // se crea solo si el chunk tiene recursos
+                List<ResourceSpawn> spawns = null;
 
                 for (int y = 0; y < region.Height; y++)
                 {
@@ -230,15 +310,13 @@ public class BlackyWorldProceduralTerritory
 
                         if (cell.IsHeightTransition && height > 0)
                         {
-
                             int lowerHeight = height - 1;
-                         
-                                ref var lowerCell = ref heightBuffers[lowerHeight].GetCell(x, y);
-                                lowerCell.id = terrainPaletteIds[cell.HeightLowerTerrainId];
-                                lowerCell.isBorder = false;
-                           
-                          
+
+                            ref var lowerCell = ref heightBuffers[lowerHeight].GetCell(x, y);
+                            lowerCell.id = terrainPaletteIds[cell.HeightLowerTerrainId];
+                            lowerCell.isBorder = false;
                         }
+
                         if (cell.HasDecoration && decorationBuffers != null)
                         {
                             // Elige la decoración según su probabilidad de aparición (0..100).
@@ -250,9 +328,28 @@ public class BlackyWorldProceduralTerritory
                                 decoCell.id = decorationPaletteId;
                             }
                         }
-                       
+
+                        if (cell.HasResource)
+                        {
+                            // Elige el recurso por Probability (0..100); lo que falte para 100 = no aparece nada.
+                            // Solo se ANOTA: la creación real ocurre en serie al cerrar el lote.
+                            resourceRng ??= _worldSeed.GetRng("RecursoSel", chunkHash);
+
+                            if (TryPickByProbability(cell.Bioma.idRecursos, resourceRng,
+                                    static e => e.Probability, static e => e.ResourceSourceId, out long resourceId)
+                                && resourcePaletteIds.TryGetValue(resourceId, out ushort resourcePaletteId))
+                            {
+                                spawns ??= new List<ResourceSpawn>();
+                                spawns.Add(new ResourceSpawn(
+                                    resourcePaletteId,
+                                    new Vector2I(region.MinX + x, region.MinY + y),   // coordenadas de MUNDO (la región ya viene en mundo)
+                                    height));
+                            }
+                        }
                     }
                 }
+
+                resourceSpawns[i] = spawns;
             });
 
             // Operaciones sobre los diccionarios/regiones compartidos: una vez por chunk y en serie.
@@ -263,6 +360,19 @@ public class BlackyWorldProceduralTerritory
                     surfaceData.CompleteGenerationChunk(item.coord, item.surfaceChunkData);
                 if (item.decorationChunkData != null)
                     decorationData.CompleteGenerationChunk(item.coord, item.decorationChunkData);
+            }
+
+            // Creación de recursos en serie (el painter y la paleta no son seguros entre hilos).
+            for (int n = 0; n < resourceSpawns.Length; n++)
+            {
+                var list = resourceSpawns[n];
+                if (list == null) continue;
+
+                for (int k = 0; k < list.Count; k++)
+                {
+                    var s = list[k];
+                    painter.InternalExecuteCreation(s.PaletteId, s.Position, s.Height, out _, false);
+                }
             }
 
             workBatch.Clear();
@@ -338,6 +448,24 @@ public class BlackyWorldProceduralTerritory
                             }
                         }
                     }
+
+                    // Recursos: se cachean los ids de paleta de TODAS las entradas del bioma, una sola vez por bioma
+                    // (en el paralelo solo se lee el diccionario).
+                    if (cell.HasResource && resourceBiomesCached.Add(cell.Bioma))
+                    {
+                        var resEntries = cell.Bioma.idRecursos;
+                        if (resEntries != null)
+                        {
+                            for (int e = 0; e < resEntries.Count; e++)
+                            {
+                                var resEntry = resEntries[e];
+                                if (resEntry == null || resEntry.ResourceSourceId <= 0 || resEntry.Probability <= 0f)
+                                    continue;
+
+                                CacheResourcePaletteId(resEntry.ResourceSourceId);
+                            }
+                        }
+                    }
                 }
 
                 foreach (long decorationId in decorationIdsToCache)
@@ -384,5 +512,5 @@ public class BlackyWorldProceduralTerritory
             ProcessBatch();
         }
     }
-  
+
 }

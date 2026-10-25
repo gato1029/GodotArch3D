@@ -37,6 +37,16 @@ internal class CommonOperations
                 throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
         }
     }
+    public static float GetHealthPercentage(int currentHealth, int maxHealth)
+    {
+        if (maxHealth <= 0) return 0.0f;
+
+        // Convertimos a float para obtener decimales exactos
+        float percentage = (float)currentHealth / maxHealth;
+
+        // Nos aseguramos de que siempre esté entre 0.0 y 1.0 (para que encaje perfecto con el shader)
+        return Mathf.Clamp(percentage, 0.0f, 1.0f);
+    }
     public static int GetRandomInt(int min = 1, int max = 1_000_000)
     {
         return rngInternal.RandiRange(min, max);

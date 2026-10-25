@@ -146,13 +146,19 @@ public class BlackyBuildingCreator
         entity.Set(new TeamComponent(team));
         entity.Set(new BuildingDefinitionComponent(idBuilding, spriteIdNormal, spriteIdConstruccion, spriteIdDestruccion));
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
+
+        //var BarLife = AtlasTexturesModsManager.Instance.CreateBarLife();
+        //Color customData = new Color(CommonOperations.GetHealthPercentage(1000, 1000), 0, 0, 0);
+        //RenderingServer.MultimeshInstanceSetTransform(BarLife.multimeshRid, BarLife.instanceId, transform);
+        //RenderingServer.MultimeshInstanceSetCustomData(BarLife.multimeshRid, BarLife.instanceId, customData);
+
         if (health!=0)
         {
-            entity.Set(new HealthComponent(health));
+            entity.Set(new HealthComponent() { value = health, MaxHealth = templateBuilding.MaxHealth });
         }
         else
         {
-            entity.Set(new HealthComponent(templateBuilding.MaxHealth));
+            entity.Set(new HealthComponent() { value = templateBuilding.MaxHealth, MaxHealth = templateBuilding.MaxHealth });
         }
         
         

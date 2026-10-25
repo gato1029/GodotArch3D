@@ -42,7 +42,7 @@ public class BlackyResourcesCreator
     private readonly StaticSpatialChunkGrid<Entity> staticHashResource;
     private int _resourcesCount = 0;
 
-    private const bool DEBUG_COLLIDERS = true;
+    private const bool DEBUG_COLLIDERS = false;
     private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
     private Dictionary<int, List<int>> _colliderDebugMap = new();
     private readonly ConcurrentQueue<CreateResourceCommand> _commandQueue = new();
@@ -159,6 +159,10 @@ public class BlackyResourcesCreator
     // Método interno: Contiene la lógica real y se ejecuta de forma segura en el hilo principal
     public void InternalExecuteCreation(ushort idResource, Vector2I tilePosition, int height, out Entity entity, bool render=true, int health=0,int amount=0)
     {
+     
+
+
+        height = 10;
         entity = default;
         Vector2 position = TilesHelper.TilePositionToWorldPosition(tilePosition);
 
@@ -180,11 +184,11 @@ public class BlackyResourcesCreator
         entity.Set(new ResourceDefinitionComponent(idResource, spriteId));
         if (health!=0)
         {
-            entity.Set(new HealthComponent(health));
+            entity.Set(new HealthComponent() { value=health});
         }
         else
         {
-            entity.Set(new HealthComponent(templateResource.health));
+            entity.Set(new HealthComponent() {value =templateResource.health });
         }
         if (amount !=0)
         {
@@ -232,7 +236,7 @@ public class BlackyResourcesCreator
             var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
             RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
             RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
-            RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture+0.1f));
+            RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
             entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
                      layer, depthOffset, spriteData.scale, offset));
         }

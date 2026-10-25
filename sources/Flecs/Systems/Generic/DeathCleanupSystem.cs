@@ -105,6 +105,11 @@ internal class DeathCleanupSystem : FlecsSystemBase
                 {
                     AttackSlotHelper.ReleaseAttackSlot(entity);
                 }
+                if (entity.Has<HealthBarComponent>())
+                {
+                    var bar = entity.Get<HealthBarComponent>();
+                    AtlasTexturesModsManager.Instance.FreeLifeBar(bar.MultiMeshRid,bar.InstanceId);
+                }
                 entity.Destruct();
             }
         }

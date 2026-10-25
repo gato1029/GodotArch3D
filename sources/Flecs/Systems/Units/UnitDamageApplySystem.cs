@@ -1,5 +1,6 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
+using Godot;
 using GodotEcsArch.sources.Flecs.Components;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
@@ -53,7 +54,13 @@ internal class UnitDamageApplySystem : FlecsSystemBase
                     atp.Active = false;
                 }
                 
-            }                                               
+            }
+            if (it.Entity(i).Has<HealthBarComponent>())
+            {
+                var BarLife =  it.Entity(i).Get<HealthBarComponent>();
+                Color customData = new Color(CommonOperations.GetHealthPercentage(hp.value, hp.MaxHealth), 1, 0, 0);
+                RenderingServer.MultimeshInstanceSetCustomData(BarLife.MultiMeshRid, BarLife.InstanceId, customData);
+            }
             // Eliminar el componente temporal
             it.Entity(i).Remove<DamagePendingComponent>();
         }

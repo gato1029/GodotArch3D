@@ -84,6 +84,14 @@ public struct BiomeCell
     /// </summary>
     public bool HasDecoration;
 
+    /// <summary>
+    /// true si esta celda llevará un recurso (árbol, piedra, mineral, etc.).
+    /// Se decide con un ruido PROPIO (independiente del de decoraciones) más un raleo por hash, y solo en interiores:
+    /// nunca en borde de mapa ni en los bordes de transición de bioma o de altura.
+    /// Puede coexistir con HasDecoration en la misma celda.
+    /// </summary>
+    public bool HasResource;
+
     public bool IsMapBorder => (BorderType & BiomeCellBorderType.Map) != 0;
     public bool IsBiomeBorder => (BorderType & BiomeCellBorderType.Biome) != 0;
     public bool IsHeightBorder => (BorderType & BiomeCellBorderType.Height) != 0;
@@ -130,6 +138,12 @@ public sealed class BiomeRegion
 ///  - Siempre debe existir al menos una regla para el nivel 0; si no, el constructor lanza error.
 ///  - Si un nivel alcanzable no tiene reglas, usa las del nivel inmediatamente inferior (y avisa en Warnings).
 ///
+/// Decoraciones y recursos:
+///  - Cada uno usa su PROPIO ruido Perlin (semillas "decorations" y "resources"), así sus manchas son independientes.
+///  - Los recursos además pasan por un raleo determinista por celda (ResourceDensity) para no formar bosques sólidos.
+///  - Ninguno se coloca en borde de mapa ni en los bordes de las bandas de transición (distancia 1 y distancia máxima).
+///  - Pueden coexistir en la misma celda.
+///
 /// Rendimiento:
 ///  - Camino rápido: las celdas cuya ventana de transición es uniforme (la mayoría) se resuelven en O(1) con una tabla
 ///    de suma acumulada, sin recorrer el anillo de offsets.
@@ -170,6 +184,32 @@ public class BlackyWorldBiomes
     private float decorationFrequency = 0.15f;
     private int decorationGridStep = 3;
     private float decorationThreshold = 0.45f;
+
+    // ---- Recursos (árboles, piedras, etc.) ----
+    private PerlinNoise resourceNoise;
+    private int resourceSeed;
+    // Tamaño de las manchas de recursos (bosques, pedregales). Es cuántos "ciclos" de ruido caben en un tile:
+    // el tamaño de una mancha es ~ 1 / frecuencia, así que 0.03 => manchas de ~33 tiles.
+    // Más bajo = manchas más grandes y más separadas. Más alto = manchas pequeñas y numerosas.
+    private float resourceFrequency = 0.02f;
+
+    // Cada cuántos tiles se evalúa el ruido real; las celdas intermedias se interpolan.
+    // 1 = ruido exacto en cada celda (más preciso, más lento). 2 = 4 veces menos cálculos de ruido.
+    // Con frecuencia 0.03 la diferencia entre 1 y 2 no se nota; subirlo más ahorra tiempo
+    // pero los bordes de las manchas se ven más "suavizados". Rango 1..16.
+    private int resourceGridStep = 3;
+
+    // Qué tan alto debe ser el ruido (0..1, centrado en ~0.5) para que una celda cuente como zona de recursos.
+    // Más alto = menos zonas y más pequeñas. 0.5 cubriría cerca de la mitad del mapa; 0.6 solo una parte menor;
+    // 0.7 serían manchas escasas. No es un porcentaje exacto: depende de la forma del ruido.
+    private float resourceThreshold = 0.5f;
+
+    // Dentro de una zona de recursos, fracción de celdas que quedan marcadas (0..1), sorteada por hash por celda.
+    // 1 = todas las celdas de la zona (mancha sólida). 0.5 = la mitad, repartidas al azar.
+    // Con 1f el raleo lo haces tú al elegir el recurso: si la suma de Probability de un bioma es menor que 100,
+    // el resto es la probabilidad de que no salga nada.
+    private float resourceDensity = 1f;
+
     private float[][] levelCuts;
     private float biomeFrequency = 0.004f;
     private int noiseGridStep = 4;
@@ -223,11 +263,52 @@ public class BlackyWorldBiomes
     /// <summary>
     /// Umbral del ruido de decoración: la celda se marca si el valor supera este umbral.
     /// Más bajo = más decoración; más alto = menos. Rango -1..1.
+    /// (Nota: Fbm devuelve valores 0..1 centrados en ~0.5, así que con 0.45 se marca más de la mitad de las celdas.)
     /// </summary>
     public float DecorationThreshold
     {
         get => decorationThreshold;
         set => decorationThreshold = Math.Clamp(value, -1f, 1f);
+    }
+
+    /// <summary>
+    /// Ciclos del ruido de recursos por tile. 0.03 => bosques/pedregales de ~30 tiles.
+    /// Más bajo = manchas más grandes de recursos.
+    /// </summary>
+    public float ResourceFrequency
+    {
+        get => resourceFrequency;
+        set => resourceFrequency = Math.Max(0.0001f, value);
+    }
+
+    /// <summary>
+    /// Paso (en tiles) de la rejilla del ruido de recursos; entre nodos se interpola. 2 = buena calidad y barato.
+    /// La rejilla está alineada a coordenadas de mundo. Rango 1..16.
+    /// </summary>
+    public int ResourceGridStep
+    {
+        get => resourceGridStep;
+        set => resourceGridStep = Math.Clamp(value, 1, 16);
+    }
+
+    /// <summary>
+    /// Umbral del ruido de recursos (0..1, el ruido está centrado en ~0.5): la celda es "zona de recursos" si el valor
+    /// lo supera. Más alto = menos zonas con recursos.
+    /// </summary>
+    public float ResourceThreshold
+    {
+        get => resourceThreshold;
+        set => resourceThreshold = Math.Clamp(value, 0f, 1f);
+    }
+
+    /// <summary>
+    /// Fracción de celdas con recurso DENTRO de una zona de recursos (0..1). 1 = bosque sólido; 0.5 = la mitad de las
+    /// celdas de la zona. Se decide con un hash determinista por celda, así que no depende de cómo partas las regiones.
+    /// </summary>
+    public float ResourceDensity
+    {
+        get => resourceDensity;
+        set => resourceDensity = Math.Clamp(value, 0f, 1f);
     }
 
     /// <summary>
@@ -383,6 +464,7 @@ public class BlackyWorldBiomes
         return false;
     }
 
+
     private int GetBiomeIndex(BiomaData bioma)
     {
         for (int i = 0; i < biomes.Count; i++)
@@ -441,6 +523,21 @@ public class BlackyWorldBiomes
     /// <summary>Ruido de parches de decoración. 2 octavas para manchas pequeñas y naturales.</summary>
     private float DecorationNodeNoise(int worldX, int worldY)
         => decorationNoise.Fbm(worldX * decorationFrequency, worldY * decorationFrequency, 2);
+
+    /// <summary>Ruido de zonas de recursos (bosques, pedregales). Semilla propia: independiente de las decoraciones.</summary>
+    private float ResourceNodeNoise(int worldX, int worldY)
+        => resourceNoise.Fbm(worldX * resourceFrequency, worldY * resourceFrequency, 2);
+
+    /// <summary>Hash determinista 0..1 por celda (no depende de cómo partas las regiones).</summary>
+    private static float Hash01(int x, int y, int seed)
+    {
+        unchecked
+        {
+            uint h = (uint)(x * 73856093) ^ (uint)(y * 19349663) ^ (uint)(seed * 83492791);
+            h ^= h >> 13; h *= 0x5bd1e995u; h ^= h >> 15;
+            return (h & 0xFFFFFF) / (float)0x1000000;
+        }
+    }
 
     /// <summary>Ruido de una sola celda, con la misma interpolación que ComputeNoiseBlock (mismos resultados).</summary>
     private float NoiseAt(int worldX, int worldY, int g)
@@ -540,6 +637,8 @@ public class BlackyWorldBiomes
 
             noise = new PerlinNoise(worldSeed.GetRng("biomes").Next());
             decorationNoise = new PerlinNoise(worldSeed.GetRng("decorations").Next());
+            resourceSeed = worldSeed.GetRng("resources").Next();
+            resourceNoise = new PerlinNoise(resourceSeed);
             int g = noiseGridStep;
 
             // Se muestrea el mundo en una cuadrícula y se guarda (valor de ruido, nivel de altura) de cada muestra.
@@ -697,6 +796,12 @@ public class BlackyWorldBiomes
         int ew = width + 2 * m, eh = height + 2 * m;
         int ex0 = minX - m, ey0 = minY - m;
 
+        // Parámetros de decoración/recursos leídos una vez por región (por si cambian durante la ejecución)
+        float decThreshold = decorationThreshold;
+        float resThreshold = resourceThreshold;
+        float resDensity = resourceDensity;
+        int resSeed = resourceSeed;
+
         // 1) Niveles de altura de la región ampliada (en serie bajo lock si heightMapWorld no es thread-safe)
         byte[] levels = new byte[(long)ew * eh];
         FillLevels(levels, ex0, ey0, ew, eh, parallel);
@@ -704,6 +809,7 @@ public class BlackyWorldBiomes
         // 2) Ruido de la región ampliada (rejilla + interpolación) y bioma de cada celda
         float[] noiseBlock = ComputeNoiseBlock(ex0, ey0, ew, eh, g, parallel);
         float[] decorationBlock = ComputeNoiseBlock(ex0, ey0, ew, eh, decorationGridStep, parallel, DecorationNodeNoise);
+        float[] resourceBlock = ComputeNoiseBlock(ex0, ey0, ew, eh, resourceGridStep, parallel, ResourceNodeNoise);
         ushort[] ids = new ushort[(long)ew * eh];
         RunRows(eh, ew, ey =>
         {
@@ -839,7 +945,7 @@ public class BlackyWorldBiomes
                     if (cell.HeightTransitionDistance == 1)
                         cell.BorderType |= BiomeCellBorderType.Height;
 
-                // Decoración: puede estar DENTRO de una transición, pero no en sus bordes.
+                // Decoración y recursos: pueden estar DENTRO de una transición, pero no en sus bordes.
                 // Los bordes de la banda son la distancia 1 (el borde real) y la distancia
                 // máxima (el límite exterior de la transición). Igual para altura.
                 bool biomeTransitionEdge = cell.IsTransition
@@ -847,13 +953,20 @@ public class BlackyWorldBiomes
                 bool heightTransitionEdge = cell.IsHeightTransition
                     && (cell.HeightTransitionDistance <= 1 || cell.HeightTransitionDistance >= hw);
 
-                if (!cell.IsMapBorder
-                    && !biomeTransitionEdge
-                    && !heightTransitionEdge
+                bool interior = !cell.IsMapBorder && !biomeTransitionEdge && !heightTransitionEdge;
+
+                if (interior
                     && HasDecorationCandidates(bioma)
-                    && decorationBlock[center] > decorationThreshold)
+                    && decorationBlock[center] > decThreshold)
                 {
                     cell.HasDecoration = true;
+                }
+
+                // Recurso: zona de ruido propio + raleo por hash. Es independiente de la decoración:
+                // una celda puede tener las dos.
+                if (interior && resourceBlock[center] > resThreshold  && Hash01(worldX, worldY, resSeed) < resDensity)
+                {
+                    cell.HasResource = true;
                 }
 
                 region.Cells[(long)y * width + x] = cell;
@@ -1030,6 +1143,8 @@ public class BlackyWorldBiomes
         long[,] perLevel = new long[LevelCount, biomes.Count];
         long[] transitions = new long[biomes.Count];
         long[,] heightPairs = new long[LevelCount, LevelCount];   // celdas en transición de altura: nivel propio -> nivel vecino
+        long[] decorations = new long[biomes.Count];               // celdas con decoración por bioma
+        long[] resources = new long[biomes.Count];                 // celdas con recurso por bioma
 
         const int StripRows = 64;
         BiomeRegion strip = null;
@@ -1068,6 +1183,8 @@ public class BlackyWorldBiomes
                     perLevel[cell.HeightLevel, b]++;
                     if (cell.IsHeightTransition) heightPairs[cell.HeightLevel, cell.HeightNeighborLevel]++;
                     if (cell.IsTransition) transitions[b]++;
+                    if (cell.HasDecoration) decorations[b]++;
+                    if (cell.HasResource) resources[b]++;
                 }
                 cachedTy = ty;
             }
@@ -1081,6 +1198,7 @@ public class BlackyWorldBiomes
 
         sw.WriteLine("# LEYENDA DE BIOMAS (debug)");
         sw.WriteLine($"# Perfil geográfico: {template.perfilGeografico}   Mundo: {w}x{h}   BiomeFrequency: {biomeFrequency.ToString(inv)}   NoiseGridStep: {noiseGridStep}   TransitionWidth: {transitionWidth}   HeightTransitionWidth: {heightTransitionWidth}");
+        sw.WriteLine($"# Decoraciones: frecuencia {decorationFrequency.ToString(inv)}  umbral {decorationThreshold.ToString(inv)}   Recursos: frecuencia {resourceFrequency.ToString(inv)}  umbral {resourceThreshold.ToString(inv)}  densidad {resourceDensity.ToString(inv)}");
         sw.WriteLine("# Color claro en el PNG = celda en transición hacia otro bioma. Color oscuro = celda en transición de altura (tiene prioridad).");
         sw.WriteLine("# Superficie de transición: UN solo id por par de biomas (el del bioma de menor id).");
         sw.WriteLine($"# Orientación del PNG: {(DebugYAxisUp ? "Y+ hacia arriba (fila de arriba = MaxY)" : "Y+ hacia abajo (fila de arriba = MinY)")}");
@@ -1109,6 +1227,15 @@ public class BlackyWorldBiomes
             long total = 0;
             for (int level = 0; level < LevelCount; level++) total += perLevel[level, b];
             sw.WriteLine($"   {BiomeLabel(biomes[b])}: {transitions[b]} de {total} celdas ({(total > 0 ? transitions[b] * 100.0 / total : 0):0.0}%)");
+        }
+
+        sw.WriteLine("#");
+        sw.WriteLine("# Celdas con decoración / recurso por bioma:");
+        for (int b = 0; b < biomes.Count; b++)
+        {
+            long total = 0;
+            for (int level = 0; level < LevelCount; level++) total += perLevel[level, b];
+            sw.WriteLine($"   {BiomeLabel(biomes[b])}: decoración {decorations[b]} ({(total > 0 ? decorations[b] * 100.0 / total : 0):0.0}%) | recurso {resources[b]} ({(total > 0 ? resources[b] * 100.0 / total : 0):0.0}%)");
         }
 
         sw.WriteLine("#");

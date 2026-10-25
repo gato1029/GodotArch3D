@@ -64,9 +64,19 @@ public record struct AmountComponent
    int value
 );
 [RegisterComponentFlecs]
+public record struct HealthBarComponent
+(
+     Rid MultiMeshRid,
+     int InstanceId,
+     bool IsVisible,       // Bandera para mostrar/ocultar fácilmente
+     float HeightOffset   // A qué altura flota sobre la unidad
+);
+
+[RegisterComponentFlecs]
 public record struct HealthComponent
 (
-   int value
+    int MaxHealth, 
+    int value
 );
 
 [RegisterComponentFlecs]

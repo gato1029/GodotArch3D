@@ -14,6 +14,45 @@ using System.Threading.Tasks;
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
 
 
+internal class BarLifeTransformSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override bool MultiThreaded => true;
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+        qb.With<PositionComponent>()
+          .With<HealthBarComponent>()
+          .Without<StoppedTag>()
+          .Without<StaticRenderTag>()
+          .Without<DeadTag>()
+          .Without<DestroyRequestTag>();
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var pos = it.Field<PositionComponent>(0);
+        var hpBar = it.Field<HealthBarComponent>(1);
+      
+        for (int i = 0; i < it.Count(); i++)
+        {
+            var e = it.Entity(i);
+            ref var p = ref pos[i];
+            ref var BarLife = ref hpBar[i];
+
+
+
+            // 2. Calculas la posición 3D de la barra sumando el offset
+            Vector3 barPos = new Vector3(p.position.X, p.position.Y+ BarLife.HeightOffset, p.height);
+
+            // 3. Creas la matriz final combinándola con la rotación de la cámara (para el billboard)
+            Transform3D finalBarTransform = new Transform3D(Basis.Identity, barPos);
+
+            RenderingServer.MultimeshInstanceSetTransform(BarLife.MultiMeshRid, BarLife.InstanceId, finalBarTransform);
+
+           
+        }
+    }
+}
 internal class SpriteTransformSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;

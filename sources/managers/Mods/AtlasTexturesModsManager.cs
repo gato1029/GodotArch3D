@@ -1,4 +1,6 @@
+using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.managers.Bars;
 using GodotEcsArch.sources.managers.Textures;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase;
@@ -30,6 +32,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     private Dictionary<int, MaterialModData> materialsMods = new Dictionary<int, MaterialModData>(); // aqui se carga solo un material por mod
     private Dictionary<int, MaterialModData> subMaterialsModsGlobal = new Dictionary<int, MaterialModData>(); // aqui se carga todas las subtexturas y pertenencia
 
+    private HealthBarManagerOptimized healthBarManager = new HealthBarManagerOptimized(widthPixels: 32f, heightPixels: 5f);
     //public void ForceChargue()
     //{
     //    GD.Print("🔄 Refreshing AtlasModsManager...");
@@ -59,6 +62,16 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
             GD.PrintErr($"Mod duplicado: {modName}");
         }
                 
+    }
+    public (Rid multimeshRid, int instanceId)CreateBarLife()
+    {
+      
+       return healthBarManager.CreateInstance();
+    }
+
+    public void FreeLifeBar(Rid healthBarRid, int instanceId)
+    {
+        healthBarManager.FreeInstance(healthBarRid, instanceId);
     }
     private void ChargueEditorMods()
     {

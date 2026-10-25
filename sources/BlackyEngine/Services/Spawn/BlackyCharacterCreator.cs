@@ -207,13 +207,16 @@ public class BlackyCharacterCreator
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0,0,0,0,0,0));
         entity.Set(new PlayerInputComponent());
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
+
+       
+
         if (health!=0)
         {
-            entity.Set(new HealthComponent(health));
+            entity.Set(new HealthComponent(1000,health));
         }
         else
         {
-            entity.Set(new HealthComponent(1000));
+            entity.Set(new HealthComponent(1000,1000));
         }
         
 
@@ -234,7 +237,25 @@ public class BlackyCharacterCreator
 
         entity.Add<UseBoidTag>();
         AddSelectionRender(entity);
+        AddBarLife(entity, 1000, 1000,position, height);
+   
+
         return entity;
+    }
+    private void AddBarLife(Entity entity, int currentLife, int MaxLife, Vector2 position, int height)
+    {
+        var BarLife = AtlasTexturesModsManager.Instance.CreateBarLife();
+        Color customData = new Color(CommonOperations.GetHealthPercentage(currentLife, MaxLife), 1, 0, 0);
+        RenderingServer.MultimeshInstanceSetCustomData(BarLife.multimeshRid, BarLife.instanceId, customData);
+
+        Vector3 barPos = new Vector3(position.X, position.Y + 1, height);
+
+        // 3. Creas la matriz final combinándola con la rotación de la cámara (para el billboard)
+        Transform3D finalBarTransform = new Transform3D(Basis.Identity, barPos);
+
+        RenderingServer.MultimeshInstanceSetTransform(BarLife.multimeshRid, BarLife.instanceId, finalBarTransform);
+
+        entity.Set(new HealthBarComponent(BarLife.multimeshRid, BarLife.instanceId, true, 1));
     }
 
     private void AddSelectionRender(Entity ent)
@@ -293,13 +314,19 @@ public class BlackyCharacterCreator
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         entity.Add<StoppedTag>();
         entity.Add<UseBoidTag>();
+
+        var BarLife = AtlasTexturesModsManager.Instance.CreateBarLife();
+        Color customData = new Color(CommonOperations.GetHealthPercentage(100, 100), 0, 0, 0);
+        RenderingServer.MultimeshInstanceSetTransform(BarLife.multimeshRid, BarLife.instanceId, transform);
+        RenderingServer.MultimeshInstanceSetCustomData(BarLife.multimeshRid, BarLife.instanceId, customData);
+
         if (health != 0)
         {
-            entity.Set(new HealthComponent(health));
+            entity.Set(new HealthComponent(100, health));
         }
         else
         {
-            entity.Set(new HealthComponent(100));
+            entity.Set(new HealthComponent(100,100));
         }
 
         float rvoRadius = MeshCreator.PixelsToUnits(25);
@@ -327,7 +354,7 @@ public class BlackyCharacterCreator
             int idDebugRangeSearch = CollisionShapeDraw.Instance.DrawCircleShape(radiusSearchEnemy, position, Colors.Yellow);
             entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle, idDebugRangeSearch));
         }
-
+        AddBarLife(entity, 100, 100, position, height);
         return entity;
     }
 }

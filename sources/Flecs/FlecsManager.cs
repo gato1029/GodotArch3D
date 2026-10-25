@@ -220,6 +220,7 @@ public class FlecsManager
         RegisterSystem<AnimationSimpleSpriteSystem>();
 
         // render
+        RegisterSystem<BarLifeTransformSystem>();
         RegisterSystem<RenderSimpleSpriteSystem>();
         RegisterSystem<RenderSpriteSystem>();
         RegisterSystem<LayeredSpriteRenderSystem>();
