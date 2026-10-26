@@ -1,0 +1,125 @@
+[gd_scene format=3 uid="uid://b5vtjpc5b1aro"]
+
+[ext_resource type="Script" uid="uid://dq82yikgmbloh" path="res://sources/WindowsDataBase/Portals/RuntimeControlPortals.cs" id="1_2asjg"]
+[ext_resource type="PackedScene" uid="uid://bor51mewublcc" path="res://sources/WindowsDataBase/Common/KuroSearchItems.tscn" id="1_bsckd"]
+[ext_resource type="Script" uid="uid://c2qwyk2n1qekm" path="res://sources/CustomWidgets/KuroButton.cs" id="2_2asjg"]
+[ext_resource type="Texture2D" uid="uid://e4igfbbvdqym" path="res://resources/Textures/iconos/file.png" id="3_l5u8r"]
+[ext_resource type="PackedScene" uid="uid://63mooil1786r" path="res://sources/RuntimeEditor/Common/TileSpritePreview.tscn" id="4_bsckd"]
+[ext_resource type="Script" uid="uid://d4g3outtemvav" path="res://sources/CustomWidgets/KuroOptionButton.cs" id="5_03sck"]
+[ext_resource type="Texture2D" uid="uid://dvxqy6d0bvmy" path="res://resources/Textures/iconos/Save.png" id="6_mf4je"]
+[ext_resource type="Texture2D" uid="uid://i1tr7l6w0mf8" path="res://resources/Textures/iconos/Delete.png" id="7_qkfbo"]
+
+[node name="RuntimeControlPortals" type="PanelContainer" unique_id=1070400664]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2asjg")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="." unique_id=873939474]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="KuroItems" parent="HBoxContainer2" unique_id=1075427436 instance=ExtResource("1_bsckd")]
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 1
+_startExpanded = true
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer2" unique_id=449834732]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_top = 40
+
+[node name="CenterContainer" type="CenterContainer" parent="HBoxContainer2/MarginContainer" unique_id=1388048951]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer" unique_id=1865078856]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2" unique_id=309207883]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/HBoxContainer" unique_id=1827542389]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "Portales"
+
+[node name="ButtonNuevo" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/HBoxContainer" unique_id=1136940818]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 8
+focus_mode = 1
+script = ExtResource("2_2asjg")
+IconTexture = ExtResource("3_l5u8r")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ContenedorDatos" type="VBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2" unique_id=2017698171]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos" unique_id=1721218876]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1656709146]
+layout_mode = 2
+text = "Nombre:"
+
+[node name="LineEditName" type="LineEdit" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1915714608]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=857389718]
+layout_mode = 2
+text = "Tipo Portal:"
+
+[node name="TipoPortal" type="OptionButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1131334882]
+layout_mode = 2
+script = ExtResource("5_03sck")
+metadata/_custom_type_script = "uid://d4g3outtemvav"
+
+[node name="Label5" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1313902771]
+layout_mode = 2
+text = "Nivel Dificultad:"
+
+[node name="SpinBoxDificultad" type="SpinBox" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1871028564]
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+
+[node name="Label2" type="Label" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=646626476]
+layout_mode = 2
+text = "Sprite:"
+
+[node name="TileSpriteSelector" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/GridContainer" unique_id=1018904121 instance=ExtResource("4_bsckd")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+isSelectorEnabled = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos" unique_id=1273559090]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ButtonGuardar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/HBoxContainer2" unique_id=556674223]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+focus_mode = 1
+script = ExtResource("2_2asjg")
+IconTexture = ExtResource("6_mf4je")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
+[node name="ButtonEliminar" type="TextureButton" parent="HBoxContainer2/MarginContainer/CenterContainer/VBoxContainer2/ContenedorDatos/HBoxContainer2" unique_id=343567802]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+focus_mode = 1
+script = ExtResource("2_2asjg")
+IconTexture = ExtResource("7_qkfbo")
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"

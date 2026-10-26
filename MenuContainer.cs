@@ -19,6 +19,14 @@ public partial class MenuContainer : VBoxContainer
         ButtonSuperficie.Pressed += ButtonSuperficie_Pressed;
         ButtonBiomas.Pressed += ButtonBiomas_Pressed;
         ButtonPerfiladorBioma.Pressed += ButtonPerfiladorBioma_Pressed;
+        ButtonPortales.Pressed += ButtonPortales_Pressed;
+    }
+
+    private void ButtonPortales_Pressed()
+    {
+        ContenedorEditor.ClearChildrens();
+        var control = RuntimeServices.NodeRegistry.Create<RuntimeControlPortals>();
+        ContenedorEditor.AddChild(control); ;
     }
 
     private void ButtonPerfiladorBioma_Pressed()

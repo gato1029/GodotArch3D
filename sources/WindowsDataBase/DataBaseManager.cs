@@ -9,6 +9,7 @@ using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Group;
 using GodotEcsArch.sources.WindowsDataBase.Info;
 using GodotEcsArch.sources.WindowsDataBase.Materials;
+using GodotEcsArch.sources.WindowsDataBase.Portals;
 using GodotEcsArch.sources.WindowsDataBase.Projectile.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.Resources.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.ResourceSource.DataBase;
@@ -125,6 +126,7 @@ namespace GodotEcsArch.sources.WindowsDataBase
             RegisterCollection<SuperficieData>("SuperficieData");
             RegisterCollection<BiomaData>("BiomaData");
             RegisterCollection<TemplateWorldProfileData>("TemplateWorldProfileData");
+            RegisterCollection<PortalConfigData>("PortalConfigData");
 
 
             ILiteCollection<TextureMasterData> TextureMasterDataCollection =

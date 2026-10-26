@@ -39,7 +39,7 @@ public class GameRuntime
         var perfilMundo = GetProfileWorld();
         int alturaMaxima = 5;
         MasterSeed = 759245143;
-        Vector2I sizeMap = new Vector2I(1024,1024);//  GenerateRandomSizeMap();
+        Vector2I sizeMap = new Vector2I(4096,4096);//  GenerateRandomSizeMap();
         CurrentWorld = new BlackyWorld(Name, perfilMundo.tipoMundo, 32, alturaMaxima, MasterSeed,sizeMap,perfilMundo.id);
                 
     }

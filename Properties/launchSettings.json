@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug MenuGame": {
+	"Godot Debug RuntimeControlPortals": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/GameRuntime/MenuGame.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/WindowsDataBase/Portals/RuntimeControlPortals.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

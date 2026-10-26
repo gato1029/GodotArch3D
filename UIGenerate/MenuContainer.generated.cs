@@ -14,6 +14,7 @@ public partial class MenuContainer : VBoxContainer
     private KuroButton ButtonSuperficie;
     private KuroButton ButtonRamps;
     private KuroButton ButtonCaminos;
+    private KuroButton ButtonPortales;
     private KuroButton ButtonTerreno;
     private KuroButton ButtonBiomas;
     private KuroButton ButtonPerfiladorBioma;
@@ -36,6 +37,7 @@ public partial class MenuContainer : VBoxContainer
         ButtonSuperficie = GetNode<KuroButton>("Menu/hbox/ButtonSuperficie");
         ButtonRamps = GetNode<KuroButton>("Menu/hbox/ButtonRamps");
         ButtonCaminos = GetNode<KuroButton>("Menu/hbox/ButtonCaminos");
+        ButtonPortales = GetNode<KuroButton>("Menu/hbox/ButtonPortales");
         ButtonTerreno = GetNode<KuroButton>("Menu/hbox/ButtonTerreno");
         ButtonBiomas = GetNode<KuroButton>("Menu/hbox/ButtonBiomas");
         ButtonPerfiladorBioma = GetNode<KuroButton>("Menu/hbox/ButtonPerfiladorBioma");

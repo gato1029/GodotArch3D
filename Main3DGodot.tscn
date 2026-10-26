@@ -151,6 +151,18 @@ FontSize = 12
 IconExpand = true
 metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
 
+[node name="ButtonPortales" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=1238051126]
+custom_minimum_size = Vector2(68, 88.75)
+layout_mode = 2
+focus_mode = 1
+script = ExtResource("4_kc28b")
+IconTexture = ExtResource("7_jssc5")
+ButtonText = "Portales"
+Padding = 18
+FontSize = 12
+IconExpand = true
+metadata/_custom_type_script = "uid://c2qwyk2n1qekm"
+
 [node name="ButtonTerreno" type="TextureButton" parent="Editor/MainWindows/Control/Panel/MenuContainer/Menu/hbox" unique_id=837397774]
 custom_minimum_size = Vector2(48, 81.5)
 layout_mode = 2
