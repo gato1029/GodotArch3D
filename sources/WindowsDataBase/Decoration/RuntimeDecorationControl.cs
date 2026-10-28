@@ -55,6 +55,10 @@ public partial class RuntimeDecorationControl : PanelContainer
     private void KuroItems_OnObjectPressed(object obj)
     {
         data = (DecorationData)obj;
+        ContenedorDatos.Visible = true;
+        LineEditName.Text = data.name;
+        var sprite = DataBaseManager.Instance.FindById<TileSpriteData>(data.idTileSprite);
+        TileSpriteSelector.LoadData(sprite);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

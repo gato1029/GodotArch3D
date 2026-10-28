@@ -66,11 +66,13 @@ public partial class RuntimeControlPortals : PanelContainer
     }
     private void KuroItems_OnObjectPressed(object obj)
     {
-        ClearAll();
+        //ClearAll();
         data = (PortalConfigData)obj;
+        ContenedorDatos.Visible = true;
+        LineEditName.Text = data.name;
         SpinBoxDificultad.Value = data.difficultyLevel;
         TipoPortal.SelectByData(data.type);
-        var sprite = DataBaseManager.Instance.FindById<TileSpriteData>(data.id);
+        var sprite = DataBaseManager.Instance.FindById<TileSpriteData>(data.idTileSprite);
         TileSpriteSelector.LoadData(sprite);
     }
     // Called every frame. 'delta' is the elapsed time since the previous frame.

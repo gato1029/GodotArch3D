@@ -48,7 +48,7 @@ internal class AnimationSimpleSpriteSystem : FlecsSystemBase
                     {
                         f.uvMap = dataAnim.uvFramesArray[0]; // Reinicia al frame inicial                        
                         a.animationComplete = true;
-                        a.currentFrameIndex = 0;
+                        a.currentFrameIndex = 1;
                         a.active = true;
                     }
                     else
