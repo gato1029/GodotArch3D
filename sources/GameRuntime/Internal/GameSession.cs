@@ -1,27 +1,39 @@
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
-using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.WindowsDataBase.WorldGameProfile;
 using System.Collections.Generic;
 using System.Linq;
+using GodotEcsArch.sources.BlackyTiles.Commands;
+using GodotEcsArch.sources.GameRuntime.Internal.TimerGame;
+using GodotEcsArch.sources.managers;
+using GodotEcsArch.sources.managers.Chunks;
 
 namespace GodotEcsArch.sources.GameRuntime.Internal;
 
-public class GameRuntime
-{
-    public string Name; // nombre de la partida
-    public int MasterSeed;
-    public List<WorldSlot> VisitedWorlds;    
-    BlackyWorld CurrentWorld; // el mundo actual en el que se encuentra el jugador
+// aquí se controla toda la partida
 
-    public GameRuntime(string name, int masterSeed = 0,bool isNewGame=true)
+public class GameSession
+{
+    private readonly string _name; // nombre de la partida
+    private int _masterSeed;
+    private readonly List<WorldSlot> VisitedWorlds;
+    private BlackyWorld _currentWorld; // el mundo actual en el que se encuentra el jugador
+    private readonly BlackyTimerGame _timer = new BlackyTimerGame();
+    
+    public GameSession(string name, int masterSeed = 0,bool isNewGame=true)
     {
-        this.Name = name;
-        this.MasterSeed = masterSeed;
+        this._name = name;
+        VisitedWorlds = new List<WorldSlot>();
+        this._masterSeed = masterSeed;
+        // 1 segundo real = 1 minutos de juego
+        _timer.MinutesPerSecond = 1.0;
+        _timer.TimeScale = 1.0;
+        
         if (isNewGame)
         {
             GenerateNewWorld();
+            
         }
         else
         {
@@ -38,9 +50,9 @@ public class GameRuntime
         }
         var perfilMundo = GetProfileWorld();
         int alturaMaxima = 5;
-        MasterSeed = 759245143;
+        _masterSeed = 759245143;
         Vector2I sizeMap = new Vector2I(256,256);//  GenerateRandomSizeMap();
-        CurrentWorld = new BlackyWorld(Name, perfilMundo.tipoMundo, 32, alturaMaxima, MasterSeed,sizeMap,perfilMundo.id);
+        _currentWorld = new BlackyWorld(_name, perfilMundo.tipoMundo, 32, alturaMaxima, _masterSeed,sizeMap,perfilMundo.id);
                 
     }
 
@@ -81,4 +93,17 @@ public class GameRuntime
         VisitedWorlds.Add(new WorldSlot { WorldName = $"World_{internalSeed}", ProfileId = profileId, InternalSeed = internalSeed });
     }
 
+    public void Update(double delta)
+    {
+        _timer.Update(delta);
+        RenderCommandQueue.ExecuteFrame();
+        ChunkManager.Instance.UpdatePlayerPosition(PositionsManager.Instance.positionCamera);
+
+        var worlds = BlackyWorldRegistry.Instance.GetAllWorlds();
+
+        foreach (var item in worlds)
+        {
+            item.Update((float)delta);
+        }
+    }
 }
