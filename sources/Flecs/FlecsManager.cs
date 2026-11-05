@@ -217,7 +217,7 @@ public class FlecsManager
         // animaciones
         RegisterSystem<AnimationLayerUpdateSystem>();
         RegisterSystem<GodotEcsArch.sources.Flecs.Systems.Animation.AnimationSystem>();
-        RegisterSystem<AnimationSimpleSpriteSystem>();
+       // RegisterSystem<AnimationSimpleSpriteSystem>(); // ya no es necesario
 
         // render
         RegisterSystem<BarLifeTransformSystem>();
@@ -241,8 +241,9 @@ public class FlecsManager
         //post        
         RegisterSystem<DeathCleanupSystem>(); // limpieza de unidades muertas
         RegisterSystem<DestroyCleanupSystem>(); // limpieza de edificios destruidos
-                
-        
+        RegisterSystem<RefreshUpdateGpuDriven>();
+
+
 
 
 

@@ -32,7 +32,7 @@ public class ResourceSourceData:IdDataLong
     public int amount { get; set; }  // Cuánto puede dar en total (ej. 3 de madera)        
     public int health { get; set; } // Salud de la fuente de recurso (ej. 100 de salud)
     public bool isExploitable { get; set; } = false; // Indica si la fuente de recurso se puede explotar o no
-    public int idMaterialResourceProduce { get; set; } // ID del material que produce (ej. ID del material madera) no se usa mas
+   // public long idMaterialResourceProduce { get; set; } // ID del material que produce (ej. ID del material madera) no se usa mas
     public List<long> listIdTileSpriteData { get; set; } = new List<long>(); // Datos de los sprites asociados a la fuente de recurso
 
     public ResourceSourceData()

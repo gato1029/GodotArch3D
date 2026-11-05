@@ -44,14 +44,14 @@ public class DestroyTileInstanceTextureCommand : IRenderCommand
         { //tiene que estar marcado para destruccion
             return;
         }
-        AtlasTexturesModsManager.Instance.FreeInstance(
-            textureInstance.Rid,
-            textureInstance.InstanceId
-        );
-        if (textureInstance.HasEntity)
-        {            
+        
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.FreeInstance(textureInstance.GpuIndex, textureInstance.InstanceId);     
+        
+      /*  if (textureInstance.HasEntity)
+        {           
             textureInstance.Entity.Destruct();
         }
+ */
         // 3. Eliminación del diccionario de forma defensiva
         // Agregamos la comprobación chunkRender != null y !IsDestroyed
         if (!isMarkFreeChunk && chunkRender != null && !chunkRender.IsDestroyed)

@@ -27,7 +27,9 @@ public class IdDataLong
     public string nameMod { get; set; }
     [BsonIgnore]
     public ushort idMod { get; set; }
-
+    [BsonIgnore]
+    public int idPallete { get; set; }
+    
     public void ReGerenateId()
     {
         id = EpochIdGenerator.NewId();

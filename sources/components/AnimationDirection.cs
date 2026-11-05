@@ -10,5 +10,4 @@ public enum AnimationDirection
     RIGHTUP,
     LEFTDOWN,
     RIGHTDOWN,
-
 }

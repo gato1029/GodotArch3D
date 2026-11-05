@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using GodotEcsArch.sources.managers.GpuDriven;
 
 
 namespace GodotEcsArch.sources.managers.Mods;
@@ -33,6 +34,10 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     private Dictionary<int, MaterialModData> subMaterialsModsGlobal = new Dictionary<int, MaterialModData>(); // aqui se carga todas las subtexturas y pertenencia
 
     private HealthBarManagerOptimized healthBarManager = new HealthBarManagerOptimized(widthPixels: 32f, heightPixels: 5f);
+
+    private readonly SpriteAtlasGroupManager _atlasManager = new SpriteAtlasGroupManager();
+    public GpuDrivenRenderManager DrivenRenderManager { get; private set; }
+
     //public void ForceChargue()
     //{
     //    GD.Print("🔄 Refreshing AtlasModsManager...");
@@ -73,6 +78,17 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
     {
         healthBarManager.FreeInstance(healthBarRid, instanceId);
     }
+
+    private void PreparShaders()
+    {
+        // 1. Instanciar los materiales base con los shaders optimizados que creamos
+        var staticMaterial = GD.Load<ShaderMaterial>("res://resources/Material/GpuStatico.tres");
+        var animatedMaterial = GD.Load<ShaderMaterial>("res://resources/Material/GpuAnimado.tres");
+        
+        _atlasManager.RegisterPipelineMaterial((int)RenderPipelineType.Static, staticMaterial);
+        _atlasManager.RegisterPipelineMaterial((int)RenderPipelineType.SimpleAnimation, animatedMaterial);
+        _atlasManager.RegisterPipelineMaterial((int)RenderPipelineType.AnimatedUnits, animatedMaterial);
+    }
     private void ChargueEditorMods()
     {
         // esta funcion se llama desde el editor, cada vez que se hace un cambio en los mods, para recargar todo y ver los cambios reflejados
@@ -82,6 +98,8 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         materialsMods.Clear();
         TableMods.Instance.Clear(); // limpio la tabla de mods para volver a cargar solo el mod actual, asi evito cargar mods que no estoy editando y tener que revisar cambios innecesarios
         textureArrayManager = new TextureArrayManager();
+        PreparShaders();
+        DrivenRenderManager = new GpuDrivenRenderManager(_atlasManager);
         renderManager = new RenderManagerOptimized(textureArrayManager);
         LoadCurrentMod();
         AtlasModsManager.Instance.ClearAll(); // limpio todos los manager de mods para volver a cargar solo el mod actual, asi evito cargar mods que no estoy editando y tener que revisar cambios innecesarios
@@ -100,6 +118,8 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         materialsMods.Clear();
 
         textureArrayManager = new TextureArrayManager();
+        PreparShaders();
+        DrivenRenderManager = new GpuDrivenRenderManager(_atlasManager);
         renderManager = new RenderManagerOptimized(textureArrayManager);
         LoadAllMods();
         AtlasModsManager.Instance.FirstLoadMaterial(); // luego de que cargo la tabla de mods, genero todos los manager por mods
@@ -119,6 +139,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         CreateTexturesRendering();
         BuildRendering();
         AtlasModsManager.Instance.FirstLoad(); // luego de que cargo la tabla de mods, genero todos los manager por mods
+        DrivenRenderManager.PostBuild();
     }
     private  bool ReviewDiferences()
     {
@@ -162,7 +183,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
 
         return idAtlasTexture;
     }
-    public  (Rid rid, int instance,int layerTexture) CreateInstanceRender(string textureIdMod)
+    public (Rid rid, int instance,int layerTexture) CreateInstanceRender(string textureIdMod)
     {
 
         if (!_textureLookup.TryGetValue(textureIdMod, out var idAtlasTexture))
@@ -179,6 +200,25 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         }
         return (multimeshRid, instanceId,layer);
     }
+    public (Rid multimeshRid, int gpuDataIndex, int instanceId, int layer, int pipelineId) CreateInstanceRenderGpu(string textureIdMod)
+    {
+
+        if (!_textureLookup.TryGetValue(textureIdMod, out var idAtlasTexture))
+        {
+            GD.PrintErr($"❌ Texture no encontrada: {textureIdMod}");
+            return (default,-1, -1, -1,-1);
+        }
+
+        (Rid multimeshRid, int gpuDataIndex, int instanceId, int layer, int pipelineId) instanceRender;
+        instanceRender = DrivenRenderManager.CreateInstance(idAtlasTexture.idTextureAtlas);
+        if (instanceRender.instanceId == -1)
+        {
+            GD.PrintErr($"No se pudo crear instancia para textureId: {textureIdMod}");
+            
+        }
+        return instanceRender;
+    }
+    
     public  void FreeInstance(Rid Multimesh, int instanceId)
     {
         renderManager.FreeInstance(Multimesh, instanceId);
@@ -192,8 +232,10 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
         }
         textureArrayManager.BuildAll();
         renderManager.Build();
+        _atlasManager.BuildAll();
+        DrivenRenderManager.Build();
     }
-    private  void CreateTexturesRendering()
+    private void CreateTexturesRendering()
     {
         // aqui se crean las texturas en el render manager, y se asignan los atlas a cada material para que luego puedan ser usados en el shader
         List<MaterialModData> data = MaterialModDbService.Instance.ObtenerTodos();
@@ -210,6 +252,28 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
                 continue; // ya existe → lo saltamos
             materialsMods.Add(item.idTextureAtlas, item);            
             textureArrayManager.SetTexture(item.idTextureAtlas, pathComplete);
+            // gato
+            switch (item.materialType)
+            {
+                case MaterialType.INTERFACE:
+                    break;
+                case MaterialType.TERRENO:
+                    _atlasManager.RegisterTexture(item.idTextureAtlas, pathComplete,(int)RenderPipelineType.Static);
+                    break;
+                case MaterialType.PERSONAJES:
+                    _atlasManager.RegisterTexture(item.idTextureAtlas, pathComplete,(int)RenderPipelineType.AnimatedUnits);
+                    break;
+                case MaterialType.ESTRUCTURAS:
+                    _atlasManager.RegisterTexture(item.idTextureAtlas, pathComplete,(int)RenderPipelineType.Static);
+                    break;
+                case MaterialType.ANIMACION_SIMPLE:
+                    _atlasManager.RegisterTexture(item.idTextureAtlas, pathComplete,(int)RenderPipelineType.SimpleAnimation);
+                    break;
+                case MaterialType.ACCESORIOS_ANIMADOS:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
         }
 

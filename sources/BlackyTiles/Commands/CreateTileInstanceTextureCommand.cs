@@ -1,5 +1,6 @@
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
+using GodotEcsArch.sources.managers.GpuDriven;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotEcsArch.sources.WindowsDataBase.Accesories.DataBase;
@@ -46,10 +47,10 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         switch (tileDataMod.tileSpriteType)
         {         
             case TileSpriteType.Static:
-                CreateSpriteSingle(idSprite,tileDataMod.spriteData,tileDataMod.nivelarBase);
+                CreateSpriteSingleGpu(idSprite,tileDataMod.spriteData,tileDataMod.nivelarBase);
                 break;
             case TileSpriteType.Animated:
-                CreateSpriteAnimated(idSprite,tileDataMod.animationData,tileDataMod.nivelarBase);
+                CreateSpriteAnimatedGpu(idSprite,tileDataMod.animationData,tileDataMod.nivelarBase);
                 break;
             default:
                 break;
@@ -145,9 +146,83 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         };
         chunkRender.AddOrReplace((height, layer, x, y), tileRender);
     }
+   private void CreateSpriteAnimatedGpu(int id, SpriteAnimationData animationData, bool nivelarBase)
+    {
+        var renderInstance =AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(animationData.idModMaterial);
+        
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
+        Vector2 offset = animationData.offsetInternal;
+        float depthOffset = animationData.yDepthRenderFormat;
+        int heightRender = this.height;
 
+    
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+        float currentTime = Time.GetTicksMsec() / 1000.0f; // Sincronizador de inicio de animación
+        float indiceAnimation = AtlasTexturesModsManager.Instance.DrivenRenderManager.SimpleAnimations.GetLutIndex(id);
+        
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Transform,renderInstance.instanceId,worldPosition.X,worldPosition.Y, worldPosition.Z, animationData.scale);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.AnimState,renderInstance.instanceId,indiceAnimation,currentTime ,0,0 );
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Flags,renderInstance.instanceId, 0,0 , 1, renderInstance.layer);
+
+        /*
+        var world = flecsManager.WorldFlecs;
+        var entity = world.Entity();
+        
+        entity.Set(new PositionComponent
+        {
+            position = new Vector2(worldPosition.X, worldPosition.Y),
+            tilePosition = new Vector2I(x, y)
+        });
+        */
+        
+        var tileRender = new TileRenderTextureInstance
+        {
+            GpuIndex = renderInstance.gpuDataIndex,
+            InstanceId = renderInstance.instanceId,
+            idSprite = id,
+        //    Entity = entity
+        };
+        chunkRender.AddOrReplace((height, layer, x, y), tileRender);
+    }
+    private void CreateSpriteSingleGpu(int id, SpriteData spriteData, bool nivelarBase)
+    {
+        
+        var renderInstance =AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(spriteData.idModMaterial);
+        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
+        Vector2 offset = spriteData.offsetInternal;
+
+        // hago esto para la altura de los muros de terreno solo para los duales 
+        int heightRender = this.height;
+        float depthOffset = spriteData.yDepthRenderFormat;
+        
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter); // debemos usar esto apartir de ahora
+
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Transform,renderInstance.instanceId,worldPosition.X,worldPosition.Y, worldPosition.Z, spriteData.scale);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.StaticData,renderInstance.instanceId,spriteData.uv);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Flags,renderInstance.instanceId, spriteData.mirrorLocalX,spriteData.mirrorLocalY, 1, renderInstance.layer);
+        
+     
+        var tileRender = new TileRenderTextureInstance
+        {
+            GpuIndex = renderInstance.gpuDataIndex,
+            InstanceId = renderInstance.instanceId,
+            idSprite = id,            
+        };
+        chunkRender.AddOrReplace((height, layer, x, y), tileRender);
+    }
     private void CreateSpriteSingle(int id, SpriteData spriteData, bool nivelarBase)
-    {        
+    {
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.CreateInstance(spriteData.idModMaterial);
+        
         var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(x, y);
         Vector2 offset = spriteData.offsetInternal;

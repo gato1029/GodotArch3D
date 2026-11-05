@@ -112,6 +112,7 @@ public class AtlasTextureGenerator:SingletonBase<AtlasTextureGenerator>
             materialModData.divisionPixelAtlasX = materiales[i].divisionPixelX;
             materialModData.divisionPixelAtlasY = materiales[i].divisionPixelY;
             materialModData.idSubTexture = idSubAtlasGlobal;
+            materialModData.materialType = materialType;
             db.Guardar(materialModData);
             idSubAtlasGlobal++;
         }

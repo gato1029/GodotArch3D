@@ -20,6 +20,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using GodotEcsArch.sources.managers.GpuDriven;
+using GodotFlecs.sources.Flecs.Components;
 using static Flecs.NET.Core.Ecs.Units;
 using static Flecs.NET.Core.Ecs.Units.Masses;
 
@@ -443,7 +445,38 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
         palleteCount++;
         int newId = palleteCount;        
         spriteLookup[tileSpriteId] = newId;
-        spritePallete[newId] = tileSpriteData;  
+        spritePallete[newId] = tileSpriteData;
+        tileSpriteData.idPallete = newId;
+        switch (tileSpriteData.tileSpriteType)
+        {
+            case TileSpriteType.Static:
+                break;
+            case TileSpriteType.Animated:
+                var init = tileSpriteData.animationData.uvFramesArray[0];
+                var totalFrames = tileSpriteData.animationData.uvFramesArray.Length;
+                AtlasTexturesModsManager.Instance.DrivenRenderManager.SimpleAnimations.RegisterAnimation(newId,
+                    new AnimClipDefinition{StartX = init.R, StartY = init.G,FrameWidth = init.B, FrameHeight = init.A, 
+                        IsLoop = tileSpriteData.animationData.loop, Speed = totalFrames,TotalFrames =  totalFrames });
+                break;
+            case TileSpriteType.AnimatedDirectionMultiple:
+                
+                foreach (var variable in tileSpriteData.spriteMultipleAnimationDirection.animationsTypes)
+                {
+                    AnimationType typeAnim = variable.Key;
+
+                    foreach (var direccion in variable.Value.animations)
+                    {
+                        var init1 = direccion.Value.uvFramesArray[0];
+                        var totalFrames1 = direccion.Value.uvFramesArray.Length;
+                        AtlasTexturesModsManager.Instance.DrivenRenderManager.UnitAnimations.RegisterAnimation(newId,typeAnim,direccion.Key,
+                            new AnimClipDefinition{StartX = init1.R, StartY = init1.G,FrameWidth = init1.B, FrameHeight = init1.A, 
+                                IsLoop = direccion.Value.loop, Speed = totalFrames1,TotalFrames =  totalFrames1 });
+                    }
+                }
+
+                
+                break;
+        }
         return newId;
     }
  

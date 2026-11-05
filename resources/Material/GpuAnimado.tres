@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bnas0t2pthgcq"]
+
+[ext_resource type="Shader" uid="uid://ck8so5vfsukil" path="res://resources/shaders/TextureMultimeshAnimationArray.gdshader" id="1_qg1ty"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_qg1ty")
+shader_parameter/debug_mode = false
+shader_parameter/texture_width = 256

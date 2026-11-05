@@ -34,7 +34,7 @@ public sealed class BlackyWorldServices
     // Spawn / Author tools
     // ============================
 
-    public BlackyCharacterCreator Characters { get; } // 
+    public BlackyCharacterCreator Characters { get; } // listo
 
     public BlackyResourcesCreator ResourcePainter { get; } // listo
 

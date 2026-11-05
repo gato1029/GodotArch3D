@@ -1,8 +1,26 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.managers.Mods;
 
 namespace GodotFlecs.sources.Flecs.Systems.Generic;
+
+internal class RefreshUpdateGpuDriven : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsPostUpdate;
+    protected override bool MultiThreaded => false; // 🟢 Se ejecuta seguro en el hilo principal
+    protected override bool HasQuery => false;
+
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.UpdateGlobalTime(it.DeltaTime());
+       AtlasTexturesModsManager.Instance.DrivenRenderManager.Flush();
+    }
+}
 
 internal class RefreshUpdateCreationGlobalSystem : FlecsSystemBase
 {

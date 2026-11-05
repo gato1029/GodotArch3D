@@ -91,6 +91,8 @@ public class BlackyGenericPalette<T> where T : class
 
                 ushort paletteId = (ushort)_persistent.Count;
                 var key = new PairCacheData(modName, bucket.Key);
+                var obj = bucket.Value as IdDataLong;
+                obj.idPallete = paletteId;
                 _cache[key] = paletteId;
 
                 _persistent.Add(new GenericPersistenceData

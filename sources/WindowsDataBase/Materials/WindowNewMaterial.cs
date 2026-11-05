@@ -67,6 +67,12 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
     public void SetData(MaterialData data)
     {
         objectData = data;
+        if (objectData.pathTexture.StartsWith("Base"))
+        {
+            //regularizar malos
+            var np =objectData.pathTexture.Replace("Base/","");
+            objectData.pathTexture = np;
+        }
 
         LineEditName.Text = objectData.name;
         LineEditId.Text = objectData.id.ToString();
@@ -95,16 +101,8 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
     }
 
     private void Guardar_Click()
-    {
-        if (LineEditPath.Text.StartsWith("AssetExternals"))
-        {
-            mode = 1;
-        }
-        else
-        {
-            mode = 0;
-        }
-
+    {      
+      
         Image image;
         if (mode == 0)
         {
@@ -143,8 +141,13 @@ public partial class WindowNewMaterial :  Window, IFacadeWindow<MaterialData>
         }
         else
         {
-            string path = FileHelper.CopyFileToAssetExternals(LineEditPath.Text, "Material", objectData.id.ToString());
-            objectData.pathTexture = path;
+            if (!LineEditPath.Text.StartsWith("Material"))
+            {
+                string path = FileHelper.CopyFileToAssetExternals(LineEditPath.Text, "Material", objectData.id.ToString());
+                objectData.pathTexture = path;    
+            }
+
+     
             DataBaseManager.Instance.InsertUpdateLog(objectData, int.Parse(LineEditId.Text));
             
         }

@@ -66,7 +66,7 @@ using static Godot.HttpRequest;
         gameDirectory = RootPath;
 #endif
         // Obtener la ruta del directorio actual del juego (directorio donde se encuentra el ejecutable)
-        string finalCarpet = ModHelper.Mod.name+"/" + carpet;
+        string finalCarpet = carpet; //ModHelper.Mod.name+"/" + carpet;
         string finalCarpetCompressed = ModHelper.Mod.name + "/" + carpet+"/DDS";
         // Crear la ruta completa para la carpeta AssetExternals
         string destinationFolder = Path.Combine(gameDirectory, finalCarpet );

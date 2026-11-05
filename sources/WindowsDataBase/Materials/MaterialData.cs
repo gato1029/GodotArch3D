@@ -18,8 +18,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.Materials
         TERRENO = 1,
         PERSONAJES = 2,
         ESTRUCTURAS = 3,
-        ITEMS = 4,
-        MAZMORRAS = 5,
+        ANIMACION_SIMPLE = 4,
         ACCESORIOS_ANIMADOS = 6,
     }
     public class IdData 

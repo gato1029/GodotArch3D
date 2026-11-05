@@ -8,6 +8,8 @@ namespace GodotEcsArch.sources.managers.Mods;
 
 public class MaterialModData
 {
+    
+
     [BsonId]
     public string idNameMod { get; set; } // modName:idMaterial, este es el nombre del mod como tal tampoco se repite es unico, no importa si existen n modos el nombre no cambiara
     public int idTextureAtlas { get; set; } // esto nunca se repetira son numeros incrementales
@@ -20,7 +22,7 @@ public class MaterialModData
     public int divisionPixelAtlasY { get; set; }
     public long timeStamp { get; set; } = 0;
     public int idSubTexture {  get; set; }
-
+    public MaterialType materialType {  get; set; }
     [BsonIgnore]
     public Texture2D textureVisual { get; set; }
     public void UpdateTimeStamp()

@@ -18,6 +18,7 @@ namespace GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 
 public class TileRenderTextureInstance
 {
+    public int GpuIndex;
     public Rid Rid;
     public int InstanceId;
     public Entity Entity;
@@ -33,7 +34,20 @@ public class TileRenderTextureInstance
         InstanceId = instanceId;
         IsDestroyed = false;
     }
-
+    public TileRenderTextureInstance(int gpuIndex, int instanceId)
+    {
+        GpuIndex = gpuIndex;
+        InstanceId = instanceId;
+        IsDestroyed = false;
+    }
+    
+    public TileRenderTextureInstance(int gpuIndex, int instanceId, Entity entity)
+    {
+        GpuIndex = gpuIndex;
+        InstanceId = instanceId;
+        Entity = entity;
+        IsDestroyed = false;
+    }
     public TileRenderTextureInstance(Rid rid, int instanceId, Entity entity)
     {
         Rid = rid;

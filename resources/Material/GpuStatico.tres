@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://by3jcs832ro3b"]
+
+[ext_resource type="Shader" uid="uid://c86qypyagpsei" path="res://resources/shaders/TextureMultimeshStaticArray.gdshader" id="1_oy3fq"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_oy3fq")
+shader_parameter/debug_mode = false
+shader_parameter/texture_width = 256

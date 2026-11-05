@@ -41,10 +41,11 @@ public class SpriteData {
 
     [BsonIgnore]
     public float yDepthRenderFormat { get; set; }
-
     [BsonIgnore]
     public Color uv { get; set; }
-
+    [BsonIgnore]
+    public float mirrorLocalX { get;  }
+    public float mirrorLocalY { get;  }
     [BsonIgnore]
     public Dictionary<string, GeometricShape2D> collisionBodyDictionary { get; set; } = new Dictionary<string, GeometricShape2D>(); // esto es para darle un tag a la animacion
 
@@ -61,6 +62,8 @@ public class SpriteData {
     [BsonCtor]
     public SpriteData(string colorString, float offsetX, float offsetY,float yDepthRender,string idModMaterial, float x, float y, float widht, float height, bool mirrorX, bool mirrorY, GeometricShape2D[] listCollisionBody)
     {
+        mirrorLocalX =  mirrorX ? 1.0f : 0.0f;;
+        mirrorLocalY =  mirrorY ? 1.0f : 0.0f;;
         offsetInternal = new Godot.Vector2(MeshCreator.PixelsToUnits(offsetX), MeshCreator.PixelsToUnits(offsetY));
         yDepthRenderFormat = MeshCreator.PixelsToUnits(yDepthRender);
         if (colorString != null)
