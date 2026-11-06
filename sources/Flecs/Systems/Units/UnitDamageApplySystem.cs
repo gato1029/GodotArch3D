@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GodotEcsArch.sources.BlackyEngine.Core;
 
 namespace GodotFlecs.sources.Flecs.Systems.Units;
 internal class UnitDamageApplySystem : FlecsSystemBase
@@ -27,7 +28,10 @@ internal class UnitDamageApplySystem : FlecsSystemBase
     }
 
     protected override void OnIter(Iter it)
-    {
+    { 
+        var world = it.World().GetCtx<BlackyWorld>();
+        if (world == null) return;
+        var stateRegister = world.State.stateChangeRegistry;
         var hpArray = it.Field<HealthComponent>(0);
         var dmgArray = it.Field<DamagePendingComponent>(1);
         var chaArray = it.Field<StateComponent>(2);
@@ -37,14 +41,16 @@ internal class UnitDamageApplySystem : FlecsSystemBase
             ref var hp = ref hpArray[i];
             ref var dmg = ref dmgArray[i];
             ref var cha = ref chaArray[i];
-           
 
+            Entity e = it.Entity(i);
             hp.value -= dmg.Amount;
             cha.stateType = GodotEcsArch.sources.managers.Characters.StateType.TAKE_HIT;
+            stateRegister.RegisterState(e.Id.Value, cha.stateType);
             if (hp.value <= 0)
             {
                 hp.value = 0;
                 cha.stateType = GodotEcsArch.sources.managers.Characters.StateType.DIE;
+                stateRegister.RegisterState(e.Id.Value, cha.stateType);
                 it.Entity(i).Add<DeadTag>();
                 it.Entity(i).Set(new DeathTimerComponent { RemainingTime = 2f }); // ⏱ 2 segundos, por ejemplo
                 if (dmg.Source!=default && dmg.Source.IsAlive() && dmg.Source.Has<AttackPendingComponent>())

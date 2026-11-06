@@ -26,14 +26,14 @@ public static class CharacterStateConfig
 {
     // Usamos un arreglo plano en lugar de un Dictionary. 
     // El tamaño debe ser igual o mayor al número total de elementos en el enum CharacterBehaviorType.
-    private static readonly CharacterStateRules[] _rulesArray = new CharacterStateRules[16];
+    private static readonly CharacterStateRules[] _rulesArray = new CharacterStateRules[3];
 
     static CharacterStateConfig()
     {
         // 1. Configurar Reglas para GENERICO
         var genericRules = new CharacterStateRules
         {
-            AnimationMap = new AnimationType[16] // Tamaño basado en el número de estados
+            AnimationMap = new AnimationType[8] // Tamaño basado en el número de estados
         };
 
         // Asignamos directamente por índice numérico del enum (Cero hashmaps)
@@ -48,7 +48,7 @@ public static class CharacterStateConfig
         // 2. Configurar Reglas para PERSONAJE_PRINCIPAL
         var principalRules = new CharacterStateRules
         {
-            AnimationMap = new AnimationType[16]
+            AnimationMap = new AnimationType[8]
         };
 
         principalRules.AnimationMap[(int)StateType.IDLE] = AnimationType.PARADO;

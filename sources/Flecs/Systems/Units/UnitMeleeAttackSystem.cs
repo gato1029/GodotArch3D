@@ -41,7 +41,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
     {
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
-
+        var stateRegister = world.State.stateChangeRegistry;
         var dynGrid = world.State.DynamicHash;
 
         var posArray = it.Field<PositionComponent>(0);
@@ -98,7 +98,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                             atp.Active = false;
                             atp.Target = default;
                             ent.Remove<AttackPendingTag>();
-
+                            stateRegister.RegisterState(ent.Id.Value, cha.stateType);
                             // El objetivo salió de rango: liberamos el slot reservado
                             AttackSlotHelper.RequestReleaseAttackSlot(ent);
                         }
@@ -119,10 +119,12 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                         }
                         else
                         {
+                            ;
                             // si no hubo collision quiere decir que no hay objetivo y libero
                             cha.stateType = StateType.IDLE;
                             atp.Active = false;
                             atp.Target = default;
+                            stateRegister.RegisterState(ent.Id.Value, cha.stateType);
                             ent.Remove<AttackPendingTag>();
 
                             // El objetivo salió de rango: liberamos el slot reservado
@@ -133,7 +135,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                 else
                 {
                     // si esta muerto libero target
-                    cha.stateType = StateType.IDLE;
+                    //cha.stateType = StateType.IDLE;
                     atp.Active = false;
                     atp.Target = default;
                     ent.Remove<AttackPendingTag>();
@@ -149,6 +151,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
                 {
                     cha.stateType = StateType.ATTACK;
                     melle.Timer = melle.Cooldown;
+                    stateRegister.RegisterState(ent.Id.Value, cha.stateType);
                 }
                 else
                 {

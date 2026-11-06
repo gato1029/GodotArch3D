@@ -235,6 +235,7 @@ public class FlecsManager
         RegisterSystem<CrowdRegisterSystem>();
 
         // creadores y spawn
+        RegisterSystem<GpuStateBufferSystem>();
         RegisterSystem<ProjectileSpawnSystem>();
         RegisterSystem<ArrowVisualSyncSystem>();
         RegisterSystem<RefreshUpdateCreationGlobalSystem>();

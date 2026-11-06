@@ -10,8 +10,7 @@ public enum StateType
     TAKE_STUN,
     DIE,
     BLOCKED,
-    ATTACKING,
-    ARMA
+
 }
 
 //internal class CharacterCreatorManager:SingletonBase<CharacterCreatorManager>

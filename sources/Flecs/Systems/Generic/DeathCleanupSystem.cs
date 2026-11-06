@@ -36,7 +36,7 @@ internal class DeathCleanupSystem : FlecsSystemBase
     {
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
-
+        var stateRegister = world.State.stateChangeRegistry;
         var dynGrid = world.State.DynamicHash;
 
         var gpuArray = it.Field<RenderGPUComponent>(0);
@@ -110,6 +110,7 @@ internal class DeathCleanupSystem : FlecsSystemBase
                     var bar = entity.Get<HealthBarComponent>();
                     AtlasTexturesModsManager.Instance.FreeLifeBar(bar.MultiMeshRid,bar.InstanceId);
                 }
+                stateRegister.Release(entity.Id.Value);
                 entity.Destruct();
             }
         }

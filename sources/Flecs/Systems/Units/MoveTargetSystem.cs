@@ -1,6 +1,7 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.managers.Characters;
 using GodotFlecs.sources.Flecs.Components;
 
@@ -28,6 +29,10 @@ public class MoveTargetSystem : FlecsSystemBase
 
     protected override void OnIter(Iter it)
     {
+        var world = it.World().GetCtx<BlackyWorld>();
+        if (world == null) return;
+        var stateRegister = world.State.stateChangeRegistry;
+        
         var posArray = it.Field<PositionComponent>(0);
         var targetArray = it.Field<MoveTargetComponent>(1);
         var stateArray = it.Field<StateComponent>(2);
@@ -44,7 +49,8 @@ public class MoveTargetSystem : FlecsSystemBase
             ref var steering = ref steeringArray[i];
             ref var resolutor = ref resolutorArray[i];
             ref var move = ref moveArray[i];
-
+            
+            Entity e = it.Entity(i);
             Vector2 toTarget = target.Value - pos.position;
             float dist = toTarget.Length();
 
@@ -69,7 +75,7 @@ public class MoveTargetSystem : FlecsSystemBase
 
             if (dist <= arrivalThreshold || closeEnoughToForceArrival)
             {
-                bool hasMorePath = it.Entity(i).Has<PathReferenceComponent>();
+                bool hasMorePath = e.Has<PathReferenceComponent>();
                 resolutor.BlockedTimer = 0;
                 resolutor.AvoidanceTimer = 0;
                 resolutor.LastConeIndex = 0;
@@ -78,20 +84,19 @@ public class MoveTargetSystem : FlecsSystemBase
                 steering.TargetDir = Vector2.Zero;
                 resolutor.Blocked = false;
                 state.stateType = StateType.IDLE;
-
+                
+                stateRegister.RegisterState(e.Id.Value, state.stateType);
                 it.Entity(i).Remove<MoveTargetComponent>();
+                
                 if (!hasMorePath)
                 {
-                    steering.DesiredDir = Vector2.Zero;
-                    steering.TargetDir = Vector2.Zero;
-                    state.stateType = StateType.IDLE;
                     it.Entity(i).Add<StoppedTag>();
                 }
                 continue;
             }
-
             steering.TargetDir = toTarget.Normalized();
             state.stateType = StateType.MOVING;
+            stateRegister.RegisterState(e.Id.Value, state.stateType);
         }
     }
 }

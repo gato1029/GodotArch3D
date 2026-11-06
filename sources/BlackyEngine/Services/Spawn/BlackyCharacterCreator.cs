@@ -199,6 +199,7 @@ public class BlackyCharacterCreator
     //    RenderingServer.MultimeshInstanceSetTransform(instance.rid, instance.instance, transform);
      //   RenderingServer.MultimeshInstanceSetColor(instance.rid, instance.instance, new Color(1, 1, 1, instance.layerTexture));
 
+        world.State.stateChangeRegistry.RegisterEntity(entity.Id.Value, renderInstance.gpuDataIndex, renderInstance.instanceId, spriteId,BehaviorType.PERSONAJE_PRINCIPAL);
         entity.Set(new GodotFlecs.sources.Flecs.Components.StateComponent
         {
             stateType = StateType.IDLE,

@@ -22,6 +22,25 @@ internal class RefreshUpdateGpuDriven : FlecsSystemBase
     }
 }
 
+
+internal class GpuStateBufferSystem : FlecsSystemBase
+{
+    protected override ulong Phase => flecs.EcsOnUpdate;
+    protected override bool MultiThreaded => false; // 🟢 Se ejecuta seguro en el hilo principal
+    protected override bool HasQuery => false;
+
+    protected override void BuildQuery(ref QueryBuilder qb)
+    {
+    }
+
+    protected override void OnIter(Iter it)
+    {
+        var world = it.World().GetCtx<BlackyWorld>();
+        if (world == null) return;
+        world.State.stateChangeRegistry.ApplyChanges();
+    }
+}
+
 internal class RefreshUpdateCreationGlobalSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;

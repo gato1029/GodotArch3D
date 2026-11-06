@@ -181,28 +181,6 @@ internal class HumanCharacterSimpleSystem : FlecsSystemBase
                             
             }
         }
-
-      
-
-
-        //nearby = CollisionManager.Instance.BuildingsCollidersFlecs.QueryAABBBInCirclePoints(pos.position, melle.Range, 0, 1);
-
-        //foreach (var target in nearby)
-        //{
-        //    if (target.Owner.Get<TeamComponent>().TeamId == team.TeamId)
-        //    {
-        //        continue; // mismo equipo, ignorar
-        //    }
-        //    else
-        //    {
-        //        if (target.Owner != default && target.Owner.IsAlive() && !target.Owner.Has<DestroyRequestTag>())
-        //        {
-
-        //            melle.Timer = melle.Cooldown; // resetear cooldown
-
-        //        }
-        //    }
-        //}
     }
 
     public static bool IsInsideAttackHalfCircle(

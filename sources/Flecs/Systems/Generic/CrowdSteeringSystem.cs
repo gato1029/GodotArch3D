@@ -8,6 +8,7 @@ using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
 using System.Runtime.CompilerServices;
+using GodotEcsArch.sources.Flecs.Globals;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Generic;
 
@@ -24,6 +25,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
     private const int MaxAttempts = 4;
     private const float ProbeMargin = 0.2f;
 
+    private BlackyStateChangeRegistry stateRegister;
     // Recto, +45°, -45° (en radianes)
     private static readonly float[] ConeOffsets = { 0f, Mathf.DegToRad(30f), -Mathf.DegToRad(30f), Mathf.DegToRad(60f), -Mathf.DegToRad(60f) };
 
@@ -51,6 +53,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
         var grid = world.State.GridSparseManager.Grid.DynamicLayer;               // capacidad por celda, crowd
         var terrain = world.State.GridSparseManager.Grid.StaticLayer;    // terreno/edificios
         var dynGrid = world.State.DynamicHash;
+        stateRegister = world.State.stateChangeRegistry;
         Span<int> neighbors = stackalloc int[8];
 
         var posArray = it.Field<PositionComponent>(0);
@@ -79,7 +82,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
             // Sin campo (se está reconstruyendo): esperar sin contar intentos.
             if (follower.Status == 2)
             {
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
                 continue;
             }
 
@@ -94,7 +97,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
             if (res.RetryTimer > 0f)
             {
                 res.RetryTimer -= dt;
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
                 continue;
             }
 
@@ -118,7 +121,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
             Vector2 dir = follower.TargetDir;
             if (dir == Vector2.Zero)
             {
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
                 continue;
             }
 
@@ -175,7 +178,7 @@ public class CrowdSteeringSystem : FlecsSystemBase
                 res.ConsecutiveBlocks++;
                 // Pequeño desfase por unidad para que no reintenten todas en el mismo frame.
                 res.RetryTimer = RetryInterval + (sid.Value % 5) * 0.03f;
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
 
                 if (res.ConsecutiveBlocks >= MaxAttempts)
                 {
@@ -211,18 +214,19 @@ public class CrowdSteeringSystem : FlecsSystemBase
         return false;
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void GoIdle(ref VelocityComponent vel, ref StateComponent state, ref SteeringComponent steering)
+    private  void GoIdle(Entity e,ref VelocityComponent vel, ref StateComponent state, ref SteeringComponent steering)
     {
         vel.desiredVel = Vector2.Zero;
         vel.currentVel = Vector2.Zero; // MovementResolutionSystem no corre en IDLE: sin velocidad fantasma
         steering.DesiredDir = Vector2.Zero;
         state.stateType = StateType.IDLE;
+        stateRegister.RegisterState(e.Id.Value, state.stateType);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Settle(Entity e, ref VelocityComponent vel, ref StateComponent state, ref SteeringComponent steering)
+    private  void Settle(Entity e, ref VelocityComponent vel, ref StateComponent state, ref SteeringComponent steering)
     {
-        GoIdle(ref vel, ref state, ref steering);
+        GoIdle(e,ref vel, ref state, ref steering);
 
         if (!e.Has<StoppedTag>())
             e.Add<StoppedTag>();

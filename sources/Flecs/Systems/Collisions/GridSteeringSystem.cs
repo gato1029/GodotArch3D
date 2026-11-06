@@ -8,6 +8,7 @@ using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
 using System.Runtime.CompilerServices;
+using GodotEcsArch.sources.Flecs.Globals;
 
 namespace GodotEcsArch.sources.Flecs.Systems.Collisions;
 
@@ -23,7 +24,7 @@ public class GridSteeringSystem : FlecsSystemBase
 
     private static readonly float[] ConeOffsetsDeg = { 0f, 30f, -30f, 60f, -60f };
     private const float AvoidanceHoldTime = 0.2f;
-
+    private BlackyStateChangeRegistry stateRegister;
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
@@ -44,7 +45,8 @@ public class GridSteeringSystem : FlecsSystemBase
 
         var gridManager = world.State.GridSparseManager.Grid.StaticLayer; // solo para terreno estático
         var dynGrid = world.State.DynamicHash;            // fuente real de colisión entre unidades
-
+        stateRegister = world.State.stateChangeRegistry;
+        
         var posArray = it.Field<PositionComponent>(0);
         var colArray = it.Field<MoveColliderComponent>(1);
         var sidArray = it.Field<SpatialIDComponent>(2);
@@ -72,14 +74,14 @@ public class GridSteeringSystem : FlecsSystemBase
             {
                 res.RetryTimer -= dt;                
                 res.AvoidanceTimer = 0f;
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
                 continue;
             }
 
             if (res.Blocked)
             {                
                 res.AvoidanceTimer = 0f;
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
                 continue;
             }
 
@@ -88,7 +90,7 @@ public class GridSteeringSystem : FlecsSystemBase
             if (targetDir == Vector2.Zero)
             {
                 res.AvoidanceTimer = 0f;
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
                 continue;
             }
 
@@ -203,7 +205,7 @@ public class GridSteeringSystem : FlecsSystemBase
                 vel.desiredVel = Vector2.Zero;
                 res.RetryTimer = RetryInterval;
                 res.ConsecutiveBlocks++;
-                GoIdle(ref vel, ref state, ref steering);
+                GoIdle(e,ref vel, ref state, ref steering);
 
                 if (res.ConsecutiveBlocks >= MaxAttempts)
                 {
@@ -215,12 +217,14 @@ public class GridSteeringSystem : FlecsSystemBase
         }
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void GoIdle(ref VelocityComponent vel, ref StateComponent state, ref SteeringComponent steering)
+    private  void GoIdle(Entity entity, ref VelocityComponent vel, ref StateComponent state,
+        ref SteeringComponent steering)
     {
         vel.desiredVel = Vector2.Zero;
         vel.currentVel = Vector2.Zero; // MovementResolutionSystem no corre en IDLE: evita velocidad fantasma
         steering.DesiredDir = Vector2.Zero;
         state.stateType = StateType.IDLE;
+        stateRegister.RegisterState(entity.Id.Value, state.stateType);
     }
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private bool CheckUnitsAtCandidate(

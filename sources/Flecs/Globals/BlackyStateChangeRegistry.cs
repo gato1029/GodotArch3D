@@ -1,50 +1,112 @@
-using GodotEcsArch.sources.managers.Characters;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using GodotEcsArch.sources.components;
+using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.managers.GpuDriven;
+using GodotEcsArch.sources.managers.Mods;
+using GodotFlecs.sources.Flecs.Components;
 
 namespace GodotEcsArch.sources.Flecs.Globals;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
+
+public struct UnitRuntimeData
+{
+    public int GpuIndex;
+    public int ShaderId;
+    public int IdUnitAnimation;
+    public BehaviorType BehaviorType;
+    public StateType CurrentState;
+    public AnimationDirection Direction;
+}
 
 public class BlackyStateChangeRegistry
 {
-    // Ahora el diccionario guarda una tupla con el estado y el índice de la GPU
-    private readonly ConcurrentDictionary<int, (StateType State, int GpuIndex)> _pending = new();
+    // Diccionario principal: La entidad (ulong) apunta directamente a su estructura completa
+    private readonly ConcurrentDictionary<ulong, UnitRuntimeData> _entityData = new();
+    
+    // Cola o registro de entidades que cambiaron en este frame (guardamos solo el ulong del ID)
+    private readonly ConcurrentDictionary<ulong, StateType> _pendingChanges = new();
 
-    // Se actualizó la firma para recibir el gpuIndex
-    public void Register(int gpuIndex,int shaderId, StateType state)
+    public void RegisterEntity(ulong entityId, int gpuIndex, int shaderId, int idUnitAnimation, BehaviorType behaviorType, StateType stateType = StateType.IDLE, AnimationDirection initialDirection = AnimationDirection.LEFT)
     {
-        _pending[shaderId] = (state, gpuIndex);
+        _entityData[entityId] = new UnitRuntimeData
+        {
+            GpuIndex = gpuIndex,
+            ShaderId = shaderId,
+            IdUnitAnimation = idUnitAnimation,
+            BehaviorType = behaviorType,
+            CurrentState = stateType,
+            Direction = initialDirection
+        };
+        
+        _pendingChanges[entityId] = stateType;
+    }
+
+    public void RegisterState(ulong entityId, StateType state)
+    {
+        if (_entityData.TryGetValue(entityId, out var data))
+        {
+            // Si el estado ya es el mismo, salimos de inmediato (cero trabajo innecesario)
+            if (data.CurrentState == state) return;
+
+            data.CurrentState = state;
+            _entityData[entityId] = data;
+            _pendingChanges[entityId] = state;
+        }
+    }
+
+    public void SetDirection(ulong entityId, AnimationDirection direction)
+    {
+        if (_entityData.TryGetValue(entityId, out var data))
+        {
+            // Si la dirección ya es la misma, no hacemos nada
+            if (data.Direction == direction) return;
+
+            data.Direction = direction;
+            _entityData[entityId] = data;
+        
+            // Marcamos como pendiente usando su estado actual para recalcular el LUT con la nueva dirección
+            _pendingChanges[entityId] = data.CurrentState;
+        }
     }
 
     public void ApplyChanges()
     {
-        // ToArray() es seguro para hilos y extrae instantáneamente el estado actual
-        var changes = _pending.ToArray();
-        _pending.Clear();
+        // Tomamos el snapshot instantáneo de los pendientes
+        var changes = _pendingChanges.ToArray();
+        _pendingChanges.Clear();
+
+        if (changes.Length == 0) return;
 
         Parallel.ForEach(changes, change =>
         {
-            int shaderId = change.Key;
-            // Desestructuramos la tupla para obtener ambos valores
-            var (state, gpuIndex) = change.Value;
+            ulong entityId = change.Key;
+            StateType state = change.Value;
 
-            UpdateAnimation(shaderId, state, gpuIndex);
+            // Único TryGetValue necesario en el hilo para rescatar de golpe GPUIndex, ShaderId y compañía
+            if (!_entityData.TryGetValue(entityId, out var data))
+                return;
+
+            // Actualización directa a la GPU usando ambos valores empaquetados
+            UpdateAnimation(data.ShaderId, state, data.Direction, data.IdUnitAnimation, data.GpuIndex, data.BehaviorType);
         });
     }
 
-    public void Remove(int shaderId)
+    public void Release(ulong entityId)
     {
-        _pending.TryRemove(shaderId, out _);
+        _entityData.TryRemove(entityId, out _);
+        _pendingChanges.TryRemove(entityId, out _);
     }
 
-    // Se agregó el parámetro gpuIndex al método de actualización
-    private void UpdateAnimation(int shaderId, StateType state, int gpuIndex)
+    private void UpdateAnimation(int shaderId, StateType state, AnimationDirection direction, int idUnitAnimation, int gpuIndex, BehaviorType behaviorType)
     {
-        // Actualizar animación del shader usando el state y gpuIndex.
+        var rules = CharacterStateConfig.GetRules(behaviorType);
+        AnimationType newAnim = rules.AnimationMap[(int)state];
+        
+        int lutIndex = AtlasTexturesModsManager.Instance.DrivenRenderManager.UnitAnimations.GetLutIndex(idUnitAnimation, newAnim, direction);
+        
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(gpuIndex)
+            .SetBufferData(BufferSlot.AnimState, shaderId, lutIndex);
     }
 }

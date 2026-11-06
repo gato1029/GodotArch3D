@@ -40,8 +40,6 @@ public class MovementResolutionSystem : FlecsSystemBase
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
         var _pathRegistry = blackyWorld.State.PathRegistryManager;
         var stateRegister = blackyWorld.State.stateChangeRegistry;
-        if (blackyWorld == null) return;
-
         var sim = blackyWorld.Simulation.Tick;
 
         var posArray = it.Field<PositionComponent>(0);
@@ -81,7 +79,7 @@ public class MovementResolutionSystem : FlecsSystemBase
                     // Limpiamos componentes de ruta
                     e.Remove<PathReferenceComponent>();
                 }
-
+                stateRegister.RegisterState(e.Id.Value, cha.stateType);
                 e.Add<StoppedTag>();
                 continue;
             }
@@ -95,7 +93,7 @@ public class MovementResolutionSystem : FlecsSystemBase
             if (!isMoving)
             {                
                 cha.stateType = StateType.IDLE;
-                stateRegister.Register(render.gpuindex, render.gpuindex, cha.stateType);
+                stateRegister.RegisterState(e.Id.Value, cha.stateType);
             }
             else
             {

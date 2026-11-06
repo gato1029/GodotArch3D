@@ -5,6 +5,7 @@ using GodotEcsArch.sources.managers.Characters;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
 using System;
+using GodotEcsArch.sources.BlackyEngine.Core;
 using StateComponent = GodotFlecs.sources.Flecs.Components.StateComponent;
 
 
@@ -26,13 +27,19 @@ public class DirectionSystem : FlecsSystemBase
     }
 
     protected override void OnIter(Iter it)
-    {
+    {   var blackyWorld = it.World().GetCtx<BlackyWorld>();
+        if (blackyWorld==null)
+        {
+            return;
+        }
+        var stateRegister = blackyWorld.State.stateChangeRegistry;
         var velArray = it.Field<VelocityComponent>(0);
         var dirArray = it.Field<DirectionComponent>(1);
         var chaArray = it.Field<StateComponent>(2);
         var steerArray = it.Field<SteeringComponent>(3); // <---
         for (int i = 0; i < it.Count(); i++)
         {
+            Entity e = it.Entity(i);
             ref var vel = ref velArray[i];
             ref var dir = ref dirArray[i];
             ref var cha = ref chaArray[i];
@@ -80,17 +87,7 @@ public class DirectionSystem : FlecsSystemBase
                     default:
                         break;
                 }
-
-                //if (vel.desiredVel.LengthSquared() > 0.01f)
-                //    cha.stateType = StateType.MOVING;
-                //else
-                //    cha.stateType = StateType.IDLE;
-               
-            }
-            else
-            {
-                // 🔹 sin movimiento
-                //cha.stateType = managers.Characters.StateType.IDLE;
+                stateRegister.SetDirection(e.Id.Value, dir.animationDirection);
             }
         }
     }

@@ -35,7 +35,6 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
         qb.With<PositionComponent>()
           .With<SpatialIDComponent>()
           .With<TeamComponent>()
-          .With<StateComponent>()
           .With<EnemySearchComponent>()
           .With<MoveResolutorComponent>()
           .With<MeleeAttackComponent>()
@@ -52,7 +51,8 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
     if (world == null) return;
 
     var rutaLibreContext = _rutaLibreContext ??= new RutaLibreQueryContext();
-
+    
+    
     var sim = world.Simulation.Tick;
     if (sim == null || sim.TickCount == 0) return;
 
@@ -62,11 +62,10 @@ public class UnitMelleEnemySearchSystem: FlecsSystemBase
     var posArray = it.Field<PositionComponent>(0);
     var spatialArray = it.Field<SpatialIDComponent>(1);
     var teamArray = it.Field<TeamComponent>(2);
-    var charArray = it.Field<StateComponent>(3);
-    var searchArray = it.Field<EnemySearchComponent>(4);
-    var moveResolutorArray = it.Field<MoveResolutorComponent>(5);
-    var melleArray = it.Field<MeleeAttackComponent>(6);
-    var dirArray = it.Field<DirectionComponent>(7);
+    var searchArray = it.Field<EnemySearchComponent>(3);
+    var moveResolutorArray = it.Field<MoveResolutorComponent>(4);
+    var melleArray = it.Field<MeleeAttackComponent>(5);
+    var dirArray = it.Field<DirectionComponent>(6);
 
     Span<int> neighbors = stackalloc int[8];
 
