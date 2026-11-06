@@ -100,7 +100,7 @@ public class CreateTileEntityCommand : IRenderCommand
 
         entity.Set(new RenderTransformComponent(transform));
 
-        entity.Set(new RenderGPUComponent(
+        entity.Set(new RenderGPUComponent(0,
             renderData.rid,
             renderData.Instance,
             renderData.MaterialId,

@@ -239,12 +239,12 @@ public class BlackyResourcesCreator
             RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
             RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
             RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
-            entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+            entity.Set(new RenderGPUComponent(0, RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
                      layer, depthOffset, spriteData.scale, offset));
         }
         else
         {
-            entity.Set(new RenderGPUComponent(default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
+            entity.Set(new RenderGPUComponent(0, default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
         }
         
     }
@@ -271,7 +271,7 @@ public class BlackyResourcesCreator
             RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
             RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, animationData.uvFramesArray[0]);
             RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
-            entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+            entity.Set(new RenderGPUComponent(0, RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
                  layer, depthOffset, animationData.scale, offset));
             entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
             entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
@@ -280,7 +280,7 @@ public class BlackyResourcesCreator
         }
         else
         {
-            entity.Set(new RenderGPUComponent(default, -1, 0, -1, layer, depthOffset, animationData.scale, offset));
+            entity.Set(new RenderGPUComponent(0, default, -1, 0, -1, layer, depthOffset, animationData.scale, offset));
         }
         
     }

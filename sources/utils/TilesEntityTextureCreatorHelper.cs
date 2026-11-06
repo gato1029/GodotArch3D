@@ -35,13 +35,13 @@ public static class TilesEntityTextureCreatorHelper
             case TileSpriteType.Static:
                 instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(templateSprite.spriteData.idModMaterial);
                 entity.Set(new RenderFrameDataComponent { uvMap = templateSprite.spriteData.uv });
-                entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.spriteData.yDepthRender, templateSprite.spriteData.scale, templateSprite.spriteData.offsetInternal));
+                entity.Set(new RenderGPUComponent(0, instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.spriteData.yDepthRender, templateSprite.spriteData.scale, templateSprite.spriteData.offsetInternal));
                 transform = transform.ScaledLocal(new Godot.Vector3(templateSprite.spriteData.scale, templateSprite.spriteData.scale, 1));
                 break;
             case TileSpriteType.Animated:
                 instanceRender = AtlasTexturesModsManager.Instance.CreateInstanceRender(templateSprite.animationData.idModMaterial);
                 entity.Set(new RenderFrameDataComponent { uvMap = templateSprite.animationData.uvFramesArray[0] });
-                entity.Set(new RenderGPUComponent(instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.animationData.yDepthRender, templateSprite.animationData.scale, templateSprite.animationData.offsetInternal));
+                entity.Set(new RenderGPUComponent(0,instanceRender.rid, instanceRender.instance, 0, instanceRender.layerTexture, renderLayer, templateSprite.animationData.yDepthRender, templateSprite.animationData.scale, templateSprite.animationData.offsetInternal));
                 transform = transform.ScaledLocal(new Godot.Vector3(templateSprite.animationData.scale, templateSprite.animationData.scale, 1));
                 break;         
             default:

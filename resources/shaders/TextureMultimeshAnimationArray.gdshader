@@ -88,7 +88,7 @@ void vertex() {
     
     // Selección matemática por hardware usando mix()
     float current_frame = mix(frame_clamp, frame_loop, is_loop);
-
+		current_frame = min(current_frame, total_frames - 1.0);
     // 6. COORDENADAS FINALES EN EL ATLAS MASIVO (4096x4096)
     float x = atlas_start_x + (current_frame * frame_w);
     float y = atlas_start_y;

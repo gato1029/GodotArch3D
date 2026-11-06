@@ -31,7 +31,7 @@ public class TileSpriteCreator:SingletonBase<TileSpriteCreator>
 
         var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(instance.rid, instance.instance, instance.material, instance.layerTexture, renderLayer, spriteData.yDepthRender, 1, originOffset));
+        entity.Set(new RenderGPUComponent(0,instance.rid, instance.instance, instance.material, instance.layerTexture, renderLayer, spriteData.yDepthRender, 1, originOffset));
         var uv = spriteData.GetUv();
         entity.Set(new RenderFrameDataComponent { uvMap = uv});
         entity.Set(new PositionComponent { position = WorldPosition, tilePosition = tilePosition, height=10 });
@@ -83,7 +83,7 @@ public class TileSpriteCreator:SingletonBase<TileSpriteCreator>
 
         var entity = flecsManager.WorldFlecs.Entity();
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(instance.rid, instance.instance, instance.material, instance.layerTexture, renderLayer, yDepthRender, 1, originOffset));
+        entity.Set(new RenderGPUComponent(0, instance.rid, instance.instance, instance.material, instance.layerTexture, renderLayer, yDepthRender, 1, originOffset));
         entity.Set(new RenderFrameDataComponent { uvMap = uv });
         entity.Set(new PositionComponent { position = WorldPosition, tilePosition = tilePosition, height = 10 });
         return entity;

@@ -5,6 +5,8 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.GpuDriven;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -28,13 +30,16 @@ public class MovementResolutionSystem : FlecsSystemBase
             .With<VelocityComponent>() // 🔥 ahora necesario
             .With<MoveResolutorComponent>()
             .With<StateComponent>()
+            .With<RenderGPUComponent>()
             .With<UnitTag>()
+            
             .Without<StoppedTag>();
     }
     protected override void OnIter(Iter it)
     {
         var blackyWorld = it.World().GetCtx<BlackyWorld>();
         var _pathRegistry = blackyWorld.State.PathRegistryManager;
+        var stateRegister = blackyWorld.State.stateChangeRegistry;
         if (blackyWorld == null) return;
 
         var sim = blackyWorld.Simulation.Tick;
@@ -43,6 +48,7 @@ public class MovementResolutionSystem : FlecsSystemBase
         var velArray = it.Field<VelocityComponent>(1);
         var moveArray = it.Field<MoveResolutorComponent>(2);
         var chaArray = it.Field<StateComponent>(3);
+        var renderArray = it.Field<RenderGPUComponent>(4);
 
         float dt = (float)it.DeltaTime(); // 🎨 movimiento
         float tick = sim?.FixedDelta ?? 0f;
@@ -59,6 +65,8 @@ public class MovementResolutionSystem : FlecsSystemBase
             ref var vel = ref velArray[i];
             ref var move = ref moveArray[i];
             ref var cha = ref chaArray[i];
+            ref var render = ref renderArray[i];
+
             if (move.Blocked)
             {
               
@@ -86,7 +94,8 @@ public class MovementResolutionSystem : FlecsSystemBase
 
             if (!isMoving)
             {                
-                cha.stateType = StateType.IDLE; 
+                cha.stateType = StateType.IDLE;
+                stateRegister.Register(render.gpuindex, render.gpuindex, cha.stateType);
             }
             else
             {
@@ -111,6 +120,10 @@ public class MovementResolutionSystem : FlecsSystemBase
 
                 vel.currentVel = dir * newSpeed;
                 pos.position += vel.currentVel * dt;
+                //actualiza el buffer gpu
+                Vector2 posBuff = pos.position + render.originOffset;
+                float z = CommonAtributes.Calculate(render.depthOffset, pos.height, render.layerRender, posBuff); 
+                AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(render.gpuindex).SetBufferData(BufferSlot.Transform, render.instance, posBuff.X, posBuff.Y,z);
             }
         }
     }

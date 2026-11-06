@@ -82,7 +82,7 @@ namespace GodotEcsArch.sources.BlackyTiles.Commands
 
             entity.Set(new RenderTransformComponent(transform));
 
-            entity.Set(new RenderGPUComponent(
+            entity.Set(new RenderGPUComponent(0,
                 dataInstance.rid,
                 dataInstance.instance,
                 data.idMaterial,

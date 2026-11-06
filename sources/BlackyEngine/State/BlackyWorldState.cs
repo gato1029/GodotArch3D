@@ -8,6 +8,7 @@ using GodotEcsArch.sources.BlackyEngine.Services.Render.TilesTexture;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyEngine.State.Occupancy;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
+using GodotEcsArch.sources.Flecs.Globals;
 using System;
 using System.Collections.Concurrent;
 
@@ -55,6 +56,7 @@ public sealed class BlackyWorldState : IDisposable
     public BlackyPathRegistryManager PathRegistryManager { get; }
     public BlackyClearanceMap ClearanceMap { get; }
     public BlackyFlowFieldManager FlowFieldManager { get; }
+    public BlackyStateChangeRegistry stateChangeRegistry { get; }
     private int idGridDraw { get; set; }
     private ModeGrid modeGrid { get; set; } = ModeGrid.NORMAL;
     private readonly BlackyWorld world;
@@ -64,7 +66,7 @@ public sealed class BlackyWorldState : IDisposable
     {
         this.world = world;
         this.config = world.Config;
-
+        stateChangeRegistry = new BlackyStateChangeRegistry();
         DynamicHash = new FastSpatialHash(config.MapSize.X, config.MapSize.Y, 11000);
         StaticSpatialBuildings = new StaticSpatialChunkGrid<Entity>(config.MapSize.X, config.MapSize.Y, 1, 512, 16);
         StaticSpatialResources = new StaticSpatialChunkGrid<Entity>(config.MapSize.X, config.MapSize.Y, 1, 512, 16);

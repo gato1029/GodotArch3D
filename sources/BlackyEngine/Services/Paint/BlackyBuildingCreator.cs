@@ -287,12 +287,12 @@ public class BlackyBuildingCreator
             RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
             RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, spriteData.uv);
             RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(1, 1, 1, renderInstance.layerTexture));
-            entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
+            entity.Set(new RenderGPUComponent(0,renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
                      layer, depthOffset, spriteData.scale, offset));
         }
         else
         {
-            entity.Set(new RenderGPUComponent(default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
+            entity.Set(new RenderGPUComponent(0,default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
         }
         
     }
@@ -317,7 +317,7 @@ public class BlackyBuildingCreator
             RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
             RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, animationData.uvFramesArray[0]);
             RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(1, 1, 1, renderInstance.layerTexture));
-            entity.Set(new RenderGPUComponent(renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
+            entity.Set(new RenderGPUComponent(0, renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
                  layer, depthOffset, animationData.scale, offset));
 
             entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
@@ -326,7 +326,7 @@ public class BlackyBuildingCreator
         }
         else
         {
-            entity.Set(new RenderGPUComponent(default, -1, 0, -1,layer, depthOffset, animationData.scale, offset));
+            entity.Set(new RenderGPUComponent(0,default, -1, 0, -1,layer, depthOffset, animationData.scale, offset));
         }
         
         

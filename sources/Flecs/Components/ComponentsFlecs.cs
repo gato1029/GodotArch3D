@@ -312,9 +312,10 @@ public record struct RenderSelectionGPUComponent
 public record struct RenderGPUComponent
 (      
     // ojo idMaterial ya no se usa
-    Rid rid,
+    int gpuindex,
+    Rid rid, // se debe eliminar si funciona
     int instance,        
-    int idMaterial,
+    int idMaterial, // no se usa
     int layerTextureMaterial,
     int layerRender,
     float depthOffset,

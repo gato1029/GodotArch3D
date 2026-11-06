@@ -163,7 +163,7 @@ public class BlackyEntityRenderSystem
         RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
         RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
 
-        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+        entity.Set(new RenderGPUComponent(0,RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
                  layer, depthOffset, spriteData.scale, offset));
     }
 
@@ -185,7 +185,7 @@ public class BlackyEntityRenderSystem
         RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
 
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
+        entity.Set(new RenderGPUComponent(0,RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
                  layer, depthOffset, animationData.scale, offset));
 
         entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));

@@ -86,7 +86,7 @@ internal class ArrowVisualSyncSystem : FlecsSystemBase
 
         // render
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, spriteData.scale, originOffset));
+        entity.Set(new RenderGPUComponent(0, instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, spriteData.scale, originOffset));
         //entity.Set(new AnimationComponent(id, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = spriteData.uv });
 

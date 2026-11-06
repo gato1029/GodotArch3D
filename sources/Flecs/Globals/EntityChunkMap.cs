@@ -142,7 +142,7 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
 
 
         item.entity.Set(new RenderTransformComponent(item.transform));
-        item.entity.Set(new RenderGPUComponent(
+        item.entity.Set(new RenderGPUComponent(0,
             instanceComplex.rid,
             instanceComplex.instance,
             instanceComplex.material,
@@ -200,7 +200,7 @@ internal class EntityChunkMap : SingletonBase<EntityChunkMap>
         RenderingServer.MultimeshInstanceSetCustomData(instanceComplex.rid, instanceComplex.instance, uv);
         RenderingServer.MultimeshInstanceSetColor(instanceComplex.rid, instanceComplex.instance, new Godot.Color(0, 0, 0, instanceComplex.layerTexture));
         
-        pending.entity.Set(new RenderGPUComponent(
+        pending.entity.Set(new RenderGPUComponent(0,
             instanceComplex.rid,
             instanceComplex.instance,
             instanceComplex.material,

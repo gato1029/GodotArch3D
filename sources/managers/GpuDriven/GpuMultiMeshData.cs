@@ -1,4 +1,4 @@
-﻿namespace GodotEcsArch.sources.managers.GpuDriven;
+namespace GodotEcsArch.sources.managers.GpuDriven;
 using System.Threading;
 using Godot;
 using GodotEcsArch.sources.utils;
@@ -217,6 +217,50 @@ public unsafe class GpuMultiMeshData
         }
 
         // 🔹 Marcamos la ranura y el Chunk como modificados
+        entry.IsDirty = true;
+        Interlocked.Exchange(ref _hasDirtyBuffers, 1);
+    }
+    public void SetBufferData(int slotId, int instanceId, float r)
+    {
+        ref var entry = ref _buffers[slotId];
+        if (!entry.IsActive) return;
+
+        fixed (byte* ptr = entry.Buffer)
+        {
+            ((float*)ptr)[instanceId * 4] = r;
+        }
+
+        entry.IsDirty = true;
+        Interlocked.Exchange(ref _hasDirtyBuffers, 1);
+    }
+    public void SetBufferData(int slotId, int instanceId, float r, float g)
+    {
+        ref var entry = ref _buffers[slotId];
+        if (!entry.IsActive) return;
+
+        fixed (byte* ptr = entry.Buffer)
+        {
+            float* p = (float*)ptr + instanceId * 4;
+            p[0] = r;
+            p[1] = g;
+        }
+
+        entry.IsDirty = true;
+        Interlocked.Exchange(ref _hasDirtyBuffers, 1);
+    }
+    public void SetBufferData(int slotId, int instanceId, float r, float g, float b)
+    {
+        ref var entry = ref _buffers[slotId];
+        if (!entry.IsActive) return;
+
+        fixed (byte* ptr = entry.Buffer)
+        {
+            float* p = (float*)ptr + instanceId * 4;
+            p[0] = r;
+            p[1] = g;
+            p[2] = b;
+        }
+
         entry.IsDirty = true;
         Interlocked.Exchange(ref _hasDirtyBuffers, 1);
     }

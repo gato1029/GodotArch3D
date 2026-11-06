@@ -6,8 +6,10 @@ using GodotEcsArch.sources.BlackyEngine.Spatial;
 using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.Collision;
+using GodotEcsArch.sources.managers.GpuDriven;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
+using GodotEcsArch.sources.WindowsDataBase.Character.DataBase;
 using GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
 using GodotFlecs.sources.Flecs;
 using GodotFlecs.sources.Flecs.Components;
@@ -74,7 +76,7 @@ public class BlackyCharacterCreator
         switch (charModel.characterType)
         {
             case CharacterType.MAIN:
-                CreateGeneric(unitData.TemplateId, entity, charModel, new Vector2(unitData.PosX,unitData.PosY), unitData.Height,unitData.Health);                
+                CreateGenericGPU(unitData.TemplateId, entity, charModel, new Vector2(unitData.PosX,unitData.PosY), unitData.Height,unitData.Health);                
                 break;
             case CharacterType.NPC:
                 break;
@@ -97,7 +99,7 @@ public class BlackyCharacterCreator
 
         return charModel.characterType switch
         {
-            CharacterType.MAIN => CreateGeneric(characterId, entity, charModel, position, height),
+            CharacterType.MAIN => CreateGenericGPU(characterId, entity, charModel, position, height),
             CharacterType.ENEMIGO => CreateEnemy(characterId, entity, charModel, position, height),
             _ => entity,
         };
@@ -155,7 +157,99 @@ public class BlackyCharacterCreator
             idDebugMove = -1;
         }
     }
+    private Entity CreateGenericGPU(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Vector2 position, int height, int health = 0)
+    {
+        var idTileSprite = characterBaseData.idTileSpriteData;
+        int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);
+        AtlasModsManager.TryGetTileSprite(spriteId, out var sprite);
+        var animationDir = sprite.spriteMultipleAnimationDirection;
 
+        var moveData = animationDir.animationsTypes[AnimationType.PARADO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+        GeometricShape2D colliderMove = moveData.collisionDictionary[CollisionUseType.BASE_PIES].Multiplicity(characterBaseData.scale);
+
+        var attackData = animationDir.animationsTypes[AnimationType.ATACANDO_CUERPO].animations[GodotEcsArch.sources.components.AnimationDirection.LEFT];
+        Circle colliderAtackMelle = (Circle)attackData.collisionDictionary[CollisionUseType.RADIO_ATAQUE_CUERPO].Multiplicity(characterBaseData.scale);
+
+       
+        var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(moveData.idModMaterial);
+        Godot.Vector2 originOffset = new Vector2(moveData.offsetInternal.X * characterBaseData.scale, moveData.offsetInternal.Y * characterBaseData.scale);
+
+        float depthOffset = moveData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, height, layer, position);
+
+        Vector3 worldPosition = new Godot.Vector3(position.X + originOffset.X, position.Y + originOffset.Y, z);
+        // transform = transform.ScaledLocal(new Godot.Vector3(characterBaseData.scale, characterBaseData.scale, 1));
+        float indiceAnimation = AtlasTexturesModsManager.Instance.DrivenRenderManager.UnitAnimations.GetLutIndex(spriteId, AnimationType.PARADO, components.AnimationDirection.LEFT);
+        float currentTime = Time.GetTicksMsec() / 1000.0f; // Sincronizador de inicio de animación
+
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, characterBaseData.scale);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.AnimState, renderInstance.instanceId, indiceAnimation, currentTime, 0, 0);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Flags, renderInstance.instanceId, 0, 0, 1, renderInstance.layer);
+
+       // entity.Set(new RenderTransformComponent(transform));
+
+
+        entity.Set(new RenderGPUComponent(renderInstance.gpuDataIndex,renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer, layer, depthOffset, characterBaseData.scale, originOffset));
+      //  entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
+   //     entity.Set(new RenderFrameDataComponent { uvMap = moveData.uvFramesArray[0] });
+
+    //    RenderingServer.MultimeshInstanceSetTransform(instance.rid, instance.instance, transform);
+     //   RenderingServer.MultimeshInstanceSetColor(instance.rid, instance.instance, new Color(1, 1, 1, instance.layerTexture));
+
+        entity.Set(new GodotFlecs.sources.Flecs.Components.StateComponent
+        {
+            stateType = StateType.IDLE,
+            behaviorType = BehaviorType.PERSONAJE_PRINCIPAL,
+            lastStateType = StateType.BLOCKED
+        });
+        if (characterBaseData.isPersist)
+        {
+            entity.Add<PersistEntityTag>(); // O un componente con datos si lo prefieres
+        }
+        entity.Set(new TeamComponent(1));
+        entity.Set(new UnitDefinitionComponent(characterId));
+        entity.Set(new PositionComponent(position, Vector2I.Zero, height));
+        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.OCHO, GodotEcsArch.sources.components.AnimationDirection.LEFT));
+        entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0), 18));
+        entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0, 0, 0, 0, 0, 0));
+        entity.Set(new PlayerInputComponent());
+        entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
+
+
+
+        if (health != 0)
+        {
+            entity.Set(new HealthComponent(1000, health));
+        }
+        else
+        {
+            entity.Set(new HealthComponent(1000, 1000));
+        }
+
+
+        float rvoRadius = MeshCreator.PixelsToUnits(16);
+
+        entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 0f, 0, 0));
+        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero, Vector2.Zero));
+        entity.Set(new WeaponComponent(1, false));
+
+        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody, 1);
+
+        int idDebugRangeMelle = CollisionShapeDraw.Instance.DrawCircleShape(colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, Colors.Blue);
+
+        if (DEBUG_COLLIDERS)
+        {
+            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle, 0));
+        }
+
+        entity.Add<UseBoidTag>();
+        AddSelectionRender(entity);
+        AddBarLife(entity, 1000, 1000, position, height, sprite.offsetLifeBarYFormat * characterBaseData.scale);
+        return entity;
+    }
     private Entity CreateGeneric(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Vector2 position, int height,int health=0)
     {        
         var idTileSprite = characterBaseData.idTileSpriteData;
@@ -182,7 +276,7 @@ public class BlackyCharacterCreator
         entity.Set(new RenderTransformComponent(transform));
 
 
-        entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));
+        entity.Set(new RenderGPUComponent(0,instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));
         entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = moveData.uvFramesArray[0] });
 
@@ -238,8 +332,6 @@ public class BlackyCharacterCreator
         entity.Add<UseBoidTag>();
         AddSelectionRender(entity);
         AddBarLife(entity, 1000, 1000,position, height,sprite.offsetLifeBarYFormat * characterBaseData.scale);
-   
-
         return entity;
     }
     private void AddBarLife(Entity entity, int currentLife, int MaxLife, Vector2 position, int height, float offsetBarY)
@@ -291,7 +383,7 @@ public class BlackyCharacterCreator
         RenderingServer.MultimeshInstanceSetColor(instance.rid, instance.instance, new Color(1, 1, 1, instance.layerTexture));
 
         entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));
+        entity.Set(new RenderGPUComponent(0,instance.rid, instance.instance, 0, instance.layerTexture, layer, depthOffset, characterBaseData.scale, originOffset));
         entity.Set(new AnimationComponent(characterBaseData.idTileSpriteData, EntityType.PERSONAJE, AnimationType.PARADO, AnimationType.NINGUNA, 0, 0, 0, false, true, true));
         entity.Set(new RenderFrameDataComponent { uvMap = moveData.uvFramesArray[0] });
 

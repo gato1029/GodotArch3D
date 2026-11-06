@@ -102,7 +102,7 @@ public class CreateTileInstanceTextureCommand : IRenderCommand
         entity.Set(new RenderTransformComponent(transform));
 
         // ya no requieres material
-        entity.Set(new RenderGPUComponent(
+        entity.Set(new RenderGPUComponent(0,
             RenderInstance.rid,
             RenderInstance.instance,            
             0,
