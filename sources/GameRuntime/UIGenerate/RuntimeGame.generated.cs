@@ -16,6 +16,8 @@ public partial class RuntimeGame : Node
     private Camera3dGodot Camera3D;
     private InputHandler InputHandlerGame;
     private CanvasLayer UI;
+    private MainHudController MainHUDController;
+    private WorldControlManager worldControlManager;
 
     public void InitializeUI()
     {
@@ -28,5 +30,7 @@ public partial class RuntimeGame : Node
         Camera3D = GetNode<Camera3dGodot>("Render/Camera3D");
         InputHandlerGame = GetNode<InputHandler>("Render/InputHandlerGame");
         UI = GetNode<CanvasLayer>("UI");
+        MainHUDController = GetNode<MainHudController>("UI/MainHUDController");
+        worldControlManager = GetNode<WorldControlManager>("UI/MainHUDController/worldControlManager");
     }
 }

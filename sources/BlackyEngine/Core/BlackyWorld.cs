@@ -116,7 +116,7 @@ public sealed class BlackyWorld : IDisposable
         Streaming = new BlackyWorldStreaming(this);
         Services = new BlackyWorldServices(this);
         BlackyWorldRegistry.Instance.AddWorld(name, this, true);
-        RTSSelectionManager.Instance.SetWorld(this);
+        //RTSSelectionManager.Instance.SetWorld(this);
 
         //Generation = new BlackyWorldGeneration(this, Services); esto ya no funcionara luego quitar         
 

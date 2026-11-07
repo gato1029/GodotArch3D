@@ -31,7 +31,7 @@ public partial class WindowEditorRuntimeResources : Window
         KuroOptionButtonMod.OnDataSelected += KuroOptionButtonMod_OnDataSelected;                        
         LoadMods();        
         KuroControlWindowItem.OnCloseWindow += KuroControlWindowItem_OnCloseWindow;
-        RTSSelectionManager.Instance.IsEnabled = false;
+        RTSSelectionManagerPast.Instance.IsEnabled = false;
         
     }
 
@@ -39,7 +39,7 @@ public partial class WindowEditorRuntimeResources : Window
 
     private void KuroControlWindowItem_OnCloseWindow(object obj)
     {
-        RTSSelectionManager.Instance.IsEnabled = true;
+        RTSSelectionManagerPast.Instance.IsEnabled = true;
         TilesEntityPreviewHelper.Clear();
     }
 

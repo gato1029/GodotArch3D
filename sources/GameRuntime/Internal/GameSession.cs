@@ -18,7 +18,7 @@ public class GameSession
     private readonly string _name; // nombre de la partida
     private int _masterSeed;
     private readonly List<WorldSlot> VisitedWorlds;
-    private BlackyWorld _currentWorld; // el mundo actual en el que se encuentra el jugador
+    public BlackyWorld CurrentWorld { get; private set; }
     private readonly BlackyTimerGame _timer = new BlackyTimerGame();
     
     public GameSession(string name, int masterSeed = 0,bool isNewGame=true)
@@ -52,7 +52,7 @@ public class GameSession
         int alturaMaxima = 5;
         _masterSeed = 759245143;
         Vector2I sizeMap = new Vector2I(256,256);//  GenerateRandomSizeMap();
-        _currentWorld = new BlackyWorld(_name, perfilMundo.tipoMundo, 32, alturaMaxima, _masterSeed,sizeMap,perfilMundo.id);
+        CurrentWorld = new BlackyWorld(_name, perfilMundo.tipoMundo, 32, alturaMaxima, _masterSeed,sizeMap,perfilMundo.id);
                 
     }
 

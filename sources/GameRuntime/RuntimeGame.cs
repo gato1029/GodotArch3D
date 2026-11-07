@@ -26,6 +26,7 @@ public partial class RuntimeGame : Node
         int seed = GenerateRandomSeed();
         string name = "Partida_" + seed; // luego Cambiar por un nombre que el usuario pueda ingresar
         _gameSession = new GameSession(name, seed);
+        worldControlManager.Initialize(_gameSession.CurrentWorld); // inicializa controlador de ui
     }
 
     public void CargarPartida()

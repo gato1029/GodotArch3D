@@ -20,11 +20,11 @@ using System.Threading.Tasks;
 
 namespace GodotEcsArch.sources.godot;
 
-public partial class RTSSelectionManager : Node2D
+public partial class RTSSelectionManagerPast : Node2D
 {
     private static BlackyWorld _world;
     private static BlackyPathfinder _pathfinder;
-    public static RTSSelectionManager Instance { get; private set; }
+    public static RTSSelectionManagerPast Instance { get; private set; }
 
     private FormationType _currentFormation = FormationType.Circle;
     private StaticSpatialChunkGrid<Entity>.QueryContext _buildingQueryContext;
