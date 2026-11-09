@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using Godot;
 using GodotEcsArch.sources.components;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.managers.GpuDriven;
@@ -98,15 +99,16 @@ public class BlackyStateChangeRegistry
         _entityData.TryRemove(entityId, out _);
         _pendingChanges.TryRemove(entityId, out _);
     }
-
+    // Al iniciar tu juego o gestor, guarda el tiempo base:
+  
     private void UpdateAnimation(int shaderId, StateType state, AnimationDirection direction, int idUnitAnimation, int gpuIndex, BehaviorType behaviorType)
     {
         var rules = CharacterStateConfig.GetRules(behaviorType);
         AnimationType newAnim = rules.AnimationMap[(int)state];
         
         int lutIndex = AtlasTexturesModsManager.Instance.DrivenRenderManager.UnitAnimations.GetLutIndex(idUnitAnimation, newAnim, direction);
-        
+        float currentTime = Time.GetTicksMsec() / 1000.0f; // Sincronizador de inicio de animación
         AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(gpuIndex)
-            .SetBufferData(BufferSlot.AnimState, shaderId, lutIndex);
+            .SetBufferData(BufferSlot.AnimState, shaderId, lutIndex,currentTime);
     }
 }

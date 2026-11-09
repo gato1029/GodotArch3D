@@ -34,7 +34,23 @@ public class UnitAnimCatalog
 
         Array.Fill(_lutLookupTable, -1);
     }
+    /// <summary>
+    /// Obtiene la duración total de un ciclo de animación en segundos en tiempo O(1).
+    /// Útil para sistemas de combate, sincronización de golpes o eventos de gameplay.
+    /// </summary>
+    public float GetAnimationDuration(int unitTypeId, AnimationType animType, AnimationDirection direction)
+    {
+        // Obtenemos el ID global en la LUT (respetando los fallbacks a DOWN si no existe)
+        int lutId = GetLutIndex(unitTypeId, animType, direction);
 
+        // Consultamos la definición original a través del LUTManager
+        if (_lutManager.TryGetClip(lutId, out var clipDef))
+        {
+            return clipDef.CycleDuration;
+        }
+
+        return 0.0f; // Retorna 0 si el clip no está registrado
+    }
     /// <summary>
     /// Registra una animación asociándole una ranura única en la LUT de VRAM.
     /// Si el unitTypeId supera la capacidad actual, expande automáticamente el arreglo en RAM.
@@ -104,6 +120,8 @@ public class UnitAnimCatalog
         return 0; // Retorna slot 0 por defecto si la combinación no está registrada
     }
 
+
+    
     /// <summary>
     /// Compila la mini-textura flotante LUT y la inyecta al ShaderMaterial animado.
     /// </summary>

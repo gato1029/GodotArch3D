@@ -456,7 +456,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
                 var totalFrames = tileSpriteData.animationData.uvFramesArray.Length;
                 AtlasTexturesModsManager.Instance.DrivenRenderManager.SimpleAnimations.RegisterAnimation(newId,
                     new AnimClipDefinition{StartX = init.R, StartY = init.G,FrameWidth = init.B, FrameHeight = init.A, 
-                        IsLoop = tileSpriteData.animationData.loop, Speed = totalFrames,TotalFrames =  totalFrames });
+                        IsLoop = tileSpriteData.animationData.loop, FPS = tileSpriteData.animationData.frameDuration,TotalFrames =  totalFrames });
                 break;
             case TileSpriteType.AnimatedDirectionMultiple:
                 
@@ -470,7 +470,7 @@ public class AtlasModsManager : SingletonBase<AtlasModsManager>
                         var totalFrames1 = direccion.Value.uvFramesArray.Length;
                         AtlasTexturesModsManager.Instance.DrivenRenderManager.UnitAnimations.RegisterAnimation(newId,typeAnim,direccion.Key,
                             new AnimClipDefinition{StartX = init1.R, StartY = init1.G,FrameWidth = init1.B, FrameHeight = init1.A, 
-                                IsLoop = direccion.Value.loop, Speed = totalFrames1,TotalFrames =  totalFrames1 });
+                                IsLoop = direccion.Value.loop, FPS = direccion.Value.frameDuration,TotalFrames =  totalFrames1 });
                     }
                 }
 

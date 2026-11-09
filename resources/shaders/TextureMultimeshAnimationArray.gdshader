@@ -11,7 +11,7 @@ uniform sampler2D anim_state_texture : hint_default_white, filter_nearest; // Sl
 uniform sampler2D flags_texture : hint_default_white, filter_nearest;       // Slot 1: R=MirrorX, G=MirrorY, B=IsVisible, A=LayerTexture
 uniform sampler2D anim_config_texture : hint_default_white, filter_nearest;// Tabla LUT global de animaciones
 uniform int texture_width = 256;
-uniform float global_time = 0.0;
+global uniform float game_time;
 
 // Variables interpoladas hacia el fragment shader
 varying float layerTexture;
@@ -56,39 +56,46 @@ void vertex() {
     float final_scale = unit_scale * is_visible;
 
     // 4. CONSULTAR LA TABLA DE CONFIGURACIÓN GLOBAL (LUT)
-    // Cada animación en la LUT ocupa 2 píxeles horizontales contiguos:
-    // Píxel 0: R=StartX, G=StartY, B=IsLoop (1.0 o 0.0), A=0
-    // Píxel 1: R=FrameWidth, G=FrameHeight, B=TotalFrames, A=Speed
     vec4 config_pos  = texelFetch(anim_config_texture, ivec2(indice_global_lut * 2, 0), 0);
     vec4 config_size = texelFetch(anim_config_texture, ivec2(indice_global_lut * 2 + 1, 0), 0);
 
     float atlas_start_x = config_pos.r;
     float atlas_start_y = config_pos.g;
-    float is_loop       = config_pos.b; // 1.0 para repetición infinita, 0.0 para un solo pase (clamp)
+    float is_loop       = config_pos.b; // 1.0 para loop, 0.0 para clamp
 
-   // Detectar espejos mediante el signo
-	mirrorX = max(-sign(config_size.r), 0.0);
-	mirrorY = max(-sign(config_size.g), 0.0);
+    // Detectar espejos mediante el signo (si ya lo manejas así)
+    mirrorX = max(-sign(config_size.r), 0.0);
+    mirrorY = max(-sign(config_size.g), 0.0);
 
-	// Recuperar dimensiones positivas
-	float frame_w = abs(config_size.r);
-	float frame_h = abs(config_size.g);
-	
-    float total_frames = config_size.b;
-    float anim_speed   = config_size.a;
-
-    // 5. CÁLCULO AUTÓNOMO DEL FRAME ACTUAL SIN CONDICIONALES "IF"
-   float tiempo_transcurrido = global_time - start_time;
+    float frame_w = abs(config_size.r);
+    float frame_h = abs(config_size.g);
     
+    float total_frames   = config_size.b;
+    float frame_duration = config_size.a; // <--- Ahora A representa la duración de cada frame en segundos (ej: 0.1f)
+
+    // 5. CÁLCULO DISCRETO DEL FRAME ACTUAL (Estilo tu lógica C# con Cero "If"s)
+    float tiempo_transcurrido = game_time - start_time;
+    
+    // Evitamos división por cero por seguridad
+    float safe_duration = max(frame_duration, 0.0001);
+    
+    // Obtenemos el índice del frame entero usando floor
+    float raw_frame = floor(tiempo_transcurrido / safe_duration);
+
     // Opción A: Reproducción continua (Loop)
-    float frame_loop = mod(floor(tiempo_transcurrido * anim_speed), total_frames);
+    float frame_loop = mod(raw_frame, total_frames);
     
     // Opción B: Reproducción retenida en el último cuadro (Clamp)
-    float frame_clamp = clamp(floor(tiempo_transcurrido * anim_speed), 0.0, total_frames - 1.0);
+    float frame_clamp = clamp(raw_frame, 0.0, total_frames - 1.0);
     
-    // Selección matemática por hardware usando mix()
+    // Selección matemática por hardware usando mix() según is_loop
     float current_frame = mix(frame_clamp, frame_loop, is_loop);
-		current_frame = min(current_frame, total_frames - 1.0);
+    current_frame = min(current_frame, total_frames - 1.0);
+
+    // (Opcional para Clamp): Si quieres que al terminar un loop=0 la animación se quede en el frame 0 
+    // en lugar del último, puedes manejarlo en C# reiniciando el 'start_time' en anim_state_texture
+    // cuando la animación expire.
+	
     // 6. COORDENADAS FINALES EN EL ATLAS MASIVO (4096x4096)
     float x = atlas_start_x + (current_frame * frame_w);
     float y = atlas_start_y;

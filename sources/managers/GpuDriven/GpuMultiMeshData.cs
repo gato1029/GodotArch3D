@@ -71,6 +71,8 @@ public unsafe class GpuMultiMeshData
     private readonly HashSet<int> _usedPositions = new();
     public ShaderMaterial Material { get; private set; }
 
+
+    
     private readonly int _textureWidth;
     private readonly int _textureHeight;
 
@@ -152,6 +154,7 @@ public unsafe class GpuMultiMeshData
         {
             Material.SetShaderParameter("texture_width", _textureWidth);
         }
+ 
     }
 
     public bool HasAvailableSpace() => FreePositions.Count > 0 || CurrentPosition < MaxInstances - 1;
@@ -288,13 +291,7 @@ public unsafe class GpuMultiMeshData
         entry.IsDirty = true;
         Interlocked.Exchange(ref _hasDirtyBuffers, 1);
     }
-    public void UpdateGlobalTime(float time)
-    {
-        if (!RequiresAnimationTime)
-            return;
 
-        Material.SetShaderParameter("global_time", time);
-    }
 
     /// <summary>
     /// Sube ÚNICAMENTE las imágenes que sufrieron cambios en CPU hacia la VRAM.

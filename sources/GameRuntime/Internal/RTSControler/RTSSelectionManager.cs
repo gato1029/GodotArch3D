@@ -22,7 +22,7 @@ public class RTSSelectionManager
     private readonly BlackyPathfinder _pathfinder;
     private readonly Query _query;
     private StaticSpatialChunkGrid<Entity>.QueryContext _buildingQueryContext;
-    private ushort _playerTeamId = 2; // TODO: Reemplazar por la fuente real del equipo del jugador
+    private ushort _playerTeamId = 1; // TODO: Reemplazar por la fuente real del equipo del jugador
     private FormationType _currentFormation = FormationType.Circle;
 
     private const int SlotsPerRing = 8;
@@ -300,7 +300,10 @@ public class RTSSelectionManager
 
         foreach (var entity in selectedEntities)
         {
-            if (!entity.IsAlive() || !entity.Has<MeleeAttackComponent>() || entity == targetEnemy) continue;
+            if (!entity.IsAlive() || entity == targetEnemy)
+            {
+                continue;
+            }
 
             if (entity.Has<PathReferenceComponent>())
             {
@@ -391,8 +394,8 @@ public class RTSSelectionManager
             entity.Set(new MoveTargetComponent { Value = firstTarget });
 
             if (entity.Has<StoppedTag>()) entity.Remove<StoppedTag>();
-            entity.Set(new AttackPendingComponent(false, targetEnemy, isTargetUnit, targetPos, 0));
-
+            entity.Set(new AttackPendingComponent(true, targetEnemy, isTargetUnit, targetPos, 0));
+            entity.Add<AttackPendingTag>();
             unitsCommanded++;
             movedCount++;
         }
@@ -458,7 +461,7 @@ public class RTSSelectionManager
 
     private Entity FindEnemyEntityAtPoint(Vector2 point)
     {
-        float tolerance = 0.5f;
+        float tolerance = 1f;
         Span<int> results = stackalloc int[30];
         int foundCount = _world.State.DynamicHash.QueryNodesInBoxFiltered(point.X - tolerance, point.Y - tolerance, point.X + tolerance, point.Y + tolerance, _playerTeamId, results);
 

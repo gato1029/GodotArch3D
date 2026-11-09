@@ -88,3 +88,10 @@ debugGridCollider={
 [rendering]
 
 textures/vram_compression/import_s3tc_bptc=true
+
+[shader_globals]
+
+game_time={
+"type": "float",
+"value": 0.0
+}

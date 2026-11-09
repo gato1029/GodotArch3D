@@ -1,20 +1,12 @@
-
-
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
 using GodotEcsArch.sources.BlackyEngine.Services.Palettes;
-using GodotEcsArch.sources.BlackyEngine.Spatial;
-using GodotEcsArch.sources.Flecs.Components;
 using GodotEcsArch.sources.Flecs.Globals;
 using GodotEcsArch.sources.managers.Characters;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
-using ImGuiGodot.Internal;
-using SadRogue.Primitives.GridViews;
-using System;
-
 
 namespace GodotFlecs.sources.Flecs.Systems.Units;
 
@@ -22,147 +14,142 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
 {
     protected override ulong Phase => flecs.EcsOnUpdate;
     protected override bool MultiThreaded => true;
+
     protected override void BuildQuery(ref QueryBuilder qb)
     {
         qb.With<PositionComponent>()
-        .With<SpatialIDComponent>()
-        .With<Components.StateComponent>()
-        .With<MeleeAttackComponent>()
-        .With<TeamComponent>()
-        .With<AttackPendingComponent>()
-        .With<DirectionComponent>()
-        .With<UnitDefinitionComponent>()
-        .With<AttackPendingTag>()
-        .Without<PlayerInputComponent>()
-        .Without<DeadTag>()
-        .Without<DestroyRequestTag>();
+          .With<StateComponent>()
+          .With<MeleeAttackComponent>()
+          .With<TeamComponent>()
+          .With<AttackPendingComponent>()
+          .With<DirectionComponent>()
+          .With<UnitDefinitionComponent>()
+          .With<AttackPendingTag>()
+          .Without<DeadTag>()
+          .Without<DestroyRequestTag>();
     }
+
     protected override void OnIter(Iter it)
     {
         var world = it.World().GetCtx<BlackyWorld>();
         if (world == null) return;
         var stateRegister = world.State.stateChangeRegistry;
-        var dynGrid = world.State.DynamicHash;
 
         var posArray = it.Field<PositionComponent>(0);
-        var spaArray = it.Field<SpatialIDComponent>(1);
-        var charArray = it.Field<Components.StateComponent>(2);
-        var melleArray = it.Field<MeleeAttackComponent>(3);
-        var teamArray = it.Field<TeamComponent>(4);
-        var attackPendArray = it.Field<AttackPendingComponent>(5);
-        var dirArray = it.Field<DirectionComponent>(6);
-        var unitArray = it.Field<UnitDefinitionComponent>(7);
+        var charArray = it.Field<StateComponent>(1);
+        var melleArray = it.Field<MeleeAttackComponent>(2);
+        var attackPendArray = it.Field<AttackPendingComponent>(4);
+        var dirArray = it.Field<DirectionComponent>(5);
+
+        float deltaTime = it.DeltaTime();
 
         for (int i = 0; i < it.Count(); i++)
         {
             ref var pos = ref posArray[i];
-            ref var spa = ref spaArray[i];
             ref var cha = ref charArray[i];
             ref var melle = ref melleArray[i];
-            ref var team = ref teamArray[i];
             ref var atp = ref attackPendArray[i];
             ref var dir = ref dirArray[i];
-            ref var unit = ref unitArray[i];
             Entity ent = it.Entity(i);
 
-            // Reducción del cooldown de ataque
+            // 1. Reducción del cooldown global de ataque
             if (melle.Timer > 0f)
             {
-                melle.Timer -= it.DeltaTime();
+                melle.Timer -= deltaTime;
             }
 
-            if (cha.stateType == StateType.EXECUTE_ATTACK)
+            // 2. Si el objetivo ya no es válido o murió, limpiamos, liberamos el slot y volvemos a IDLE
+            if (!atp.Active || !atp.Target.IsAlive() || atp.Target.Has<DeadTag>())
             {
-                if (atp.Active && atp.Target.IsAlive() && !atp.Target.Has<DeadTag>())
+                melle.AnimTimer = 0f;
+                melle.Timer = 0;
+                atp.Active = false;
+                atp.Target = default;
+                ent.Remove<AttackPendingTag>();
+                
+                if (cha.stateType == StateType.ATTACK)
+                {
+                    cha.stateType = StateType.IDLE;
+                    stateRegister.RegisterState(ent.Id.Value, cha.stateType);
+                }
+
+                // Aquí SÍ liberamos el slot porque el objetivo ya no existe o se canceló el ataque
+                AttackSlotHelper.RequestReleaseAttackSlot(ent);
+                continue;
+            }
+
+            // 3. Si el cooldown está listo y no estamos atacando todavía, iniciamos el estado ATTACK y el timer de animación
+            if (melle.Timer <= 0f && cha.stateType != StateType.ATTACK)
+            {
+                cha.stateType = StateType.ATTACK;
+                melle.AnimTimer = 0f;
+                stateRegister.RegisterState(ent.Id.Value, cha.stateType);
+            }
+
+            // 4. Si estamos en estado ATTACK, avanzamos el temporizador de la animación
+            if (cha.stateType == StateType.ATTACK)
+            {
+                melle.AnimTimer += deltaTime;
+                // Cuando se cumple la duración de la animación, evaluamos colisión y aplicamos daño
+                if (melle.AnimTimer >= melle.AnimDuration)
                 {
                     Vector2 originAttackCenter = pos.position + melle.OffSetRange;
                     var targetPos = atp.Target.Get<PositionComponent>();
+                    bool hitSuccess = false;
 
                     if (atp.Target.Has<UnitDefinitionComponent>())
                     {
                         ushort targetTemplateId = atp.Target.Get<UnitDefinitionComponent>().idTemplate;
                         if (CheckCollisionWithTargetUnit(originAttackCenter, dir.normalized, melle.RangeAttack, targetPos.position, targetTemplateId))
                         {
-                            GlobalData.EventsDamage.Enqueue(new DamageEvent
-                            {
-                                Source = ent,
-                                Target = atp.Target,
-                                Amount = melle.Damage
-                            });
-                            //cha.characterStateType = CharacterStateType.ATTACK;
-                        }
-                        else
-                        {
-                            // si no hubo collision quiere decir que no hay objetivo y libero
-                            cha.stateType = StateType.IDLE;
-                            atp.Active = false;
-                            atp.Target = default;
-                            ent.Remove<AttackPendingTag>();
-                            stateRegister.RegisterState(ent.Id.Value, cha.stateType);
-                            // El objetivo salió de rango: liberamos el slot reservado
-                            AttackSlotHelper.RequestReleaseAttackSlot(ent);
+                            hitSuccess = true;
                         }
                     }
                     else
-                    //if (atp.Target.Has<BuildingDefinitionComponent>())
                     {
                         ushort targetTemplateId = atp.Target.Get<BuildingDefinitionComponent>().idTemplate;
                         if (CheckCollisionWithTargetBuild(originAttackCenter, dir.normalized, melle.RangeAttack, targetPos.position, targetTemplateId))
                         {
-                            GlobalData.EventsDamage.Enqueue(new DamageEvent
-                            {
-                                Source = ent,
-                                Target = atp.Target,
-                                Amount = melle.Damage
-                            });
-                            //cha.characterStateType = CharacterStateType.ATTACK;
-                        }
-                        else
-                        {
-                            ;
-                            // si no hubo collision quiere decir que no hay objetivo y libero
-                            cha.stateType = StateType.IDLE;
-                            atp.Active = false;
-                            atp.Target = default;
-                            stateRegister.RegisterState(ent.Id.Value, cha.stateType);
-                            ent.Remove<AttackPendingTag>();
-
-                            // El objetivo salió de rango: liberamos el slot reservado
-                            AttackSlotHelper.RequestReleaseAttackSlot(ent);
+                            hitSuccess = true;
                         }
                     }
-                }
-                else
-                {
-                    // si esta muerto libero target
-                    //cha.stateType = StateType.IDLE;
-                    atp.Active = false;
-                    atp.Target = default;
-                    ent.Remove<AttackPendingTag>();
 
-                    // El target murió o dejó de existir: liberamos el slot reservado
-                    AttackSlotHelper.RequestReleaseAttackSlot(ent);
-                }
-            }
+                    if (hitSuccess)
+                    {// 🎯 ÉXITO: El golpe conectó, aplicamos daño.
+                        GlobalData.EventsDamage.Enqueue(new DamageEvent
+                        {
+                            Source = ent,
+                            Target = atp.Target,
+                            Amount = melle.Damage
+                        });
+                        // Reiniciamos animación, activamos el cooldown principal y regresamos a IDLE
+                        // ⚠️ IMPORTANTE: NO liberamos el slot aquí para que la unidad mantenga su posición en el anillo
+                        melle.AnimTimer = 0f;
+                        melle.Timer = 0;
+                        cha.stateType = StateType.IDLE;
+                        stateRegister.RegisterState(ent.Id.Value, cha.stateType);
+                    }else
+                    {
+                        // ❌ FALLO: El objetivo esquivó o salió del rango al golpear. Limpiamos y liberamos slot.
+                        melle.Timer = 0;
+                        melle.AnimTimer = 0f;
+                        atp.Active = false;
+                        atp.Target = default;
+                        ent.Remove<AttackPendingTag>();
 
-            if (melle.Timer <= 0f)
-            {
-                if (atp.Active && atp.Target.IsAlive() && !atp.Target.Has<DeadTag>())
-                {
-                    cha.stateType = StateType.ATTACK;
-                    melle.Timer = melle.Cooldown;
-                    stateRegister.RegisterState(ent.Id.Value, cha.stateType);
-                }
-                else
-                {
-                    cha.stateType = StateType.IDLE;
-                    atp.Active = false;
-                    atp.Target = default;
-                    ent.Remove<AttackPendingTag>();
+                        if (cha.stateType == StateType.ATTACK)
+                        {
+                            cha.stateType = StateType.IDLE;
+                            stateRegister.RegisterState(ent.Id.Value, cha.stateType);
+                        }
 
-                    // Ataque cancelado por cooldown sin target válido: liberamos el slot
-                    AttackSlotHelper.RequestReleaseAttackSlot(ent);
+                        // Liberamos el slot para que se libere el espacio en el anillo
+                        AttackSlotHelper.RequestReleaseAttackSlot(ent);
+                    }
+
+                 
                 }
+            
             }
         }
     }

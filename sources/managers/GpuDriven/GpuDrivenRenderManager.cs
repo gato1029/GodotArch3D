@@ -364,15 +364,12 @@ public class GpuDrivenRenderManager
 
     public void UpdateGlobalTime(float deltaTime)
     {
-        _globalTime += deltaTime;
-
-     //   float shaderTime = _globalTime;
-
-        foreach (var gpuData in _gpuDataList)
-        {
-            if (gpuData.RequiresAnimationTime)
-                gpuData.UpdateGlobalTime(_globalTime);
-        }
+        //_globalTime += deltaTime;
+        float currentTime = Time.GetTicksMsec() / 1000.0f;
+    
+        // Forzamos el casting a Variant para evitar ambigüedades en C#
+        RenderingServer.GlobalShaderParameterSet("game_time", (Variant)currentTime);
+  
     }
     // ============================================================
     // FLUSH

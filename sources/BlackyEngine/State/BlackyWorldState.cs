@@ -67,7 +67,7 @@ public sealed class BlackyWorldState : IDisposable
         this.world = world;
         this.config = world.Config;
         stateChangeRegistry = new BlackyStateChangeRegistry();
-        DynamicHash = new FastSpatialHash(config.MapSize.X, config.MapSize.Y, 11000);
+        DynamicHash = new FastSpatialHash(config.MapSize.X, config.MapSize.Y, 31000);// mejorar luego
         StaticSpatialBuildings = new StaticSpatialChunkGrid<Entity>(config.MapSize.X, config.MapSize.Y, 1, 512, 16);
         StaticSpatialResources = new StaticSpatialChunkGrid<Entity>(config.MapSize.X, config.MapSize.Y, 1, 512, 16);
         StaticSpatialTerrain = new StaticSpatialChunkGrid<ColliderSpriteInstanceData>(config.MapSize.X, config.MapSize.Y, 1, 512,16);

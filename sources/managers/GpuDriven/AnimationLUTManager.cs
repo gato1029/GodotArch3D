@@ -12,8 +12,13 @@ public struct AnimClipDefinition
     public float FrameWidth;  // Ancho de cada cuadro individual (en píxeles)
     public float FrameHeight; // Alto de cada cuadro individual (en píxeles)
     public float TotalFrames; // Cantidad total de cuadros que componen la animación
-    public float Speed;       // Velocidad de reproducción (cuadros por segundo)
+    public float FPS;       // Velocidad de reproducción (cuadros por segundo)
     public bool IsLoop;       // true = Repetición infinita, false = Se detiene en el último frame
+    /// <summary>
+    /// Calcula la duración total de un ciclo completo de la animación en segundos.
+    /// Útil para sincronizar eventos de gameplay (como aplicar daño en el frame exacto de un golpe).
+    /// </summary>
+    public float CycleDuration => FPS > 0f ? TotalFrames * FPS : 0f;
 }
 /// <summary>
 /// Gestiona la tabla de consulta global (LUT) en VRAM utilizada por el shader animado.
@@ -35,7 +40,13 @@ public class AnimationLUTManager
 
         return globalId;
     }
-
+    /// <summary>
+    /// Permite recuperar la definición de un clip usando su ID global en la LUT.
+    /// </summary>
+    public bool TryGetClip(int globalId, out AnimClipDefinition clip)
+    {
+        return _definitions.TryGetValue(globalId, out clip);
+    }
     /// <summary>
     /// Construye la mini-textura flotante LUT y la asigna al parámetro 'anim_config_texture' del ShaderMaterial.
     /// </summary>
@@ -64,7 +75,7 @@ public class AnimationLUTManager
             lutImage.SetPixel(pixelPos, 0, new Color(clip.StartX, clip.StartY, loopFlag, 0.0f));
 
             // Píxel 1: FrameWidth, FrameHeight, TotalFrames, Speed
-            lutImage.SetPixel(pixelPos + 1, 0, new Color(clip.FrameWidth, clip.FrameHeight, clip.TotalFrames, clip.Speed));
+            lutImage.SetPixel(pixelPos + 1, 0, new Color(clip.FrameWidth, clip.FrameHeight, clip.TotalFrames, clip.FPS));
         }
 
         _lutTexture = ImageTexture.CreateFromImage(lutImage);

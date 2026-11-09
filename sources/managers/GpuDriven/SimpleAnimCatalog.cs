@@ -19,7 +19,23 @@ public class SimpleAnimCatalog
 
         Array.Fill(_lookupTable, -1);
     }
+    /// <summary>
+    /// Obtiene la duración total de un ciclo de animación en segundos en tiempo O(1).
+    /// Útil para eventos
+    /// </summary>
+    public float GetAnimationDuration(int unitTypeId)
+    {
+        // Obtenemos el ID global en la LUT (respetando los fallbacks a DOWN si no existe)
+        int lutId = GetLutIndex(unitTypeId);
 
+        // Consultamos la definición original a través del LUTManager
+        if (_lutManager.TryGetClip(lutId, out var clipDef))
+        {
+            return clipDef.CycleDuration;
+        }
+
+        return 0.0f; // Retorna 0 si el clip no está registrado
+    }
     public void RegisterAnimation(
         int animationId,
         AnimClipDefinition clipDef)
