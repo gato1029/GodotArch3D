@@ -7,6 +7,7 @@ public enum TipoContador
 {
     EdificiosUnidadesRango, // sirve para hacer la particion de frames para procesamiento
     UnidadesMelle,
+    IndexSearchStagering,
     _TotalTipos // Utilizado para dimensionar los arrays automáticamente
 }
 

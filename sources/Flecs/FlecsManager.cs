@@ -156,14 +156,16 @@ public class FlecsManager
         //RegisterSystem<BuildingSpawnSystem>(); // revisar creo q no se usa quitarlo
 
         //update
-        RegisterSystem<HumanInputSystem>();
+        //RegisterSystem<HumanInputSystem>();
         //RegisterSystem<HumanCharacterSystem>();
-        RegisterSystem<HumanCharacterSimpleSystem>();
-        RegisterSystem<UnitMelleEnemySearchSystem>();
-        RegisterSystem<RangedEnemySearchSystem>();
-
-        RegisterSystem<PathManagerSystem>();        
-        RegisterSystem<MoveTargetAttackMelleSystem>();
+        //RegisterSystem<HumanCharacterSimpleSystem>();
+       // RegisterSystem<UnitMelleEnemySearchSystem>();
+     //   RegisterSystem<RangedEnemySearchSystem>();
+        RegisterSystem<UnitChaseSystem>();
+        RegisterSystem<PathManagerSystem>();
+        RegisterSystem<AttackingPathTransitionSystem>();
+        RegisterSystem<UnitChaseSystem>();
+       // RegisterSystem<MoveTargetAttackMelleSystem>();
         RegisterSystem<MoveTargetSystem>();
         RegisterSystem<FlowFieldFollowSystem>();
 

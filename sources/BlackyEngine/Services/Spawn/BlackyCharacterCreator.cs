@@ -337,8 +337,8 @@ public class BlackyCharacterCreator
 
         if (characterBaseData.unitAttackType == UnitAttackType.CUERPO)
         {
-         //   entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 1f, 0,durationAnim,0,ContadoresHelper.Obtener(TipoContador.UnidadesMelle)));
-         //   entity.Set(new EnemySearchComponent(radiusSearchEnemy, 0, 0));
+            entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 1f, 0,durationAnim,0,ContadoresHelper.Obtener(TipoContador.UnidadesMelle)));
+            entity.Set(new EnemySearchComponent(radiusSearchEnemy, 0, 0, ContadoresHelper.Obtener(TipoContador.IndexSearchStagering),true ));
       
         }
         else

@@ -154,11 +154,12 @@ public record struct HumanAttackComponent
 );
 
 [RegisterComponentFlecs]
-public record struct EnemySearchComponent
-(
+public record struct EnemySearchComponent(
     float Radius,           // Radio de búsqueda
     float Interval,         // Cada cuánto buscar (en segundos)
-    float Timer            // Temporizador interno
+    float Timer,            // Temporizador interno
+    int StaggerIndex,       // Índice secuencial para el staggering
+    bool EnableChase        // ¿Esta entidad persigue al objetivo si sale del radio inicial?
 );
 
 [RegisterComponentFlecs]
@@ -169,6 +170,10 @@ public record struct TeamComponent
 
 [RegisterComponentFlecs]
 public record struct SelectedTag();
+
+[RegisterComponentFlecs]
+public record struct AttackingPathFollowerTag();
+
 
 [RegisterComponentFlecs]
 public record struct PersistEntityTag();
@@ -191,6 +196,10 @@ public record struct StaticRenderTag();
 
 [RegisterComponentFlecs]
 public record struct DestroyRequestTag();
+
+[RegisterComponentFlecs]
+public record struct ChaseTargetTag();
+
 
 [RegisterComponentFlecs]
 public record struct DeadTag();

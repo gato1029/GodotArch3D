@@ -25,6 +25,7 @@ internal class UnitMeleeAttackSystem : FlecsSystemBase
           .With<DirectionComponent>()
           .With<UnitDefinitionComponent>()
           .With<AttackPendingTag>()
+          .With<StoppedTag>()
           .Without<DeadTag>()
           .Without<DestroyRequestTag>();
     }

@@ -190,7 +190,7 @@ public class RTSSelectionManager
         }
     }
 
-    private void CommandSelectedUnitsToMove(Vector2 targetPosition)
+  private void CommandSelectedUnitsToMove(Vector2 targetPosition)
     {
         List<Entity> selectedEntities = new();
         _query.Each((Entity entity) => { if (entity.IsAlive()) selectedEntities.Add(entity); });
@@ -234,6 +234,19 @@ public class RTSSelectionManager
             Vector2 formationOffset = assignment.Value;
 
             if (!entity.IsAlive()) continue;
+            
+            // Si estaba atacando o persiguiendo, limpiamos esos estados de combate
+            if (entity.Has<ChaseTargetTag>()) entity.Remove<ChaseTargetTag>();
+            if (entity.Has<AttackPendingTag>()) entity.Remove<AttackPendingTag>();
+            if (entity.Has<AttackingPathFollowerTag>()) entity.Remove<AttackingPathFollowerTag>();
+            if (entity.Has<AttackPendingComponent>())
+            {
+                ref var atp = ref entity.GetMut<AttackPendingComponent>();
+                atp.Active = false;
+                atp.Target = default;
+            }
+            AttackSlotHelper.RequestReleaseAttackSlot(entity);
+
             if (entity.Has<MovementMassiveTag>()) entity.Remove<MovementMassiveTag>();
 
             if (entity.Has<FlowFieldFollowerComponent>())
@@ -283,7 +296,7 @@ public class RTSSelectionManager
         else GD.Print($"Moviendo {unitsCommanded} unidades a {targetPosition}");
     }
 
-    private void CommandSelectedUnitsToAttack(Entity targetEnemy)
+  private void CommandSelectedUnitsToAttack(Entity targetEnemy)
     {
         if (!targetEnemy.IsAlive() || targetEnemy.Has<DeadTag>()) return;
 
@@ -296,7 +309,6 @@ public class RTSSelectionManager
         ushort idTarget = isTargetUnit ? targetEnemy.Get<UnitDefinitionComponent>().idTemplate : targetEnemy.Get<BuildingDefinitionComponent>().idTemplate;
 
         int unitsCommanded = 0;
-        List<Entity> unitsNeedingMove = new();
 
         foreach (var entity in selectedEntities)
         {
@@ -305,6 +317,7 @@ public class RTSSelectionManager
                 continue;
             }
 
+            // Si la unidad estaba siguiendo una ruta o path anterior, lo liberamos
             if (entity.Has<PathReferenceComponent>())
             {
                 var oldPath = entity.Get<PathReferenceComponent>();
@@ -312,98 +325,185 @@ public class RTSSelectionManager
                 entity.Remove<PathReferenceComponent>();
             }
 
+            // Limpiamos tags de navegación previa por si acaso
+            if (entity.Has<AttackingPathFollowerTag>()) entity.Remove<AttackingPathFollowerTag>();
+
             ref var pos = ref entity.GetMut<PositionComponent>();
-            ref var melle = ref entity.GetMut<MeleeAttackComponent>();
             Vector2 dirNormalized = entity.Has<DirectionComponent>() ? entity.Get<DirectionComponent>().normalized : Vector2.Right;
-            Vector2 originAttackCenter = pos.position + melle.OffSetRange;
 
-            bool inRange = isTargetUnit
-                ? CombatCollisionHelper.CheckCollisionWithTargetUnit(originAttackCenter, dirNormalized, melle.RangeAttack, targetPos, idTarget)
-                : CombatCollisionHelper.CheckCollisionWithTargetBuild(originAttackCenter, dirNormalized, melle.RangeAttack, targetPos, idTarget);
+            // Determinamos si es Melee o Rango para verificar si ya está en rango de ataque
+            bool inRange = false;
+            float impactThreshold = isTargetUnit && targetEnemy.Has<MoveColliderComponent>() 
+                ? targetEnemy.Get<MoveColliderComponent>().Radius 
+                : 0.5f;
 
+            if (entity.Has<MeleeAttackComponent>())
+            {
+                ref var melee = ref entity.GetMut<MeleeAttackComponent>();
+                Vector2 originAttackCenter = pos.position + melee.OffSetRange;
+
+                inRange = isTargetUnit
+                    ? CombatCollisionHelper.CheckCollisionWithTargetUnit(originAttackCenter, dirNormalized, melee.RangeAttack, targetPos, idTarget)
+                    : CombatCollisionHelper.CheckCollisionWithTargetBuild(originAttackCenter, dirNormalized, melee.RangeAttack, targetPos, idTarget);
+            }
+            else if (entity.Has<RangedAttackComponent>())
+            {
+                ref var ranged = ref entity.GetMut<RangedAttackComponent>();
+                float distSqr = pos.position.DistanceSquaredTo(targetPos);
+                float rangeSqr = ranged.Range * ranged.Range;
+                inRange = (distSqr <= rangeSqr);
+            }
+
+            // ==========================================
+            // EVALUACIÓN: ¿Está en rango, persecución directa o necesita A*?
+            // ==========================================
             if (inRange)
             {
+                // 1. YA ESTÁ EN RANGO: Ataca de inmediato
                 AttackSlotHelper.ReleaseAttackSlot(entity);
-                entity.Set(new AttackPendingComponent(true, targetEnemy, isTargetUnit, targetPos, 0));
+                entity.Set(new AttackPendingComponent(true, targetEnemy, isTargetUnit, targetPos, impactThreshold));
                 entity.Add<AttackPendingTag>();
+                
+                if (entity.Has<ChaseTargetTag>()) entity.Remove<ChaseTargetTag>();
+                if (!entity.Has<StoppedTag>()) entity.Add<StoppedTag>();
+                if (entity.Has<MoveTargetComponent>()) entity.Remove<MoveTargetComponent>();
+
                 unitsCommanded++;
             }
             else
             {
-                unitsNeedingMove.Add(entity);
+                // 2. ESTÁ LEJOS: Verificamos si tiene permitido perseguir
+                bool canChase;
+                if (entity.Has<EnemySearchComponent>())
+                {
+                    canChase = entity.Get<EnemySearchComponent>().EnableChase;
+                }
+                else
+                {
+                    bool isMobileUnit = entity.Has<UnitDefinitionComponent>() || entity.Has<MoveColliderComponent>();
+                    bool isBuilding = entity.Has<BuildingDefinitionComponent>();
+                    canChase = isMobileUnit && !isBuilding;
+                }
+
+                if (!canChase)
+                {
+                    // Unidades estáticas / Torres: No persiguen, asignan blanco directo de contraataque
+                    AssignDirectAttackTarget(entity, targetEnemy, isTargetUnit, targetPos, impactThreshold);
+                    unitsCommanded++;
+                    continue;
+                }
+
+                // 3. UNIDAD MÓVIL LEJANA: Comprobamos si hay línea de visión directa (Ruta Libre)
+                Vector2 tempTargetPos = targetPos;
+                bool hasLineOfSight = CollisionMathHelper.RutaLibre(entity, ref tempTargetPos, _world);
+
+                if (hasLineOfSight)
+                {
+                    // CASO A: Lejos pero con línea recta despejada -> Chase directo
+                    entity.Set(new AttackPendingComponent(
+                        Active: true,
+                        Target: targetEnemy,
+                        isUnit: isTargetUnit,
+                        targetPosition: targetPos,
+                        impactThereshold: impactThreshold
+                    ));
+
+                    entity.Add<ChaseTargetTag>();
+                    if (entity.Has<StoppedTag>()) entity.Remove<StoppedTag>();
+                    unitsCommanded++;
+                }
+                else
+                {
+                    // CASO B: Hay obstáculos en medio -> ¡Usamos A* global para rodearlos!
+                    Vector2 entityPos = pos.position;
+                    Vector2I originTile = TilesHelper.WorldPositionToTile(entityPos);
+                    Vector2I destinyTile = TilesHelper.WorldPositionToTile(targetPos);
+
+                    var points = _pathfinder.FindPathWorld(originTile, destinyTile);
+                    if (points != null && points.Count > 0)
+                    {
+                        int pathId = _world.State.PathRegistryManager.RegisterPath(points.ToArray());
+                        int pathLength = points.Count;
+
+                        _world.State.PathRegistryManager.AddReference(pathId);
+                        
+                        entity.Set(new PathReferenceComponent(pathId, 1, Vector2.Zero));
+                        
+                        Vector2 firstWaypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, 0);
+                        entity.Set(new MoveTargetComponent { Value = firstWaypoint });
+
+                        entity.Set(new AttackPendingComponent(
+                            Active: true,
+                            Target: targetEnemy,
+                            isUnit: isTargetUnit,
+                            targetPosition: targetPos,
+                            impactThereshold: impactThreshold
+                        ));
+                        
+                        entity.Add<AttackingPathFollowerTag>(); // Seguido por el AttackingPathTransitionSystem
+
+                        if (entity.Has<StoppedTag>()) entity.Remove<StoppedTag>();
+                        unitsCommanded++;
+                    }
+                    else
+                    {
+                        // Fallback: Si el A* no encuentra ruta, intentamos persecución directa por vectores
+                        entity.Set(new AttackPendingComponent(
+                            Active: true,
+                            Target: targetEnemy,
+                            isUnit: isTargetUnit,
+                            targetPosition: targetPos,
+                            impactThereshold: impactThreshold
+                        ));
+
+                        entity.Add<ChaseTargetTag>();
+                        if (entity.Has<StoppedTag>()) entity.Remove<StoppedTag>();
+                        unitsCommanded++;
+                    }
+                }
             }
         }
 
-        if (unitsNeedingMove.Count == 0) return;
-
-        Vector2 groupCenter = Vector2.Zero;
-        foreach (var entity in unitsNeedingMove) groupCenter += entity.Get<PositionComponent>().position;
-        groupCenter /= unitsNeedingMove.Count;
-
-        Vector2 movementDirection = (targetPos - groupCenter).Normalized();
-        Vector2I origin = TilesHelper.WorldPositionToTile(groupCenter);
-        Vector2I destiny = TilesHelper.WorldPositionToTile(targetPos);
-
-        var points = _pathfinder.FindPathWorld(origin, destiny);
-        if (points == null || points.Count == 0) return;
-
-        int pathId = _world.State.PathRegistryManager.RegisterPath(points.ToArray());
-        int pathLength = points.Count;
-        int movedCount = 0;
-
-        foreach (var entity in unitsNeedingMove)
-        {
-            if (!entity.IsAlive()) continue;
-
-            ref var melle = ref entity.GetMut<MeleeAttackComponent>();
-            int slotIndex;
-
-            if (entity.Has<AttackSlotComponent>())
-            {
-                var mySlot = entity.Get<AttackSlotComponent>();
-                slotIndex = (mySlot.Target == targetEnemy && mySlot.Target.IsAlive()) ? mySlot.SlotIndex : AttackSlotHelper.AcquireAttackSlot(entity, targetEnemy, MaxAttackSlots);
-            }
-            else
-            {
-                slotIndex = AttackSlotHelper.AcquireAttackSlot(entity, targetEnemy, MaxAttackSlots);
-            }
-
-            if (slotIndex == -1) continue;
-
-            int ring = slotIndex / SlotsPerRing;
-            int slotInRing = slotIndex % SlotsPerRing;
-            float angle = slotInRing * (MathF.Tau / SlotsPerRing);
-            float ringRadius = melle.RangeAttack - 0.85f + ring * (melle.RangeAttack * 0.5f);
-            Vector2 slotOffset = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * ringRadius;
-
-            Vector2 entityPos = entity.Get<PositionComponent>().position;
-            int startIndex = 0;
-            Vector2 waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, 0);
-            Vector2 firstTarget = waypoint + slotOffset;
-
-            while (startIndex < pathLength - 1)
-            {
-                if ((firstTarget - entityPos).Dot(movementDirection) >= 0f) break;
-                startIndex++;
-                waypoint = _world.State.PathRegistryManager.GetWaypoint(pathId, startIndex);
-                firstTarget = waypoint + slotOffset;
-            }
-
-            _world.State.PathRegistryManager.AddReference(pathId);
-            entity.Set(new PathReferenceComponent(pathId, startIndex + 1, slotOffset));
-            entity.Set(new MoveTargetComponent { Value = firstTarget });
-
-            if (entity.Has<StoppedTag>()) entity.Remove<StoppedTag>();
-            entity.Set(new AttackPendingComponent(true, targetEnemy, isTargetUnit, targetPos, 0));
-            entity.Add<AttackPendingTag>();
-            unitsCommanded++;
-            movedCount++;
-        }
-
-        if (movedCount == 0) _world.State.PathRegistryManager.ReleasePath(pathId);
-        GD.Print($"{unitsCommanded} unidades atacando a la entidad {targetEnemy.Id}");
+        GD.Print($"{unitsCommanded} unidades ordenadas para atacar a la entidad {targetEnemy.Id}");
     }
+    /// <summary>
+    /// Asigna un objetivo de ataque directo a una unidad o estructura estática,
+    /// obligándola a disparar/atacar sin activar la persecución (Hold Ground).
+    /// </summary>
+    public  void AssignDirectAttackTarget( Entity entity, Entity targetEntity, bool isUnit, Vector2 targetPos, float impactThreshold)
+    {
+        if (!entity.IsAlive() || !targetEntity.IsAlive()) return;
 
+        // 1. Aseguramos que la unidad esté detenida (no se mueva)
+        entity.Add<StoppedTag>();
+
+        // 2. Si tenía un componente de movimiento previo, lo removemos para que no intente caminar
+        if (entity.Has<MoveTargetComponent>())
+        {
+            entity.Remove<MoveTargetComponent>();
+        }
+
+        // 3. Limpiamos cualquier tag de persecución por si venía de otro estado
+        if (entity.Has<ChaseTargetTag>())
+        {
+            entity.Remove<ChaseTargetTag>();
+        }
+
+        // 4. Inyectamos el AttackPendingComponent con los datos del blanco
+        entity.Set(new AttackPendingComponent(
+            Active: true,
+            Target: targetEntity,
+            isUnit: isUnit,
+            targetPosition: targetPos,
+            impactThereshold: impactThreshold
+        ));
+
+        // 5. Activamos el tag de ataque para que los sistemas de Melee o Rango lo procesen de inmediato
+        if (!entity.Has<AttackPendingTag>())
+        {
+            entity.Add<AttackPendingTag>();
+        }
+    }
     private void CommandSelectedUnitsToMoveFlowField(Vector2 targetPosition)
     {
         List<Entity> selectedEntities = new();
