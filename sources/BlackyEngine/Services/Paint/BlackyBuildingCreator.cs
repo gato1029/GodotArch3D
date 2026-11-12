@@ -17,6 +17,7 @@ using GodotFlecs.sources.Flecs.Components;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using GodotEcsArch.sources.managers.GpuDriven;
 
 namespace GodotEcsArch.sources.BlackyEngine.Services.Paint;
 
@@ -214,7 +215,7 @@ public class BlackyBuildingCreator
         if (entity.Has<RenderGPUComponent>())
         {
             RenderGPUComponent gpu = entity.Get<RenderGPUComponent>();
-            AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.FreeInstance(gpu.rid, gpu.instance);
         }
         if (entity.Has<RangedAttackComponent>())
         {
@@ -278,28 +279,29 @@ public class BlackyBuildingCreator
 
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
-        Transform3D transform = new(Basis.Identity, worldPosition);
-        transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
-
+      
         if (render)
         {
-            var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
-            RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
-            RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, spriteData.uv);
-            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(1, 1, 1, renderInstance.layerTexture));
-            entity.Set(new RenderGPUComponent(0,renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
-                     layer, depthOffset, spriteData.scale, offset));
+            var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(spriteData.idModMaterial);
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+                BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, spriteData.scale);
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+                BufferSlot.StaticData, renderInstance.instanceId, spriteData.uv);
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+                BufferSlot.Flags, renderInstance.instanceId, spriteData.mirrorLocalX, spriteData.mirrorLocalY, 1, renderInstance.layer);
+            entity.Set(new RenderGPUComponent(renderInstance.gpuDataIndex, renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer,
+                layer, depthOffset, spriteData.scale, offset));
         }
+
         else
         {
-            entity.Set(new RenderGPUComponent(0,default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
+            entity.Set(new RenderGPUComponent(-1, default, -1, 0, -1, layer, depthOffset, spriteData.scale, offset));
         }
         
     }
 
     private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile, bool render)
     {
-        
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile);
         Vector2 offset = animationData.offsetInternal;
 
@@ -307,29 +309,27 @@ public class BlackyBuildingCreator
         float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
-        Transform3D transform = new(Basis.Identity, worldPosition);
-        transform = transform.ScaledLocal(new Vector3(animationData.scale, animationData.scale, 1));
+ 
+        float indiceAnimation = AtlasTexturesModsManager.Instance.DrivenRenderManager.SimpleAnimations.GetLutIndex(idSprite);
+        float currentTime = Time.GetTicksMsec() / 1000.0f; // Sincronizador de inicio de animación
         
-        entity.Set(new RenderTransformComponent(transform));
         if (render)
         {
-            var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
-            RenderingServer.MultimeshInstanceSetTransform(renderInstance.rid, renderInstance.instance, transform);
-            RenderingServer.MultimeshInstanceSetCustomData(renderInstance.rid, renderInstance.instance, animationData.uvFramesArray[0]);
-            RenderingServer.MultimeshInstanceSetColor(renderInstance.rid, renderInstance.instance, new Godot.Color(1, 1, 1, renderInstance.layerTexture));
-            entity.Set(new RenderGPUComponent(0, renderInstance.rid, renderInstance.instance, 0, renderInstance.layerTexture,
-                 layer, depthOffset, animationData.scale, offset));
+            var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(animationData.idModMaterial);
 
-            entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
-            entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
-            entity.Add<SpriteSimpleAnimationTag>();
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+                BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, animationData.scale);
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+                BufferSlot.AnimState, renderInstance.instanceId, indiceAnimation, currentTime, 0, 0);
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+                BufferSlot.Flags, renderInstance.instanceId, 0, 0, 1, renderInstance.layer);
+            entity.Set(new RenderGPUComponent(renderInstance.gpuDataIndex, renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer,
+                layer, depthOffset, animationData.scale, offset));
         }
         else
         {
-            entity.Set(new RenderGPUComponent(0,default, -1, 0, -1,layer, depthOffset, animationData.scale, offset));
+            entity.Set(new RenderGPUComponent(-1, default, -1, 0, -1, layer, depthOffset, animationData.scale, offset));
         }
-        
-        
     }
 
     private int AsignarCollider(int mundoX, int mundoY, Entity entity, TileSpriteData tileSpriteData, out  int idDebugBody, ushort team)

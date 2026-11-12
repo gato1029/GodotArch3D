@@ -251,34 +251,7 @@ public class BlackyResourcesCreator
         }
 
     }
-    private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile, bool render)
-    {
-        
-        Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
-        Vector2 offset = spriteData.offsetInternal;
-
-        float depthOffset = spriteData.yDepthRenderFormat;
-        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
-
-        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
-
-        Transform3D transform = new(Basis.Identity, worldPosition);
-        transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
-        if (render)
-        {
-            var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
-            RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
-            RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
-            RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
-            entity.Set(new RenderGPUComponent(0, RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
-                     layer, depthOffset, spriteData.scale, offset));
-        }
-        else
-        {
-            entity.Set(new RenderGPUComponent(0, default, -1, 0, -1,layer, depthOffset, spriteData.scale, offset));
-        }
-        
-    }
+    
     private void CreateAnimationGPU(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile, bool render)
     {
 
