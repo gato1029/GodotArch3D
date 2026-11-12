@@ -159,22 +159,23 @@ public class FlecsManager
         //RegisterSystem<HumanInputSystem>();
         //RegisterSystem<HumanCharacterSystem>();
         //RegisterSystem<HumanCharacterSimpleSystem>();
-       // RegisterSystem<UnitMelleEnemySearchSystem>();
-     //   RegisterSystem<RangedEnemySearchSystem>();
+        // RegisterSystem<UnitMelleEnemySearchSystem>();
+        //   RegisterSystem<RangedEnemySearchSystem>();
+        RegisterSystem<UniversalEnemySearchSystem>();
         RegisterSystem<UnitChaseSystem>();
         RegisterSystem<PathManagerSystem>();
         RegisterSystem<AttackingPathTransitionSystem>();
         RegisterSystem<UnitChaseSystem>();
-       // RegisterSystem<MoveTargetAttackMelleSystem>();
+        // RegisterSystem<MoveTargetAttackMelleSystem>();
         RegisterSystem<MoveTargetSystem>();
         RegisterSystem<FlowFieldFollowSystem>();
 
-         // aqui antes el hash de colliders
-        
+        // aqui antes el hash de colliders
+
         //RegisterSystem<ResolveTerrainCollisionSystem>(); // resuelve colisiones con el terreno, debe ir antes de movimiento para ajustar la posición       
-       
-   
-                                                         
+
+
+
 
 
         //RegisterSystem<ApplyOverlapCorrectionsSystem>(); // <- nuevo
@@ -203,7 +204,7 @@ public class FlecsManager
         RegisterSystem<ApplyDamageSystem>(); // aplica el daño a las unidades/buildings single thread
         RegisterSystem<UnitDamageApplySystem>(); // aplica efectos de daño a las unidades
         RegisterSystem<BuildingDamageApplySystem>(); // aplica efectos de daño a los edificios
-        
+
         // transform
         // RegisterSystem<SpriteTransformStaticSystem>(); revisar si no usa, de ser asi quitarlo
         RegisterSystem<ProjectileTransformSystem>();
@@ -217,18 +218,18 @@ public class FlecsManager
         //RegisterSystem<StateCharacterSystem>();
 
         // animaciones
-        RegisterSystem<AnimationLayerUpdateSystem>();
-        RegisterSystem<GodotEcsArch.sources.Flecs.Systems.Animation.AnimationSystem>();
-       // RegisterSystem<AnimationSimpleSpriteSystem>(); // ya no es necesario
+      //  RegisterSystem<AnimationLayerUpdateSystem>();
+      //  RegisterSystem<AnimationSystem>();
+        // RegisterSystem<AnimationSimpleSpriteSystem>(); // ya no es necesario
 
         // render
         RegisterSystem<BarLifeTransformSystem>();
-        RegisterSystem<RenderSimpleSpriteSystem>();
-        RegisterSystem<RenderSpriteSystem>();
-        RegisterSystem<LayeredSpriteRenderSystem>();
-        RegisterSystem<RenderTileSpriteTextureSystem> ();
+  //      RegisterSystem<RenderSimpleSpriteSystem>();
+   //     RegisterSystem<RenderSpriteSystem>();
+ //       RegisterSystem<LayeredSpriteRenderSystem>();
+   //     RegisterSystem<RenderTileSpriteTextureSystem>();
         RegisterSystem<HumanCameraMoveSystem>();
-        
+
         RegisterSystem<RvoDebugSystem>();
 
         RegisterSystem<RegisterFastHashSystem>();

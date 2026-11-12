@@ -123,7 +123,7 @@ public sealed class BlackyWorld : IDisposable
         if (!isLoad)
         {
             // si es nuevo hacemos procedural etc
-          //  ProceduralTerritory = new BlackyWorldProceduralTerritory(this, Config);
+            ProceduralTerritory = new BlackyWorldProceduralTerritory(this, Config);
             //Procedural = new BlackyWorldProceduralGeneration(this, Config);
             DebugBoot();
         }

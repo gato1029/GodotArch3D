@@ -2,10 +2,12 @@ using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyEngine.Core;
+using GodotEcsArch.sources.managers.Characters;
+using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
-using GodotFlecs.sources.Flecs.Systems;
+using System;
 
-namespace GodotEcsArch.sources.Flecs.Systems.Units;
+namespace GodotFlecs.sources.Flecs.Systems.Units;
 
 internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
 {
@@ -18,7 +20,9 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
           .With<RangedAttackComponent>()
           .With<AttackPendingComponent>()
           .With<AttackPendingTag>()
+          .With<StoppedTag>()
           .Without<DeadTag>();
+        // Nota: NO exigimos DirectionComponent en la query global para permitir que las torretas sin dirección también disparen.
     }
 
     protected override void OnIter(Iter it)
@@ -27,6 +31,7 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
         if (world == null) return;
 
         var arrowPool = world.Services.ArrowPool;
+        var stateRegister = world.State.stateChangeRegistry;
         float deltaTime = it.DeltaTime();
 
         var posArray = it.Field<PositionComponent>(0);
@@ -58,6 +63,37 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
 
             if (distanceSquared <= rangeSquared)
             {
+                // 🔄 ROTACIÓN / DIRECCIÓN OPCIONAL: Si la entidad tiene DirectionComponent (ej. arqueros), la orientamos hacia el objetivo
+                if (entity.Has<DirectionComponent>())
+                {
+                    ref var dir = ref entity.GetMut<DirectionComponent>();
+                    Vector2 lookDir = targetPos.position - pos.position;
+
+                    if (lookDir != Vector2.Zero)
+                    {
+                        dir.value = lookDir.Normalized();
+                        dir.normalized = new Vector2(
+                            MathF.Abs(lookDir.X) < 0.01f ? 0 : MathF.Sign(lookDir.X),
+                            MathF.Abs(lookDir.Y) < 0.01f ? 0 : MathF.Sign(lookDir.Y)
+                        );
+
+                        switch (dir.directionType)
+                        {
+                            case DirectionAnimationType.DOS:
+                                dir.animationDirection = CommonOperations.GetDirectionAnimationLeftRight(dir.value);
+                                break;
+                            case DirectionAnimationType.CUATRO:
+                                dir.animationDirection = CommonOperations.GetDirectionAnimation(dir.value);
+                                break;
+                            case DirectionAnimationType.OCHO:
+                                dir.animationDirection = CommonOperations.GetDirectionAnimationEight(dir.value);
+                                break;
+                        }
+
+                        stateRegister.SetDirection(entity.Id.Value, dir.animationDirection);
+                    }
+                }
+
                 // 3. Controlar la cadencia de fuego (Cooldown)
                 ranged.Timer += deltaTime;
                 if (ranged.Timer < ranged.Cooldown)
@@ -67,7 +103,7 @@ internal class UnitRangedAttackExecutionSystem : FlecsSystemBase
 
                 ranged.Timer -= ranged.Cooldown;
 
-                // 4. Delegar SIEMPRE al hilo principal de forma segura
+                // 4. Delegar el disparo del proyectil
                 Vector2 direction = (targetPos.position - pos.position).Normalized();
                 float totalDist = pos.position.DistanceTo(targetPos.position);
 

@@ -52,8 +52,8 @@ internal class DeathCleanupSystem : FlecsSystemBase
                 var entity = it.Entity(i);
                 ref var gpu = ref gpuArray[i];
                 ref var spatial = ref spatialArray[i];
-                AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
-                dynGrid.UnregisterDirect(spatial.Value); // toda unidad deberia tener su idspatial
+                AtlasTexturesModsManager.Instance.DrivenRenderManager.FreeInstance(gpu.gpuindex, gpu.instance);
+                dynGrid.UnregisterDirect(spatial.Value); // toda unidad debe tener su idspatial
                              
                 world.Tick.TotalUnits--;
                 
@@ -110,6 +110,11 @@ internal class DeathCleanupSystem : FlecsSystemBase
                     var bar = entity.Get<HealthBarComponent>();
                     AtlasTexturesModsManager.Instance.FreeLifeBar(bar.MultiMeshRid,bar.InstanceId);
                 }
+                if (entity.Has<EnemySearchComponent>())
+                {
+                    var enemy = entity.Get<EnemySearchComponent>();
+                    ContadoresHelper.Liberar(TipoContador.IndexSearchStagering, enemy.StaggerIndex);
+                }
                 stateRegister.Release(entity.Id.Value);
                 entity.Destruct();
             }
@@ -159,7 +164,7 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                 ref var  pos = ref posArray[i];
                 if (gpu.instance!=-1)
                 {
-                    AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance);
+                    AtlasTexturesModsManager.Instance.DrivenRenderManager.FreeInstance(gpu.gpuindex, gpu.instance);
                 }
                 
                 staticGrid.FreeColliderSafe(spatial.Value); // todo edificio deberia tener su collider
@@ -202,6 +207,11 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                 if (entity.Has<AttackSlotComponent>())
                 {
                     AttackSlotHelper.ReleaseAttackSlot(entity);
+                }
+                if (entity.Has<EnemySearchComponent>())
+                {
+                    var enemy = entity.Get<EnemySearchComponent>();
+                    ContadoresHelper.Liberar(TipoContador.IndexSearchStagering, enemy.StaggerIndex);
                 }
                 entity.Destruct();
             }

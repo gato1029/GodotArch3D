@@ -21,7 +21,7 @@ public class DirectionSystem : FlecsSystemBase
         qb.With<VelocityComponent>()
           .With<DirectionComponent>()
           .With<StateComponent>()
-          .With<SteeringComponent>() // <--- Añadimos esto
+          .With<SteeringComponent>() 
           .Without<DeadTag>()
           .Without<StoppedTag>();
     }

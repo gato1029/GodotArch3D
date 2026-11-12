@@ -3,6 +3,7 @@ using Godot;
 using GodotEcsArch.sources.BlackyEngine.State.RuntimeCaches;
 using GodotEcsArch.sources.BlackyTiles.Data;
 using GodotEcsArch.sources.managers.Chunks;
+using GodotEcsArch.sources.managers.GpuDriven;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
@@ -85,15 +86,16 @@ public class BlackyEntityRenderSystem
                 ref var gpu = ref ent.Ensure<RenderGPUComponent>();
                 if (gpu.instance!=-1)
                 {
-                    AtlasTexturesModsManager.Instance.FreeInstance(gpu.rid, gpu.instance); // liberamos instancia
+                    AtlasTexturesModsManager.Instance.DrivenRenderManager.FreeInstance(gpu.gpuindex, gpu.instance); // liberamos instancia
                     gpu.rid = default;
+                    gpu.gpuindex = 0;
                     gpu.instance = -1;
                     gpu.layerTextureMaterial = -1;
 
-                    if (ent.Has<SpriteSimpleAnimationTag>())
-                    {
-                        ent.Remove<SpriteSimpleAnimationTag>();
-                    }
+                    //if (ent.Has<SpriteSimpleAnimationTag>())
+                    //{
+                    //    ent.Remove<SpriteSimpleAnimationTag>();
+                    //}
                 }                
             }
         }
@@ -147,7 +149,7 @@ public class BlackyEntityRenderSystem
 
     private void CreateSprite(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteData spriteData, int heightRender, Vector2I positionTile)
     {
-        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(spriteData.idModMaterial);
+        var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(spriteData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
         Vector2 offset = spriteData.offsetInternal;
 
@@ -156,20 +158,20 @@ public class BlackyEntityRenderSystem
 
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
-        Transform3D transform = new(Basis.Identity, worldPosition);
-        transform = transform.ScaledLocal(new Vector3(spriteData.scale, spriteData.scale, 1));
-
-        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
-        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, spriteData.uv);
-        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
-
-        entity.Set(new RenderGPUComponent(0,RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
-                 layer, depthOffset, spriteData.scale, offset));
+        
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+        BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, spriteData.scale);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.StaticData, renderInstance.instanceId, spriteData.uv);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Flags, renderInstance.instanceId, spriteData.mirrorLocalX, spriteData.mirrorLocalY, 1, renderInstance.layer);
+        entity.Set(new RenderGPUComponent(renderInstance.gpuDataIndex, renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer,
+                layer, depthOffset, spriteData.scale, offset));
     }
 
     private void CreateAnimation(Entity entity, WindowsDataBase.Accesories.DataBase.SpriteAnimationData animationData, int idSprite, int heightRender, Vector2I positionTile)
     {
-        var RenderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRender(animationData.idModMaterial);
+        var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(animationData.idModMaterial);
         Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile);
         Vector2 offset = animationData.offsetInternal;
 
@@ -177,21 +179,18 @@ public class BlackyEntityRenderSystem
         float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
 
-        Transform3D transform = new(Basis.Identity, worldPosition);
-        transform = transform.ScaledLocal(new Vector3(animationData.scale, animationData.scale, 1));
+        float indiceAnimation = AtlasTexturesModsManager.Instance.DrivenRenderManager.SimpleAnimations.GetLutIndex(idSprite);
+        float currentTime = Time.GetTicksMsec() / 1000.0f; // Sincronizador de inicio de animación
+       
 
-        RenderingServer.MultimeshInstanceSetTransform(RenderInstance.rid, RenderInstance.instance, transform);
-        RenderingServer.MultimeshInstanceSetCustomData(RenderInstance.rid, RenderInstance.instance, animationData.uvFramesArray[0]);
-        RenderingServer.MultimeshInstanceSetColor(RenderInstance.rid, RenderInstance.instance, new Godot.Color(1, 1, 1, RenderInstance.layerTexture));
-
-        entity.Set(new RenderTransformComponent(transform));
-        entity.Set(new RenderGPUComponent(0,RenderInstance.rid, RenderInstance.instance, 0, RenderInstance.layerTexture,
-                 layer, depthOffset, animationData.scale, offset));
-
-        entity.Set(new AnimationSimpleComponent(idSprite, 1, 0, animationData.frameDuration, false, true, true));
-        entity.Set(new RenderFrameDataComponent { uvMap = animationData.uvFramesArray[0] });
-        entity.Set(new PositionComponent { position = new Vector2(worldPosition.X, worldPosition.Y), tilePosition = positionTile });
-        entity.Add<SpriteSimpleAnimationTag>();
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+        BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, animationData.scale);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+        BufferSlot.AnimState, renderInstance.instanceId, indiceAnimation, currentTime, 0, 0);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+        BufferSlot.Flags, renderInstance.instanceId, 0, 0, 1, renderInstance.layer);
+        entity.Set(new RenderGPUComponent(renderInstance.gpuDataIndex, renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer,
+             layer, depthOffset, animationData.scale, offset));
     }
 
 
