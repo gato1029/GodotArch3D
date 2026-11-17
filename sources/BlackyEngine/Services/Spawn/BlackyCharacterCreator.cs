@@ -159,6 +159,7 @@ public class BlackyCharacterCreator
     }
     private Entity CreateGenericGPU(ushort characterId, Entity entity, CharacterModelBaseData characterBaseData, Vector2 position, int height, int health = 0)
     {
+        
         var idTileSprite = characterBaseData.idTileSpriteData;
         int spriteId = AtlasModsManager.GetSpriteUniqueId(idTileSprite);
         AtlasModsManager.TryGetTileSprite(spriteId, out var sprite);
@@ -194,12 +195,12 @@ public class BlackyCharacterCreator
         entity.Set(new RenderGPUComponent(renderInstance.gpuDataIndex,renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer, layer, depthOffset, characterBaseData.scale, originOffset));
   
         world.State.stateChangeRegistry.RegisterEntity(entity.Id.Value, renderInstance.gpuDataIndex, renderInstance.instanceId, spriteId,BehaviorType.PERSONAJE_PRINCIPAL);
-        entity.Set(new GodotFlecs.sources.Flecs.Components.StateComponent
-        {
-            stateType = StateType.IDLE,
-            behaviorType = BehaviorType.PERSONAJE_PRINCIPAL,
-            lastStateType = StateType.BLOCKED
-        });
+         entity.Set(new GodotFlecs.sources.Flecs.Components.StateComponent
+         {
+             stateType = StateType.IDLE,
+             behaviorType = BehaviorType.PERSONAJE_PRINCIPAL,
+             lastStateType = StateType.BLOCKED
+         });
         if (characterBaseData.isPersist)
         {
             entity.Add<PersistEntityTag>(); // O un componente con datos si lo prefieres
@@ -207,39 +208,37 @@ public class BlackyCharacterCreator
         entity.Set(new TeamComponent(1));
         entity.Set(new UnitDefinitionComponent(characterId));
         entity.Set(new PositionComponent(position, Vector2I.Zero, height));
-        entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.OCHO, GodotEcsArch.sources.components.AnimationDirection.LEFT));
+         entity.Set(new DirectionComponent(Godot.Vector2.Zero, Godot.Vector2.Zero, DirectionAnimationType.OCHO, GodotEcsArch.sources.components.AnimationDirection.LEFT));
         entity.Set(new VelocityComponent(new Vector2(0, 0), 3, new Vector2(0, 0), 18));
         entity.Set(new MoveResolutorComponent(false, 0, position, 0, 0, 0, 0, 0, 0, 0));
-    //    entity.Set(new PlayerInputComponent());
         entity.Set(new AttackSlotsComponent { OccupiedMask = 0 });
         
         if (health != 0)
-        {
-            entity.Set(new HealthComponent(1000, health));
-        }
-        else
-        {
-            entity.Set(new HealthComponent(1000, 1000));
-        }
-
-
-        float rvoRadius = MeshCreator.PixelsToUnits(16);
-
-        entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 0f, 0, durationAnim,0,ContadoresHelper.Obtener(TipoContador.UnidadesMelle)));
-        entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero, Vector2.Zero));
-        entity.Set(new WeaponComponent(1, false));
-
-        AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody, 1);
-
-        int idDebugRangeMelle = CollisionShapeDraw.Instance.DrawCircleShape(colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, Colors.Blue);
-
-        if (DEBUG_COLLIDERS)
-        {
-            entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle, 0));
-        }
-
-        entity.Add<UseBoidTag>();
-        AddSelectionRender(entity);
+         {
+             entity.Set(new HealthComponent(1000, health));
+         }
+         else
+         {
+             entity.Set(new HealthComponent(1000, 1000));
+         }
+        //
+        //
+         float rvoRadius = MeshCreator.PixelsToUnits(16);
+        
+         entity.Set(new MeleeAttackComponent(20, colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, 0f, 0, durationAnim,0,ContadoresHelper.Obtener(TipoContador.UnidadesMelle)));
+         entity.Set(new SteeringComponent(rvoRadius, 4, Vector2.Zero, Vector2.Zero));
+         entity.Set(new WeaponComponent(1, false));
+        
+         AddCollider(entity, position, characterBaseData.bodyColliders, colliderMove, out int idDebugMove, out int idDebugBody, 1);
+         
+         if (DEBUG_COLLIDERS)
+         { 
+             int idDebugRangeMelle = CollisionShapeDraw.Instance.DrawCircleShape(colliderAtackMelle.Radius, colliderAtackMelle.OriginCurrent, Colors.Blue);
+             entity.Set(new RvoAgentDebugComponent(idDebugMove, idDebugBody, idDebugRangeMelle, 0));
+         }
+        
+         entity.Add<UseBoidTag>();
+         AddSelectionRender(entity);
         AddBarLife(entity, 1000, 1000, position, height, sprite.offsetLifeBarYFormat * characterBaseData.scale);
         return entity;
     }

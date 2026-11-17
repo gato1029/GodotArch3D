@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Flecs.NET.Core.Ecs;
+using FileAccess = Godot.FileAccess;
 
 namespace GodotEcsArch.sources.BlackyEngine.Generation.Terrain;
 

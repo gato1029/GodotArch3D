@@ -12,9 +12,6 @@ using System.Threading.Tasks;
 
 namespace GodotFlecs.sources.Flecs.Components;
 
-
-
-[RegisterComponentFlecs]
 public struct DamageEvent
 {
     public Entity Source;   // Quién causa el daño
@@ -46,24 +43,24 @@ public enum AnimationType
 }
 
 
-[RegisterComponentFlecs]
+
 public record struct DeathTimerComponent
 (
    float RemainingTime
 );
-[RegisterComponentFlecs]
+
 public record struct DamagePendingComponent
 (
     int Amount,
     Entity Source
 );
 
-[RegisterComponentFlecs]
+
 public record struct AmountComponent
 (
    int value
 );
-[RegisterComponentFlecs]
+
 public record struct HealthBarComponent
 (
      Rid MultiMeshRid,
@@ -72,14 +69,14 @@ public record struct HealthBarComponent
      float HeightOffset   // A qué altura flota sobre la unidad
 );
 
-[RegisterComponentFlecs]
+
 public record struct HealthComponent
 (
     int MaxHealth, 
     int value
 );
 
-[RegisterComponentFlecs]
+
 public record struct AttackPendingComponent
 (
     bool Active,
@@ -89,13 +86,13 @@ public record struct AttackPendingComponent
     float impactThereshold
 );
 
-[RegisterComponentFlecs]
+
 public record struct AttackPendingRelation
 (     
 );
 
 
-[RegisterComponentFlecs]
+
 public record struct ProjectileComponent
 {
     public Entity Owner;     // Quién lo disparó (unidad o torre)
@@ -109,7 +106,7 @@ public record struct ProjectileComponent
     public Vector2 TargetPosition;  // posición inicial del objetivo
 }
 
-[RegisterComponentFlecs]
+
 public record struct RangedAttackComponent
 (
     ushort idMod,
@@ -122,15 +119,13 @@ public record struct RangedAttackComponent
     float SpeedProjectile,
     int NumberUnitRange
 );
-[RegisterComponentFlecs]
+
 public record struct WeaponComponent
 (
     int idWeapon,
     bool isRanged
-    //Dictionary< AnimationDirection,GeometricShape2D> collidersDirection
-    
 );
-[RegisterComponentFlecs]
+
 public record struct MeleeAttackComponent
 (
     int Damage,
@@ -143,7 +138,7 @@ public record struct MeleeAttackComponent
     int numberUnitMelle
 );
 
-[RegisterComponentFlecs]
+
 public record struct HumanAttackComponent
 (       
    int Damage,
@@ -153,7 +148,7 @@ public record struct HumanAttackComponent
    float Timer            // Temporizador interno
 );
 
-[RegisterComponentFlecs]
+
 public record struct EnemySearchComponent(
     float Radius,           // Radio de búsqueda
     float Interval,         // Cada cuánto buscar (en segundos)
@@ -162,77 +157,77 @@ public record struct EnemySearchComponent(
     bool EnableChase        // ¿Esta entidad persigue al objetivo si sale del radio inicial?
 );
 
-[RegisterComponentFlecs]
+
 public record struct TeamComponent
 (
     ushort TeamId            // Ej: 0 = player, 1 = enemigos
 );
 
-[RegisterComponentFlecs]
+
 public record struct SelectedTag();
 
-[RegisterComponentFlecs]
+
 public record struct AttackingPathFollowerTag();
 
 
-[RegisterComponentFlecs]
+
 public record struct PersistEntityTag();
-[RegisterComponentFlecs]
+
 public record struct RvoDeltaTag();
 
-[RegisterComponentFlecs]
+
 public record struct ActiveProjectileTag();
 
-[RegisterComponentFlecs]
+
 public record struct ProjectileInitializedTag();
 
 
 
-[RegisterComponentFlecs]
+
 public record struct StaticTag();
 
-[RegisterComponentFlecs]
+
 public record struct StaticRenderTag();
 
-[RegisterComponentFlecs]
+
 public record struct DestroyRequestTag();
 
-[RegisterComponentFlecs]
+
 public record struct ChaseTargetTag();
 
 
-[RegisterComponentFlecs]
+
 public record struct DeadTag();
-[RegisterComponentFlecs]
+
 public struct AttackPendingTag { }
 
-[RegisterComponentFlecs]
+
 public record struct UseRvoTag();   // unidades controladas por RVO
-[RegisterComponentFlecs]
+
 public record struct UseBoidTag();  // unidades con avoidance simple
 
 
-[RegisterComponentFlecs]
+
 public record struct SpriteSimpleAnimationTag();
 
-[RegisterComponentFlecs]
+
 public record struct RenderDisabledTag();
 
 
 
-[RegisterComponentFlecs]
+
 public record struct DirtyTileSpriteTextureRenderTag();
 
-[RegisterComponentFlecs]
+
 public record struct DirtyTransformTag();
 
-[RegisterComponentFlecs]
+
 public record struct UnitDefinitionComponent
 (
     ushort idTemplate // id Template de la unidad, para buscar en la base de datos
 );
 
-[RegisterComponentFlecs]
+
 public record struct BuildingDefinitionComponent
 (
     ushort idTemplate, // id Template del edificio
@@ -241,27 +236,27 @@ public record struct BuildingDefinitionComponent
     int idSpriteDestruccion 
 );
 
-[RegisterComponentFlecs]
+
 public record struct ResourceDefinitionComponent
 (
     ushort idTemplate, // id Template del recurso
     int idSpriteTemplate // id template del sprite    
 );
 
-[RegisterComponentFlecs]
+
 public record struct IdGenericComponent
 (
     long id,
     EntityType entityType
 );
 
-[RegisterComponentFlecs]
+
 public record struct RenderFrameDataComponent
 {
     public Color uvMap;
 }
 
-[RegisterComponentFlecs]
+
 public record struct RenderLayerListComponent
 {
     public AnimationComponent[] Animations;
@@ -270,7 +265,7 @@ public record struct RenderLayerListComponent
     public RenderTransformComponent[] Transforms;
 }
 
-[RegisterComponentFlecs]
+
 public record struct AnimationSimpleComponent
 (
    int idSprite,      
@@ -283,7 +278,7 @@ public record struct AnimationSimpleComponent
 );
 
 
-[RegisterComponentFlecs]
+
 public record struct AnimationComponent
 (
    long idSpriteOrAnimation,
@@ -298,19 +293,19 @@ public record struct AnimationComponent
    bool visible
 );
 
-[RegisterComponentFlecs]
+
 public record struct TileSpriteComponent
 (
     long idTileSprite
 );
 
 
-[RegisterComponentFlecs]
+
 public record struct LayerRenderComponent
 (
     int layerRender       
 );
-[RegisterComponentFlecs]
+
 public record struct RenderSelectionGPUComponent
 (
     Rid rid,
@@ -319,7 +314,7 @@ public record struct RenderSelectionGPUComponent
     int layerRender,
     Vector2 offset
 );
-[RegisterComponentFlecs]
+
 public record struct RenderGPUComponent
 (      
     // ojo idMaterial ya no se usa
@@ -334,7 +329,7 @@ public record struct RenderGPUComponent
     Vector2 originOffset       
 );
 
-[RegisterComponentFlecs]
+
 public record struct RenderInstanceComponent
 (
     Rid rid,
@@ -342,7 +337,7 @@ public record struct RenderInstanceComponent
     int materialId,        
     bool isActive
 );
-[RegisterComponentFlecs]
+
 public record struct RenderTransformComponent
 (
     Transform3D transform
@@ -361,7 +356,7 @@ public record struct AnimationCustomCharacterComponent
      AnimationExtraData[] animationExtraComponent
 );
 
-[RegisterComponentFlecs]
+
 public struct PlayerInputComponent
 {
     public Vector2 moveDirection;
@@ -370,7 +365,7 @@ public struct PlayerInputComponent
     public bool isAttack;
 }
 
-[RegisterComponentFlecs]
+
 public record struct StateComponent
 {
     public StateType lastStateType;
@@ -378,23 +373,23 @@ public record struct StateComponent
     public BehaviorType behaviorType;                   
 }
 
-[RegisterComponentFlecs]
+
 public record struct BuildingComponent
 {
     public Rect2 colliderLocal;        
 }
 
-[RegisterComponentFlecs]
+
 public record struct VelocityComponent(Vector2 currentVel, float MaxSpeed, Vector2 desiredVel,float Acceleration );
 
-[RegisterComponentFlecs]
+
 public record struct MoveTargetComponent(
     Vector2 Value
     );
 
 
 
-[RegisterComponentFlecs]
+
 public record struct MoveResolutorComponent(
     bool Blocked,     // Flag que indica si el agente está bloqueado
     float BlockedTimer, // tiempo acumulado sin moverse
@@ -408,27 +403,27 @@ public record struct MoveResolutorComponent(
     float AvoidanceTimer// NUEVO: cuántas veces seguidas no pudo avanzar
 );
 
-[RegisterComponentFlecs]
+
 public record struct RvoAgentIdComponent(
     int Id,
     float radius
     );
 
 
-[RegisterComponentFlecs]
+
 public record struct RvoAgentDebugComponent(
     int idShapeMove,
     int idShapeBody,
     int idShapeRadiusAttack,
     int idShapeRadiusRangeSearch
     );
-[RegisterComponentFlecs]
+
 public struct SpatialComponent
 {
     public Vector2I Chunk;
     public int IndexInBucket;
 }
-[RegisterComponentFlecs]
+
 public record struct PositionComponent
 (         
      Vector2 position,
@@ -439,12 +434,12 @@ public struct ProjectilePositionComponent
 {
     public Vector2 Position;
 }
-[RegisterComponentFlecs]
+
 public struct ProjectileVelocityComponent
 {
     public Vector2 Velocity;
 }
-[RegisterComponentFlecs]
+
 public struct ProjectileTargetComponent
 {
     public ushort idMod;
@@ -457,7 +452,7 @@ public struct ProjectileTargetComponent
     public float impactThereshold;
 }
 
-[RegisterComponentFlecs]
+
 public record struct DirectionComponent
 (
     Vector2 value,
@@ -465,7 +460,7 @@ public record struct DirectionComponent
     DirectionAnimationType directionType,
     AnimationDirection animationDirection
 );
-[RegisterComponentFlecs]
+
 public record struct ColliderComponent
 (
     int idCollider,
@@ -475,21 +470,21 @@ public record struct ColliderComponent
     Vector2 offsetMove,
     int idDebug
 );
-[RegisterComponentFlecs]
+
 public record struct ColliderDebugComponent
 (
      List<int> idShapes
 );
 
 
-[RegisterComponentFlecs]
+
 public record struct TileSpriteTextureComponent
 (
     int idSpriteInternal
 );
 
 // El componente que se añade a cualquier entidad que necesite colisiones
-[RegisterComponentFlecs]
+
 public record struct SpatialIDComponent
 (
      int Value,     // ID compacto para el array
@@ -510,7 +505,7 @@ public enum ShapeType : byte
     Circle,    
     Slope // triangulos
 }
-[RegisterComponentFlecs]
+
 public record struct FastColliderComponent
 (
      ShapeType Shape,
@@ -520,25 +515,25 @@ public record struct FastColliderComponent
      float OffsetY
 );
 
-[RegisterComponentFlecs]
+
 public record struct MovementColliderRefComponent(Entity Value);
-[RegisterComponentFlecs]
+
 public record struct BodyColliderRefComponent ( Entity Value );
-[RegisterComponentFlecs]
+
 public record struct SensorColliderRefComponent ( Entity Value );
 
 
-[RegisterComponentFlecs]
+
 public record struct UnitTag();
 
 
-[RegisterComponentFlecs]
+
 public record struct StoppedTag();
 
-[RegisterComponentFlecs]
+
 public record struct PlayerTag();
 
-[RegisterComponentFlecs]
+
 public record struct StuckComponent
 (
     Vector2 LastPosition,
@@ -546,20 +541,20 @@ public record struct StuckComponent
      bool IsBlocked 
 );
 // En el ENEMIGO/TARGET: qué slots están ocupados
-[RegisterComponentFlecs]
+
 public struct AttackSlotsComponent
 {
     public uint OccupiedMask; // hasta 32 slots, uno por bit
 }
 // En el ATACANTE: qué slot tiene reservado y contra quién
-[RegisterComponentFlecs]
+
 public struct AttackSlotComponent
 {
     public Entity Target;
     public int SlotIndex;
 }
 
-[RegisterComponentFlecs]
+
 public record struct PathReferenceComponent
 (
     int PathId,       // El ID de la ruta en el BlackyPathRegistryManager
@@ -567,7 +562,7 @@ public record struct PathReferenceComponent
     Vector2 FormationOffset
 );
 
-[RegisterComponentFlecs]
+
 public record struct SteeringComponent
 (
     float SeparationRadius,
@@ -576,16 +571,16 @@ public record struct SteeringComponent
     Vector2 TargetDir
 );
 
-[RegisterComponentFlecs]
+
 public record struct SteeringStateComponent
 (
     Vector2 LastDir
 );
-[RegisterComponentFlecs]
+
 public record struct MovementMassiveTag
 ();
 
-[RegisterComponentFlecs]
+
 public record struct FlowFieldFollowerComponent
 (
     int FlowFieldId,
@@ -595,14 +590,14 @@ public record struct FlowFieldFollowerComponent
     bool Counted      // true si ya cuenta en SettledCount del campo
 );
 
-[RegisterComponentFlecs]
+
 public record struct MoveColliderComponent
 (
     float Radius, // Para colisiones circulares, que usara el steerring
     Vector2 Offset,
     float AvoidanceRadius
 );
-[RegisterComponentFlecs]
+
 public struct FastCollider
 {
     public SlopeType Slope { get; set; } // Solo se usa si Shape == Slope
@@ -612,7 +607,7 @@ public struct FastCollider
     public Vector2 Offset { get; set; }
 }
 
-[RegisterComponentFlecs]
+
 public record struct BodyColliderComponent
 (
     FastCollider[] Shapes

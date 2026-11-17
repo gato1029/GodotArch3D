@@ -14,6 +14,8 @@ ambient_light_color = Color(0.5529655, 0.71749705, 0.9567016, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_0gpky"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_55l5k"]
+
 [node name="RuntimeGame" type="Node" unique_id=161006943]
 script = ExtResource("1_cweo2")
 
@@ -53,6 +55,7 @@ script = ExtResource("3_cweo2")
 [node name="UI" type="CanvasLayer" parent="." unique_id=775197375]
 
 [node name="MainHUDController" type="Control" parent="UI" unique_id=1145811633]
+clip_contents = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -61,27 +64,64 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_mcfvu")
+metadata/_edit_use_anchors_ = true
 
 [node name="worldControlManager" type="Node2D" parent="UI/MainHUDController" unique_id=628236789]
 script = ExtResource("6_0gpky")
 
-[node name="GridContainer" type="GridContainer" parent="UI/MainHUDController" unique_id=1986339651]
+[node name="GridContainer" type="VBoxContainer" parent="UI/MainHUDController" unique_id=123273151]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 260.0
-offset_bottom = 60.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("4_6cyr2")
-columns = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="UI/MainHUDController/GridContainer" unique_id=1687034795]
-custom_minimum_size = Vector2(300, 100)
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer" unique_id=1438408347]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MainHUDController/GridContainer/PanelContainer" unique_id=1195240541]
+[node name="PanelContainer" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=1687034795]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Label" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelContainer" unique_id=1195240541]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Llanuras Desiertas"
+
+[node name="PanelReloj" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=1173445895]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 6
+
+[node name="LabelReloj" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj" unique_id=910257847]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Llanuras Desiertas"
+
+[node name="PanelContainer3" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=2069356194]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Label" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelContainer3" unique_id=1566360459]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Llanuras Desiertas"
+
+[node name="PanelContainer3" type="PanelContainer" parent="UI/MainHUDController/GridContainer" unique_id=238722415]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxEmpty_55l5k")
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/MainHUDController/GridContainer" unique_id=1801125616]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="UI/MainHUDController/GridContainer/PanelContainer2" unique_id=8574280]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Llanuras Desiertas"
