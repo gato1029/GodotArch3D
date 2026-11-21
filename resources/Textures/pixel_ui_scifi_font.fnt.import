@@ -1,0 +1,16 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://b0n1jock4gkbu"
+valid=false
+
+[deps]
+
+source_file="res://resources/Textures/pixel_ui_scifi_font.fnt"
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2

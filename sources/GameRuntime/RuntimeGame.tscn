@@ -4,15 +4,22 @@
 [ext_resource type="Material" uid="uid://b8ijoojk7ee2o" path="res://resources/Material/ColorRed.tres" id="1_qmkwe"]
 [ext_resource type="Script" uid="uid://ij040pb1t1ds" path="res://Camera3dGodot.cs" id="2_6cyr2"]
 [ext_resource type="Script" uid="uid://4cbviq8mh5xd" path="res://sources/godot/InputHandler.cs" id="3_cweo2"]
-[ext_resource type="Theme" uid="uid://epe8tdceq51g" path="res://resources/Textures/GameUI/GameTheme.tres" id="4_6cyr2"]
 [ext_resource type="Script" uid="uid://c3jrfbamdau07" path="res://sources/GameRuntime/MainHudController.cs" id="5_mcfvu"]
 [ext_resource type="Script" uid="uid://cpyltx8k45opr" path="res://sources/GameRuntime/WorldControlManager.cs" id="6_0gpky"]
+[ext_resource type="Theme" uid="uid://bt0igjw3qfbha" path="res://resources/Textures/GameUI/GameThemeSCI.tres" id="7_inpai"]
+[ext_resource type="Texture2D" uid="uid://bc3jw1qljmf21" path="res://resources/Textures/GameUI/ui.png" id="8_bwi75"]
+[ext_resource type="Script" uid="uid://cxcuw64vwuab7" path="res://sources/CustomWidgets/KuroAnimatedTextureRect.cs" id="9_bwi75"]
 
 [sub_resource type="Environment" id="Environment_mcfvu"]
 background_color = Color(0.05882353, 0.08235294, 0.12941177, 1)
 ambient_light_color = Color(0.5529655, 0.71749705, 0.9567016, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_0gpky"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bwi75"]
+atlas = ExtResource("8_bwi75")
+region = Rect2(16, 352, 320, 320)
+filter_clip = true
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_55l5k"]
 
@@ -76,7 +83,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("4_6cyr2")
+theme = ExtResource("7_inpai")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer" unique_id=1438408347]
 layout_mode = 2
@@ -94,12 +101,25 @@ text = "Llanuras Desiertas"
 [node name="PanelReloj" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=1173445895]
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
-size_flags_horizontal = 6
-
-[node name="LabelReloj" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj" unique_id=910257847]
-layout_mode = 2
 size_flags_horizontal = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj" unique_id=1628382336]
+layout_mode = 2
+
+[node name="LabelReloj" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj/HBoxContainer" unique_id=910257847]
+layout_mode = 2
+size_flags_horizontal = 6
 text = "Llanuras Desiertas"
+
+[node name="KuroAnimatedTextureRect" type="TextureRect" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj/HBoxContainer" unique_id=1682938960]
+layout_mode = 2
+texture = SubResource("AtlasTexture_bwi75")
+script = ExtResource("9_bwi75")
+Texture = SubResource("AtlasTexture_bwi75")
+Hframes = 5
+Vframes = 5
+Frame = 2
+metadata/_custom_type_script = "uid://cxcuw64vwuab7"
 
 [node name="PanelContainer3" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=2069356194]
 custom_minimum_size = Vector2(300, 100)
