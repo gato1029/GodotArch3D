@@ -7,8 +7,9 @@
 [ext_resource type="Script" uid="uid://c3jrfbamdau07" path="res://sources/GameRuntime/MainHudController.cs" id="5_mcfvu"]
 [ext_resource type="Script" uid="uid://cpyltx8k45opr" path="res://sources/GameRuntime/WorldControlManager.cs" id="6_0gpky"]
 [ext_resource type="Theme" uid="uid://bt0igjw3qfbha" path="res://resources/Textures/GameUI/GameThemeSCI.tres" id="7_inpai"]
+[ext_resource type="PackedScene" uid="uid://cn8ipeef38bgm" path="res://sources/GameRuntime/Widgets/GamePanelDetalle.tscn" id="8_8cqwj"]
 [ext_resource type="Texture2D" uid="uid://bc3jw1qljmf21" path="res://resources/Textures/GameUI/ui.png" id="8_bwi75"]
-[ext_resource type="Script" uid="uid://cxcuw64vwuab7" path="res://sources/CustomWidgets/KuroAnimatedTextureRect.cs" id="9_bwi75"]
+[ext_resource type="Script" uid="uid://bojaarghbss7" path="res://sources/CustomWidgets/AnimatedTextureRect.cs" id="10_8cqwj"]
 
 [sub_resource type="Environment" id="Environment_mcfvu"]
 background_color = Color(0.05882353, 0.08235294, 0.12941177, 1)
@@ -16,10 +17,25 @@ ambient_light_color = Color(0.5529655, 0.71749705, 0.9567016, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_0gpky"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_dt6vk"]
+atlas = ExtResource("8_bwi75")
+region = Rect2(876, 523, 40, 46)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_bwi75"]
 atlas = ExtResource("8_bwi75")
+region = Rect2(815, 78, 34, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ln6sf"]
+atlas = ExtResource("8_bwi75")
 region = Rect2(16, 352, 320, 320)
-filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_55l5k"]
+atlas = ExtResource("8_bwi75")
+region = Rect2(812, 208, 39, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oos5e"]
+atlas = ExtResource("8_bwi75")
+region = Rect2(934, 528, 51, 38)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_55l5k"]
 
@@ -87,8 +103,10 @@ theme = ExtResource("7_inpai")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer" unique_id=1438408347]
 layout_mode = 2
+size_flags_horizontal = 4
 
 [node name="PanelContainer" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=1687034795]
+visible = false
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
 size_flags_horizontal = 2
@@ -98,30 +116,99 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Llanuras Desiertas"
 
-[node name="PanelReloj" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=1173445895]
-custom_minimum_size = Vector2(300, 100)
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj" unique_id=1628382336]
-layout_mode = 2
-
-[node name="LabelReloj" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj/HBoxContainer" unique_id=910257847]
+[node name="Control" type="Control" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=1587996371]
 layout_mode = 2
 size_flags_horizontal = 6
-text = "Llanuras Desiertas"
 
-[node name="KuroAnimatedTextureRect" type="TextureRect" parent="UI/MainHUDController/GridContainer/HBoxContainer/PanelReloj/HBoxContainer" unique_id=1682938960]
+[node name="PanelDetalle" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control" unique_id=1058631267 instance=ExtResource("8_8cqwj")]
+layout_mode = 0
+anchors_preset = 0
+
+[node name="CenterContainter" type="CenterContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control" unique_id=1454715863]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -191.0
+offset_right = 191.0
+offset_bottom = 88.0
+grow_horizontal = 2
+size_flags_horizontal = 6
+size_flags_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter" unique_id=153415624]
 layout_mode = 2
-texture = SubResource("AtlasTexture_bwi75")
-script = ExtResource("9_bwi75")
-Texture = SubResource("AtlasTexture_bwi75")
-Hframes = 5
-Vframes = 5
-Frame = 2
-metadata/_custom_type_script = "uid://cxcuw64vwuab7"
+
+[node name="PanelTopCenter" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer" unique_id=1173445895]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter" unique_id=1414215177]
+layout_mode = 2
+
+[node name="ButtonInformacion" type="Button" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2" unique_id=1940387028]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_dt6vk")
+expand_icon = true
+
+[node name="ButtonInventario" type="Button" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2" unique_id=44223116]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_bwi75")
+expand_icon = true
+
+[node name="Reloj" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2" unique_id=1438739127]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2/Reloj" unique_id=1628382336]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="AnimatedTextureRect" type="TextureRect" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2/Reloj/HBoxContainer" unique_id=1519186859]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+expand_mode = 1
+script = ExtResource("10_8cqwj")
+SourceTexture = SubResource("AtlasTexture_ln6sf")
+MaxFrameIndex = 23
+HFrames = 5
+VFrames = 5
+metadata/_custom_type_script = "uid://bojaarghbss7"
+
+[node name="LabelReloj" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2/Reloj/HBoxContainer" unique_id=910257847]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "00:00:00"
+
+[node name="ButtonRecursos" type="Button" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2" unique_id=1389166655]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_55l5k")
+icon_alignment = 1
+expand_icon = true
+
+[node name="ButtonPlanos" type="Button" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2" unique_id=441797251]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_oos5e")
+icon_alignment = 1
+expand_icon = true
 
 [node name="PanelContainer3" type="PanelContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer" unique_id=2069356194]
+visible = false
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -131,17 +218,55 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Llanuras Desiertas"
 
-[node name="PanelContainer3" type="PanelContainer" parent="UI/MainHUDController/GridContainer" unique_id=238722415]
+[node name="PanelCentral" type="PanelContainer" parent="UI/MainHUDController/GridContainer" unique_id=238722415]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_55l5k")
 
 [node name="PanelContainer2" type="PanelContainer" parent="UI/MainHUDController/GridContainer" unique_id=1801125616]
-custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Label" type="Label" parent="UI/MainHUDController/GridContainer/PanelContainer2" unique_id=8574280]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer/PanelContainer2" unique_id=1733632435]
+layout_mode = 2
+
+[node name="ButtonInventario" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1438854989]
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Llanuras Desiertas"
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_bwi75")
+expand_icon = true
+
+[node name="ButtonInventario2" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1549474848]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_bwi75")
+expand_icon = true
+
+[node name="ButtonInventario3" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1977740392]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_bwi75")
+expand_icon = true
+
+[node name="ButtonInventario4" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1711898652]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_bwi75")
+expand_icon = true
+
+[node name="ButtonInventario5" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1763291567]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = SubResource("AtlasTexture_bwi75")
+expand_icon = true

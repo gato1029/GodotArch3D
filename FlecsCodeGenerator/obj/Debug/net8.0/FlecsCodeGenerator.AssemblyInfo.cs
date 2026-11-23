@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FlecsCodeGenerator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dc4bebeab6c22eaf3307da6c17ddd847c11d8b71")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4f37986a295a5244b2b0b5adb4c325530d490139")]
 [assembly: System.Reflection.AssemblyProductAttribute("FlecsCodeGenerator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FlecsCodeGenerator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

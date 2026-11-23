@@ -112,7 +112,8 @@ public class BlackyBuildingCreator
     private void InternalExecuteCreation(ushort idBuilding, Vector2I tilePosition, int height, int health=0, bool render=true)
     {
         ushort team = 1;
-        var templateBuilding = BlackyPalletesPersistence.buildingPalette.GetData(idBuilding);
+        BuildingData templateBuilding;
+        templateBuilding = BlackyPalletesPersistence.buildingPalette.GetData(idBuilding);
         if (templateBuilding == null) return;
 
         int spriteIdNormal = AtlasModsManager.GetSpriteUniqueId(templateBuilding.IdTileSpriteNormal);
