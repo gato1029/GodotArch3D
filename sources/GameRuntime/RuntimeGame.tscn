@@ -121,8 +121,9 @@ layout_mode = 2
 size_flags_horizontal = 6
 
 [node name="PanelDetalle" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control" unique_id=1058631267 instance=ExtResource("8_8cqwj")]
-layout_mode = 0
-anchors_preset = 0
+layout_mode = 1
+offset_left = -384.0
+offset_right = -196.0
 
 [node name="CenterContainter" type="CenterContainer" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control" unique_id=1454715863]
 layout_mode = 1
@@ -182,6 +183,8 @@ SourceTexture = SubResource("AtlasTexture_ln6sf")
 MaxFrameIndex = 23
 HFrames = 5
 VFrames = 5
+FrameIndex = 20
+Playing = true
 metadata/_custom_type_script = "uid://bojaarghbss7"
 
 [node name="LabelReloj" type="Label" parent="UI/MainHUDController/GridContainer/HBoxContainer/Control/CenterContainter/HBoxContainer/PanelTopCenter/HBoxContainer2/Reloj/HBoxContainer" unique_id=910257847]
@@ -231,7 +234,7 @@ size_flags_horizontal = 4
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/MainHUDController/GridContainer/PanelContainer2" unique_id=1733632435]
 layout_mode = 2
 
-[node name="ButtonInventario" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1438854989]
+[node name="ButtonSlot1" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1438854989]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -239,7 +242,7 @@ size_flags_vertical = 4
 icon = SubResource("AtlasTexture_bwi75")
 expand_icon = true
 
-[node name="ButtonInventario2" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1549474848]
+[node name="ButtonSlot2" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1441184843]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -247,7 +250,7 @@ size_flags_vertical = 4
 icon = SubResource("AtlasTexture_bwi75")
 expand_icon = true
 
-[node name="ButtonInventario3" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1977740392]
+[node name="ButtonSlot3" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1803553143]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -255,7 +258,7 @@ size_flags_vertical = 4
 icon = SubResource("AtlasTexture_bwi75")
 expand_icon = true
 
-[node name="ButtonInventario4" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1711898652]
+[node name="ButtonSlot4" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1853489810]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -263,7 +266,7 @@ size_flags_vertical = 4
 icon = SubResource("AtlasTexture_bwi75")
 expand_icon = true
 
-[node name="ButtonInventario5" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=1763291567]
+[node name="ButtonSlot5" type="Button" parent="UI/MainHUDController/GridContainer/PanelContainer2/HBoxContainer" unique_id=2015050341]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 4

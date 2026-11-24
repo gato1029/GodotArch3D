@@ -18,6 +18,7 @@ public partial class WorldControlManager : Node2D
 
     private RTSSelectionManager _selectionManager;
     private BuildingPlacementManager _buildingPlacementManager;
+    private RTSCommandDispatcher _commandDispatcher;
 
     // Variables de control visual y de arrastre (Box Selection)
     private bool _isDragging = false;
@@ -32,6 +33,7 @@ public partial class WorldControlManager : Node2D
         _world = world;
         _selectionManager = new RTSSelectionManager(world);
         _buildingPlacementManager = new BuildingPlacementManager(world);
+        _commandDispatcher = new RTSCommandDispatcher(world);
         GD.Print("WorldControlManager Initialized");
     }
 
@@ -64,7 +66,7 @@ public partial class WorldControlManager : Node2D
         if (@event is InputEventMouseButton mbRight && mbRight.ButtonIndex == MouseButton.Right && mbRight.Pressed)
         {
             Vector2 targetWorldPos = PositionsManager.Instance.positionMouseCamera;
-            _selectionManager.HandleRightClick(targetWorldPos);
+            _commandDispatcher.IssueCommand(targetWorldPos,_selectionManager.CurrentSelectionKind);
             return;
         }
 

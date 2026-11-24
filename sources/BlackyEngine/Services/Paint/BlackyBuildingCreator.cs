@@ -370,7 +370,7 @@ public class BlackyBuildingCreator
                 idDebugBody = -1;
             }
         }
-
+        entity.Set(new SelectorComponent{ size  =tileSpriteData.fastColliderBasePies.Width , offset = tileSpriteData.fastColliderBasePies.Offset});
         int idCollider = staticHash.RegisterStaticSafe(entity, minX, minY, maxX, maxY, team);
 
         if (DEBUG_COLLIDERS)

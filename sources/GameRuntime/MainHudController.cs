@@ -26,7 +26,7 @@ public partial class MainHudController : Control
 	{
 		// Ocultar todos los paneles por defecto
 		// _buildingPanel.Hide();
-		// _unitPanel.Hide();
+		PanelDetalle.Hide();
 
 		if (selectedEntities.Count == 0) return;
 
@@ -42,7 +42,8 @@ public partial class MainHudController : Control
 			else if (target.Has<UnitDefinitionComponent>())
 			{
 				// Mostrar estadísticas de la unidad seleccionada
-				// _unitPanel.Show();
+				PanelDetalle.Show();
+				PanelDetalle.SetEntity(target);
 			}
 		}
 		else

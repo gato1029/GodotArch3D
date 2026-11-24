@@ -8,10 +8,10 @@
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	},
-	"Godot Debug GamePanelDetalle": {
+	"Godot Debug RuntimeGame": {
 	  "commandName": "Executable",
 	  "executablePath": "D:/godot/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64/Godot_v4.7-stable_mono_win64.exe",
-	  "commandLineArgs": "--upwards ./sources/GameRuntime/Widgets/GamePanelDetalle.tscn --verbose",
+	  "commandLineArgs": "--upwards ./sources/GameRuntime/RuntimeGame.tscn --verbose",
 	  "workingDirectory": ".",
 	  "nativeDebugging": true
 	}

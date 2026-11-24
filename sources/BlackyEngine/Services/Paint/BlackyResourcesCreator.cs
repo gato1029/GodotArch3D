@@ -326,6 +326,7 @@ public class BlackyResourcesCreator
 
     private int AsignarCollider(int Mundo_x, int Mundo_y, Entity entity, TileSpriteData tileSpriteData)
     {
+        
         if (tileSpriteData.fastCollidersBody.Count == 0) return 0;
 
         var debugBodies = new List<int>();
@@ -334,6 +335,7 @@ public class BlackyResourcesCreator
 
         float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
 
+        
         foreach (var collider in tileSpriteData.fastCollidersBody)
         {
             FastCollider fast = collider;
@@ -359,6 +361,7 @@ public class BlackyResourcesCreator
             }
         }
 
+        entity.Set(new SelectorComponent{ size  =tileSpriteData.fastColliderBasePies.Width , offset = tileSpriteData.fastColliderBasePies.Offset});
         int idCollider = staticHashResource.RegisterStaticSafe(entity, minX, minY, maxX, maxY);
 
         if (DEBUG_COLLIDERS)

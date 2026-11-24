@@ -1,6 +1,7 @@
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.BlackyTiles.Data;
+using GodotEcsArch.sources.managers.GpuDriven;
 using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
@@ -19,7 +20,47 @@ internal class BlackyManagerSelector
         if (ent.Has<UnitDefinitionComponent>())
         {
             CreateCircle(ent);
-        }        
+        }
+
+        if (ent.Has<ResourceDefinitionComponent>())
+        {
+            CreateResourceSelector(ent);
+        }
+
+        if (ent.Has<BuildingDefinitionComponent>())
+        {
+            
+        }
+    }
+
+    private static void CreateResourceSelector(Entity ent)
+    {
+         AtlasModsManager.GetSpriteUniqueId(idCircle,out TileSpriteData tileSpriteData);
+        var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(tileSpriteData.spriteData.idModMaterial);
+        
+       // Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
+        Vector2 offset = tileSpriteData.spriteData.offsetInternal;
+        
+        var position =  ent.Get<PositionComponent>();
+        var positionCenter = position.tilePosition;
+        var heightRender = position.height;
+        
+        float depthOffset = tileSpriteData.spriteData.yDepthRenderFormat;
+        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
+
+        Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
+        
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, tileSpriteData.spriteData.scale);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.StaticData, renderInstance.instanceId, tileSpriteData.spriteData.uv);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Flags, renderInstance.instanceId, tileSpriteData.spriteData.mirrorLocalX, tileSpriteData.spriteData.mirrorLocalY, 1, renderInstance.layer);
+        
+        ent.Set(new RenderGPUComponent(renderInstance.gpuDataIndex, renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer,
+            layer, depthOffset, tileSpriteData.spriteData.scale, offset));
+        
+        //ent.Set(new RenderSelectionGPUComponent(instance.rid, instance.instance, instance.layerTexture,layer,moveCollider.Offset));
     }
 
     private static void CreateCircle(Entity ent)

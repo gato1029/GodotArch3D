@@ -5,6 +5,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Flecs.NET.Core;
 using Godot;
 using GodotEcsArch.sources.components;

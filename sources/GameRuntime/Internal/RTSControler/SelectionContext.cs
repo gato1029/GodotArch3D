@@ -25,7 +25,21 @@ public static class SelectionContext
         
         OnSelectionChanged?.Invoke(_currentSelection);
     }
-
+    public static void SetSelection(Entity entity)
+    {
+        _currentSelection.Clear();
+        if (entity.IsAlive())
+        {
+            _currentSelection.Add(entity);
+        }
+        OnSelectionChanged?.Invoke(_currentSelection);
+    }
+    public static void AddSelection(Entity entity)
+    {
+        _currentSelection.Add(entity);
+        OnSelectionChanged?.Invoke(_currentSelection);
+    }
+    
     public static void Clear()
     {
         _currentSelection.Clear();

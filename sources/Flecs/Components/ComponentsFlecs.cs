@@ -115,7 +115,7 @@ public record struct RangedAttackComponent
     float Range,           // Rango de ataque (ej. 1.5m)
     float Cooldown,        // Tiempo entre ataques
     float Timer,           // Temporizador interno
-    bool Homing,           // misil auto dirigido
+    bool Homing,           // misil autodirigido
     float SpeedProjectile,
     int NumberUnitRange
 );
@@ -487,7 +487,7 @@ public record struct TileSpriteTextureComponent
 
 public record struct SpatialIDComponent
 (
-     int Value,     // ID compacto para el array
+     int Value,     // Id compacto para el array
      uint Layer,    // Qué SOY (ej: Soy una BALA)
      uint Mask     // Con qué CHOCO (ej: Choco con ENEMIGOS y MUROS)
 );
@@ -590,6 +590,11 @@ public record struct FlowFieldFollowerComponent
     bool Counted      // true si ya cuenta en SettledCount del campo
 );
 
+public record struct SelectorComponent
+(
+    float size,
+    Vector2 offset
+);
 
 public record struct MoveColliderComponent
 (

@@ -3,7 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://bc3jw1qljmf21" path="res://resources/Textures/GameUI/ui.png" id="1_0dq64"]
 [ext_resource type="Theme" uid="uid://bt0igjw3qfbha" path="res://resources/Textures/GameUI/GameThemeSCI.tres" id="1_r5ipe"]
 [ext_resource type="Script" uid="uid://bhm2v82rxxll7" path="res://sources/GameRuntime/Widgets/GamePanelDetalle.cs" id="2_ut71o"]
+[ext_resource type="Resource" uid="uid://1ptxwcvgwkah" path="res://resources/CustomResources/salud.tres" id="3_5ebse"]
 [ext_resource type="Texture2D" uid="uid://dcx3fl4lirflt" path="res://sources/WindowsDataBase/Common/icons/icon.svg" id="3_iup3e"]
+[ext_resource type="Resource" uid="uid://cesgwxy5evwu2" path="res://resources/CustomResources/armadura.tres" id="4_26mnu"]
+[ext_resource type="Resource" uid="uid://cksqp3fthw85e" path="res://resources/CustomResources/ataqueFisico.tres" id="5_h46n0"]
+[ext_resource type="Resource" uid="uid://daq3u5klpeq3y" path="res://resources/CustomResources/cantidadRecursos.tres" id="6_h46n0"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8cqwj"]
 atlas = ExtResource("1_0dq64")
@@ -15,18 +19,6 @@ texture_margin_left = 6.0
 texture_margin_top = 5.0
 texture_margin_right = 6.0
 texture_margin_bottom = 5.0
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_3lt7h"]
-atlas = ExtResource("1_0dq64")
-region = Rect2(744, 271, 42, 39)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_07rtg"]
-atlas = ExtResource("1_0dq64")
-region = Rect2(873, 265, 39, 49)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_bifsr"]
-atlas = ExtResource("1_0dq64")
-region = Rect2(870, 391, 45, 46)
 
 [node name="GamePanelDetalle" type="PanelContainer" unique_id=1058631267]
 anchors_preset = 8
@@ -42,6 +34,7 @@ grow_vertical = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_r5ipe")
 script = ExtResource("2_ut71o")
+UiStatsIcon = Array[Object]([ExtResource("3_5ebse"), ExtResource("4_26mnu"), ExtResource("5_h46n0"), ExtResource("6_h46n0")])
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1386728020]
 layout_mode = 2
@@ -73,47 +66,7 @@ size_flags_vertical = 4
 texture = ExtResource("3_iup3e")
 stretch_mode = 5
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/HBoxContainer" unique_id=122677155]
+[node name="Contenedor" type="GridContainer" parent="VBoxContainer/HBoxContainer" unique_id=122677155]
 layout_mode = 2
 size_flags_vertical = 0
 columns = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/GridContainer" unique_id=1606271867]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/GridContainer/HBoxContainer" unique_id=672192425]
-custom_minimum_size = Vector2(16, 16)
-layout_mode = 2
-texture = SubResource("AtlasTexture_3lt7h")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/GridContainer/HBoxContainer" unique_id=1160732480]
-layout_mode = 2
-text = "45"
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/GridContainer" unique_id=1711646735]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/GridContainer/HBoxContainer2" unique_id=660660017]
-custom_minimum_size = Vector2(16, 16)
-layout_mode = 2
-texture = SubResource("AtlasTexture_07rtg")
-expand_mode = 1
-
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/GridContainer/HBoxContainer2" unique_id=1901241392]
-layout_mode = 2
-text = "45"
-
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/GridContainer" unique_id=133109553]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/GridContainer/HBoxContainer3" unique_id=1207792178]
-custom_minimum_size = Vector2(16, 16)
-layout_mode = 2
-texture = SubResource("AtlasTexture_bifsr")
-expand_mode = 1
-
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/GridContainer/HBoxContainer3" unique_id=1910665349]
-layout_mode = 2
-text = "45"

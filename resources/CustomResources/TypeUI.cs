@@ -3,7 +3,9 @@ using System;
 public enum TypeUIIcon
 {
 	SALUD,
-	ATAQUE
+	ATAQUE_FISICO,
+	ARMADURA,
+	CANTIDAD_RECURSOS
 }
 
 [GlobalClass]

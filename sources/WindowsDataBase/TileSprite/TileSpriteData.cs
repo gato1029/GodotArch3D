@@ -144,6 +144,9 @@ public class TileSpriteData:IdDataLong
     [BsonIgnore]
     public FastCollider fastColliderUmbralAtaque { get; set; }
     [BsonIgnore]
+    public FastCollider fastColliderBasePies { get; set; }
+    
+    [BsonIgnore]
     public float offsetLifeBarYFormat { get; set; }
     public TileSpriteData()
     {
@@ -286,6 +289,10 @@ public class TileSpriteData:IdDataLong
                     break;
             }
 
+            if (item.collisionUseType == CollisionUseType.BASE_PIES)
+            {
+                fastColliderBasePies = fastCollider;
+            }
             if (item.collisionUseType == CollisionUseType.CUERPO)
             {
               
@@ -331,6 +338,10 @@ public class TileSpriteData:IdDataLong
                     break;
                 default:
                     break;
+            }
+            if (item.collisionUseType == CollisionUseType.BASE_PIES)
+            {
+                fastColliderBasePies = fastCollider;
             }
             if (item.collisionUseType == CollisionUseType.CUERPO)
             {

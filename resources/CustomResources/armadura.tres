@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TypeUI" format=3 uid="uid://cesgwxy5evwu2"]
+
+[ext_resource type="Texture2D" uid="uid://bc3jw1qljmf21" path="res://resources/Textures/GameUI/ui.png" id="1_oa7dm"]
+[ext_resource type="Script" uid="uid://ccf4iab75pwtg" path="res://resources/CustomResources/TypeUI.cs" id="1_wc40d"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oa7dm"]
+atlas = ExtResource("1_oa7dm")
+region = Rect2(873, 265, 39, 49)
+
+[resource]
+script = ExtResource("1_wc40d")
+Texture = SubResource("AtlasTexture_oa7dm")
+Type = 2
+metadata/_custom_type_script = "uid://ccf4iab75pwtg"

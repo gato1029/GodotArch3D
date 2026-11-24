@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dwqa85fane14e"]
+
+[ext_resource type="Texture2D" uid="uid://bc3jw1qljmf21" path="res://resources/Textures/GameUI/ui.png" id="1_nfklt"]
+[ext_resource type="Script" uid="uid://488mrgx5efd5" path="res://sources/GameRuntime/Widgets/UiStats.cs" id="1_ttlyn"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3lt7h"]
+atlas = ExtResource("1_nfklt")
+region = Rect2(744, 271, 42, 39)
+
+[node name="UiStat" type="HBoxContainer" unique_id=620477265]
+script = ExtResource("1_ttlyn")
+
+[node name="TextureIcon" type="TextureRect" parent="." unique_id=1349145896]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = SubResource("AtlasTexture_3lt7h")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LabelValue" type="Label" parent="." unique_id=465281827]
+layout_mode = 2
+text = "45"
