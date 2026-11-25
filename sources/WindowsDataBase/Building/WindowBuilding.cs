@@ -81,21 +81,10 @@ public partial class WindowBuilding : Window, IFacadeWindow<BuildingData>
                 this.Size = sizeReal;
                 ContainerAtaque.Visible = false;
                 break;
-            case BuildingType.ProductorMaterial:
-                this.Size = sizeReal;
-                ContainerAtaque.Visible = false;
-                break;
-            case BuildingType.ProductorUnidades:
-                this.Size = sizeReal;
-                ContainerAtaque.Visible = false;
-                break;
-            case BuildingType.Torres:     
+            
+            case BuildingType.Torre:     
                 this.Size = sizeReal+sizeAtaque;
                 ContainerAtaque.Visible = true;
-                break;
-            case BuildingType.Procesador:
-                this.Size = sizeReal;
-                ContainerAtaque.Visible = false;
                 break;
             default:
                 break;

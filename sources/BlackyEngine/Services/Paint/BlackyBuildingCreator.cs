@@ -184,7 +184,7 @@ public class BlackyBuildingCreator
         }
 
         // Particularidades por tipo de edificio
-        if (templateBuilding.BuildingType == BuildingType.Torres)
+        if (templateBuilding.BuildingType == BuildingType.Torre)
         {
             CreateTorre(entity, templateBuilding);
         }

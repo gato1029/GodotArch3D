@@ -1,17 +1,32 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 using Flecs.NET.Core;
 using GodotFlecs.sources.Flecs.Components;
 
 public partial class GamePanelDetalle : PanelContainer
 {
+	private delegate bool TryReadStatDelegate(in Entity entity, out int value);
+
+	private readonly struct StatDescriptor
+	{
+		public readonly TypeUIIcon Type;
+		public readonly TryReadStatDelegate TryRead;
+
+		public StatDescriptor(TypeUIIcon type, TryReadStatDelegate tryRead)
+		{
+			Type = type;
+			TryRead = tryRead;
+		}
+	}
+
 	[Export] public int MaxNameCharacter = 23;
 	[Export] public Godot.Collections.Array<TypeUI> UiStatsIcon;
 
+	private StatDescriptor[] _descriptors = Array.Empty<StatDescriptor>();
 	private AtlasTexture[] _iconLookup = Array.Empty<AtlasTexture>();
-	private readonly Dictionary<TypeUIIcon, UiStats> _activeStatWidgets = new();
-	private readonly Dictionary<TypeUIIcon, int> _lastRenderedValues = new();
+	private UiStats[] _statWidgets = Array.Empty<UiStats>();
+	private int[] _lastRenderedValues = Array.Empty<int>();
+	private bool[] _hasRenderedValue = Array.Empty<bool>();
 
 	private Entity _currentEntity;
 	private bool _hasEntity;
@@ -19,14 +34,47 @@ public partial class GamePanelDetalle : PanelContainer
 	public override void _Ready()
 	{
 		InitializeUI(); // Insertado por el generador de UI
-		BuildIconLookup();
+		BuildStatTables();
 		SetProcess(false);
 	}
 
-	private void BuildIconLookup()
+	private void BuildStatTables()
 	{
 		int count = Enum.GetValues<TypeUIIcon>().Length;
+
+		_descriptors = new StatDescriptor[count];
 		_iconLookup = new AtlasTexture[count];
+		_statWidgets = new UiStats[count];
+		_lastRenderedValues = new int[count];
+		_hasRenderedValue = new bool[count];
+
+		// Registro único por stat: si mañana agregas DEFENSA o VELOCIDAD, solo sumas su entrada aquí.
+		RegisterDescriptor(new StatDescriptor(
+			TypeUIIcon.SALUD,
+			static (in Entity e, out int val) =>
+			{
+				if (!e.Has<HealthComponent>()) { val = 0; return false; }
+				val = (int)e.Get<HealthComponent>().value;
+				return true;
+			}));
+
+		RegisterDescriptor(new StatDescriptor(
+			TypeUIIcon.ATAQUE_FISICO,
+			static (in Entity e, out int val) =>
+			{
+				if (!e.Has<MeleeAttackComponent>()) { val = 0; return false; }
+				val = e.Get<MeleeAttackComponent>().Damage;
+				return true;
+			}));
+
+		RegisterDescriptor(new StatDescriptor(
+			TypeUIIcon.CANTIDAD_RECURSOS,
+			static (in Entity e, out int val) =>
+			{
+				if (!e.Has<AmountComponent>()) { val = 0; return false; }
+				val = e.Get<AmountComponent>().value;
+				return true;
+			}));
 
 		if (UiStatsIcon == null) return;
 
@@ -36,21 +84,33 @@ public partial class GamePanelDetalle : PanelContainer
 			if (entry == null) continue;
 
 			int index = (int)entry.Type;
-			if ((uint)index < (uint)_iconLookup.Length)
+			if ((uint)index < (uint)count)
 			{
 				_iconLookup[index] = entry.Texture;
 			}
 		}
 	}
 
+	private void RegisterDescriptor(in StatDescriptor descriptor)
+	{
+		int index = (int)descriptor.Type;
+		if ((uint)index < (uint)_descriptors.Length)
+		{
+			_descriptors[index] = descriptor;
+		}
+	}
+
 	public void SetEntity(Entity entity)
 	{
 		_currentEntity = entity;
-		_lastRenderedValues.Clear();
 
-		foreach (var kvp in _activeStatWidgets)
+		for (int i = 0; i < _statWidgets.Length; i++)
 		{
-			kvp.Value.Visible = false;
+			_hasRenderedValue[i] = false;
+			if (_statWidgets[i] != null)
+			{
+				_statWidgets[i].Visible = false;
+			}
 		}
 
 		if (!_currentEntity.IsAlive())
@@ -61,45 +121,57 @@ public partial class GamePanelDetalle : PanelContainer
 		}
 
 		_hasEntity = true;
-
-		if (_currentEntity.Has<HealthComponent>())
-		{
-			ref readonly var health = ref _currentEntity.Get<HealthComponent>();
-			int val = (int)health.value; // Ajusta al nombre real de tu campo (Current, Value, etc.)
-			EnsureStatWidget(TypeUIIcon.SALUD, val);
-			_lastRenderedValues[TypeUIIcon.SALUD] = val;
-		}
-
-		if (_currentEntity.Has<MeleeAttackComponent>())
-		{
-			ref readonly var attack = ref _currentEntity.Get<MeleeAttackComponent>();
-			int val = attack.Damage; // Ajusta al nombre real de tu campo
-			EnsureStatWidget(TypeUIIcon.ATAQUE_FISICO, val);
-			_lastRenderedValues[TypeUIIcon.ATAQUE_FISICO] = val;
-		}
-
+		SyncAllStats(forceUpdate: true);
 		SetProcess(Visible);
 	}
 
-	private void EnsureStatWidget(TypeUIIcon statType, int initialValue)
+	private void SyncAllStats(bool forceUpdate)
 	{
-		if (!_activeStatWidgets.TryGetValue(statType, out UiStats widget))
+		for (int i = 0; i < _descriptors.Length; i++)
 		{
-			
+			TryReadStatDelegate tryRead = _descriptors[i].TryRead;
+			if (tryRead == null) continue;
+
+			if (!tryRead(in _currentEntity, out int currentValue))
+			{
+				if (_statWidgets[i] != null)
+				{
+					_statWidgets[i].Visible = false;
+				}
+				_hasRenderedValue[i] = false;
+				continue;
+			}
+
+			UiStats widget = EnsureStatWidget(i);
+			widget.Visible = true;
+
+			if (forceUpdate || !_hasRenderedValue[i] || _lastRenderedValues[i] != currentValue)
+			{
+				_lastRenderedValues[i] = currentValue;
+				_hasRenderedValue[i] = true;
+				widget.SetValue(currentValue);
+			}
+		}
+	}
+
+	private UiStats EnsureStatWidget(int index)
+	{
+		UiStats widget = _statWidgets[index];
+		if (widget == null)
+		{
 			widget = RuntimeServices.NodeRegistry.Create<UiStats>();
 			Contenedor.AddChild(widget);
 
-			AtlasTexture icon = _iconLookup[(int)statType];
+			AtlasTexture icon = _iconLookup[index];
 			if (icon != null)
 			{
 				widget.SetIcon(icon);
 			}
 
-			_activeStatWidgets[statType] = widget;
+			_statWidgets[index] = widget;
 		}
 
-		widget.Visible = true;
-		widget.SetValue(initialValue);
+		return widget;
 	}
 
 	public override void _Notification(int what)
@@ -121,32 +193,6 @@ public partial class GamePanelDetalle : PanelContainer
 			return;
 		}
 
-		if (_activeStatWidgets.TryGetValue(TypeUIIcon.SALUD, out UiStats hpWidget) &&
-			hpWidget.Visible &&
-			_currentEntity.Has<HealthComponent>())
-		{
-			ref readonly var health = ref _currentEntity.Get<HealthComponent>();
-			int currentHp = (int)health.value;
-
-			if (!_lastRenderedValues.TryGetValue(TypeUIIcon.SALUD, out int lastHp) || lastHp != currentHp)
-			{
-				_lastRenderedValues[TypeUIIcon.SALUD] = currentHp;
-				hpWidget.SetValue(currentHp);
-			}
-		}
-
-		if (_activeStatWidgets.TryGetValue(TypeUIIcon.ATAQUE_FISICO, out UiStats atkWidget) &&
-			atkWidget.Visible &&
-			_currentEntity.Has<MeleeAttackComponent>())
-		{
-			ref readonly var attack = ref _currentEntity.Get<MeleeAttackComponent>();
-			int currentAtk = attack.Damage;
-
-			if (!_lastRenderedValues.TryGetValue(TypeUIIcon.ATAQUE_FISICO, out int lastAtk) || lastAtk != currentAtk)
-			{
-				_lastRenderedValues[TypeUIIcon.ATAQUE_FISICO] = currentAtk;
-				atkWidget.SetValue(currentAtk);
-			}
-		}
+		SyncAllStats(forceUpdate: false);
 	}
 }

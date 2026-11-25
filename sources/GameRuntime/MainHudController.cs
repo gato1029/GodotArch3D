@@ -45,6 +45,11 @@ public partial class MainHudController : Control
 				PanelDetalle.Show();
 				PanelDetalle.SetEntity(target);
 			}
+			else if(target.Has<ResourceDefinitionComponent>())
+			{
+				PanelDetalle.Show();
+				PanelDetalle.SetEntity(target);
+			}
 		}
 		else
 		{

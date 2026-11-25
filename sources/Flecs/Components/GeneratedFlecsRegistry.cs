@@ -608,6 +608,12 @@ public static class GeneratedFlecsRegistry
             .Member<bool>("Counted")
             ;
 
+        // Registro de Componente: SelectorComponent
+        world.Component<SelectorComponent>()
+            .Member<float>("Size")
+            .Member<Vector2>("Offset")
+            ;
+
         // Registro de Componente: MoveColliderComponent
         world.Component<MoveColliderComponent>()
             .Member<float>("Radius")

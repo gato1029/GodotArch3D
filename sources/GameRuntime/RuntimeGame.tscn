@@ -183,7 +183,7 @@ SourceTexture = SubResource("AtlasTexture_ln6sf")
 MaxFrameIndex = 23
 HFrames = 5
 VFrames = 5
-FrameIndex = 20
+FrameIndex = 1
 Playing = true
 metadata/_custom_type_script = "uid://bojaarghbss7"
 

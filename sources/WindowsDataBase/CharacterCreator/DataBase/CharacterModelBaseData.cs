@@ -11,9 +11,64 @@ using GodotFlecs.sources.Flecs.Components;
 using LiteDB;
 using SadRogue.Primitives;
 using System.Collections.Generic;
+using GodotEcsArch.sources.WindowsDataBase.Building.DataBase;
 
-namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
+namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase;
+public enum UnitRoleType
 {
+    NINGUNO,               // Enemigos base o personajes sin rol de trabajo
+    CONSTRUCTOR,
+    GUERRERO,
+    ARQUERO,
+    RECOLECTOR_TRABAJADOR
+}
+public struct BuilderTemplateConfig
+{
+    public float BuildSpeedMultiplier { get; set; }
+    public float BuildRange { get; set; }
+    public long[] AllowedStructureIds { get; set; }
+}
+
+public struct WarriorTemplateConfig
+{
+    public float MeleeRange { get; set; }
+    public float AttackCooldown { get; set; }
+}
+
+public struct ArcherTemplateConfig
+{
+    public int ProjectileId { get; set; }
+    public float AttackRange { get; set; }
+    public float MinAttackRange { get; set; }
+}
+
+public struct GathererTemplateConfig
+{
+    public int CarryCapacity { get; set; }
+    public float GatherSpeedMultiplier { get; set; }
+    public float GatherRange { get; set; }
+    public long[] AllowedResourceIds { get; set; }
+}
+    public class UnitEggData : IdDataLong
+    {
+        public string eggName { get; set; }
+        public string description { get; set; }
+        public long idTileSpriteData { get; set; }
+
+        // Referencia al CharacterModelBaseData que saldrá al eclosionar
+        public long targetCharacterId { get; set; }
+
+        // Reglas de creación / incubación
+        public float hatchTimeSeconds { get; set; }
+        public int populationCost { get; set; }
+        public CostInput[] costInputs { get; set; }
+
+        public UnitEggData()
+        {
+            id = EpochIdGenerator.NewId();
+        }
+    }
+    
     public struct UnitMoveData
     {
         public float radiusMove { get; set; }
@@ -23,6 +78,7 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
     {        
         public long idTileSpriteData { get; set; }
         public BehaviorType characterBehaviorType { get; set; }
+        public UnitRoleType unitRoleType { get; set; }
         public CharacterType characterType { get; set; }
         public UnitDirectionType unitDirectionType { get; set; }
         public UnitType unitType { get; set; }
@@ -99,4 +155,4 @@ namespace GodotEcsArch.sources.WindowsDataBase.CharacterCreator.DataBase
             }            
         }
     }
-}
+

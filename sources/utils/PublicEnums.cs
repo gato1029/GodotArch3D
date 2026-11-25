@@ -13,7 +13,8 @@ public enum CharacterType
 {
     MAIN,
     NPC,
-    ENEMIGO
+    ENEMIGO,
+    ALIADO
 }
 public enum BehaviorType   
 {
