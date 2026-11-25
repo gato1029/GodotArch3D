@@ -1,4 +1,4 @@
-﻿using Flecs.NET.Core;
+using Flecs.NET.Core;
 using GodotEcsArch.sources.BlackyEngine.Spatial;
 
 namespace GodotEcsArch.sources.GameRuntime.Internal.RTSControler;
@@ -44,7 +44,7 @@ public class RTSSelectionManager
     {
         ClearPreviousSelection();
 
-        float tolerance = 1.0f;
+        float tolerance = 1f;
         float minX = point.X - tolerance;
         float minY = point.Y - tolerance;
         float maxX = point.X + tolerance;
@@ -82,7 +82,11 @@ public class RTSSelectionManager
             GD.Print($"Unidad seleccionada por Spatial Hash (clic): {closestUnit.Id}");
             return;
         }
-
+         tolerance = 0f;
+         minX = point.X - tolerance;
+         minY = point.Y - tolerance;
+         maxX = point.X + tolerance;
+         maxY = point.Y + tolerance;
         // 2) Prioridad 2: Edificios estáticos
         Entity? closestBuilding = FindClosestStaticEntity(
             _world.State.StaticSpatialBuildings, point, minX, minY, maxX, maxY, teamIgnore);
@@ -209,7 +213,7 @@ public class RTSSelectionManager
         int count = grid.QueryRectNonAlloc(minX, minY, maxX, maxY, gridIds, teamIgnore);
 
         Entity bestEntity = default;
-        float bestDistSq = float.MaxValue;
+        float bestDistSq =0.25f;
 
         for (int i = 0; i < count; i++)
         {
@@ -275,10 +279,10 @@ public class RTSSelectionManager
                     if (ent.Has<RenderSelectionGPUComponent>())
                     {
                         ref var selector = ref ent.GetMut<RenderSelectionGPUComponent>();
-                        if (selector.rid != default && selector.instance != -1)
+                        if (selector.gpuIndex != default && selector.instance != -1)
                         {
-                            AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
-                            selector.rid = default;
+                            AtlasTexturesModsManager.Instance.DrivenRenderManager .FreeInstance(selector.gpuIndex, selector.instance);
+                            selector.gpuIndex = default;
                             selector.instance = -1;
                         }
                     }

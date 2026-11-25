@@ -43,7 +43,7 @@ public class BlackyResourcesCreator
     private readonly StaticSpatialChunkGrid<Entity> staticHashResource;
     private int _resourcesCount = 0;
 
-    private const bool DEBUG_COLLIDERS = false;
+    private const bool DEBUG_COLLIDERS = true;
     private int layer = (int)BlackyRenderLayer.Personajes_Arboles_Edificios;
     private Dictionary<int, List<int>> _colliderDebugMap = new();
     private readonly ConcurrentQueue<CreateResourceCommand> _commandQueue = new();

@@ -256,6 +256,7 @@ public class AtlasTexturesModsManager: SingletonBase<AtlasTexturesModsManager>
             switch (item.materialType)
             {
                 case MaterialType.INTERFACE:
+                    _atlasManager.RegisterTexture(item.idTextureAtlas, pathComplete, (int)RenderPipelineType.Static);
                     break;
                 case MaterialType.TERRENO:
                     _atlasManager.RegisterTexture(item.idTextureAtlas, pathComplete,(int)RenderPipelineType.Static);

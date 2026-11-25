@@ -80,9 +80,9 @@ internal class DeathCleanupSystem : FlecsSystemBase
                 if (entity.Has<RenderSelectionGPUComponent>())
                 {
                     var selector = entity.Get<RenderSelectionGPUComponent>();
-                    if (selector.rid != default && selector.instance != -1)
+                    if (selector.gpuIndex != default && selector.instance != -1)
                     {
-                        AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
+                        AtlasTexturesModsManager.Instance.DrivenRenderManager.FreeInstance(selector.gpuIndex, selector.instance);
                     }
                 }
                 if (entity.Has<FlowFieldFollowerComponent>())
@@ -193,9 +193,9 @@ internal class DestroyCleanupSystem : FlecsSystemBase
                 if (entity.Has<RenderSelectionGPUComponent>())
                 {
                     var selector = entity.Get<RenderSelectionGPUComponent>();
-                    if (selector.rid != default && selector.instance != -1)
+                    if (selector.gpuIndex != default && selector.instance != -1)
                     {
-                        AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
+                        AtlasTexturesModsManager.Instance.DrivenRenderManager.FreeInstance(selector.gpuIndex, selector.instance);
                     }
                 }
                 // -------------------------------------------------

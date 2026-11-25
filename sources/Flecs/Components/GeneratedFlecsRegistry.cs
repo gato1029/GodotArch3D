@@ -345,7 +345,7 @@ public static class GeneratedFlecsRegistry
 
         // Registro de Componente: RenderSelectionGPUComponent
         world.Component<RenderSelectionGPUComponent>()
-            .Member<Rid>("Rid")
+            .Member<int>("GpuIndex")
             .Member<int>("Instance")
             .Member<int>("LayerTextureMaterial")
             .Member<int>("LayerRender")

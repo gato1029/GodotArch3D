@@ -1,6 +1,8 @@
 using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Godot;
+using GodotEcsArch.sources.managers.GpuDriven;
+using GodotEcsArch.sources.managers.Mods;
 using GodotEcsArch.sources.utils;
 using GodotFlecs.sources.Flecs.Components;
 using GodotFlecs.sources.Flecs.Systems;
@@ -103,6 +105,8 @@ internal class SpriteSelectorTransformSystem : FlecsSystemBase
         qb.With<PositionComponent>()
           .With<RenderSelectionGPUComponent>()
           .With<SelectedTag>()
+          .With<UnitDefinitionComponent>()
+          .Without<StoppedTag>()
           .Without<DeadTag>()
           .Without<DestroyRequestTag>();          
     }
@@ -115,16 +119,24 @@ internal class SpriteSelectorTransformSystem : FlecsSystemBase
         {
             var e = it.Entity(i);
             ref var p = ref pos[i];
-            ref var r = ref ren[i];
+            ref var render = ref ren[i];
 
 
-            var transform = RenderingServer.MultimeshInstanceGetTransform(r.rid, r.instance);
+
+            //actualiza el buffer gpu
+            Vector2 posBuff = p.position + render.offset;
             float depthOffset = 0;
+            float z = CommonAtributes.CalculateSelection(depthOffset, p.height, render.layerRender, posBuff);
 
-            float z = CommonAtributes.CalculateSelection(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
+            AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(render.gpuIndex).SetBufferData(BufferSlot.Transform, render.instance, posBuff.X, posBuff.Y, z);
 
-            transform.Origin = new Vector3(p.position.X+r.offset.X, p.position.Y+r.offset.Y, z);
-            RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, transform);
+            //var transform = RenderingServer.MultimeshInstanceGetTransform(r.rid, r.instance);
+         
+
+            //float z = CommonAtributes.CalculateSelection(depthOffset, p.height, r.layerRender, p.position); // debemos usar esto apartir de ahora
+
+            //transform.Origin = new Vector3(p.position.X+r.offset.X, p.position.Y+r.offset.Y, z);
+            //RenderingServer.MultimeshInstanceSetTransform(r.rid, r.instance, transform);
         }
     }
 }

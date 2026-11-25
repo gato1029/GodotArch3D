@@ -990,10 +990,10 @@ public partial class RTSSelectionManagerPast : Node2D
                     ent.Remove<SelectedTag>();
 
                     ref var selector = ref ent.GetMut<RenderSelectionGPUComponent>();
-                    if (selector.rid != default && selector.instance != -1)
+                    if (selector.gpuIndex != default && selector.instance != -1)
                     {
-                        AtlasTexturesModsManager.Instance.FreeInstance(selector.rid, selector.instance);
-                        selector.rid = default;
+                        AtlasTexturesModsManager.Instance.DrivenRenderManager. FreeInstance(selector.gpuIndex, selector.instance);
+                        selector.gpuIndex = default;
                         selector.instance = -1;
                     }
                 }

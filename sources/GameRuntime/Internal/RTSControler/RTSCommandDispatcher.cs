@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Flecs.NET.Core;
@@ -24,7 +24,7 @@ public class RTSCommandDispatcher
     private const int MaxAttackSlots = 32;
     private const float DefaultUnitRadius = 0.6f;
     private const float SkipFirstWaypointRadius = 1.0f;
-    private ushort _playerTeamId = 1; // TODO: Reemplazar por la fuente real del equipo del jugador
+    private ushort _playerTeamId = 2; // TODO: Reemplazar por la fuente real del equipo del jugador
     public RTSCommandDispatcher(BlackyWorld world)
     {
         _world = world;
@@ -111,7 +111,19 @@ public class RTSCommandDispatcher
         if (selectedEntities.Count == 0) return;
 
         Vector2 groupCenter = Vector2.Zero;
-        foreach (var entity in selectedEntities) groupCenter += entity.Get<PositionComponent>().position;
+        foreach (var entity in selectedEntities)
+        {
+            if (!entity.IsAlive() || entity.Has<DeadTag>() )
+            {
+                selectedEntities.Remove(entity);
+            }
+            else
+            {
+                groupCenter += entity.Get<PositionComponent>().position;
+            }
+
+        }
+        if (selectedEntities.Count == 0) return;
         groupCenter /= selectedEntities.Count;
 
         Vector2 toTarget = targetPosition - groupCenter;
@@ -173,7 +185,10 @@ public class RTSCommandDispatcher
             if (entity.Has<PathReferenceComponent>())
             {
                 var oldPath = entity.Get<PathReferenceComponent>();
-                if (oldPath.PathId != pathId) _world.State.PathRegistryManager.ReleasePath(oldPath.PathId);
+                if (oldPath.PathId != pathId) // siempre liberamos el anterior
+                { 
+                    _world.State.PathRegistryManager.ReleasePath(oldPath.PathId); 
+                }
             }
 
             Vector2 entityPos = entity.Get<PositionComponent>().position;

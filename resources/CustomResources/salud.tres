@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TypeUI" format=3 uid="uid://1ptxwcvgwkah"]
+[gd_resource type="Resource" format=3 uid="uid://1ptxwcvgwkah"]
 
 [ext_resource type="Texture2D" uid="uid://bc3jw1qljmf21" path="res://resources/Textures/GameUI/ui.png" id="1_6dh1y"]
 [ext_resource type="Script" uid="uid://ccf4iab75pwtg" path="res://resources/CustomResources/TypeUI.cs" id="1_p1m80"]

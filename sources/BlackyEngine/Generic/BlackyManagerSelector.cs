@@ -29,65 +29,66 @@ internal class BlackyManagerSelector
 
         if (ent.Has<BuildingDefinitionComponent>())
         {
-            
+
         }
     }
 
     private static void CreateResourceSelector(Entity ent)
     {
-         AtlasModsManager.GetSpriteUniqueId(idCircle,out TileSpriteData tileSpriteData);
+        AtlasModsManager.GetSpriteUniqueId(idCircle, out TileSpriteData tileSpriteData);
         var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(tileSpriteData.spriteData.idModMaterial);
-        
-       // Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
-        Vector2 offset = tileSpriteData.spriteData.offsetInternal;
-        
-        var position =  ent.Get<PositionComponent>();
-        var positionCenter = position.tilePosition;
+
+        // Vector2 positionCenter = TilesHelper.TilePositionToWorldPosition(positionTile.X, positionTile.Y);
+        var selector = ent.Get<SelectorComponent>();
+        Vector2 offset =selector. offset;
+
+        var position = ent.Get<PositionComponent>();
+        var positionCenter = position.position;
         var heightRender = position.height;
-        
-        float depthOffset = tileSpriteData.spriteData.yDepthRenderFormat;
-        float z = CommonAtributes.Calculate(depthOffset, heightRender, layer, positionCenter);
+
+        float depthOffset = 0;
+        float z = CommonAtributes.CalculateSelection(depthOffset, heightRender, layer, positionCenter);
 
         Vector3 worldPosition = new(positionCenter.X + offset.X, positionCenter.Y + offset.Y, z);
-        
+        float scaleX = (selector.size * 3) / MeshCreator.PixelsToUnits(16f);
+        float scaleY = (selector.size * 3) / MeshCreator.PixelsToUnits(16f);
         AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
-            BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, tileSpriteData.spriteData.scale);
+            BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, scaleX);
         AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
             BufferSlot.StaticData, renderInstance.instanceId, tileSpriteData.spriteData.uv);
         AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
             BufferSlot.Flags, renderInstance.instanceId, tileSpriteData.spriteData.mirrorLocalX, tileSpriteData.spriteData.mirrorLocalY, 1, renderInstance.layer);
-        
-        ent.Set(new RenderGPUComponent(renderInstance.gpuDataIndex, renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer,
-            layer, depthOffset, tileSpriteData.spriteData.scale, offset));
-        
-        //ent.Set(new RenderSelectionGPUComponent(instance.rid, instance.instance, instance.layerTexture,layer,moveCollider.Offset));
+
+
+        ent.Set(new RenderSelectionGPUComponent(renderInstance.gpuDataIndex, renderInstance.instanceId, renderInstance.layer, layer, offset));
     }
 
     private static void CreateCircle(Entity ent)
     {
-        int sprite = AtlasModsManager.GetSpriteUniqueId(idCircle,out TileSpriteData tileSpriteData);        
-        var instance = AtlasTexturesModsManager.Instance.CreateInstanceRender(tileSpriteData.spriteData.idModMaterial);
+        int sprite = AtlasModsManager.GetSpriteUniqueId(idCircle, out TileSpriteData tileSpriteData);
+        var renderInstance = AtlasTexturesModsManager.Instance.CreateInstanceRenderGpu(tileSpriteData.spriteData.idModMaterial);
         var uv = tileSpriteData.spriteData.uv;
-        var position =  ent.Get<PositionComponent>();
+        var position = ent.Get<PositionComponent>();
         var moveCollider = ent.Get<MoveColliderComponent>();
-        
+
         float depthOffset = 0;
         float z = CommonAtributes.CalculateSelection(depthOffset, position.height, layer, position.position);
-
-        Transform3D transform = new Transform3D(Basis.Identity, Godot.Vector3.Zero);
-        transform.Origin = new Godot.Vector3(position.position.X +moveCollider.Offset.X , position.position.Y +moveCollider.Offset.Y , z);
-
+        Vector3 worldPosition = new(position.position.X + moveCollider.Offset.X, position.position.Y + moveCollider.Offset.Y, z);
         float scaleX = (moveCollider.Radius * 3) / MeshCreator.PixelsToUnits(16f);
         float scaleY = (moveCollider.Radius * 3) / MeshCreator.PixelsToUnits(16f);
 
-        transform = transform.ScaledLocal(new Godot.Vector3(scaleX,scaleY, 1));
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+              BufferSlot.Transform, renderInstance.instanceId, worldPosition.X, worldPosition.Y, worldPosition.Z, scaleX);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.StaticData, renderInstance.instanceId, tileSpriteData.spriteData.uv);
+        AtlasTexturesModsManager.Instance.DrivenRenderManager.GetGpuMeshData(renderInstance.gpuDataIndex).SetBufferData(
+            BufferSlot.Flags, renderInstance.instanceId, tileSpriteData.spriteData.mirrorLocalX, tileSpriteData.spriteData.mirrorLocalY, 1, renderInstance.layer);
 
-        RenderingServer.MultimeshInstanceSetTransform(instance.rid, instance.instance, transform); // luego comentar esto
-        RenderingServer.MultimeshInstanceSetCustomData(instance.rid, instance.instance, uv); 
-        RenderingServer.MultimeshInstanceSetColor(instance.rid, instance.instance, new Color(1, 1, 1, instance.layerTexture));
+        //ent.Set(new RenderGPUComponent(renderInstance.gpuDataIndex, renderInstance.multimeshRid, renderInstance.instanceId, 0, renderInstance.layer,
+        //    layer, depthOffset, tileSpriteData.spriteData.scale, offset));
 
-        ent.Set(new RenderSelectionGPUComponent(instance.rid, instance.instance, instance.layerTexture,layer,moveCollider.Offset));
+        ent.Set(new RenderSelectionGPUComponent(renderInstance.gpuDataIndex, renderInstance.instanceId, renderInstance.layer, layer, moveCollider.Offset));
 
-        
+
     }
 }

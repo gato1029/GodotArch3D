@@ -308,7 +308,8 @@ public record struct LayerRenderComponent
 
 public record struct RenderSelectionGPUComponent
 (
-    Rid rid,
+    int gpuIndex,
+    //Rid rid,
     int instance,    
     int layerTextureMaterial,
     int layerRender,
