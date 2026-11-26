@@ -76,29 +76,42 @@ public struct GathererTemplateConfig
     }
     public class CharacterModelBaseData : IdDataLong
     {        
+        public string Description { get; set; }
         public long idTileSpriteData { get; set; }
-        public BehaviorType characterBehaviorType { get; set; }
-        public UnitRoleType unitRoleType { get; set; }
-        public CharacterType characterType { get; set; }
+        public string colorBase { get; set; }
+        public float scale { get; set; } = 1f;
         public UnitDirectionType unitDirectionType { get; set; }
+        public bool isPersist { get; set; }
+
+        // --- 2. Tipo, rol y movimiento ---
+        public CharacterType characterType { get; set; }
+        public UnitRoleType unitRoleType { get; set; }
+        public BehaviorType characterBehaviorType { get; set; }
         public UnitType unitType { get; set; }
         public UnitMoveType unitMoveType { get; set; }
         public UnitMoveData unitMoveData { get; set; }
+
+        // --- 3. Combate y stats generales ---
         public UnitAttackType unitAttackType { get; set; }
-        public int idProjectile { get; set; }
-        public string colorBase { set; get; }
-        public string description { set; get; }
-        public float scale { set; get; } // si
+        public int idProjectile { get; set; } // Puedes mantenerlo aquí como fallback general o usar ArcherConfig
         public BonusData[] bonusDataArray { get; set; }
         public ElementsData[] damageDataArray { get; set; }
         public ElementsData[] defenseDataArray { get; set; }
         public StatsData[] statsDataArray { get; set; }
-        public bool isPersist { get; set; }
 
+        // --- 4. Parámetros específicos por rol (template) ---
+        public BuilderTemplateConfig BuilderConfig { get; set; }
+        public WarriorTemplateConfig WarriorConfig { get; set; }
+        public ArcherTemplateConfig ArcherConfig { get; set; }
+        public GathererTemplateConfig GathererConfig { get; set; }
+
+        // --- 5. Runtime (no persistir directo en LiteDB) ---
         [BsonIgnore]
         public List<FastCollider> bodyColliders { get; set; }
+
         [BsonIgnore]
         public FastCollider colliderUmbralAtaque { get; set; }
+
         public CharacterModelBaseData()
         {
             id = EpochIdGenerator.NewId();
